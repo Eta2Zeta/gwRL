@@ -1,0 +1,398 @@
+{
+  "_meta": {
+    "game": "Global War 1936 v4.3",
+    "source_rulebook_section": "Home Country (rulebook.txt lines 187-214)",
+    "description": "Nation-level Home Country data extracted from the rulebook definition and mapped to land node ids.",
+    "inputs": [
+      "gw36_manual_map.json",
+      "rulebook.txt"
+    ]
+  },
+  "non_listed_nation_rule": "Non-listed nations: all originally possessed land zones except offshore territories.",
+  "nations": {
+    "Germany": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_ger_bavaria",
+        "land_ger_berlin",
+        "land_ger_eastern_germany",
+        "land_ger_western_germany"
+      ],
+      "home_country_land_zone_names": [
+        "Bavaria",
+        "Berlin",
+        "Eastern Germany",
+        "Western Germany"
+      ]
+    },
+    "Japan": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_jap_hokkaido",
+        "land_jap_honshu",
+        "land_jap_kyushu",
+        "land_jap_tokyo"
+      ],
+      "home_country_land_zone_names": [
+        "Hokkaido",
+        "Honshu",
+        "Kyushu",
+        "Tokyo"
+      ]
+    },
+    "Italy": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_ita_lazio",
+        "land_ita_northern_italy",
+        "land_ita_rome",
+        "land_ita_southern_italy"
+      ],
+      "home_country_land_zone_names": [
+        "Lazio",
+        "Northern Italy",
+        "Rome",
+        "Southern Italy"
+      ]
+    },
+    "Great Britain": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_gbr_london",
+        "land_gbr_northern_england",
+        "land_gbr_scotland",
+        "land_gbr_southern_england"
+      ],
+      "home_country_land_zone_names": [
+        "London",
+        "Northern England",
+        "Scotland",
+        "Southern England"
+      ],
+      "missing_named_zones_in_map": [
+        "Northern Ireland"
+      ]
+    },
+    "FEC": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_india_benares",
+        "land_india_calcutta",
+        "land_india_delhi",
+        "land_india_maharashtra",
+        "land_india_punjab",
+        "land_india_southern_india"
+      ],
+      "home_country_land_zone_names": [
+        "Benares",
+        "Calcutta",
+        "Delhi",
+        "Maharashtra",
+        "Punjab",
+        "Southern India"
+      ]
+    },
+    "France": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_fra_alsace_lorraine",
+        "land_fra_aquitaine",
+        "land_fra_normandy",
+        "land_fra_paris",
+        "land_fra_picardy",
+        "land_fra_southern_france"
+      ],
+      "home_country_land_zone_names": [
+        "Alsace-Lorraine",
+        "Aquitaine",
+        "Normandy",
+        "Paris",
+        "Picardy",
+        "Southern France"
+      ]
+    },
+    "Vichy": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_fra_corsica",
+        "land_fra_southern_france"
+      ],
+      "home_country_land_zone_names": [
+        "Corsica",
+        "Southern France"
+      ]
+    },
+    "USSR": {
+      "rulebook_definition": "All originally possessed land zones with a Soviet roundel.",
+      "home_country_land_zone_ids": [
+        "land_usr_amur",
+        "land_usr_angara",
+        "land_usr_buryatia",
+        "land_usr_chita",
+        "land_usr_crimea",
+        "land_usr_donets_kuban",
+        "land_usr_eastern_ukraine",
+        "land_usr_gorky",
+        "land_usr_irkutsk",
+        "land_usr_kalmytskaya",
+        "land_usr_kaluga_oblast",
+        "land_usr_kamchatka",
+        "land_usr_karelia",
+        "land_usr_kiev",
+        "land_usr_kola",
+        "land_usr_leningrad",
+        "land_usr_magadan",
+        "land_usr_moscow",
+        "land_usr_north_sakhalin",
+        "land_usr_north_caucasia",
+        "land_usr_northern_belorussia",
+        "land_usr_northern_russia",
+        "land_usr_orel_kursk",
+        "land_usr_primorsky_krai",
+        "land_usr_saratov",
+        "land_usr_smolensk",
+        "land_usr_south_sakhalin",
+        "land_usr_southern_belorussia",
+        "land_usr_southern_ukraine",
+        "land_usr_southern_yakutia",
+        "land_usr_stalingrad",
+        "land_usr_stalino",
+        "land_usr_taurida",
+        "land_usr_transcaucasia",
+        "land_usr_tula_lipetsk",
+        "land_usr_vanavara",
+        "land_usr_western_russia",
+        "land_usr_western_ukraine",
+        "land_usr_yakutsk",
+        "land_usr_yaroslavl"
+      ],
+      "home_country_land_zone_names": [
+        "Amur",
+        "Angara",
+        "Buryatia",
+        "Chita",
+        "Crimea",
+        "Donets-Kuban",
+        "Eastern Ukraine",
+        "Gorky",
+        "Irkutsk",
+        "Kalmytskaya",
+        "Kaluga Oblast",
+        "Kamchatka",
+        "Karelia",
+        "Kiev",
+        "Kola",
+        "Leningrad",
+        "Magadan",
+        "Moscow",
+        "North Sakhalin",
+        "North-Caucasia",
+        "Northern Belorussia",
+        "Northern Russia",
+        "Orel-Kursk",
+        "Primorsky Krai",
+        "Saratov",
+        "Smolensk",
+        "South Sakhalin",
+        "Southern Belorussia",
+        "Southern Ukraine",
+        "Southern Yakutia",
+        "Stalingrad",
+        "Stalino",
+        "Taurida",
+        "Transcaucasia",
+        "Tula-Lipetsk",
+        "Vanavara",
+        "Western Russia",
+        "Western Ukraine",
+        "Yakutsk",
+        "Yaroslavl"
+      ]
+    },
+    "ANZAC": {
+      "rulebook_definition": "All land zones in Australia and New Zealand.",
+      "home_country_land_zone_ids": [
+        "land_aus_new_south_wales",
+        "land_nz_north_island",
+        "land_aus_northern_territory",
+        "land_aus_queensland",
+        "land_aus_south_australia",
+        "land_nz_south_island",
+        "land_aus_tasmania",
+        "land_aus_western_australia"
+      ],
+      "home_country_land_zone_names": [
+        "New South Wales",
+        "North Island",
+        "Northern Territory",
+        "Queensland",
+        "South Australia",
+        "South Island",
+        "Tasmania",
+        "Western Australia"
+      ]
+    },
+    "USA": {
+      "rulebook_definition": "Contiguous USA zones adjoining Washington, D.C.",
+      "home_country_land_zone_ids": [
+        "land_usa_appalachia",
+        "land_usa_chicago",
+        "land_usa_great_lakes",
+        "land_usa_great_plains",
+        "land_usa_heartlands",
+        "land_usa_midwest",
+        "land_usa_new_orleans",
+        "land_usa_new_york",
+        "land_usa_pacific_northwest",
+        "land_usa_san_francisco",
+        "land_usa_southeastern_united_states",
+        "land_usa_southwest_united_states",
+        "land_usa_texas",
+        "land_usa_the_carolinas",
+        "land_usa_the_northeast",
+        "land_usa_upper_midwest",
+        "land_usa_washington_dc",
+        "land_usa_western_united_states"
+      ],
+      "home_country_land_zone_names": [
+        "Appalachia",
+        "Chicago",
+        "Great Lakes",
+        "Great Plains",
+        "Heartlands",
+        "Midwest",
+        "New Orleans",
+        "New York",
+        "Pacific Northwest",
+        "San Francisco",
+        "Southeastern United States",
+        "Southwest United States",
+        "Texas",
+        "The Carolinas",
+        "The Northeast",
+        "Upper Midwest",
+        "Washington, D.C.",
+        "Western United States"
+      ]
+    },
+    "CCP": {
+      "rulebook_definition": "All zones originally with Chinese warlord/KMT/CCP/Manchukuo/Mongolian roundels, plus Formosa and Hong Kong.",
+      "home_country_land_zone_ids": [
+        "land_china_beiping",
+        "land_mongolia_central_mongolia",
+        "land_manchuria_eastern",
+        "land_formosa",
+        "land_hong_kong",
+        "land_china_hopeh",
+        "land_china_hunan",
+        "land_mongolia_kherlen",
+        "land_mongolia_kobdo",
+        "land_kwangsi",
+        "land_kwangtung",
+        "land_china_kweichow",
+        "land_china_nanking",
+        "land_manchuria_northern",
+        "land_manchuria_rehe",
+        "land_china_shantung",
+        "land_china_shensi",
+        "land_china_sinkiang",
+        "land_china_suiyuan",
+        "land_china_szechwan",
+        "land_mongolia_tannu_tuva",
+        "land_china_tsinghai",
+        "land_mongolia_ulyassutai",
+        "land_manchuria_western",
+        "land_china_yunnan"
+      ],
+      "home_country_land_zone_names": [
+        "Beiping",
+        "Central Mongolia",
+        "Eastern Manchuria",
+        "Formosa",
+        "Hong Kong",
+        "Hopeh",
+        "Hunan",
+        "Kherlen",
+        "Kobdo",
+        "Kwangsi",
+        "Kwangtung",
+        "Kweichow",
+        "Nanking",
+        "Northern Manchuria",
+        "Rehe",
+        "Shantung",
+        "Shensi",
+        "Sinkiang",
+        "Suiyuan",
+        "Szechwan",
+        "Tannu Tuva",
+        "Tsinghai",
+        "Ulyassutai",
+        "Western Manchuria",
+        "Yunnan"
+      ]
+    },
+    "KMT": {
+      "rulebook_definition": "All zones originally with Chinese warlord/KMT/CCP/Manchukuo/Mongolian roundels, plus Formosa and Hong Kong.",
+      "home_country_land_zone_ids": [
+        "land_china_beiping",
+        "land_mongolia_central_mongolia",
+        "land_manchuria_eastern",
+        "land_formosa",
+        "land_hong_kong",
+        "land_china_hopeh",
+        "land_china_hunan",
+        "land_mongolia_kherlen",
+        "land_mongolia_kobdo",
+        "land_kwangsi",
+        "land_kwangtung",
+        "land_china_kweichow",
+        "land_china_nanking",
+        "land_manchuria_northern",
+        "land_manchuria_rehe",
+        "land_china_shantung",
+        "land_china_shensi",
+        "land_china_sinkiang",
+        "land_china_suiyuan",
+        "land_china_szechwan",
+        "land_mongolia_tannu_tuva",
+        "land_china_tsinghai",
+        "land_mongolia_ulyassutai",
+        "land_manchuria_western",
+        "land_china_yunnan"
+      ],
+      "home_country_land_zone_names": [
+        "Beiping",
+        "Central Mongolia",
+        "Eastern Manchuria",
+        "Formosa",
+        "Hong Kong",
+        "Hopeh",
+        "Hunan",
+        "Kherlen",
+        "Kobdo",
+        "Kwangsi",
+        "Kwangtung",
+        "Kweichow",
+        "Nanking",
+        "Northern Manchuria",
+        "Rehe",
+        "Shantung",
+        "Shensi",
+        "Sinkiang",
+        "Suiyuan",
+        "Szechwan",
+        "Tannu Tuva",
+        "Tsinghai",
+        "Ulyassutai",
+        "Western Manchuria",
+        "Yunnan"
+      ]
+    },
+    "Free France": {
+      "rulebook_definition": "Does not have a Home Country.",
+      "home_country_land_zone_ids": [],
+      "home_country_land_zone_names": []
+    }
+  }
+}
