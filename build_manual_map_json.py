@@ -10,6 +10,7 @@ DEFAULT_EDGE = {
     "river_crossing": False,
     "railway_connection": False,
     "railway_gauge": None,
+    "railroads": [],
     "port_or_dock_connection": False,
     "canal_or_strait": None,
     "narrow_crossing": False,
@@ -30,6 +31,7 @@ DEFAULT_NODE = {
     "source": "llm_manual_from_region_images",
     "source_confidence": 0.7,
     "neighbors": [],
+    "rail_secondary_edges": [],
 }
 
 
@@ -45,8 +47,19 @@ def add_node(nodes, node_id, **attrs):
     node["id"] = node_id
     node["name"] = node.get("name") or node_id
     node["neighbors"] = []
+    node["rail_secondary_edges"] = []
     nodes[node_id] = node
     return node
+
+
+def find_edge(nodes, src, dst):
+    node = nodes.get(src)
+    if not node:
+        return None
+    for edge in node.get("neighbors", []):
+        if edge["neighbor_id"] == dst:
+            return edge
+    return None
 
 
 def set_edge(nodes, src, dst, **attrs):
@@ -67,8 +80,17 @@ def set_edge(nodes, src, dst, **attrs):
     for k, v in attrs.items():
         target[k] = v
 
+    if "railroads" not in target or target["railroads"] is None:
+        target["railroads"] = []
+
     if target["railway_connection"] and not target["railway_gauge"]:
         target["railway_gauge"] = "narrow"
+
+    if not target["railway_connection"]:
+        target["railway_gauge"] = None
+        target["railroads"] = []
+
+    return target
 
 
 def link(nodes, a, b, **attrs):
@@ -76,7 +98,92 @@ def link(nodes, a, b, **attrs):
     set_edge(nodes, b, a, **attrs)
 
 
-def link_rail(nodes, a, b, border_terrain="normal", river_crossing=False, has_river=False, confidence=0.78):
+def next_rail_id(nodes, a, b):
+    edge = find_edge(nodes, a, b)
+    next_idx = len(edge.get("railroads", [])) + 1 if edge else 1
+    pair = "__".join(sorted([a, b]))
+    return f"rail__{pair}__{next_idx}"
+
+
+def add_rail_segment(nodes, src, dst, rail_id, gauge, confidence):
+    edge = find_edge(nodes, src, dst)
+    if edge is None:
+        raise KeyError(f"Cannot attach rail {rail_id}; edge {src} -> {dst} not found")
+
+    railroads = edge.setdefault("railroads", [])
+    if not any(r.get("rail_id") == rail_id for r in railroads):
+        railroads.append(
+            {
+                "rail_id": rail_id,
+                "railway_gauge": gauge,
+                "inference_confidence": confidence,
+            }
+        )
+
+    edge["railway_connection"] = True
+    edge["railway_gauge"] = gauge
+
+
+def connect_rail_edges(
+    nodes,
+    node_id,
+    from_neighbor_id,
+    from_rail_id,
+    to_neighbor_id,
+    to_rail_id,
+    confidence=0.78,
+    bidirectional=True,
+):
+    if node_id not in nodes:
+        raise KeyError(f"Cannot connect rails at missing node {node_id}")
+
+    node = nodes[node_id]
+
+    from_edge = find_edge(nodes, node_id, from_neighbor_id)
+    to_edge = find_edge(nodes, node_id, to_neighbor_id)
+    if not from_edge or not to_edge:
+        raise KeyError(f"Missing neighbor edge at {node_id} for rail-secondary connection")
+
+    from_has = any(r.get("rail_id") == from_rail_id for r in from_edge.get("railroads", []))
+    to_has = any(r.get("rail_id") == to_rail_id for r in to_edge.get("railroads", []))
+    if not (from_has and to_has):
+        raise ValueError(
+            f"Cannot connect missing rail ids at {node_id}: {from_neighbor_id}/{from_rail_id} -> {to_neighbor_id}/{to_rail_id}"
+        )
+
+    def _add_connection(a_neighbor, a_rail, b_neighbor, b_rail):
+        connection_id = f"rconn__{node_id}__{a_neighbor}__{a_rail}__{b_neighbor}__{b_rail}"
+        entry = {
+            "connection_id": connection_id,
+            "from_neighbor_id": a_neighbor,
+            "from_rail_id": a_rail,
+            "to_neighbor_id": b_neighbor,
+            "to_rail_id": b_rail,
+            "inference_confidence": confidence,
+        }
+        edges = node.setdefault("rail_secondary_edges", [])
+        if not any(x.get("connection_id") == connection_id for x in edges):
+            edges.append(entry)
+
+    _add_connection(from_neighbor_id, from_rail_id, to_neighbor_id, to_rail_id)
+    if bidirectional and not (from_neighbor_id == to_neighbor_id and from_rail_id == to_rail_id):
+        _add_connection(to_neighbor_id, to_rail_id, from_neighbor_id, from_rail_id)
+
+
+def link_rail(
+    nodes,
+    a,
+    b,
+    border_terrain="normal",
+    river_crossing=False,
+    has_river=False,
+    rail_id=None,
+    gauge="narrow",
+    confidence=0.78,
+):
+    if rail_id is None:
+        rail_id = next_rail_id(nodes, a, b)
+
     link(
         nodes,
         a,
@@ -85,9 +192,12 @@ def link_rail(nodes, a, b, border_terrain="normal", river_crossing=False, has_ri
         has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=True,
-        railway_gauge="narrow",
+        railway_gauge=gauge,
         inference_confidence=confidence,
     )
+
+    add_rail_segment(nodes, a, b, rail_id=rail_id, gauge=gauge, confidence=confidence)
+    add_rail_segment(nodes, b, a, rail_id=rail_id, gauge=gauge, confidence=confidence)
 
 
 def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, has_river=False, confidence=0.76):
@@ -129,7 +239,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, ports/docks, and straits/canals used by RL action masking.",
+            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, ports/docks, and straits/canals used by RL action masking. Rail-enabled edges include `railroads` with per-rail IDs; nodes include `rail_secondary_edges` to map rail continuity through multi-rail junction tiles.",
             "build": {
                 "source_images": [
                     "original_regions/europe_sub/europe_nw.png",
@@ -624,11 +734,11 @@ def build():
     # Additional manual links
     link(nodes, "land_jap_tokyo", "sea_p16", border_terrain="coast", port_or_dock_connection=True, inference_confidence=0.7)
     link(nodes, "land_jap_honshu", "sea_p16", border_terrain="coast", port_or_dock_connection=True, inference_confidence=0.7)
-    link(nodes, "land_jap_honshu", "land_jap_hokkaido", border_terrain="normal", railway_connection=True, railway_gauge="narrow", inference_confidence=0.65)
-    link(nodes, "land_jap_honshu", "land_jap_kyushu", border_terrain="normal", railway_connection=True, railway_gauge="narrow", inference_confidence=0.65)
+    link_rail(nodes, "land_jap_honshu", "land_jap_hokkaido", confidence=0.65)
+    link_rail(nodes, "land_jap_honshu", "land_jap_kyushu", confidence=0.65)
 
-    link(nodes, "land_usa_new_york", "land_usa_chicago", border_terrain="normal", railway_connection=True, railway_gauge="broad", inference_confidence=0.66)
-    link(nodes, "land_usa_san_francisco", "land_usa_chicago", border_terrain="normal", railway_connection=True, railway_gauge="broad", inference_confidence=0.66)
+    link_rail(nodes, "land_usa_new_york", "land_usa_chicago", gauge="broad", confidence=0.66)
+    link_rail(nodes, "land_usa_san_francisco", "land_usa_chicago", gauge="broad", confidence=0.66)
 
     # Core Western Europe land adjacencies
     link_rail(nodes, "land_neu_netherlands", "land_neu_belgium")
@@ -959,11 +1069,43 @@ def build():
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
 
+    rail_hopeh_shensi_beiping = "rail__china__hopeh_shensi_beiping"
+    rail_hopeh_shantung_beiping = "rail__china__hopeh_shantung_beiping"
+
     link_land(nodes, "land_china_suiyuan", "land_china_hopeh")
     link_land(nodes, "land_china_suiyuan", "land_china_beiping")
-    link_land(nodes, "land_china_hopeh", "land_china_beiping")
-    link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
-    link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
+    link_rail(nodes, "land_china_hopeh", "land_china_beiping", rail_id=rail_hopeh_shensi_beiping)
+    link_rail(nodes, "land_china_hopeh", "land_china_beiping", rail_id=rail_hopeh_shantung_beiping)
+    link_rail(
+        nodes,
+        "land_china_hopeh",
+        "land_china_shantung",
+        river_crossing=True,
+        rail_id=rail_hopeh_shantung_beiping,
+    )
+    link_rail(
+        nodes,
+        "land_china_hopeh",
+        "land_china_shensi",
+        river_crossing=True,
+        rail_id=rail_hopeh_shensi_beiping,
+    )
+    connect_rail_edges(
+        nodes,
+        "land_china_hopeh",
+        "land_china_shensi",
+        rail_hopeh_shensi_beiping,
+        "land_china_beiping",
+        rail_hopeh_shensi_beiping,
+    )
+    connect_rail_edges(
+        nodes,
+        "land_china_hopeh",
+        "land_china_shantung",
+        rail_hopeh_shantung_beiping,
+        "land_china_beiping",
+        rail_hopeh_shantung_beiping,
+    )
     link_land(nodes, "land_china_beiping", "land_china_shantung")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
     link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
@@ -1315,6 +1457,34 @@ def build():
             seen[e["neighbor_id"]] = e
         node["neighbors"] = [seen[k] for k in sorted(seen.keys())]
 
+        for edge in node["neighbors"]:
+            rails = edge.get("railroads") or []
+            rail_seen = {}
+            for rail in rails:
+                rail_id = rail.get("rail_id")
+                if rail_id:
+                    rail_seen[rail_id] = rail
+
+            if edge.get("railway_connection") and not rail_seen:
+                fallback_pair = "__".join(sorted([nid, edge["neighbor_id"]]))
+                fallback_rail_id = f"rail__{fallback_pair}__1"
+                rail_seen[fallback_rail_id] = {
+                    "rail_id": fallback_rail_id,
+                    "railway_gauge": edge.get("railway_gauge") or "narrow",
+                    "inference_confidence": edge.get("inference_confidence", 0.7),
+                }
+
+            edge["railroads"] = [rail_seen[k] for k in sorted(rail_seen.keys())]
+            edge["railway_connection"] = bool(edge["railroads"])
+            edge["railway_gauge"] = edge["railroads"][0]["railway_gauge"] if edge["railroads"] else None
+
+        sec_seen = {}
+        for sec in node.get("rail_secondary_edges", []):
+            sid = sec.get("connection_id")
+            if sid:
+                sec_seen[sid] = sec
+        node["rail_secondary_edges"] = [sec_seen[k] for k in sorted(sec_seen.keys())]
+
     # Ensure symmetric closure (best-effort defaults for missing reverse)
     for src, node in list(nodes.items()):
         for e in list(node.get("neighbors", [])):
@@ -1323,7 +1493,7 @@ def build():
                 continue
             revs = [x for x in nodes[dst].get("neighbors", []) if x["neighbor_id"] == src]
             if not revs:
-                set_edge(nodes, dst, src, **{k: v for k, v in e.items() if k != "neighbor_id"})
+                set_edge(nodes, dst, src, **{k: deepcopy(v) for k, v in e.items() if k != "neighbor_id"})
 
     # Deterministic node ordering
     doc["nodes"] = {k: nodes[k] for k in sorted(nodes.keys())}
