@@ -9,7 +9,7 @@ DEFAULT_EDGE = {
     "has_river": False,
     "river_crossing": False,
     "railway_connection": False,
-    "railway_gauge": None,
+    "gauge_change": False,
     "railroads": [],
     "port_or_dock_connection": False,
     "canal_or_strait": None,
@@ -91,11 +91,8 @@ def set_edge(nodes, src, dst, **attrs):
     if "railroads" not in target or target["railroads"] is None:
         target["railroads"] = []
 
-    if target["railway_connection"] and not target["railway_gauge"]:
-        target["railway_gauge"] = "narrow"
-
     if not target["railway_connection"]:
-        target["railway_gauge"] = None
+        target["gauge_change"] = False
         target["railroads"] = []
 
     return target
@@ -120,7 +117,7 @@ def next_rail_id(nodes, a, b):
     return f"{base}_{idx}"
 
 
-def add_rail_segment(nodes, src, dst, rail_id, gauge, confidence):
+def add_rail_segment(nodes, src, dst, rail_id, confidence):
     edge = find_edge(nodes, src, dst)
     if edge is None:
         raise KeyError(f"Cannot attach rail {rail_id}; edge {src} -> {dst} not found")
@@ -130,13 +127,13 @@ def add_rail_segment(nodes, src, dst, rail_id, gauge, confidence):
         railroads.append(
             {
                 "rail_id": rail_id,
-                "railway_gauge": gauge,
+                "gauge_change": False,
                 "inference_confidence": confidence,
             }
         )
 
     edge["railway_connection"] = True
-    edge["railway_gauge"] = gauge
+    edge["gauge_change"] = False
 
 
 def connect_rail_edges(
@@ -161,12 +158,10 @@ def connect_rail_edges(
 
     if from_rail_id is None and to_rail_id is None:
         auto_rail_id = f"rail_{zone_name_part(from_neighbor_id)}_{zone_name_part(node_id)}_{zone_name_part(to_neighbor_id)}"
-        from_gauge = from_edge.get("railway_gauge") or "narrow"
-        to_gauge = to_edge.get("railway_gauge") or from_gauge
-        add_rail_segment(nodes, node_id, from_neighbor_id, auto_rail_id, from_gauge, confidence)
-        add_rail_segment(nodes, from_neighbor_id, node_id, auto_rail_id, from_gauge, confidence)
-        add_rail_segment(nodes, node_id, to_neighbor_id, auto_rail_id, to_gauge, confidence)
-        add_rail_segment(nodes, to_neighbor_id, node_id, auto_rail_id, to_gauge, confidence)
+        add_rail_segment(nodes, node_id, from_neighbor_id, auto_rail_id, confidence)
+        add_rail_segment(nodes, from_neighbor_id, node_id, auto_rail_id, confidence)
+        add_rail_segment(nodes, node_id, to_neighbor_id, auto_rail_id, confidence)
+        add_rail_segment(nodes, to_neighbor_id, node_id, auto_rail_id, confidence)
         from_rail_id = auto_rail_id
         to_rail_id = auto_rail_id
     elif from_rail_id is None or to_rail_id is None:
@@ -206,14 +201,12 @@ def link_rail(
     river_crossing=False,
     has_river=False,
     rail_id=None,
-    gauge="narrow",
     confidence=0.78,
 ):
     if rail_id is None:
         existing_edge = find_edge(nodes, a, b)
         if existing_edge and existing_edge.get("railroads"):
             rail_id = existing_edge["railroads"][0]["rail_id"]
-            gauge = existing_edge["railroads"][0].get("railway_gauge") or gauge
         else:
             rail_id = next_rail_id(nodes, a, b)
 
@@ -225,12 +218,12 @@ def link_rail(
         has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=True,
-        railway_gauge=gauge,
+        gauge_change=False,
         inference_confidence=confidence,
     )
 
-    add_rail_segment(nodes, a, b, rail_id=rail_id, gauge=gauge, confidence=confidence)
-    add_rail_segment(nodes, b, a, rail_id=rail_id, gauge=gauge, confidence=confidence)
+    add_rail_segment(nodes, a, b, rail_id=rail_id, confidence=confidence)
+    add_rail_segment(nodes, b, a, rail_id=rail_id, confidence=confidence)
 
 
 def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, has_river=False, confidence=0.76):
@@ -242,7 +235,7 @@ def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, has_ri
         has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=False,
-        railway_gauge=None,
+        gauge_change=False,
         port_or_dock_connection=False,
         canal_or_strait=None,
         narrow_crossing=False,
@@ -259,7 +252,7 @@ def link_land_sea(nodes, land, sea, port=False, canal=None, narrow=False, confid
         has_river=False,
         river_crossing=False,
         railway_connection=False,
-        railway_gauge=None,
+        gauge_change=False,
         port_or_dock_connection=port,
         canal_or_strait=canal,
         narrow_crossing=narrow,
@@ -272,7 +265,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, ports/docks, and straits/canals used by RL action masking. Rail-enabled edges include `railroads` with per-rail IDs; nodes include `rail_secondary_edges` to map rail continuity through multi-rail junction tiles.",
+            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, ports/docks, and straits/canals used by RL action masking. Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag; nodes include `rail_secondary_edges` to map rail continuity through multi-rail junction tiles.",
             "build": {
                 "source_images": [
                     "original_regions/europe_sub/europe_nw.png",
@@ -623,18 +616,18 @@ def build():
         ("land_manchuria_western", "Western Manchuria", "normal", 1, "Japan", False, False),
         ("land_manchuria_eastern", "Eastern Manchuria", "normal", 1, "Japan", False, False),
         ("land_manchuria_rehe", "Rehe", "normal", 1, "Japan", False, False),
-        ("land_china_suiyuan", "Suiyuan", "normal", 1, "China", False, False),
-        ("land_china_hopeh", "Hopeh", "normal", 1, "China", False, False),
-        ("land_china_beiping", "Beiping", "city", 2, "China", False, False),
-        ("land_china_shantung", "Shantung", "normal", 2, "China", False, False),
-        ("land_china_nanking", "Nanking", "city", 2, "China", False, False),
-        ("land_china_hunan", "Hunan", "normal", 2, "China", False, False),
-        ("land_china_shensi", "Shensi", "normal", 2, "China", False, False),
-        ("land_china_szechwan", "Szechwan", "mountain", 2, "China", False, False),
-        ("land_china_kweichow", "Kweichow", "mountain", 0, "China", False, False),
-        ("land_china_yunnan", "Yunnan", "mountain", 1, "China", False, False),
-        ("land_china_tsinghai", "Tsinghai", "mountain", 0, "China", False, False),
-        ("land_china_sinkiang", "Sinkiang", "mountain", 0, "China", False, False),
+        ("land_china_suiyuan", "Suiyuan", "normal", 1, "Mengjiang", False, False),
+        ("land_china_hopeh", "Hopeh", "normal", 1, "Zhili Clique", False, False),
+        ("land_china_beiping", "Beiping", "city", 2, "Zhili Clique", False, False),
+        ("land_china_shantung", "Shantung", "normal", 2, "KMT", False, False),
+        ("land_china_nanking", "Nanking", "city", 2, "KMT", False, False),
+        ("land_china_hunan", "Hunan", "normal", 2, "KMT", False, False),
+        ("land_china_shensi", "Shensi", "normal", 2, "CCP", False, False),
+        ("land_china_szechwan", "Szechwan", "mountain", 2, "KMT", False, False),
+        ("land_china_kweichow", "Kweichow", "mountain", 0, "KMT", False, False),
+        ("land_china_yunnan", "Yunnan", "mountain", 1, "Yunnan Clique", False, False),
+        ("land_china_tsinghai", "Tsinghai", "mountain", 0, "Ma Clique", False, False),
+        ("land_china_sinkiang", "Sinkiang", "mountain", 0, "Sinkiang Clique", False, False),
         ("land_jap_tokyo", "Tokyo", "city", 3, "Japan", True, True),
         ("land_jap_honshu", "Honshu", "normal", 2, "Japan", False, False),
         ("land_jap_hokkaido", "Hokkaido", "forest", 1, "Japan", False, False),
@@ -643,7 +636,7 @@ def build():
         ("land_formosa", "Formosa", "normal", 2, "Japan", False, False),
         ("land_hainan", "Hainan", "normal", 1, "Japan", False, False),
         ("land_hong_kong", "Hong Kong", "city", 2, "United Kingdom", False, False),
-        ("land_kwangtung", "Kwangtung", "normal", 2, "China", False, False),
+        ("land_kwangtung", "Kwangtung", "normal", 2, "Guangxi Clique", False, False),
         ("land_annam_tonkin", "Annam-Tonkin", "jungle", 1, "France", False, False),
         ("land_cochinchina", "Cochinchina", "jungle", 1, "France", False, False),
         ("land_siam", "Siam", "jungle", 1, "Siam", False, False),
@@ -770,8 +763,8 @@ def build():
     link_rail(nodes, "land_jap_honshu", "land_jap_hokkaido", confidence=0.65)
     link_rail(nodes, "land_jap_honshu", "land_jap_kyushu", confidence=0.65)
 
-    link_rail(nodes, "land_usa_new_york", "land_usa_chicago", gauge="broad", confidence=0.66)
-    link_rail(nodes, "land_usa_san_francisco", "land_usa_chicago", gauge="broad", confidence=0.66)
+    link_rail(nodes, "land_usa_new_york", "land_usa_chicago", confidence=0.66)
+    link_rail(nodes, "land_usa_san_francisco", "land_usa_chicago", confidence=0.66)
 
     # Core Western Europe land adjacencies
     link_rail(nodes, "land_neu_netherlands", "land_neu_belgium")
@@ -1473,13 +1466,13 @@ def build():
                 fallback_rail_id = f"rail_{n1}_{n2}"
                 rail_seen[fallback_rail_id] = {
                     "rail_id": fallback_rail_id,
-                    "railway_gauge": edge.get("railway_gauge") or "narrow",
+                    "gauge_change": False,
                     "inference_confidence": edge.get("inference_confidence", 0.7),
                 }
 
             edge["railroads"] = [rail_seen[k] for k in sorted(rail_seen.keys())]
             edge["railway_connection"] = bool(edge["railroads"])
-            edge["railway_gauge"] = edge["railroads"][0]["railway_gauge"] if edge["railroads"] else None
+            edge["gauge_change"] = any(r.get("gauge_change", False) for r in edge["railroads"])
 
         sec_seen = {}
         for sec in node.get("rail_secondary_edges", []):
@@ -1497,6 +1490,24 @@ def build():
             revs = [x for x in nodes[dst].get("neighbors", []) if x["neighbor_id"] == src]
             if not revs:
                 set_edge(nodes, dst, src, **{k: deepcopy(v) for k, v in e.items() if k != "neighbor_id"})
+
+    # Gauge-change rule: only rail links crossing USSR <-> non-USSR are marked as a gauge change.
+    for src, node in nodes.items():
+        src_owner = node.get("original_owner")
+        for edge in node.get("neighbors", []):
+            if not edge.get("railway_connection"):
+                edge["gauge_change"] = False
+                continue
+
+            dst = edge["neighbor_id"]
+            dst_owner = nodes[dst].get("original_owner") if dst in nodes else None
+            is_ussr_cross_border = (
+                (src_owner == "Soviet Union" and dst_owner != "Soviet Union")
+                or (dst_owner == "Soviet Union" and src_owner != "Soviet Union")
+            )
+            edge["gauge_change"] = bool(is_ussr_cross_border)
+            for rail in edge.get("railroads", []):
+                rail["gauge_change"] = bool(is_ussr_cross_border)
 
     # Deterministic node ordering
     doc["nodes"] = {k: nodes[k] for k in sorted(nodes.keys())}

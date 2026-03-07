@@ -136,10 +136,24 @@ def build():
         "Contiguous USA zones adjoining Washington, D.C.",
     )
 
+    chinese_roundel_owners = {
+        "China",
+        "KMT",
+        "CCP",
+        "Yunnan Clique",
+        "Szechwan Clique",
+        "Ma Clique",
+        "Sinkiang Clique",
+        "Tibet",
+        "Zhili Clique",
+        "Mengjiang",
+        "Guangxi Clique",
+        "Mongolia",
+    }
     china_ids = {
         node_id
         for node_id, node in nodes.items()
-        if node.get("type") == "land" and node.get("original_owner") in {"China", "Mongolia"}
+        if node.get("type") == "land" and node.get("original_owner") in chinese_roundel_owners
     }
     china_ids.update(
         node_id for node_id in nodes if node_id.startswith("land_manchuria_")
