@@ -62,6 +62,14 @@ def find_edge(nodes, src, dst):
     return None
 
 
+def zone_name_part(node_id):
+    if node_id.startswith("land_"):
+        parts = node_id.split("_", 2)
+        if len(parts) == 3:
+            return parts[2]
+    return node_id
+
+
 def set_edge(nodes, src, dst, **attrs):
     if src not in nodes or dst not in nodes:
         missing = [node_id for node_id in (src, dst) if node_id not in nodes]
@@ -100,9 +108,16 @@ def link(nodes, a, b, **attrs):
 
 def next_rail_id(nodes, a, b):
     edge = find_edge(nodes, a, b)
-    next_idx = len(edge.get("railroads", [])) + 1 if edge else 1
-    pair = "__".join(sorted([a, b]))
-    return f"rail__{pair}__{next_idx}"
+    existing = {r.get("rail_id") for r in (edge.get("railroads", []) if edge else [])}
+    n1, n2 = sorted([zone_name_part(a), zone_name_part(b)])
+    base = f"rail_{n1}_{n2}"
+    if base not in existing:
+        return base
+
+    idx = 2
+    while f"{base}_{idx}" in existing:
+        idx += 1
+    return f"{base}_{idx}"
 
 
 def add_rail_segment(nodes, src, dst, rail_id, gauge, confidence):
@@ -128,9 +143,9 @@ def connect_rail_edges(
     nodes,
     node_id,
     from_neighbor_id,
-    from_rail_id,
     to_neighbor_id,
-    to_rail_id,
+    from_rail_id=None,
+    to_rail_id=None,
     confidence=0.78,
     bidirectional=True,
 ):
@@ -144,15 +159,28 @@ def connect_rail_edges(
     if not from_edge or not to_edge:
         raise KeyError(f"Missing neighbor edge at {node_id} for rail-secondary connection")
 
-    from_has = any(r.get("rail_id") == from_rail_id for r in from_edge.get("railroads", []))
-    to_has = any(r.get("rail_id") == to_rail_id for r in to_edge.get("railroads", []))
-    if not (from_has and to_has):
-        raise ValueError(
-            f"Cannot connect missing rail ids at {node_id}: {from_neighbor_id}/{from_rail_id} -> {to_neighbor_id}/{to_rail_id}"
-        )
+    if from_rail_id is None and to_rail_id is None:
+        auto_rail_id = f"rail_{zone_name_part(from_neighbor_id)}_{zone_name_part(node_id)}_{zone_name_part(to_neighbor_id)}"
+        from_gauge = from_edge.get("railway_gauge") or "narrow"
+        to_gauge = to_edge.get("railway_gauge") or from_gauge
+        add_rail_segment(nodes, node_id, from_neighbor_id, auto_rail_id, from_gauge, confidence)
+        add_rail_segment(nodes, from_neighbor_id, node_id, auto_rail_id, from_gauge, confidence)
+        add_rail_segment(nodes, node_id, to_neighbor_id, auto_rail_id, to_gauge, confidence)
+        add_rail_segment(nodes, to_neighbor_id, node_id, auto_rail_id, to_gauge, confidence)
+        from_rail_id = auto_rail_id
+        to_rail_id = auto_rail_id
+    elif from_rail_id is None or to_rail_id is None:
+        raise ValueError("Either provide both from_rail_id/to_rail_id or neither.")
+    else:
+        from_has = any(r.get("rail_id") == from_rail_id for r in from_edge.get("railroads", []))
+        to_has = any(r.get("rail_id") == to_rail_id for r in to_edge.get("railroads", []))
+        if not (from_has and to_has):
+            raise ValueError(
+                f"Cannot connect missing rail ids at {node_id}: {from_neighbor_id}/{from_rail_id} -> {to_neighbor_id}/{to_rail_id}"
+            )
 
     def _add_connection(a_neighbor, a_rail, b_neighbor, b_rail):
-        connection_id = f"rconn__{node_id}__{a_neighbor}__{a_rail}__{b_neighbor}__{b_rail}"
+        connection_id = f"rail_{zone_name_part(a_neighbor)}_{zone_name_part(node_id)}_{zone_name_part(b_neighbor)}"
         entry = {
             "connection_id": connection_id,
             "from_neighbor_id": a_neighbor,
@@ -182,7 +210,12 @@ def link_rail(
     confidence=0.78,
 ):
     if rail_id is None:
-        rail_id = next_rail_id(nodes, a, b)
+        existing_edge = find_edge(nodes, a, b)
+        if existing_edge and existing_edge.get("railroads"):
+            rail_id = existing_edge["railroads"][0]["rail_id"]
+            gauge = existing_edge["railroads"][0].get("railway_gauge") or gauge
+        else:
+            rail_id = next_rail_id(nodes, a, b)
 
     link(
         nodes,
@@ -1069,43 +1102,13 @@ def build():
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
 
-    rail_hopeh_shensi_beiping = "rail__china__hopeh_shensi_beiping"
-    rail_hopeh_shantung_beiping = "rail__china__hopeh_shantung_beiping"
-
     link_land(nodes, "land_china_suiyuan", "land_china_hopeh")
     link_land(nodes, "land_china_suiyuan", "land_china_beiping")
-    link_rail(nodes, "land_china_hopeh", "land_china_beiping", rail_id=rail_hopeh_shensi_beiping)
-    link_rail(nodes, "land_china_hopeh", "land_china_beiping", rail_id=rail_hopeh_shantung_beiping)
-    link_rail(
-        nodes,
-        "land_china_hopeh",
-        "land_china_shantung",
-        river_crossing=True,
-        rail_id=rail_hopeh_shantung_beiping,
-    )
-    link_rail(
-        nodes,
-        "land_china_hopeh",
-        "land_china_shensi",
-        river_crossing=True,
-        rail_id=rail_hopeh_shensi_beiping,
-    )
-    connect_rail_edges(
-        nodes,
-        "land_china_hopeh",
-        "land_china_shensi",
-        rail_hopeh_shensi_beiping,
-        "land_china_beiping",
-        rail_hopeh_shensi_beiping,
-    )
-    connect_rail_edges(
-        nodes,
-        "land_china_hopeh",
-        "land_china_shantung",
-        rail_hopeh_shantung_beiping,
-        "land_china_beiping",
-        rail_hopeh_shantung_beiping,
-    )
+    link_land(nodes, "land_china_hopeh", "land_china_beiping")
+    link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
+    link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
+    connect_rail_edges(nodes, "land_china_hopeh", "land_china_shensi", "land_china_beiping")
+    connect_rail_edges(nodes, "land_china_hopeh", "land_china_shantung", "land_china_beiping")
     link_land(nodes, "land_china_beiping", "land_china_shantung")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
     link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
@@ -1466,8 +1469,8 @@ def build():
                     rail_seen[rail_id] = rail
 
             if edge.get("railway_connection") and not rail_seen:
-                fallback_pair = "__".join(sorted([nid, edge["neighbor_id"]]))
-                fallback_rail_id = f"rail__{fallback_pair}__1"
+                n1, n2 = sorted([zone_name_part(nid), zone_name_part(edge["neighbor_id"])])
+                fallback_rail_id = f"rail_{n1}_{n2}"
                 rail_seen[fallback_rail_id] = {
                     "rail_id": fallback_rail_id,
                     "railway_gauge": edge.get("railway_gauge") or "narrow",
