@@ -6,6 +6,7 @@ OUTPUT = "gw36_manual_map.json"
 DEFAULT_EDGE = {
     "neighbor_id": None,
     "border_terrain": "normal",
+    "has_river": False,
     "river_crossing": False,
     "railway_connection": False,
     "railway_gauge": None,
@@ -75,12 +76,13 @@ def link(nodes, a, b, **attrs):
     set_edge(nodes, b, a, **attrs)
 
 
-def link_rail(nodes, a, b, border_terrain="normal", river_crossing=False, confidence=0.78):
+def link_rail(nodes, a, b, border_terrain="normal", river_crossing=False, has_river=False, confidence=0.78):
     link(
         nodes,
         a,
         b,
         border_terrain=border_terrain,
+        has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=True,
         railway_gauge="narrow",
@@ -88,12 +90,13 @@ def link_rail(nodes, a, b, border_terrain="normal", river_crossing=False, confid
     )
 
 
-def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, confidence=0.76):
+def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, has_river=False, confidence=0.76):
     link(
         nodes,
         a,
         b,
         border_terrain=border_terrain,
+        has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=False,
         railway_gauge=None,
@@ -110,6 +113,7 @@ def link_land_sea(nodes, land, sea, port=False, canal=None, narrow=False, confid
         land,
         sea,
         border_terrain="coast",
+        has_river=False,
         river_crossing=False,
         railway_connection=False,
         railway_gauge=None,
@@ -497,7 +501,6 @@ def build():
         ("land_hainan", "Hainan", "normal", 1, "Japan", False, False),
         ("land_hong_kong", "Hong Kong", "city", 2, "United Kingdom", False, False),
         ("land_kwangtung", "Kwangtung", "normal", 2, "China", False, False),
-        ("land_kwangsi", "Kwangsi", "jungle", 0, "China", False, False),
         ("land_annam_tonkin", "Annam-Tonkin", "jungle", 1, "France", False, False),
         ("land_cochinchina", "Cochinchina", "jungle", 1, "France", False, False),
         ("land_siam", "Siam", "jungle", 1, "Siam", False, False),
@@ -956,34 +959,30 @@ def build():
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
 
-    link_rail(nodes, "land_china_suiyuan", "land_china_hopeh")
-    link_rail(nodes, "land_china_suiyuan", "land_china_beiping")
-    link_rail(nodes, "land_china_hopeh", "land_china_beiping")
-    link_rail(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
-    link_rail(nodes, "land_china_hopeh", "land_china_shensi")
-    link_rail(nodes, "land_china_beiping", "land_china_shantung")
+    link_land(nodes, "land_china_suiyuan", "land_china_hopeh")
+    link_land(nodes, "land_china_suiyuan", "land_china_beiping")
+    link_land(nodes, "land_china_hopeh", "land_china_beiping")
+    link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
+    link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
+    link_land(nodes, "land_china_beiping", "land_china_shantung")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
     link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
-    link_rail(nodes, "land_china_hunan", "land_kwangtung")
-    link_rail(nodes, "land_kwangtung", "land_kwangsi")
-    link_rail(nodes, "land_kwangsi", "land_china_yunnan", border_terrain="mountain")
-    link_rail(nodes, "land_china_yunnan", "land_china_kweichow", border_terrain="mountain")
-    link_rail(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain")
-    link_rail(nodes, "land_china_szechwan", "land_china_shensi")
-    link_rail(nodes, "land_china_shensi", "land_china_suiyuan")
-    link_rail(nodes, "land_china_tsinghai", "land_china_szechwan", border_terrain="mountain")
-    link_rail(nodes, "land_china_tsinghai", "land_china_sinkiang", border_terrain="mountain")
-    link_rail(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
-    link_rail(nodes, "land_china_shensi", "land_china_hunan")
-    link_rail(nodes, "land_china_hunan", "land_china_kweichow")
-    link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
+    link_land(nodes, "land_china_hunan", "land_kwangtung")
+    link_land(nodes, "land_china_kweichow", "land_kwangtung")
+    link_land(nodes, "land_china_yunnan", "land_china_kweichow", border_terrain="mountain")
+    link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain")
+    link_land(nodes, "land_china_szechwan", "land_china_shensi")
+    link_land(nodes, "land_china_shensi", "land_china_suiyuan")
+    link_land(nodes, "land_china_tsinghai", "land_china_szechwan", border_terrain="mountain")
+    link_land(nodes, "land_china_tsinghai", "land_china_sinkiang", border_terrain="mountain")
+    link_land(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
+    link_land(nodes, "land_china_shensi", "land_china_hunan")
+    link_land(nodes, "land_china_hunan", "land_china_kweichow")
     link_rail(nodes, "land_kwangtung", "land_hong_kong")
-    link_rail(nodes, "land_hong_kong", "land_kwangsi")
-    link_rail(nodes, "land_annam_tonkin", "land_kwangsi", border_terrain="jungle")
-    link_rail(nodes, "land_annam_tonkin", "land_cochinchina", border_terrain="jungle")
-    link_rail(nodes, "land_cochinchina", "land_siam", border_terrain="jungle")
-    link_rail(nodes, "land_siam", "land_kwangsi", border_terrain="jungle")
-    link_rail(nodes, "land_siam", "land_burma", border_terrain="jungle")
+    link_land(nodes, "land_annam_tonkin", "land_kwangtung", border_terrain="jungle")
+    link_land(nodes, "land_annam_tonkin", "land_cochinchina", border_terrain="jungle")
+    link_land(nodes, "land_cochinchina", "land_siam", border_terrain="jungle")
+    link_land(nodes, "land_siam", "land_burma", border_terrain="jungle")
 
     link_rail(nodes, "land_jap_honshu", "land_jap_kyushu")
     link_rail(nodes, "land_jap_honshu", "land_jap_hokkaido")
