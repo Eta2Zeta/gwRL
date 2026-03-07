@@ -6,7 +6,7 @@ OUTPUT = "gw36_manual_map.json"
 DEFAULT_EDGE = {
     "neighbor_id": None,
     "border_terrain": "normal",
-    "has_river": False,
+    "river_crossing": False,
     "railway_connection": False,
     "railway_gauge": None,
     "port_or_dock_connection": False,
@@ -75,26 +75,26 @@ def link(nodes, a, b, **attrs):
     set_edge(nodes, b, a, **attrs)
 
 
-def link_rail(nodes, a, b, border_terrain="normal", has_river=False, confidence=0.78):
+def link_rail(nodes, a, b, border_terrain="normal", river_crossing=False, confidence=0.78):
     link(
         nodes,
         a,
         b,
         border_terrain=border_terrain,
-        has_river=has_river,
+        river_crossing=river_crossing,
         railway_connection=True,
         railway_gauge="narrow",
         inference_confidence=confidence,
     )
 
 
-def link_land(nodes, a, b, border_terrain="normal", has_river=False, confidence=0.76):
+def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, confidence=0.76):
     link(
         nodes,
         a,
         b,
         border_terrain=border_terrain,
-        has_river=has_river,
+        river_crossing=river_crossing,
         railway_connection=False,
         railway_gauge=None,
         port_or_dock_connection=False,
@@ -110,7 +110,7 @@ def link_land_sea(nodes, land, sea, port=False, canal=None, narrow=False, confid
         land,
         sea,
         border_terrain="coast",
-        has_river=False,
+        river_crossing=False,
         railway_connection=False,
         railway_gauge=None,
         port_or_dock_connection=port,
@@ -638,7 +638,7 @@ def build():
     link_rail(nodes, "land_ger_eastern_germany", "land_ger_berlin")
     link_rail(nodes, "land_ger_eastern_germany", "land_ger_bavaria")
     link_rail(nodes, "land_ger_eastern_germany", "land_ger_konigsberg")
-    link_rail(nodes, "land_ger_eastern_germany", "land_pol_west_poland", has_river=True)
+    link_rail(nodes, "land_ger_eastern_germany", "land_pol_west_poland", river_crossing=True)
 
     link_rail(nodes, "land_ger_bavaria", "land_cze_bohemia")
     link_rail(nodes, "land_ger_bavaria", "land_aut_austria", border_terrain="mountain")
@@ -653,7 +653,7 @@ def build():
     link_rail(nodes, "land_fra_paris", "land_fra_alsace_lorraine")
     link_rail(nodes, "land_fra_aquitaine", "land_fra_southern_france")
     link_rail(nodes, "land_fra_alsace_lorraine", "land_fra_southern_france")
-    link_rail(nodes, "land_fra_alsace_lorraine", "land_ger_western_germany", has_river=True)
+    link_rail(nodes, "land_fra_alsace_lorraine", "land_ger_western_germany", river_crossing=True)
 
     link_rail(nodes, "land_fra_southern_france", "land_ita_northern_italy", border_terrain="mountain")
     link_rail(nodes, "land_fra_southern_france", "land_switzerland", border_terrain="mountain")
@@ -684,10 +684,10 @@ def build():
     link_rail(nodes, "land_lithuania", "land_pol_west_poland")
     link_rail(nodes, "land_lithuania", "land_ger_konigsberg")
 
-    link_rail(nodes, "land_ger_konigsberg", "land_pol_west_poland")
+    link_rail(nodes, "land_ger_konigsberg", "land_pol_west_poland", river_crossing=True)
 
     # Poland / Central Europe
-    link_rail(nodes, "land_pol_west_poland", "land_pol_warsaw")
+    link_rail(nodes, "land_pol_west_poland", "land_pol_warsaw", river_crossing=True)
     link_rail(nodes, "land_pol_west_poland", "land_pol_podlachia")
     link_rail(nodes, "land_pol_west_poland", "land_pol_dolnoslaskie")
     link_rail(nodes, "land_pol_west_poland", "land_cze_bohemia")
@@ -726,12 +726,12 @@ def build():
     link_rail(nodes, "land_hun_hungary", "land_yug_western_yugoslavia")
     link_rail(nodes, "land_hun_hungary", "land_yug_eastern_yugoslavia")
 
-    link_rail(nodes, "land_rom_central_romania", "land_rom_bessarabia")
-    link_rail(nodes, "land_rom_central_romania", "land_bulgaria")
+    link_rail(nodes, "land_rom_central_romania", "land_rom_bessarabia", river_crossing=True)
+    link_rail(nodes, "land_rom_central_romania", "land_bulgaria", river_crossing=True)
     link_rail(nodes, "land_rom_central_romania", "land_yug_eastern_yugoslavia")
 
     link_rail(nodes, "land_rom_bessarabia", "land_usr_western_ukraine")
-    link_rail(nodes, "land_rom_bessarabia", "land_usr_southern_ukraine", has_river=True)
+    link_rail(nodes, "land_rom_bessarabia", "land_usr_southern_ukraine", river_crossing=True)
 
     link_rail(nodes, "land_bulgaria", "land_yug_eastern_yugoslavia")
     link_rail(nodes, "land_bulgaria", "land_gre_macedonia", border_terrain="mountain")
@@ -760,9 +760,9 @@ def build():
     # Middle East + India
     link_rail(nodes, "land_tur_eastern_anatolia", "land_syria", border_terrain="mountain")
     link_rail(nodes, "land_tur_eastern_anatolia", "land_northern_iraq", border_terrain="mountain")
-    link_rail(nodes, "land_northern_iraq", "land_southern_iraq")
+    link_rail(nodes, "land_northern_iraq", "land_southern_iraq", river_crossing=True)
     link_rail(nodes, "land_northern_iraq", "land_iran_northern_iran", border_terrain="mountain")
-    link_rail(nodes, "land_southern_iraq", "land_iran_southern_iran")
+    link_rail(nodes, "land_southern_iraq", "land_iran_southern_iran", river_crossing=True)
     link_rail(nodes, "land_southern_iraq", "land_kuwait")
     link_rail(nodes, "land_southern_iraq", "land_transjordan")
     link_rail(nodes, "land_syria", "land_transjordan")
@@ -779,19 +779,19 @@ def build():
     link_rail(nodes, "land_kashmir", "land_india_punjab")
     link_rail(nodes, "land_tibet", "land_nepal", border_terrain="mountain")
     link_rail(nodes, "land_india_punjab", "land_india_delhi")
-    link_rail(nodes, "land_india_delhi", "land_india_maharashtra")
+    link_rail(nodes, "land_india_delhi", "land_india_maharashtra", river_crossing=True)
     link_rail(nodes, "land_india_delhi", "land_india_benares")
-    link_rail(nodes, "land_india_benares", "land_india_calcutta")
+    link_rail(nodes, "land_india_benares", "land_india_calcutta", river_crossing=True)
     link_rail(nodes, "land_india_benares", "land_burma", border_terrain="jungle")
     link_rail(nodes, "land_india_maharashtra", "land_india_southern_india")
-    link_rail(nodes, "land_india_maharashtra", "land_india_benares")
-    link_rail(nodes, "land_india_southern_india", "land_india_calcutta")
-    link_rail(nodes, "land_burma", "land_india_calcutta", border_terrain="jungle")
+    link_rail(nodes, "land_india_maharashtra", "land_india_benares", river_crossing=True)
+    link_rail(nodes, "land_india_southern_india", "land_india_calcutta", river_crossing=True)
+    link_rail(nodes, "land_burma", "land_india_calcutta", border_terrain="jungle", river_crossing=True)
 
     # North America
     link_rail(nodes, "land_can_district_of_keewatin", "land_can_manitoba")
     link_rail(nodes, "land_can_manitoba", "land_can_ontario")
-    link_rail(nodes, "land_can_ontario", "land_can_quebec")
+    link_rail(nodes, "land_can_ontario", "land_can_quebec", river_crossing=True)
     link_rail(nodes, "land_can_quebec", "land_can_labrador")
     link_rail(nodes, "land_can_labrador", "land_can_newfoundland")
     link_rail(nodes, "land_can_newfoundland", "land_can_st_pierre_island")
@@ -806,14 +806,14 @@ def build():
     link_rail(nodes, "land_usa_western_united_states", "land_usa_great_plains")
     link_rail(nodes, "land_usa_pacific_northwest", "land_usa_upper_midwest")
     link_rail(nodes, "land_usa_upper_midwest", "land_usa_great_lakes")
-    link_rail(nodes, "land_usa_upper_midwest", "land_usa_midwest")
+    link_rail(nodes, "land_usa_upper_midwest", "land_usa_midwest", river_crossing=True)
     link_rail(nodes, "land_usa_midwest", "land_usa_great_lakes")
-    link_rail(nodes, "land_usa_midwest", "land_usa_heartlands")
-    link_rail(nodes, "land_usa_heartlands", "land_usa_appalachia")
+    link_rail(nodes, "land_usa_midwest", "land_usa_heartlands", river_crossing=True)
+    link_rail(nodes, "land_usa_heartlands", "land_usa_appalachia", river_crossing=True)
     link_rail(nodes, "land_usa_heartlands", "land_usa_texas")
-    link_rail(nodes, "land_usa_heartlands", "land_usa_new_orleans")
+    link_rail(nodes, "land_usa_heartlands", "land_usa_new_orleans", river_crossing=True)
     link_rail(nodes, "land_usa_great_lakes", "land_usa_chicago")
-    link_rail(nodes, "land_usa_chicago", "land_usa_heartlands")
+    link_rail(nodes, "land_usa_chicago", "land_usa_heartlands", river_crossing=True)
     link_rail(nodes, "land_usa_chicago", "land_usa_appalachia")
     link_rail(nodes, "land_usa_the_northeast", "land_usa_appalachia")
     link_rail(nodes, "land_usa_the_northeast", "land_usa_new_york")
@@ -827,7 +827,7 @@ def build():
     link_rail(nodes, "land_usa_southwest_united_states", "land_mex_western_mexico")
     link_rail(nodes, "land_usa_southwest_united_states", "land_usa_san_francisco")
     link_rail(nodes, "land_usa_san_francisco", "land_usa_western_united_states")
-    link_rail(nodes, "land_usa_great_plains", "land_usa_upper_midwest")
+    link_rail(nodes, "land_usa_great_plains", "land_usa_upper_midwest", river_crossing=True)
     link_rail(nodes, "land_usa_great_plains", "land_usa_western_united_states")
     link_rail(nodes, "land_usa_great_plains", "land_usa_texas")
     link_rail(nodes, "land_usa_new_york", "land_usa_washington_dc")
@@ -835,36 +835,36 @@ def build():
     link_rail(nodes, "land_usa_washington_dc", "land_usa_the_carolinas")
 
     link_rail(nodes, "land_mex_western_mexico", "land_mex_eastern_mexico")
-    link_rail(nodes, "land_mex_eastern_mexico", "land_usa_texas")
+    link_rail(nodes, "land_mex_eastern_mexico", "land_usa_texas", river_crossing=True)
     link_rail(nodes, "land_mex_eastern_mexico", "land_central_america")
     link_rail(nodes, "land_central_america", "land_panama")
     link_rail(nodes, "land_cuba", "land_hispaniola")
 
     # South America
-    link_rail(nodes, "land_colombia", "land_venezuela")
+    link_rail(nodes, "land_colombia", "land_venezuela", river_crossing=True)
     link_rail(nodes, "land_colombia", "land_ecuador")
     link_rail(nodes, "land_colombia", "land_peru")
     link_rail(nodes, "land_colombia", "land_panama")
-    link_rail(nodes, "land_venezuela", "land_guyana")
-    link_rail(nodes, "land_guyana", "land_suriname")
-    link_rail(nodes, "land_suriname", "land_french_guiana")
-    link_rail(nodes, "land_venezuela", "land_brazil_amazon_jungle")
+    link_rail(nodes, "land_venezuela", "land_guyana", river_crossing=True)
+    link_rail(nodes, "land_guyana", "land_suriname", river_crossing=True)
+    link_rail(nodes, "land_suriname", "land_french_guiana", river_crossing=True)
+    link_rail(nodes, "land_venezuela", "land_brazil_amazon_jungle", river_crossing=True)
     link_rail(nodes, "land_ecuador", "land_peru")
     link_rail(nodes, "land_peru", "land_bolivia", border_terrain="mountain")
-    link_rail(nodes, "land_peru", "land_brazil_amazon_jungle")
+    link_rail(nodes, "land_peru", "land_brazil_amazon_jungle", river_crossing=True)
     link_rail(nodes, "land_bolivia", "land_paraguay")
     link_rail(nodes, "land_bolivia", "land_chile", border_terrain="mountain")
     link_rail(nodes, "land_bolivia", "land_brazil_pampas")
-    link_rail(nodes, "land_paraguay", "land_brazil_pampas")
-    link_rail(nodes, "land_paraguay", "land_buenos_aires")
-    link_rail(nodes, "land_paraguay", "land_rio_grande")
+    link_rail(nodes, "land_paraguay", "land_brazil_pampas", river_crossing=True)
+    link_rail(nodes, "land_paraguay", "land_buenos_aires", river_crossing=True)
+    link_rail(nodes, "land_paraguay", "land_rio_grande", river_crossing=True)
     link_rail(nodes, "land_brazil_amazon_jungle", "land_brazil_caatinga", border_terrain="jungle")
     link_rail(nodes, "land_brazil_caatinga", "land_brazil_rio_de_janeiro")
     link_rail(nodes, "land_brazil_rio_de_janeiro", "land_brazil_pampas")
-    link_rail(nodes, "land_brazil_pampas", "land_rio_grande")
-    link_rail(nodes, "land_brazil_pampas", "land_uruguay")
-    link_rail(nodes, "land_uruguay", "land_buenos_aires")
-    link_rail(nodes, "land_buenos_aires", "land_rio_grande")
+    link_rail(nodes, "land_brazil_pampas", "land_rio_grande", river_crossing=True)
+    link_rail(nodes, "land_brazil_pampas", "land_uruguay", river_crossing=True)
+    link_rail(nodes, "land_uruguay", "land_buenos_aires", river_crossing=True)
+    link_rail(nodes, "land_buenos_aires", "land_rio_grande", river_crossing=True)
     link_rail(nodes, "land_buenos_aires", "land_patagonia")
     link_rail(nodes, "land_patagonia", "land_chile")
     link_rail(nodes, "land_chile", "land_peru", border_terrain="mountain")
@@ -882,10 +882,10 @@ def build():
     link_rail(nodes, "land_tripolitania", "land_cyrenaica")
     link_rail(nodes, "land_cyrenaica", "land_tobruk")
     link_rail(nodes, "land_tobruk", "land_western_egypt")
-    link_rail(nodes, "land_western_egypt", "land_lower_egypt")
-    link_rail(nodes, "land_lower_egypt", "land_upper_egypt")
-    link_rail(nodes, "land_upper_egypt", "land_nubia")
-    link_rail(nodes, "land_nubia", "land_sudan")
+    link_rail(nodes, "land_western_egypt", "land_lower_egypt", river_crossing=True)
+    link_rail(nodes, "land_lower_egypt", "land_upper_egypt", river_crossing=True)
+    link_rail(nodes, "land_upper_egypt", "land_nubia", river_crossing=True)
+    link_rail(nodes, "land_nubia", "land_sudan", river_crossing=True)
     link_rail(nodes, "land_sudan", "land_eritrea")
     link_rail(nodes, "land_eritrea", "land_abyssinia", border_terrain="mountain")
     link_rail(nodes, "land_abyssinia", "land_french_somaliland", border_terrain="mountain")
@@ -898,38 +898,38 @@ def build():
     link_rail(nodes, "land_chad", "land_sudan")
     link_rail(nodes, "land_niger", "land_nigeria")
     link_rail(nodes, "land_dahomey", "land_nigeria")
-    link_rail(nodes, "land_nigeria", "land_cameroon")
-    link_rail(nodes, "land_cameroon", "land_oubangui_chari")
-    link_rail(nodes, "land_oubangui_chari", "land_chad")
-    link_rail(nodes, "land_oubangui_chari", "land_sudan")
+    link_rail(nodes, "land_nigeria", "land_cameroon", river_crossing=True)
+    link_rail(nodes, "land_cameroon", "land_oubangui_chari", river_crossing=True)
+    link_rail(nodes, "land_oubangui_chari", "land_chad", river_crossing=True)
+    link_rail(nodes, "land_oubangui_chari", "land_sudan", river_crossing=True)
     link_rail(nodes, "land_cameroon", "land_belgian_congo", border_terrain="jungle")
-    link_rail(nodes, "land_belgian_congo", "land_oubangui_chari", border_terrain="jungle")
-    link_rail(nodes, "land_belgian_congo", "land_angola")
+    link_rail(nodes, "land_belgian_congo", "land_oubangui_chari", border_terrain="jungle", river_crossing=True)
+    link_rail(nodes, "land_belgian_congo", "land_angola", river_crossing=True)
     link_rail(nodes, "land_belgian_congo", "land_tanganyika")
-    link_rail(nodes, "land_belgian_congo", "land_rhodesia")
-    link_rail(nodes, "land_angola", "land_rhodesia")
+    link_rail(nodes, "land_belgian_congo", "land_rhodesia", river_crossing=True)
+    link_rail(nodes, "land_angola", "land_rhodesia", river_crossing=True)
     link_rail(nodes, "land_angola", "land_southwest_africa")
     link_rail(nodes, "land_rhodesia", "land_tanganyika")
-    link_rail(nodes, "land_rhodesia", "land_portuguese_east_africa")
+    link_rail(nodes, "land_rhodesia", "land_portuguese_east_africa", river_crossing=True)
     link_rail(nodes, "land_rhodesia", "land_bechuanaland")
     link_rail(nodes, "land_rhodesia", "land_south_africa")
     link_rail(nodes, "land_southwest_africa", "land_bechuanaland")
     link_rail(nodes, "land_bechuanaland", "land_cape_town")
     link_rail(nodes, "land_bechuanaland", "land_south_africa")
     link_rail(nodes, "land_south_africa", "land_cape_town")
-    link_rail(nodes, "land_tanganyika", "land_portuguese_east_africa")
+    link_rail(nodes, "land_tanganyika", "land_portuguese_east_africa", river_crossing=True)
 
     # East Asia + Oceania
     link_rail(nodes, "land_usr_stalino", "land_usr_vanavara")
     link_rail(nodes, "land_usr_vanavara", "land_usr_irkutsk")
     link_rail(nodes, "land_usr_irkutsk", "land_usr_angara")
-    link_rail(nodes, "land_usr_irkutsk", "land_usr_buryatia")
-    link_rail(nodes, "land_usr_angara", "land_usr_buryatia")
+    link_rail(nodes, "land_usr_irkutsk", "land_usr_buryatia", river_crossing=True)
+    link_rail(nodes, "land_usr_angara", "land_usr_buryatia", river_crossing=True)
     link_rail(nodes, "land_usr_angara", "land_usr_chita")
     link_rail(nodes, "land_usr_chita", "land_usr_amur")
     link_rail(nodes, "land_usr_chita", "land_usr_buryatia")
     link_rail(nodes, "land_usr_amur", "land_usr_primorsky_krai")
-    link_rail(nodes, "land_usr_amur", "land_usr_yakutsk")
+    link_rail(nodes, "land_usr_amur", "land_usr_yakutsk", river_crossing=True)
     link_rail(nodes, "land_usr_yakutsk", "land_usr_southern_yakutia")
     link_rail(nodes, "land_usr_yakutsk", "land_usr_magadan")
     link_rail(nodes, "land_usr_magadan", "land_usr_kamchatka")
@@ -949,9 +949,9 @@ def build():
     link_rail(nodes, "land_manchuria_rehe", "land_manchuria_eastern")
     link_rail(nodes, "land_manchuria_rehe", "land_china_suiyuan")
     link_rail(nodes, "land_manchuria_rehe", "land_china_beiping")
-    link_rail(nodes, "land_manchuria_eastern", "land_korea", border_terrain="mountain", has_river=False)
-    link_land(nodes, "land_korea", "land_usr_primorsky_krai", border_terrain="mountain", has_river=False)
-    link_rail(nodes, "land_korea", "land_manchuria_rehe", border_terrain="mountain")
+    link_rail(nodes, "land_manchuria_eastern", "land_korea", border_terrain="normal", river_crossing=False)
+    link_land(nodes, "land_korea", "land_usr_primorsky_krai", border_terrain="mountain", river_crossing=False)
+    link_land(nodes, "land_korea", "land_manchuria_rehe", border_terrain="normal")
     link_rail(nodes, "land_manchuria_northern", "land_usr_chita")
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
@@ -959,11 +959,11 @@ def build():
     link_rail(nodes, "land_china_suiyuan", "land_china_hopeh")
     link_rail(nodes, "land_china_suiyuan", "land_china_beiping")
     link_rail(nodes, "land_china_hopeh", "land_china_beiping")
-    link_rail(nodes, "land_china_hopeh", "land_china_shantung")
+    link_rail(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
     link_rail(nodes, "land_china_hopeh", "land_china_shensi")
     link_rail(nodes, "land_china_beiping", "land_china_shantung")
-    link_rail(nodes, "land_china_shantung", "land_china_nanking")
-    link_rail(nodes, "land_china_nanking", "land_china_hunan")
+    link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
+    link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
     link_rail(nodes, "land_china_hunan", "land_kwangtung")
     link_rail(nodes, "land_kwangtung", "land_kwangsi")
     link_rail(nodes, "land_kwangsi", "land_china_yunnan", border_terrain="mountain")
@@ -976,7 +976,7 @@ def build():
     link_rail(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
     link_rail(nodes, "land_china_shensi", "land_china_hunan")
     link_rail(nodes, "land_china_hunan", "land_china_kweichow")
-    link_rail(nodes, "land_china_nanking", "land_china_hunan")
+    link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
     link_rail(nodes, "land_kwangtung", "land_hong_kong")
     link_rail(nodes, "land_hong_kong", "land_kwangsi")
     link_rail(nodes, "land_annam_tonkin", "land_kwangsi", border_terrain="jungle")
@@ -1021,15 +1021,15 @@ def build():
     link_rail(nodes, "land_usr_western_russia", "land_usr_smolensk")
     link_rail(nodes, "land_usr_western_russia", "land_usr_northern_belorussia")
     link_rail(nodes, "land_usr_western_russia", "land_usr_kaluga_oblast")
-    link_rail(nodes, "land_usr_western_russia", "land_usr_moscow")
+    link_rail(nodes, "land_usr_western_russia", "land_usr_moscow", river_crossing=True)
 
     link_rail(nodes, "land_usr_moscow", "land_usr_smolensk")
     link_rail(nodes, "land_usr_moscow", "land_usr_kaluga_oblast")
-    link_rail(nodes, "land_usr_moscow", "land_usr_tula_lipetsk")
+    link_rail(nodes, "land_usr_moscow", "land_usr_tula_lipetsk", river_crossing=True)
     link_rail(nodes, "land_usr_moscow", "land_usr_orel_kursk")
-    link_rail(nodes, "land_usr_moscow", "land_usr_yaroslavl")
+    link_rail(nodes, "land_usr_moscow", "land_usr_yaroslavl", river_crossing=True)
 
-    link_rail(nodes, "land_usr_yaroslavl", "land_usr_gorky")
+    link_rail(nodes, "land_usr_yaroslavl", "land_usr_gorky", river_crossing=True)
     link_rail(nodes, "land_usr_yaroslavl", "land_usr_moscow")
 
     link_rail(nodes, "land_usr_smolensk", "land_usr_northern_belorussia")
@@ -1045,9 +1045,9 @@ def build():
     link_rail(nodes, "land_usr_western_ukraine", "land_usr_kiev")
     link_rail(nodes, "land_usr_western_ukraine", "land_usr_southern_ukraine")
 
-    link_rail(nodes, "land_usr_kiev", "land_usr_eastern_ukraine", has_river=True)
-    link_rail(nodes, "land_usr_kiev", "land_usr_southern_ukraine", has_river=True)
-    link_rail(nodes, "land_usr_kiev", "land_usr_taurida", has_river=True)
+    link_rail(nodes, "land_usr_kiev", "land_usr_eastern_ukraine", river_crossing=True)
+    link_rail(nodes, "land_usr_kiev", "land_usr_southern_ukraine", river_crossing=True)
+    link_rail(nodes, "land_usr_kiev", "land_usr_taurida", river_crossing=True)
     link_rail(nodes, "land_usr_kiev", "land_usr_orel_kursk")
 
     link_rail(nodes, "land_usr_eastern_ukraine", "land_usr_southern_ukraine")
@@ -1060,7 +1060,7 @@ def build():
     link_rail(nodes, "land_usr_southern_ukraine", "land_usr_crimea")
 
     link_rail(nodes, "land_usr_taurida", "land_usr_crimea")
-    link_rail(nodes, "land_usr_taurida", "land_usr_donets_kuban")
+    link_rail(nodes, "land_usr_taurida", "land_usr_donets_kuban", river_crossing=True)
 
     link_rail(nodes, "land_usr_crimea", "land_usr_donets_kuban")
 
@@ -1068,9 +1068,9 @@ def build():
     link_rail(nodes, "land_usr_donets_kuban", "land_usr_kalmytskaya")
     link_rail(nodes, "land_usr_donets_kuban", "land_usr_north_caucasia")
 
-    link_rail(nodes, "land_usr_stalingrad", "land_usr_kalmytskaya")
+    link_rail(nodes, "land_usr_stalingrad", "land_usr_kalmytskaya", river_crossing=True)
     link_rail(nodes, "land_usr_stalingrad", "land_usr_tula_lipetsk")
-    link_rail(nodes, "land_usr_stalingrad", "land_usr_saratov")
+    link_rail(nodes, "land_usr_stalingrad", "land_usr_saratov", river_crossing=True)
     link_rail(nodes, "land_usr_stalingrad", "land_usr_north_caucasia")
 
     link_rail(nodes, "land_usr_kalmytskaya", "land_usr_saratov")
