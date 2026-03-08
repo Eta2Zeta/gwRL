@@ -18,7 +18,6 @@ DEFAULT_EDGE = {
     "canal_or_strait": None,
     "narrow_crossing": False,
     "special_fortification": None,
-    "inference_confidence": 0.7,
 }
 
 DEFAULT_NODE = {
@@ -32,7 +31,6 @@ DEFAULT_NODE = {
     "is_capital": False,
     "is_victory_city": False,
     "source": "llm_manual_from_region_images",
-    "source_confidence": 0.7,
     "neighbors": [],
 }
 
@@ -195,7 +193,6 @@ def add_rail_segment(nodes, src, dst, rail_id, confidence):
             {
                 "rail_id": rail_id,
                 "gauge_change": False,
-                "inference_confidence": confidence,
             }
         )
 
@@ -247,7 +244,6 @@ def link_rail(
         river_crossing=river_crossing,
         railway_connection=True,
         gauge_change=False,
-        inference_confidence=confidence,
     )
 
     add_rail_segment(nodes, a, b, rail_id=rail_id, confidence=confidence)
@@ -270,7 +266,6 @@ def link_land(nodes, a, b, border_terrain="normal", passable=True, river_crossin
         port_or_dock_connection=False,
         canal_or_strait=None,
         narrow_crossing=False,
-        inference_confidence=confidence,
     )
 
 
@@ -327,7 +322,6 @@ def link_land_sea(
         port_or_dock_connection=bool(naval_facilities),
         canal_or_strait=canal,
         narrow_crossing=narrow,
-        inference_confidence=confidence,
     )
 
     if railway_connection:
@@ -448,7 +442,6 @@ def build():
             terrain="sea",
             ipp_value=None,
             original_owner="Neutral",
-            source_confidence=0.8,
         )
 
     # Europe land nodes (manual from region images)
@@ -756,82 +749,81 @@ def build():
             is_capital=cap,
             is_victory_city=vc,
             source="llm_manual_from_region_images",
-            source_confidence=0.76,
         )
 
     # Sea-sea framework (Europe basin)
-    link(nodes, "sea_a6", "sea_a7", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_a7", "sea_a10", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_a10", "sea_a11", border_terrain="sea", inference_confidence=0.85)
-    link(nodes, "sea_a11", "sea_a12", border_terrain="sea", inference_confidence=0.85)
-    link(nodes, "sea_a12", "sea_a13", border_terrain="sea", inference_confidence=0.85)
-    link(nodes, "sea_a13", "sea_a14", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a20", "sea_a21", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a21", "sea_a23", border_terrain="sea", inference_confidence=0.85)
-    link(nodes, "sea_a22", "sea_a23", border_terrain="sea", inference_confidence=0.85)
-    link(nodes, "sea_a22", "sea_a28", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a28", "sea_a29", border_terrain="sea", inference_confidence=0.8)
+    link(nodes, "sea_a6", "sea_a7", border_terrain="sea")
+    link(nodes, "sea_a7", "sea_a10", border_terrain="sea")
+    link(nodes, "sea_a10", "sea_a11", border_terrain="sea")
+    link(nodes, "sea_a11", "sea_a12", border_terrain="sea")
+    link(nodes, "sea_a12", "sea_a13", border_terrain="sea")
+    link(nodes, "sea_a13", "sea_a14", border_terrain="sea")
+    link(nodes, "sea_a20", "sea_a21", border_terrain="sea")
+    link(nodes, "sea_a21", "sea_a23", border_terrain="sea")
+    link(nodes, "sea_a22", "sea_a23", border_terrain="sea")
+    link(nodes, "sea_a22", "sea_a28", border_terrain="sea")
+    link(nodes, "sea_a28", "sea_a29", border_terrain="sea")
 
-    link(nodes, "sea_m1", "sea_a44", border_terrain="sea", canal_or_strait="Strait of Gibraltar", inference_confidence=0.9)
-    link(nodes, "sea_m1", "sea_m2", border_terrain="sea", inference_confidence=0.86)
-    link(nodes, "sea_m2", "sea_m3", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_m2", "sea_m4", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_m3", "sea_m5", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_m4", "sea_m5", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_m5", "sea_m10", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_m10", "sea_m11", border_terrain="sea", inference_confidence=0.88)
-    link(nodes, "sea_m11", "sea_m12", border_terrain="sea", inference_confidence=0.78)
-    link(nodes, "sea_m10", "sea_m9", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_m9", "sea_i3", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_i3", "sea_i5", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_i5", "sea_i4", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_i3", "sea_i6", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_i4", "sea_i6", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_i6", "sea_i7", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_i6", "sea_i11", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_a1", "sea_a2", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a2", "sea_a15", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a15", "sea_a18", border_terrain="sea", inference_confidence=0.86)
-    link(nodes, "sea_a18", "sea_a19", border_terrain="sea", inference_confidence=0.86)
-    link(nodes, "sea_a18", "sea_a25", border_terrain="sea", inference_confidence=0.86)
-    link(nodes, "sea_a25", "sea_a26", border_terrain="sea", inference_confidence=0.86)
-    link(nodes, "sea_a26", "sea_a31", border_terrain="sea", inference_confidence=0.86)
-    link(nodes, "sea_a31", "sea_a33", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_a33", "sea_a35", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a35", "sea_a38", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a38", "sea_a39", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a39", "sea_a40", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_a36", "sea_a31", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_a36", "sea_a33", border_terrain="sea", inference_confidence=0.8)
+    link(nodes, "sea_m1", "sea_a44", border_terrain="sea", canal_or_strait="Strait of Gibraltar")
+    link(nodes, "sea_m1", "sea_m2", border_terrain="sea")
+    link(nodes, "sea_m2", "sea_m3", border_terrain="sea")
+    link(nodes, "sea_m2", "sea_m4", border_terrain="sea")
+    link(nodes, "sea_m3", "sea_m5", border_terrain="sea")
+    link(nodes, "sea_m4", "sea_m5", border_terrain="sea")
+    link(nodes, "sea_m5", "sea_m10", border_terrain="sea")
+    link(nodes, "sea_m10", "sea_m11", border_terrain="sea")
+    link(nodes, "sea_m11", "sea_m12", border_terrain="sea")
+    link(nodes, "sea_m10", "sea_m9", border_terrain="sea")
+    link(nodes, "sea_m9", "sea_i3", border_terrain="sea")
+    link(nodes, "sea_i3", "sea_i5", border_terrain="sea")
+    link(nodes, "sea_i5", "sea_i4", border_terrain="sea")
+    link(nodes, "sea_i3", "sea_i6", border_terrain="sea")
+    link(nodes, "sea_i4", "sea_i6", border_terrain="sea")
+    link(nodes, "sea_i6", "sea_i7", border_terrain="sea")
+    link(nodes, "sea_i6", "sea_i11", border_terrain="sea")
+    link(nodes, "sea_a1", "sea_a2", border_terrain="sea")
+    link(nodes, "sea_a2", "sea_a15", border_terrain="sea")
+    link(nodes, "sea_a15", "sea_a18", border_terrain="sea")
+    link(nodes, "sea_a18", "sea_a19", border_terrain="sea")
+    link(nodes, "sea_a18", "sea_a25", border_terrain="sea")
+    link(nodes, "sea_a25", "sea_a26", border_terrain="sea")
+    link(nodes, "sea_a26", "sea_a31", border_terrain="sea")
+    link(nodes, "sea_a31", "sea_a33", border_terrain="sea")
+    link(nodes, "sea_a33", "sea_a35", border_terrain="sea")
+    link(nodes, "sea_a35", "sea_a38", border_terrain="sea")
+    link(nodes, "sea_a38", "sea_a39", border_terrain="sea")
+    link(nodes, "sea_a39", "sea_a40", border_terrain="sea")
+    link(nodes, "sea_a36", "sea_a31", border_terrain="sea")
+    link(nodes, "sea_a36", "sea_a33", border_terrain="sea")
 
-    link(nodes, "sea_p5", "sea_p6", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p6", "sea_p11", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p11", "sea_p12", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p6", "sea_p12", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p12", "sea_p13", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p12", "sea_p24", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p13", "sea_p25", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p24", "sea_p25", border_terrain="sea", inference_confidence=0.8)
-    link(nodes, "sea_p25", "sea_p28", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_p28", "sea_p30", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_p30", "sea_p31", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_p2", "sea_p7", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_p2", "sea_p8", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_p7", "sea_p14", border_terrain="sea", inference_confidence=0.82)
-    link(nodes, "sea_p14", "sea_p15", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p15", "sea_p32", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p32", "sea_p34", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p15", "sea_p50", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p50", "sea_p52", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p50", "sea_p59", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p59", "sea_p60", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p60", "sea_p61", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p61", "sea_p62", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p62", "sea_p63", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p63", "sea_p64", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p64", "sea_p65", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p65", "sea_p68", border_terrain="sea", inference_confidence=0.84)
-    link(nodes, "sea_p68", "sea_p69", border_terrain="sea", inference_confidence=0.84)
+    link(nodes, "sea_p5", "sea_p6", border_terrain="sea")
+    link(nodes, "sea_p6", "sea_p11", border_terrain="sea")
+    link(nodes, "sea_p11", "sea_p12", border_terrain="sea")
+    link(nodes, "sea_p6", "sea_p12", border_terrain="sea")
+    link(nodes, "sea_p12", "sea_p13", border_terrain="sea")
+    link(nodes, "sea_p12", "sea_p24", border_terrain="sea")
+    link(nodes, "sea_p13", "sea_p25", border_terrain="sea")
+    link(nodes, "sea_p24", "sea_p25", border_terrain="sea")
+    link(nodes, "sea_p25", "sea_p28", border_terrain="sea")
+    link(nodes, "sea_p28", "sea_p30", border_terrain="sea")
+    link(nodes, "sea_p30", "sea_p31", border_terrain="sea")
+    link(nodes, "sea_p2", "sea_p7", border_terrain="sea")
+    link(nodes, "sea_p2", "sea_p8", border_terrain="sea")
+    link(nodes, "sea_p7", "sea_p14", border_terrain="sea")
+    link(nodes, "sea_p14", "sea_p15", border_terrain="sea")
+    link(nodes, "sea_p15", "sea_p32", border_terrain="sea")
+    link(nodes, "sea_p32", "sea_p34", border_terrain="sea")
+    link(nodes, "sea_p15", "sea_p50", border_terrain="sea")
+    link(nodes, "sea_p50", "sea_p52", border_terrain="sea")
+    link(nodes, "sea_p50", "sea_p59", border_terrain="sea")
+    link(nodes, "sea_p59", "sea_p60", border_terrain="sea")
+    link(nodes, "sea_p60", "sea_p61", border_terrain="sea")
+    link(nodes, "sea_p61", "sea_p62", border_terrain="sea")
+    link(nodes, "sea_p62", "sea_p63", border_terrain="sea")
+    link(nodes, "sea_p63", "sea_p64", border_terrain="sea")
+    link(nodes, "sea_p64", "sea_p65", border_terrain="sea")
+    link(nodes, "sea_p65", "sea_p68", border_terrain="sea")
+    link(nodes, "sea_p68", "sea_p69", border_terrain="sea")
 
     # Additional manual links
     link_land_sea(nodes, "land_jap_tokyo", "sea_p16", naval_facilities=["minor_port"], confidence=0.7)
@@ -883,7 +875,7 @@ def build():
     # Scandinavia + Baltic
     link_rail(nodes, "land_nor_trondelag", "land_nor_southern_norway", border_terrain="mountain")
     link_land(nodes, "land_nor_trondelag", "land_swe_norrland", border_terrain="tundra", confidence=0.72)
-    link(nodes, "land_nor_southern_norway", "land_denmark", border_terrain="coast", narrow_crossing=True, inference_confidence=0.78)
+    link(nodes, "land_nor_southern_norway", "land_denmark", border_terrain="coast", narrow_crossing=True)
 
     link_rail(nodes, "land_swe_norrland", "land_swe_gotland")
     link_rail(nodes, "land_swe_norrland", "land_fin_lapland")
@@ -1016,7 +1008,7 @@ def build():
     link_rail(nodes, "land_can_nova_scotia", "land_can_st_pierre_island")
     link_rail(nodes, "land_can_manitoba", "land_can_alberta_saskatchewan")
     link_rail(nodes, "land_can_alberta_saskatchewan", "land_can_british_columbia", border_terrain="mountain")
-    link(nodes, "land_can_baffin_island", "land_can_labrador", border_terrain="coast", narrow_crossing=True, inference_confidence=0.72)
+    link(nodes, "land_can_baffin_island", "land_can_labrador", border_terrain="coast", narrow_crossing=True)
 
     link_rail(nodes, "land_usa_pacific_northwest", "land_usa_western_united_states", border_terrain="mountain")
     link_rail(nodes, "land_usa_western_united_states", "land_usa_southwest_united_states", border_terrain="mountain")
@@ -1190,6 +1182,7 @@ def build():
     link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_szechwan", "land_china_shensi", border_terrain="mountain")
     link_land(nodes, "land_china_shensi", "land_china_suiyuan", border_terrain="mountain", river_crossing=True)
+    link_land(nodes, "land_china_shensi", "land_china_tsinghai", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_tsinghai", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_tsinghai", "land_china_sinkiang", border_terrain="mountain")
     link_land(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
@@ -1417,7 +1410,7 @@ def build():
     link_land_sea(nodes, "land_puerto_rico", "sea_a36", port=True)
     link_land_sea(nodes, "land_panama", "sea_a36", port=True)
     link_land_sea(nodes, "land_panama", "sea_p31", port=True, canal="Panama Canal")
-    link(nodes, "sea_a36", "sea_p31", border_terrain="sea", canal_or_strait="Panama Canal", inference_confidence=0.9)
+    link(nodes, "sea_a36", "sea_p31", border_terrain="sea", canal_or_strait="Panama Canal")
 
     link_land_sea(nodes, "land_colombia", "sea_a36", port=True)
     link_land_sea(nodes, "land_venezuela", "sea_a36", port=True)
@@ -1443,7 +1436,7 @@ def build():
     link_land_sea(nodes, "land_lower_egypt", "sea_m9", port=True)
     link_land_sea(nodes, "land_upper_egypt", "sea_i5", port=True, canal="Suez Canal")
     link_land_sea(nodes, "land_lower_egypt", "sea_i5", port=True, canal="Suez Canal")
-    link(nodes, "sea_m9", "sea_i5", border_terrain="sea", canal_or_strait="Suez Canal", inference_confidence=0.94)
+    link(nodes, "sea_m9", "sea_i5", border_terrain="sea", canal_or_strait="Suez Canal")
 
     link_land_sea(nodes, "land_eritrea", "sea_i5", port=True)
     link_land_sea(nodes, "land_french_somaliland", "sea_i5", port=True)
@@ -1529,15 +1522,15 @@ def build():
     link_land_sea(nodes, "land_new_hebrides", "sea_p65", port=True)
 
     # Denmark straits and canal/strait annotations
-    link(nodes, "sea_a10", "sea_a11", border_terrain="sea", canal_or_strait="Danish Straits", inference_confidence=0.9)
-    link(nodes, "sea_a11", "sea_a12", border_terrain="sea", canal_or_strait="Danish Straits", inference_confidence=0.9)
-    link(nodes, "land_denmark", "land_swe_gotland", border_terrain="coast", narrow_crossing=True, canal_or_strait="Danish Straits", inference_confidence=0.84)
+    link(nodes, "sea_a10", "sea_a11", border_terrain="sea", canal_or_strait="Danish Straits")
+    link(nodes, "sea_a11", "sea_a12", border_terrain="sea", canal_or_strait="Danish Straits")
+    link(nodes, "land_denmark", "land_swe_gotland", border_terrain="coast", narrow_crossing=True, canal_or_strait="Danish Straits")
 
     # Turkish straits (treated as canal in rules)
-    link(nodes, "sea_m10", "sea_m11", border_terrain="sea", canal_or_strait="Turkish Straits", inference_confidence=0.95)
+    link(nodes, "sea_m10", "sea_m11", border_terrain="sea", canal_or_strait="Turkish Straits")
 
     # Kaiser-Wilhelm Canal note between North Sea and Baltic adjacency near Western Germany
-    link(nodes, "sea_a23", "sea_a12", border_terrain="sea", canal_or_strait="Kaiser-Wilhelm Kanal", inference_confidence=0.82)
+    link(nodes, "sea_a23", "sea_a12", border_terrain="sea", canal_or_strait="Kaiser-Wilhelm Kanal")
 
     # Ports in Germany/France/UK linked on both relevant seas
     link_land_sea(nodes, "land_ger_western_germany", "sea_a12", port=True, canal="Kaiser-Wilhelm Kanal")
@@ -1565,7 +1558,6 @@ def build():
                 rail_seen[fallback_rail_id] = {
                     "rail_id": fallback_rail_id,
                     "gauge_change": False,
-                    "inference_confidence": edge.get("inference_confidence", 0.7),
                 }
 
             edge["railroads"] = [rail_seen[k] for k in sorted(rail_seen.keys())]
