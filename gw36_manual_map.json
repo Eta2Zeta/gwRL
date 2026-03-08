@@ -2,7 +2,7 @@
   "_meta": {
     "game": "Global War 1936 v4.3",
     "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-    "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
+    "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Edge naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Land nodes may also carry intrinsic facilities via `node_facilities` and `node_facility_ids` (e.g. airfields or built-in ports). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
     "build": {
       "source_images": [
         "original_regions/europe_sub/europe_nw.png",
@@ -31,6 +31,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_british_somaliland",
@@ -145,11 +147,13 @@
       "type": "land",
       "terrain": "desert",
       "ipp_value": 0,
-      "original_owner": "FEC",
-      "current_owner": "FEC",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_saudi_arabia",
@@ -205,6 +209,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_punjab",
@@ -303,6 +309,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_yug_eastern_yugoslavia",
@@ -379,6 +387,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_belgian_congo",
@@ -476,6 +486,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cochinchina",
@@ -542,6 +554,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_queensland",
@@ -639,6 +653,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_south_australia",
@@ -736,6 +752,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_new_south_wales",
@@ -812,6 +830,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_new_south_wales",
@@ -910,6 +930,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_new_south_wales",
@@ -965,6 +987,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_northern_territory",
@@ -1041,6 +1065,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cze_bohemia",
@@ -1181,6 +1207,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_iran_northern_iran",
@@ -1274,6 +1302,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cape_town",
@@ -1372,6 +1402,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_angola",
@@ -1491,6 +1523,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a31",
@@ -1525,6 +1559,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_pampas",
@@ -1623,6 +1659,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_celebes",
@@ -1699,6 +1737,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_caatinga",
@@ -1776,6 +1816,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_amazon_jungle",
@@ -1852,6 +1894,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bolivia",
@@ -1991,6 +2035,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_caatinga",
@@ -2067,6 +2113,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_abyssinia",
@@ -2122,6 +2170,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_paraguay",
@@ -2240,6 +2290,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gre_macedonia",
@@ -2358,6 +2410,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_benares",
@@ -2450,6 +2504,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_belgian_congo",
@@ -2542,11 +2598,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 0,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_british_columbia",
@@ -2598,11 +2656,13 @@
       "type": "land",
       "terrain": "tundra",
       "ipp_value": 0,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
@@ -2660,11 +2720,13 @@
       "type": "land",
       "terrain": "mountain",
       "ipp_value": 1,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_alberta_saskatchewan",
@@ -2735,11 +2797,13 @@
       "type": "land",
       "terrain": "tundra",
       "ipp_value": 0,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_manitoba",
@@ -2786,11 +2850,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 1,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_baffin_island",
@@ -2898,11 +2964,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 1,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_alberta_saskatchewan",
@@ -2991,11 +3059,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 1,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
@@ -3067,11 +3137,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 1,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_quebec",
@@ -3143,11 +3215,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 2,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_manitoba",
@@ -3219,11 +3293,13 @@
       "type": "land",
       "terrain": "normal",
       "ipp_value": 1,
-      "original_owner": "Canada",
-      "current_owner": "Canada",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
@@ -3321,6 +3397,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_newfoundland",
@@ -3397,6 +3475,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bechuanaland",
@@ -3473,6 +3553,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_borneo",
@@ -3528,6 +3610,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mex_eastern_mexico",
@@ -3584,6 +3668,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_niger",
@@ -3661,6 +3747,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bolivia",
@@ -3758,6 +3846,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_hopeh",
@@ -3864,6 +3954,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_beiping",
@@ -3977,6 +4069,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_kweichow",
@@ -4065,6 +4159,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_hunan",
@@ -4143,6 +4239,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_hunan",
@@ -4239,6 +4337,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_hopeh",
@@ -4333,6 +4433,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_hopeh",
@@ -4416,6 +4518,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_szechwan",
@@ -4462,6 +4566,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_beiping",
@@ -4550,6 +4656,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_hopeh",
@@ -4676,6 +4784,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_shensi",
@@ -4738,6 +4848,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_kweichow",
@@ -4768,6 +4880,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_annam_tonkin",
@@ -4834,6 +4948,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ecuador",
@@ -4952,6 +5068,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_hispaniola",
@@ -5007,6 +5125,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_tobruk",
@@ -5063,6 +5183,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aut_austria",
@@ -5182,6 +5304,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aut_austria",
@@ -5322,6 +5446,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_nigeria",
@@ -5377,6 +5503,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_nor_southern_norway",
@@ -5483,6 +5611,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_new_guinea",
@@ -5538,6 +5668,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_colombia",
@@ -5594,6 +5726,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_abyssinia",
@@ -5670,6 +5804,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a28",
@@ -5704,6 +5840,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a28",
@@ -5738,6 +5876,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_latvia",
@@ -5834,6 +5974,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p65",
@@ -5868,6 +6010,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fin_southern_finland",
@@ -5940,6 +6084,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fin_lapland",
@@ -6037,6 +6183,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fin_southern_finland",
@@ -6093,6 +6241,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p15",
@@ -6127,6 +6277,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_paris",
@@ -6225,6 +6377,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_paris",
@@ -6301,6 +6455,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_m3",
@@ -6335,6 +6491,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_paris",
@@ -6427,6 +6585,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_alsace_lorraine",
@@ -6546,6 +6706,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_normandy",
@@ -6663,6 +6825,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_alsace_lorraine",
@@ -6822,6 +6986,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_suriname",
@@ -6877,6 +7043,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_northern_algeria",
@@ -6953,6 +7121,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_abyssinia",
@@ -7008,6 +7178,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_niger",
@@ -7043,6 +7215,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gbr_northern_england",
@@ -7119,6 +7293,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gbr_london",
@@ -7216,6 +7392,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gbr_northern_england",
@@ -7291,6 +7469,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gbr_london",
@@ -7387,6 +7567,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aut_austria",
@@ -7527,6 +7709,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ger_eastern_germany",
@@ -7562,6 +7746,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ger_bavaria",
@@ -7701,6 +7887,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ger_eastern_germany",
@@ -7798,6 +7986,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_alsace_lorraine",
@@ -7957,6 +8147,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bulgaria",
@@ -8075,6 +8267,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gre_macedonia",
@@ -8110,9 +8304,11 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
-          "neighbor_id": "sea_p34",
+          "neighbor_id": "sea_p43",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -8144,6 +8340,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_suriname",
@@ -8220,6 +8418,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p50",
@@ -8254,6 +8454,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cuba",
@@ -8309,6 +8511,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_kwangtung",
@@ -8364,6 +8568,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aut_austria",
@@ -8483,6 +8689,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_burma",
@@ -8597,6 +8805,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_burma",
@@ -8710,6 +8920,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_southern_india",
@@ -8785,6 +8997,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_benares",
@@ -8862,6 +9076,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_benares",
@@ -8959,6 +9175,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_afghanistan",
@@ -9057,6 +9275,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_calcutta",
@@ -9174,6 +9394,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_afghanistan",
@@ -9272,6 +9494,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_afghanistan",
@@ -9410,6 +9634,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a21",
@@ -9464,6 +9690,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ita_northern_italy",
@@ -9561,6 +9789,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aut_austria",
@@ -9700,6 +9930,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ita_lazio",
@@ -9797,6 +10029,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_m3",
@@ -9831,6 +10065,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ita_lazio",
@@ -9927,6 +10163,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_abyssinia",
@@ -9971,6 +10209,44 @@
         }
       ]
     },
+    "land_jap_caroline_islands": {
+      "id": "land_jap_caroline_islands",
+      "name": "Caroline Islands",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [
+        "major_port",
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_caroline_islands_major_port",
+        "facility_caroline_islands_airfield"
+      ],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p46",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
     "land_jap_hokkaido": {
       "id": "land_jap_hokkaido",
       "name": "Hokkaido",
@@ -9982,6 +10258,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_jap_honshu",
@@ -10057,6 +10335,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_jap_hokkaido",
@@ -10173,6 +10453,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_jap_honshu",
@@ -10217,6 +10499,80 @@
         }
       ]
     },
+    "land_jap_mariana_islands": {
+      "id": "land_jap_mariana_islands",
+      "name": "Mariana Islands",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_mariana_islands_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_jap_okinawa": {
+      "id": "land_jap_okinawa",
+      "name": "Okinawa",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port",
+            "seaplane_base"
+          ],
+          "naval_facility_ids": [
+            "facility_okinawa_minor_port",
+            "facility_okinawa_seaplane_base"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
     "land_jap_tokyo": {
       "id": "land_jap_tokyo",
       "name": "Tokyo",
@@ -10228,6 +10584,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p16",
@@ -10251,6 +10609,38 @@
         }
       ]
     },
+    "land_jap_volcanic_islands": {
+      "id": "land_jap_volcanic_islands",
+      "name": "Volcanic Islands",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p34",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
     "land_java": {
       "id": "land_java",
       "name": "Java",
@@ -10262,6 +10652,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_borneo",
@@ -10338,6 +10730,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_afghanistan",
@@ -10436,6 +10830,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_eastern",
@@ -10543,6 +10939,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_southern_iraq",
@@ -10598,6 +10996,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_annam_tonkin",
@@ -10706,6 +11106,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_estonia",
@@ -10783,6 +11185,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ger_konigsberg",
@@ -10881,6 +11285,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_upper_egypt",
@@ -10977,6 +11383,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mindanao",
@@ -11032,6 +11440,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_i4",
@@ -11066,6 +11476,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_korea",
@@ -11184,6 +11596,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_western",
@@ -11261,6 +11675,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_beiping",
@@ -11375,6 +11791,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_eastern",
@@ -11484,6 +11902,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_i4",
@@ -11518,6 +11938,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_central_america",
@@ -11595,6 +12017,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mex_eastern_mexico",
@@ -11691,6 +12115,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_luzon_and_the_visayas",
@@ -11746,6 +12172,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mongolia_kherlen",
@@ -11792,6 +12220,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_western",
@@ -11838,6 +12268,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mongolia_tannu_tuva",
@@ -11884,6 +12316,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mongolia_kobdo",
@@ -11914,6 +12348,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mongolia_central_mongolia",
@@ -11960,6 +12396,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_kashmir",
@@ -12016,6 +12454,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_picardy",
@@ -12113,6 +12553,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ger_western_germany",
@@ -12189,6 +12631,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_new_guinea",
@@ -12244,6 +12688,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p65",
@@ -12278,6 +12724,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_dutch_new_guinea",
@@ -12354,6 +12802,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p65",
@@ -12388,6 +12838,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_chad",
@@ -12465,6 +12917,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cameroon",
@@ -12562,6 +13016,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
@@ -12653,6 +13109,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_nor_southern_norway",
@@ -12724,6 +13182,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_french_morocco",
@@ -12842,6 +13302,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_iran_northern_iran",
@@ -12940,6 +13402,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_sudan",
@@ -12996,6 +13460,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_nz_south_island",
@@ -13051,6 +13517,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_nz_north_island",
@@ -13106,6 +13574,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_qatar",
@@ -13182,6 +13652,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_belgian_congo",
@@ -13280,9 +13752,11 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
-          "neighbor_id": "sea_p34",
+          "neighbor_id": "sea_p44",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -13290,13 +13764,9 @@
           "railway_connection": false,
           "gauge_change": false,
           "railroads": [],
-          "naval_facilities": [
-            "minor_port"
-          ],
-          "naval_facility_ids": [
-            "facility_land_palau_minor_port"
-          ],
-          "port_or_dock_connection": true,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
           "canal_or_strait": null,
           "narrow_crossing": false,
           "special_fortification": null
@@ -13314,6 +13784,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_central_america",
@@ -13410,6 +13882,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bolivia",
@@ -13508,6 +13982,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_buenos_aires",
@@ -13584,6 +14060,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bolivia",
@@ -13703,6 +14181,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cze_bohemia",
@@ -13822,6 +14302,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cze_slovakia",
@@ -13941,6 +14423,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_pol_east_poland",
@@ -14060,6 +14544,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_lithuania",
@@ -14179,6 +14665,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_pol_dolnoslaskie",
@@ -14298,6 +14786,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cze_bohemia",
@@ -14459,6 +14949,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_rhodesia",
@@ -14535,6 +15027,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a36",
@@ -14569,6 +15063,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_oman",
@@ -14645,6 +15141,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_angola",
@@ -14785,6 +15283,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_pampas",
@@ -14862,6 +15362,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_rom_central_romania",
@@ -14959,6 +15461,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bulgaria",
@@ -15078,6 +15582,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aden",
@@ -15187,6 +15693,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_i4",
@@ -15221,6 +15729,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_burma",
@@ -15287,6 +15797,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bechuanaland",
@@ -15384,6 +15896,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_northern_algeria",
@@ -15440,6 +15954,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_iran_southern_iran",
@@ -15558,6 +16074,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_angola",
@@ -15634,6 +16152,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_french_morocco",
@@ -15689,6 +16209,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_abyssinia",
@@ -15808,6 +16330,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_java",
@@ -15863,6 +16387,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_french_guiana",
@@ -15939,6 +16465,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
@@ -16030,6 +16558,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fin_lapland",
@@ -16139,6 +16669,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_southern_france",
@@ -16216,6 +16748,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_northern_iraq",
@@ -16313,6 +16847,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_belgian_congo",
@@ -16410,6 +16946,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_india_benares",
@@ -16498,6 +17036,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_northern_territory",
@@ -16553,6 +17093,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cyrenaica",
@@ -16629,6 +17171,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_southern_iraq",
@@ -16705,6 +17249,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_tripolitania",
@@ -16781,6 +17327,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_cyrenaica",
@@ -16837,6 +17385,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_northern_algeria",
@@ -16913,6 +17463,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_tur_ankara",
@@ -17006,6 +17558,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_tur_akdeniz",
@@ -17104,6 +17658,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_azerbaijan",
@@ -17244,6 +17800,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bulgaria",
@@ -17383,6 +17941,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_tur_ankara",
@@ -17459,6 +18019,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_lower_egypt",
@@ -17535,6 +18097,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_pampas",
@@ -17611,6 +18175,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_chicago",
@@ -17730,6 +18296,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_appalachia",
@@ -17849,6 +18417,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_chicago",
@@ -17946,6 +18516,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_texas",
@@ -18023,6 +18595,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_appalachia",
@@ -18142,6 +18716,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_great_lakes",
@@ -18219,6 +18795,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_heartlands",
@@ -18316,6 +18894,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_chicago",
@@ -18413,6 +18993,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_upper_midwest",
@@ -18489,6 +19071,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_chicago",
@@ -18586,6 +19170,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_new_orleans",
@@ -18662,6 +19248,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mex_western_mexico",
@@ -18780,6 +19368,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mex_eastern_mexico",
@@ -18899,6 +19489,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_appalachia",
@@ -18996,6 +19588,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_appalachia",
@@ -19073,6 +19667,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_great_lakes",
@@ -19160,6 +19756,42 @@
         }
       ]
     },
+    "land_usa_wake_island": {
+      "id": "land_usa_wake_island",
+      "name": "Wake Island",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United States",
+      "current_owner": "United States",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p36",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_wake_island_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
     "land_usa_washington_dc": {
       "id": "land_usa_washington_dc",
       "name": "Washington, D.C.",
@@ -19171,6 +19803,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_appalachia",
@@ -19289,6 +19923,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_great_plains",
@@ -19403,6 +20039,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_northern",
@@ -19501,6 +20139,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_buryatia",
@@ -19578,6 +20218,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_angara",
@@ -19676,6 +20318,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_northern",
@@ -19790,6 +20434,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_donets_kuban",
@@ -19907,6 +20553,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_crimea",
@@ -20047,6 +20695,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_donets_kuban",
@@ -20187,6 +20837,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_saratov",
@@ -20264,6 +20916,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_angara",
@@ -20341,6 +20995,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_donets_kuban",
@@ -20439,6 +21095,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_moscow",
@@ -20516,6 +21174,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_magadan",
@@ -20567,6 +21227,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fin_viipuri_province",
@@ -20665,6 +21327,8 @@
       "is_capital": false,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_eastern_ukraine",
@@ -20805,6 +21469,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_karelia",
@@ -20897,6 +21563,8 @@
       "is_capital": false,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_estonia",
@@ -21015,6 +21683,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_kamchatka",
@@ -21087,6 +21757,8 @@
       "is_capital": true,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_kaluga_oblast",
@@ -21227,6 +21899,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_donets_kuban",
@@ -21345,6 +22019,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_south_sakhalin",
@@ -21396,6 +22072,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_latvia",
@@ -21536,6 +22214,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_karelia",
@@ -21634,6 +22314,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_eastern_ukraine",
@@ -21732,6 +22414,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_korea",
@@ -21845,6 +22529,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_gorky",
@@ -21943,6 +22629,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_kaluga_oblast",
@@ -22062,6 +22750,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_north_sakhalin",
@@ -22117,6 +22807,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_pol_lubelskie",
@@ -22236,6 +22928,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_rom_bessarabia",
@@ -22376,6 +23070,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_yakutsk",
@@ -22411,6 +23107,8 @@
       "is_capital": false,
       "is_victory_city": true,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_donets_kuban",
@@ -22530,6 +23228,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_vanavara",
@@ -22565,6 +23265,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_crimea",
@@ -22704,6 +23406,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_azerbaijan",
@@ -22817,6 +23521,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_eastern_ukraine",
@@ -22957,6 +23663,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_irkutsk",
@@ -23013,6 +23721,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_kaluga_oblast",
@@ -23174,6 +23884,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_pol_east_poland",
@@ -23314,6 +24026,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_amur",
@@ -23391,6 +24105,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_gorky",
@@ -23489,6 +24205,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_amazon_jungle",
@@ -23586,6 +24304,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_northern_algeria",
@@ -23642,6 +24362,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_lower_egypt",
@@ -23718,6 +24440,8 @@
       "is_capital": true,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_albania",
@@ -23858,6 +24582,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_albania",
@@ -23976,6 +24702,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_baffin_island",
@@ -24054,6 +24782,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
@@ -24160,6 +24890,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a10",
@@ -24206,6 +24938,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
@@ -24408,6 +25142,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_estonia",
@@ -24534,6 +25270,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fin_lapland",
@@ -24612,6 +25350,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
@@ -24698,6 +25438,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
@@ -24840,6 +25582,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a18",
@@ -24870,6 +25614,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_baffin_island",
@@ -24932,6 +25678,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a21",
@@ -24962,6 +25710,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gbr_northern_england",
@@ -25068,6 +25818,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_normandy",
@@ -25170,6 +25922,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
@@ -25392,6 +26146,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_ontario",
@@ -25446,6 +26202,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_new_york",
@@ -25512,6 +26270,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_the_carolinas",
@@ -25598,6 +26358,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_esp_basque_country",
@@ -25764,6 +26526,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a28",
@@ -25794,6 +26558,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bermuda",
@@ -25896,6 +26662,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a31",
@@ -25958,6 +26726,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a33",
@@ -26004,6 +26774,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_colombia",
@@ -26206,6 +26978,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_brazil_caatinga",
@@ -26392,6 +27166,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_angola",
@@ -26538,6 +27314,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_buenos_aires",
@@ -26648,6 +27426,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_m1",
@@ -26678,6 +27458,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_gbr_scotland",
@@ -26768,6 +27550,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_a10",
@@ -26814,6 +27598,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_burma",
@@ -26924,6 +27710,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aden",
@@ -27022,6 +27810,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_british_somaliland",
@@ -27208,6 +27998,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_eritrea",
@@ -27350,6 +28142,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_western_australia",
@@ -27564,6 +28358,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_iran_southern_iran",
@@ -27674,6 +28470,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_southern_france",
@@ -27800,6 +28598,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_bulgaria",
@@ -27942,6 +28742,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_tur_akdeniz",
@@ -28104,6 +28906,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_azerbaijan",
@@ -28166,6 +28970,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_m1",
@@ -28228,6 +29034,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fra_corsica",
@@ -28354,6 +29162,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_ita_lazio",
@@ -28440,6 +29250,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_albania",
@@ -28582,6 +29394,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_lower_egypt",
@@ -28744,6 +29558,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p12",
@@ -28790,6 +29606,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p11",
@@ -28868,6 +29686,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p12",
@@ -28914,6 +29734,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_beiping",
@@ -29047,6 +29869,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_formosa",
@@ -29161,6 +29985,38 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p34",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p50",
           "border_terrain": "sea",
           "passable": true,
@@ -29189,6 +30045,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_jap_honshu",
@@ -29229,6 +30087,22 @@
           "canal_or_strait": null,
           "narrow_crossing": false,
           "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p34",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
         }
       ]
     },
@@ -29243,6 +30117,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usr_kamchatka",
@@ -29337,6 +30213,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p12",
@@ -29383,6 +30261,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_western_united_states",
@@ -29461,6 +30341,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_usa_san_francisco",
@@ -29527,6 +30409,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mex_western_mexico",
@@ -29613,6 +30497,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_chile",
@@ -29719,6 +30605,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_china_nanking",
@@ -29777,7 +30665,125 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p33": {
+      "id": "sea_p33",
+      "name": "Sea Zone P33",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_okinawa",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port",
+            "seaplane_base"
+          ],
+          "naval_facility_ids": [
+            "facility_okinawa_minor_port",
+            "facility_okinawa_seaplane_base"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p34",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p43",
           "border_terrain": "sea",
           "passable": true,
           "has_river": false,
@@ -29805,6 +30811,236 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_volcanic_islands",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p16",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p35",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p45",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p35": {
+      "id": "sea_p35",
+      "name": "Sea Zone P35",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p34",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p36": {
+      "id": "sea_p36",
+      "name": "Central Pacific",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_usa_wake_island",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_wake_island_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p42": {
+      "id": "sea_p42",
+      "name": "Sea Zone P42",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p43": {
+      "id": "sea_p43",
+      "name": "Mariana Sea",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_guam",
@@ -29827,7 +31063,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_palau",
+          "neighbor_id": "land_jap_mariana_islands",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -29839,7 +31075,7 @@
             "minor_port"
           ],
           "naval_facility_ids": [
-            "facility_land_palau_minor_port"
+            "facility_mariana_islands_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -29848,6 +31084,390 @@
         },
         {
           "neighbor_id": "sea_p32",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p34",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p42",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p44",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p45",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p46",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p44": {
+      "id": "sea_p44",
+      "name": "Sea Zone P44",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_palau",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p46",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p45": {
+      "id": "sea_p45",
+      "name": "Sea Zone P45",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p34",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p46",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p46": {
+      "id": "sea_p46",
+      "name": "Sea Zone P46",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_caroline_islands",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p43",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p44",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p45",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p47",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p53",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p54",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p47": {
+      "id": "sea_p47",
+      "name": "Sea Zone P47",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p46",
           "border_terrain": "sea",
           "passable": true,
           "has_river": false,
@@ -29875,6 +31495,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_british_columbia",
@@ -29925,6 +31547,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_annam_tonkin",
@@ -30107,6 +31731,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_mindanao",
@@ -30146,6 +31772,70 @@
         }
       ]
     },
+    "sea_p53": {
+      "id": "sea_p53",
+      "name": "Sea Zone P53",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p46",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p54": {
+      "id": "sea_p54",
+      "name": "Sea Zone P54",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_capital": false,
+      "is_victory_city": false,
+      "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p46",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "special_fortification": null
+        }
+      ]
+    },
     "sea_p59": {
       "id": "sea_p59",
       "name": "Java Sea",
@@ -30157,6 +31847,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_borneo",
@@ -30263,6 +31955,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_can_british_columbia",
@@ -30365,6 +32059,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_celebes",
@@ -30431,6 +32127,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_northern_territory",
@@ -30537,6 +32235,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_queensland",
@@ -30603,6 +32303,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_new_britain",
@@ -30689,6 +32391,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "sea_p63",
@@ -30735,6 +32439,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_fiji",
@@ -30841,6 +32547,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_aus_new_south_wales",
@@ -30927,6 +32635,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_nz_north_island",
@@ -30997,6 +32707,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_jap_hokkaido",
@@ -31123,6 +32835,8 @@
       "is_capital": false,
       "is_victory_city": false,
       "source": "llm_manual_from_region_images",
+      "node_facilities": [],
+      "node_facility_ids": [],
       "neighbors": [
         {
           "neighbor_id": "land_jap_hokkaido",

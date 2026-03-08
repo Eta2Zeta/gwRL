@@ -31,6 +31,8 @@ DEFAULT_NODE = {
     "is_capital": False,
     "is_victory_city": False,
     "source": "llm_manual_from_region_images",
+    "node_facilities": [],
+    "node_facility_ids": [],
     "neighbors": [],
 }
 
@@ -47,6 +49,9 @@ NAVAL_FACILITY_TYPES = [
 ]
 NAVAL_FACILITY_TYPE_SET = set(NAVAL_FACILITY_TYPES)
 NAVAL_FACILITY_TYPE_ORDER = {name: idx for idx, name in enumerate(NAVAL_FACILITY_TYPES)}
+NODE_FACILITY_TYPES = NAVAL_FACILITY_TYPES + ["airfield"]
+NODE_FACILITY_TYPE_SET = set(NODE_FACILITY_TYPES)
+NODE_FACILITY_TYPE_ORDER = {name: idx for idx, name in enumerate(NODE_FACILITY_TYPES)}
 
 
 def normalize_naval_facility_types(facility_types):
@@ -76,6 +81,33 @@ def normalize_naval_facility_types(facility_types):
     return normalized
 
 
+def normalize_node_facility_types(facility_types):
+    if not facility_types:
+        return []
+    if isinstance(facility_types, str):
+        facility_types = [facility_types]
+
+    normalized = []
+    seen = set()
+    for facility in facility_types:
+        if facility is None:
+            continue
+        if not isinstance(facility, str):
+            raise TypeError(f"Node facility type must be a string, got {type(facility)!r}")
+
+        key = facility.strip()
+        if key not in NODE_FACILITY_TYPE_SET:
+            raise ValueError(
+                f"Unknown node facility type '{facility}'. Valid types: {sorted(NODE_FACILITY_TYPE_SET)}"
+            )
+        if key not in seen:
+            seen.add(key)
+            normalized.append(key)
+
+    normalized.sort(key=lambda name: NODE_FACILITY_TYPE_ORDER[name])
+    return normalized
+
+
 def add_node(nodes, node_id, **attrs):
     if node_id in nodes:
         raise ValueError(f"Duplicate node id: {node_id}")
@@ -87,6 +119,22 @@ def add_node(nodes, node_id, **attrs):
         node["current_owner"] = node["original_owner"]
     node["id"] = node_id
     node["name"] = node.get("name") or node_id
+    node_facilities = normalize_node_facility_types(node.get("node_facilities"))
+    node_facility_ids = node.get("node_facility_ids") or []
+    if isinstance(node_facility_ids, str):
+        node_facility_ids = [node_facility_ids]
+    else:
+        node_facility_ids = list(node_facility_ids)
+    if node_facilities and not node_facility_ids:
+        node_part = zone_name_part(node_id)
+        node_facility_ids = [f"facility_{node_part}_{facility}" for facility in node_facilities]
+    if len(node_facility_ids) != len(node_facilities):
+        raise ValueError(
+            f"Node {node_id} node_facility_ids length ({len(node_facility_ids)}) "
+            f"must match node_facilities length ({len(node_facilities)})."
+        )
+    node["node_facilities"] = node_facilities
+    node["node_facility_ids"] = node_facility_ids
     node["neighbors"] = []
     nodes[node_id] = node
     return node
@@ -335,7 +383,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
+            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Edge naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Land nodes may also carry intrinsic facilities via `node_facilities` and `node_facility_ids` (e.g. airfields or built-in ports). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
             "build": {
                 "source_images": [
                     "original_regions/europe_sub/europe_nw.png",
@@ -420,9 +468,20 @@ def build():
         ("sea_p15", "East China Sea"),
         ("sea_p16", "Sea Zone P16"),
         ("sea_p32", "Philippine Sea West"),
+        ("sea_p33", "Sea Zone P33"),
         ("sea_p34", "Western Pacific Central"),
+        ("sea_p35", "Sea Zone P35"),
+        ("sea_p36", "Central Pacific"),
+        ("sea_p42", "Sea Zone P42"),
+        ("sea_p43", "Mariana Sea"),
+        ("sea_p44", "Sea Zone P44"),
+        ("sea_p45", "Sea Zone P45"),
+        ("sea_p46", "Sea Zone P46"),
+        ("sea_p47", "Sea Zone P47"),
         ("sea_p50", "South China Sea"),
         ("sea_p52", "Philippine Sea South"),
+        ("sea_p53", "Sea Zone P53"),
+        ("sea_p54", "Sea Zone P54"),
         ("sea_p59", "Java Sea"),
         ("sea_p60", "Celebes Sea"),
         ("sea_p61", "Arafura Sea"),
@@ -702,6 +761,8 @@ def build():
         ("land_jap_hokkaido", "Hokkaido", "forest", 1, "Japan", False, False),
         ("land_jap_kyushu", "Kyushu", "mountain", 1, "Japan", False, False),
         ("land_korea", "Korea", "mountain", 2, "Japan", False, False),
+        ("land_jap_okinawa", "Okinawa", "normal", 0, "Japan", False, False),
+        ("land_jap_volcanic_islands", "Volcanic Islands", "normal", 0, "Japan", False, False),
         ("land_formosa", "Formosa", "normal", 2, "Japan", False, False),
         ("land_hainan", "Hainan", "normal", 1, "Japan", False, False),
         ("land_hong_kong", "Hong Kong", "city", 2, "FEC", False, False),
@@ -712,6 +773,9 @@ def build():
         ("land_luzon_and_the_visayas", "Luzon and the Visayas", "jungle", 1, "Philippines", False, False),
         ("land_mindanao", "Mindanao", "jungle", 1, "Philippines", False, False),
         ("land_guam", "Guam", "normal", 0, "United States", False, False),
+        ("land_jap_mariana_islands", "Mariana Islands", "normal", 0, "Japan", False, False),
+        ("land_jap_caroline_islands", "Caroline Islands", "normal", 0, "Japan", False, False),
+        ("land_usa_wake_island", "Wake Island", "normal", 0, "United States", False, False),
         ("land_palau", "Palau", "normal", 0, "Japan", False, False),
 
         ("land_sumatra", "Sumatra", "jungle", 2, "Netherlands", False, False),
@@ -750,6 +814,13 @@ def build():
             is_victory_city=vc,
             source="llm_manual_from_region_images",
         )
+
+    # Intrinsic facilities printed on the land tile itself.
+    nodes["land_jap_caroline_islands"]["node_facilities"] = ["major_port", "airfield"]
+    nodes["land_jap_caroline_islands"]["node_facility_ids"] = [
+        "facility_caroline_islands_major_port",
+        "facility_caroline_islands_airfield",
+    ]
 
     # Sea-sea framework (Europe basin)
     link(nodes, "sea_a6", "sea_a7", border_terrain="sea")
@@ -812,7 +883,25 @@ def build():
     link(nodes, "sea_p7", "sea_p14", border_terrain="sea")
     link(nodes, "sea_p14", "sea_p15", border_terrain="sea")
     link(nodes, "sea_p15", "sea_p32", border_terrain="sea")
-    link(nodes, "sea_p32", "sea_p34", border_terrain="sea")
+    link(nodes, "sea_p15", "sea_p33", border_terrain="sea")
+    link(nodes, "sea_p15", "sea_p34", border_terrain="sea")
+    link(nodes, "sea_p16", "sea_p34", border_terrain="sea")
+    link(nodes, "sea_p32", "sea_p33", border_terrain="sea")
+    link(nodes, "sea_p32", "sea_p43", border_terrain="sea")
+    link(nodes, "sea_p33", "sea_p34", border_terrain="sea")
+    link(nodes, "sea_p33", "sea_p43", border_terrain="sea")
+    link(nodes, "sea_p34", "sea_p43", border_terrain="sea")
+    link(nodes, "sea_p34", "sea_p35", border_terrain="sea")
+    link(nodes, "sea_p34", "sea_p45", border_terrain="sea")
+    link(nodes, "sea_p42", "sea_p43", border_terrain="sea")
+    link(nodes, "sea_p43", "sea_p44", border_terrain="sea")
+    link(nodes, "sea_p43", "sea_p45", border_terrain="sea")
+    link(nodes, "sea_p43", "sea_p46", border_terrain="sea")
+    link(nodes, "sea_p44", "sea_p46", border_terrain="sea")
+    link(nodes, "sea_p45", "sea_p46", border_terrain="sea")
+    link(nodes, "sea_p46", "sea_p47", border_terrain="sea")
+    link(nodes, "sea_p46", "sea_p53", border_terrain="sea")
+    link(nodes, "sea_p46", "sea_p54", border_terrain="sea")
     link(nodes, "sea_p15", "sea_p50", border_terrain="sea")
     link(nodes, "sea_p50", "sea_p52", border_terrain="sea")
     link(nodes, "sea_p50", "sea_p59", border_terrain="sea")
@@ -1467,6 +1556,8 @@ def build():
     link_land_sea(nodes, "land_jap_honshu", "sea_p7", port=True)
     link_land_sea(nodes, "land_jap_honshu", "sea_p15", port=True)
     link_land_sea(nodes, "land_jap_kyushu", "sea_p15", port=True)
+    link_land_sea(nodes, "land_jap_okinawa", "sea_p33", naval_facilities=["minor_port", "seaplane_base"])
+    link_land_sea(nodes, "land_jap_volcanic_islands", "sea_p34", port=False)
     link_land_sea(nodes, "land_korea", "sea_p15", port=True)
     link_land_sea(nodes, "land_korea", "sea_p14", port=True)
     link_land_sea(nodes, "land_manchuria_eastern", "sea_p7", port=True)
@@ -1500,8 +1591,11 @@ def build():
     link_land_sea(nodes, "land_siam", "sea_p50", port=True)
     link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p32", port=True)
     link_land_sea(nodes, "land_mindanao", "sea_p52", port=True)
-    link_land_sea(nodes, "land_palau", "sea_p34", port=True)
-    link_land_sea(nodes, "land_guam", "sea_p34", port=True)
+    link_land_sea(nodes, "land_palau", "sea_p44", port=False)
+    link_land_sea(nodes, "land_guam", "sea_p43", port=True)
+    link_land_sea(nodes, "land_jap_mariana_islands", "sea_p43", port=True)
+    link_land_sea(nodes, "land_jap_caroline_islands", "sea_p46", port=False)
+    link_land_sea(nodes, "land_usa_wake_island", "sea_p36", port=True)
     link_land_sea(nodes, "land_sumatra", "sea_p59", port=True)
     link_land_sea(nodes, "land_java", "sea_p59", port=True)
     link_land_sea(nodes, "land_borneo", "sea_p59", port=True)
@@ -1539,6 +1633,26 @@ def build():
 
     # Clean neighbors: sort and dedupe per node
     for nid, node in nodes.items():
+        node_facilities = normalize_node_facility_types(node.get("node_facilities"))
+        node_facility_ids = node.get("node_facility_ids") or []
+        if isinstance(node_facility_ids, str):
+            node_facility_ids = [node_facility_ids]
+        else:
+            node_facility_ids = list(node_facility_ids)
+
+        if node_facilities and not node_facility_ids:
+            node_part = zone_name_part(nid)
+            node_facility_ids = [f"facility_{node_part}_{facility}" for facility in node_facilities]
+
+        if len(node_facility_ids) != len(node_facilities):
+            raise ValueError(
+                f"Node {nid} node_facility_ids length ({len(node_facility_ids)}) "
+                f"must match node_facilities length ({len(node_facilities)})."
+            )
+
+        node["node_facilities"] = node_facilities
+        node["node_facility_ids"] = node_facility_ids
+
         seen = {}
         for e in node.get("neighbors", []):
             seen[e["neighbor_id"]] = e
