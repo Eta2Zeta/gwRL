@@ -6,12 +6,14 @@ OUTPUT = "gw36_manual_map.json"
 DEFAULT_EDGE = {
     "neighbor_id": None,
     "border_terrain": "normal",
+    "passable": True,
     "has_river": False,
     "river_crossing": False,
     "railway_connection": False,
     "gauge_change": False,
     "railroads": [],
     "naval_facilities": [],
+    "naval_facility_ids": [],
     "port_or_dock_connection": False,
     "canal_or_strait": None,
     "narrow_crossing": False,
@@ -139,7 +141,25 @@ def set_edge(nodes, src, dst, **attrs):
     if target.get("port_or_dock_connection") and not naval_facilities:
         naval_facilities = ["minor_port"]
 
+    naval_facility_ids = target.get("naval_facility_ids") or []
+    if isinstance(naval_facility_ids, str):
+        naval_facility_ids = [naval_facility_ids]
+    else:
+        naval_facility_ids = list(naval_facility_ids)
+
+    if naval_facilities and not naval_facility_ids:
+        land_node = src if src.startswith("land_") else (dst if dst.startswith("land_") else src)
+        land_part = zone_name_part(land_node)
+        naval_facility_ids = [f"facility_{land_part}_{facility}" for facility in naval_facilities]
+
+    if len(naval_facility_ids) != len(naval_facilities):
+        raise ValueError(
+            f"Edge {src}->{dst} naval_facility_ids length ({len(naval_facility_ids)}) "
+            f"must match naval_facilities length ({len(naval_facilities)})."
+        )
+
     target["naval_facilities"] = naval_facilities
+    target["naval_facility_ids"] = naval_facility_ids
     target["port_or_dock_connection"] = bool(naval_facilities)
 
     return target
@@ -204,6 +224,7 @@ def link_rail(
     a,
     b,
     border_terrain="normal",
+    passable=True,
     river_crossing=False,
     has_river=False,
     rail_id=None,
@@ -221,6 +242,7 @@ def link_rail(
         a,
         b,
         border_terrain=border_terrain,
+        passable=passable,
         has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=True,
@@ -232,17 +254,19 @@ def link_rail(
     add_rail_segment(nodes, b, a, rail_id=rail_id, confidence=confidence)
 
 
-def link_land(nodes, a, b, border_terrain="normal", river_crossing=False, has_river=False, confidence=0.76):
+def link_land(nodes, a, b, border_terrain="normal", passable=True, river_crossing=False, has_river=False, confidence=0.76):
     link(
         nodes,
         a,
         b,
         border_terrain=border_terrain,
+        passable=passable,
         has_river=has_river,
         river_crossing=river_crossing,
         railway_connection=False,
         gauge_change=False,
         naval_facilities=[],
+        naval_facility_ids=[],
         port_or_dock_connection=False,
         canal_or_strait=None,
         narrow_crossing=False,
@@ -256,25 +280,50 @@ def link_land_sea(
     sea,
     port=False,
     naval_facilities=None,
+    naval_facility_id=None,
+    naval_facility_ids=None,
     railway_connection=False,
     rail_id=None,
+    passable=True,
     canal=None,
     narrow=False,
     confidence=0.76,
 ):
     if naval_facilities is None:
         naval_facilities = ["minor_port"] if port else []
+    naval_facilities = normalize_naval_facility_types(naval_facilities)
+
+    if naval_facility_ids is None:
+        if naval_facility_id is not None:
+            if len(naval_facilities) != 1:
+                raise ValueError("naval_facility_id requires exactly one naval facility type.")
+            naval_facility_ids = [naval_facility_id]
+        else:
+            land_part = zone_name_part(land)
+            naval_facility_ids = [f"facility_{land_part}_{facility}" for facility in naval_facilities]
+    elif isinstance(naval_facility_ids, str):
+        naval_facility_ids = [naval_facility_ids]
+    else:
+        naval_facility_ids = list(naval_facility_ids)
+
+    if len(naval_facility_ids) != len(naval_facilities):
+        raise ValueError(
+            f"link_land_sea {land}<->{sea}: naval_facility_ids length ({len(naval_facility_ids)}) "
+            f"must match naval_facilities length ({len(naval_facilities)})."
+        )
 
     link(
         nodes,
         land,
         sea,
         border_terrain="coast",
+        passable=passable,
         has_river=False,
         river_crossing=False,
         railway_connection=False,
         gauge_change=False,
         naval_facilities=naval_facilities,
+        naval_facility_ids=naval_facility_ids,
         port_or_dock_connection=bool(naval_facilities),
         canal_or_strait=canal,
         narrow_crossing=narrow,
@@ -292,7 +341,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` and may include multiple values on the same edge (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
+            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
             "build": {
                 "source_images": [
                     "original_regions/europe_sub/europe_nw.png",
@@ -943,7 +992,9 @@ def build():
     link_rail(nodes, "land_kashmir", "land_tibet", border_terrain="mountain")
     link_rail(nodes, "land_kashmir", "land_nepal", border_terrain="mountain")
     link_rail(nodes, "land_kashmir", "land_india_punjab")
-    link_rail(nodes, "land_tibet", "land_nepal", border_terrain="mountain")
+    link_rail(nodes, "land_tibet", "land_nepal", border_terrain="mountain", passable=False)
+    link_land(nodes, "land_tibet", "land_india_benares", border_terrain="mountain", passable=False)
+    link_land(nodes, "land_tibet", "land_india_calcutta", border_terrain="mountain", passable=False)
     link_rail(nodes, "land_india_punjab", "land_india_delhi")
     link_rail(nodes, "land_india_delhi", "land_india_maharashtra", river_crossing=True)
     link_rail(nodes, "land_india_delhi", "land_india_benares")
@@ -1127,21 +1178,23 @@ def build():
     link_land(nodes, "land_china_hopeh", "land_china_beiping")
     link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
     link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
+    link_land(nodes, "land_china_hopeh", "land_china_szechwan", river_crossing=True)
     link_rail_through_node(nodes, "land_china_hopeh", "land_china_shantung", "land_china_beiping")
     link_rail_through_node(nodes, "land_china_hopeh", "land_china_shensi", "land_china_beiping")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
-    link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
-    link_land(nodes, "land_china_hunan", "land_kwangtung")
+    link_rail(nodes, "land_china_nanking", "land_china_hunan")
+    link_rail(nodes, "land_china_hunan", "land_kwangtung", has_river=True)
     link_land(nodes, "land_china_kweichow", "land_kwangtung")
-    link_land(nodes, "land_china_yunnan", "land_china_kweichow", border_terrain="mountain")
-    link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain")
-    link_land(nodes, "land_china_szechwan", "land_china_shensi")
-    link_land(nodes, "land_china_shensi", "land_china_suiyuan")
-    link_land(nodes, "land_china_tsinghai", "land_china_szechwan", border_terrain="mountain")
+    link_land(nodes, "land_china_yunnan", "land_china_kweichow", border_terrain="mountain", has_river=True)
+    link_land(nodes, "land_china_shantung", "land_china_szechwan")
+    link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
+    link_land(nodes, "land_china_szechwan", "land_china_shensi", border_terrain="mountain")
+    link_land(nodes, "land_china_shensi", "land_china_suiyuan", border_terrain="mountain", river_crossing=True)
+    link_land(nodes, "land_china_tsinghai", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_tsinghai", "land_china_sinkiang", border_terrain="mountain")
     link_land(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
-    link_land(nodes, "land_china_shensi", "land_china_hunan")
-    link_land(nodes, "land_china_hunan", "land_china_kweichow")
+    link_land(nodes, "land_china_hunan", "land_china_kweichow", has_river=True, river_crossing=True)
+    link_land(nodes, "land_china_hunan", "land_china_szechwan")
     link_rail(nodes, "land_kwangtung", "land_hong_kong")
     link_land(nodes, "land_annam_tonkin", "land_kwangtung", border_terrain="jungle")
     link_land(nodes, "land_annam_tonkin", "land_cochinchina", border_terrain="jungle")
@@ -1425,8 +1478,26 @@ def build():
     link_land_sea(nodes, "land_korea", "sea_p14", port=True)
     link_land_sea(nodes, "land_manchuria_eastern", "sea_p7", port=True)
     link_land_sea(nodes, "land_china_beiping", "sea_p14", port=True, railway_connection=True, confidence=0.78)
-    link_land_sea(nodes, "land_china_shantung", "sea_p14", port=True)
-    link_land_sea(nodes, "land_china_nanking", "sea_p15", port=True)
+    link_land_sea(
+        nodes,
+        "land_china_shantung",
+        "sea_p14",
+        naval_facilities=["major_port", "minor_dockyard"],
+    )
+    link_land_sea(
+        nodes,
+        "land_china_nanking",
+        "sea_p14",
+        naval_facilities=["major_port"],
+        naval_facility_id="port_nanking_major",
+    )
+    link_land_sea(
+        nodes,
+        "land_china_nanking",
+        "sea_p32",
+        naval_facilities=["major_port"],
+        naval_facility_id="port_nanking_major",
+    )
     link_land_sea(nodes, "land_formosa", "sea_p15", port=True)
     link_land_sea(nodes, "land_hainan", "sea_p50", port=True)
     link_land_sea(nodes, "land_hong_kong", "sea_p50", port=True)
@@ -1504,7 +1575,26 @@ def build():
             facilities = normalize_naval_facility_types(edge.get("naval_facilities"))
             if edge.get("port_or_dock_connection") and not facilities:
                 facilities = ["minor_port"]
+
+            facility_ids = edge.get("naval_facility_ids") or []
+            if isinstance(facility_ids, str):
+                facility_ids = [facility_ids]
+            else:
+                facility_ids = list(facility_ids)
+
+            if facilities and not facility_ids:
+                land_node = nid if nid.startswith("land_") else (edge["neighbor_id"] if edge["neighbor_id"].startswith("land_") else nid)
+                land_part = zone_name_part(land_node)
+                facility_ids = [f"facility_{land_part}_{facility}" for facility in facilities]
+
+            if len(facility_ids) != len(facilities):
+                raise ValueError(
+                    f"Edge {nid}->{edge['neighbor_id']} naval_facility_ids length ({len(facility_ids)}) "
+                    f"must match naval_facilities length ({len(facilities)})."
+                )
+
             edge["naval_facilities"] = facilities
+            edge["naval_facility_ids"] = facility_ids
             edge["port_or_dock_connection"] = bool(facilities)
 
     # Ensure symmetric closure (best-effort defaults for missing reverse)
