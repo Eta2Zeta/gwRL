@@ -32,7 +32,6 @@ DEFAULT_NODE = {
     "source": "llm_manual_from_region_images",
     "source_confidence": 0.7,
     "neighbors": [],
-    "rail_secondary_edges": [],
 }
 
 # Rulebook (13.2.2-13.2.5) facility types that can sit on a land-sea boundary.
@@ -89,7 +88,6 @@ def add_node(nodes, node_id, **attrs):
     node["id"] = node_id
     node["name"] = node.get("name") or node_id
     node["neighbors"] = []
-    node["rail_secondary_edges"] = []
     nodes[node_id] = node
     return node
 
@@ -185,61 +183,20 @@ def add_rail_segment(nodes, src, dst, rail_id, confidence):
     edge["gauge_change"] = False
 
 
-def connect_rail_edges(
-    nodes,
-    node_id,
-    from_neighbor_id,
-    to_neighbor_id,
-    from_rail_id=None,
-    to_rail_id=None,
-    confidence=0.78,
-    bidirectional=True,
-):
-    if node_id not in nodes:
-        raise KeyError(f"Cannot connect rails at missing node {node_id}")
-
-    node = nodes[node_id]
-
+def link_rail_through_node(nodes, node_id, from_neighbor_id, to_neighbor_id, rail_id=None, confidence=0.78):
     from_edge = find_edge(nodes, node_id, from_neighbor_id)
     to_edge = find_edge(nodes, node_id, to_neighbor_id)
     if not from_edge or not to_edge:
-        raise KeyError(f"Missing neighbor edge at {node_id} for rail-secondary connection")
+        raise KeyError(f"Missing neighbor edge at {node_id} for rail-through link")
 
-    if from_rail_id is None and to_rail_id is None:
-        auto_rail_id = f"rail_{zone_name_part(from_neighbor_id)}_{zone_name_part(node_id)}_{zone_name_part(to_neighbor_id)}"
-        add_rail_segment(nodes, node_id, from_neighbor_id, auto_rail_id, confidence)
-        add_rail_segment(nodes, from_neighbor_id, node_id, auto_rail_id, confidence)
-        add_rail_segment(nodes, node_id, to_neighbor_id, auto_rail_id, confidence)
-        add_rail_segment(nodes, to_neighbor_id, node_id, auto_rail_id, confidence)
-        from_rail_id = auto_rail_id
-        to_rail_id = auto_rail_id
-    elif from_rail_id is None or to_rail_id is None:
-        raise ValueError("Either provide both from_rail_id/to_rail_id or neither.")
-    else:
-        from_has = any(r.get("rail_id") == from_rail_id for r in from_edge.get("railroads", []))
-        to_has = any(r.get("rail_id") == to_rail_id for r in to_edge.get("railroads", []))
-        if not (from_has and to_has):
-            raise ValueError(
-                f"Cannot connect missing rail ids at {node_id}: {from_neighbor_id}/{from_rail_id} -> {to_neighbor_id}/{to_rail_id}"
-            )
+    if rail_id is None:
+        rail_id = f"rail_{zone_name_part(from_neighbor_id)}_{zone_name_part(node_id)}_{zone_name_part(to_neighbor_id)}"
 
-    def _add_connection(a_neighbor, a_rail, b_neighbor, b_rail):
-        connection_id = f"rail_{zone_name_part(a_neighbor)}_{zone_name_part(node_id)}_{zone_name_part(b_neighbor)}"
-        entry = {
-            "connection_id": connection_id,
-            "from_neighbor_id": a_neighbor,
-            "from_rail_id": a_rail,
-            "to_neighbor_id": b_neighbor,
-            "to_rail_id": b_rail,
-            "inference_confidence": confidence,
-        }
-        edges = node.setdefault("rail_secondary_edges", [])
-        if not any(x.get("connection_id") == connection_id for x in edges):
-            edges.append(entry)
-
-    _add_connection(from_neighbor_id, from_rail_id, to_neighbor_id, to_rail_id)
-    if bidirectional and not (from_neighbor_id == to_neighbor_id and from_rail_id == to_rail_id):
-        _add_connection(to_neighbor_id, to_rail_id, from_neighbor_id, from_rail_id)
+    # Apply the same rail id to both legs through the junction node.
+    add_rail_segment(nodes, node_id, from_neighbor_id, rail_id=rail_id, confidence=confidence)
+    add_rail_segment(nodes, from_neighbor_id, node_id, rail_id=rail_id, confidence=confidence)
+    add_rail_segment(nodes, node_id, to_neighbor_id, rail_id=rail_id, confidence=confidence)
+    add_rail_segment(nodes, to_neighbor_id, node_id, rail_id=rail_id, confidence=confidence)
 
 
 def link_rail(
@@ -335,7 +292,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` and may include multiple values on the same edge (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag; nodes include `rail_secondary_edges` to map rail continuity through multi-rail junction tiles.",
+            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` and may include multiple values on the same edge (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
             "build": {
                 "source_images": [
                     "original_regions/europe_sub/europe_nw.png",
@@ -1165,13 +1122,13 @@ def build():
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
 
-    link_land(nodes, "land_china_suiyuan", "land_china_hopeh")
+    link_land(nodes, "land_china_suiyuan", "land_china_hopeh", has_river=True)
     link_rail(nodes, "land_china_suiyuan", "land_china_beiping", border_terrain="mountain")
     link_land(nodes, "land_china_hopeh", "land_china_beiping")
     link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
     link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
-    connect_rail_edges(nodes, "land_china_hopeh", "land_china_shensi", "land_china_beiping")
-    connect_rail_edges(nodes, "land_china_hopeh", "land_china_shantung", "land_china_beiping")
+    link_rail_through_node(nodes, "land_china_hopeh", "land_china_shantung", "land_china_beiping")
+    link_rail_through_node(nodes, "land_china_hopeh", "land_china_shensi", "land_china_beiping")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
     link_rail(nodes, "land_china_nanking", "land_china_hunan", river_crossing=True)
     link_land(nodes, "land_china_hunan", "land_kwangtung")
@@ -1549,13 +1506,6 @@ def build():
                 facilities = ["minor_port"]
             edge["naval_facilities"] = facilities
             edge["port_or_dock_connection"] = bool(facilities)
-
-        sec_seen = {}
-        for sec in node.get("rail_secondary_edges", []):
-            sid = sec.get("connection_id")
-            if sid:
-                sec_seen[sid] = sec
-        node["rail_secondary_edges"] = [sec_seen[k] for k in sorted(sec_seen.keys())]
 
     # Ensure symmetric closure (best-effort defaults for missing reverse)
     for src, node in list(nodes.items()):

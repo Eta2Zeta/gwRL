@@ -2,7 +2,7 @@
   "_meta": {
     "game": "Global War 1936 v4.3",
     "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-    "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` and may include multiple values on the same edge (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag; nodes include `rail_secondary_edges` to map rail continuity through multi-rail junction tiles.",
+    "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Naval facilities are encoded as `naval_facilities` and may include multiple values on the same edge (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
     "build": {
       "source_images": [
         "original_regions/europe_sub/europe_nw.png",
@@ -138,8 +138,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aden": {
       "id": "land_aden",
@@ -192,8 +191,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_afghanistan": {
       "id": "land_afghanistan",
@@ -292,8 +290,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_albania": {
       "id": "land_albania",
@@ -367,8 +364,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_angola": {
       "id": "land_angola",
@@ -463,8 +459,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_annam_tonkin": {
       "id": "land_annam_tonkin",
@@ -526,8 +521,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aus_new_south_wales": {
       "id": "land_aus_new_south_wales",
@@ -622,8 +616,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aus_northern_territory": {
       "id": "land_aus_northern_territory",
@@ -718,8 +711,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aus_queensland": {
       "id": "land_aus_queensland",
@@ -793,8 +785,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aus_south_australia": {
       "id": "land_aus_south_australia",
@@ -893,8 +884,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aus_tasmania": {
       "id": "land_aus_tasmania",
@@ -947,8 +937,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aus_western_australia": {
       "id": "land_aus_western_australia",
@@ -1022,8 +1011,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_aut_austria": {
       "id": "land_aut_austria",
@@ -1164,8 +1152,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_azerbaijan": {
       "id": "land_azerbaijan",
@@ -1258,8 +1245,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_bechuanaland": {
       "id": "land_bechuanaland",
@@ -1358,8 +1344,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_belgian_congo": {
       "id": "land_belgian_congo",
@@ -1479,8 +1464,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_bermuda": {
       "id": "land_bermuda",
@@ -1512,8 +1496,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_bolivia": {
       "id": "land_bolivia",
@@ -1612,8 +1595,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_borneo": {
       "id": "land_borneo",
@@ -1687,8 +1669,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_brazil_amazon_jungle": {
       "id": "land_brazil_amazon_jungle",
@@ -1766,8 +1747,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_brazil_caatinga": {
       "id": "land_brazil_caatinga",
@@ -1841,8 +1821,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_brazil_pampas": {
       "id": "land_brazil_pampas",
@@ -1979,8 +1958,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_brazil_rio_de_janeiro": {
       "id": "land_brazil_rio_de_janeiro",
@@ -2054,8 +2032,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_british_somaliland": {
       "id": "land_british_somaliland",
@@ -2108,8 +2085,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_buenos_aires": {
       "id": "land_buenos_aires",
@@ -2225,8 +2201,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_bulgaria": {
       "id": "land_bulgaria",
@@ -2342,8 +2317,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_burma": {
       "id": "land_burma",
@@ -2432,8 +2406,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cameroon": {
       "id": "land_cameroon",
@@ -2528,8 +2501,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_alberta_saskatchewan": {
       "id": "land_can_alberta_saskatchewan",
@@ -2586,8 +2558,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_baffin_island": {
       "id": "land_can_baffin_island",
@@ -2647,8 +2618,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_british_columbia": {
       "id": "land_can_british_columbia",
@@ -2718,8 +2688,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_district_of_keewatin": {
       "id": "land_can_district_of_keewatin",
@@ -2770,8 +2739,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_labrador": {
       "id": "land_can_labrador",
@@ -2877,8 +2845,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_manitoba": {
       "id": "land_can_manitoba",
@@ -2971,8 +2938,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_newfoundland": {
       "id": "land_can_newfoundland",
@@ -3046,8 +3012,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_nova_scotia": {
       "id": "land_can_nova_scotia",
@@ -3121,8 +3086,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_ontario": {
       "id": "land_can_ontario",
@@ -3196,8 +3160,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_quebec": {
       "id": "land_can_quebec",
@@ -3292,8 +3255,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_can_st_pierre_island": {
       "id": "land_can_st_pierre_island",
@@ -3367,8 +3329,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cape_town": {
       "id": "land_cape_town",
@@ -3442,8 +3403,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_celebes": {
       "id": "land_celebes",
@@ -3496,8 +3456,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_central_america": {
       "id": "land_central_america",
@@ -3554,8 +3513,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_chad": {
       "id": "land_chad",
@@ -3633,8 +3591,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_chile": {
       "id": "land_chile",
@@ -3729,8 +3686,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_beiping": {
       "id": "land_china_beiping",
@@ -3836,8 +3792,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_hopeh": {
       "id": "land_china_hopeh",
@@ -3923,7 +3878,7 @@
         {
           "neighbor_id": "land_china_suiyuan",
           "border_terrain": "normal",
-          "has_river": false,
+          "has_river": true,
           "river_crossing": false,
           "railway_connection": false,
           "gauge_change": false,
@@ -3934,40 +3889,6 @@
           "narrow_crossing": false,
           "special_fortification": null,
           "inference_confidence": 0.76
-        }
-      ],
-      "rail_secondary_edges": [
-        {
-          "connection_id": "rail_beiping_hopeh_shantung",
-          "from_neighbor_id": "land_china_beiping",
-          "from_rail_id": "rail_shantung_hopeh_beiping",
-          "to_neighbor_id": "land_china_shantung",
-          "to_rail_id": "rail_shantung_hopeh_beiping",
-          "inference_confidence": 0.78
-        },
-        {
-          "connection_id": "rail_beiping_hopeh_shensi",
-          "from_neighbor_id": "land_china_beiping",
-          "from_rail_id": "rail_shensi_hopeh_beiping",
-          "to_neighbor_id": "land_china_shensi",
-          "to_rail_id": "rail_shensi_hopeh_beiping",
-          "inference_confidence": 0.78
-        },
-        {
-          "connection_id": "rail_shantung_hopeh_beiping",
-          "from_neighbor_id": "land_china_shantung",
-          "from_rail_id": "rail_shantung_hopeh_beiping",
-          "to_neighbor_id": "land_china_beiping",
-          "to_rail_id": "rail_shantung_hopeh_beiping",
-          "inference_confidence": 0.78
-        },
-        {
-          "connection_id": "rail_shensi_hopeh_beiping",
-          "from_neighbor_id": "land_china_shensi",
-          "from_rail_id": "rail_shensi_hopeh_beiping",
-          "to_neighbor_id": "land_china_beiping",
-          "to_rail_id": "rail_shensi_hopeh_beiping",
-          "inference_confidence": 0.78
         }
       ]
     },
@@ -4050,8 +3971,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_kweichow": {
       "id": "land_china_kweichow",
@@ -4126,8 +4046,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_nanking": {
       "id": "land_china_nanking",
@@ -4201,8 +4120,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_shantung": {
       "id": "land_china_shantung",
@@ -4276,8 +4194,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_shensi": {
       "id": "land_china_shensi",
@@ -4358,8 +4275,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_sinkiang": {
       "id": "land_china_sinkiang",
@@ -4404,8 +4320,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_suiyuan": {
       "id": "land_china_suiyuan",
@@ -4444,7 +4359,7 @@
         {
           "neighbor_id": "land_china_hopeh",
           "border_terrain": "normal",
-          "has_river": false,
+          "has_river": true,
           "river_crossing": false,
           "railway_connection": false,
           "gauge_change": false,
@@ -4492,8 +4407,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_szechwan": {
       "id": "land_china_szechwan",
@@ -4568,8 +4482,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_tsinghai": {
       "id": "land_china_tsinghai",
@@ -4614,8 +4527,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_china_yunnan": {
       "id": "land_china_yunnan",
@@ -4645,8 +4557,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cochinchina": {
       "id": "land_cochinchina",
@@ -4708,8 +4619,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_colombia": {
       "id": "land_colombia",
@@ -4825,8 +4735,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cuba": {
       "id": "land_cuba",
@@ -4879,8 +4788,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cyrenaica": {
       "id": "land_cyrenaica",
@@ -4937,8 +4845,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cze_bohemia": {
       "id": "land_cze_bohemia",
@@ -5058,8 +4965,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_cze_slovakia": {
       "id": "land_cze_slovakia",
@@ -5200,8 +5106,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_dahomey": {
       "id": "land_dahomey",
@@ -5254,8 +5159,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_denmark": {
       "id": "land_denmark",
@@ -5351,8 +5255,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_dutch_new_guinea": {
       "id": "land_dutch_new_guinea",
@@ -5405,8 +5308,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ecuador": {
       "id": "land_ecuador",
@@ -5463,8 +5365,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_eritrea": {
       "id": "land_eritrea",
@@ -5538,8 +5439,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_esp_basque_country": {
       "id": "land_esp_basque_country",
@@ -5571,8 +5471,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_esp_catalonia": {
       "id": "land_esp_catalonia",
@@ -5604,8 +5503,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_estonia": {
       "id": "land_estonia",
@@ -5696,8 +5594,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fiji": {
       "id": "land_fiji",
@@ -5729,8 +5626,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fin_lapland": {
       "id": "land_fin_lapland",
@@ -5802,8 +5698,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fin_southern_finland": {
       "id": "land_fin_southern_finland",
@@ -5898,8 +5793,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fin_viipuri_province": {
       "id": "land_fin_viipuri_province",
@@ -5956,8 +5850,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_formosa": {
       "id": "land_formosa",
@@ -5989,8 +5882,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_alsace_lorraine": {
       "id": "land_fra_alsace_lorraine",
@@ -6089,8 +5981,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_aquitaine": {
       "id": "land_fra_aquitaine",
@@ -6164,8 +6055,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_corsica": {
       "id": "land_fra_corsica",
@@ -6197,8 +6087,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_normandy": {
       "id": "land_fra_normandy",
@@ -6287,8 +6176,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_paris": {
       "id": "land_fra_paris",
@@ -6408,8 +6296,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_picardy": {
       "id": "land_fra_picardy",
@@ -6521,8 +6408,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_fra_southern_france": {
       "id": "land_fra_southern_france",
@@ -6676,8 +6562,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_french_guiana": {
       "id": "land_french_guiana",
@@ -6730,8 +6615,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_french_morocco": {
       "id": "land_french_morocco",
@@ -6805,8 +6689,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_french_somaliland": {
       "id": "land_french_somaliland",
@@ -6859,8 +6742,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_french_sudan": {
       "id": "land_french_sudan",
@@ -6896,8 +6778,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_gbr_london": {
       "id": "land_gbr_london",
@@ -6971,8 +6852,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_gbr_northern_england": {
       "id": "land_gbr_northern_england",
@@ -7067,8 +6947,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_gbr_scotland": {
       "id": "land_gbr_scotland",
@@ -7138,8 +7017,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_gbr_southern_england": {
       "id": "land_gbr_southern_england",
@@ -7230,8 +7108,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ger_bavaria": {
       "id": "land_ger_bavaria",
@@ -7372,8 +7249,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ger_berlin": {
       "id": "land_ger_berlin",
@@ -7409,8 +7285,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ger_eastern_germany": {
       "id": "land_ger_eastern_germany",
@@ -7547,8 +7422,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ger_konigsberg": {
       "id": "land_ger_konigsberg",
@@ -7643,8 +7517,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ger_western_germany": {
       "id": "land_ger_western_germany",
@@ -7798,8 +7671,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_gre_macedonia": {
       "id": "land_gre_macedonia",
@@ -7915,8 +7787,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_gre_thessaly": {
       "id": "land_gre_thessaly",
@@ -7952,8 +7823,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_guam": {
       "id": "land_guam",
@@ -7985,8 +7855,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_guyana": {
       "id": "land_guyana",
@@ -8060,8 +7929,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_hainan": {
       "id": "land_hainan",
@@ -8093,8 +7961,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_hispaniola": {
       "id": "land_hispaniola",
@@ -8147,8 +8014,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_hong_kong": {
       "id": "land_hong_kong",
@@ -8201,8 +8067,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_hun_hungary": {
       "id": "land_hun_hungary",
@@ -8322,8 +8187,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_benares": {
       "id": "land_india_benares",
@@ -8422,8 +8286,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_calcutta": {
       "id": "land_india_calcutta",
@@ -8518,8 +8381,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_ceylon": {
       "id": "land_india_ceylon",
@@ -8589,8 +8451,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_delhi": {
       "id": "land_india_delhi",
@@ -8668,8 +8529,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_maharashtra": {
       "id": "land_india_maharashtra",
@@ -8764,8 +8624,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_punjab": {
       "id": "land_india_punjab",
@@ -8864,8 +8723,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_india_southern_india": {
       "id": "land_india_southern_india",
@@ -8977,8 +8835,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_iran_northern_iran": {
       "id": "land_iran_northern_iran",
@@ -9077,8 +8934,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_iran_southern_iran": {
       "id": "land_iran_southern_iran",
@@ -9211,8 +9067,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ireland": {
       "id": "land_ireland",
@@ -9261,8 +9116,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ita_lazio": {
       "id": "land_ita_lazio",
@@ -9357,8 +9211,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ita_northern_italy": {
       "id": "land_ita_northern_italy",
@@ -9495,8 +9348,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ita_rome": {
       "id": "land_ita_rome",
@@ -9591,8 +9443,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ita_sardinia": {
       "id": "land_ita_sardinia",
@@ -9624,8 +9475,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_ita_southern_italy": {
       "id": "land_ita_southern_italy",
@@ -9716,8 +9566,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_italian_somaliland": {
       "id": "land_italian_somaliland",
@@ -9770,8 +9619,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_jap_hokkaido": {
       "id": "land_jap_hokkaido",
@@ -9841,8 +9689,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_jap_honshu": {
       "id": "land_jap_honshu",
@@ -9950,8 +9797,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_jap_kyushu": {
       "id": "land_jap_kyushu",
@@ -10004,8 +9850,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_jap_tokyo": {
       "id": "land_jap_tokyo",
@@ -10037,8 +9882,7 @@
           "special_fortification": null,
           "inference_confidence": 0.7
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_java": {
       "id": "land_java",
@@ -10112,8 +9956,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_kashmir": {
       "id": "land_kashmir",
@@ -10212,8 +10055,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_korea": {
       "id": "land_korea",
@@ -10313,8 +10155,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_kuwait": {
       "id": "land_kuwait",
@@ -10367,8 +10208,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_kwangtung": {
       "id": "land_kwangtung",
@@ -10466,8 +10306,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_latvia": {
       "id": "land_latvia",
@@ -10545,8 +10384,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_lithuania": {
       "id": "land_lithuania",
@@ -10645,8 +10483,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_lower_egypt": {
       "id": "land_lower_egypt",
@@ -10737,8 +10574,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_luzon_and_the_visayas": {
       "id": "land_luzon_and_the_visayas",
@@ -10791,8 +10627,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_madagascar": {
       "id": "land_madagascar",
@@ -10824,8 +10659,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_manchuria_eastern": {
       "id": "land_manchuria_eastern",
@@ -10941,8 +10775,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_manchuria_northern": {
       "id": "land_manchuria_northern",
@@ -11020,8 +10853,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_manchuria_rehe": {
       "id": "land_manchuria_rehe",
@@ -11135,8 +10967,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_manchuria_western": {
       "id": "land_manchuria_western",
@@ -11244,8 +11075,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mauritius": {
       "id": "land_mauritius",
@@ -11277,8 +11107,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mex_eastern_mexico": {
       "id": "land_mex_eastern_mexico",
@@ -11356,8 +11185,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mex_western_mexico": {
       "id": "land_mex_western_mexico",
@@ -11448,8 +11276,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mindanao": {
       "id": "land_mindanao",
@@ -11502,8 +11329,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mongolia_central_mongolia": {
       "id": "land_mongolia_central_mongolia",
@@ -11548,8 +11374,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mongolia_kherlen": {
       "id": "land_mongolia_kherlen",
@@ -11594,8 +11419,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mongolia_kobdo": {
       "id": "land_mongolia_kobdo",
@@ -11640,8 +11464,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mongolia_tannu_tuva": {
       "id": "land_mongolia_tannu_tuva",
@@ -11671,8 +11494,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_mongolia_ulyassutai": {
       "id": "land_mongolia_ulyassutai",
@@ -11717,8 +11539,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nepal": {
       "id": "land_nepal",
@@ -11775,8 +11596,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_neu_belgium": {
       "id": "land_neu_belgium",
@@ -11871,8 +11691,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_neu_netherlands": {
       "id": "land_neu_netherlands",
@@ -11946,8 +11765,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_new_britain": {
       "id": "land_new_britain",
@@ -12000,8 +11818,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_new_caledonia": {
       "id": "land_new_caledonia",
@@ -12033,8 +11850,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_new_guinea": {
       "id": "land_new_guinea",
@@ -12108,8 +11924,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_new_hebrides": {
       "id": "land_new_hebrides",
@@ -12141,8 +11956,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_niger": {
       "id": "land_niger",
@@ -12220,8 +12034,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nigeria": {
       "id": "land_nigeria",
@@ -12316,8 +12129,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nor_southern_norway": {
       "id": "land_nor_southern_norway",
@@ -12402,8 +12214,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nor_trondelag": {
       "id": "land_nor_trondelag",
@@ -12471,8 +12282,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_northern_algeria": {
       "id": "land_northern_algeria",
@@ -12588,8 +12398,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_northern_iraq": {
       "id": "land_northern_iraq",
@@ -12688,8 +12497,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nubia": {
       "id": "land_nubia",
@@ -12746,8 +12554,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nz_north_island": {
       "id": "land_nz_north_island",
@@ -12800,8 +12607,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_nz_south_island": {
       "id": "land_nz_south_island",
@@ -12854,8 +12660,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_oman": {
       "id": "land_oman",
@@ -12929,8 +12734,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_oubangui_chari": {
       "id": "land_oubangui_chari",
@@ -13029,8 +12833,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_palau": {
       "id": "land_palau",
@@ -13062,8 +12865,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_panama": {
       "id": "land_panama",
@@ -13154,8 +12956,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_paraguay": {
       "id": "land_paraguay",
@@ -13254,8 +13055,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_patagonia": {
       "id": "land_patagonia",
@@ -13329,8 +13129,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_peru": {
       "id": "land_peru",
@@ -13450,8 +13249,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_pol_dolnoslaskie": {
       "id": "land_pol_dolnoslaskie",
@@ -13571,8 +13369,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_pol_east_poland": {
       "id": "land_pol_east_poland",
@@ -13692,8 +13489,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_pol_lubelskie": {
       "id": "land_pol_lubelskie",
@@ -13813,8 +13609,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_pol_podlachia": {
       "id": "land_pol_podlachia",
@@ -13934,8 +13729,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_pol_warsaw": {
       "id": "land_pol_warsaw",
@@ -14055,8 +13849,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_pol_west_poland": {
       "id": "land_pol_west_poland",
@@ -14218,8 +14011,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_portuguese_east_africa": {
       "id": "land_portuguese_east_africa",
@@ -14293,8 +14085,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_puerto_rico": {
       "id": "land_puerto_rico",
@@ -14326,8 +14117,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_qatar": {
       "id": "land_qatar",
@@ -14401,8 +14191,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_rhodesia": {
       "id": "land_rhodesia",
@@ -14543,8 +14332,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_rio_grande": {
       "id": "land_rio_grande",
@@ -14622,8 +14410,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_rom_bessarabia": {
       "id": "land_rom_bessarabia",
@@ -14718,8 +14505,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_rom_central_romania": {
       "id": "land_rom_central_romania",
@@ -14839,8 +14625,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_saudi_arabia": {
       "id": "land_saudi_arabia",
@@ -14948,8 +14733,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_seychelles": {
       "id": "land_seychelles",
@@ -14981,8 +14765,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_siam": {
       "id": "land_siam",
@@ -15044,8 +14827,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_south_africa": {
       "id": "land_south_africa",
@@ -15140,8 +14922,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_southern_algeria": {
       "id": "land_southern_algeria",
@@ -15198,8 +14979,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_southern_iraq": {
       "id": "land_southern_iraq",
@@ -15315,8 +15095,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_southwest_africa": {
       "id": "land_southwest_africa",
@@ -15390,8 +15169,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_spanish_morocco": {
       "id": "land_spanish_morocco",
@@ -15444,8 +15222,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_sudan": {
       "id": "land_sudan",
@@ -15565,8 +15342,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_sumatra": {
       "id": "land_sumatra",
@@ -15619,8 +15395,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_suriname": {
       "id": "land_suriname",
@@ -15694,8 +15469,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_swe_gotland": {
       "id": "land_swe_gotland",
@@ -15780,8 +15554,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_swe_norrland": {
       "id": "land_swe_norrland",
@@ -15889,8 +15662,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_switzerland": {
       "id": "land_switzerland",
@@ -15968,8 +15740,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_syria": {
       "id": "land_syria",
@@ -16064,8 +15835,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tanganyika": {
       "id": "land_tanganyika",
@@ -16160,8 +15930,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tibet": {
       "id": "land_tibet",
@@ -16218,8 +15987,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_timor": {
       "id": "land_timor",
@@ -16272,8 +16040,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tobruk": {
       "id": "land_tobruk",
@@ -16347,8 +16114,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_transjordan": {
       "id": "land_transjordan",
@@ -16422,8 +16188,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tripoli": {
       "id": "land_tripoli",
@@ -16497,8 +16262,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tripolitania": {
       "id": "land_tripolitania",
@@ -16555,8 +16319,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tunisia": {
       "id": "land_tunisia",
@@ -16630,8 +16393,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tur_akdeniz": {
       "id": "land_tur_akdeniz",
@@ -16724,8 +16486,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tur_ankara": {
       "id": "land_tur_ankara",
@@ -16824,8 +16585,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tur_eastern_anatolia": {
       "id": "land_tur_eastern_anatolia",
@@ -16966,8 +16726,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tur_istanbul": {
       "id": "land_tur_istanbul",
@@ -17104,8 +16863,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_tur_karadeniz": {
       "id": "land_tur_karadeniz",
@@ -17179,8 +16937,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_upper_egypt": {
       "id": "land_upper_egypt",
@@ -17254,8 +17011,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_uruguay": {
       "id": "land_uruguay",
@@ -17329,8 +17085,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_appalachia": {
       "id": "land_usa_appalachia",
@@ -17450,8 +17205,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_chicago": {
       "id": "land_usa_chicago",
@@ -17571,8 +17325,7 @@
           "special_fortification": null,
           "inference_confidence": 0.66
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_great_lakes": {
       "id": "land_usa_great_lakes",
@@ -17667,8 +17420,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_great_plains": {
       "id": "land_usa_great_plains",
@@ -17746,8 +17498,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_heartlands": {
       "id": "land_usa_heartlands",
@@ -17867,8 +17618,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_midwest": {
       "id": "land_usa_midwest",
@@ -17946,8 +17696,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_new_orleans": {
       "id": "land_usa_new_orleans",
@@ -18042,8 +17791,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_new_york": {
       "id": "land_usa_new_york",
@@ -18138,8 +17886,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_pacific_northwest": {
       "id": "land_usa_pacific_northwest",
@@ -18213,8 +17960,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_san_francisco": {
       "id": "land_usa_san_francisco",
@@ -18309,8 +18055,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_southeastern_united_states": {
       "id": "land_usa_southeastern_united_states",
@@ -18384,8 +18129,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_southwest_united_states": {
       "id": "land_usa_southwest_united_states",
@@ -18501,8 +18245,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_texas": {
       "id": "land_usa_texas",
@@ -18622,8 +18365,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_the_carolinas": {
       "id": "land_usa_the_carolinas",
@@ -18718,8 +18460,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_the_northeast": {
       "id": "land_usa_the_northeast",
@@ -18797,8 +18538,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_upper_midwest": {
       "id": "land_usa_upper_midwest",
@@ -18897,8 +18637,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_washington_dc": {
       "id": "land_usa_washington_dc",
@@ -19014,8 +18753,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usa_western_united_states": {
       "id": "land_usa_western_united_states",
@@ -19129,8 +18867,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_amur": {
       "id": "land_usr_amur",
@@ -19229,8 +18966,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_angara": {
       "id": "land_usr_angara",
@@ -19308,8 +19044,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_buryatia": {
       "id": "land_usr_buryatia",
@@ -19408,8 +19143,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_chita": {
       "id": "land_usr_chita",
@@ -19523,8 +19257,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_crimea": {
       "id": "land_usr_crimea",
@@ -19636,8 +19369,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_donets_kuban": {
       "id": "land_usr_donets_kuban",
@@ -19778,8 +19510,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_eastern_ukraine": {
       "id": "land_usr_eastern_ukraine",
@@ -19920,8 +19651,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_gorky": {
       "id": "land_usr_gorky",
@@ -19999,8 +19729,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_irkutsk": {
       "id": "land_usr_irkutsk",
@@ -20078,8 +19807,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_kalmytskaya": {
       "id": "land_usr_kalmytskaya",
@@ -20178,8 +19906,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_kaluga_oblast": {
       "id": "land_usr_kaluga_oblast",
@@ -20257,8 +19984,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_kamchatka": {
       "id": "land_usr_kamchatka",
@@ -20309,8 +20035,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_karelia": {
       "id": "land_usr_karelia",
@@ -20409,8 +20134,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_kiev": {
       "id": "land_usr_kiev",
@@ -20551,8 +20275,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_kola": {
       "id": "land_usr_kola",
@@ -20641,8 +20364,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_leningrad": {
       "id": "land_usr_leningrad",
@@ -20758,8 +20480,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_magadan": {
       "id": "land_usr_magadan",
@@ -20831,8 +20552,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_moscow": {
       "id": "land_usr_moscow",
@@ -20973,8 +20693,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_north_caucasia": {
       "id": "land_usr_north_caucasia",
@@ -21090,8 +20809,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_north_sakhalin": {
       "id": "land_usr_north_sakhalin",
@@ -21142,8 +20860,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_northern_belorussia": {
       "id": "land_usr_northern_belorussia",
@@ -21284,8 +21001,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_northern_russia": {
       "id": "land_usr_northern_russia",
@@ -21384,8 +21100,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_orel_kursk": {
       "id": "land_usr_orel_kursk",
@@ -21484,8 +21199,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_primorsky_krai": {
       "id": "land_usr_primorsky_krai",
@@ -21595,8 +21309,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_saratov": {
       "id": "land_usr_saratov",
@@ -21695,8 +21408,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_smolensk": {
       "id": "land_usr_smolensk",
@@ -21816,8 +21528,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_south_sakhalin": {
       "id": "land_usr_south_sakhalin",
@@ -21870,8 +21581,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_southern_belorussia": {
       "id": "land_usr_southern_belorussia",
@@ -21991,8 +21701,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_southern_ukraine": {
       "id": "land_usr_southern_ukraine",
@@ -22133,8 +21842,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_southern_yakutia": {
       "id": "land_usr_southern_yakutia",
@@ -22170,8 +21878,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_stalingrad": {
       "id": "land_usr_stalingrad",
@@ -22291,8 +21998,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_stalino": {
       "id": "land_usr_stalino",
@@ -22328,8 +22034,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_taurida": {
       "id": "land_usr_taurida",
@@ -22466,8 +22171,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_transcaucasia": {
       "id": "land_usr_transcaucasia",
@@ -22577,8 +22281,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_tula_lipetsk": {
       "id": "land_usr_tula_lipetsk",
@@ -22719,8 +22422,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_vanavara": {
       "id": "land_usr_vanavara",
@@ -22777,8 +22479,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_western_russia": {
       "id": "land_usr_western_russia",
@@ -22940,8 +22641,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_western_ukraine": {
       "id": "land_usr_western_ukraine",
@@ -23082,8 +22782,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_yakutsk": {
       "id": "land_usr_yakutsk",
@@ -23161,8 +22860,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_usr_yaroslavl": {
       "id": "land_usr_yaroslavl",
@@ -23261,8 +22959,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_venezuela": {
       "id": "land_venezuela",
@@ -23357,8 +23054,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_western_algeria": {
       "id": "land_western_algeria",
@@ -23415,8 +23111,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_western_egypt": {
       "id": "land_western_egypt",
@@ -23490,8 +23185,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_yug_eastern_yugoslavia": {
       "id": "land_yug_eastern_yugoslavia",
@@ -23632,8 +23326,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "land_yug_western_yugoslavia": {
       "id": "land_yug_western_yugoslavia",
@@ -23749,8 +23442,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a1": {
       "id": "sea_a1",
@@ -23825,8 +23517,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a10": {
       "id": "sea_a10",
@@ -23922,8 +23613,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a11": {
       "id": "sea_a11",
@@ -23968,8 +23658,7 @@
           "special_fortification": null,
           "inference_confidence": 0.9
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a12": {
       "id": "sea_a12",
@@ -24148,8 +23837,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a13": {
       "id": "sea_a13",
@@ -24262,8 +23950,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a14": {
       "id": "sea_a14",
@@ -24338,8 +24025,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a15": {
       "id": "sea_a15",
@@ -24418,8 +24104,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a18": {
       "id": "sea_a18",
@@ -24547,8 +24232,7 @@
           "special_fortification": null,
           "inference_confidence": 0.86
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a19": {
       "id": "sea_a19",
@@ -24578,8 +24262,7 @@
           "special_fortification": null,
           "inference_confidence": 0.86
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a2": {
       "id": "sea_a2",
@@ -24639,8 +24322,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a20": {
       "id": "sea_a20",
@@ -24670,8 +24352,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a21": {
       "id": "sea_a21",
@@ -24767,8 +24448,7 @@
           "special_fortification": null,
           "inference_confidence": 0.85
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a22": {
       "id": "sea_a22",
@@ -24862,8 +24542,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a23": {
       "id": "sea_a23",
@@ -25059,8 +24738,7 @@
           "special_fortification": null,
           "inference_confidence": 0.85
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a24": {
       "id": "sea_a24",
@@ -25109,8 +24787,7 @@
           "special_fortification": null,
           "inference_confidence": 0.76
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a25": {
       "id": "sea_a25",
@@ -25172,8 +24849,7 @@
           "special_fortification": null,
           "inference_confidence": 0.86
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a26": {
       "id": "sea_a26",
@@ -25252,8 +24928,7 @@
           "special_fortification": null,
           "inference_confidence": 0.86
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a28": {
       "id": "sea_a28",
@@ -25400,8 +25075,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a29": {
       "id": "sea_a29",
@@ -25431,8 +25105,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a31": {
       "id": "sea_a31",
@@ -25526,8 +25199,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a33": {
       "id": "sea_a33",
@@ -25587,8 +25259,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a35": {
       "id": "sea_a35",
@@ -25633,8 +25304,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a36": {
       "id": "sea_a36",
@@ -25813,8 +25483,7 @@
           "special_fortification": null,
           "inference_confidence": 0.9
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a38": {
       "id": "sea_a38",
@@ -25978,8 +25647,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a39": {
       "id": "sea_a39",
@@ -26109,8 +25777,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a40": {
       "id": "sea_a40",
@@ -26208,8 +25875,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a44": {
       "id": "sea_a44",
@@ -26239,8 +25905,7 @@
           "special_fortification": null,
           "inference_confidence": 0.9
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a6": {
       "id": "sea_a6",
@@ -26321,8 +25986,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_a7": {
       "id": "sea_a7",
@@ -26367,8 +26031,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_i11": {
       "id": "sea_i11",
@@ -26466,8 +26129,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_i3": {
       "id": "sea_i3",
@@ -26559,8 +26221,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_i4": {
       "id": "sea_i4",
@@ -26724,8 +26385,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_i5": {
       "id": "sea_i5",
@@ -26853,8 +26513,7 @@
           "special_fortification": null,
           "inference_confidence": 0.94
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_i6": {
       "id": "sea_i6",
@@ -27046,8 +26705,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_i7": {
       "id": "sea_i7",
@@ -27145,8 +26803,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m1": {
       "id": "sea_m1",
@@ -27259,8 +26916,7 @@
           "special_fortification": null,
           "inference_confidence": 0.86
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m10": {
       "id": "sea_m10",
@@ -27388,8 +27044,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m11": {
       "id": "sea_m11",
@@ -27534,8 +27189,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m12": {
       "id": "sea_m12",
@@ -27595,8 +27249,7 @@
           "special_fortification": null,
           "inference_confidence": 0.78
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m2": {
       "id": "sea_m2",
@@ -27656,8 +27309,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m3": {
       "id": "sea_m3",
@@ -27770,8 +27422,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m4": {
       "id": "sea_m4",
@@ -27850,8 +27501,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m5": {
       "id": "sea_m5",
@@ -27979,8 +27629,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_m9": {
       "id": "sea_m9",
@@ -28125,8 +27774,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p11": {
       "id": "sea_p11",
@@ -28171,8 +27819,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p12": {
       "id": "sea_p12",
@@ -28247,8 +27894,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p13": {
       "id": "sea_p13",
@@ -28293,8 +27939,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p14": {
       "id": "sea_p14",
@@ -28396,8 +28041,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p15": {
       "id": "sea_p15",
@@ -28542,8 +28186,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p16": {
       "id": "sea_p16",
@@ -28592,8 +28235,7 @@
           "special_fortification": null,
           "inference_confidence": 0.7
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p2": {
       "id": "sea_p2",
@@ -28683,8 +28325,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p24": {
       "id": "sea_p24",
@@ -28729,8 +28370,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p25": {
       "id": "sea_p25",
@@ -28805,8 +28445,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p28": {
       "id": "sea_p28",
@@ -28868,8 +28507,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p30": {
       "id": "sea_p30",
@@ -28948,8 +28586,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p31": {
       "id": "sea_p31",
@@ -29045,8 +28682,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p32": {
       "id": "sea_p32",
@@ -29108,8 +28744,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p34": {
       "id": "sea_p34",
@@ -29173,8 +28808,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p5": {
       "id": "sea_p5",
@@ -29221,8 +28855,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p50": {
       "id": "sea_p50",
@@ -29384,8 +29017,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p52": {
       "id": "sea_p52",
@@ -29432,8 +29064,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p59": {
       "id": "sea_p59",
@@ -29529,8 +29160,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p6": {
       "id": "sea_p6",
@@ -29624,8 +29254,7 @@
           "special_fortification": null,
           "inference_confidence": 0.8
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p60": {
       "id": "sea_p60",
@@ -29687,8 +29316,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p61": {
       "id": "sea_p61",
@@ -29784,8 +29412,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p62": {
       "id": "sea_p62",
@@ -29847,8 +29474,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p63": {
       "id": "sea_p63",
@@ -29927,8 +29553,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p64": {
       "id": "sea_p64",
@@ -29973,8 +29598,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p65": {
       "id": "sea_p65",
@@ -30070,8 +29694,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p68": {
       "id": "sea_p68",
@@ -30150,8 +29773,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p69": {
       "id": "sea_p69",
@@ -30215,8 +29837,7 @@
           "special_fortification": null,
           "inference_confidence": 0.84
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p7": {
       "id": "sea_p7",
@@ -30329,8 +29950,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     },
     "sea_p8": {
       "id": "sea_p8",
@@ -30394,8 +30014,7 @@
           "special_fortification": null,
           "inference_confidence": 0.82
         }
-      ],
-      "rail_secondary_edges": []
+      ]
     }
   }
 }
