@@ -29,6 +29,7 @@ DEFAULT_NODE = {
     "ipp_value": None,
     "original_owner": "Neutral",
     "current_owner": None,
+    "is_city": False,
     "is_capital": False,
     "is_victory_city": False,
     "node_facilities": [],
@@ -417,7 +418,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Edge naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Land nodes may also carry intrinsic facilities via `node_facilities` and `node_facility_ids` (e.g. airfields or built-in ports). Narrow straits are represented with both `narrow_crossing` (boolean) and `narrow_crossings` (integer count). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
+            "schema_notes": "Nodes are land/sea tiles. City status is represented with `is_city` (boolean) and is separate from terrain. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Edge naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Land nodes may also carry intrinsic facilities via `node_facilities` and `node_facility_ids` (e.g. airfields or built-in ports). Narrow straits are represented with both `narrow_crossing` (boolean) and `narrow_crossings` (integer count). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
             "build": {
                 "method": "manual_llm_transcription",
                 "coverage": "manual_global_pass_v2",
@@ -490,11 +491,15 @@ def build():
         ("sea_p30", "Eastern Pacific Tropical North"),
         ("sea_p31", "Eastern Pacific Tropical East"),
         ("sea_p2", "Sea of Okhotsk"),
+        ("sea_p3", "Sea Zone P3"),
         ("sea_p7", "Sea of Japan"),
         ("sea_p8", "Kurile Sea"),
+        ("sea_p9", "Sea Zone P9"),
+        ("sea_p10", "Sea Zone P10"),
         ("sea_p14", "Yellow Sea"),
         ("sea_p15", "East China Sea"),
         ("sea_p16", "Sea Zone P16"),
+        ("sea_p17", "Sea Zone P17"),
         ("sea_p32", "Philippine Sea West"),
         ("sea_p33", "Sea Zone P33"),
         ("sea_p34", "Western Pacific Central"),
@@ -790,6 +795,7 @@ def build():
         ("land_jap_honshu", "Honshu", "normal", 2, "Japan", False, False),
         ("land_jap_hokkaido", "Hokkaido", "forest", 1, "Japan", False, False),
         ("land_jap_kyushu", "Kyushu", "mountain", 1, "Japan", False, False),
+        ("land_jap_kurile_islands", "Kurile Islands", "normal", 0, "Japan", False, False),
         ("land_korea", "Korea", "mountain", 2, "Japan", False, False),
         ("land_jap_okinawa", "Okinawa", "normal", 0, "Japan", False, False),
         ("land_jap_volcanic_islands", "Volcanic Islands", "normal", 0, "Japan", False, False),
@@ -833,15 +839,22 @@ def build():
     ]
 
     for node_id, name, terrain, ipp, owner, cap, vc in land_nodes:
+        is_city = terrain == "city"
+        node_terrain = "normal" if is_city else terrain
+        if node_id == "land_jap_tokyo":
+            # Tokyo is city + mountainous per map semantics.
+            is_city = True
+            node_terrain = "mountain"
         add_node(
             nodes,
             node_id,
             name=name,
             type="land",
-            terrain=terrain,
+            terrain=node_terrain,
             ipp_value=ipp,
             original_owner=owner,
             current_owner=owner,
+            is_city=is_city,
             is_capital=cap,
             is_victory_city=vc,
         )
@@ -852,6 +865,8 @@ def build():
         "facility_caroline_islands_major_port",
         "facility_caroline_islands_airfield",
     ]
+    nodes["land_jap_tokyo"]["node_facilities"] = ["airfield"]
+    nodes["land_jap_tokyo"]["node_facility_ids"] = ["facility_tokyo_airfield"]
 
     # Sea-sea framework (Europe basin)
     link(nodes, "sea_a6", "sea_a7", border_terrain="sea")
@@ -912,6 +927,12 @@ def build():
     link(nodes, "sea_p30", "sea_p31", border_terrain="sea")
     link(nodes, "sea_p2", "sea_p7", border_terrain="sea")
     link(nodes, "sea_p2", "sea_p8", border_terrain="sea")
+    link(nodes, "sea_p2", "sea_p9", border_terrain="sea")
+    link(nodes, "sea_p3", "sea_p9", border_terrain="sea")
+    link(nodes, "sea_p8", "sea_p9", border_terrain="sea")
+    link(nodes, "sea_p9", "sea_p10", border_terrain="sea")
+    link(nodes, "sea_p9", "sea_p17", border_terrain="sea")
+    link(nodes, "sea_p9", "sea_p16", border_terrain="sea", narrow_crossing=True, narrow_crossings=1)
     link(nodes, "sea_p7", "sea_p14", border_terrain="sea")
     link(nodes, "sea_p14", "sea_p15", border_terrain="sea")
     link(nodes, "sea_p15", "sea_p32", border_terrain="sea")
@@ -952,8 +973,9 @@ def build():
     link(nodes, "sea_p68", "sea_p69", border_terrain="sea")
 
     # Additional manual links
-    link_land_sea(nodes, "land_jap_tokyo", "sea_p16", naval_facilities=["minor_port"], confidence=0.7)
+    link_land_sea(nodes, "land_jap_tokyo", "sea_p16", naval_facilities=["major_shipyard"], confidence=0.7)
     link_land_sea(nodes, "land_jap_honshu", "sea_p16", naval_facilities=["minor_port"], confidence=0.7)
+    link_rail(nodes, "land_jap_tokyo", "land_jap_honshu", border_terrain="mountain", confidence=0.7)
     link_rail(nodes, "land_jap_honshu", "land_jap_hokkaido", confidence=0.65)
     link_rail(nodes, "land_jap_honshu", "land_jap_kyushu", confidence=0.65)
 
@@ -1586,12 +1608,15 @@ def build():
 
     # East Asia + Oceania coast/port links
     link_land_sea(nodes, "land_usr_kamchatka", "sea_p2", port=False)
+    link_land_sea(nodes, "land_usr_kamchatka", "sea_p9", port=False, narrow=True, narrow_crossings=1)
     link_land_sea(nodes, "land_usr_magadan", "sea_p2", port=False)
     link_land_sea(nodes, "land_usr_north_sakhalin", "sea_p2", port=False)
     link_land_sea(nodes, "land_usr_south_sakhalin", "sea_p8", port=True)
     link_land_sea(nodes, "land_usr_primorsky_krai", "sea_p7", port=True)
     link_land_sea(nodes, "land_jap_hokkaido", "sea_p8", port=True)
+    link_land_sea(nodes, "land_jap_hokkaido", "sea_p16", port=False, narrow=True, narrow_crossings=1)
     link_land_sea(nodes, "land_jap_hokkaido", "sea_p7", port=True)
+    link_land_sea(nodes, "land_jap_kurile_islands", "sea_p9", port=False, narrow=True, narrow_crossings=1)
     link_land_sea(nodes, "land_jap_honshu", "sea_p7", port=True)
     link_land_sea(nodes, "land_jap_honshu", "sea_p15", port=True)
     link_land_sea(nodes, "land_jap_kyushu", "sea_p15", port=True)
