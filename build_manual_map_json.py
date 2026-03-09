@@ -17,6 +17,7 @@ DEFAULT_EDGE = {
     "port_or_dock_connection": False,
     "canal_or_strait": None,
     "narrow_crossing": False,
+    "narrow_crossings": 0,
     "special_fortification": None,
 }
 
@@ -30,7 +31,6 @@ DEFAULT_NODE = {
     "current_owner": None,
     "is_capital": False,
     "is_victory_city": False,
-    "source": "llm_manual_from_region_images",
     "node_facilities": [],
     "node_facility_ids": [],
     "neighbors": [],
@@ -208,6 +208,20 @@ def set_edge(nodes, src, dst, **attrs):
     target["naval_facility_ids"] = naval_facility_ids
     target["port_or_dock_connection"] = bool(naval_facilities)
 
+    narrow_crossings = target.get("narrow_crossings", 0)
+    if isinstance(narrow_crossings, bool):
+        narrow_crossings = int(narrow_crossings)
+    elif isinstance(narrow_crossings, (int, float)):
+        narrow_crossings = int(narrow_crossings)
+    else:
+        raise TypeError(f"Edge {src}->{dst} narrow_crossings must be numeric, got {type(narrow_crossings)!r}")
+    if narrow_crossings < 0:
+        raise ValueError(f"Edge {src}->{dst} narrow_crossings must be >= 0")
+    if target.get("narrow_crossing") and narrow_crossings == 0:
+        narrow_crossings = 1
+    target["narrow_crossings"] = narrow_crossings
+    target["narrow_crossing"] = bool(narrow_crossings > 0)
+
     return target
 
 
@@ -298,7 +312,20 @@ def link_rail(
     add_rail_segment(nodes, b, a, rail_id=rail_id, confidence=confidence)
 
 
-def link_land(nodes, a, b, border_terrain="normal", passable=True, river_crossing=False, has_river=False, confidence=0.76):
+def link_land(
+    nodes,
+    a,
+    b,
+    border_terrain="normal",
+    passable=True,
+    river_crossing=False,
+    has_river=False,
+    narrow_crossing=False,
+    narrow_crossings=0,
+    confidence=0.76,
+):
+    if narrow_crossing and narrow_crossings == 0:
+        narrow_crossings = 1
     link(
         nodes,
         a,
@@ -313,7 +340,8 @@ def link_land(nodes, a, b, border_terrain="normal", passable=True, river_crossin
         naval_facility_ids=[],
         port_or_dock_connection=False,
         canal_or_strait=None,
-        narrow_crossing=False,
+        narrow_crossing=narrow_crossing,
+        narrow_crossings=narrow_crossings,
     )
 
 
@@ -330,8 +358,13 @@ def link_land_sea(
     passable=True,
     canal=None,
     narrow=False,
+    narrow_crossings=0,
     confidence=0.76,
 ):
+    if narrow and narrow_crossings == 0:
+        narrow_crossings = 1
+    if narrow_crossings > 0:
+        narrow = True
     if naval_facilities is None:
         naval_facilities = ["minor_port"] if port else []
     naval_facilities = normalize_naval_facility_types(naval_facilities)
@@ -370,6 +403,7 @@ def link_land_sea(
         port_or_dock_connection=bool(naval_facilities),
         canal_or_strait=canal,
         narrow_crossing=narrow,
+        narrow_crossings=narrow_crossings,
     )
 
     if railway_connection:
@@ -383,15 +417,8 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
-            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Edge naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Land nodes may also carry intrinsic facilities via `node_facilities` and `node_facility_ids` (e.g. airfields or built-in ports). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
+            "schema_notes": "Nodes are land/sea tiles. Neighbor edges encode terrain crossing, passability, rivers, rail, typed naval facilities, and straits/canals used by RL action masking. Edge naval facilities are encoded as `naval_facilities` plus matching `naval_facility_ids`; each edge can include multiple facilities (e.g. minor/major port, dockyard, shipyard, seaplane/submarine base). Land nodes may also carry intrinsic facilities via `node_facilities` and `node_facility_ids` (e.g. airfields or built-in ports). Narrow straits are represented with both `narrow_crossing` (boolean) and `narrow_crossings` (integer count). Rail-enabled edges include `railroads` with per-rail IDs plus a `gauge_change` flag.",
             "build": {
-                "source_images": [
-                    "original_regions/europe_sub/europe_nw.png",
-                    "original_regions/europe_sub/europe_ne.png",
-                    "original_regions/europe_sub/europe_center.png",
-                    "original_regions/europe_sub/europe_sw.png",
-                    "original_regions/europe_sub/europe_se.png",
-                ],
                 "method": "manual_llm_transcription",
                 "coverage": "manual_global_pass_v2",
             },
@@ -436,6 +463,7 @@ def build():
         ("sea_i6", "Arabian Sea"),
         ("sea_i7", "Persian Gulf"),
         ("sea_i11", "Bay of Bengal"),
+        ("sea_i12", "Sea Zone I12"),
         ("sea_a1", "Hudson Bay"),
         ("sea_a2", "Baffin Bay"),
         ("sea_a15", "Labrador Sea North"),
@@ -472,13 +500,15 @@ def build():
         ("sea_p34", "Western Pacific Central"),
         ("sea_p35", "Sea Zone P35"),
         ("sea_p36", "Central Pacific"),
+        ("sea_p41", "South China Sea"),
         ("sea_p42", "Sea Zone P42"),
         ("sea_p43", "Mariana Sea"),
         ("sea_p44", "Sea Zone P44"),
         ("sea_p45", "Sea Zone P45"),
         ("sea_p46", "Sea Zone P46"),
         ("sea_p47", "Sea Zone P47"),
-        ("sea_p50", "South China Sea"),
+        ("sea_p50", "Sea Zone P50"),
+        ("sea_p51", "Sea Zone P51"),
         ("sea_p52", "Philippine Sea South"),
         ("sea_p53", "Sea Zone P53"),
         ("sea_p54", "Sea Zone P54"),
@@ -764,14 +794,16 @@ def build():
         ("land_jap_okinawa", "Okinawa", "normal", 0, "Japan", False, False),
         ("land_jap_volcanic_islands", "Volcanic Islands", "normal", 0, "Japan", False, False),
         ("land_formosa", "Formosa", "normal", 2, "Japan", False, False),
-        ("land_hainan", "Hainan", "normal", 1, "Japan", False, False),
+        ("land_hainan", "Hainan", "normal", 1, "Guangxi Clique", False, False),
         ("land_hong_kong", "Hong Kong", "city", 2, "FEC", False, False),
         ("land_kwangtung", "Kwangtung", "normal", 2, "Guangxi Clique", False, False),
         ("land_annam_tonkin", "Annam-Tonkin", "jungle", 1, "France", False, False),
         ("land_cochinchina", "Cochinchina", "jungle", 1, "France", False, False),
         ("land_siam", "Siam", "jungle", 1, "Siam", False, False),
-        ("land_luzon_and_the_visayas", "Luzon and the Visayas", "jungle", 1, "Philippines", False, False),
-        ("land_mindanao", "Mindanao", "jungle", 1, "Philippines", False, False),
+        ("land_british_malaya", "British Malaya", "jungle", 1, "FEC", False, False),
+        ("land_sarawak", "Sarawak", "jungle", 0, "FEC", False, False),
+        ("land_luzon_and_the_visayas", "Luzon and the Visayas", "jungle", 1, "United States", False, False),
+        ("land_mindanao", "Mindanao", "jungle", 1, "United States", False, False),
         ("land_guam", "Guam", "normal", 0, "United States", False, False),
         ("land_jap_mariana_islands", "Mariana Islands", "normal", 0, "Japan", False, False),
         ("land_jap_caroline_islands", "Caroline Islands", "normal", 0, "Japan", False, False),
@@ -812,7 +844,6 @@ def build():
             current_owner=owner,
             is_capital=cap,
             is_victory_city=vc,
-            source="llm_manual_from_region_images",
         )
 
     # Intrinsic facilities printed on the land tile itself.
@@ -852,6 +883,7 @@ def build():
     link(nodes, "sea_i4", "sea_i6", border_terrain="sea")
     link(nodes, "sea_i6", "sea_i7", border_terrain="sea")
     link(nodes, "sea_i6", "sea_i11", border_terrain="sea")
+    link(nodes, "sea_i11", "sea_i12", border_terrain="sea")
     link(nodes, "sea_a1", "sea_a2", border_terrain="sea")
     link(nodes, "sea_a2", "sea_a15", border_terrain="sea")
     link(nodes, "sea_a15", "sea_a18", border_terrain="sea")
@@ -883,9 +915,12 @@ def build():
     link(nodes, "sea_p7", "sea_p14", border_terrain="sea")
     link(nodes, "sea_p14", "sea_p15", border_terrain="sea")
     link(nodes, "sea_p15", "sea_p32", border_terrain="sea")
+    link(nodes, "sea_p32", "sea_p41", border_terrain="sea")
     link(nodes, "sea_p15", "sea_p33", border_terrain="sea")
     link(nodes, "sea_p15", "sea_p34", border_terrain="sea")
     link(nodes, "sea_p16", "sea_p34", border_terrain="sea")
+    link(nodes, "sea_p41", "sea_p42", border_terrain="sea")
+    link(nodes, "sea_p41", "sea_p50", border_terrain="sea")
     link(nodes, "sea_p32", "sea_p33", border_terrain="sea")
     link(nodes, "sea_p32", "sea_p43", border_terrain="sea")
     link(nodes, "sea_p33", "sea_p34", border_terrain="sea")
@@ -902,7 +937,9 @@ def build():
     link(nodes, "sea_p46", "sea_p47", border_terrain="sea")
     link(nodes, "sea_p46", "sea_p53", border_terrain="sea")
     link(nodes, "sea_p46", "sea_p54", border_terrain="sea")
-    link(nodes, "sea_p15", "sea_p50", border_terrain="sea")
+    link(nodes, "sea_p42", "sea_p50", border_terrain="sea")
+    link(nodes, "sea_i12", "sea_p50", border_terrain="sea")
+    link(nodes, "sea_p50", "sea_p51", border_terrain="sea")
     link(nodes, "sea_p50", "sea_p52", border_terrain="sea")
     link(nodes, "sea_p50", "sea_p59", border_terrain="sea")
     link(nodes, "sea_p59", "sea_p60", border_terrain="sea")
@@ -1281,7 +1318,9 @@ def build():
     link_land(nodes, "land_annam_tonkin", "land_kwangtung", border_terrain="jungle")
     link_land(nodes, "land_annam_tonkin", "land_cochinchina", border_terrain="jungle")
     link_land(nodes, "land_cochinchina", "land_siam", border_terrain="jungle")
+    link_land(nodes, "land_siam", "land_british_malaya", border_terrain="jungle")
     link_land(nodes, "land_siam", "land_burma", border_terrain="jungle")
+    link_land(nodes, "land_sarawak", "land_borneo", border_terrain="jungle")
 
     link_rail(nodes, "land_jap_honshu", "land_jap_kyushu")
     link_rail(nodes, "land_jap_honshu", "land_jap_hokkaido")
@@ -1583,19 +1622,26 @@ def build():
         naval_facility_id="port_nanking_major",
     )
     link_land_sea(nodes, "land_formosa", "sea_p15", port=True)
-    link_land_sea(nodes, "land_hainan", "sea_p50", port=True)
-    link_land_sea(nodes, "land_hong_kong", "sea_p50", port=True)
-    link_land_sea(nodes, "land_kwangtung", "sea_p50", port=True)
-    link_land_sea(nodes, "land_annam_tonkin", "sea_p50", port=True)
-    link_land_sea(nodes, "land_cochinchina", "sea_p50", port=True)
-    link_land_sea(nodes, "land_siam", "sea_p50", port=True)
+    link_land_sea(nodes, "land_formosa", "sea_p41", port=False)
+    link_land_sea(nodes, "land_hainan", "sea_p41", port=False, narrow=True, narrow_crossings=1)
+    link_land_sea(nodes, "land_kwangtung", "sea_p41", port=False, narrow=True, narrow_crossings=1)
+    link_land_sea(nodes, "land_cochinchina", "sea_p50", naval_facilities=["major_port"])
+    link_land_sea(nodes, "land_siam", "sea_p50", port=False)
+    link_land_sea(nodes, "land_british_malaya", "sea_p50", naval_facilities=["major_dockyard"])
+    link_land_sea(nodes, "land_british_malaya", "sea_i12", port=False)
+    link_land_sea(nodes, "land_sarawak", "sea_p50", port=False)
+    link_land_sea(nodes, "land_sarawak", "sea_p51", port=False)
     link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p32", port=True)
+    link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p41", port=False)
+    link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p50", naval_facilities=["submarine_base"])
+    link_land_sea(nodes, "land_mindanao", "sea_p50", naval_facilities=["major_port"])
     link_land_sea(nodes, "land_mindanao", "sea_p52", port=True)
     link_land_sea(nodes, "land_palau", "sea_p44", port=False)
     link_land_sea(nodes, "land_guam", "sea_p43", port=True)
     link_land_sea(nodes, "land_jap_mariana_islands", "sea_p43", port=True)
     link_land_sea(nodes, "land_jap_caroline_islands", "sea_p46", port=False)
     link_land_sea(nodes, "land_usa_wake_island", "sea_p36", port=True)
+    link_land_sea(nodes, "land_sumatra", "sea_p50", naval_facilities=["minor_port"])
     link_land_sea(nodes, "land_sumatra", "sea_p59", port=True)
     link_land_sea(nodes, "land_java", "sea_p59", port=True)
     link_land_sea(nodes, "land_borneo", "sea_p59", port=True)
