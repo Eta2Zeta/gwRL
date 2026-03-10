@@ -228,7 +228,12 @@ def set_edge(nodes, src, dst, **attrs):
 
 def link(nodes, a, b, **attrs):
     set_edge(nodes, a, b, **attrs)
-    set_edge(nodes, b, a, **attrs)
+
+    reverse_edge_attrs = dict(attrs)
+    # River crossing is directional: reverse edge defaults to no crossing.
+    if "river_crossing" in reverse_edge_attrs:
+        reverse_edge_attrs["river_crossing"] = False
+    set_edge(nodes, b, a, **reverse_edge_attrs)
 
 
 def next_rail_id(nodes, a, b):
@@ -787,6 +792,7 @@ def build():
         ("land_china_hunan", "Hunan", "normal", 2, "KMT", False, False),
         ("land_china_shensi", "Shensi", "normal", 2, "CCP", False, False),
         ("land_china_szechwan", "Szechwan", "mountain", 2, "KMT", False, False),
+        ("land_china_sikang", "Sikang", "mountain", 0, "Szechwan Clique", False, False),
         ("land_china_kweichow", "Kweichow", "mountain", 0, "KMT", False, False),
         ("land_china_yunnan", "Yunnan", "mountain", 1, "Yunnan Clique", False, False),
         ("land_china_tsinghai", "Tsinghai", "mountain", 0, "Ma Clique", False, False),
@@ -1326,13 +1332,25 @@ def build():
     link_rail(nodes, "land_china_hunan", "land_kwangtung", has_river=True)
     link_land(nodes, "land_china_kweichow", "land_kwangtung")
     link_land(nodes, "land_china_yunnan", "land_china_kweichow", border_terrain="mountain", has_river=True)
+    link_land(nodes, "land_china_yunnan", "land_kwangtung", border_terrain="mountain")
+    link_rail(nodes, "land_china_yunnan", "land_annam_tonkin", border_terrain="jungle")
+    link_land(nodes, "land_china_yunnan", "land_burma", border_terrain="mountain", passable=False)
     link_land(nodes, "land_china_shantung", "land_china_szechwan")
     link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_szechwan", "land_china_shensi", border_terrain="mountain")
     link_land(nodes, "land_china_shensi", "land_china_suiyuan", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_shensi", "land_china_tsinghai", border_terrain="mountain", river_crossing=True)
-    link_land(nodes, "land_china_tsinghai", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
+    link_land(nodes, "land_china_tsinghai", "land_china_szechwan")
+    link_land(nodes, "land_china_tsinghai", "land_china_sikang", border_terrain="mountain", river_crossing=True)
+    link_land(nodes, "land_china_sikang", "land_india_calcutta", border_terrain="mountain", passable=False)
+    link_land(nodes, "land_china_sikang", "land_tibet", border_terrain="mountain", has_river=True)
+    link_land(nodes, "land_china_sikang", "land_china_yunnan", border_terrain="mountain", has_river=True)
+    link_land(nodes, "land_china_sikang", "land_china_kweichow", border_terrain="mountain")
+    link_land(nodes, "land_china_sikang", "land_china_szechwan", border_terrain="mountain")
     link_land(nodes, "land_china_tsinghai", "land_china_sinkiang", border_terrain="mountain")
+    link_land(nodes, "land_china_tsinghai", "land_china_suiyuan")
+    link_land(nodes, "land_china_tsinghai", "land_mongolia_ulyassutai", border_terrain="desert")
+    link_land(nodes, "land_china_tsinghai", "land_mongolia_central_mongolia", border_terrain="desert")
     link_land(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
     link_land(nodes, "land_china_hunan", "land_china_kweichow", has_river=True, river_crossing=True)
     link_land(nodes, "land_china_hunan", "land_china_szechwan")
@@ -1782,7 +1800,10 @@ def build():
                 continue
             revs = [x for x in nodes[dst].get("neighbors", []) if x["neighbor_id"] == src]
             if not revs:
-                set_edge(nodes, dst, src, **{k: deepcopy(v) for k, v in e.items() if k != "neighbor_id"})
+                reverse_defaults = {k: deepcopy(v) for k, v in e.items() if k != "neighbor_id"}
+                if "river_crossing" in reverse_defaults:
+                    reverse_defaults["river_crossing"] = False
+                set_edge(nodes, dst, src, **reverse_defaults)
 
     # Gauge-change rule: only rail links crossing USSR <-> non-USSR are marked as a gauge change.
     for src, node in nodes.items():
