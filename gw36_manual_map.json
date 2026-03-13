@@ -51,7 +51,7 @@
         },
         {
           "neighbor_id": "land_eritrea",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -155,7 +155,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_saudi_arabia",
-          "border_terrain": "desert",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -236,7 +236,7 @@
         },
         {
           "neighbor_id": "land_iran_northern_iran",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -258,7 +258,7 @@
         },
         {
           "neighbor_id": "land_iran_southern_iran",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -318,7 +318,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_yug_eastern_yugoslavia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -340,7 +340,7 @@
         },
         {
           "neighbor_id": "land_yug_western_yugoslavia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -502,7 +502,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_yunnan",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1105,7 +1105,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_cze_bohemia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1127,7 +1127,7 @@
         },
         {
           "neighbor_id": "land_cze_slovakia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1149,7 +1149,7 @@
         },
         {
           "neighbor_id": "land_ger_bavaria",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1253,7 +1253,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_iran_northern_iran",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1275,7 +1275,7 @@
         },
         {
           "neighbor_id": "land_tur_eastern_anatolia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1478,7 +1478,7 @@
         },
         {
           "neighbor_id": "land_cameroon",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1641,7 +1641,7 @@
         },
         {
           "neighbor_id": "land_chile",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1685,7 +1685,7 @@
         },
         {
           "neighbor_id": "land_peru",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1767,7 +1767,7 @@
         },
         {
           "neighbor_id": "land_sarawak",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -1903,7 +1903,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_brazil_amazon_jungle",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -2212,7 +2212,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_siam",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -2592,7 +2592,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_yunnan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": false,
           "has_river": false,
           "river_crossing": false,
@@ -2609,7 +2609,7 @@
         },
         {
           "neighbor_id": "land_india_benares",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -2653,7 +2653,7 @@
         },
         {
           "neighbor_id": "land_siam",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -2937,7 +2937,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_alberta_saskatchewan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -3072,7 +3072,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_baffin_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -4128,7 +4128,7 @@
         },
         {
           "neighbor_id": "land_china_suiyuan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -4431,7 +4431,7 @@
           "border_terrain": "normal",
           "passable": true,
           "has_river": true,
-          "river_crossing": false,
+          "river_crossing": true,
           "railway_connection": false,
           "gauge_change": false,
           "railroads": [],
@@ -4448,7 +4448,7 @@
           "border_terrain": "mountain",
           "passable": true,
           "has_river": false,
-          "river_crossing": false,
+          "river_crossing": true,
           "railway_connection": false,
           "gauge_change": false,
           "railroads": [],
@@ -4465,7 +4465,7 @@
           "border_terrain": "mountain",
           "passable": true,
           "has_river": false,
-          "river_crossing": true,
+          "river_crossing": false,
           "railway_connection": false,
           "gauge_change": false,
           "railroads": [],
@@ -4482,7 +4482,7 @@
           "border_terrain": "mountain",
           "passable": true,
           "has_river": true,
-          "river_crossing": false,
+          "river_crossing": true,
           "railway_connection": false,
           "gauge_change": false,
           "railroads": [],
@@ -4770,7 +4770,7 @@
         },
         {
           "neighbor_id": "land_china_szechwan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -4820,7 +4820,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_kweichow",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -4854,7 +4854,7 @@
         },
         {
           "neighbor_id": "land_china_tsinghai",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -4955,7 +4955,7 @@
         },
         {
           "neighbor_id": "land_china_tsinghai",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5027,7 +5027,7 @@
         },
         {
           "neighbor_id": "land_china_shensi",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5133,7 +5133,7 @@
         },
         {
           "neighbor_id": "land_china_kweichow",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5184,7 +5184,7 @@
         },
         {
           "neighbor_id": "land_china_sikang",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5201,7 +5201,7 @@
         },
         {
           "neighbor_id": "land_china_sinkiang",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5251,7 +5251,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_shensi",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5425,7 +5425,7 @@
         },
         {
           "neighbor_id": "land_china_kweichow",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": true,
           "river_crossing": false,
@@ -5442,7 +5442,7 @@
         },
         {
           "neighbor_id": "land_china_sikang",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": true,
           "river_crossing": false,
@@ -5492,7 +5492,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_annam_tonkin",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5955,7 +5955,7 @@
         },
         {
           "neighbor_id": "land_cze_bohemia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -5999,7 +5999,7 @@
         },
         {
           "neighbor_id": "land_pol_dolnoslaskie",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -6021,7 +6021,7 @@
         },
         {
           "neighbor_id": "land_pol_east_poland",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -6140,7 +6140,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_nor_southern_norway",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -6905,7 +6905,7 @@
       "node_facility_ids": [],
       "neighbors": [
         {
-          "neighbor_id": "sea_p15",
+          "neighbor_id": "sea_p32",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -6914,10 +6914,10 @@
           "gauge_change": false,
           "railroads": [],
           "naval_facilities": [
-            "minor_port"
+            "major_port"
           ],
           "naval_facility_ids": [
-            "facility_land_formosa_minor_port"
+            "facility_land_formosa_major_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -7838,7 +7838,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_abyssinia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -8905,7 +8905,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_bulgaria",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -8971,7 +8971,7 @@
         },
         {
           "neighbor_id": "land_yug_eastern_yugoslavia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -9030,7 +9030,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_gre_macedonia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -9273,8 +9273,12 @@
       "is_city": true,
       "is_capital": false,
       "is_victory_city": false,
-      "node_facilities": [],
-      "node_facility_ids": [],
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_hong_kong_airfield"
+      ],
       "neighbors": [
         {
           "neighbor_id": "land_kwangtung",
@@ -9293,6 +9297,27 @@
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p41",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_dockyard"
+          ],
+          "naval_facility_ids": [
+            "facility_hong_kong_major_dockyard"
+          ],
+          "port_or_dock_connection": true,
           "canal_or_strait": null,
           "narrow_crossing": false,
           "narrow_crossings": 0,
@@ -9530,7 +9555,7 @@
         },
         {
           "neighbor_id": "land_tibet",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": false,
           "has_river": false,
           "river_crossing": false,
@@ -9563,7 +9588,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_burma",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -9585,7 +9610,7 @@
         },
         {
           "neighbor_id": "land_china_sikang",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": false,
           "has_river": false,
           "river_crossing": false,
@@ -9646,7 +9671,7 @@
         },
         {
           "neighbor_id": "land_tibet",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": false,
           "has_river": false,
           "river_crossing": false,
@@ -10009,7 +10034,7 @@
         },
         {
           "neighbor_id": "land_iran_southern_iran",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -10259,7 +10284,7 @@
         },
         {
           "neighbor_id": "land_northern_iraq",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -10341,7 +10366,7 @@
         },
         {
           "neighbor_id": "land_iran_northern_iran",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -10604,7 +10629,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_aut_austria",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -10626,7 +10651,7 @@
         },
         {
           "neighbor_id": "land_fra_southern_france",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -10692,7 +10717,7 @@
         },
         {
           "neighbor_id": "land_switzerland",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -11232,7 +11257,7 @@
         },
         {
           "neighbor_id": "land_jap_tokyo",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -11396,10 +11421,12 @@
           "gauge_change": false,
           "railroads": [],
           "naval_facilities": [
-            "minor_port"
+            "major_port",
+            "major_shipyard"
           ],
           "naval_facility_ids": [
-            "facility_kyushu_minor_port"
+            "facility_kyushu_major_port",
+            "facility_kyushu_major_shipyard"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -11678,7 +11705,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_afghanistan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -11955,7 +11982,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_annam_tonkin",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -12011,7 +12038,7 @@
         },
         {
           "neighbor_id": "land_china_yunnan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -12392,7 +12419,24 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "sea_p32",
+          "neighbor_id": "sea_p41",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p42",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -12407,23 +12451,6 @@
             "facility_and_the_visayas_minor_port"
           ],
           "port_or_dock_connection": true,
-          "canal_or_strait": null,
-          "narrow_crossing": false,
-          "narrow_crossings": 0,
-          "special_fortification": null
-        },
-        {
-          "neighbor_id": "sea_p41",
-          "border_terrain": "coast",
-          "passable": true,
-          "has_river": false,
-          "river_crossing": false,
-          "railway_connection": false,
-          "gauge_change": false,
-          "railroads": [],
-          "naval_facilities": [],
-          "naval_facility_ids": [],
-          "port_or_dock_connection": false,
           "canal_or_strait": null,
           "narrow_crossing": false,
           "narrow_crossings": 0,
@@ -13191,6 +13218,23 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "sea_p42",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p50",
           "border_terrain": "coast",
           "passable": true,
@@ -13250,7 +13294,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_tsinghai",
-          "border_terrain": "desert",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -13367,7 +13411,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_mongolia_tannu_tuva",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -13450,7 +13494,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_tsinghai",
-          "border_terrain": "desert",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -13517,7 +13561,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_kashmir",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -13539,7 +13583,7 @@
         },
         {
           "neighbor_id": "land_tibet",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": false,
           "has_river": false,
           "river_crossing": false,
@@ -14177,7 +14221,7 @@
         },
         {
           "neighbor_id": "land_nor_trondelag",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -14333,7 +14377,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_french_morocco",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -14524,7 +14568,7 @@
         },
         {
           "neighbor_id": "land_tur_eastern_anatolia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -14740,7 +14784,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_qatar",
-          "border_terrain": "desert",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -14762,7 +14806,7 @@
         },
         {
           "neighbor_id": "land_saudi_arabia",
-          "border_terrain": "desert",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -14821,7 +14865,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_belgian_congo",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -15289,7 +15333,7 @@
         },
         {
           "neighbor_id": "land_chile",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -16311,7 +16355,7 @@
         },
         {
           "neighbor_id": "land_saudi_arabia",
-          "border_terrain": "desert",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -16725,7 +16769,7 @@
         },
         {
           "neighbor_id": "land_cze_slovakia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -17083,7 +17127,7 @@
         },
         {
           "neighbor_id": "land_cochinchina",
-          "border_terrain": "jungle",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -17502,7 +17546,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_french_morocco",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -17848,7 +17892,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -17989,7 +18033,7 @@
         },
         {
           "neighbor_id": "land_nor_trondelag",
-          "border_terrain": "tundra",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -18061,7 +18105,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_fra_southern_france",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -18083,7 +18127,7 @@
         },
         {
           "neighbor_id": "land_ger_bavaria",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -18187,7 +18231,7 @@
         },
         {
           "neighbor_id": "land_tur_eastern_anatolia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -18349,7 +18393,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_sikang",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": true,
           "river_crossing": false,
@@ -18400,7 +18444,7 @@
         },
         {
           "neighbor_id": "land_kashmir",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -19172,7 +19216,7 @@
         },
         {
           "neighbor_id": "land_tur_akdeniz",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -19194,7 +19238,7 @@
         },
         {
           "neighbor_id": "land_tur_ankara",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -20826,7 +20870,7 @@
         },
         {
           "neighbor_id": "land_usa_western_united_states",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -21484,7 +21528,7 @@
         },
         {
           "neighbor_id": "land_usa_pacific_northwest",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -24072,7 +24116,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_korea",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -25104,7 +25148,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_azerbaijan",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -25126,7 +25170,7 @@
         },
         {
           "neighbor_id": "land_tur_eastern_anatolia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -25148,7 +25192,7 @@
         },
         {
           "neighbor_id": "land_usr_north_caucasia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26290,7 +26334,7 @@
         },
         {
           "neighbor_id": "land_yug_western_yugoslavia",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26350,7 +26394,7 @@
         },
         {
           "neighbor_id": "land_aut_austria",
-          "border_terrain": "mountain",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26453,7 +26497,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_baffin_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26470,7 +26514,7 @@
         },
         {
           "neighbor_id": "land_can_district_of_keewatin",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26487,7 +26531,7 @@
         },
         {
           "neighbor_id": "land_can_manitoba",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26537,7 +26581,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26558,7 +26602,7 @@
         },
         {
           "neighbor_id": "land_gbr_scotland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26579,7 +26623,7 @@
         },
         {
           "neighbor_id": "land_nor_southern_norway",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26617,7 +26661,7 @@
         },
         {
           "neighbor_id": "sea_a7",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26650,7 +26694,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_a10",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26700,7 +26744,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26721,7 +26765,7 @@
         },
         {
           "neighbor_id": "land_estonia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26742,7 +26786,7 @@
         },
         {
           "neighbor_id": "land_ger_eastern_germany",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26763,7 +26807,7 @@
         },
         {
           "neighbor_id": "land_ger_konigsberg",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26784,7 +26828,7 @@
         },
         {
           "neighbor_id": "land_ger_western_germany",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26805,7 +26849,7 @@
         },
         {
           "neighbor_id": "land_swe_gotland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26826,7 +26870,7 @@
         },
         {
           "neighbor_id": "land_usr_leningrad",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26847,7 +26891,7 @@
         },
         {
           "neighbor_id": "sea_a11",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26881,7 +26925,7 @@
         },
         {
           "neighbor_id": "sea_a23",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26914,7 +26958,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_estonia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26935,7 +26979,7 @@
         },
         {
           "neighbor_id": "land_fin_southern_finland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26956,7 +27000,7 @@
         },
         {
           "neighbor_id": "land_swe_gotland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26977,7 +27021,7 @@
         },
         {
           "neighbor_id": "land_usr_kola",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -26998,7 +27042,7 @@
         },
         {
           "neighbor_id": "sea_a12",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27048,7 +27092,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_fin_lapland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27065,7 +27109,7 @@
         },
         {
           "neighbor_id": "land_swe_norrland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27082,7 +27126,7 @@
         },
         {
           "neighbor_id": "land_usr_kola",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27099,7 +27143,7 @@
         },
         {
           "neighbor_id": "sea_a13",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27132,7 +27176,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27153,7 +27197,7 @@
         },
         {
           "neighbor_id": "land_can_quebec",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27191,7 +27235,7 @@
         },
         {
           "neighbor_id": "sea_a2",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27224,7 +27268,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_labrador",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27245,7 +27289,7 @@
         },
         {
           "neighbor_id": "land_can_newfoundland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27266,7 +27310,7 @@
         },
         {
           "neighbor_id": "land_can_nova_scotia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27287,7 +27331,7 @@
         },
         {
           "neighbor_id": "land_can_st_pierre_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27308,7 +27352,7 @@
         },
         {
           "neighbor_id": "sea_a15",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27375,7 +27419,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_a18",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27408,7 +27452,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_baffin_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27425,7 +27469,7 @@
         },
         {
           "neighbor_id": "sea_a1",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27508,7 +27552,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_gbr_northern_england",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27529,7 +27573,7 @@
         },
         {
           "neighbor_id": "land_gbr_southern_england",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27550,7 +27594,7 @@
         },
         {
           "neighbor_id": "land_ireland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27571,7 +27615,7 @@
         },
         {
           "neighbor_id": "sea_a20",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27621,7 +27665,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_fra_normandy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27638,7 +27682,7 @@
         },
         {
           "neighbor_id": "land_fra_picardy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27659,7 +27703,7 @@
         },
         {
           "neighbor_id": "land_ireland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27730,7 +27774,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_denmark",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27751,7 +27795,7 @@
         },
         {
           "neighbor_id": "land_fra_normandy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27772,7 +27816,7 @@
         },
         {
           "neighbor_id": "land_fra_picardy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27793,7 +27837,7 @@
         },
         {
           "neighbor_id": "land_gbr_london",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27814,7 +27858,7 @@
         },
         {
           "neighbor_id": "land_gbr_southern_england",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27835,7 +27879,7 @@
         },
         {
           "neighbor_id": "land_ger_western_germany",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27856,7 +27900,7 @@
         },
         {
           "neighbor_id": "land_neu_belgium",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27877,7 +27921,7 @@
         },
         {
           "neighbor_id": "land_neu_netherlands",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27915,7 +27959,7 @@
         },
         {
           "neighbor_id": "sea_a21",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27932,7 +27976,7 @@
         },
         {
           "neighbor_id": "sea_a22",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27965,7 +28009,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_ontario",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -27986,7 +28030,7 @@
         },
         {
           "neighbor_id": "land_usa_great_lakes",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28023,7 +28067,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_usa_new_york",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28044,7 +28088,7 @@
         },
         {
           "neighbor_id": "sea_a18",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28094,7 +28138,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_usa_the_carolinas",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28115,7 +28159,7 @@
         },
         {
           "neighbor_id": "land_usa_washington_dc",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28136,7 +28180,7 @@
         },
         {
           "neighbor_id": "sea_a25",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28186,7 +28230,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_esp_basque_country",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28207,7 +28251,7 @@
         },
         {
           "neighbor_id": "land_esp_catalonia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28228,7 +28272,7 @@
         },
         {
           "neighbor_id": "land_fra_aquitaine",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28249,7 +28293,7 @@
         },
         {
           "neighbor_id": "land_fra_southern_france",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28270,7 +28314,7 @@
         },
         {
           "neighbor_id": "land_french_morocco",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28291,7 +28335,7 @@
         },
         {
           "neighbor_id": "land_spanish_morocco",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28312,7 +28356,7 @@
         },
         {
           "neighbor_id": "sea_a22",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28362,7 +28406,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_a28",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28395,7 +28439,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_bermuda",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28416,7 +28460,7 @@
         },
         {
           "neighbor_id": "land_usa_southeastern_united_states",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28437,7 +28481,7 @@
         },
         {
           "neighbor_id": "sea_a26",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28471,7 +28515,7 @@
         },
         {
           "neighbor_id": "sea_a36",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28504,7 +28548,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_a31",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28538,7 +28582,7 @@
         },
         {
           "neighbor_id": "sea_a36",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28571,7 +28615,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_a33",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28621,7 +28665,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_colombia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28642,7 +28686,7 @@
         },
         {
           "neighbor_id": "land_cuba",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28663,7 +28707,7 @@
         },
         {
           "neighbor_id": "land_hispaniola",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28684,7 +28728,7 @@
         },
         {
           "neighbor_id": "land_panama",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28705,7 +28749,7 @@
         },
         {
           "neighbor_id": "land_puerto_rico",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28726,7 +28770,7 @@
         },
         {
           "neighbor_id": "land_usa_new_orleans",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28747,7 +28791,7 @@
         },
         {
           "neighbor_id": "land_venezuela",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28835,7 +28879,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_brazil_caatinga",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28856,7 +28900,7 @@
         },
         {
           "neighbor_id": "land_cameroon",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28877,7 +28921,7 @@
         },
         {
           "neighbor_id": "land_dahomey",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28898,7 +28942,7 @@
         },
         {
           "neighbor_id": "land_french_guiana",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28919,7 +28963,7 @@
         },
         {
           "neighbor_id": "land_guyana",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28940,7 +28984,7 @@
         },
         {
           "neighbor_id": "land_nigeria",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28961,7 +29005,7 @@
         },
         {
           "neighbor_id": "land_suriname",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -28982,7 +29026,7 @@
         },
         {
           "neighbor_id": "sea_a35",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29032,7 +29076,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_angola",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29053,7 +29097,7 @@
         },
         {
           "neighbor_id": "land_brazil_pampas",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29074,7 +29118,7 @@
         },
         {
           "neighbor_id": "land_brazil_rio_de_janeiro",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29095,7 +29139,7 @@
         },
         {
           "neighbor_id": "land_southwest_africa",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29116,7 +29160,7 @@
         },
         {
           "neighbor_id": "land_uruguay",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29137,7 +29181,7 @@
         },
         {
           "neighbor_id": "sea_a38",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29187,7 +29231,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_buenos_aires",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29208,7 +29252,7 @@
         },
         {
           "neighbor_id": "land_cape_town",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29229,7 +29273,7 @@
         },
         {
           "neighbor_id": "land_patagonia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29250,7 +29294,7 @@
         },
         {
           "neighbor_id": "land_south_africa",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29271,7 +29315,7 @@
         },
         {
           "neighbor_id": "sea_a39",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29304,7 +29348,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_m1",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29337,7 +29381,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_gbr_scotland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29358,7 +29402,7 @@
         },
         {
           "neighbor_id": "land_nor_southern_norway",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29379,7 +29423,7 @@
         },
         {
           "neighbor_id": "land_nor_trondelag",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29450,7 +29494,7 @@
         },
         {
           "neighbor_id": "sea_a6",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29483,7 +29527,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_burma",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29504,7 +29548,7 @@
         },
         {
           "neighbor_id": "land_india_calcutta",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29525,7 +29569,7 @@
         },
         {
           "neighbor_id": "land_india_ceylon",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29546,7 +29590,7 @@
         },
         {
           "neighbor_id": "land_india_southern_india",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29584,7 +29628,7 @@
         },
         {
           "neighbor_id": "sea_i6",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29617,7 +29661,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_british_malaya",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29634,7 +29678,7 @@
         },
         {
           "neighbor_id": "sea_i11",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29684,7 +29728,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_aden",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29705,7 +29749,7 @@
         },
         {
           "neighbor_id": "land_saudi_arabia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29756,7 +29800,7 @@
         },
         {
           "neighbor_id": "sea_m9",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29789,7 +29833,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_british_somaliland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29810,7 +29854,7 @@
         },
         {
           "neighbor_id": "land_italian_somaliland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29831,7 +29875,7 @@
         },
         {
           "neighbor_id": "land_madagascar",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29852,7 +29896,7 @@
         },
         {
           "neighbor_id": "land_mauritius",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29873,7 +29917,7 @@
         },
         {
           "neighbor_id": "land_portuguese_east_africa",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29894,7 +29938,7 @@
         },
         {
           "neighbor_id": "land_seychelles",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29915,7 +29959,7 @@
         },
         {
           "neighbor_id": "land_tanganyika",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29936,7 +29980,7 @@
         },
         {
           "neighbor_id": "sea_i5",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -29986,7 +30030,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_eritrea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30007,7 +30051,7 @@
         },
         {
           "neighbor_id": "land_french_somaliland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30028,7 +30072,7 @@
         },
         {
           "neighbor_id": "land_lower_egypt",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30049,7 +30093,7 @@
         },
         {
           "neighbor_id": "land_upper_egypt",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30070,7 +30114,7 @@
         },
         {
           "neighbor_id": "sea_i3",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30104,7 +30148,7 @@
         },
         {
           "neighbor_id": "sea_m9",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30137,7 +30181,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_aus_western_australia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30158,7 +30202,7 @@
         },
         {
           "neighbor_id": "land_india_ceylon",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30179,7 +30223,7 @@
         },
         {
           "neighbor_id": "land_india_maharashtra",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30200,7 +30244,7 @@
         },
         {
           "neighbor_id": "land_india_southern_india",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30221,7 +30265,7 @@
         },
         {
           "neighbor_id": "land_iran_southern_iran",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30242,7 +30286,7 @@
         },
         {
           "neighbor_id": "land_oman",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30263,7 +30307,7 @@
         },
         {
           "neighbor_id": "land_saudi_arabia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30297,7 +30341,7 @@
         },
         {
           "neighbor_id": "sea_i3",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30314,7 +30358,7 @@
         },
         {
           "neighbor_id": "sea_i4",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30364,7 +30408,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_iran_southern_iran",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30385,7 +30429,7 @@
         },
         {
           "neighbor_id": "land_kuwait",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30406,7 +30450,7 @@
         },
         {
           "neighbor_id": "land_qatar",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30427,7 +30471,7 @@
         },
         {
           "neighbor_id": "land_southern_iraq",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30448,7 +30492,7 @@
         },
         {
           "neighbor_id": "sea_i6",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30481,7 +30525,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_fra_southern_france",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30502,7 +30546,7 @@
         },
         {
           "neighbor_id": "land_northern_algeria",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30523,7 +30567,7 @@
         },
         {
           "neighbor_id": "land_tripoli",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30544,7 +30588,7 @@
         },
         {
           "neighbor_id": "land_tunisia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30615,7 +30659,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_bulgaria",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30636,7 +30680,7 @@
         },
         {
           "neighbor_id": "land_rom_bessarabia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30657,7 +30701,7 @@
         },
         {
           "neighbor_id": "land_tur_istanbul",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30678,7 +30722,7 @@
         },
         {
           "neighbor_id": "land_usr_crimea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30716,7 +30760,7 @@
         },
         {
           "neighbor_id": "sea_m5",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30766,7 +30810,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_tur_akdeniz",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30783,7 +30827,7 @@
         },
         {
           "neighbor_id": "land_tur_karadeniz",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30804,7 +30848,7 @@
         },
         {
           "neighbor_id": "land_usr_crimea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30825,7 +30869,7 @@
         },
         {
           "neighbor_id": "land_usr_north_caucasia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30846,7 +30890,7 @@
         },
         {
           "neighbor_id": "land_usr_taurida",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30867,7 +30911,7 @@
         },
         {
           "neighbor_id": "land_usr_transcaucasia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30888,7 +30932,7 @@
         },
         {
           "neighbor_id": "sea_m10",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30938,7 +30982,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_azerbaijan",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30955,7 +30999,7 @@
         },
         {
           "neighbor_id": "land_usr_transcaucasia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -30972,7 +31016,7 @@
         },
         {
           "neighbor_id": "sea_m11",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31005,7 +31049,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_m1",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31072,7 +31116,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_fra_corsica",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31093,7 +31137,7 @@
         },
         {
           "neighbor_id": "land_ita_northern_italy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31114,7 +31158,7 @@
         },
         {
           "neighbor_id": "land_ita_rome",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31135,7 +31179,7 @@
         },
         {
           "neighbor_id": "land_ita_sardinia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31156,7 +31200,7 @@
         },
         {
           "neighbor_id": "sea_m2",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31206,7 +31250,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_ita_lazio",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31227,7 +31271,7 @@
         },
         {
           "neighbor_id": "land_ita_southern_italy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31248,7 +31292,7 @@
         },
         {
           "neighbor_id": "sea_m2",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31298,7 +31342,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_albania",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31319,7 +31363,7 @@
         },
         {
           "neighbor_id": "land_gre_macedonia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31340,7 +31384,7 @@
         },
         {
           "neighbor_id": "land_ita_southern_italy",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31361,7 +31405,7 @@
         },
         {
           "neighbor_id": "land_yug_western_yugoslavia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31399,7 +31443,7 @@
         },
         {
           "neighbor_id": "sea_m3",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31416,7 +31460,7 @@
         },
         {
           "neighbor_id": "sea_m4",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31449,7 +31493,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_lower_egypt",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31470,7 +31514,7 @@
         },
         {
           "neighbor_id": "land_syria",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31491,7 +31535,7 @@
         },
         {
           "neighbor_id": "land_tobruk",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31512,7 +31556,7 @@
         },
         {
           "neighbor_id": "land_transjordan",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31533,7 +31577,7 @@
         },
         {
           "neighbor_id": "land_western_egypt",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31588,7 +31632,7 @@
         },
         {
           "neighbor_id": "sea_m10",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31621,7 +31665,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p9",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31671,7 +31715,7 @@
         },
         {
           "neighbor_id": "sea_p6",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31704,7 +31748,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p11",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31755,7 +31799,7 @@
         },
         {
           "neighbor_id": "sea_p6",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31788,7 +31832,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p12",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31838,7 +31882,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_beiping",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31864,7 +31908,7 @@
         },
         {
           "neighbor_id": "land_china_nanking",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31885,7 +31929,7 @@
         },
         {
           "neighbor_id": "land_china_shantung",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31908,7 +31952,7 @@
         },
         {
           "neighbor_id": "land_korea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31946,7 +31990,7 @@
         },
         {
           "neighbor_id": "sea_p7",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -31978,29 +32022,8 @@
       "node_facility_ids": [],
       "neighbors": [
         {
-          "neighbor_id": "land_formosa",
-          "border_terrain": "coast",
-          "passable": true,
-          "has_river": false,
-          "river_crossing": false,
-          "railway_connection": false,
-          "gauge_change": false,
-          "railroads": [],
-          "naval_facilities": [
-            "minor_port"
-          ],
-          "naval_facility_ids": [
-            "facility_land_formosa_minor_port"
-          ],
-          "port_or_dock_connection": true,
-          "canal_or_strait": null,
-          "narrow_crossing": false,
-          "narrow_crossings": 0,
-          "special_fortification": null
-        },
-        {
           "neighbor_id": "land_jap_honshu",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32021,7 +32044,7 @@
         },
         {
           "neighbor_id": "land_jap_kyushu",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32029,10 +32052,12 @@
           "gauge_change": false,
           "railroads": [],
           "naval_facilities": [
-            "minor_port"
+            "major_port",
+            "major_shipyard"
           ],
           "naval_facility_ids": [
-            "facility_kyushu_minor_port"
+            "facility_kyushu_major_port",
+            "facility_kyushu_major_shipyard"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -32042,7 +32067,7 @@
         },
         {
           "neighbor_id": "land_korea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32063,7 +32088,7 @@
         },
         {
           "neighbor_id": "sea_p14",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32147,7 +32172,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_hokkaido",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32164,7 +32189,7 @@
         },
         {
           "neighbor_id": "land_jap_honshu",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32185,7 +32210,7 @@
         },
         {
           "neighbor_id": "land_jap_tokyo",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32223,7 +32248,7 @@
         },
         {
           "neighbor_id": "sea_p9",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32256,7 +32281,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p9",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32289,7 +32314,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_usr_kamchatka",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32306,7 +32331,7 @@
         },
         {
           "neighbor_id": "land_usr_magadan",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32323,7 +32348,7 @@
         },
         {
           "neighbor_id": "land_usr_north_sakhalin",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32407,7 +32432,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p12",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32457,7 +32482,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_usa_western_united_states",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32474,7 +32499,7 @@
         },
         {
           "neighbor_id": "sea_p13",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32491,7 +32516,7 @@
         },
         {
           "neighbor_id": "sea_p24",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32541,7 +32566,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_usa_san_francisco",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32562,7 +32587,7 @@
         },
         {
           "neighbor_id": "sea_p25",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32645,7 +32670,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_mex_western_mexico",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32666,7 +32691,7 @@
         },
         {
           "neighbor_id": "land_usa_southwest_united_states",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32687,7 +32712,7 @@
         },
         {
           "neighbor_id": "sea_p28",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32737,7 +32762,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_chile",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32758,7 +32783,7 @@
         },
         {
           "neighbor_id": "land_mex_western_mexico",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32779,7 +32804,7 @@
         },
         {
           "neighbor_id": "land_panama",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32800,7 +32825,7 @@
         },
         {
           "neighbor_id": "sea_a36",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32817,7 +32842,7 @@
         },
         {
           "neighbor_id": "sea_p30",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32850,7 +32875,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_china_nanking",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32870,8 +32895,8 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_luzon_and_the_visayas",
-          "border_terrain": "coast",
+          "neighbor_id": "land_formosa",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32879,10 +32904,10 @@
           "gauge_change": false,
           "railroads": [],
           "naval_facilities": [
-            "minor_port"
+            "major_port"
           ],
           "naval_facility_ids": [
-            "facility_and_the_visayas_minor_port"
+            "facility_land_formosa_major_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -32892,7 +32917,7 @@
         },
         {
           "neighbor_id": "sea_p15",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32926,6 +32951,23 @@
         },
         {
           "neighbor_id": "sea_p41",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p42",
           "border_terrain": "sea",
           "passable": true,
           "has_river": false,
@@ -32976,7 +33018,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_okinawa",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -32999,7 +33041,7 @@
         },
         {
           "neighbor_id": "sea_p15",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33016,7 +33058,7 @@
         },
         {
           "neighbor_id": "sea_p32",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33083,7 +33125,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_volcanic_islands",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33100,7 +33142,7 @@
         },
         {
           "neighbor_id": "sea_p15",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33117,7 +33159,7 @@
         },
         {
           "neighbor_id": "sea_p16",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33134,7 +33176,7 @@
         },
         {
           "neighbor_id": "sea_p33",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33218,7 +33260,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p34",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33251,7 +33293,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_usa_wake_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33288,7 +33330,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_formosa",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33305,7 +33347,7 @@
         },
         {
           "neighbor_id": "land_hainan",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33321,8 +33363,29 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "land_hong_kong",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_dockyard"
+          ],
+          "naval_facility_ids": [
+            "facility_hong_kong_major_dockyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "land_kwangtung",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33339,7 +33402,7 @@
         },
         {
           "neighbor_id": "land_luzon_and_the_visayas",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33356,7 +33419,7 @@
         },
         {
           "neighbor_id": "sea_p32",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33422,8 +33485,63 @@
       "node_facility_ids": [],
       "neighbors": [
         {
+          "neighbor_id": "land_luzon_and_the_visayas",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_and_the_visayas_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mindanao",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p41",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33456,7 +33574,41 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "sea_p44",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p50",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p51",
           "border_terrain": "sea",
           "passable": true,
           "has_river": false,
@@ -33490,7 +33642,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_guam",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33511,7 +33663,7 @@
         },
         {
           "neighbor_id": "land_jap_mariana_islands",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33532,7 +33684,7 @@
         },
         {
           "neighbor_id": "sea_p32",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33549,7 +33701,7 @@
         },
         {
           "neighbor_id": "sea_p33",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33566,7 +33718,7 @@
         },
         {
           "neighbor_id": "sea_p34",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33583,7 +33735,7 @@
         },
         {
           "neighbor_id": "sea_p42",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33667,7 +33819,24 @@
       "neighbors": [
         {
           "neighbor_id": "land_palau",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p42",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33684,7 +33853,7 @@
         },
         {
           "neighbor_id": "sea_p43",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33701,6 +33870,57 @@
         },
         {
           "neighbor_id": "sea_p46",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p51",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p52",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p53",
           "border_terrain": "sea",
           "passable": true,
           "has_river": false,
@@ -33734,7 +33954,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p34",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33751,7 +33971,7 @@
         },
         {
           "neighbor_id": "sea_p43",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33801,7 +34021,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_caroline_islands",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33818,7 +34038,7 @@
         },
         {
           "neighbor_id": "sea_p43",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33835,7 +34055,7 @@
         },
         {
           "neighbor_id": "sea_p44",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33852,7 +34072,7 @@
         },
         {
           "neighbor_id": "sea_p45",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33936,7 +34156,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p46",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -33969,7 +34189,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_british_columbia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34023,7 +34243,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_british_malaya",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34044,7 +34264,7 @@
         },
         {
           "neighbor_id": "land_cochinchina",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34065,7 +34285,7 @@
         },
         {
           "neighbor_id": "land_luzon_and_the_visayas",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34086,7 +34306,7 @@
         },
         {
           "neighbor_id": "land_mindanao",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34107,7 +34327,7 @@
         },
         {
           "neighbor_id": "land_sarawak",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34124,7 +34344,7 @@
         },
         {
           "neighbor_id": "land_siam",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34141,7 +34361,7 @@
         },
         {
           "neighbor_id": "land_sumatra",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34162,7 +34382,7 @@
         },
         {
           "neighbor_id": "sea_i12",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34179,7 +34399,7 @@
         },
         {
           "neighbor_id": "sea_p41",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34196,7 +34416,7 @@
         },
         {
           "neighbor_id": "sea_p42",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34280,7 +34500,41 @@
       "neighbors": [
         {
           "neighbor_id": "land_sarawak",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p42",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p44",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34297,7 +34551,7 @@
         },
         {
           "neighbor_id": "sea_p50",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34330,7 +34584,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_mindanao",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34350,8 +34604,25 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "sea_p44",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p50",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34383,8 +34654,25 @@
       "node_facility_ids": [],
       "neighbors": [
         {
+          "neighbor_id": "sea_p44",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_p46",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34417,7 +34705,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p46",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34450,7 +34738,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_borneo",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34471,7 +34759,7 @@
         },
         {
           "neighbor_id": "land_java",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34492,7 +34780,7 @@
         },
         {
           "neighbor_id": "land_sumatra",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34513,7 +34801,7 @@
         },
         {
           "neighbor_id": "sea_p50",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34563,7 +34851,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_can_british_columbia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34584,7 +34872,7 @@
         },
         {
           "neighbor_id": "land_usa_pacific_northwest",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34639,7 +34927,7 @@
         },
         {
           "neighbor_id": "sea_p5",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34672,7 +34960,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_celebes",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34693,7 +34981,7 @@
         },
         {
           "neighbor_id": "sea_p59",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34743,7 +35031,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_aus_northern_territory",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34764,7 +35052,7 @@
         },
         {
           "neighbor_id": "land_dutch_new_guinea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34785,7 +35073,7 @@
         },
         {
           "neighbor_id": "land_timor",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34806,7 +35094,7 @@
         },
         {
           "neighbor_id": "sea_p60",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34856,7 +35144,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_aus_queensland",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34877,7 +35165,7 @@
         },
         {
           "neighbor_id": "sea_p61",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34927,7 +35215,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_new_britain",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34948,7 +35236,7 @@
         },
         {
           "neighbor_id": "land_new_guinea",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -34969,7 +35257,7 @@
         },
         {
           "neighbor_id": "sea_p62",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35019,7 +35307,7 @@
       "neighbors": [
         {
           "neighbor_id": "sea_p63",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35069,7 +35357,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_fiji",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35090,7 +35378,7 @@
         },
         {
           "neighbor_id": "land_new_caledonia",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35111,7 +35399,7 @@
         },
         {
           "neighbor_id": "land_new_hebrides",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35132,7 +35420,7 @@
         },
         {
           "neighbor_id": "sea_p64",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35182,7 +35470,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_aus_new_south_wales",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35203,7 +35491,7 @@
         },
         {
           "neighbor_id": "land_aus_tasmania",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35224,7 +35512,7 @@
         },
         {
           "neighbor_id": "sea_p65",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35274,7 +35562,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_nz_north_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35295,7 +35583,7 @@
         },
         {
           "neighbor_id": "land_nz_south_island",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35316,7 +35604,7 @@
         },
         {
           "neighbor_id": "sea_p68",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35349,7 +35637,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_hokkaido",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35370,7 +35658,7 @@
         },
         {
           "neighbor_id": "land_jap_honshu",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35391,7 +35679,7 @@
         },
         {
           "neighbor_id": "land_manchuria_eastern",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35412,7 +35700,7 @@
         },
         {
           "neighbor_id": "land_usr_primorsky_krai",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35450,7 +35738,7 @@
         },
         {
           "neighbor_id": "sea_p2",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35483,7 +35771,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_hokkaido",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35504,7 +35792,7 @@
         },
         {
           "neighbor_id": "land_usr_south_sakhalin",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35525,7 +35813,7 @@
         },
         {
           "neighbor_id": "sea_p2",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35575,7 +35863,7 @@
       "neighbors": [
         {
           "neighbor_id": "land_jap_kurile_islands",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35592,7 +35880,7 @@
         },
         {
           "neighbor_id": "land_usr_kamchatka",
-          "border_terrain": "coast",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35660,7 +35948,7 @@
         },
         {
           "neighbor_id": "sea_p2",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35677,7 +35965,7 @@
         },
         {
           "neighbor_id": "sea_p3",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -35694,7 +35982,7 @@
         },
         {
           "neighbor_id": "sea_p8",
-          "border_terrain": "sea",
+          "border_terrain": "normal",
           "passable": true,
           "has_river": false,
           "river_crossing": false,

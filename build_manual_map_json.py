@@ -230,7 +230,9 @@ def link(nodes, a, b, **attrs):
     set_edge(nodes, a, b, **attrs)
 
     reverse_edge_attrs = dict(attrs)
-    # River crossing is directional: reverse edge defaults to no crossing.
+    # Directional edge semantics: reverse edge gets default values unless explicitly set.
+    if "border_terrain" in reverse_edge_attrs:
+        reverse_edge_attrs["border_terrain"] = DEFAULT_EDGE["border_terrain"]
     if "river_crossing" in reverse_edge_attrs:
         reverse_edge_attrs["river_crossing"] = False
     set_edge(nodes, b, a, **reverse_edge_attrs)
@@ -871,6 +873,8 @@ def build():
         "facility_caroline_islands_major_port",
         "facility_caroline_islands_airfield",
     ]
+    nodes["land_hong_kong"]["node_facilities"] = ["airfield"]
+    nodes["land_hong_kong"]["node_facility_ids"] = ["facility_hong_kong_airfield"]
     nodes["land_jap_tokyo"]["node_facilities"] = ["airfield"]
     nodes["land_jap_tokyo"]["node_facility_ids"] = ["facility_tokyo_airfield"]
 
@@ -948,6 +952,7 @@ def build():
     link(nodes, "sea_p16", "sea_p34", border_terrain="sea")
     link(nodes, "sea_p41", "sea_p42", border_terrain="sea")
     link(nodes, "sea_p41", "sea_p50", border_terrain="sea")
+    link(nodes, "sea_p32", "sea_p42", border_terrain="sea")
     link(nodes, "sea_p32", "sea_p33", border_terrain="sea")
     link(nodes, "sea_p32", "sea_p43", border_terrain="sea")
     link(nodes, "sea_p33", "sea_p34", border_terrain="sea")
@@ -959,7 +964,12 @@ def build():
     link(nodes, "sea_p43", "sea_p44", border_terrain="sea")
     link(nodes, "sea_p43", "sea_p45", border_terrain="sea")
     link(nodes, "sea_p43", "sea_p46", border_terrain="sea")
+    link(nodes, "sea_p42", "sea_p44", border_terrain="sea")
+    link(nodes, "sea_p42", "sea_p51", border_terrain="sea")
     link(nodes, "sea_p44", "sea_p46", border_terrain="sea")
+    link(nodes, "sea_p44", "sea_p51", border_terrain="sea")
+    link(nodes, "sea_p44", "sea_p52", border_terrain="sea")
+    link(nodes, "sea_p44", "sea_p53", border_terrain="sea")
     link(nodes, "sea_p45", "sea_p46", border_terrain="sea")
     link(nodes, "sea_p46", "sea_p47", border_terrain="sea")
     link(nodes, "sea_p46", "sea_p53", border_terrain="sea")
@@ -1331,12 +1341,12 @@ def build():
     link_rail(nodes, "land_china_nanking", "land_china_hunan")
     link_rail(nodes, "land_china_hunan", "land_kwangtung", has_river=True)
     link_land(nodes, "land_china_kweichow", "land_kwangtung")
-    link_land(nodes, "land_china_yunnan", "land_china_kweichow", border_terrain="mountain", has_river=True)
+    link_land(nodes, "land_china_kweichow", "land_china_yunnan", border_terrain="mountain", has_river=True, river_crossing=True)
     link_land(nodes, "land_china_yunnan", "land_kwangtung", border_terrain="mountain")
     link_rail(nodes, "land_china_yunnan", "land_annam_tonkin", border_terrain="jungle")
     link_land(nodes, "land_china_yunnan", "land_burma", border_terrain="mountain", passable=False)
     link_land(nodes, "land_china_shantung", "land_china_szechwan")
-    link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain", river_crossing=True)
+    link_land(nodes, "land_china_kweichow", "land_china_szechwan", border_terrain="mountain")
     link_land(nodes, "land_china_szechwan", "land_china_shensi", border_terrain="mountain")
     link_land(nodes, "land_china_shensi", "land_china_suiyuan", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_shensi", "land_china_tsinghai", border_terrain="mountain", river_crossing=True)
@@ -1345,14 +1355,15 @@ def build():
     link_land(nodes, "land_china_sikang", "land_india_calcutta", border_terrain="mountain", passable=False)
     link_land(nodes, "land_china_sikang", "land_tibet", border_terrain="mountain", has_river=True)
     link_land(nodes, "land_china_sikang", "land_china_yunnan", border_terrain="mountain", has_river=True)
-    link_land(nodes, "land_china_sikang", "land_china_kweichow", border_terrain="mountain")
+    link_land(nodes, "land_china_kweichow", "land_china_sikang", border_terrain="mountain", river_crossing=True)
     link_land(nodes, "land_china_sikang", "land_china_szechwan", border_terrain="mountain")
     link_land(nodes, "land_china_tsinghai", "land_china_sinkiang", border_terrain="mountain")
     link_land(nodes, "land_china_tsinghai", "land_china_suiyuan")
     link_land(nodes, "land_china_tsinghai", "land_mongolia_ulyassutai", border_terrain="desert")
     link_land(nodes, "land_china_tsinghai", "land_mongolia_central_mongolia", border_terrain="desert")
     link_land(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
-    link_land(nodes, "land_china_hunan", "land_china_kweichow", has_river=True, river_crossing=True)
+    link_land(nodes, "land_china_kweichow", "land_china_hunan", has_river=True, river_crossing=True)
+    set_edge(nodes, "land_china_hunan", "land_china_kweichow", river_crossing=True)
     link_land(nodes, "land_china_hunan", "land_china_szechwan")
     link_rail(nodes, "land_kwangtung", "land_hong_kong")
     link_land(nodes, "land_annam_tonkin", "land_kwangtung", border_terrain="jungle")
@@ -1637,7 +1648,7 @@ def build():
     link_land_sea(nodes, "land_jap_kurile_islands", "sea_p9", port=False, narrow=True, narrow_crossings=1)
     link_land_sea(nodes, "land_jap_honshu", "sea_p7", port=True)
     link_land_sea(nodes, "land_jap_honshu", "sea_p15", port=True)
-    link_land_sea(nodes, "land_jap_kyushu", "sea_p15", port=True)
+    link_land_sea(nodes, "land_jap_kyushu", "sea_p15", naval_facilities=["major_port", "major_shipyard"])
     link_land_sea(nodes, "land_jap_okinawa", "sea_p33", naval_facilities=["minor_port", "seaplane_base"])
     link_land_sea(nodes, "land_jap_volcanic_islands", "sea_p34", port=False)
     link_land_sea(nodes, "land_korea", "sea_p15", port=True)
@@ -1664,20 +1675,28 @@ def build():
         naval_facilities=["major_port"],
         naval_facility_id="port_nanking_major",
     )
-    link_land_sea(nodes, "land_formosa", "sea_p15", port=True)
+    link_land_sea(nodes, "land_formosa", "sea_p32", naval_facilities=["major_port"])
     link_land_sea(nodes, "land_formosa", "sea_p41", port=False)
     link_land_sea(nodes, "land_hainan", "sea_p41", port=False, narrow=True, narrow_crossings=1)
     link_land_sea(nodes, "land_kwangtung", "sea_p41", port=False, narrow=True, narrow_crossings=1)
+    link_land_sea(
+        nodes,
+        "land_hong_kong",
+        "sea_p41",
+        naval_facilities=["major_dockyard"],
+        naval_facility_id="facility_hong_kong_major_dockyard",
+    )
     link_land_sea(nodes, "land_cochinchina", "sea_p50", naval_facilities=["major_port"])
     link_land_sea(nodes, "land_siam", "sea_p50", port=False)
     link_land_sea(nodes, "land_british_malaya", "sea_p50", naval_facilities=["major_dockyard"])
     link_land_sea(nodes, "land_british_malaya", "sea_i12", port=False)
     link_land_sea(nodes, "land_sarawak", "sea_p50", port=False)
     link_land_sea(nodes, "land_sarawak", "sea_p51", port=False)
-    link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p32", port=True)
+    link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p42", port=True)
     link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p41", port=False)
     link_land_sea(nodes, "land_luzon_and_the_visayas", "sea_p50", naval_facilities=["submarine_base"])
     link_land_sea(nodes, "land_mindanao", "sea_p50", naval_facilities=["major_port"])
+    link_land_sea(nodes, "land_mindanao", "sea_p42", port=False)
     link_land_sea(nodes, "land_mindanao", "sea_p52", port=True)
     link_land_sea(nodes, "land_palau", "sea_p44", port=False)
     link_land_sea(nodes, "land_guam", "sea_p43", port=True)
@@ -1801,6 +1820,8 @@ def build():
             revs = [x for x in nodes[dst].get("neighbors", []) if x["neighbor_id"] == src]
             if not revs:
                 reverse_defaults = {k: deepcopy(v) for k, v in e.items() if k != "neighbor_id"}
+                if "border_terrain" in reverse_defaults:
+                    reverse_defaults["border_terrain"] = DEFAULT_EDGE["border_terrain"]
                 if "river_crossing" in reverse_defaults:
                     reverse_defaults["river_crossing"] = False
                 set_edge(nodes, dst, src, **reverse_defaults)
