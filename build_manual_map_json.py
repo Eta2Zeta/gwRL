@@ -763,6 +763,8 @@ def build():
 
         ("land_usr_stalino", "Stalino", "tundra", 0, "Soviet Union", False, False),
         ("land_usr_vanavara", "Vanavara", "tundra", 0, "Soviet Union", False, False),
+        ("land_usr_eastern_kazakhstan", "Eastern Kazakhstan", "normal", 0, "Soviet Union", False, False),
+        ("land_usr_novosibirsk", "Novosibirsk", "city", 1, "Soviet Union", False, False),
         ("land_usr_irkutsk", "Irkutsk", "tundra", 1, "Soviet Union", False, False),
         ("land_usr_angara", "Angara", "tundra", 0, "Soviet Union", False, False),
         ("land_usr_yakutsk", "Yakutsk", "tundra", 0, "Soviet Union", False, False),
@@ -780,7 +782,7 @@ def build():
         ("land_mongolia_kobdo", "Kobdo", "mountain", 0, "Mongolia", False, False),
         ("land_mongolia_ulyassutai", "Ulyassutai", "mountain", 0, "Mongolia", False, False),
         ("land_mongolia_central_mongolia", "Central Mongolia", "mountain", 0, "Mongolia", False, False),
-        ("land_mongolia_kherlen", "Kherlen", "mountain", 1, "Mongolia", False, False),
+        ("land_mongolia_kerulen", "Kerulen", "mountain", 1, "Mongolia", False, False),
 
         ("land_manchuria_northern", "Northern Manchuria", "normal", 1, "Japan", False, False),
         ("land_manchuria_western", "Western Manchuria", "normal", 1, "Japan", False, False),
@@ -1311,16 +1313,33 @@ def build():
     link_rail(nodes, "land_usr_north_sakhalin", "land_usr_south_sakhalin")
 
     link_land(nodes, "land_mongolia_tannu_tuva", "land_mongolia_kobdo", border_terrain="mountain")
+    link_land(nodes, "land_mongolia_tannu_tuva", "land_usr_novosibirsk")
+    link_land(nodes, "land_mongolia_tannu_tuva", "land_usr_angara", river_crossing=True)
+    link_land(nodes, "land_mongolia_tannu_tuva", "land_mongolia_central_mongolia", border_terrain="mountain")
     link_land(nodes, "land_mongolia_kobdo", "land_mongolia_ulyassutai")
+    link_land(nodes, "land_mongolia_central_mongolia", "land_mongolia_kobdo")
+    set_edge(nodes, "land_mongolia_kobdo", "land_mongolia_central_mongolia", border_terrain="mountain")
+    link_land(nodes, "land_mongolia_kobdo", "land_usr_eastern_kazakhstan", river_crossing=True)
+    link_land(nodes, "land_mongolia_kobdo", "land_usr_novosibirsk")
+    link_land(nodes, "land_mongolia_kobdo", "land_china_sinkiang")
     link_land(nodes, "land_mongolia_ulyassutai", "land_mongolia_central_mongolia")
-    link_land(nodes, "land_mongolia_central_mongolia", "land_mongolia_kherlen")
-    link_land(nodes, "land_mongolia_kherlen", "land_manchuria_western")
+    link_land(nodes, "land_mongolia_central_mongolia", "land_usr_angara", river_crossing=True)
+    link_land(nodes, "land_mongolia_central_mongolia", "land_usr_buryatia")
+    link_land(nodes, "land_mongolia_central_mongolia", "land_usr_chita")
+    link_land(nodes, "land_mongolia_central_mongolia", "land_mongolia_kerulen")
+    link_land(nodes, "land_mongolia_kerulen", "land_manchuria_western", border_terrain="mountain")
+    link_land(nodes, "land_mongolia_kerulen", "land_usr_chita")
+    set_edge(nodes, "land_usr_chita", "land_mongolia_kerulen", border_terrain="mountain")
+    link_land(nodes, "land_mongolia_kerulen", "land_china_suiyuan", border_terrain="desert")
+    set_edge(nodes, "land_china_suiyuan", "land_mongolia_kerulen", border_terrain="desert")
 
     link_rail(nodes, "land_manchuria_northern", "land_manchuria_western")
+    link_land(nodes, "land_manchuria_northern", "land_manchuria_eastern", border_terrain="mountain")
+    set_edge(nodes, "land_manchuria_eastern", "land_manchuria_northern", border_terrain="mountain")
     link_rail(nodes, "land_manchuria_western", "land_manchuria_eastern")
     link_rail(nodes, "land_manchuria_western", "land_manchuria_rehe")
     link_rail(nodes, "land_manchuria_rehe", "land_manchuria_eastern")
-    link_rail(nodes, "land_manchuria_rehe", "land_china_suiyuan")
+    link_land(nodes, "land_manchuria_rehe", "land_china_suiyuan")
     link_rail(nodes, "land_manchuria_rehe", "land_china_beiping")
     link_rail(nodes, "land_manchuria_eastern", "land_korea", border_terrain="normal", river_crossing=False)
     link_land(nodes, "land_korea", "land_usr_primorsky_krai", border_terrain="mountain", river_crossing=False)
@@ -1328,9 +1347,10 @@ def build():
     link_rail(nodes, "land_manchuria_northern", "land_usr_chita")
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
+    link_land(nodes, "land_usr_amur", "land_manchuria_eastern", border_terrain="mountain")
 
     link_land(nodes, "land_china_suiyuan", "land_china_hopeh", has_river=True)
-    link_rail(nodes, "land_china_suiyuan", "land_china_beiping", border_terrain="mountain")
+    link_rail(nodes, "land_china_suiyuan", "land_china_beiping")
     link_land(nodes, "land_china_hopeh", "land_china_beiping")
     link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
     link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
@@ -1361,7 +1381,12 @@ def build():
     link_land(nodes, "land_china_tsinghai", "land_china_suiyuan")
     link_land(nodes, "land_china_tsinghai", "land_mongolia_ulyassutai", border_terrain="desert")
     link_land(nodes, "land_china_tsinghai", "land_mongolia_central_mongolia", border_terrain="desert")
+    set_edge(nodes, "land_mongolia_central_mongolia", "land_china_tsinghai", border_terrain="desert")
     link_land(nodes, "land_china_sinkiang", "land_china_szechwan", border_terrain="mountain")
+    link_land(nodes, "land_mongolia_ulyassutai", "land_china_sinkiang", border_terrain="desert")
+    set_edge(nodes, "land_china_sinkiang", "land_mongolia_ulyassutai", border_terrain="desert")
+    link_land(nodes, "land_mongolia_central_mongolia", "land_china_suiyuan", border_terrain="desert")
+    set_edge(nodes, "land_china_suiyuan", "land_mongolia_central_mongolia", border_terrain="desert")
     link_land(nodes, "land_china_kweichow", "land_china_hunan", has_river=True, river_crossing=True)
     set_edge(nodes, "land_china_hunan", "land_china_kweichow", river_crossing=True)
     link_land(nodes, "land_china_hunan", "land_china_szechwan")
@@ -1653,7 +1678,6 @@ def build():
     link_land_sea(nodes, "land_jap_volcanic_islands", "sea_p34", port=False)
     link_land_sea(nodes, "land_korea", "sea_p15", port=True)
     link_land_sea(nodes, "land_korea", "sea_p14", port=True)
-    link_land_sea(nodes, "land_manchuria_eastern", "sea_p7", port=True)
     link_land_sea(nodes, "land_china_beiping", "sea_p14", port=True, railway_connection=True, confidence=0.78)
     link_land_sea(
         nodes,
