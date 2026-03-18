@@ -17,6 +17,29 @@ int readIntField(const json::Value& object, const std::string& key) {
     return object.require(key).asInt();
 }
 
+std::vector<std::string> readStringArrayField(const json::Value& object, const std::string& key) {
+    std::vector<std::string> values;
+    if (const auto* field = object.find(key)) {
+        for (const auto& value : field->asArray()) {
+            values.push_back(value.asString());
+        }
+    }
+    return values;
+}
+
+std::vector<ZoneNeighbor> readNeighborsField(const json::Value& object, const std::string& key) {
+    std::vector<ZoneNeighbor> neighbors;
+    if (const auto* field = object.find(key)) {
+        for (const auto& neighborValue : field->asArray()) {
+            neighbors.push_back(ZoneNeighbor{
+                .id = readStringField(neighborValue, "id"),
+                .railway = neighborValue.require("railway").asBool(),
+            });
+        }
+    }
+    return neighbors;
+}
+
 }  // namespace
 
 GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
@@ -38,6 +61,8 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
             .displayName = readStringField(zoneValue, "display_name"),
             .kind = parseZoneKind(readStringField(zoneValue, "kind")),
             .controller = readStringField(zoneValue, "controller"),
+            .facilities = readStringArrayField(zoneValue, "facilities"),
+            .neighbors = readNeighborsField(zoneValue, "neighbors"),
         });
     }
 

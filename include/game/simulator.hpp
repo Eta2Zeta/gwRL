@@ -3,6 +3,7 @@
 #include "game/agent.hpp"
 #include "game/mdp.hpp"
 
+#include <filesystem>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -37,7 +38,8 @@ class Simulator {
     static SimulationResult run(
         GameState initialState,
         const SimplifiedChinaMdp& mdp,
-        const std::unordered_map<std::string, std::unique_ptr<Agent>>& agents);
+        const std::unordered_map<std::string, std::unique_ptr<Agent>>& agents,
+        const std::filesystem::path& snapshotDirectory = {});
 };
 
 }  // namespace game

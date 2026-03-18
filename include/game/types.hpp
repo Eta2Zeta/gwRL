@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace game {
 
@@ -18,11 +19,18 @@ enum class ZoneKind {
     Sea,
 };
 
+struct ZoneNeighbor {
+    std::string id;
+    bool railway {false};
+};
+
 struct Zone {
     std::string id;
     std::string displayName;
     ZoneKind kind {ZoneKind::Land};
     std::string controller;
+    std::vector<std::string> facilities;
+    std::vector<ZoneNeighbor> neighbors;
 };
 
 inline std::string_view toString(Phase phase) {

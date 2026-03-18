@@ -46,6 +46,7 @@ void printSimulationResult(const game::SimulationResult& simulation) {
 int main(int argc, char** argv) {
     const auto scenarioPath = argc > 1 ? std::filesystem::path(argv[1])
                                        : std::filesystem::path("data/china_simplified_setup.json");
+    const auto snapshotDirectory = std::filesystem::path("output/snapshots");
 
     try {
         auto gameState = game::SetupLoader::loadFromFile(scenarioPath);
@@ -56,8 +57,9 @@ int main(int argc, char** argv) {
         agents.emplace("Japan", std::make_unique<game::PassAgent>("Japan"));
         agents.emplace("KMT", std::make_unique<game::PassAgent>("KMT"));
 
-        const auto simulation = game::Simulator::run(std::move(gameState), mdp, agents);
+        const auto simulation = game::Simulator::run(std::move(gameState), mdp, agents, snapshotDirectory);
         printSimulationResult(simulation);
+        std::cout << "\nSnapshots written to " << snapshotDirectory.string() << "\n";
         return 0;
     } catch (const std::exception& error) {
         std::cerr << "Failed to load scenario: " << error.what() << "\n";

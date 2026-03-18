@@ -37,163 +37,351 @@
       "id": "land_china_suiyuan",
       "display_name": "Suiyuan",
       "kind": "land",
-      "controller": "Mengjiang"
+      "controller": "Mengjiang",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_beiping", "railway": true},
+        {"id": "land_china_hopeh", "railway": false},
+        {"id": "land_china_shensi", "railway": false},
+        {"id": "land_china_tsinghai", "railway": false},
+        {"id": "land_manchuria_rehe", "railway": false}
+      ]
     },
     {
       "id": "land_china_hopeh",
       "display_name": "Hopeh",
       "kind": "land",
-      "controller": "ZhiliClique"
+      "controller": "ZhiliClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_beiping", "railway": true},
+        {"id": "land_china_shantung", "railway": true},
+        {"id": "land_china_shensi", "railway": true},
+        {"id": "land_china_suiyuan", "railway": false},
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "sea_p14", "railway": false}
+      ]
     },
     {
       "id": "land_china_beiping",
       "display_name": "Beiping",
       "kind": "land",
-      "controller": "ZhiliClique"
+      "controller": "ZhiliClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hopeh", "railway": true},
+        {"id": "land_china_suiyuan", "railway": true},
+        {"id": "land_manchuria_rehe", "railway": true},
+        {"id": "sea_p14", "railway": true}
+      ]
     },
     {
       "id": "land_china_shantung",
       "display_name": "Shantung",
       "kind": "land",
-      "controller": "KMT"
+      "controller": "KMT",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hopeh", "railway": true},
+        {"id": "land_china_hunan", "railway": true},
+        {"id": "land_china_nanking", "railway": true},
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "sea_p14", "railway": false}
+      ]
     },
     {
       "id": "land_china_nanking",
       "display_name": "Nanking",
       "kind": "land",
-      "controller": "KMT"
+      "controller": "KMT",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hunan", "railway": true},
+        {"id": "land_china_shantung", "railway": true},
+        {"id": "sea_p14", "railway": false},
+        {"id": "sea_p32", "railway": false}
+      ]
     },
     {
       "id": "land_china_hunan",
       "display_name": "Hunan",
       "kind": "land",
-      "controller": "KMT"
+      "controller": "KMT",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_kweichow", "railway": false},
+        {"id": "land_china_nanking", "railway": true},
+        {"id": "land_china_shantung", "railway": true},
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "land_kwangtung", "railway": true}
+      ]
     },
     {
       "id": "land_china_shensi",
       "display_name": "Shensi",
       "kind": "land",
-      "controller": "CCP"
+      "controller": "CCP",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hopeh", "railway": true},
+        {"id": "land_china_suiyuan", "railway": false},
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "land_china_tsinghai", "railway": false}
+      ]
     },
     {
       "id": "land_china_szechwan",
       "display_name": "Szechwan",
       "kind": "land",
-      "controller": "KMT"
+      "controller": "KMT",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hopeh", "railway": false},
+        {"id": "land_china_hunan", "railway": false},
+        {"id": "land_china_kweichow", "railway": false},
+        {"id": "land_china_shantung", "railway": false},
+        {"id": "land_china_shensi", "railway": false},
+        {"id": "land_china_sikang", "railway": false},
+        {"id": "land_china_sinkiang", "railway": false},
+        {"id": "land_china_tsinghai", "railway": false}
+      ]
     },
     {
       "id": "land_china_sikang",
       "display_name": "Sikang",
       "kind": "land",
-      "controller": "SzechwanClique"
+      "controller": "SzechwanClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_kweichow", "railway": false},
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "land_china_tsinghai", "railway": false},
+        {"id": "land_china_yunnan", "railway": false}
+      ]
     },
     {
       "id": "land_china_kweichow",
       "display_name": "Kweichow",
       "kind": "land",
-      "controller": "KMT"
+      "controller": "KMT",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hunan", "railway": false},
+        {"id": "land_china_sikang", "railway": false},
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "land_china_yunnan", "railway": false},
+        {"id": "land_kwangtung", "railway": false}
+      ]
     },
     {
       "id": "land_china_yunnan",
       "display_name": "Yunnan",
       "kind": "land",
-      "controller": "YunnanClique"
+      "controller": "YunnanClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_kweichow", "railway": false},
+        {"id": "land_china_sikang", "railway": false},
+        {"id": "land_kwangtung", "railway": false}
+      ]
     },
     {
       "id": "land_china_tsinghai",
       "display_name": "Tsinghai",
       "kind": "land",
-      "controller": "MaClique"
+      "controller": "MaClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_shensi", "railway": false},
+        {"id": "land_china_sikang", "railway": false},
+        {"id": "land_china_sinkiang", "railway": false},
+        {"id": "land_china_suiyuan", "railway": false},
+        {"id": "land_china_szechwan", "railway": false}
+      ]
     },
     {
       "id": "land_china_sinkiang",
       "display_name": "Sinkiang",
       "kind": "land",
-      "controller": "SinkiangClique"
+      "controller": "SinkiangClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_szechwan", "railway": false},
+        {"id": "land_china_tsinghai", "railway": false}
+      ]
     },
     {
       "id": "land_kwangtung",
       "display_name": "Kwangtung",
       "kind": "land",
-      "controller": "GuangxiClique"
+      "controller": "GuangxiClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_hunan", "railway": true},
+        {"id": "land_china_kweichow", "railway": false},
+        {"id": "land_china_yunnan", "railway": false},
+        {"id": "land_hong_kong", "railway": true},
+        {"id": "sea_p41", "railway": false}
+      ]
     },
     {
       "id": "land_hong_kong",
       "display_name": "Hong Kong",
       "kind": "land",
-      "controller": "FEC"
+      "controller": "FEC",
+      "facilities": ["airfield"],
+      "neighbors": [
+        {"id": "land_kwangtung", "railway": true},
+        {"id": "sea_p41", "railway": false}
+      ]
     },
     {
       "id": "land_hainan",
       "display_name": "Hainan",
       "kind": "land",
-      "controller": "GuangxiClique"
+      "controller": "GuangxiClique",
+      "facilities": [],
+      "neighbors": [
+        {"id": "sea_p41", "railway": false}
+      ]
     },
     {
       "id": "land_formosa",
       "display_name": "Formosa",
       "kind": "land",
-      "controller": "Japan"
+      "controller": "Japan",
+      "facilities": [],
+      "neighbors": [
+        {"id": "sea_p32", "railway": false},
+        {"id": "sea_p41", "railway": false}
+      ]
     },
     {
       "id": "land_manchuria_northern",
       "display_name": "Northern Manchuria",
       "kind": "land",
-      "controller": "Japan"
+      "controller": "Japan",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_manchuria_eastern", "railway": false},
+        {"id": "land_manchuria_western", "railway": true}
+      ]
     },
     {
       "id": "land_manchuria_western",
       "display_name": "Western Manchuria",
       "kind": "land",
-      "controller": "Japan"
+      "controller": "Japan",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_manchuria_eastern", "railway": true},
+        {"id": "land_manchuria_northern", "railway": true},
+        {"id": "land_manchuria_rehe", "railway": true}
+      ]
     },
     {
       "id": "land_manchuria_eastern",
       "display_name": "Eastern Manchuria",
       "kind": "land",
-      "controller": "Japan"
+      "controller": "Japan",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_korea", "railway": true},
+        {"id": "land_manchuria_northern", "railway": false},
+        {"id": "land_manchuria_rehe", "railway": true},
+        {"id": "land_manchuria_western", "railway": true}
+      ]
     },
     {
       "id": "land_manchuria_rehe",
       "display_name": "Rehe",
       "kind": "land",
-      "controller": "Japan"
+      "controller": "Japan",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_beiping", "railway": true},
+        {"id": "land_china_suiyuan", "railway": false},
+        {"id": "land_korea", "railway": true},
+        {"id": "land_manchuria_eastern", "railway": true},
+        {"id": "land_manchuria_western", "railway": true},
+        {"id": "sea_p14", "railway": false}
+      ]
     },
     {
       "id": "land_korea",
       "display_name": "Korea",
       "kind": "land",
-      "controller": "Japan"
+      "controller": "Japan",
+      "facilities": ["airfield"],
+      "neighbors": [
+        {"id": "land_manchuria_eastern", "railway": true},
+        {"id": "land_manchuria_rehe", "railway": true},
+        {"id": "sea_p14", "railway": false},
+        {"id": "sea_p15", "railway": false}
+      ]
     },
     {
       "id": "sea_p14",
       "display_name": "Sea Zone P14",
       "kind": "sea",
-      "controller": "Neutral"
+      "controller": "Neutral",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_beiping", "railway": true},
+        {"id": "land_china_hopeh", "railway": false},
+        {"id": "land_china_nanking", "railway": false},
+        {"id": "land_china_shantung", "railway": false},
+        {"id": "land_korea", "railway": false},
+        {"id": "land_manchuria_rehe", "railway": false},
+        {"id": "sea_p15", "railway": false}
+      ]
     },
     {
       "id": "sea_p15",
       "display_name": "Sea Zone P15",
       "kind": "sea",
-      "controller": "Neutral"
+      "controller": "Neutral",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_korea", "railway": false},
+        {"id": "sea_p14", "railway": false},
+        {"id": "sea_p32", "railway": false}
+      ]
     },
     {
       "id": "sea_p16",
       "display_name": "Sea Zone P16",
       "kind": "sea",
-      "controller": "Neutral"
+      "controller": "Neutral",
+      "facilities": [],
+      "neighbors": []
     },
     {
       "id": "sea_p32",
       "display_name": "Sea Zone P32",
       "kind": "sea",
-      "controller": "Neutral"
+      "controller": "Neutral",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_china_nanking", "railway": false},
+        {"id": "land_formosa", "railway": false},
+        {"id": "sea_p15", "railway": false},
+        {"id": "sea_p41", "railway": false}
+      ]
     },
     {
       "id": "sea_p41",
       "display_name": "Sea Zone P41",
       "kind": "sea",
-      "controller": "Neutral"
+      "controller": "Neutral",
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_formosa", "railway": false},
+        {"id": "land_hainan", "railway": false},
+        {"id": "land_hong_kong", "railway": false},
+        {"id": "land_kwangtung", "railway": false},
+        {"id": "sea_p32", "railway": false}
+      ]
     }
   ],
   "setup": {

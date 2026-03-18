@@ -1,5 +1,8 @@
 #include "game/simulator.hpp"
 
+#include "game/snapshot_writer.hpp"
+
+#include <filesystem>
 #include <stdexcept>
 
 namespace game {
@@ -7,10 +10,17 @@ namespace game {
 SimulationResult Simulator::run(
     GameState initialState,
     const SimplifiedChinaMdp& mdp,
-    const std::unordered_map<std::string, std::unique_ptr<Agent>>& agents) {
+    const std::unordered_map<std::string, std::unique_ptr<Agent>>& agents,
+    const std::filesystem::path& snapshotDirectory) {
     SimulationResult result{
         .finalState = std::move(initialState),
     };
+
+    const bool writeSnapshots = !snapshotDirectory.empty();
+    if (writeSnapshots) {
+        std::filesystem::create_directories(snapshotDirectory);
+        SnapshotWriter::writeState(result.finalState, snapshotDirectory / "step_000_initial.json", 0);
+    }
 
     int stepIndex = 0;
     while (!result.finalState.isTerminal()) {
@@ -37,6 +47,11 @@ SimulationResult Simulator::run(
             .nextNation = step.nextNation,
             .nextPhase = step.nextPhase,
         });
+
+        if (writeSnapshots) {
+            const auto fileName = "step_" + std::to_string(stepIndex) + ".json";
+            SnapshotWriter::writeState(result.finalState, snapshotDirectory / fileName, stepIndex);
+        }
     }
 
     result.outcome.totalActions = static_cast<int>(result.trace.size());
