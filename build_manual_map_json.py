@@ -792,7 +792,7 @@ def build():
         ("land_china_hopeh", "Hopeh", "normal", 1, "Zhili Clique", False, False),
         ("land_china_beiping", "Beiping", "city", 2, "Zhili Clique", False, False),
         ("land_china_shantung", "Shantung", "normal", 2, "KMT", False, False),
-        ("land_china_nanking", "Nanking", "city", 2, "KMT", False, False),
+        ("land_china_nanking", "Nanking", "city", 2, "KMT", False, True),
         ("land_china_hunan", "Hunan", "normal", 2, "KMT", False, False),
         ("land_china_shensi", "Shensi", "normal", 2, "CCP", False, False),
         ("land_china_szechwan", "Szechwan", "mountain", 2, "KMT", False, False),
@@ -877,6 +877,8 @@ def build():
     ]
     nodes["land_hong_kong"]["node_facilities"] = ["airfield"]
     nodes["land_hong_kong"]["node_facility_ids"] = ["facility_hong_kong_airfield"]
+    nodes["land_korea"]["node_facilities"] = ["airfield"]
+    nodes["land_korea"]["node_facility_ids"] = ["facility_korea_airfield"]
     nodes["land_jap_tokyo"]["node_facilities"] = ["airfield"]
     nodes["land_jap_tokyo"]["node_facility_ids"] = ["facility_tokyo_airfield"]
 
@@ -1342,8 +1344,9 @@ def build():
     link_land(nodes, "land_manchuria_rehe", "land_china_suiyuan")
     link_rail(nodes, "land_manchuria_rehe", "land_china_beiping")
     link_rail(nodes, "land_manchuria_eastern", "land_korea", border_terrain="normal", river_crossing=False)
+    set_edge(nodes, "land_korea", "land_manchuria_eastern", border_terrain="mountain")
     link_land(nodes, "land_korea", "land_usr_primorsky_krai", border_terrain="mountain", river_crossing=False)
-    link_land(nodes, "land_korea", "land_manchuria_rehe", border_terrain="normal")
+    link_rail(nodes, "land_korea", "land_manchuria_rehe", border_terrain="normal")
     link_rail(nodes, "land_manchuria_northern", "land_usr_chita")
     link_land(nodes, "land_manchuria_western", "land_usr_chita")
     link_rail(nodes, "land_manchuria_northern", "land_usr_amur")
@@ -1352,12 +1355,15 @@ def build():
     link_land(nodes, "land_china_suiyuan", "land_china_hopeh", has_river=True)
     link_rail(nodes, "land_china_suiyuan", "land_china_beiping")
     link_land(nodes, "land_china_hopeh", "land_china_beiping")
-    link_land(nodes, "land_china_hopeh", "land_china_shantung", river_crossing=True)
-    link_land(nodes, "land_china_hopeh", "land_china_shensi", river_crossing=True)
-    link_land(nodes, "land_china_hopeh", "land_china_szechwan", river_crossing=True)
+    link_land(nodes, "land_china_hopeh", "land_china_shantung")
+    set_edge(nodes, "land_china_shantung", "land_china_hopeh", river_crossing=True)
+    link_land(nodes, "land_china_hopeh", "land_china_shensi")
+    link_land(nodes, "land_china_hopeh", "land_china_szechwan")
     link_rail_through_node(nodes, "land_china_hopeh", "land_china_shantung", "land_china_beiping")
     link_rail_through_node(nodes, "land_china_hopeh", "land_china_shensi", "land_china_beiping")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
+    link_rail(nodes, "land_china_shantung", "land_china_hunan", river_crossing=True)
+    set_edge(nodes, "land_china_hunan", "land_china_shantung", river_crossing=True)
     link_rail(nodes, "land_china_nanking", "land_china_hunan")
     link_rail(nodes, "land_china_hunan", "land_kwangtung", has_river=True)
     link_land(nodes, "land_china_kweichow", "land_kwangtung")
@@ -1678,7 +1684,9 @@ def build():
     link_land_sea(nodes, "land_jap_volcanic_islands", "sea_p34", port=False)
     link_land_sea(nodes, "land_korea", "sea_p15", port=True)
     link_land_sea(nodes, "land_korea", "sea_p14", port=True)
+    link_land_sea(nodes, "land_china_hopeh", "sea_p14", port=False)
     link_land_sea(nodes, "land_china_beiping", "sea_p14", port=True, railway_connection=True, confidence=0.78)
+    link_land_sea(nodes, "land_manchuria_rehe", "sea_p14", naval_facilities=["major_port"])
     link_land_sea(
         nodes,
         "land_china_shantung",

@@ -4243,7 +4243,7 @@
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
-          "river_crossing": true,
+          "river_crossing": false,
           "railway_connection": true,
           "gauge_change": false,
           "railroads": [
@@ -4265,7 +4265,7 @@
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
-          "river_crossing": true,
+          "river_crossing": false,
           "railway_connection": true,
           "gauge_change": false,
           "railroads": [
@@ -4304,7 +4304,24 @@
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
-          "river_crossing": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
           "railway_connection": false,
           "gauge_change": false,
           "railroads": [],
@@ -4360,6 +4377,28 @@
           "railroads": [
             {
               "rail_id": "rail_hunan_nanking",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shantung",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_hunan_shantung",
               "gauge_change": false
             }
           ],
@@ -4523,7 +4562,7 @@
       "current_owner": "KMT",
       "is_city": true,
       "is_capital": false,
-      "is_victory_city": false,
+      "is_victory_city": true,
       "node_facilities": [],
       "node_facility_ids": [],
       "neighbors": [
@@ -4634,12 +4673,34 @@
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
-          "river_crossing": false,
+          "river_crossing": true,
           "railway_connection": true,
           "gauge_change": false,
           "railroads": [
             {
               "rail_id": "rail_shantung_hopeh_beiping",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_hunan_shantung",
               "gauge_change": false
             }
           ],
@@ -11867,12 +11928,16 @@
       "is_city": false,
       "is_capital": false,
       "is_victory_city": false,
-      "node_facilities": [],
-      "node_facility_ids": [],
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_korea_airfield"
+      ],
       "neighbors": [
         {
           "neighbor_id": "land_manchuria_eastern",
-          "border_terrain": "normal",
+          "border_terrain": "mountain",
           "passable": true,
           "has_river": false,
           "river_crossing": false,
@@ -11898,9 +11963,14 @@
           "passable": true,
           "has_river": false,
           "river_crossing": false,
-          "railway_connection": false,
+          "railway_connection": true,
           "gauge_change": false,
-          "railroads": [],
+          "railroads": [
+            {
+              "rail_id": "rail_land_korea_rehe",
+              "gauge_change": false
+            }
+          ],
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
@@ -12875,9 +12945,14 @@
           "passable": true,
           "has_river": false,
           "river_crossing": false,
-          "railway_connection": false,
+          "railway_connection": true,
           "gauge_change": false,
-          "railroads": [],
+          "railroads": [
+            {
+              "rail_id": "rail_land_korea_rehe",
+              "gauge_change": false
+            }
+          ],
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
@@ -12925,6 +13000,27 @@
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_rehe_major_port"
+          ],
+          "port_or_dock_connection": true,
           "canal_or_strait": null,
           "narrow_crossing": false,
           "narrow_crossings": 0,
@@ -32452,6 +32548,23 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "land_china_nanking",
           "border_terrain": "normal",
           "passable": true,
@@ -32509,6 +32622,27 @@
           ],
           "naval_facility_ids": [
             "facility_land_korea_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_rehe_major_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,

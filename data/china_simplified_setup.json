@@ -1,0 +1,219 @@
+{
+  "scenario_name": "Simplified China Theater",
+  "nations": [
+    {
+      "id": "CCP",
+      "display_name": "Chinese Communist Party",
+      "income": 4,
+      "max_factory_output": 1
+    },
+    {
+      "id": "Japan",
+      "display_name": "Japan",
+      "income": 10,
+      "max_factory_output": 4
+    },
+    {
+      "id": "KMT",
+      "display_name": "Kuomintang",
+      "income": 8,
+      "max_factory_output": 3
+    }
+  ],
+  "turn_order": [
+    "CCP",
+    "Japan",
+    "KMT"
+  ],
+  "phases": [
+    "purchase_units",
+    "combat",
+    "non_combat",
+    "place_units"
+  ],
+  "zones": [
+    {
+      "id": "land_china_suiyuan",
+      "display_name": "Suiyuan",
+      "kind": "land",
+      "controller": "Mengjiang"
+    },
+    {
+      "id": "land_china_hopeh",
+      "display_name": "Hopeh",
+      "kind": "land",
+      "controller": "ZhiliClique"
+    },
+    {
+      "id": "land_china_beiping",
+      "display_name": "Beiping",
+      "kind": "land",
+      "controller": "ZhiliClique"
+    },
+    {
+      "id": "land_china_shantung",
+      "display_name": "Shantung",
+      "kind": "land",
+      "controller": "KMT"
+    },
+    {
+      "id": "land_china_nanking",
+      "display_name": "Nanking",
+      "kind": "land",
+      "controller": "KMT"
+    },
+    {
+      "id": "land_china_hunan",
+      "display_name": "Hunan",
+      "kind": "land",
+      "controller": "KMT"
+    },
+    {
+      "id": "land_china_shensi",
+      "display_name": "Shensi",
+      "kind": "land",
+      "controller": "CCP"
+    },
+    {
+      "id": "land_china_szechwan",
+      "display_name": "Szechwan",
+      "kind": "land",
+      "controller": "KMT"
+    },
+    {
+      "id": "land_china_sikang",
+      "display_name": "Sikang",
+      "kind": "land",
+      "controller": "SzechwanClique"
+    },
+    {
+      "id": "land_china_kweichow",
+      "display_name": "Kweichow",
+      "kind": "land",
+      "controller": "KMT"
+    },
+    {
+      "id": "land_china_yunnan",
+      "display_name": "Yunnan",
+      "kind": "land",
+      "controller": "YunnanClique"
+    },
+    {
+      "id": "land_china_tsinghai",
+      "display_name": "Tsinghai",
+      "kind": "land",
+      "controller": "MaClique"
+    },
+    {
+      "id": "land_china_sinkiang",
+      "display_name": "Sinkiang",
+      "kind": "land",
+      "controller": "SinkiangClique"
+    },
+    {
+      "id": "land_kwangtung",
+      "display_name": "Kwangtung",
+      "kind": "land",
+      "controller": "GuangxiClique"
+    },
+    {
+      "id": "land_hong_kong",
+      "display_name": "Hong Kong",
+      "kind": "land",
+      "controller": "FEC"
+    },
+    {
+      "id": "land_hainan",
+      "display_name": "Hainan",
+      "kind": "land",
+      "controller": "GuangxiClique"
+    },
+    {
+      "id": "land_formosa",
+      "display_name": "Formosa",
+      "kind": "land",
+      "controller": "Japan"
+    },
+    {
+      "id": "land_manchuria_northern",
+      "display_name": "Northern Manchuria",
+      "kind": "land",
+      "controller": "Japan"
+    },
+    {
+      "id": "land_manchuria_western",
+      "display_name": "Western Manchuria",
+      "kind": "land",
+      "controller": "Japan"
+    },
+    {
+      "id": "land_manchuria_eastern",
+      "display_name": "Eastern Manchuria",
+      "kind": "land",
+      "controller": "Japan"
+    },
+    {
+      "id": "land_manchuria_rehe",
+      "display_name": "Rehe",
+      "kind": "land",
+      "controller": "Japan"
+    },
+    {
+      "id": "land_korea",
+      "display_name": "Korea",
+      "kind": "land",
+      "controller": "Japan"
+    },
+    {
+      "id": "sea_p14",
+      "display_name": "Sea Zone P14",
+      "kind": "sea",
+      "controller": "Neutral"
+    },
+    {
+      "id": "sea_p15",
+      "display_name": "Sea Zone P15",
+      "kind": "sea",
+      "controller": "Neutral"
+    },
+    {
+      "id": "sea_p16",
+      "display_name": "Sea Zone P16",
+      "kind": "sea",
+      "controller": "Neutral"
+    },
+    {
+      "id": "sea_p32",
+      "display_name": "Sea Zone P32",
+      "kind": "sea",
+      "controller": "Neutral"
+    },
+    {
+      "id": "sea_p41",
+      "display_name": "Sea Zone P41",
+      "kind": "sea",
+      "controller": "Neutral"
+    }
+  ],
+  "setup": {
+    "CCP": {
+      "units": []
+    },
+    "Japan": {
+      "units": [
+        {
+          "type": "Infantry",
+          "zone": "land_manchuria_rehe"
+        }
+      ]
+    },
+    "KMT": {
+      "units": [
+        {
+          "type": "Infantry",
+          "zone": "land_china_beiping"
+        }
+      ]
+    }
+  }
+}
