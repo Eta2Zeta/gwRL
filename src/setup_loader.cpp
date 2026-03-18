@@ -46,6 +46,9 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
         turnOrder.push_back(nationIdValue.asString());
     }
     game.setTurnOrder(std::move(turnOrder));
+    if (const auto* turnLimit = root.find("turn_limit_per_nation")) {
+        game.setTurnLimitPerNation(turnLimit->asInt());
+    }
 
     std::vector<Phase> phases;
     for (const auto& phaseValue : root.require("phases").asArray()) {

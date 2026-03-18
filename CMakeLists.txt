@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(gw_simplified
     src/game_state.cpp
     src/main.cpp
+    src/simulator.cpp
     src/setup_loader.cpp
     src/simple_json.cpp
 )

@@ -69,13 +69,16 @@ void GameState::setTurnOrder(std::vector<std::string> turnOrder) {
     if (turnOrder.empty()) {
         throw std::runtime_error("Turn order cannot be empty");
     }
+    completedTurns_.clear();
     for (const auto& nationId : turnOrder) {
         if (!hasNation(nationId)) {
             throw std::runtime_error("Turn order references unknown nation: " + nationId);
         }
+        completedTurns_.emplace(nationId, 0);
     }
     turnOrder_ = std::move(turnOrder);
     currentNationIndex_ = 0;
+    terminal_ = false;
 }
 
 void GameState::setPhaseOrder(std::vector<Phase> phases) {
@@ -84,6 +87,13 @@ void GameState::setPhaseOrder(std::vector<Phase> phases) {
     }
     phaseOrder_ = std::move(phases);
     currentPhaseIndex_ = 0;
+}
+
+void GameState::setTurnLimitPerNation(int turnLimitPerNation) {
+    if (turnLimitPerNation <= 0) {
+        throw std::runtime_error("Turn limit per nation must be positive");
+    }
+    turnLimitPerNation_ = turnLimitPerNation;
 }
 
 std::string_view GameState::currentNation() const {
@@ -100,9 +110,30 @@ Phase GameState::currentPhase() const {
     return phaseOrder_.at(currentPhaseIndex_);
 }
 
+int GameState::completedTurnsFor(std::string_view nationId) const {
+    auto it = completedTurns_.find(std::string(nationId));
+    if (it == completedTurns_.end()) {
+        throw std::runtime_error("Unknown nation id in completedTurnsFor: " + std::string(nationId));
+    }
+    return it->second;
+}
+
+int GameState::unitCountFor(std::string_view nationId) const {
+    int count = 0;
+    for (const auto& unit : units_) {
+        if (unit->ownerId() == nationId) {
+            ++count;
+        }
+    }
+    return count;
+}
+
 void GameState::advancePhase() {
     if (turnOrder_.empty() || phaseOrder_.empty()) {
         throw std::runtime_error("Turn structure has not been initialized");
+    }
+    if (terminal_) {
+        throw std::runtime_error("Cannot advance a terminal game state");
     }
 
     ++currentPhaseIndex_;
@@ -110,7 +141,22 @@ void GameState::advancePhase() {
         return;
     }
 
+    const auto finishedNation = turnOrder_.at(currentNationIndex_);
+    ++completedTurns_.at(finishedNation);
     currentPhaseIndex_ = 0;
+
+    bool everyoneFinished = true;
+    for (const auto& nationId : turnOrder_) {
+        if (completedTurns_.at(nationId) < turnLimitPerNation_) {
+            everyoneFinished = false;
+            break;
+        }
+    }
+    if (everyoneFinished) {
+        terminal_ = true;
+        return;
+    }
+
     currentNationIndex_ = (currentNationIndex_ + 1) % turnOrder_.size();
 }
 

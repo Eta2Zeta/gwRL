@@ -25,6 +25,7 @@
     "Japan",
     "KMT"
   ],
+  "turn_limit_per_nation": 2,
   "phases": [
     "purchase_units",
     "combat",

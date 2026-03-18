@@ -27,16 +27,22 @@ class GameState {
 
     void setTurnOrder(std::vector<std::string> turnOrder);
     void setPhaseOrder(std::vector<Phase> phases);
+    void setTurnLimitPerNation(int turnLimitPerNation);
 
     std::string_view currentNation() const;
     Phase currentPhase() const;
     void advancePhase();
+    bool isTerminal() const { return terminal_; }
+    int turnLimitPerNation() const { return turnLimitPerNation_; }
+    int completedTurnsFor(std::string_view nationId) const;
+    int unitCountFor(std::string_view nationId) const;
 
     const std::unordered_map<std::string, Nation>& nations() const { return nations_; }
     const std::unordered_map<std::string, Zone>& zones() const { return zones_; }
     const std::vector<std::unique_ptr<Unit>>& units() const { return units_; }
     const std::vector<std::string>& turnOrder() const { return turnOrder_; }
     const std::vector<Phase>& phaseOrder() const { return phaseOrder_; }
+    const std::unordered_map<std::string, int>& completedTurns() const { return completedTurns_; }
 
   private:
     std::unordered_map<std::string, Nation> nations_;
@@ -44,8 +50,11 @@ class GameState {
     std::vector<std::unique_ptr<Unit>> units_;
     std::vector<std::string> turnOrder_;
     std::vector<Phase> phaseOrder_;
+    std::unordered_map<std::string, int> completedTurns_;
     std::size_t currentNationIndex_ {0};
     std::size_t currentPhaseIndex_ {0};
+    int turnLimitPerNation_ {2};
+    bool terminal_ {false};
 };
 
 }  // namespace game
