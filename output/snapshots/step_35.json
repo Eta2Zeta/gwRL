@@ -1,8 +1,6 @@
 {
-  "step_index": 17,
-  "terminal": false,
-  "current_nation": "CCP",
-  "current_phase": "declaration_of_war",
+  "step_index": 35,
+  "terminal": true,
   "nations": [
     {
       "id": "CCP",
@@ -31,9 +29,7 @@
       "id": "land_china_beiping",
       "name": "Beiping",
       "current_owner": "KMT",
-      "units": [
-        {"owner": "KMT", "type": "Infantry", "movement_left": 1}
-      ],
+      "units": [],
       "facilities": [],
       "neighbors": [
         {"id": "land_china_hopeh", "railway": true},
@@ -46,7 +42,9 @@
       "id": "land_china_hopeh",
       "name": "Hopeh",
       "current_owner": "KMT",
-      "units": [],
+      "units": [
+        {"owner": "Japan", "type": "Infantry", "movement_left": 0}
+      ],
       "facilities": [],
       "neighbors": [
         {"id": "land_china_beiping", "railway": true},
@@ -331,7 +329,9 @@
       "id": "land_korea",
       "name": "Korea",
       "current_owner": "Japan",
-      "units": [],
+      "units": [
+        {"owner": "KMT", "type": "Infantry", "movement_left": 0}
+      ],
       "facilities": ["airfield"],
       "neighbors": [
         {"id": "land_manchuria_eastern", "railway": true},

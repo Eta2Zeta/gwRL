@@ -1,15 +1,38 @@
 {
   "step_index": 8,
   "terminal": false,
-  "current_nation": "KMT",
-  "current_phase": "purchase_units",
+  "current_nation": "Japan",
+  "current_phase": "combat",
+  "nations": [
+    {
+      "id": "CCP",
+      "name": "Chinese Communist Party",
+      "total_income": 2,
+      "at_war_with": ["Japan"],
+      "allies": []
+    },
+    {
+      "id": "Japan",
+      "name": "Japan",
+      "total_income": 15,
+      "at_war_with": ["CCP", "KMT"],
+      "allies": []
+    },
+    {
+      "id": "KMT",
+      "name": "Kuomintang",
+      "total_income": 8,
+      "at_war_with": ["Japan"],
+      "allies": []
+    }
+  ],
   "nodes": [
     {
       "id": "land_china_beiping",
       "name": "Beiping",
       "current_owner": "ZhiliClique",
       "units": [
-        {"owner": "KMT", "type": "Infantry", "movement_left": 1}
+        {"owner": "ZhiliClique", "type": "Infantry", "movement_left": 1}
       ],
       "facilities": [],
       "neighbors": [
@@ -66,7 +89,9 @@
       "id": "land_china_nanking",
       "name": "Nanking",
       "current_owner": "KMT",
-      "units": [],
+      "units": [
+        {"owner": "KMT", "type": "Infantry", "movement_left": 1}
+      ],
       "facilities": [],
       "neighbors": [
         {"id": "land_china_hunan", "railway": true},
@@ -216,6 +241,93 @@
       ]
     },
     {
+      "id": "land_jap_caroline_islands",
+      "name": "Caroline Islands",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": ["major_port", "airfield"],
+      "neighbors": []
+    },
+    {
+      "id": "land_jap_hokkaido",
+      "name": "Hokkaido",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_jap_honshu", "railway": true},
+        {"id": "sea_p16", "railway": false}
+      ]
+    },
+    {
+      "id": "land_jap_honshu",
+      "name": "Honshu",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_jap_hokkaido", "railway": true},
+        {"id": "land_jap_kyushu", "railway": true},
+        {"id": "land_jap_tokyo", "railway": true},
+        {"id": "sea_p15", "railway": false},
+        {"id": "sea_p16", "railway": false}
+      ]
+    },
+    {
+      "id": "land_jap_kurile_islands",
+      "name": "Kurile Islands",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": []
+    },
+    {
+      "id": "land_jap_kyushu",
+      "name": "Kyushu",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": [
+        {"id": "land_jap_honshu", "railway": true},
+        {"id": "sea_p15", "railway": false}
+      ]
+    },
+    {
+      "id": "land_jap_mariana_islands",
+      "name": "Mariana Islands",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": []
+    },
+    {
+      "id": "land_jap_okinawa",
+      "name": "Okinawa",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": []
+    },
+    {
+      "id": "land_jap_tokyo",
+      "name": "Tokyo",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": ["airfield"],
+      "neighbors": [
+        {"id": "land_jap_honshu", "railway": true},
+        {"id": "sea_p16", "railway": false}
+      ]
+    },
+    {
+      "id": "land_jap_volcanic_islands",
+      "name": "Volcanic Islands",
+      "current_owner": "Japan",
+      "units": [],
+      "facilities": [],
+      "neighbors": []
+    },
+    {
       "id": "land_korea",
       "name": "Korea",
       "current_owner": "Japan",
@@ -315,9 +427,13 @@
       "id": "sea_p15",
       "name": "Sea Zone P15",
       "current_owner": "Neutral",
-      "units": [],
+      "units": [
+        {"owner": "Japan", "type": "Transport", "movement_left": 2, "cargo": []}
+      ],
       "facilities": [],
       "neighbors": [
+        {"id": "land_jap_honshu", "railway": false},
+        {"id": "land_jap_kyushu", "railway": false},
         {"id": "land_korea", "railway": false},
         {"id": "sea_p14", "railway": false},
         {"id": "sea_p32", "railway": false}
@@ -329,7 +445,11 @@
       "current_owner": "Neutral",
       "units": [],
       "facilities": [],
-      "neighbors": []
+      "neighbors": [
+        {"id": "land_jap_hokkaido", "railway": false},
+        {"id": "land_jap_honshu", "railway": false},
+        {"id": "land_jap_tokyo", "railway": false}
+      ]
     },
     {
       "id": "sea_p32",

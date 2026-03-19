@@ -17,11 +17,28 @@ int readIntField(const json::Value& object, const std::string& key) {
     return object.require(key).asInt();
 }
 
+int readIntFieldOrDefault(const json::Value& object, const std::string& key, int defaultValue) {
+    if (const auto* field = object.find(key)) {
+        return field->asInt();
+    }
+    return defaultValue;
+}
+
 std::vector<std::string> readStringArrayField(const json::Value& object, const std::string& key) {
     std::vector<std::string> values;
     if (const auto* field = object.find(key)) {
         for (const auto& value : field->asArray()) {
             values.push_back(value.asString());
+        }
+    }
+    return values;
+}
+
+std::vector<UnitKind> readUnitKindArrayField(const json::Value& object, const std::string& key) {
+    std::vector<UnitKind> values;
+    if (const auto* field = object.find(key)) {
+        for (const auto& value : field->asArray()) {
+            values.push_back(parseUnitKind(value.asString()));
         }
     }
     return values;
@@ -47,12 +64,14 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
     GameState game;
 
     for (const auto& nationValue : root.require("nations").asArray()) {
-        game.addNation(
-            Nation(
-                readStringField(nationValue, "id"),
-                readStringField(nationValue, "display_name"),
-                readIntField(nationValue, "income"),
-                readIntField(nationValue, "max_factory_output")));
+        Nation nation(
+            readStringField(nationValue, "id"),
+            readStringField(nationValue, "display_name"),
+            readIntField(nationValue, "income"),
+            readIntField(nationValue, "max_factory_output"));
+        nation.setAtWarWith(readStringArrayField(nationValue, "at_war_with"));
+        nation.setAllies(readStringArrayField(nationValue, "allies"));
+        game.addNation(std::move(nation));
     }
 
     for (const auto& zoneValue : root.require("zones").asArray()) {
@@ -60,10 +79,37 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
             .id = readStringField(zoneValue, "id"),
             .displayName = readStringField(zoneValue, "display_name"),
             .kind = parseZoneKind(readStringField(zoneValue, "kind")),
+            .terrain = [&]() {
+                if (const auto* terrainValue = zoneValue.find("terrain")) {
+                    return terrainValue->asString();
+                }
+                return std::string("normal");
+            }(),
             .controller = readStringField(zoneValue, "controller"),
+            .isCity = [&]() {
+                if (const auto* isCityValue = zoneValue.find("is_city")) {
+                    return isCityValue->asBool();
+                }
+                return false;
+            }(),
+            .incomeValue = readIntFieldOrDefault(zoneValue, "income_value", 0),
             .facilities = readStringArrayField(zoneValue, "facilities"),
             .neighbors = readNeighborsField(zoneValue, "neighbors"),
         });
+    }
+
+    for (const auto& nationValue : root.require("nations").asArray()) {
+        auto& nation = game.nation(readStringField(nationValue, "id"));
+        nation.setIncome(0);
+        nation.setTreasury(0);
+    }
+    for (const auto& [zoneId, zone] : game.zones()) {
+        if (!game.hasNation(zone.controller)) {
+            continue;
+        }
+        auto& nation = game.nation(zone.controller);
+        nation.setIncome(nation.income() + zone.incomeValue);
+        nation.setTreasury(nation.treasury() + zone.incomeValue);
     }
 
     std::vector<std::string> turnOrder;
@@ -92,7 +138,15 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
         for (const auto& unitValue : units) {
             const auto unitKind = parseUnitKind(readStringField(unitValue, "type"));
             const auto zoneId = readStringField(unitValue, "zone");
-            game.addUnit(makeUnit(unitKind, nationId, zoneId));
+            const auto ownerId = [&]() {
+                if (const auto* ownerValue = unitValue.find("owner")) {
+                    return ownerValue->asString();
+                }
+                return nationId;
+            }();
+            auto unit = makeUnit(unitKind, ownerId, zoneId);
+            unit->setCargo(readUnitKindArrayField(unitValue, "cargo"));
+            game.addUnit(std::move(unit));
         }
     }
 

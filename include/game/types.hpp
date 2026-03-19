@@ -8,6 +8,7 @@
 namespace game {
 
 enum class Phase {
+    DeclarationOfWar,
     PurchaseUnits,
     Combat,
     NonCombat,
@@ -28,13 +29,18 @@ struct Zone {
     std::string id;
     std::string displayName;
     ZoneKind kind {ZoneKind::Land};
+    std::string terrain {"normal"};
     std::string controller;
+    bool isCity {false};
+    int incomeValue {0};
     std::vector<std::string> facilities;
     std::vector<ZoneNeighbor> neighbors;
 };
 
 inline std::string_view toString(Phase phase) {
     switch (phase) {
+        case Phase::DeclarationOfWar:
+            return "declaration_of_war";
         case Phase::PurchaseUnits:
             return "purchase_units";
         case Phase::Combat:
@@ -58,6 +64,9 @@ inline std::string_view toString(ZoneKind zoneKind) {
 }
 
 inline Phase parsePhase(std::string_view value) {
+    if (value == "declaration_of_war") {
+        return Phase::DeclarationOfWar;
+    }
     if (value == "purchase_units") {
         return Phase::PurchaseUnits;
     }

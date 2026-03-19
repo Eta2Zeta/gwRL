@@ -24,10 +24,22 @@ class GameState {
     Nation& nation(std::string_view nationId);
     const Nation& nation(std::string_view nationId) const;
     const Zone& zone(std::string_view zoneId) const;
+    Unit& unitAt(std::size_t unitIndex);
+    const Unit& unitAt(std::size_t unitIndex) const;
 
     void setTurnOrder(std::vector<std::string> turnOrder);
     void setPhaseOrder(std::vector<Phase> phases);
     void setTurnLimitPerNation(int turnLimitPerNation);
+    void declareWar(std::string_view aggressorNationId, std::string_view defenderNationId);
+    bool areAtWar(std::string_view nationA, std::string_view nationB) const;
+    bool isWarlordFaction(std::string_view factionId) const;
+    int activateWarlordForKmt(std::string_view warlordFactionId);
+    void moveUnit(std::size_t unitIndex, std::string zoneId, int movementCost);
+    void moveUnit(Unit* unit, std::string zoneId, int movementCost);
+    void setZoneController(std::string_view zoneId, std::string controller);
+    std::vector<Unit*> unitsInZone(std::string_view zoneId);
+    void removeUnits(const std::vector<const Unit*>& destroyedUnits);
+    void resetMovementForNation(std::string_view nationId);
 
     std::string_view currentNation() const;
     Phase currentPhase() const;

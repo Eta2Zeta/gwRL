@@ -45,10 +45,22 @@ void writeJsonString(std::ostream& output, const std::string& value) {
     output << '"';
 }
 
+void writeStringArray(std::ostream& output, const std::vector<std::string>& values) {
+    output << "[";
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        if (i > 0) {
+            output << ", ";
+        }
+        writeJsonString(output, values[i]);
+    }
+    output << "]";
+}
+
 struct UnitView {
     std::string owner;
     std::string type;
     int movementLeft {0};
+    std::vector<std::string> cargo;
 };
 
 }  // namespace
@@ -84,6 +96,48 @@ void SnapshotWriter::writeState(
         writeJsonString(output, std::string(toString(gameState.currentPhase())));
         output << ",\n";
     }
+
+    std::vector<std::string> nationIds;
+    nationIds.reserve(gameState.nations().size());
+    for (const auto& [nationId, nation] : gameState.nations()) {
+        nationIds.push_back(nationId);
+    }
+    std::sort(nationIds.begin(), nationIds.end());
+
+    writeIndent(output, 1);
+    output << "\"nations\": [\n";
+    for (std::size_t i = 0; i < nationIds.size(); ++i) {
+        const auto& nation = gameState.nation(nationIds[i]);
+        writeIndent(output, 2);
+        output << "{\n";
+        writeIndent(output, 3);
+        output << "\"id\": ";
+        writeJsonString(output, nation.id());
+        output << ",\n";
+        writeIndent(output, 3);
+        output << "\"name\": ";
+        writeJsonString(output, nation.displayName());
+        output << ",\n";
+        writeIndent(output, 3);
+        output << "\"total_income\": " << nation.income() << ",\n";
+        writeIndent(output, 3);
+        output << "\"at_war_with\": ";
+        writeStringArray(output, nation.atWarWith());
+        output << ",\n";
+        writeIndent(output, 3);
+        output << "\"allies\": ";
+        writeStringArray(output, nation.allies());
+        output << "\n";
+        writeIndent(output, 2);
+        output << "}";
+        if (i + 1 < nationIds.size()) {
+            output << ",";
+        }
+        output << "\n";
+    }
+    writeIndent(output, 1);
+    output << "],\n";
+
     writeIndent(output, 1);
     output << "\"nodes\": [\n";
 
@@ -97,6 +151,13 @@ void SnapshotWriter::writeState(
                     .owner = unit->ownerId(),
                     .type = std::string(toString(unit->kind())),
                     .movementLeft = unit->movementLeft(),
+                    .cargo = [&]() {
+                        std::vector<std::string> cargoTypes;
+                        for (const auto cargoKind : unit->cargo()) {
+                            cargoTypes.push_back(std::string(toString(cargoKind)));
+                        }
+                        return cargoTypes;
+                    }(),
                 });
             }
         }
@@ -138,6 +199,16 @@ void SnapshotWriter::writeState(
                 output << ", \"type\": ";
                 writeJsonString(output, unitView.type);
                 output << ", \"movement_left\": " << unitView.movementLeft;
+                if (!unitView.cargo.empty() || unitView.type == "Transport") {
+                    output << ", \"cargo\": [";
+                    for (std::size_t cargoIndex = 0; cargoIndex < unitView.cargo.size(); ++cargoIndex) {
+                        if (cargoIndex > 0) {
+                            output << ", ";
+                        }
+                        writeJsonString(output, unitView.cargo[cargoIndex]);
+                    }
+                    output << "]";
+                }
                 output << "}";
                 if (unitIndex + 1 < unitViews.size()) {
                     output << ",";

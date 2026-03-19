@@ -1,8 +1,6 @@
 {
-  "step_index": 17,
-  "terminal": false,
-  "current_nation": "CCP",
-  "current_phase": "declaration_of_war",
+  "step_index": 32,
+  "terminal": true,
   "nations": [
     {
       "id": "CCP",

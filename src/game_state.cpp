@@ -1,8 +1,24 @@
 #include "game/game_state.hpp"
 
+#include <array>
+#include <algorithm>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace game {
+
+namespace {
+
+constexpr std::array<std::string_view, 6> kWarlordFactions{
+    "ZhiliClique",
+    "SzechwanClique",
+    "SinkiangClique",
+    "YunnanClique",
+    "GuangxiClique",
+    "MaClique",
+};
+
+}  // namespace
 
 void GameState::addNation(Nation nation) {
     const auto nationId = nation.id();
@@ -23,9 +39,6 @@ void GameState::addZone(Zone zone) {
 void GameState::addUnit(std::unique_ptr<Unit> unit) {
     if (!unit) {
         throw std::runtime_error("Cannot add null unit");
-    }
-    if (!hasNation(unit->ownerId())) {
-        throw std::runtime_error("Unknown unit owner: " + unit->ownerId());
     }
     if (!hasZone(unit->zoneId())) {
         throw std::runtime_error("Unknown unit zone: " + unit->zoneId());
@@ -65,6 +78,20 @@ const Zone& GameState::zone(std::string_view zoneId) const {
     return it->second;
 }
 
+Unit& GameState::unitAt(std::size_t unitIndex) {
+    if (unitIndex >= units_.size()) {
+        throw std::runtime_error("Unit index out of range");
+    }
+    return *units_.at(unitIndex);
+}
+
+const Unit& GameState::unitAt(std::size_t unitIndex) const {
+    if (unitIndex >= units_.size()) {
+        throw std::runtime_error("Unit index out of range");
+    }
+    return *units_.at(unitIndex);
+}
+
 void GameState::setTurnOrder(std::vector<std::string> turnOrder) {
     if (turnOrder.empty()) {
         throw std::runtime_error("Turn order cannot be empty");
@@ -94,6 +121,124 @@ void GameState::setTurnLimitPerNation(int turnLimitPerNation) {
         throw std::runtime_error("Turn limit per nation must be positive");
     }
     turnLimitPerNation_ = turnLimitPerNation;
+}
+
+void GameState::declareWar(std::string_view aggressorNationId, std::string_view defenderNationId) {
+    if (aggressorNationId == defenderNationId) {
+        throw std::runtime_error("A nation cannot declare war on itself");
+    }
+    auto& aggressor = nation(aggressorNationId);
+    auto& defender = nation(defenderNationId);
+    aggressor.declareWarOn(defender.id());
+    defender.declareWarOn(aggressor.id());
+}
+
+bool GameState::areAtWar(std::string_view nationA, std::string_view nationB) const {
+    if (nationA == nationB) {
+        return false;
+    }
+    return nation(nationA).isAtWarWith(nationB) || nation(nationB).isAtWarWith(nationA);
+}
+
+bool GameState::isWarlordFaction(std::string_view factionId) const {
+    for (const auto candidate : kWarlordFactions) {
+        if (candidate == factionId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int GameState::activateWarlordForKmt(std::string_view warlordFactionId) {
+    if (!isWarlordFaction(warlordFactionId)) {
+        return 0;
+    }
+
+    int addedIncome = 0;
+    for (auto& [zoneId, zone] : zones_) {
+        if (zone.controller == warlordFactionId) {
+            addedIncome += zone.incomeValue;
+            setZoneController(zoneId, "KMT");
+        }
+    }
+
+    for (auto& unit : units_) {
+        if (unit->ownerId() == warlordFactionId) {
+            unit->setOwnerId("KMT");
+        }
+    }
+    return addedIncome;
+}
+
+void GameState::moveUnit(std::size_t unitIndex, std::string zoneId, int movementCost) {
+    if (!hasZone(zoneId)) {
+        throw std::runtime_error("Unknown destination zone: " + zoneId);
+    }
+    auto& unit = unitAt(unitIndex);
+    unit.spendMovement(movementCost);
+    unit.setZoneId(std::move(zoneId));
+}
+
+void GameState::moveUnit(Unit* unit, std::string zoneId, int movementCost) {
+    if (unit == nullptr) {
+        throw std::runtime_error("Cannot move a null unit");
+    }
+    if (!hasZone(zoneId)) {
+        throw std::runtime_error("Unknown destination zone: " + zoneId);
+    }
+    unit->spendMovement(movementCost);
+    unit->setZoneId(std::move(zoneId));
+}
+
+void GameState::setZoneController(std::string_view zoneId, std::string controller) {
+    auto it = zones_.find(std::string(zoneId));
+    if (it == zones_.end()) {
+        throw std::runtime_error("Unknown zone id: " + std::string(zoneId));
+    }
+
+    auto& zone = it->second;
+    if (zone.controller == controller) {
+        return;
+    }
+    if (hasNation(zone.controller)) {
+        auto& oldNation = nation(zone.controller);
+        oldNation.setIncome(oldNation.income() - zone.incomeValue);
+    }
+    if (hasNation(controller)) {
+        auto& newNation = nation(controller);
+        newNation.setIncome(newNation.income() + zone.incomeValue);
+    }
+    zone.controller = std::move(controller);
+}
+
+std::vector<Unit*> GameState::unitsInZone(std::string_view zoneId) {
+    std::vector<Unit*> result;
+    for (auto& unit : units_) {
+        if (unit->zoneId() == zoneId) {
+            result.push_back(unit.get());
+        }
+    }
+    return result;
+}
+
+void GameState::removeUnits(const std::vector<const Unit*>& destroyedUnits) {
+    std::unordered_set<const Unit*> destroyedSet(destroyedUnits.begin(), destroyedUnits.end());
+    units_.erase(
+        std::remove_if(
+            units_.begin(),
+            units_.end(),
+            [&](const std::unique_ptr<Unit>& unit) {
+                return destroyedSet.find(unit.get()) != destroyedSet.end();
+            }),
+        units_.end());
+}
+
+void GameState::resetMovementForNation(std::string_view nationId) {
+    for (auto& unit : units_) {
+        if (unit->ownerId() == nationId) {
+            unit->resetMovement();
+        }
+    }
 }
 
 std::string_view GameState::currentNation() const {
@@ -158,6 +303,7 @@ void GameState::advancePhase() {
     }
 
     currentNationIndex_ = (currentNationIndex_ + 1) % turnOrder_.size();
+    resetMovementForNation(turnOrder_.at(currentNationIndex_));
 }
 
 }  // namespace game

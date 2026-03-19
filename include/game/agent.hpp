@@ -34,4 +34,38 @@ class PassAgent final : public Agent {
     }
 };
 
+class LazyPolicyAgent final : public Agent {
+  public:
+    explicit LazyPolicyAgent(std::string nationId) : Agent(std::move(nationId)) {}
+
+    Action chooseAction(const GameState&, const std::vector<Action>& legalActions) override {
+        if (legalActions.empty()) {
+            throw std::runtime_error("LazyPolicyAgent was asked to choose from an empty action list");
+        }
+        for (const auto& action : legalActions) {
+            if (action.kind == ActionKind::EndPhase) {
+                return action;
+            }
+        }
+        return legalActions.front();
+    }
+};
+
+class FirstActionAgent final : public Agent {
+  public:
+    explicit FirstActionAgent(std::string nationId) : Agent(std::move(nationId)) {}
+
+    Action chooseAction(const GameState&, const std::vector<Action>& legalActions) override {
+        if (legalActions.empty()) {
+            throw std::runtime_error("FirstActionAgent was asked to choose from an empty action list");
+        }
+        for (const auto& action : legalActions) {
+            if (action.kind != ActionKind::EndPhase) {
+                return action;
+            }
+        }
+        return legalActions.front();
+    }
+};
+
 }  // namespace game

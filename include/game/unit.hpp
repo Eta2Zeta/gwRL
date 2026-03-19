@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 namespace game {
 
@@ -61,8 +63,19 @@ class Unit {
     int maxMovement() const { return maxMovement_; }
     int movementLeft() const { return movementLeft_; }
 
+    void setOwnerId(std::string ownerId) { ownerId_ = std::move(ownerId); }
     void setZoneId(std::string zoneId) { zoneId_ = std::move(zoneId); }
     void resetMovement() { movementLeft_ = maxMovement_; }
+    virtual bool canCarryCargo() const { return false; }
+    virtual const std::vector<UnitKind>& cargo() const {
+        static const std::vector<UnitKind> emptyCargo;
+        return emptyCargo;
+    }
+    virtual void setCargo(std::vector<UnitKind> cargo) {
+        if (!cargo.empty()) {
+            throw std::runtime_error("This unit cannot carry cargo");
+        }
+    }
 
     void spendMovement(int amount) {
         if (amount < 0) {
@@ -110,10 +123,25 @@ class Fighter final : public Unit {
 
 class Transport final : public Unit {
   public:
+    static constexpr std::size_t kMaxCargo = 2;
+
     Transport(std::string ownerId, std::string zoneId)
         : Unit(UnitKind::Transport, std::move(ownerId), std::move(zoneId), 2) {}
 
+    bool canCarryCargo() const override { return true; }
+    const std::vector<UnitKind>& cargo() const override { return cargo_; }
+
+    void setCargo(std::vector<UnitKind> cargo) override {
+        if (cargo.size() > kMaxCargo) {
+            throw std::runtime_error("Transport cargo cannot exceed 2 units");
+        }
+        cargo_ = std::move(cargo);
+    }
+
     std::unique_ptr<Unit> clone() const override { return std::make_unique<Transport>(*this); }
+
+  private:
+    std::vector<UnitKind> cargo_;
 };
 
 inline std::unique_ptr<Unit> makeUnit(UnitKind kind, std::string ownerId, std::string zoneId) {
