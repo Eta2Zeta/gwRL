@@ -33,7 +33,7 @@ class GameState {
     void declareWar(std::string_view aggressorNationId, std::string_view defenderNationId);
     bool areAtWar(std::string_view nationA, std::string_view nationB) const;
     bool isWarlordFaction(std::string_view factionId) const;
-    int activateWarlordForKmt(std::string_view warlordFactionId);
+    int activateAllWarlordsForKmt();
     void moveUnit(std::size_t unitIndex, std::string zoneId, int movementCost);
     void moveUnit(Unit* unit, std::string zoneId, int movementCost);
     void setZoneController(std::string_view zoneId, std::string controller);

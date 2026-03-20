@@ -15,6 +15,7 @@ struct TraceEntry {
     std::string actingNation;
     Phase phaseBefore {Phase::PurchaseUnits};
     Action action;
+    std::vector<std::string> detailLines;
     bool terminalAfterAction {false};
     std::optional<std::string> nextNation;
     std::optional<Phase> nextPhase;

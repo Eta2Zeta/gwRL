@@ -1,0 +1,37 @@
+Japan Option-B Torch training summary
+episodes=200
+state_dim=116
+action_dim=20
+recent_average_reward=6.5750
+last_reward=4.4000
+last_japan_income=4
+last_japan_units=4
+last_loss=0.2198
+last_gradient_norm=34.8243
+encoder_match_with_cpp_export=yes
+
+First combat policy
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4): prob=0.8776 logit=6.2058
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1): prob=0.0552 logit=3.4393
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=3): prob=0.0362 logit=3.0165
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=2): prob=0.0194 logit=2.3946
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4): prob=0.0063 logit=1.2621
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1): prob=0.0039 logit=0.7805
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=2): prob=0.0008 logit=-0.8510
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=3): prob=0.0006 logit=-1.0777
+- end_phase: prob=0.0001 logit=-2.7222
+
+Greedy evaluation
+- reward=7.4000
+- japan_income=7
+- japan_units=4
+Japan / declaration_of_war -> declare_war_on_china (value=7.5971)
+    declaration result: all warlord lands and units transfer to KMT
+Japan / combat -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4) (value=7.5725)
+    combat: no defenders, territory occupied immediately
+Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1) (value=7.2920)
+    combat: no defenders, territory occupied immediately
+Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=1) (value=7.5805)
+    combat: no defenders, territory occupied immediately
+Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1) (value=7.6915)
+    combat: no defenders, territory occupied immediately

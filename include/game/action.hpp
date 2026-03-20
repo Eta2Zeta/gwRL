@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -16,8 +15,9 @@ enum class ActionKind {
 
 struct Action {
     ActionKind kind {ActionKind::EndPhase};
-    std::optional<std::size_t> unitIndex;
+    std::optional<std::string> sourceZoneId;
     std::optional<std::string> targetZoneId;
+    std::optional<int> unitCount;
 };
 
 inline std::string_view toString(ActionKind kind) {

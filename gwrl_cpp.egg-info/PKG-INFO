@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: gwrl_cpp
+Version: 0.1.0
+Summary: C++ training environment bindings for gwRL
+Dynamic: summary

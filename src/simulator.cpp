@@ -43,6 +43,7 @@ SimulationResult Simulator::run(
             .actingNation = step.actingNation,
             .phaseBefore = step.phaseBefore,
             .action = step.action,
+            .detailLines = step.detailLines,
             .terminalAfterAction = step.terminal,
             .nextNation = step.nextNation,
             .nextPhase = step.nextPhase,

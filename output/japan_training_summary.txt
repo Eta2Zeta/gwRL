@@ -1,0 +1,249 @@
+Japan training summary
+episodes=20
+action_catalog_size=66
+state_feature_count=116
+
+Note:
+  These are intermediate Japan decision states seen during training.
+  They are not terminal end-of-session boards.
+  "Acting nation" means whose turn it is at that decision point.
+
+recent_average_reward=4.37
+last_episode_reward=5.2
+last_episode_income=5
+last_episode_unit_count=2
+
+Most visited Japan decision states
+
+State 1
+Seen during training: 20 times
+Learned best action: declare_war_on_china
+Estimated Japan value: 3.75
+Acting nation: Japan
+Phase: declaration_of_war
+Turns completed so far:
+  - CCP: 1
+  - Japan: 0
+  - KMT: 0
+Wars: none
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 1, treasury 1
+  - KMT: income 2, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller ZhiliClique, income 2, city
+    * other infantry: 2 total, 2 movable
+  - Hopeh [land_china_hopeh]: controller ZhiliClique, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller Mengjiang, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * Japan infantry: 4 total, 4 movable
+
+State 2
+Seen during training: 18 times
+Learned best action: end_phase
+Estimated Japan value: 3.75
+Acting nation: Japan
+Phase: purchase_units
+Turns completed so far:
+  - CCP: 1
+  - Japan: 0
+  - KMT: 0
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 1, treasury 1
+  - KMT: income 6, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller KMT, income 2, city
+    * KMT infantry: 2 total, 2 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * Japan infantry: 4 total, 4 movable
+
+State 3
+Seen during training: 18 times
+Learned best action: end_phase
+Estimated Japan value: 3.75
+Acting nation: Japan
+Phase: declaration_of_war
+Turns completed so far:
+  - CCP: 1
+  - Japan: 0
+  - KMT: 0
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 1, treasury 1
+  - KMT: income 6, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller KMT, income 2, city
+    * KMT infantry: 2 total, 2 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * Japan infantry: 4 total, 4 movable
+
+State 4
+Seen during training: 18 times
+Learned best action: move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4)
+Estimated Japan value: 4.92727
+Acting nation: Japan
+Phase: combat
+Turns completed so far:
+  - CCP: 1
+  - Japan: 0
+  - KMT: 0
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 1, treasury 1
+  - KMT: income 6, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller KMT, income 2, city
+    * KMT infantry: 2 total, 2 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * Japan infantry: 4 total, 4 movable
+
+State 5
+Seen during training: 11 times
+Learned best action: end_phase
+Estimated Japan value: 4.92727
+Acting nation: Japan
+Phase: declaration_of_war
+Turns completed so far:
+  - CCP: 2
+  - Japan: 1
+  - KMT: 1
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 3, treasury 1
+  - KMT: income 4, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller Japan, income 2, city
+    * Japan infantry: 2 total, 2 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * no infantry present
+
+State 6
+Seen during training: 11 times
+Learned best action: end_phase
+Estimated Japan value: 4.92727
+Acting nation: Japan
+Phase: place_units
+Turns completed so far:
+  - CCP: 1
+  - Japan: 0
+  - KMT: 0
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 3, treasury 1
+  - KMT: income 4, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller Japan, income 2, city
+    * Japan infantry: 2 total, 0 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * no infantry present
+
+State 7
+Seen during training: 11 times
+Learned best action: end_phase
+Estimated Japan value: 4.92727
+Acting nation: Japan
+Phase: non_combat
+Turns completed so far:
+  - CCP: 1
+  - Japan: 0
+  - KMT: 0
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 3, treasury 1
+  - KMT: income 4, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller Japan, income 2, city
+    * Japan infantry: 2 total, 0 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * no infantry present
+
+State 8
+Seen during training: 11 times
+Learned best action: end_phase
+Estimated Japan value: 4.92727
+Acting nation: Japan
+Phase: purchase_units
+Turns completed so far:
+  - CCP: 2
+  - Japan: 1
+  - KMT: 1
+Wars: Japan vs CCP, Japan vs KMT
+Economy:
+  - CCP: income 2, treasury 2
+  - Japan: income 3, treasury 1
+  - KMT: income 4, treasury 2
+Map state:
+  - Beiping [land_china_beiping]: controller Japan, income 2, city
+    * Japan infantry: 2 total, 2 movable
+  - Hopeh [land_china_hopeh]: controller KMT, income 1
+    * no infantry present
+  - Shantung [land_china_shantung]: controller KMT, income 2
+    * KMT infantry: 1 total, 1 movable
+  - Shensi [land_china_shensi]: controller CCP, income 2
+    * no infantry present
+  - Suiyuan [land_china_suiyuan]: controller KMT, income 1
+    * no infantry present
+  - Rehe [land_manchuria_rehe]: controller Japan, income 1
+    * no infantry present
+

@@ -9,13 +9,14 @@ namespace game {
 
 namespace {
 
-constexpr std::array<std::string_view, 6> kWarlordFactions{
+constexpr std::array<std::string_view, 7> kWarlordFactions{
     "ZhiliClique",
     "SzechwanClique",
     "SinkiangClique",
     "YunnanClique",
     "GuangxiClique",
     "MaClique",
+    "Mengjiang",
 };
 
 }  // namespace
@@ -149,22 +150,20 @@ bool GameState::isWarlordFaction(std::string_view factionId) const {
     return false;
 }
 
-int GameState::activateWarlordForKmt(std::string_view warlordFactionId) {
-    if (!isWarlordFaction(warlordFactionId)) {
-        return 0;
-    }
-
+int GameState::activateAllWarlordsForKmt() {
     int addedIncome = 0;
-    for (auto& [zoneId, zone] : zones_) {
-        if (zone.controller == warlordFactionId) {
-            addedIncome += zone.incomeValue;
-            setZoneController(zoneId, "KMT");
+    for (const auto warlordFaction : kWarlordFactions) {
+        for (auto& [zoneId, zone] : zones_) {
+            if (zone.controller == warlordFaction) {
+                addedIncome += zone.incomeValue;
+                setZoneController(zoneId, "KMT");
+            }
         }
-    }
 
-    for (auto& unit : units_) {
-        if (unit->ownerId() == warlordFactionId) {
-            unit->setOwnerId("KMT");
+        for (auto& unit : units_) {
+            if (unit->ownerId() == warlordFaction) {
+                unit->setOwnerId("KMT");
+            }
         }
     }
     return addedIncome;
