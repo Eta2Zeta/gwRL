@@ -68,7 +68,8 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
             readStringField(nationValue, "id"),
             readStringField(nationValue, "display_name"),
             readIntField(nationValue, "income"),
-            readIntField(nationValue, "max_factory_output"));
+            readIntField(nationValue, "max_factory_output"),
+            readIntFieldOrDefault(nationValue, "treasury", -1));
         nation.setAtWarWith(readStringArrayField(nationValue, "at_war_with"));
         nation.setAllies(readStringArrayField(nationValue, "allies"));
         game.addNation(std::move(nation));
@@ -101,7 +102,6 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
     for (const auto& nationValue : root.require("nations").asArray()) {
         auto& nation = game.nation(readStringField(nationValue, "id"));
         nation.setIncome(0);
-        nation.setTreasury(0);
     }
     for (const auto& [zoneId, zone] : game.zones()) {
         if (!game.hasNation(zone.controller)) {
@@ -109,7 +109,6 @@ GameState SetupLoader::loadFromFile(const std::filesystem::path& filePath) {
         }
         auto& nation = game.nation(zone.controller);
         nation.setIncome(nation.income() + zone.incomeValue);
-        nation.setTreasury(nation.treasury() + zone.incomeValue);
     }
 
     std::vector<std::string> turnOrder;

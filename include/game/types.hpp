@@ -10,7 +10,8 @@ namespace game {
 enum class Phase {
     DeclarationOfWar,
     PurchaseUnits,
-    Combat,
+    CombatMove,
+    CombatResolve,
     NonCombat,
     PlaceUnits,
 };
@@ -43,8 +44,10 @@ inline std::string_view toString(Phase phase) {
             return "declaration_of_war";
         case Phase::PurchaseUnits:
             return "purchase_units";
-        case Phase::Combat:
-            return "combat";
+        case Phase::CombatMove:
+            return "combat_move";
+        case Phase::CombatResolve:
+            return "combat_resolve";
         case Phase::NonCombat:
             return "non_combat";
         case Phase::PlaceUnits:
@@ -70,8 +73,11 @@ inline Phase parsePhase(std::string_view value) {
     if (value == "purchase_units") {
         return Phase::PurchaseUnits;
     }
-    if (value == "combat") {
-        return Phase::Combat;
+    if (value == "combat_move") {
+        return Phase::CombatMove;
+    }
+    if (value == "combat_resolve") {
+        return Phase::CombatResolve;
     }
     if (value == "non_combat") {
         return Phase::NonCombat;

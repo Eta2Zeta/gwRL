@@ -95,8 +95,16 @@ void JapanTrainingEnv::advanceUntilTrackedNationDecision() {
         if (actions.empty()) {
             return;
         }
-        if (gameState_.currentNation() == trackedNationId_ && actions.size() > 1) {
-            return;
+        if (gameState_.currentNation() == trackedNationId_) {
+            const auto hasTrackedDecision = std::any_of(
+                actions.begin(),
+                actions.end(),
+                [](const Action& action) {
+                    return action.kind != ActionKind::EndPhase;
+                });
+            if (hasTrackedDecision) {
+                return;
+            }
         }
         mdp_.step(
             gameState_,

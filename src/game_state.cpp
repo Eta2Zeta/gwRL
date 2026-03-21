@@ -19,6 +19,19 @@ constexpr std::array<std::string_view, 7> kWarlordFactions{
     "Mengjiang",
 };
 
+int facilityOutput(std::string_view facilityId) {
+    if (facilityId == "minor_factory") {
+        return 1;
+    }
+    if (facilityId == "medium_factory") {
+        return 3;
+    }
+    if (facilityId == "major_factory") {
+        return 5;
+    }
+    return 0;
+}
+
 }  // namespace
 
 void GameState::addNation(Nation nation) {
@@ -250,6 +263,105 @@ void GameState::resetMovementForNation(std::string_view nationId) {
     }
 }
 
+int GameState::factoryOutputForZone(std::string_view zoneId) const {
+    const auto& targetZone = zone(zoneId);
+    int output = 0;
+    for (const auto& facilityId : targetZone.facilities) {
+        output += facilityOutput(facilityId);
+    }
+    return output;
+}
+
+int GameState::totalFactoryOutputForNation(std::string_view nationId) const {
+    int totalOutput = 0;
+    for (const auto& [zoneId, zoneValue] : zones_) {
+        if (zoneValue.controller == nationId) {
+            totalOutput += factoryOutputForZone(zoneId);
+        }
+    }
+    return totalOutput;
+}
+
+int GameState::placedUnitsThisPhaseInZone(std::string_view zoneId) const {
+    const auto it = placedUnitsThisPhaseByZone_.find(std::string(zoneId));
+    return it != placedUnitsThisPhaseByZone_.end() ? it->second : 0;
+}
+
+int GameState::remainingPlacementCapacityForZone(std::string_view nationId, std::string_view zoneId) const {
+    const auto& targetZone = zone(zoneId);
+    if (targetZone.controller != nationId) {
+        return 0;
+    }
+    return std::max(0, factoryOutputForZone(zoneId) - placedUnitsThisPhaseInZone(zoneId));
+}
+
+int GameState::pendingPurchaseCountFor(std::string_view nationId) const {
+    const auto it = pendingPurchasesByNation_.find(std::string(nationId));
+    if (it == pendingPurchasesByNation_.end()) {
+        return 0;
+    }
+    int total = 0;
+    for (const auto& [unitKind, count] : it->second) {
+        total += count;
+    }
+    return total;
+}
+
+int GameState::pendingPurchaseCountFor(std::string_view nationId, UnitKind unitKind) const {
+    const auto it = pendingPurchasesByNation_.find(std::string(nationId));
+    if (it == pendingPurchasesByNation_.end()) {
+        return 0;
+    }
+    const auto kindIt = it->second.find(unitKind);
+    return kindIt != it->second.end() ? kindIt->second : 0;
+}
+
+void GameState::addPendingPurchases(std::string_view nationId, UnitKind unitKind, int count) {
+    if (count <= 0) {
+        throw std::runtime_error("Pending purchase count must be positive");
+    }
+    pendingPurchasesByNation_[std::string(nationId)][unitKind] += count;
+}
+
+void GameState::removePendingPurchases(std::string_view nationId, UnitKind unitKind, int count) {
+    if (count <= 0) {
+        throw std::runtime_error("Pending purchase removal count must be positive");
+    }
+    auto nationIt = pendingPurchasesByNation_.find(std::string(nationId));
+    if (nationIt == pendingPurchasesByNation_.end()) {
+        throw std::runtime_error("No pending purchases recorded for nation");
+    }
+    auto kindIt = nationIt->second.find(unitKind);
+    if (kindIt == nationIt->second.end() || kindIt->second < count) {
+        throw std::runtime_error("Tried to remove more pending purchases than are available");
+    }
+    kindIt->second -= count;
+    if (kindIt->second == 0) {
+        nationIt->second.erase(kindIt);
+    }
+    if (nationIt->second.empty()) {
+        pendingPurchasesByNation_.erase(nationIt);
+    }
+}
+
+void GameState::placePurchasedUnits(std::string_view nationId, std::string_view zoneId, UnitKind unitKind, int count) {
+    if (count <= 0) {
+        throw std::runtime_error("Placed unit count must be positive");
+    }
+    if (remainingPlacementCapacityForZone(nationId, zoneId) < count) {
+        throw std::runtime_error("Not enough placement capacity in target zone");
+    }
+    if (pendingPurchaseCountFor(nationId, unitKind) < count) {
+        throw std::runtime_error("Not enough pending purchased units of requested type");
+    }
+
+    removePendingPurchases(nationId, unitKind, count);
+    placedUnitsThisPhaseByZone_[std::string(zoneId)] += count;
+    for (int index = 0; index < count; ++index) {
+        addUnit(makeUnit(unitKind, std::string(nationId), std::string(zoneId)));
+    }
+}
+
 std::string_view GameState::currentNation() const {
     if (turnOrder_.empty()) {
         throw std::runtime_error("Turn order has not been initialized");
@@ -290,8 +402,12 @@ void GameState::advancePhase() {
         throw std::runtime_error("Cannot advance a terminal game state");
     }
 
+    const auto previousPhase = currentPhase();
     ++currentPhaseIndex_;
     if (currentPhaseIndex_ < phaseOrder_.size()) {
+        if (currentPhase() == Phase::PlaceUnits || previousPhase == Phase::PlaceUnits) {
+            placedUnitsThisPhaseByZone_.clear();
+        }
         return;
     }
 
@@ -313,6 +429,7 @@ void GameState::advancePhase() {
 
     currentNationIndex_ = (currentNationIndex_ + 1) % turnOrder_.size();
     resetMovementForNation(turnOrder_.at(currentNationIndex_));
+    placedUnitsThisPhaseByZone_.clear();
 }
 
 }  // namespace game

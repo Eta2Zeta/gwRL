@@ -41,6 +41,15 @@ class GameState {
     std::vector<const Unit*> unitsInZone(std::string_view zoneId) const;
     void removeUnits(const std::vector<const Unit*>& destroyedUnits);
     void resetMovementForNation(std::string_view nationId);
+    int factoryOutputForZone(std::string_view zoneId) const;
+    int totalFactoryOutputForNation(std::string_view nationId) const;
+    int placedUnitsThisPhaseInZone(std::string_view zoneId) const;
+    int remainingPlacementCapacityForZone(std::string_view nationId, std::string_view zoneId) const;
+    int pendingPurchaseCountFor(std::string_view nationId) const;
+    int pendingPurchaseCountFor(std::string_view nationId, UnitKind unitKind) const;
+    void addPendingPurchases(std::string_view nationId, UnitKind unitKind, int count);
+    void removePendingPurchases(std::string_view nationId, UnitKind unitKind, int count);
+    void placePurchasedUnits(std::string_view nationId, std::string_view zoneId, UnitKind unitKind, int count);
 
     std::string_view currentNation() const;
     Phase currentPhase() const;
@@ -64,6 +73,8 @@ class GameState {
     std::vector<std::string> turnOrder_;
     std::vector<Phase> phaseOrder_;
     std::unordered_map<std::string, int> completedTurns_;
+    std::unordered_map<std::string, std::unordered_map<UnitKind, int>> pendingPurchasesByNation_;
+    std::unordered_map<std::string, int> placedUnitsThisPhaseByZone_;
     std::size_t currentNationIndex_ {0};
     std::size_t currentPhaseIndex_ {0};
     int turnLimitPerNation_ {2};

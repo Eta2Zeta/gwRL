@@ -19,11 +19,22 @@ constexpr std::array<std::string_view, 6> kKnownControllers{
     "Neutral",
 };
 
+const std::vector<UnitKind>& trackedPurchaseUnitKinds() {
+    static const std::vector<UnitKind> kinds{
+        UnitKind::Infantry,
+        UnitKind::Artillery,
+        UnitKind::Fighter,
+    };
+    return kinds;
+}
+
 struct ZoneCounts {
     std::unordered_map<std::string, int> infantryByNation;
     std::unordered_map<std::string, int> movableInfantryByNation;
+    std::unordered_map<std::string, int> pendingInfantryByNation;
     int otherInfantry {0};
     int otherMovableInfantry {0};
+    int otherPendingInfantry {0};
 };
 
 std::unordered_map<std::string, ZoneCounts> buildZoneCounts(const GameState& gameState) {
@@ -45,6 +56,17 @@ std::unordered_map<std::string, ZoneCounts> buildZoneCounts(const GameState& gam
             if (unit.movementLeft() > 0) {
                 ++counts.otherMovableInfantry;
             }
+        }
+
+        if (!unit.hasPendingCombatTarget()) {
+            continue;
+        }
+
+        auto& pendingCounts = zoneCounts[*unit.pendingCombatTargetZoneId()];
+        if (gameState.hasNation(unit.ownerId())) {
+            ++pendingCounts.pendingInfantryByNation[unit.ownerId()];
+        } else {
+            ++pendingCounts.otherPendingInfantry;
         }
     }
     return zoneCounts;
@@ -105,6 +127,8 @@ std::vector<double> StateEncoder::encode(const GameState& gameState) const {
         appendOneHot(features, controllerOrder_, safeController(zone.controller, controllerOrder_));
         features.push_back(zone.isCity ? 1.0 : 0.0);
         features.push_back(static_cast<double>(zone.incomeValue));
+        features.push_back(static_cast<double>(gameState.factoryOutputForZone(zoneId)));
+        features.push_back(static_cast<double>(gameState.remainingPlacementCapacityForZone(trackedNationId_, zoneId)));
 
         const auto countsIt = zoneCounts.find(zoneId);
         const ZoneCounts emptyCounts;
@@ -118,14 +142,25 @@ std::vector<double> StateEncoder::encode(const GameState& gameState) const {
             const auto movableIt = counts.movableInfantryByNation.find(nationId);
             features.push_back(
                 movableIt != counts.movableInfantryByNation.end() ? static_cast<double>(movableIt->second) : 0.0);
+
+            const auto pendingIt = counts.pendingInfantryByNation.find(nationId);
+            features.push_back(
+                pendingIt != counts.pendingInfantryByNation.end() ? static_cast<double>(pendingIt->second) : 0.0);
         }
 
         features.push_back(static_cast<double>(counts.otherInfantry));
         features.push_back(static_cast<double>(counts.otherMovableInfantry));
+        features.push_back(static_cast<double>(counts.otherPendingInfantry));
     }
 
     appendOneHot(features, nationOrder_, gameState.currentNation());
-    for (const auto phase : {Phase::DeclarationOfWar, Phase::PurchaseUnits, Phase::Combat, Phase::NonCombat, Phase::PlaceUnits}) {
+    for (const auto phase : {
+             Phase::DeclarationOfWar,
+             Phase::PurchaseUnits,
+             Phase::CombatMove,
+             Phase::CombatResolve,
+             Phase::NonCombat,
+             Phase::PlaceUnits}) {
         features.push_back(gameState.currentPhase() == phase ? 1.0 : 0.0);
     }
 
@@ -137,6 +172,9 @@ std::vector<double> StateEncoder::encode(const GameState& gameState) const {
     }
     for (const auto& nationId : nationOrder_) {
         features.push_back(static_cast<double>(gameState.nation(nationId).treasury()));
+    }
+    for (const auto unitKind : trackedPurchaseUnitKinds()) {
+        features.push_back(static_cast<double>(gameState.pendingPurchaseCountFor(trackedNationId_, unitKind)));
     }
 
     features.push_back(gameState.areAtWar("Japan", "CCP") ? 1.0 : 0.0);
@@ -164,6 +202,13 @@ std::string StateEncoder::encodeKey(const GameState& gameState) const {
         output << nationId << ":" << nation.income() << ":" << nation.treasury() << ",";
     }
 
+    output << "|pending=";
+    for (const auto unitKind : trackedPurchaseUnitKinds()) {
+        output << toString(unitKind)
+               << ":" << gameState.pendingPurchaseCountFor(trackedNationId_, unitKind)
+               << ",";
+    }
+
     output << "|wars="
            << (gameState.areAtWar("Japan", "CCP") ? 1 : 0)
            << (gameState.areAtWar("Japan", "KMT") ? 1 : 0)
@@ -178,27 +223,32 @@ std::string StateEncoder::encodeKey(const GameState& gameState) const {
         output << "|zone=" << zoneId
                << ":ctrl=" << safeController(zone.controller, controllerOrder_)
                << ":city=" << (zone.isCity ? 1 : 0)
-               << ":income=" << zone.incomeValue;
+               << ":income=" << zone.incomeValue
+               << ":factory=" << gameState.factoryOutputForZone(zoneId)
+               << ":placement=" << gameState.remainingPlacementCapacityForZone(trackedNationId_, zoneId);
 
         for (const auto& nationId : nationOrder_) {
             const auto infantryIt = counts.infantryByNation.find(nationId);
             const auto movableIt = counts.movableInfantryByNation.find(nationId);
+            const auto pendingIt = counts.pendingInfantryByNation.find(nationId);
             output << ":" << nationId
                    << "=" << (infantryIt != counts.infantryByNation.end() ? infantryIt->second : 0)
-                   << "/" << (movableIt != counts.movableInfantryByNation.end() ? movableIt->second : 0);
+                   << "/" << (movableIt != counts.movableInfantryByNation.end() ? movableIt->second : 0)
+                   << "/" << (pendingIt != counts.pendingInfantryByNation.end() ? pendingIt->second : 0);
         }
 
         output << ":other=" << counts.otherInfantry
-               << "/" << counts.otherMovableInfantry;
+               << "/" << counts.otherMovableInfantry
+               << "/" << counts.otherPendingInfantry;
     }
 
     return output.str();
 }
 
 std::size_t StateEncoder::featureCount() const {
-    const auto perZoneFeatureCount = controllerOrder_.size() + 2 + nationOrder_.size() * 2 + 2;
-    const auto globalFeatureCount = nationOrder_.size() + 5 + nationOrder_.size() + nationOrder_.size()
-                                    + nationOrder_.size() + 3;
+    const auto perZoneFeatureCount = controllerOrder_.size() + 4 + nationOrder_.size() * 3 + 3;
+    const auto globalFeatureCount = nationOrder_.size() + 6 + nationOrder_.size() + nationOrder_.size()
+                                    + nationOrder_.size() + trackedPurchaseUnitKinds().size() + 3;
     return zoneOrder_.size() * perZoneFeatureCount + globalFeatureCount;
 }
 
@@ -212,14 +262,18 @@ std::vector<std::string> StateEncoder::featureLabels() const {
         }
         labels.push_back(zoneId + ".is_city");
         labels.push_back(zoneId + ".income_value");
+        labels.push_back(zoneId + ".factory_output");
+        labels.push_back(zoneId + ".remaining_placement_capacity");
 
         for (const auto& nationId : nationOrder_) {
             labels.push_back(zoneId + ".infantry_count." + nationId);
             labels.push_back(zoneId + ".movable_infantry_count." + nationId);
+            labels.push_back(zoneId + ".pending_infantry_count." + nationId);
         }
 
         labels.push_back(zoneId + ".infantry_count.other");
         labels.push_back(zoneId + ".movable_infantry_count.other");
+        labels.push_back(zoneId + ".pending_infantry_count.other");
     }
 
     for (const auto& nationId : nationOrder_) {
@@ -227,7 +281,8 @@ std::vector<std::string> StateEncoder::featureLabels() const {
     }
     labels.push_back("global.current_phase.declaration_of_war");
     labels.push_back("global.current_phase.purchase_units");
-    labels.push_back("global.current_phase.combat");
+    labels.push_back("global.current_phase.combat_move");
+    labels.push_back("global.current_phase.combat_resolve");
     labels.push_back("global.current_phase.non_combat");
     labels.push_back("global.current_phase.place_units");
 
@@ -239,6 +294,9 @@ std::vector<std::string> StateEncoder::featureLabels() const {
     }
     for (const auto& nationId : nationOrder_) {
         labels.push_back("global.treasury." + nationId);
+    }
+    for (const auto unitKind : trackedPurchaseUnitKinds()) {
+        labels.push_back("global.pending_purchase." + std::string(toString(unitKind)));
     }
 
     labels.push_back("global.at_war.Japan_vs_CCP");

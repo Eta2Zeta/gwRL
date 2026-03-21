@@ -30,12 +30,16 @@ class SimplifiedChinaMdp {
         switch (gameState.currentPhase()) {
             case Phase::DeclarationOfWar:
                 return legalDeclarationOfWarActions(gameState);
-            case Phase::Combat:
-                return legalCombatActions(gameState);
             case Phase::PurchaseUnits:
+                return legalPurchaseActions(gameState);
+            case Phase::CombatMove:
+                return legalCombatMoveActions(gameState);
+            case Phase::CombatResolve:
+                return legalCombatResolveActions(gameState);
             case Phase::NonCombat:
-            case Phase::PlaceUnits:
                 return {Action{ActionKind::EndPhase}};
+            case Phase::PlaceUnits:
+                return legalPlaceActions(gameState);
         }
         throw std::runtime_error("Unsupported phase in legalActions");
     }
@@ -62,6 +66,10 @@ class SimplifiedChinaMdp {
     }
 
   private:
+    static std::vector<UnitKind> purchasableUnitKinds() {
+        return {UnitKind::Infantry, UnitKind::Artillery, UnitKind::Fighter};
+    }
+
     struct CombatOutcome {
         bool attackersWon {false};
         std::vector<const Unit*> destroyedAttackers;
@@ -70,7 +78,9 @@ class SimplifiedChinaMdp {
     };
 
     static bool isLandCombatUnit(const Unit& unit) {
-        return unit.kind() == UnitKind::Infantry || unit.kind() == UnitKind::Marine;
+        return unit.kind() == UnitKind::Infantry
+            || unit.kind() == UnitKind::Artillery
+            || unit.kind() == UnitKind::Marine;
     }
 
     static bool isCombatMovableInfantry(const Unit& unit) {
@@ -80,6 +90,9 @@ class SimplifiedChinaMdp {
     static int baseAttackValue(const Unit& unit) {
         switch (unit.kind()) {
             case UnitKind::Infantry:
+                return 2;
+            case UnitKind::Artillery:
+                return 3;
             case UnitKind::Marine:
                 return 2;
             case UnitKind::Fighter:
@@ -92,6 +105,9 @@ class SimplifiedChinaMdp {
     static int baseDefenseValue(const Unit& unit) {
         switch (unit.kind()) {
             case UnitKind::Infantry:
+                return 4;
+            case UnitKind::Artillery:
+                return 3;
             case UnitKind::Marine:
                 return 4;
             case UnitKind::Fighter:
@@ -237,6 +253,71 @@ class SimplifiedChinaMdp {
         return gameState.areAtWar(actingNationId, zone.controller);
     }
 
+    static std::vector<std::string> sortedZoneIds(const GameState& gameState) {
+        std::vector<std::string> zoneIds;
+        zoneIds.reserve(gameState.zones().size());
+        for (const auto& [zoneId, zone] : gameState.zones()) {
+            zoneIds.push_back(zoneId);
+        }
+        std::sort(zoneIds.begin(), zoneIds.end());
+        return zoneIds;
+    }
+
+    static std::vector<const Unit*> availableCombatMoveInfantry(
+        const GameState& gameState,
+        std::string_view nationId,
+        std::string_view zoneId) {
+        std::vector<const Unit*> units;
+        for (auto* unit : gameState.unitsInZone(zoneId)) {
+            if (unit->ownerId() != nationId
+                || !isCombatMovableInfantry(*unit)
+                || unit->movementLeft() <= 0
+                || unit->hasPendingCombatTarget()) {
+                continue;
+            }
+            units.push_back(unit);
+        }
+        return units;
+    }
+
+    static std::vector<const Unit*> pendingAttackersForZone(
+        const GameState& gameState,
+        std::string_view nationId,
+        std::string_view targetZoneId) {
+        std::vector<const Unit*> units;
+        for (const auto& unitPtr : gameState.units()) {
+            const auto* unit = unitPtr.get();
+            if (unit->ownerId() != nationId || !unit->hasPendingCombatTarget()) {
+                continue;
+            }
+            if (unit->pendingCombatTargetZoneId().has_value()
+                && *unit->pendingCombatTargetZoneId() == targetZoneId) {
+                units.push_back(unit);
+            }
+        }
+        return units;
+    }
+
+    static bool hasPendingAttackersForZone(
+        const GameState& gameState,
+        std::string_view nationId,
+        std::string_view targetZoneId) {
+        return !pendingAttackersForZone(gameState, nationId, targetZoneId).empty();
+    }
+
+    static std::vector<const Unit*> defendingLandUnitsForZone(
+        const GameState& gameState,
+        std::string_view actingNationId,
+        std::string_view targetZoneId) {
+        std::vector<const Unit*> defenders;
+        for (const auto* unit : gameState.unitsInZone(targetZoneId)) {
+            if (unit->ownerId() != actingNationId && isLandCombatUnit(*unit)) {
+                defenders.push_back(unit);
+            }
+        }
+        return defenders;
+    }
+
     std::vector<Action> legalDeclarationOfWarActions(const GameState& gameState) const {
         std::vector<Action> actions;
         const auto actingNationId = gameState.currentNation();
@@ -248,7 +329,36 @@ class SimplifiedChinaMdp {
         return actions;
     }
 
-    std::vector<Action> legalCombatActions(const GameState& gameState) const {
+    std::vector<Action> legalPurchaseActions(const GameState& gameState) const {
+        std::vector<Action> actions;
+        const auto actingNationId = gameState.currentNation();
+        const auto& actingNation = gameState.nation(actingNationId);
+        const auto remainingCapacity = std::max(
+            0,
+            gameState.totalFactoryOutputForNation(actingNationId) - gameState.pendingPurchaseCountFor(actingNationId));
+
+        if (remainingCapacity > 0) {
+            for (const auto unitKind : purchasableUnitKinds()) {
+                const auto cost = purchaseCost(unitKind);
+                if (cost <= 0 || actingNation.treasury() < cost) {
+                    continue;
+                }
+                const auto maxCount = std::min(remainingCapacity, actingNation.treasury() / cost);
+                for (int unitCount = 1; unitCount <= maxCount; ++unitCount) {
+                    actions.push_back(Action{
+                        .kind = ActionKind::PurchaseUnit,
+                        .unitCount = unitCount,
+                        .unitKind = unitKind,
+                    });
+                }
+            }
+        }
+
+        actions.push_back(Action{ActionKind::EndPhase});
+        return actions;
+    }
+
+    std::vector<Action> legalCombatMoveActions(const GameState& gameState) const {
         std::vector<Action> actions;
         const auto actingNationId = gameState.currentNation();
         std::vector<std::string> sourceZoneOrder;
@@ -256,7 +366,10 @@ class SimplifiedChinaMdp {
 
         for (const auto& unitPtr : gameState.units()) {
             const auto& unit = *unitPtr;
-            if (unit.ownerId() != actingNationId || !isCombatMovableInfantry(unit) || unit.movementLeft() <= 0) {
+            if (unit.ownerId() != actingNationId
+                || !isCombatMovableInfantry(unit)
+                || unit.movementLeft() <= 0
+                || unit.hasPendingCombatTarget()) {
                 continue;
             }
 
@@ -283,6 +396,9 @@ class SimplifiedChinaMdp {
                 if (!isEnemyControlledLandZone(gameState, actingNationId, destinationZone)) {
                     continue;
                 }
+                if (hasPendingAttackersForZone(gameState, actingNationId, destinationZone.id)) {
+                    continue;
+                }
                 for (int infantryCount = 1; infantryCount <= availableInfantry; ++infantryCount) {
                     actions.push_back(Action{
                         .kind = ActionKind::MoveCombatUnit,
@@ -297,13 +413,84 @@ class SimplifiedChinaMdp {
         return actions;
     }
 
+    std::vector<Action> legalCombatResolveActions(const GameState& gameState) const {
+        std::vector<Action> actions;
+        const auto actingNationId = gameState.currentNation();
+
+        for (const auto& zoneId : sortedZoneIds(gameState)) {
+            const auto& zone = gameState.zone(zoneId);
+            if (zone.kind != ZoneKind::Land || zone.controller == actingNationId) {
+                continue;
+            }
+
+            const auto attackers = pendingAttackersForZone(gameState, actingNationId, zoneId);
+            if (attackers.empty()) {
+                continue;
+            }
+
+            const auto defenders = defendingLandUnitsForZone(gameState, actingNationId, zoneId);
+            if (defenders.empty()) {
+                continue;
+            }
+
+            actions.push_back(Action{
+                .kind = ActionKind::ResolveCombat,
+                .targetZoneId = zoneId,
+            });
+        }
+
+        if (actions.empty()) {
+            actions.push_back(Action{ActionKind::EndPhase});
+        }
+        return actions;
+    }
+
+    std::vector<Action> legalPlaceActions(const GameState& gameState) const {
+        std::vector<Action> actions;
+        const auto actingNationId = gameState.currentNation();
+        const auto pendingCount = gameState.pendingPurchaseCountFor(actingNationId);
+
+        for (const auto& zoneId : sortedZoneIds(gameState)) {
+            const auto remainingCapacity = gameState.remainingPlacementCapacityForZone(actingNationId, zoneId);
+            if (remainingCapacity <= 0) {
+                continue;
+            }
+            for (const auto unitKind : purchasableUnitKinds()) {
+                const auto pendingUnitsOfKind = gameState.pendingPurchaseCountFor(actingNationId, unitKind);
+                const auto maxCount = std::min(remainingCapacity, pendingUnitsOfKind);
+                for (int unitCount = 1; unitCount <= maxCount; ++unitCount) {
+                    actions.push_back(Action{
+                        .kind = ActionKind::PlaceUnit,
+                        .targetZoneId = zoneId,
+                        .unitCount = unitCount,
+                        .unitKind = unitKind,
+                    });
+                }
+            }
+        }
+
+        if (pendingCount == 0 || actions.empty()) {
+            actions.push_back(Action{ActionKind::EndPhase});
+        }
+        return actions;
+    }
+
     void applyAction(GameState& gameState, const Action& action, StepResult& result) const {
         switch (action.kind) {
             case ActionKind::DeclareWarOnChina:
                 applyDeclareWarOnChina(gameState, result);
                 return;
+            case ActionKind::PurchaseUnit:
+                applyPurchaseUnit(gameState, action, result);
+                return;
             case ActionKind::MoveCombatUnit:
                 applyCombatMove(gameState, action, result);
+                return;
+            case ActionKind::ResolveCombat:
+                applyResolveCombat(gameState, action, result);
+                return;
+            case ActionKind::PlaceUnit:
+                applyPlaceUnit(gameState, action, result);
                 return;
             case ActionKind::EndPhase:
                 gameState.advancePhase();
@@ -329,9 +516,48 @@ class SimplifiedChinaMdp {
         result.detailLines.push_back("declaration result: all warlord lands and units transfer to KMT");
     }
 
+    void applyPurchaseUnit(GameState& gameState, const Action& action, StepResult& result) const {
+        if (gameState.currentPhase() != Phase::PurchaseUnits) {
+            throw std::runtime_error("PurchaseUnit can only be used in purchase_units");
+        }
+        if (!action.unitKind.has_value() || !action.unitCount.has_value()) {
+            throw std::runtime_error("PurchaseUnit requires a unit kind and count");
+        }
+
+        const auto actingNationId = gameState.currentNation();
+        const auto unitKind = *action.unitKind;
+        const auto unitCount = *action.unitCount;
+        if (unitCount <= 0) {
+            throw std::runtime_error("PurchaseUnit requires a positive unit count");
+        }
+
+        const auto remainingCapacity = std::max(
+            0,
+            gameState.totalFactoryOutputForNation(actingNationId) - gameState.pendingPurchaseCountFor(actingNationId));
+        if (unitCount > remainingCapacity) {
+            throw std::runtime_error("PurchaseUnit exceeds remaining factory output capacity");
+        }
+
+        const auto unitCost = purchaseCost(unitKind);
+        const auto totalCost = unitCost * unitCount;
+        auto& nation = gameState.nation(actingNationId);
+        if (unitCost <= 0 || totalCost > nation.treasury()) {
+            throw std::runtime_error("PurchaseUnit exceeds available treasury");
+        }
+
+        nation.spendTreasury(totalCost);
+        gameState.addPendingPurchases(actingNationId, unitKind, unitCount);
+        result.detailLines.push_back(
+            "purchase: "
+            + std::to_string(unitCount)
+            + " " + std::string(toString(unitKind))
+            + " for " + std::to_string(totalCost)
+            + " treasury");
+    }
+
     void applyCombatMove(GameState& gameState, const Action& action, StepResult& result) const {
-        if (gameState.currentPhase() != Phase::Combat) {
-            throw std::runtime_error("MoveCombatUnit can only be used in combat");
+        if (gameState.currentPhase() != Phase::CombatMove) {
+            throw std::runtime_error("MoveCombatUnit can only be used in combat_move");
         }
         if (!action.sourceZoneId.has_value() || !action.targetZoneId.has_value() || !action.unitCount.has_value()) {
             throw std::runtime_error("MoveCombatUnit requires a source zone, target zone, and unit count");
@@ -361,10 +587,16 @@ class SimplifiedChinaMdp {
         if (!isEnemyControlledLandZone(gameState, actingNationId, destinationZone)) {
             throw std::runtime_error("Combat move target is not an enemy-controlled land zone");
         }
+        if (hasPendingAttackersForZone(gameState, actingNationId, targetZoneId)) {
+            throw std::runtime_error("Combat move target already has pending infantry assigned to it");
+        }
 
         std::vector<Unit*> attackingUnits;
         for (auto* unit : gameState.unitsInZone(sourceZoneId)) {
-            if (unit->ownerId() != actingNationId || !isCombatMovableInfantry(*unit) || unit->movementLeft() <= 0) {
+            if (unit->ownerId() != actingNationId
+                || !isCombatMovableInfantry(*unit)
+                || unit->movementLeft() <= 0
+                || unit->hasPendingCombatTarget()) {
                 continue;
             }
             attackingUnits.push_back(unit);
@@ -393,6 +625,59 @@ class SimplifiedChinaMdp {
             return;
         }
 
+        result.detailLines.push_back(
+            "combat move: "
+            + std::to_string(attackingUnits.size())
+            + " infantry committed from "
+            + sourceZoneId
+            + " to pending battle at "
+            + targetZoneId);
+        for (auto* unit : attackingUnits) {
+            unit->setPendingCombatTargetZoneId(targetZoneId);
+        }
+    }
+
+    void applyResolveCombat(GameState& gameState, const Action& action, StepResult& result) const {
+        if (gameState.currentPhase() != Phase::CombatResolve) {
+            throw std::runtime_error("ResolveCombat can only be used in combat_resolve");
+        }
+        if (!action.targetZoneId.has_value()) {
+            throw std::runtime_error("ResolveCombat requires a target zone");
+        }
+
+        const auto actingNationId = gameState.currentNation();
+        const auto& targetZoneId = *action.targetZoneId;
+
+        std::vector<Unit*> attackingUnits;
+        for (auto& unitPtr : gameState.units()) {
+            auto* unit = unitPtr.get();
+            if (unit->ownerId() != actingNationId || !unit->hasPendingCombatTarget()) {
+                continue;
+            }
+            if (*unit->pendingCombatTargetZoneId() == targetZoneId) {
+                attackingUnits.push_back(unit);
+            }
+        }
+        if (attackingUnits.empty()) {
+            throw std::runtime_error("ResolveCombat requires pending attackers in the target zone");
+        }
+
+        std::vector<const Unit*> defendingUnits;
+        for (auto* unit : gameState.unitsInZone(targetZoneId)) {
+            if (unit->ownerId() != actingNationId && isLandCombatUnit(*unit)) {
+                defendingUnits.push_back(unit);
+            }
+        }
+        if (defendingUnits.empty()) {
+            throw std::runtime_error("ResolveCombat requires defenders in the target zone");
+        }
+
+        result.detailLines.push_back(
+            "resolving pending battle at "
+            + targetZoneId
+            + ": attackers=" + std::to_string(attackingUnits.size())
+            + ", defenders=" + std::to_string(defendingUnits.size()));
+
         const auto outcome = resolveLandCombat(
             gameState.zone(targetZoneId),
             std::vector<const Unit*>(attackingUnits.begin(), attackingUnits.end()),
@@ -402,21 +687,56 @@ class SimplifiedChinaMdp {
             outcome.roundLogs.begin(),
             outcome.roundLogs.end());
 
-        gameState.removeUnits(outcome.destroyedDefenders);
-        gameState.removeUnits(outcome.destroyedAttackers);
+        std::vector<Unit*> survivingAttackers;
+        survivingAttackers.reserve(attackingUnits.size());
+        for (auto* unit : attackingUnits) {
+            if (std::find(outcome.destroyedAttackers.begin(), outcome.destroyedAttackers.end(), unit)
+                == outcome.destroyedAttackers.end()) {
+                survivingAttackers.push_back(unit);
+            }
+        }
 
         if (outcome.attackersWon) {
             result.detailLines.push_back("combat result: attackers won and occupy the territory");
-            for (auto* unit : attackingUnits) {
-                if (std::find(outcome.destroyedAttackers.begin(), outcome.destroyedAttackers.end(), unit)
-                    == outcome.destroyedAttackers.end()) {
-                    gameState.moveUnit(unit, targetZoneId, 0);
-                }
+            for (auto* unit : survivingAttackers) {
+                unit->clearPendingCombatTargetZoneId();
+                gameState.moveUnit(unit, targetZoneId, 0);
             }
+            gameState.removeUnits(outcome.destroyedDefenders);
+            gameState.removeUnits(outcome.destroyedAttackers);
             gameState.setZoneController(targetZoneId, std::string(actingNationId));
         } else {
             result.detailLines.push_back("combat result: defenders held, surviving attackers stay in origin");
+            for (auto* unit : survivingAttackers) {
+                unit->clearPendingCombatTargetZoneId();
+            }
+            gameState.removeUnits(outcome.destroyedDefenders);
+            gameState.removeUnits(outcome.destroyedAttackers);
         }
+    }
+
+    void applyPlaceUnit(GameState& gameState, const Action& action, StepResult& result) const {
+        if (gameState.currentPhase() != Phase::PlaceUnits) {
+            throw std::runtime_error("PlaceUnit can only be used in place_units");
+        }
+        if (!action.targetZoneId.has_value() || !action.unitKind.has_value() || !action.unitCount.has_value()) {
+            throw std::runtime_error("PlaceUnit requires a target zone, unit kind, and count");
+        }
+
+        const auto actingNationId = gameState.currentNation();
+        const auto& targetZoneId = *action.targetZoneId;
+        const auto unitKind = *action.unitKind;
+        const auto unitCount = *action.unitCount;
+        if (unitCount <= 0) {
+            throw std::runtime_error("PlaceUnit requires a positive unit count");
+        }
+
+        gameState.placePurchasedUnits(actingNationId, targetZoneId, unitKind, unitCount);
+        result.detailLines.push_back(
+            "place units: "
+            + std::to_string(unitCount)
+            + " " + std::string(toString(unitKind))
+            + " placed at " + targetZoneId);
     }
 };
 

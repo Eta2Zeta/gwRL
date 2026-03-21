@@ -29,6 +29,11 @@ std::string describeAction(const game::Action& action) {
         description += std::to_string(*action.unitCount);
         hasDetails = true;
     }
+    if (action.unitKind.has_value()) {
+        description += hasDetails ? ", unit=" : "(unit=";
+        description += std::string(game::toString(*action.unitKind));
+        hasDetails = true;
+    }
     if (hasDetails) {
         description += ")";
     }
@@ -40,9 +45,19 @@ std::string describeAction(const game::Action& action) {
 PYBIND11_MODULE(gwrl_cpp, module) {
     module.doc() = "C++ training environment bindings for gwRL";
 
+    py::enum_<game::UnitKind>(module, "UnitKind")
+        .value("Infantry", game::UnitKind::Infantry)
+        .value("Artillery", game::UnitKind::Artillery)
+        .value("Marine", game::UnitKind::Marine)
+        .value("Fighter", game::UnitKind::Fighter)
+        .value("Transport", game::UnitKind::Transport);
+
     py::enum_<game::ActionKind>(module, "ActionKind")
         .value("DeclareWarOnChina", game::ActionKind::DeclareWarOnChina)
+        .value("PurchaseUnit", game::ActionKind::PurchaseUnit)
         .value("MoveCombatUnit", game::ActionKind::MoveCombatUnit)
+        .value("ResolveCombat", game::ActionKind::ResolveCombat)
+        .value("PlaceUnit", game::ActionKind::PlaceUnit)
         .value("EndPhase", game::ActionKind::EndPhase);
 
     py::class_<game::Action>(module, "Action")
@@ -51,6 +66,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def_readwrite("source_zone_id", &game::Action::sourceZoneId)
         .def_readwrite("target_zone_id", &game::Action::targetZoneId)
         .def_readwrite("unit_count", &game::Action::unitCount)
+        .def_readwrite("unit_kind", &game::Action::unitKind)
         .def("describe", &describeAction)
         .def("__repr__", [](const game::Action& action) {
             return "<Action " + describeAction(action) + ">";

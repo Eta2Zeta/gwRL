@@ -14,6 +14,7 @@
       "display_name": "Japan",
       "income": 1,
       "max_factory_output": 4,
+      "treasury": 13,
       "at_war_with": [],
       "allies": []
     },
@@ -35,7 +36,8 @@
   "phases": [
     "declaration_of_war",
     "purchase_units",
-    "combat",
+    "combat_move",
+    "combat_resolve",
     "non_combat",
     "place_units"
   ],
@@ -164,7 +166,9 @@
       "controller": "Japan",
       "is_city": false,
       "income_value": 1,
-      "facilities": [],
+      "facilities": [
+        "minor_factory"
+      ],
       "neighbors": [
         {
           "id": "land_china_beiping",

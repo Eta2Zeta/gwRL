@@ -39,7 +39,9 @@ class TrainingConfig:
     seed: int = 1936
 
 
-def build_first_combat_snapshot(env: gwrl_cpp.JapanTrainingEnv) -> tuple[list[float], list[list[float]], list[gwrl_cpp.Action]]:
+def build_first_decision_after_declaration_snapshot(
+    env: gwrl_cpp.JapanTrainingEnv,
+) -> tuple[list[float], list[list[float]], list[gwrl_cpp.Action]]:
     env.reset()
     legal_actions = env.legal_actions()
     declare_war = next(
@@ -55,7 +57,7 @@ def verify_against_cpp_example(env: gwrl_cpp.JapanTrainingEnv, example_path: Pat
     with example_path.open("r", encoding="utf-8") as handle:
         exported = json.load(handle)
 
-    state_features, legal_action_features, legal_actions = build_first_combat_snapshot(env)
+    state_features, legal_action_features, legal_actions = build_first_decision_after_declaration_snapshot(env)
     state_labels = env.state_feature_labels()
     action_labels = env.action_feature_labels()
 
@@ -110,8 +112,9 @@ def run_greedy_episode(env: gwrl_cpp.JapanTrainingEnv, model: LegalActionPolicyV
             logits, value = model(state_tensor, action_tensor)
         action_index = int(torch.argmax(logits.squeeze(0)).item())
         action = env.legal_actions()[action_index]
+        acting_turn = env.completed_turns_for("Japan") + 1
         trace.append(
-            f"{env.current_nation()} / {env.current_phase()} -> "
+            f"Japan turn {acting_turn} / {env.current_phase()} -> "
             f"{action.describe()} (value={float(value.item()):.4f})"
         )
         step_result = env.step(action)
@@ -208,12 +211,12 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
     if cpp_example_path.exists():
         verification = verify_against_cpp_example(env, cpp_example_path)
 
-    state_features, legal_action_features, legal_actions = build_first_combat_snapshot(env)
+    state_features, legal_action_features, legal_actions = build_first_decision_after_declaration_snapshot(env)
     state_tensor, action_tensor = tensorize_state_and_actions(state_features, legal_action_features)
     with torch.no_grad():
         logits, value = model(state_tensor, action_tensor)
         probabilities = torch.softmax(logits.squeeze(0), dim=0)
-    first_combat_policy = [
+    first_decision_policy = [
         {
             "action": action.describe(),
             "probability": float(probabilities[index].item()),
@@ -221,7 +224,7 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
         }
         for index, action in enumerate(legal_actions)
     ]
-    first_combat_policy.sort(key=lambda item: item["probability"], reverse=True)
+    first_decision_policy.sort(key=lambda item: item["probability"], reverse=True)
 
     greedy_evaluation = run_greedy_episode(env, model)
     return {
@@ -229,7 +232,7 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
         "state_dim": state_dim,
         "action_dim": action_dim,
         "history": history,
-        "first_combat_policy": first_combat_policy,
+        "first_decision_policy": first_decision_policy,
         "greedy_evaluation": greedy_evaluation,
         "verification": verification,
         "model": model,
@@ -274,8 +277,8 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
             lines.append(f"verification_note={message}")
 
     lines.append("")
-    lines.append("First combat policy")
-    for entry in result["first_combat_policy"]:
+    lines.append("First decision after declaration")
+    for entry in result["first_decision_policy"]:
         lines.append(
             f"- {entry['action']}: prob={entry['probability']:.4f} logit={entry['logit']:.4f}"
         )
@@ -297,7 +300,7 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
         "state_dim": result["state_dim"],
         "action_dim": result["action_dim"],
         "history": result["history"],
-        "first_combat_policy": result["first_combat_policy"],
+        "first_decision_policy": result["first_decision_policy"],
         "greedy_evaluation": result["greedy_evaluation"],
         "verification": result["verification"],
     }
@@ -339,9 +342,9 @@ def main() -> None:
     print(f"state_dim={result['state_dim']}")
     print(f"action_dim={result['action_dim']}")
     print(f"recent_average_reward={recent_average_reward:.4f}")
-    if result["first_combat_policy"]:
-        best = result["first_combat_policy"][0]
-        print(f"best_first_combat_action={best['action']} prob={best['probability']:.4f}")
+    if result["first_decision_policy"]:
+        best = result["first_decision_policy"][0]
+        print(f"best_first_decision_action={best['action']} prob={best['probability']:.4f}")
 
 
 if __name__ == "__main__":

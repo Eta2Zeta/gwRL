@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -32,6 +33,16 @@ class Nation {
     void setTreasury(int treasury) { treasury_ = treasury; }
     void setAtWarWith(std::vector<std::string> nationIds) { replaceSet(atWarWith_, std::move(nationIds)); }
     void setAllies(std::vector<std::string> nationIds) { replaceSet(allies_, std::move(nationIds)); }
+    void addTreasury(int amount) { treasury_ += amount; }
+    void spendTreasury(int amount) {
+        if (amount < 0) {
+            throw std::runtime_error("Treasury spend cannot be negative");
+        }
+        if (amount > treasury_) {
+            throw std::runtime_error("Nation does not have enough treasury");
+        }
+        treasury_ -= amount;
+    }
 
     bool isAtWarWith(std::string_view nationId) const {
         return atWarWith_.find(std::string(nationId)) != atWarWith_.end();

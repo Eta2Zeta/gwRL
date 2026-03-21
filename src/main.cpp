@@ -47,6 +47,11 @@ std::string describeAction(const game::Action& action) {
         description += std::to_string(*action.unitCount);
         hasDetails = true;
     }
+    if (action.unitKind.has_value()) {
+        description += hasDetails ? ", unit=" : "(unit=";
+        description += std::string(game::toString(*action.unitKind));
+        hasDetails = true;
+    }
     if (hasDetails) {
         description += ")";
     }
@@ -168,19 +173,18 @@ void writeJsonNumberArray(std::ostream& output, const std::vector<double>& value
     output << "]";
 }
 
-game::GameState buildJapanFirstCombatState(const std::filesystem::path& scenarioPath) {
+game::GameState buildJapanFirstDecisionAfterDeclarationState(const std::filesystem::path& scenarioPath) {
     auto gameState = game::SetupLoader::loadFromFile(scenarioPath);
     game::SimplifiedChinaMdp mdp;
 
-    for (int step = 0; step < 5; ++step) {
+    for (int step = 0; step < 6; ++step) {
         mdp.step(gameState, game::Action{.kind = game::ActionKind::EndPhase});
     }
     mdp.step(gameState, game::Action{.kind = game::ActionKind::DeclareWarOnChina});
     mdp.step(gameState, game::Action{.kind = game::ActionKind::EndPhase});
-    mdp.step(gameState, game::Action{.kind = game::ActionKind::EndPhase});
 
-    if (gameState.currentNation() != "Japan" || gameState.currentPhase() != game::Phase::Combat) {
-        throw std::runtime_error("Failed to build Japan first combat state");
+    if (gameState.currentNation() != "Japan") {
+        throw std::runtime_error("Failed to build Japan first post-declaration state");
     }
     return gameState;
 }
@@ -188,7 +192,7 @@ game::GameState buildJapanFirstCombatState(const std::filesystem::path& scenario
 void writeTrainingExample(
     const std::filesystem::path& scenarioPath,
     const std::filesystem::path& outputPath) {
-    const auto gameState = buildJapanFirstCombatState(scenarioPath);
+    const auto gameState = buildJapanFirstDecisionAfterDeclarationState(scenarioPath);
     const game::SimplifiedChinaMdp mdp;
     const auto legalActions = mdp.legalActions(gameState);
     const auto stateEncoder = game::StateEncoder::forNation(gameState, "Japan");
@@ -204,7 +208,7 @@ void writeTrainingExample(
 
     output << "{\n";
     output << "  \"description\": ";
-    writeJsonString(output, "Japan first combat decision state");
+    writeJsonString(output, "Japan first decision after declaration");
     output << ",\n";
     output << "  \"scenario_path\": ";
     writeJsonString(output, scenarioPath.string());
