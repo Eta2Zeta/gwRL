@@ -456,22 +456,32 @@ def build():
         ("sea_a28", "Western Mediterranean Approaches"),
         ("sea_a29", "Mid-Atlantic East"),
         ("sea_a44", "Strait of Gibraltar (Atlantic)"),
-        ("sea_m1", "Western Mediterranean"),
-        ("sea_m2", "Central Mediterranean"),
+        ("sea_m1", "North Western Mediterranean"),
+        ("sea_m2", "Western Mediterranean"),
         ("sea_m3", "Tyrrhenian Sea"),
-        ("sea_m4", "Ionian Sea"),
+        ("sea_m4", "Central Mediterranean Sea"),
         ("sea_m5", "Adriatic Sea"),
+        ("sea_m6", "Ionian Sea"),
+        ("sea_m7", "Aegean Sea"),
+        ("sea_m8", "Eastern Mediterranean"),
+        ("sea_m9", "Eastern Mediterranean"),
         ("sea_m10", "Western Black Sea"),
         ("sea_m11", "Eastern Black Sea"),
         ("sea_m12", "Caspian Sea"),
-        ("sea_m9", "Eastern Mediterranean"),
+        ("sea_i1", "Mozambique Channel"),
+        ("sea_i2", "Sea Zone I2"),
         ("sea_i3", "Red Sea"),
-        ("sea_i4", "Somali Coast"),
+        ("sea_i4", "Gulf of Aden"),
         ("sea_i5", "Red Sea South"),
-        ("sea_i6", "Arabian Sea"),
-        ("sea_i7", "Persian Gulf"),
+        ("sea_i6", "Strait of Hormuz"),
+        ("sea_i7", "Arabian Sea"),
+        ("sea_i8", "Sea Zone I8"),
+        ("sea_i9", "Sea Zone I9"),
+        ("sea_i10", "Sea Zone I10"),
         ("sea_i11", "Bay of Bengal"),
         ("sea_i12", "Sea Zone I12"),
+        ("sea_i13", "Sea Zone I13"),
+        ("sea_i14", "Sea Zone I14"),
         ("sea_a1", "Hudson Bay"),
         ("sea_a2", "Baffin Bay"),
         ("sea_a15", "Labrador Sea North"),
@@ -571,8 +581,8 @@ def build():
         ("land_denmark", "Denmark", "normal", 1, "Denmark", True, True),
         ("land_nor_southern_norway", "Southern Norway", "mountain", 1, "Norway", False, False),
         ("land_nor_trondelag", "Trondelag", "mountain", 1, "Norway", False, False),
-        ("land_swe_norrland", "Norrland", "tundra", 2, "Sweden", False, False),
-        ("land_swe_gotland", "Gotland", "normal", 1, "Sweden", False, False),
+        ("land_swe_norrland", "Norrland", "normal", 2, "Sweden", False, False),
+        ("land_swe_gotaland", "Gotaland", "normal", 1, "Sweden", False, False),
         ("land_fin_lapland", "Lapland", "tundra", 1, "Finland", False, False),
         ("land_fin_southern_finland", "Southern Finland", "forest", 1, "Finland", True, True),
         ("land_fin_viipuri_province", "Viipuri Province", "forest", 1, "Finland", False, False),
@@ -731,10 +741,11 @@ def build():
         ("land_tripolitania", "Tripolitania", "desert", 0, "Italy", False, False),
         ("land_cyrenaica", "Cyrenaica", "desert", 1, "Italy", False, False),
         ("land_tobruk", "Tobruk", "desert", 0, "Italy", False, False),
-        ("land_western_egypt", "Western Egypt", "desert", 1, "Egypt", False, False),
-        ("land_upper_egypt", "Upper Egypt", "desert", 0, "Egypt", False, False),
-        ("land_lower_egypt", "Lower Egypt", "desert", 1, "Egypt", False, False),
-        ("land_nubia", "Nubia", "desert", 1, "Egypt", False, False),
+        ("land_cyprus", "Cyprus", "mountain", 1, "United Kingdom", False, False),
+        ("land_western_egypt", "Western Egypt", "desert", 1, "United Kingdom", False, False),
+        ("land_upper_egypt", "Upper Egypt", "desert", 0, "United Kingdom", False, False),
+        ("land_lower_egypt", "Lower Egypt", "desert", 1, "United Kingdom", False, False),
+        ("land_nubia", "Nubia", "desert", 1, "United Kingdom", False, False),
         ("land_eritrea", "Eritrea", "mountain", 0, "Italy", False, False),
         ("land_abyssinia", "Abyssinia", "mountain", 0, "Ethiopia", False, False),
         ("land_french_somaliland", "French Somaliland", "normal", 0, "France", False, False),
@@ -1042,10 +1053,10 @@ def build():
 
     # Scandinavia + Baltic
     link_rail(nodes, "land_nor_trondelag", "land_nor_southern_norway", border_terrain="mountain")
-    link_land(nodes, "land_nor_trondelag", "land_swe_norrland", border_terrain="tundra", confidence=0.72)
+    link_rail(nodes, "land_nor_trondelag", "land_swe_norrland", border_terrain="tundra", confidence=0.72)
     link(nodes, "land_nor_southern_norway", "land_denmark", border_terrain="coast", narrow_crossing=True)
 
-    link_rail(nodes, "land_swe_norrland", "land_swe_gotland")
+    link_rail(nodes, "land_swe_norrland", "land_swe_gotaland")
     link_rail(nodes, "land_swe_norrland", "land_fin_lapland")
     link_rail(nodes, "land_swe_norrland", "land_fin_southern_finland")
 
@@ -1284,10 +1295,10 @@ def build():
     link_rail(nodes, "land_belgian_congo", "land_angola", river_crossing=True)
     link_rail(nodes, "land_belgian_congo", "land_tanganyika")
     link_rail(nodes, "land_belgian_congo", "land_rhodesia", river_crossing=True)
-    link_rail(nodes, "land_angola", "land_rhodesia", river_crossing=True)
+    link_land(nodes, "land_angola", "land_rhodesia", river_crossing=True)
     link_rail(nodes, "land_angola", "land_southwest_africa")
     link_rail(nodes, "land_rhodesia", "land_tanganyika")
-    link_rail(nodes, "land_rhodesia", "land_portuguese_east_africa", river_crossing=True)
+    link_rail(nodes, "land_rhodesia", "land_portuguese_east_africa", has_river=True)
     link_rail(nodes, "land_rhodesia", "land_bechuanaland")
     link_rail(nodes, "land_rhodesia", "land_south_africa")
     link_rail(nodes, "land_southwest_africa", "land_bechuanaland")
@@ -1362,8 +1373,8 @@ def build():
     link_rail_through_node(nodes, "land_china_hopeh", "land_china_shantung", "land_china_beiping")
     link_rail_through_node(nodes, "land_china_hopeh", "land_china_shensi", "land_china_beiping")
     link_rail(nodes, "land_china_shantung", "land_china_nanking", river_crossing=True)
-    link_rail(nodes, "land_china_shantung", "land_china_hunan", river_crossing=True)
-    set_edge(nodes, "land_china_hunan", "land_china_shantung", river_crossing=True)
+    link_rail(nodes, "land_china_shantung", "land_china_hunan")
+    set_edge(nodes, "land_china_shantung", "land_china_hunan", river_crossing=True)
     link_rail(nodes, "land_china_nanking", "land_china_hunan")
     link_rail(nodes, "land_china_hunan", "land_kwangtung", has_river=True)
     link_land(nodes, "land_china_kweichow", "land_kwangtung")
@@ -1522,10 +1533,10 @@ def build():
     for lid in ["land_ireland", "land_fra_normandy", "land_fra_picardy"]:
         link_land_sea(nodes, lid, "sea_a22", port=(lid != "land_fra_normandy"))
 
-    for lid in ["land_denmark", "land_swe_gotland", "land_ger_konigsberg", "land_ger_eastern_germany", "land_estonia", "land_usr_leningrad"]:
+    for lid in ["land_denmark", "land_swe_gotaland", "land_ger_konigsberg", "land_ger_eastern_germany", "land_estonia", "land_usr_leningrad"]:
         link_land_sea(nodes, lid, "sea_a12", port=True)
 
-    for lid in ["land_fin_southern_finland", "land_swe_gotland", "land_estonia", "land_usr_kola"]:
+    for lid in ["land_fin_southern_finland", "land_swe_gotaland", "land_estonia", "land_usr_kola"]:
         link_land_sea(nodes, lid, "sea_a13", port=True)
 
     for lid in ["land_fin_lapland", "land_swe_norrland", "land_usr_kola"]:
@@ -1638,10 +1649,11 @@ def build():
     # Africa coast/port links
     link_land_sea(nodes, "land_french_morocco", "sea_a28", port=True)
     link_land_sea(nodes, "land_spanish_morocco", "sea_a28", port=True)
-    link_land_sea(nodes, "land_northern_algeria", "sea_m1", port=True)
-    link_land_sea(nodes, "land_tunisia", "sea_m1", port=True)
-    link_land_sea(nodes, "land_tripoli", "sea_m1", port=True)
+    link_land_sea(nodes, "land_northern_algeria", "sea_m2", port=True)
+    link_land_sea(nodes, "land_tunisia", "sea_m2", port=True)
+    link_land_sea(nodes, "land_tripoli", "sea_m4", port=True)
     link_land_sea(nodes, "land_tobruk", "sea_m9", port=True)
+    link_land_sea(nodes, "land_tobruk", "sea_m8", port=True)
     link_land_sea(nodes, "land_western_egypt", "sea_m9", port=True)
     link_land_sea(nodes, "land_lower_egypt", "sea_m9", port=True)
     link_land_sea(nodes, "land_upper_egypt", "sea_i5", port=True, canal="Suez Canal")
@@ -1758,7 +1770,7 @@ def build():
     # Denmark straits and canal/strait annotations
     link(nodes, "sea_a10", "sea_a11", border_terrain="sea", canal_or_strait="Danish Straits")
     link(nodes, "sea_a11", "sea_a12", border_terrain="sea", canal_or_strait="Danish Straits")
-    link(nodes, "land_denmark", "land_swe_gotland", border_terrain="coast", narrow_crossing=True, canal_or_strait="Danish Straits")
+    link(nodes, "land_denmark", "land_swe_gotaland", border_terrain="coast", narrow_crossing=True, canal_or_strait="Danish Straits")
 
     # Turkish straits (treated as canal in rules)
     link(nodes, "sea_m10", "sea_m11", border_terrain="sea", canal_or_strait="Turkish Straits")

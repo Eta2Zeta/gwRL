@@ -1,8 +1,39 @@
 #include "game/japan_training_env.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 
 namespace game {
+
+namespace {
+
+const Action& selectAutoplayAction(
+    const std::vector<Action>& actions,
+    std::string_view currentNation,
+    std::string_view trackedNation) {
+    const auto endPhaseIt = std::find_if(
+        actions.begin(),
+        actions.end(),
+        [](const Action& action) {
+            return action.kind == ActionKind::EndPhase;
+        });
+
+    if (currentNation != trackedNation && endPhaseIt != actions.end()) {
+        return *endPhaseIt;
+    }
+
+    if (actions.size() == 1) {
+        return actions.front();
+    }
+
+    if (endPhaseIt != actions.end()) {
+        return *endPhaseIt;
+    }
+
+    return actions.front();
+}
+
+}  // namespace
 
 JapanTrainingEnv::JapanTrainingEnv(std::filesystem::path scenarioPath, std::string trackedNationId)
     : scenarioPath_(std::move(scenarioPath)),
@@ -67,7 +98,9 @@ void JapanTrainingEnv::advanceUntilTrackedNationDecision() {
         if (gameState_.currentNation() == trackedNationId_ && actions.size() > 1) {
             return;
         }
-        mdp_.step(gameState_, actions.front());
+        mdp_.step(
+            gameState_,
+            selectAutoplayAction(actions, gameState_.currentNation(), trackedNationId_));
     }
 }
 

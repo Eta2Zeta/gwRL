@@ -1,0 +1,54 @@
+{
+  "description": "Japan first combat decision state",
+  "scenario_path": "data/china_simplified_setup.json",
+  "current_nation": "Japan",
+  "current_phase": "combat",
+  "state_feature_count": 116,
+  "action_feature_count": 20,
+  "zone_order": ["land_china_beiping", "land_china_hopeh", "land_china_shantung", "land_china_shensi", "land_china_suiyuan", "land_manchuria_rehe"],
+  "controller_order": ["CCP", "Japan", "KMT", "ZhiliClique", "Mengjiang", "Neutral"],
+  "nation_order": ["CCP", "Japan", "KMT"],
+  "action_zone_order": ["land_china_beiping", "land_china_hopeh", "land_china_shantung", "land_china_shensi", "land_china_suiyuan", "land_manchuria_rehe"],
+  "max_combat_unit_count": 4,
+  "state_feature_labels": ["land_china_beiping.owner.CCP", "land_china_beiping.owner.Japan", "land_china_beiping.owner.KMT", "land_china_beiping.owner.ZhiliClique", "land_china_beiping.owner.Mengjiang", "land_china_beiping.owner.Neutral", "land_china_beiping.is_city", "land_china_beiping.income_value", "land_china_beiping.infantry_count.CCP", "land_china_beiping.movable_infantry_count.CCP", "land_china_beiping.infantry_count.Japan", "land_china_beiping.movable_infantry_count.Japan", "land_china_beiping.infantry_count.KMT", "land_china_beiping.movable_infantry_count.KMT", "land_china_beiping.infantry_count.other", "land_china_beiping.movable_infantry_count.other", "land_china_hopeh.owner.CCP", "land_china_hopeh.owner.Japan", "land_china_hopeh.owner.KMT", "land_china_hopeh.owner.ZhiliClique", "land_china_hopeh.owner.Mengjiang", "land_china_hopeh.owner.Neutral", "land_china_hopeh.is_city", "land_china_hopeh.income_value", "land_china_hopeh.infantry_count.CCP", "land_china_hopeh.movable_infantry_count.CCP", "land_china_hopeh.infantry_count.Japan", "land_china_hopeh.movable_infantry_count.Japan", "land_china_hopeh.infantry_count.KMT", "land_china_hopeh.movable_infantry_count.KMT", "land_china_hopeh.infantry_count.other", "land_china_hopeh.movable_infantry_count.other", "land_china_shantung.owner.CCP", "land_china_shantung.owner.Japan", "land_china_shantung.owner.KMT", "land_china_shantung.owner.ZhiliClique", "land_china_shantung.owner.Mengjiang", "land_china_shantung.owner.Neutral", "land_china_shantung.is_city", "land_china_shantung.income_value", "land_china_shantung.infantry_count.CCP", "land_china_shantung.movable_infantry_count.CCP", "land_china_shantung.infantry_count.Japan", "land_china_shantung.movable_infantry_count.Japan", "land_china_shantung.infantry_count.KMT", "land_china_shantung.movable_infantry_count.KMT", "land_china_shantung.infantry_count.other", "land_china_shantung.movable_infantry_count.other", "land_china_shensi.owner.CCP", "land_china_shensi.owner.Japan", "land_china_shensi.owner.KMT", "land_china_shensi.owner.ZhiliClique", "land_china_shensi.owner.Mengjiang", "land_china_shensi.owner.Neutral", "land_china_shensi.is_city", "land_china_shensi.income_value", "land_china_shensi.infantry_count.CCP", "land_china_shensi.movable_infantry_count.CCP", "land_china_shensi.infantry_count.Japan", "land_china_shensi.movable_infantry_count.Japan", "land_china_shensi.infantry_count.KMT", "land_china_shensi.movable_infantry_count.KMT", "land_china_shensi.infantry_count.other", "land_china_shensi.movable_infantry_count.other", "land_china_suiyuan.owner.CCP", "land_china_suiyuan.owner.Japan", "land_china_suiyuan.owner.KMT", "land_china_suiyuan.owner.ZhiliClique", "land_china_suiyuan.owner.Mengjiang", "land_china_suiyuan.owner.Neutral", "land_china_suiyuan.is_city", "land_china_suiyuan.income_value", "land_china_suiyuan.infantry_count.CCP", "land_china_suiyuan.movable_infantry_count.CCP", "land_china_suiyuan.infantry_count.Japan", "land_china_suiyuan.movable_infantry_count.Japan", "land_china_suiyuan.infantry_count.KMT", "land_china_suiyuan.movable_infantry_count.KMT", "land_china_suiyuan.infantry_count.other", "land_china_suiyuan.movable_infantry_count.other", "land_manchuria_rehe.owner.CCP", "land_manchuria_rehe.owner.Japan", "land_manchuria_rehe.owner.KMT", "land_manchuria_rehe.owner.ZhiliClique", "land_manchuria_rehe.owner.Mengjiang", "land_manchuria_rehe.owner.Neutral", "land_manchuria_rehe.is_city", "land_manchuria_rehe.income_value", "land_manchuria_rehe.infantry_count.CCP", "land_manchuria_rehe.movable_infantry_count.CCP", "land_manchuria_rehe.infantry_count.Japan", "land_manchuria_rehe.movable_infantry_count.Japan", "land_manchuria_rehe.infantry_count.KMT", "land_manchuria_rehe.movable_infantry_count.KMT", "land_manchuria_rehe.infantry_count.other", "land_manchuria_rehe.movable_infantry_count.other", "global.current_nation.CCP", "global.current_nation.Japan", "global.current_nation.KMT", "global.current_phase.declaration_of_war", "global.current_phase.purchase_units", "global.current_phase.combat", "global.current_phase.non_combat", "global.current_phase.place_units", "global.completed_turns.CCP", "global.completed_turns.Japan", "global.completed_turns.KMT", "global.income.CCP", "global.income.Japan", "global.income.KMT", "global.treasury.CCP", "global.treasury.Japan", "global.treasury.KMT", "global.at_war.Japan_vs_CCP", "global.at_war.Japan_vs_KMT", "global.at_war.CCP_vs_KMT"],
+  "state_features": [0, 0, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 4, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 1, 6, 2, 1, 2, 1, 1, 0],
+  "action_feature_labels": ["action_kind.declare_war_on_china", "action_kind.move_combat_unit", "action_kind.end_phase", "source_zone.land_china_beiping", "source_zone.land_china_hopeh", "source_zone.land_china_shantung", "source_zone.land_china_shensi", "source_zone.land_china_suiyuan", "source_zone.land_manchuria_rehe", "target_zone.land_china_beiping", "target_zone.land_china_hopeh", "target_zone.land_china_shantung", "target_zone.land_china_shensi", "target_zone.land_china_suiyuan", "target_zone.land_manchuria_rehe", "combat_unit_count.0", "combat_unit_count.1", "combat_unit_count.2", "combat_unit_count.3", "combat_unit_count.4"],
+  "legal_actions": [
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=2)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=3)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=2)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=3)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0]
+    },
+    {
+      "description": "move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4)",
+      "action_features": [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]
+    },
+    {
+      "description": "end_phase",
+      "action_features": [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+    }
+  ]
+}

@@ -425,14 +425,9 @@
           "passable": true,
           "has_river": false,
           "river_crossing": true,
-          "railway_connection": true,
+          "railway_connection": false,
           "gauge_change": false,
-          "railroads": [
-            {
-              "rail_id": "rail_land_angola_land_rhodesia",
-              "gauge_change": false
-            }
-          ],
+          "railroads": [],
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
@@ -4393,7 +4388,7 @@
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
-          "river_crossing": true,
+          "river_crossing": false,
           "railway_connection": true,
           "gauge_change": false,
           "railroads": [
@@ -5855,6 +5850,21 @@
         }
       ]
     },
+    "land_cyprus": {
+      "id": "land_cyprus",
+      "name": "Cyprus",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
     "land_cyrenaica": {
       "id": "land_cyrenaica",
       "name": "Cyrenaica",
@@ -6280,7 +6290,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_swe_gotland",
+          "neighbor_id": "land_swe_gotaland",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -12419,8 +12429,8 @@
       "type": "land",
       "terrain": "desert",
       "ipp_value": 1,
-      "original_owner": "Egypt",
-      "current_owner": "Egypt",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_city": false,
       "is_capital": false,
       "is_victory_city": false,
@@ -14783,9 +14793,14 @@
           "passable": true,
           "has_river": false,
           "river_crossing": false,
-          "railway_connection": false,
+          "railway_connection": true,
           "gauge_change": false,
-          "railroads": [],
+          "railroads": [
+            {
+              "rail_id": "rail_norrland_trondelag",
+              "gauge_change": false
+            }
+          ],
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
@@ -14920,7 +14935,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "sea_m1",
+          "neighbor_id": "sea_m2",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -15052,8 +15067,8 @@
       "type": "land",
       "terrain": "desert",
       "ipp_value": 1,
-      "original_owner": "Egypt",
-      "current_owner": "Egypt",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_city": false,
       "is_capital": false,
       "is_victory_city": false,
@@ -16673,7 +16688,7 @@
           "neighbor_id": "land_rhodesia",
           "border_terrain": "normal",
           "passable": true,
-          "has_river": false,
+          "has_river": true,
           "river_crossing": false,
           "railway_connection": true,
           "gauge_change": false,
@@ -16874,14 +16889,9 @@
           "passable": true,
           "has_river": false,
           "river_crossing": false,
-          "railway_connection": true,
+          "railway_connection": false,
           "gauge_change": false,
-          "railroads": [
-            {
-              "rail_id": "rail_land_angola_land_rhodesia",
-              "gauge_change": false
-            }
-          ],
+          "railroads": [],
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
@@ -16938,8 +16948,8 @@
           "neighbor_id": "land_portuguese_east_africa",
           "border_terrain": "normal",
           "passable": true,
-          "has_river": false,
-          "river_crossing": true,
+          "has_river": true,
+          "river_crossing": false,
           "railway_connection": true,
           "gauge_change": false,
           "railroads": [
@@ -18332,9 +18342,9 @@
         }
       ]
     },
-    "land_swe_gotland": {
-      "id": "land_swe_gotland",
-      "name": "Gotland",
+    "land_swe_gotaland": {
+      "id": "land_swe_gotaland",
+      "name": "Gotaland",
       "type": "land",
       "terrain": "normal",
       "ipp_value": 1,
@@ -18373,7 +18383,7 @@
           "gauge_change": false,
           "railroads": [
             {
-              "rail_id": "rail_gotland_norrland",
+              "rail_id": "rail_gotaland_norrland",
               "gauge_change": false
             }
           ],
@@ -18398,7 +18408,7 @@
             "minor_port"
           ],
           "naval_facility_ids": [
-            "facility_gotland_minor_port"
+            "facility_gotaland_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -18419,7 +18429,7 @@
             "minor_port"
           ],
           "naval_facility_ids": [
-            "facility_gotland_minor_port"
+            "facility_gotaland_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -18433,7 +18443,7 @@
       "id": "land_swe_norrland",
       "name": "Norrland",
       "type": "land",
-      "terrain": "tundra",
+      "terrain": "normal",
       "ipp_value": 2,
       "original_owner": "Sweden",
       "current_owner": "Sweden",
@@ -18493,9 +18503,14 @@
           "passable": true,
           "has_river": false,
           "river_crossing": false,
-          "railway_connection": false,
+          "railway_connection": true,
           "gauge_change": false,
-          "railroads": [],
+          "railroads": [
+            {
+              "rail_id": "rail_norrland_trondelag",
+              "gauge_change": false
+            }
+          ],
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
@@ -18505,7 +18520,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_swe_gotland",
+          "neighbor_id": "land_swe_gotaland",
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
@@ -18514,7 +18529,7 @@
           "gauge_change": false,
           "railroads": [
             {
-              "rail_id": "rail_gotland_norrland",
+              "rail_id": "rail_gotaland_norrland",
               "gauge_change": false
             }
           ],
@@ -19062,6 +19077,27 @@
           "special_fortification": null
         },
         {
+          "neighbor_id": "sea_m8",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_tobruk_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "sea_m9",
           "border_terrain": "coast",
           "passable": true,
@@ -19224,7 +19260,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "sea_m1",
+          "neighbor_id": "sea_m4",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -19365,7 +19401,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "sea_m1",
+          "neighbor_id": "sea_m2",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -19972,8 +20008,8 @@
       "type": "land",
       "terrain": "desert",
       "ipp_value": 0,
-      "original_owner": "Egypt",
-      "current_owner": "Egypt",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_city": false,
       "is_capital": false,
       "is_victory_city": false,
@@ -26774,8 +26810,8 @@
       "type": "land",
       "terrain": "desert",
       "ipp_value": 1,
-      "original_owner": "Egypt",
-      "current_owner": "Egypt",
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
       "is_city": false,
       "is_capital": false,
       "is_victory_city": false,
@@ -27489,7 +27525,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_swe_gotland",
+          "neighbor_id": "land_swe_gotaland",
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
@@ -27501,7 +27537,7 @@
             "minor_port"
           ],
           "naval_facility_ids": [
-            "facility_gotland_minor_port"
+            "facility_gotaland_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -27640,7 +27676,7 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_swe_gotland",
+          "neighbor_id": "land_swe_gotaland",
           "border_terrain": "normal",
           "passable": true,
           "has_river": false,
@@ -27652,7 +27688,7 @@
             "minor_port"
           ],
           "naval_facility_ids": [
-            "facility_gotland_minor_port"
+            "facility_gotaland_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -30152,6 +30188,36 @@
         }
       ]
     },
+    "sea_i1": {
+      "id": "sea_i1",
+      "name": "Mozambique Channel",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
+    "sea_i10": {
+      "id": "sea_i10",
+      "name": "Sea Zone I10",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
     "sea_i11": {
       "id": "sea_i11",
       "name": "Bay of Bengal",
@@ -30353,6 +30419,51 @@
         }
       ]
     },
+    "sea_i13": {
+      "id": "sea_i13",
+      "name": "Sea Zone I13",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
+    "sea_i14": {
+      "id": "sea_i14",
+      "name": "Sea Zone I14",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
+    "sea_i2": {
+      "id": "sea_i2",
+      "name": "Sea Zone I2",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
     "sea_i3": {
       "id": "sea_i3",
       "name": "Red Sea",
@@ -30460,7 +30571,7 @@
     },
     "sea_i4": {
       "id": "sea_i4",
-      "name": "Somali Coast",
+      "name": "Gulf of Aden",
       "type": "sea",
       "terrain": "sea",
       "ipp_value": null,
@@ -30808,7 +30919,7 @@
     },
     "sea_i6": {
       "id": "sea_i6",
-      "name": "Arabian Sea",
+      "name": "Strait of Hormuz",
       "type": "sea",
       "terrain": "sea",
       "ipp_value": null,
@@ -31035,7 +31146,7 @@
     },
     "sea_i7": {
       "id": "sea_i7",
-      "name": "Persian Gulf",
+      "name": "Arabian Sea",
       "type": "sea",
       "terrain": "sea",
       "ipp_value": null,
@@ -31150,9 +31261,39 @@
         }
       ]
     },
+    "sea_i8": {
+      "id": "sea_i8",
+      "name": "Sea Zone I8",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
+    "sea_i9": {
+      "id": "sea_i9",
+      "name": "Sea Zone I9",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
     "sea_m1": {
       "id": "sea_m1",
-      "name": "Western Mediterranean",
+      "name": "North Western Mediterranean",
       "type": "sea",
       "terrain": "sea",
       "ipp_value": null,
@@ -31178,69 +31319,6 @@
           ],
           "naval_facility_ids": [
             "facility_southern_france_minor_port"
-          ],
-          "port_or_dock_connection": true,
-          "canal_or_strait": null,
-          "narrow_crossing": false,
-          "narrow_crossings": 0,
-          "special_fortification": null
-        },
-        {
-          "neighbor_id": "land_northern_algeria",
-          "border_terrain": "normal",
-          "passable": true,
-          "has_river": false,
-          "river_crossing": false,
-          "railway_connection": false,
-          "gauge_change": false,
-          "railroads": [],
-          "naval_facilities": [
-            "minor_port"
-          ],
-          "naval_facility_ids": [
-            "facility_algeria_minor_port"
-          ],
-          "port_or_dock_connection": true,
-          "canal_or_strait": null,
-          "narrow_crossing": false,
-          "narrow_crossings": 0,
-          "special_fortification": null
-        },
-        {
-          "neighbor_id": "land_tripoli",
-          "border_terrain": "normal",
-          "passable": true,
-          "has_river": false,
-          "river_crossing": false,
-          "railway_connection": false,
-          "gauge_change": false,
-          "railroads": [],
-          "naval_facilities": [
-            "minor_port"
-          ],
-          "naval_facility_ids": [
-            "facility_land_tripoli_minor_port"
-          ],
-          "port_or_dock_connection": true,
-          "canal_or_strait": null,
-          "narrow_crossing": false,
-          "narrow_crossings": 0,
-          "special_fortification": null
-        },
-        {
-          "neighbor_id": "land_tunisia",
-          "border_terrain": "normal",
-          "passable": true,
-          "has_river": false,
-          "river_crossing": false,
-          "railway_connection": false,
-          "gauge_change": false,
-          "railroads": [],
-          "naval_facilities": [
-            "minor_port"
-          ],
-          "naval_facility_ids": [
-            "facility_land_tunisia_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -31676,7 +31754,7 @@
     },
     "sea_m2": {
       "id": "sea_m2",
-      "name": "Central Mediterranean",
+      "name": "Western Mediterranean",
       "type": "sea",
       "terrain": "sea",
       "ipp_value": null,
@@ -31688,6 +31766,48 @@
       "node_facilities": [],
       "node_facility_ids": [],
       "neighbors": [
+        {
+          "neighbor_id": "land_northern_algeria",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_algeria_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_tunisia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_tunisia_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
         {
           "neighbor_id": "sea_m1",
           "border_terrain": "normal",
@@ -31877,7 +31997,7 @@
     },
     "sea_m4": {
       "id": "sea_m4",
-      "name": "Ionian Sea",
+      "name": "Central Mediterranean Sea",
       "type": "sea",
       "terrain": "sea",
       "ipp_value": null,
@@ -31924,6 +32044,27 @@
           ],
           "naval_facility_ids": [
             "facility_southern_italy_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_tripoli",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_tripoli_minor_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -32111,6 +32252,73 @@
           "naval_facilities": [],
           "naval_facility_ids": [],
           "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_m6": {
+      "id": "sea_m6",
+      "name": "Ionian Sea",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
+    "sea_m7": {
+      "id": "sea_m7",
+      "name": "Aegean Sea",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": []
+    },
+    "sea_m8": {
+      "id": "sea_m8",
+      "name": "Eastern Mediterranean",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_tobruk",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_tobruk_minor_port"
+          ],
+          "port_or_dock_connection": true,
           "canal_or_strait": null,
           "narrow_crossing": false,
           "narrow_crossings": 0,

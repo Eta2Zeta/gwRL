@@ -1,37 +1,35 @@
 Japan Option-B Torch training summary
-episodes=200
+episodes=800
 state_dim=116
 action_dim=20
-recent_average_reward=6.5750
-last_reward=4.4000
-last_japan_income=4
+recent_average_reward=5.4000
+last_reward=5.4000
+last_japan_income=5
 last_japan_units=4
-last_loss=0.2198
-last_gradient_norm=34.8243
+last_loss=-0.0120
+last_gradient_norm=0.5158
 encoder_match_with_cpp_export=yes
 
 First combat policy
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4): prob=0.8776 logit=6.2058
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1): prob=0.0552 logit=3.4393
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=3): prob=0.0362 logit=3.0165
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=2): prob=0.0194 logit=2.3946
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4): prob=0.0063 logit=1.2621
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1): prob=0.0039 logit=0.7805
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=2): prob=0.0008 logit=-0.8510
-- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=3): prob=0.0006 logit=-1.0777
-- end_phase: prob=0.0001 logit=-2.7222
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4): prob=0.9920 logit=11.5264
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=3): prob=0.0060 logit=6.4103
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=2): prob=0.0017 logit=5.1795
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1): prob=0.0003 logit=3.5388
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4): prob=0.0000 logit=-4.6538
+- end_phase: prob=0.0000 logit=-5.6987
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=3): prob=0.0000 logit=-5.7005
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=2): prob=0.0000 logit=-6.5657
+- move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1): prob=0.0000 logit=-7.0946
 
 Greedy evaluation
-- reward=7.4000
-- japan_income=7
+- reward=5.4000
+- japan_income=5
 - japan_units=4
-Japan / declaration_of_war -> declare_war_on_china (value=7.5971)
+Japan / declaration_of_war -> declare_war_on_china (value=5.4215)
     declaration result: all warlord lands and units transfer to KMT
-Japan / combat -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4) (value=7.5725)
+Japan / combat -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4) (value=5.4089)
     combat: no defenders, territory occupied immediately
-Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1) (value=7.2920)
+Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=3) (value=5.3777)
     combat: no defenders, territory occupied immediately
-Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=1) (value=7.5805)
-    combat: no defenders, territory occupied immediately
-Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1) (value=7.6915)
+Japan / combat -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1) (value=5.3988)
     combat: no defenders, territory occupied immediately
