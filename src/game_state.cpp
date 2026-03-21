@@ -362,6 +362,35 @@ void GameState::placePurchasedUnits(std::string_view nationId, std::string_view 
     }
 }
 
+void GameState::recordEnemyUnitValueDestroyedByNation(
+    std::string_view nationId,
+    const std::vector<const Unit*>& destroyedUnits) {
+    int addedValue = 0;
+    for (const auto* unit : destroyedUnits) {
+        if (unit == nullptr || unit->ownerId() == nationId) {
+            continue;
+        }
+        addedValue += rewardValue(unit->kind());
+    }
+    enemyUnitValueDestroyedByNation_[std::string(nationId)] += addedValue;
+}
+
+void GameState::forceCurrentTurnState(std::string_view nationId, Phase phase) {
+    const auto nationIt = std::find(turnOrder_.begin(), turnOrder_.end(), nationId);
+    if (nationIt == turnOrder_.end()) {
+        throw std::runtime_error("Unknown nation id in forceCurrentTurnState: " + std::string(nationId));
+    }
+    const auto phaseIt = std::find(phaseOrder_.begin(), phaseOrder_.end(), phase);
+    if (phaseIt == phaseOrder_.end()) {
+        throw std::runtime_error("Unknown phase in forceCurrentTurnState");
+    }
+
+    currentNationIndex_ = static_cast<std::size_t>(std::distance(turnOrder_.begin(), nationIt));
+    currentPhaseIndex_ = static_cast<std::size_t>(std::distance(phaseOrder_.begin(), phaseIt));
+    terminal_ = false;
+    placedUnitsThisPhaseByZone_.clear();
+}
+
 std::string_view GameState::currentNation() const {
     if (turnOrder_.empty()) {
         throw std::runtime_error("Turn order has not been initialized");
@@ -392,6 +421,21 @@ int GameState::unitCountFor(std::string_view nationId) const {
         }
     }
     return count;
+}
+
+int GameState::unitValueFor(std::string_view nationId) const {
+    int totalValue = 0;
+    for (const auto& unit : units_) {
+        if (unit->ownerId() == nationId) {
+            totalValue += rewardValue(unit->kind());
+        }
+    }
+    return totalValue;
+}
+
+int GameState::enemyUnitValueDestroyedByNation(std::string_view nationId) const {
+    const auto it = enemyUnitValueDestroyedByNation_.find(std::string(nationId));
+    return it != enemyUnitValueDestroyedByNation_.end() ? it->second : 0;
 }
 
 void GameState::advancePhase() {

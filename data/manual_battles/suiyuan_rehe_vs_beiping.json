@@ -1,0 +1,61 @@
+{
+  "description": "2 infantry from Suiyuan and 1 artillery from Rehe attack 2 infantry in Beiping",
+  "scenario_path": "data/china_simplified_setup.json",
+  "acting_nation": "Japan",
+  "phase": "combat_move",
+  "clear_units": true,
+  "wars": [
+    {
+      "aggressor": "Japan",
+      "defender": "KMT"
+    }
+  ],
+  "controllers": {
+    "land_china_suiyuan": "Japan",
+    "land_manchuria_rehe": "Japan",
+    "land_china_beiping": "KMT"
+  },
+  "units": [
+    {
+      "owner": "Japan",
+      "type": "Infantry",
+      "zone": "land_china_suiyuan",
+      "count": 2
+    },
+    {
+      "owner": "Japan",
+      "type": "Artillery",
+      "zone": "land_manchuria_rehe",
+      "count": 1
+    },
+    {
+      "owner": "KMT",
+      "type": "Infantry",
+      "zone": "land_china_beiping",
+      "count": 2
+    }
+  ],
+  "actions": [
+    {
+      "kind": "move_combat_unit",
+      "from": "land_china_suiyuan",
+      "to": "land_china_beiping",
+      "unit": "Infantry",
+      "count": 2
+    },
+    {
+      "kind": "move_combat_unit",
+      "from": "land_manchuria_rehe",
+      "to": "land_china_beiping",
+      "unit": "Artillery",
+      "count": 1
+    },
+    {
+      "kind": "end_phase"
+    },
+    {
+      "kind": "resolve_combat",
+      "to": "land_china_beiping"
+    }
+  ]
+}

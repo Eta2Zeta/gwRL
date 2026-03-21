@@ -1,39 +1,55 @@
 Japan Torch training summary
-episodes=800
-state_dim=156
+episodes=500
+state_dim=446
 action_dim=26
-recent_average_reward=5.5350
-last_reward=5.5000
+recent_average_reward=6.8950
+last_reward=7.0000
 last_japan_income=5
-last_japan_units=5
-last_loss=-0.0293
-last_gradient_norm=0.3023
-encoder_match_with_cpp_export=yes
+last_japan_units=4
+last_japan_unit_value=14
+last_destroyed_enemy_unit_value=6
+last_loss=0.0286
+last_gradient_norm=2.9211
+encoder_match_with_cpp_export=no
+verification_note=state feature labels do not match C++ export
+verification_note=state feature values do not match C++ export
 
 First decision after declaration
-- purchase_unit(count=1, unit=Artillery): prob=0.6667 logit=-5.9315
-- purchase_unit(count=1, unit=Fighter): prob=0.2796 logit=-6.8004
-- purchase_unit(count=1, unit=Infantry): prob=0.0457 logit=-8.6108
-- end_phase: prob=0.0079 logit=-10.3654
+- purchase_unit(count=1, unit=Artillery): prob=0.8270 logit=4.4294
+- purchase_unit(count=1, unit=Infantry): prob=0.1510 logit=2.7292
+- purchase_unit(count=1, unit=Fighter): prob=0.0220 logit=0.8014
+- end_phase: prob=0.0000 logit=-13.2871
 
 Greedy evaluation
-- reward=5.6000
+- reward=7.0000
 - japan_income=5
-- japan_units=6
-Japan turn 1 / declaration_of_war -> declare_war_on_china (value=5.5755)
+- japan_units=4
+- japan_unit_value=14
+- destroyed_enemy_unit_value=6
+Japan turn 1 / declaration_of_war -> declare_war_on_china (value=6.7344)
     declaration result: all warlord lands and units transfer to KMT
-Japan turn 1 / purchase_units -> purchase_unit(count=1, unit=Artillery) (value=5.5942)
+Japan turn 1 / purchase_units -> purchase_unit(count=1, unit=Artillery) (value=6.7404)
     purchase: 1 Artillery for 4 treasury
-Japan turn 1 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4) (value=5.5991)
-    combat: no defenders, territory occupied immediately
-Japan turn 1 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (value=5.6324)
+Japan turn 1 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4, unit=Infantry) (value=6.7250)
+    combat move: 4 Infantry committed from land_manchuria_rehe to pending battle at land_china_beiping
+Japan turn 1 / combat_resolve -> resolve_combat(to=land_china_beiping) (value=6.7310)
+    resolving pending battle at land_china_beiping: attackers=4, defenders=2
+    round 1: attacker 4 Inf (8/12=0.67), defender 2 Inf (10/12=0.83)
+      after casualties: attacker 3.17 Inf, defender 1.33 Inf, losses attacker=0.83, defender=0.67
+    round 2: attacker 3.17 Inf (6.33/12=0.53), defender 1.33 Inf (6.67/12=0.56)
+      after casualties: attacker 2.61 Inf, defender 0.81 Inf, losses attacker=0.56, defender=0.53
+    round 3: attacker 2.61 Inf (5.22/12=0.44), defender 0.81 Inf (4.03/12=0.34)
+      after casualties: attacker 2.28 Inf, defender 0.37 Inf, losses attacker=0.34, defender=0.44
+    round 4: attacker 2.28 Inf (4.55/12=0.38), defender 0.37 Inf (1.85/12=0.15)
+      after casualties: attacker 2.12 Inf, defender 0, losses attacker=0.15, defender=0.38
+    combat result: attackers won and occupy the territory
+Japan turn 1 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (value=6.7363)
     place units: 1 Artillery placed at land_manchuria_rehe
-Japan turn 2 / purchase_units -> purchase_unit(count=1, unit=Artillery) (value=5.6447)
+Japan turn 2 / purchase_units -> purchase_unit(count=1, unit=Artillery) (value=6.7343)
     purchase: 1 Artillery for 4 treasury
-Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1) (value=5.6969)
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_beiping, to=land_china_hopeh, count=2, unit=Infantry) (value=6.7476)
     combat: no defenders, territory occupied immediately
-Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1) (value=5.6598)
+Japan turn 2 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1, unit=Artillery) (value=6.7364)
     combat: no defenders, territory occupied immediately
-Japan turn 2 / combat_move -> end_phase (value=5.6989)
-Japan turn 2 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (value=5.7132)
+Japan turn 2 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (value=6.7551)
     place units: 1 Artillery placed at land_manchuria_rehe

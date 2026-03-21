@@ -86,7 +86,8 @@ StepResult JapanTrainingEnv::step(const Action& action) {
 
 double JapanTrainingEnv::finalReward() const {
     return static_cast<double>(gameState_.nation(trackedNationId_).income())
-           + 0.1 * static_cast<double>(gameState_.unitCountFor(trackedNationId_));
+           + 0.1 * static_cast<double>(gameState_.unitValueFor(trackedNationId_))
+           + 0.1 * static_cast<double>(gameState_.enemyUnitValueDestroyedByNation(trackedNationId_));
 }
 
 void JapanTrainingEnv::advanceUntilTrackedNationDecision() {

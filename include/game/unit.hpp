@@ -195,4 +195,20 @@ inline int purchaseCost(UnitKind kind) {
     throw std::runtime_error("Unknown unit kind for purchase cost");
 }
 
+inline int rewardValue(UnitKind kind) {
+    switch (kind) {
+        case UnitKind::Infantry:
+            return 3;
+        case UnitKind::Artillery:
+            return 4;
+        case UnitKind::Marine:
+            return 0;
+        case UnitKind::Fighter:
+            return 10;
+        case UnitKind::Transport:
+            return 0;
+    }
+    throw std::runtime_error("Unknown unit kind for reward value");
+}
+
 }  // namespace game

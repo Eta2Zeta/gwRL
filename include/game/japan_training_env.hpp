@@ -34,6 +34,10 @@ class JapanTrainingEnv {
     int nationIncome(std::string_view nationId) const { return gameState_.nation(nationId).income(); }
     int nationTreasury(std::string_view nationId) const { return gameState_.nation(nationId).treasury(); }
     int unitCountFor(std::string_view nationId) const { return gameState_.unitCountFor(nationId); }
+    int unitValueFor(std::string_view nationId) const { return gameState_.unitValueFor(nationId); }
+    int enemyUnitValueDestroyedByNation(std::string_view nationId) const {
+        return gameState_.enemyUnitValueDestroyedByNation(nationId);
+    }
 
   private:
     void advanceUntilTrackedNationDecision();

@@ -4,7 +4,10 @@
 #include "game/game_state.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <optional>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -70,10 +73,22 @@ class SimplifiedChinaMdp {
         return {UnitKind::Infantry, UnitKind::Artillery, UnitKind::Fighter};
     }
 
+    static std::vector<UnitKind> combatMovableUnitKinds() {
+        return {UnitKind::Infantry, UnitKind::Artillery, UnitKind::Marine};
+    }
+
+    struct ForceState {
+        double infantry {0.0};
+        double artillery {0.0};
+        double marine {0.0};
+    };
+
     struct CombatOutcome {
         bool attackersWon {false};
-        std::vector<const Unit*> destroyedAttackers;
-        std::vector<const Unit*> destroyedDefenders;
+        int survivingAttackerCount {0};
+        int survivingDefenderCount {0};
+        ForceState survivingAttackerForce {};
+        ForceState survivingDefenderForce {};
         std::vector<std::string> roundLogs;
     };
 
@@ -83,12 +98,14 @@ class SimplifiedChinaMdp {
             || unit.kind() == UnitKind::Marine;
     }
 
-    static bool isCombatMovableInfantry(const Unit& unit) {
-        return unit.kind() == UnitKind::Infantry;
+    static bool isCombatMovableLandUnit(const Unit& unit) {
+        return unit.kind() == UnitKind::Infantry
+            || unit.kind() == UnitKind::Artillery
+            || unit.kind() == UnitKind::Marine;
     }
 
-    static int baseAttackValue(const Unit& unit) {
-        switch (unit.kind()) {
+    static int baseAttackValue(UnitKind kind) {
+        switch (kind) {
             case UnitKind::Infantry:
                 return 2;
             case UnitKind::Artillery:
@@ -102,8 +119,12 @@ class SimplifiedChinaMdp {
         throw std::runtime_error("Unknown unit kind for attack value");
     }
 
-    static int baseDefenseValue(const Unit& unit) {
-        switch (unit.kind()) {
+    static int baseAttackValue(const Unit& unit) {
+        return baseAttackValue(unit.kind());
+    }
+
+    static int baseDefenseValue(UnitKind kind) {
+        switch (kind) {
             case UnitKind::Infantry:
                 return 4;
             case UnitKind::Artillery:
@@ -117,44 +138,293 @@ class SimplifiedChinaMdp {
         throw std::runtime_error("Unknown unit kind for defense value");
     }
 
-    static int adjustedAttackValue(const Unit& unit, const Zone& battleZone) {
-        auto value = baseAttackValue(unit);
+    static int baseDefenseValue(const Unit& unit) {
+        return baseDefenseValue(unit.kind());
+    }
+
+    static int adjustedAttackValue(UnitKind kind, const Zone& battleZone) {
+        auto value = baseAttackValue(kind);
         if (battleZone.terrain == "mountain") {
             value -= 1;
         }
         return std::max(0, value);
     }
 
-    static int adjustedDefenseValue(const Unit& unit, const Zone& battleZone) {
-        auto value = baseDefenseValue(unit);
+    static int adjustedAttackValue(const Unit& unit, const Zone& battleZone) {
+        return adjustedAttackValue(unit.kind(), battleZone);
+    }
+
+    static int adjustedDefenseValue(UnitKind kind, const Zone& battleZone) {
+        auto value = baseDefenseValue(kind);
         if (battleZone.isCity) {
             value += 1;
         }
         return std::max(0, value);
     }
 
-    static void removeLowestValueCasualties(
-        std::vector<const Unit*>& units,
-        const Zone& battleZone,
-        bool attackers,
-        int casualtyCount,
-        std::vector<const Unit*>& destroyedUnits) {
-        if (casualtyCount <= 0 || units.empty()) {
-            return;
+    static int adjustedDefenseValue(const Unit& unit, const Zone& battleZone) {
+        return adjustedDefenseValue(unit.kind(), battleZone);
+    }
+
+    static ForceState buildForceState(const std::vector<const Unit*>& units) {
+        ForceState force;
+        for (const auto* unit : units) {
+            switch (unit->kind()) {
+                case UnitKind::Infantry:
+                    force.infantry += 1.0;
+                    break;
+                case UnitKind::Artillery:
+                    force.artillery += 1.0;
+                    break;
+                case UnitKind::Marine:
+                    force.marine += 1.0;
+                    break;
+                case UnitKind::Fighter:
+                case UnitKind::Transport:
+                    break;
+            }
         }
+        return force;
+    }
+
+    static double totalUnits(const ForceState& force) {
+        return force.infantry + force.artillery + force.marine;
+    }
+
+    static std::string formatCount(double value) {
+        if (std::abs(value - std::round(value)) < 1e-9) {
+            return std::to_string(static_cast<int>(std::round(value)));
+        }
+        std::ostringstream stream;
+        stream.setf(std::ios::fixed);
+        stream.precision(2);
+        stream << value;
+        return stream.str();
+    }
+
+    static std::string describeForce(const ForceState& force) {
+        std::vector<std::string> parts;
+        if (force.infantry > 0.0) {
+            parts.push_back(formatCount(force.infantry) + " Inf");
+        }
+        if (force.artillery > 0.0) {
+            parts.push_back(formatCount(force.artillery) + " Art");
+        }
+        if (force.marine > 0.0) {
+            parts.push_back(formatCount(force.marine) + " Mar");
+        }
+        if (parts.empty()) {
+            return "0";
+        }
+        std::ostringstream stream;
+        for (std::size_t index = 0; index < parts.size(); ++index) {
+            if (index > 0) {
+                stream << " + ";
+            }
+            stream << parts[index];
+        }
+        return stream.str();
+    }
+
+    static double forceCountForKind(const ForceState& force, UnitKind kind) {
+        switch (kind) {
+            case UnitKind::Infantry:
+                return force.infantry;
+            case UnitKind::Artillery:
+                return force.artillery;
+            case UnitKind::Marine:
+                return force.marine;
+            case UnitKind::Fighter:
+            case UnitKind::Transport:
+                return 0.0;
+        }
+        throw std::runtime_error("Unknown unit kind in forceCountForKind");
+    }
+
+    static std::vector<UnitKind> casualtyPriorityOrder(const Zone& battleZone, bool attackers) {
+        std::vector<UnitKind> order{UnitKind::Infantry, UnitKind::Artillery, UnitKind::Marine};
         std::stable_sort(
-            units.begin(),
-            units.end(),
-            [&](const Unit* lhs, const Unit* rhs) {
-                const auto lhsValue = attackers ? adjustedAttackValue(*lhs, battleZone)
-                                                : adjustedDefenseValue(*lhs, battleZone);
-                const auto rhsValue = attackers ? adjustedAttackValue(*rhs, battleZone)
-                                                : adjustedDefenseValue(*rhs, battleZone);
+            order.begin(),
+            order.end(),
+            [&](UnitKind lhs, UnitKind rhs) {
+                const auto lhsValue = attackers ? adjustedAttackValue(lhs, battleZone)
+                                                : adjustedDefenseValue(lhs, battleZone);
+                const auto rhsValue = attackers ? adjustedAttackValue(rhs, battleZone)
+                                                : adjustedDefenseValue(rhs, battleZone);
                 return lhsValue < rhsValue;
             });
-        const auto actualLosses = std::min<std::size_t>(units.size(), static_cast<std::size_t>(casualtyCount));
-        destroyedUnits.insert(destroyedUnits.end(), units.begin(), units.begin() + actualLosses);
-        units.erase(units.begin(), units.begin() + actualLosses);
+        return order;
+    }
+
+    static void applyFractionalCasualties(
+        ForceState& force,
+        const Zone& battleZone,
+        bool attackers,
+        double casualties) {
+        if (casualties <= 0.0 || totalUnits(force) <= 0.0) {
+            return;
+        }
+
+        auto removeFromKind = [&](UnitKind kind, double amount) {
+            switch (kind) {
+                case UnitKind::Infantry: {
+                    const auto removed = std::min(force.infantry, amount);
+                    force.infantry -= removed;
+                    return removed;
+                }
+                case UnitKind::Artillery: {
+                    const auto removed = std::min(force.artillery, amount);
+                    force.artillery -= removed;
+                    return removed;
+                }
+                case UnitKind::Marine: {
+                    const auto removed = std::min(force.marine, amount);
+                    force.marine -= removed;
+                    return removed;
+                }
+                case UnitKind::Fighter:
+                case UnitKind::Transport:
+                    return 0.0;
+            }
+            return 0.0;
+        };
+
+        auto remaining = casualties;
+        for (const auto kind : casualtyPriorityOrder(battleZone, attackers)) {
+            if (remaining <= 1e-9) {
+                break;
+            }
+            remaining -= removeFromKind(kind, remaining);
+        }
+    }
+
+    static double artillerySupportBonus(const ForceState& force) {
+        return std::min(force.infantry + force.marine, force.artillery);
+    }
+
+    static double regularAttackValue(const ForceState& force, const Zone& battleZone, bool includeArtillery) {
+        double total = 0.0;
+        total += force.infantry * adjustedAttackValue(UnitKind::Infantry, battleZone);
+        total += force.marine * adjustedAttackValue(UnitKind::Marine, battleZone);
+        if (includeArtillery) {
+            total += force.artillery * adjustedAttackValue(UnitKind::Artillery, battleZone);
+        }
+        total += artillerySupportBonus(force);
+        return total;
+    }
+
+    static double regularDefenseValue(const ForceState& force, const Zone& battleZone, bool includeArtillery) {
+        double total = 0.0;
+        total += force.infantry * adjustedDefenseValue(UnitKind::Infantry, battleZone);
+        total += force.marine * adjustedDefenseValue(UnitKind::Marine, battleZone);
+        if (includeArtillery) {
+            total += force.artillery * adjustedDefenseValue(UnitKind::Artillery, battleZone);
+        }
+        total += artillerySupportBonus(force);
+        return total;
+    }
+
+    static int roundedSurvivorCount(double survivingUnits, int initialUnits) {
+        if (survivingUnits <= 1e-9) {
+            return 0;
+        }
+        return std::min(initialUnits, std::max(1, static_cast<int>(std::round(survivingUnits))));
+    }
+
+    static std::unordered_map<UnitKind, int> roundedSurvivorDistribution(
+        const ForceState& force,
+        const Zone& battleZone,
+        bool attackers,
+        int roundedTotalSurvivors) {
+        std::unordered_map<UnitKind, int> survivorsByKind;
+        if (roundedTotalSurvivors <= 0) {
+            return survivorsByKind;
+        }
+
+        struct FractionalKindState {
+            UnitKind kind;
+            int baseCount;
+            double remainder;
+            int priorityValue;
+        };
+
+        std::vector<FractionalKindState> kindStates;
+        int assignedSurvivors = 0;
+        for (const auto kind : {UnitKind::Infantry, UnitKind::Artillery, UnitKind::Marine}) {
+            const auto survivingCount = forceCountForKind(force, kind);
+            if (survivingCount <= 1e-9) {
+                continue;
+            }
+
+            const auto baseCount = static_cast<int>(std::floor(survivingCount + 1e-9));
+            if (baseCount > 0) {
+                survivorsByKind[kind] = baseCount;
+                assignedSurvivors += baseCount;
+            }
+
+            const auto priorityValue = attackers ? adjustedAttackValue(kind, battleZone)
+                                                 : adjustedDefenseValue(kind, battleZone);
+            kindStates.push_back(FractionalKindState{
+                .kind = kind,
+                .baseCount = baseCount,
+                .remainder = survivingCount - static_cast<double>(baseCount),
+                .priorityValue = priorityValue,
+            });
+        }
+
+        auto remainingSurvivors = std::max(0, roundedTotalSurvivors - assignedSurvivors);
+        std::stable_sort(
+            kindStates.begin(),
+            kindStates.end(),
+            [](const FractionalKindState& lhs, const FractionalKindState& rhs) {
+                if (std::abs(lhs.remainder - rhs.remainder) > 1e-9) {
+                    return lhs.remainder > rhs.remainder;
+                }
+                return lhs.priorityValue > rhs.priorityValue;
+            });
+
+        for (auto& kindState : kindStates) {
+            if (remainingSurvivors <= 0) {
+                break;
+            }
+            const auto rawAvailable = forceCountForKind(force, kindState.kind);
+            const auto maxAvailable = static_cast<int>(std::ceil(rawAvailable - 1e-9));
+            if (maxAvailable <= survivorsByKind[kindState.kind]) {
+                continue;
+            }
+            ++survivorsByKind[kindState.kind];
+            --remainingSurvivors;
+        }
+
+        return survivorsByKind;
+    }
+
+    static std::vector<const Unit*> destroyedUnitsFromRoundedSurvivors(
+        const std::vector<const Unit*>& units,
+        const Zone& battleZone,
+        bool attackers,
+        const ForceState& survivingForce,
+        int roundedTotalSurvivors) {
+        const auto survivorsByKind =
+            roundedSurvivorDistribution(survivingForce, battleZone, attackers, roundedTotalSurvivors);
+
+        std::unordered_map<UnitKind, int> keptByKind;
+        std::vector<const Unit*> destroyedUnits;
+        destroyedUnits.reserve(units.size());
+
+        for (const auto* unit : units) {
+            const auto allowedSurvivors = [&]() {
+                const auto it = survivorsByKind.find(unit->kind());
+                return it != survivorsByKind.end() ? it->second : 0;
+            }();
+            if (keptByKind[unit->kind()] < allowedSurvivors) {
+                ++keptByKind[unit->kind()];
+                continue;
+            }
+            destroyedUnits.push_back(unit);
+        }
+
+        return destroyedUnits;
     }
 
     CombatOutcome resolveLandCombat(
@@ -162,75 +432,104 @@ class SimplifiedChinaMdp {
         std::vector<const Unit*> attackingUnits,
         std::vector<const Unit*> defendingUnits) const {
         CombatOutcome outcome;
-        int accumulatedAttack = 0;
-        int accumulatedDefense = 0;
+        const auto initialAttackerCount = static_cast<int>(attackingUnits.size());
+        const auto initialDefenderCount = static_cast<int>(defendingUnits.size());
 
-        while (!attackingUnits.empty() && !defendingUnits.empty()) {
-            const auto attackerCountBeforeRound = attackingUnits.size();
-            const auto defenderCountBeforeRound = defendingUnits.size();
-            const auto attackRemainderBeforeRound = accumulatedAttack;
-            const auto defenseRemainderBeforeRound = accumulatedDefense;
+        auto attackingForce = buildForceState(attackingUnits);
+        auto defendingForce = buildForceState(defendingUnits);
+        int roundNumber = 1;
 
-            int roundAttack = 0;
-            for (const auto* unit : attackingUnits) {
-                roundAttack += adjustedAttackValue(*unit, battleZone);
+        while (totalUnits(attackingForce) > 1e-9 && totalUnits(defendingForce) > 1e-9) {
+            if (roundNumber == 1 && (attackingForce.artillery > 0.0 || defendingForce.artillery > 0.0)) {
+                const auto artilleryAttackValue =
+                    attackingForce.artillery * adjustedAttackValue(UnitKind::Artillery, battleZone);
+                const auto artilleryDefenseValue =
+                    defendingForce.artillery * adjustedDefenseValue(UnitKind::Artillery, battleZone);
+                const auto artilleryDefenderLosses = artilleryAttackValue / 12.0;
+                const auto artilleryAttackerLosses = artilleryDefenseValue / 12.0;
+
+                outcome.roundLogs.push_back(
+                    "first strike: attacker "
+                    + formatCount(attackingForce.artillery)
+                    + " Art ("
+                    + formatCount(artilleryAttackValue)
+                    + "/12="
+                    + formatCount(artilleryDefenderLosses)
+                    + "), defender "
+                    + formatCount(defendingForce.artillery)
+                    + " Art ("
+                    + formatCount(artilleryDefenseValue)
+                    + "/12="
+                    + formatCount(artilleryAttackerLosses)
+                    + ")");
+
+                auto attackerAfterStrike = attackingForce;
+                auto defenderAfterStrike = defendingForce;
+                applyFractionalCasualties(attackerAfterStrike, battleZone, true, artilleryAttackerLosses);
+                applyFractionalCasualties(defenderAfterStrike, battleZone, false, artilleryDefenderLosses);
+                attackingForce = attackerAfterStrike;
+                defendingForce = defenderAfterStrike;
+
+                outcome.roundLogs.push_back(
+                    "  after first strike: attacker "
+                    + describeForce(attackingForce)
+                    + ", defender "
+                    + describeForce(defendingForce)
+                    + ", losses attacker=" + formatCount(artilleryAttackerLosses)
+                    + ", defender=" + formatCount(artilleryDefenderLosses));
             }
 
-            int roundDefense = 0;
-            for (const auto* unit : defendingUnits) {
-                roundDefense += adjustedDefenseValue(*unit, battleZone);
-            }
+            const auto includeArtillery = roundNumber > 1;
+            const auto roundAttack = regularAttackValue(attackingForce, battleZone, includeArtillery);
+            const auto roundDefense = regularDefenseValue(defendingForce, battleZone, includeArtillery);
 
-            if (roundAttack == 0 && roundDefense == 0) {
+            if (roundAttack <= 1e-9 && roundDefense <= 1e-9) {
                 break;
             }
 
-            accumulatedAttack += roundAttack;
-            accumulatedDefense += roundDefense;
-
             outcome.roundLogs.push_back(
                 "round "
-                + std::to_string(outcome.roundLogs.size() / 2 + 1)
+                + std::to_string(roundNumber)
                 + ": attacker "
-                + std::to_string(attackerCountBeforeRound)
-                + " Inf (" + std::to_string(attackRemainderBeforeRound) + "+"
-                + std::to_string(roundAttack) + "=" + std::to_string(accumulatedAttack)
+                + describeForce(attackingForce)
+                + " ("
+                + formatCount(roundAttack)
+                + "/12="
+                + formatCount(roundAttack / 12.0)
                 + "), defender "
-                + std::to_string(defenderCountBeforeRound)
-                + " Inf (" + std::to_string(defenseRemainderBeforeRound) + "+"
-                + std::to_string(roundDefense) + "=" + std::to_string(accumulatedDefense)
+                + describeForce(defendingForce)
+                + " ("
+                + formatCount(roundDefense)
+                + "/12="
+                + formatCount(roundDefense / 12.0)
                 + ")");
 
-            const auto defenderLosses = accumulatedAttack / 12;
-            accumulatedAttack %= 12;
-            const auto attackerLosses = accumulatedDefense / 12;
-            accumulatedDefense %= 12;
+            const auto defenderLosses = roundAttack / 12.0;
+            const auto attackerLosses = roundDefense / 12.0;
 
-            removeLowestValueCasualties(
-                defendingUnits,
-                battleZone,
-                false,
-                defenderLosses,
-                outcome.destroyedDefenders);
-            removeLowestValueCasualties(
-                attackingUnits,
-                battleZone,
-                true,
-                attackerLosses,
-                outcome.destroyedAttackers);
+            auto attackerAfterRound = attackingForce;
+            auto defenderAfterRound = defendingForce;
+            applyFractionalCasualties(attackerAfterRound, battleZone, true, attackerLosses);
+            applyFractionalCasualties(defenderAfterRound, battleZone, false, defenderLosses);
+            attackingForce = attackerAfterRound;
+            defendingForce = defenderAfterRound;
 
             outcome.roundLogs.push_back(
                 "  after casualties: attacker "
-                + std::to_string(attackingUnits.size())
-                + " Inf attack_remainder=" + std::to_string(accumulatedAttack)
+                + describeForce(attackingForce)
                 + ", defender "
-                + std::to_string(defendingUnits.size())
-                + " Inf defense_remainder=" + std::to_string(accumulatedDefense)
-                + ", losses attacker=" + std::to_string(attackerLosses)
-                + ", defender=" + std::to_string(defenderLosses));
+                + describeForce(defendingForce)
+                + ", losses attacker=" + formatCount(attackerLosses)
+                + ", defender=" + formatCount(defenderLosses));
+
+            ++roundNumber;
         }
 
-        outcome.attackersWon = defendingUnits.empty() && !attackingUnits.empty();
+        outcome.survivingAttackerForce = attackingForce;
+        outcome.survivingDefenderForce = defendingForce;
+        outcome.survivingAttackerCount = roundedSurvivorCount(totalUnits(attackingForce), initialAttackerCount);
+        outcome.survivingDefenderCount = roundedSurvivorCount(totalUnits(defendingForce), initialDefenderCount);
+        outcome.attackersWon = outcome.survivingAttackerCount > 0 && outcome.survivingDefenderCount == 0;
         return outcome;
     }
 
@@ -263,23 +562,6 @@ class SimplifiedChinaMdp {
         return zoneIds;
     }
 
-    static std::vector<const Unit*> availableCombatMoveInfantry(
-        const GameState& gameState,
-        std::string_view nationId,
-        std::string_view zoneId) {
-        std::vector<const Unit*> units;
-        for (auto* unit : gameState.unitsInZone(zoneId)) {
-            if (unit->ownerId() != nationId
-                || !isCombatMovableInfantry(*unit)
-                || unit->movementLeft() <= 0
-                || unit->hasPendingCombatTarget()) {
-                continue;
-            }
-            units.push_back(unit);
-        }
-        return units;
-    }
-
     static std::vector<const Unit*> pendingAttackersForZone(
         const GameState& gameState,
         std::string_view nationId,
@@ -303,6 +585,19 @@ class SimplifiedChinaMdp {
         std::string_view nationId,
         std::string_view targetZoneId) {
         return !pendingAttackersForZone(gameState, nationId, targetZoneId).empty();
+    }
+
+    static bool hasPendingAttackersForZoneAndKind(
+        const GameState& gameState,
+        std::string_view nationId,
+        std::string_view targetZoneId,
+        UnitKind unitKind) {
+        for (const auto* unit : pendingAttackersForZone(gameState, nationId, targetZoneId)) {
+            if (unit->kind() == unitKind) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static std::vector<const Unit*> defendingLandUnitsForZone(
@@ -362,12 +657,12 @@ class SimplifiedChinaMdp {
         std::vector<Action> actions;
         const auto actingNationId = gameState.currentNation();
         std::vector<std::string> sourceZoneOrder;
-        std::unordered_map<std::string, int> availableInfantryByZone;
+        std::unordered_map<std::string, std::unordered_map<UnitKind, int>> availableUnitsByZoneAndKind;
 
         for (const auto& unitPtr : gameState.units()) {
             const auto& unit = *unitPtr;
             if (unit.ownerId() != actingNationId
-                || !isCombatMovableInfantry(unit)
+                || !isCombatMovableLandUnit(unit)
                 || unit.movementLeft() <= 0
                 || unit.hasPendingCombatTarget()) {
                 continue;
@@ -378,34 +673,44 @@ class SimplifiedChinaMdp {
                 continue;
             }
 
-            auto [it, inserted] = availableInfantryByZone.emplace(originZone.id, 0);
-            if (inserted) {
+            if (availableUnitsByZoneAndKind.find(originZone.id) == availableUnitsByZoneAndKind.end()) {
                 sourceZoneOrder.push_back(originZone.id);
             }
-            ++it->second;
+            ++availableUnitsByZoneAndKind[originZone.id][unit.kind()];
         }
+
+        std::sort(sourceZoneOrder.begin(), sourceZoneOrder.end());
+        sourceZoneOrder.erase(std::unique(sourceZoneOrder.begin(), sourceZoneOrder.end()), sourceZoneOrder.end());
 
         for (const auto& originZoneId : sourceZoneOrder) {
             const auto& originZone = gameState.zone(originZoneId);
-            const auto availableInfantry = availableInfantryByZone.at(originZoneId);
-            for (const auto& neighbor : originZone.neighbors) {
-                if (!gameState.hasZone(neighbor.id)) {
+            const auto& availableByKind = availableUnitsByZoneAndKind.at(originZoneId);
+            for (const auto unitKind : combatMovableUnitKinds()) {
+                const auto availableIt = availableByKind.find(unitKind);
+                if (availableIt == availableByKind.end()) {
                     continue;
                 }
-                const auto& destinationZone = gameState.zone(neighbor.id);
-                if (!isEnemyControlledLandZone(gameState, actingNationId, destinationZone)) {
-                    continue;
-                }
-                if (hasPendingAttackersForZone(gameState, actingNationId, destinationZone.id)) {
-                    continue;
-                }
-                for (int infantryCount = 1; infantryCount <= availableInfantry; ++infantryCount) {
-                    actions.push_back(Action{
-                        .kind = ActionKind::MoveCombatUnit,
-                        .sourceZoneId = originZone.id,
-                        .targetZoneId = destinationZone.id,
-                        .unitCount = infantryCount,
-                    });
+                const auto availableCount = availableIt->second;
+                for (const auto& neighbor : originZone.neighbors) {
+                    if (!gameState.hasZone(neighbor.id)) {
+                        continue;
+                    }
+                    const auto& destinationZone = gameState.zone(neighbor.id);
+                    if (!isEnemyControlledLandZone(gameState, actingNationId, destinationZone)) {
+                        continue;
+                    }
+                    if (hasPendingAttackersForZoneAndKind(gameState, actingNationId, destinationZone.id, unitKind)) {
+                        continue;
+                    }
+                    for (int unitCount = 1; unitCount <= availableCount; ++unitCount) {
+                        actions.push_back(Action{
+                            .kind = ActionKind::MoveCombatUnit,
+                            .sourceZoneId = originZone.id,
+                            .targetZoneId = destinationZone.id,
+                            .unitCount = unitCount,
+                            .unitKind = unitKind,
+                        });
+                    }
                 }
             }
         }
@@ -566,8 +871,12 @@ class SimplifiedChinaMdp {
         const auto actingNationId = gameState.currentNation();
         const auto& sourceZoneId = *action.sourceZoneId;
         const auto& targetZoneId = *action.targetZoneId;
-        const auto infantryCount = *action.unitCount;
-        if (infantryCount <= 0) {
+        if (!action.unitKind.has_value()) {
+            throw std::runtime_error("MoveCombatUnit requires a unit kind");
+        }
+        const auto unitKind = *action.unitKind;
+        const auto unitCount = *action.unitCount;
+        if (unitCount <= 0) {
             throw std::runtime_error("MoveCombatUnit requires a positive unit count");
         }
 
@@ -587,24 +896,25 @@ class SimplifiedChinaMdp {
         if (!isEnemyControlledLandZone(gameState, actingNationId, destinationZone)) {
             throw std::runtime_error("Combat move target is not an enemy-controlled land zone");
         }
-        if (hasPendingAttackersForZone(gameState, actingNationId, targetZoneId)) {
-            throw std::runtime_error("Combat move target already has pending infantry assigned to it");
+        if (hasPendingAttackersForZoneAndKind(gameState, actingNationId, targetZoneId, unitKind)) {
+            throw std::runtime_error("Combat move target already has pending attackers of this unit type assigned to it");
         }
 
         std::vector<Unit*> attackingUnits;
         for (auto* unit : gameState.unitsInZone(sourceZoneId)) {
             if (unit->ownerId() != actingNationId
-                || !isCombatMovableInfantry(*unit)
+                || unit->kind() != unitKind
+                || !isCombatMovableLandUnit(*unit)
                 || unit->movementLeft() <= 0
                 || unit->hasPendingCombatTarget()) {
                 continue;
             }
             attackingUnits.push_back(unit);
         }
-        if (static_cast<int>(attackingUnits.size()) < infantryCount) {
-            throw std::runtime_error("Combat move requested more infantry than are available in the source zone");
+        if (static_cast<int>(attackingUnits.size()) < unitCount) {
+            throw std::runtime_error("Combat move requested more units than are available in the source zone");
         }
-        attackingUnits.resize(static_cast<std::size_t>(infantryCount));
+        attackingUnits.resize(static_cast<std::size_t>(unitCount));
         for (auto* unit : attackingUnits) {
             unit->spendMovement(1);
         }
@@ -628,7 +938,8 @@ class SimplifiedChinaMdp {
         result.detailLines.push_back(
             "combat move: "
             + std::to_string(attackingUnits.size())
-            + " infantry committed from "
+            + " " + std::string(toString(unitKind))
+            + " committed from "
             + sourceZoneId
             + " to pending battle at "
             + targetZoneId);
@@ -687,11 +998,23 @@ class SimplifiedChinaMdp {
             outcome.roundLogs.begin(),
             outcome.roundLogs.end());
 
+        const auto destroyedAttackers = destroyedUnitsFromRoundedSurvivors(
+            std::vector<const Unit*>(attackingUnits.begin(), attackingUnits.end()),
+            gameState.zone(targetZoneId),
+            true,
+            outcome.survivingAttackerForce,
+            outcome.survivingAttackerCount);
+        const auto destroyedDefenders = destroyedUnitsFromRoundedSurvivors(
+            defendingUnits,
+            gameState.zone(targetZoneId),
+            false,
+            outcome.survivingDefenderForce,
+            outcome.survivingDefenderCount);
+
         std::vector<Unit*> survivingAttackers;
         survivingAttackers.reserve(attackingUnits.size());
         for (auto* unit : attackingUnits) {
-            if (std::find(outcome.destroyedAttackers.begin(), outcome.destroyedAttackers.end(), unit)
-                == outcome.destroyedAttackers.end()) {
+            if (std::find(destroyedAttackers.begin(), destroyedAttackers.end(), unit) == destroyedAttackers.end()) {
                 survivingAttackers.push_back(unit);
             }
         }
@@ -702,16 +1025,23 @@ class SimplifiedChinaMdp {
                 unit->clearPendingCombatTargetZoneId();
                 gameState.moveUnit(unit, targetZoneId, 0);
             }
-            gameState.removeUnits(outcome.destroyedDefenders);
-            gameState.removeUnits(outcome.destroyedAttackers);
+            gameState.recordEnemyUnitValueDestroyedByNation(actingNationId, destroyedDefenders);
+            gameState.removeUnits(destroyedDefenders);
+            gameState.removeUnits(destroyedAttackers);
             gameState.setZoneController(targetZoneId, std::string(actingNationId));
         } else {
-            result.detailLines.push_back("combat result: defenders held, surviving attackers stay in origin");
+            if (outcome.survivingDefenderCount == 0) {
+                result.detailLines.push_back(
+                    "combat result: both forces were destroyed, territory remains under defender control");
+            } else {
+                result.detailLines.push_back("combat result: defenders held, surviving attackers stay in origin");
+            }
             for (auto* unit : survivingAttackers) {
                 unit->clearPendingCombatTargetZoneId();
             }
-            gameState.removeUnits(outcome.destroyedDefenders);
-            gameState.removeUnits(outcome.destroyedAttackers);
+            gameState.recordEnemyUnitValueDestroyedByNation(actingNationId, destroyedDefenders);
+            gameState.removeUnits(destroyedDefenders);
+            gameState.removeUnits(destroyedAttackers);
         }
     }
 

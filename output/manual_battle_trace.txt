@@ -1,0 +1,56 @@
+Manual battle
+description=2 infantry from Suiyuan and 1 artillery from Rehe attack 2 infantry in Beiping
+spec_file=data/manual_battles/suiyuan_rehe_vs_beiping.json
+scenario=data/china_simplified_setup.json
+start=Japan / combat_move
+
+Initial forces
+  land_china_beiping (KMT): KMT Infantry, KMT Infantry
+  land_china_suiyuan (Japan): Japan Infantry, Japan Infantry
+  land_manchuria_rehe (Japan): Japan Artillery
+
+1: Japan / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=2, unit=Infantry)
+    combat move: 2 Infantry committed from land_china_suiyuan to pending battle at land_china_beiping
+    next=Japan / combat_move
+    forces:
+      land_china_beiping (KMT): KMT Infantry, KMT Infantry
+      land_china_suiyuan (Japan): Japan Infantry->land_china_beiping, Japan Infantry->land_china_beiping
+      land_manchuria_rehe (Japan): Japan Artillery
+
+2: Japan / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery)
+    combat move: 1 Artillery committed from land_manchuria_rehe to pending battle at land_china_beiping
+    next=Japan / combat_move
+    forces:
+      land_china_beiping (KMT): KMT Infantry, KMT Infantry
+      land_china_suiyuan (Japan): Japan Infantry->land_china_beiping, Japan Infantry->land_china_beiping
+      land_manchuria_rehe (Japan): Japan Artillery->land_china_beiping
+
+3: Japan / combat_move -> end_phase
+    next=Japan / combat_resolve
+    forces:
+      land_china_beiping (KMT): KMT Infantry, KMT Infantry
+      land_china_suiyuan (Japan): Japan Infantry->land_china_beiping, Japan Infantry->land_china_beiping
+      land_manchuria_rehe (Japan): Japan Artillery->land_china_beiping
+
+4: Japan / combat_resolve -> resolve_combat(to=land_china_beiping)
+    resolving pending battle at land_china_beiping: attackers=3, defenders=2
+    first strike: attacker 1 Art (3/12=0.25), defender 0 Art (0/12=0)
+      after first strike: attacker 2 Inf + 1 Art, defender 1.75 Inf, losses attacker=0, defender=0.25
+    round 1: attacker 2 Inf + 1 Art (5/12=0.42), defender 1.75 Inf (8.75/12=0.73)
+      after casualties: attacker 1.27 Inf + 1 Art, defender 1.33 Inf, losses attacker=0.73, defender=0.42
+    round 2: attacker 1.27 Inf + 1 Art (6.54/12=0.55), defender 1.33 Inf (6.67/12=0.56)
+      after casualties: attacker 0.72 Inf + 1 Art, defender 0.79 Inf, losses attacker=0.56, defender=0.55
+    round 3: attacker 0.72 Inf + 1 Art (5.15/12=0.43), defender 0.79 Inf (3.94/12=0.33)
+      after casualties: attacker 0.39 Inf + 1 Art, defender 0.36 Inf, losses attacker=0.33, defender=0.43
+    round 4: attacker 0.39 Inf + 1 Art (4.16/12=0.35), defender 0.36 Inf (1.80/12=0.15)
+      after casualties: attacker 0.24 Inf + 1 Art, defender 0.01 Inf, losses attacker=0.15, defender=0.35
+    round 5: attacker 0.24 Inf + 1 Art (3.71/12=0.31), defender 0.01 Inf (0.06/12=0.01)
+      after casualties: attacker 0.23 Inf + 1 Art, defender 0, losses attacker=0.01, defender=0.31
+    combat result: attackers won and occupy the territory
+    next=Japan / combat_resolve
+    forces:
+      land_china_beiping (Japan): Japan Artillery
+
+Final reward
+  Japan=5.000000
+  components: income=4 surviving_unit_value=4 destroyed_enemy_unit_value=6

@@ -96,5 +96,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("completed_turns_for", &game::JapanTrainingEnv::completedTurnsFor)
         .def("nation_income", &game::JapanTrainingEnv::nationIncome)
         .def("nation_treasury", &game::JapanTrainingEnv::nationTreasury)
-        .def("unit_count_for", &game::JapanTrainingEnv::unitCountFor);
+        .def("unit_count_for", &game::JapanTrainingEnv::unitCountFor)
+        .def("unit_value_for", &game::JapanTrainingEnv::unitValueFor)
+        .def("enemy_unit_value_destroyed_by_nation", &game::JapanTrainingEnv::enemyUnitValueDestroyedByNation);
 }

@@ -7,8 +7,10 @@ namespace game {
 
 namespace {
 
-bool isInfantry(const Unit& unit) {
-    return unit.kind() == UnitKind::Infantry;
+bool isCombatMovableLandUnit(const Unit& unit) {
+    return unit.kind() == UnitKind::Infantry
+        || unit.kind() == UnitKind::Artillery
+        || unit.kind() == UnitKind::Marine;
 }
 
 const std::vector<UnitKind>& unitKindOrder() {
@@ -48,14 +50,15 @@ double availableUnitCountForAction(
     }
 
     if (action.kind == ActionKind::MoveCombatUnit) {
-        if (!action.sourceZoneId.has_value()) {
+        if (!action.sourceZoneId.has_value() || !action.unitKind.has_value()) {
             return 0.0;
         }
 
         double availableCount = 0.0;
         for (const auto* unit : gameState.unitsInZone(*action.sourceZoneId)) {
             if (unit->ownerId() == trackedNationId
-                && isInfantry(*unit)
+                && unit->kind() == *action.unitKind
+                && isCombatMovableLandUnit(*unit)
                 && unit->movementLeft() > 0
                 && !unit->hasPendingCombatTarget()) {
                 availableCount += 1.0;
@@ -73,7 +76,7 @@ double availableUnitCountForAction(
         for (const auto& unitPtr : gameState.units()) {
             const auto& unit = *unitPtr;
             if (unit.ownerId() == trackedNationId
-                && isInfantry(unit)
+                && isCombatMovableLandUnit(unit)
                 && unit.hasPendingCombatTarget()
                 && *unit.pendingCombatTargetZoneId() == *action.targetZoneId) {
                 availableCount += 1.0;

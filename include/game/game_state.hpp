@@ -50,6 +50,10 @@ class GameState {
     void addPendingPurchases(std::string_view nationId, UnitKind unitKind, int count);
     void removePendingPurchases(std::string_view nationId, UnitKind unitKind, int count);
     void placePurchasedUnits(std::string_view nationId, std::string_view zoneId, UnitKind unitKind, int count);
+    void recordEnemyUnitValueDestroyedByNation(
+        std::string_view nationId,
+        const std::vector<const Unit*>& destroyedUnits);
+    void forceCurrentTurnState(std::string_view nationId, Phase phase);
 
     std::string_view currentNation() const;
     Phase currentPhase() const;
@@ -58,6 +62,8 @@ class GameState {
     int turnLimitPerNation() const { return turnLimitPerNation_; }
     int completedTurnsFor(std::string_view nationId) const;
     int unitCountFor(std::string_view nationId) const;
+    int unitValueFor(std::string_view nationId) const;
+    int enemyUnitValueDestroyedByNation(std::string_view nationId) const;
 
     const std::unordered_map<std::string, Nation>& nations() const { return nations_; }
     const std::unordered_map<std::string, Zone>& zones() const { return zones_; }
@@ -73,6 +79,7 @@ class GameState {
     std::vector<std::string> turnOrder_;
     std::vector<Phase> phaseOrder_;
     std::unordered_map<std::string, int> completedTurns_;
+    std::unordered_map<std::string, int> enemyUnitValueDestroyedByNation_;
     std::unordered_map<std::string, std::unordered_map<UnitKind, int>> pendingPurchasesByNation_;
     std::unordered_map<std::string, int> placedUnitsThisPhaseByZone_;
     std::size_t currentNationIndex_ {0};

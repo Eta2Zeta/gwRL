@@ -125,6 +125,8 @@ def run_greedy_episode(env: gwrl_cpp.JapanTrainingEnv, model: LegalActionPolicyV
         "final_reward": env.final_reward(),
         "japan_income": env.nation_income("Japan"),
         "japan_units": env.unit_count_for("Japan"),
+        "japan_unit_value": env.unit_value_for("Japan"),
+        "destroyed_enemy_unit_value": env.enemy_unit_value_destroyed_by_nation("Japan"),
         "trace": trace,
     }
 
@@ -197,6 +199,8 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
                 "reward": final_reward,
                 "japan_income": float(env.nation_income("Japan")),
                 "japan_units": float(env.unit_count_for("Japan")),
+                "japan_unit_value": float(env.unit_value_for("Japan")),
+                "destroyed_enemy_unit_value": float(env.enemy_unit_value_destroyed_by_nation("Japan")),
                 "japan_decisions": float(len(values)),
                 "loss": float(loss.item()),
                 "policy_loss": float(policy_loss.item()),
@@ -263,6 +267,8 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
                 f"last_reward={last['reward']:.4f}",
                 f"last_japan_income={int(last['japan_income'])}",
                 f"last_japan_units={int(last['japan_units'])}",
+                f"last_japan_unit_value={int(last['japan_unit_value'])}",
+                f"last_destroyed_enemy_unit_value={int(last['destroyed_enemy_unit_value'])}",
                 f"last_loss={last['loss']:.4f}",
                 f"last_gradient_norm={last['gradient_norm']:.4f}",
             ]
@@ -288,6 +294,10 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
     lines.append(f"- reward={result['greedy_evaluation']['final_reward']:.4f}")
     lines.append(f"- japan_income={result['greedy_evaluation']['japan_income']}")
     lines.append(f"- japan_units={result['greedy_evaluation']['japan_units']}")
+    lines.append(f"- japan_unit_value={result['greedy_evaluation']['japan_unit_value']}")
+    lines.append(
+        f"- destroyed_enemy_unit_value={result['greedy_evaluation']['destroyed_enemy_unit_value']}"
+    )
     lines.extend(result["greedy_evaluation"]["trace"])
 
     (output_dir / "japan_torch_training_summary.txt").write_text(
