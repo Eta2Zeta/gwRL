@@ -38,6 +38,7 @@ class GameState {
     void moveUnit(Unit* unit, std::string zoneId, int movementCost);
     void setZoneController(std::string_view zoneId, std::string controller);
     std::vector<Unit*> unitsInZone(std::string_view zoneId);
+    std::vector<const Unit*> unitsInZone(std::string_view zoneId) const;
     void removeUnits(const std::vector<const Unit*>& destroyedUnits);
     void resetMovementForNation(std::string_view nationId);
 

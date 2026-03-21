@@ -220,6 +220,16 @@ std::vector<Unit*> GameState::unitsInZone(std::string_view zoneId) {
     return result;
 }
 
+std::vector<const Unit*> GameState::unitsInZone(std::string_view zoneId) const {
+    std::vector<const Unit*> result;
+    for (const auto& unit : units_) {
+        if (unit->zoneId() == zoneId) {
+            result.push_back(unit.get());
+        }
+    }
+    return result;
+}
+
 void GameState::removeUnits(const std::vector<const Unit*>& destroyedUnits) {
     std::unordered_set<const Unit*> destroyedSet(destroyedUnits.begin(), destroyedUnits.end());
     units_.erase(

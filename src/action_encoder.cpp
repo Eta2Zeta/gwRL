@@ -17,6 +17,23 @@ void appendOneHotIndex(std::vector<double>& features, std::size_t size, std::opt
     }
 }
 
+double availableCombatInfantryCount(
+    const GameState& gameState,
+    std::string_view trackedNationId,
+    const std::optional<std::string>& sourceZoneId) {
+    if (!sourceZoneId.has_value()) {
+        return 0.0;
+    }
+
+    double availableCount = 0.0;
+    for (const auto* unit : gameState.unitsInZone(*sourceZoneId)) {
+        if (unit->ownerId() == trackedNationId && isInfantry(*unit) && unit->movementLeft() > 0) {
+            availableCount += 1.0;
+        }
+    }
+    return availableCount;
+}
+
 }  // namespace
 
 ActionEncoder ActionEncoder::forNation(const GameState& gameState, std::string trackedNationId) {
@@ -27,19 +44,10 @@ ActionEncoder ActionEncoder::forNation(const GameState& gameState, std::string t
         encoder.zoneOrder_.push_back(zoneId);
     }
     std::sort(encoder.zoneOrder_.begin(), encoder.zoneOrder_.end());
-
-    int infantryCount = 0;
-    for (const auto& unitPtr : gameState.units()) {
-        const auto& unit = *unitPtr;
-        if (unit.ownerId() == encoder.trackedNationId_ && isInfantry(unit)) {
-            ++infantryCount;
-        }
-    }
-    encoder.maxCombatUnitCount_ = std::max(1, infantryCount);
     return encoder;
 }
 
-std::vector<double> ActionEncoder::encode(const Action& action) const {
+std::vector<double> ActionEncoder::encode(const GameState& gameState, const Action& action) const {
     std::vector<double> features;
     features.reserve(featureCount());
 
@@ -67,18 +75,19 @@ std::vector<double> ActionEncoder::encode(const Action& action) const {
     }
     appendOneHotIndex(features, zoneOrder_.size(), targetIndex);
 
-    const auto cappedCount = action.unitCount.has_value()
-        ? std::min(*action.unitCount, maxCombatUnitCount_)
-        : 0;
-    for (int count = 0; count <= maxCombatUnitCount_; ++count) {
-        features.push_back(cappedCount == count ? 1.0 : 0.0);
-    }
+    const auto unitCount = action.unitCount.has_value() ? static_cast<double>(*action.unitCount) : 0.0;
+    const auto availableCount = availableCombatInfantryCount(gameState, trackedNationId_, action.sourceZoneId);
+    const auto unitFraction = availableCount > 0.0 ? unitCount / availableCount : 0.0;
+
+    features.push_back(unitCount);
+    features.push_back(availableCount);
+    features.push_back(unitFraction);
 
     return features;
 }
 
 std::size_t ActionEncoder::featureCount() const {
-    return 3 + zoneOrder_.size() + zoneOrder_.size() + static_cast<std::size_t>(maxCombatUnitCount_ + 1);
+    return 3 + zoneOrder_.size() + zoneOrder_.size() + 3;
 }
 
 std::vector<std::string> ActionEncoder::featureLabels() const {
@@ -95,9 +104,9 @@ std::vector<std::string> ActionEncoder::featureLabels() const {
     for (const auto& zoneId : zoneOrder_) {
         labels.push_back("target_zone." + zoneId);
     }
-    for (int count = 0; count <= maxCombatUnitCount_; ++count) {
-        labels.push_back("combat_unit_count." + std::to_string(count));
-    }
+    labels.push_back("combat_unit_count");
+    labels.push_back("combat_available_count");
+    labels.push_back("combat_unit_fraction");
 
     return labels;
 }

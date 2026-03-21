@@ -7,7 +7,7 @@ from torch import Tensor, nn
 
 
 @dataclass
-class OptionBModelConfig:
+class PolicyValueModelConfig:
     state_dim: int
     action_dim: int
     state_hidden_dim: int = 128
@@ -29,7 +29,7 @@ class LegalActionPolicyValueNet(nn.Module):
     - value: [batch]
     """
 
-    def __init__(self, config: OptionBModelConfig) -> None:
+    def __init__(self, config: PolicyValueModelConfig) -> None:
         super().__init__()
         self.config = config
 

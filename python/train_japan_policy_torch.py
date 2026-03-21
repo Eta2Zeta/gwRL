@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from option_b_model import LegalActionPolicyValueNet, OptionBModelConfig
+from policy_value_model import LegalActionPolicyValueNet, PolicyValueModelConfig
 
 try:
     import gwrl_cpp
@@ -133,7 +133,7 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
     action_dim = len(env.action_feature_labels())
 
     model = LegalActionPolicyValueNet(
-        OptionBModelConfig(
+        PolicyValueModelConfig(
             state_dim=state_dim,
             action_dim=action_dim,
             state_hidden_dim=config.state_hidden_dim,
@@ -204,7 +204,7 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
         )
 
     verification: dict[str, Any] | None = None
-    cpp_example_path = Path("output/japan_option_b_example.json")
+    cpp_example_path = Path("output/japan_training_example.json")
     if cpp_example_path.exists():
         verification = verify_against_cpp_example(env, cpp_example_path)
 
@@ -247,7 +247,7 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
     )
 
     lines = [
-        "Japan Option-B Torch training summary",
+        "Japan Torch training summary",
         f"episodes={int(result['config']['episodes'])}",
         f"state_dim={result['state_dim']}",
         f"action_dim={result['action_dim']}",
@@ -311,7 +311,7 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train the Japan Option-B policy with PyTorch")
+    parser = argparse.ArgumentParser(description="Train the Japan policy with PyTorch")
     parser.add_argument("--episodes", type=int, default=800)
     parser.add_argument("--scenario", type=Path, default=Path("data/china_simplified_setup.json"))
     parser.add_argument("--output-dir", type=Path, default=Path("output"))
@@ -334,7 +334,7 @@ def main() -> None:
         if recent_window
         else 0.0
     )
-    print("Japan Option-B Torch training complete")
+    print("Japan Torch training complete")
     print(f"episodes={config.episodes}")
     print(f"state_dim={result['state_dim']}")
     print(f"action_dim={result['action_dim']}")

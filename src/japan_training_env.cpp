@@ -62,7 +62,7 @@ std::vector<std::vector<double>> JapanTrainingEnv::encodeLegalActions() const {
     const auto actions = legalActions();
     encodedActions.reserve(actions.size());
     for (const auto& action : actions) {
-        encodedActions.push_back(actionEncoder_.encode(action));
+        encodedActions.push_back(actionEncoder_.encode(gameState_, action));
     }
     return encodedActions;
 }

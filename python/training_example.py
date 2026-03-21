@@ -5,15 +5,15 @@ from pathlib import Path
 from typing import Any
 
 
-def load_option_b_example(path: str | Path) -> dict[str, Any]:
-    """Load a C++-exported Option-B training example JSON file."""
+def load_training_example(path: str | Path) -> dict[str, Any]:
+    """Load a C++-exported training example JSON file."""
 
     with Path(path).open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
 
-def summarize_option_b_example(path: str | Path) -> str:
-    data = load_option_b_example(path)
+def summarize_training_example(path: str | Path) -> str:
+    data = load_training_example(path)
     legal_actions = data.get("legal_actions", [])
     lines = [
         f"current_nation={data.get('current_nation')}",
@@ -32,5 +32,5 @@ def summarize_option_b_example(path: str | Path) -> str:
 if __name__ == "__main__":
     import sys
 
-    example_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("output/japan_option_b_example.json")
-    print(summarize_option_b_example(example_path))
+    example_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("output/japan_training_example.json")
+    print(summarize_training_example(example_path))

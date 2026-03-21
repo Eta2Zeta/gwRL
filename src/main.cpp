@@ -185,7 +185,7 @@ game::GameState buildJapanFirstCombatState(const std::filesystem::path& scenario
     return gameState;
 }
 
-void writeOptionBExample(
+void writeTrainingExample(
     const std::filesystem::path& scenarioPath,
     const std::filesystem::path& outputPath) {
     const auto gameState = buildJapanFirstCombatState(scenarioPath);
@@ -199,7 +199,7 @@ void writeOptionBExample(
 
     std::ofstream output(outputPath);
     if (!output) {
-        throw std::runtime_error("Unable to write Option-B example: " + outputPath.string());
+        throw std::runtime_error("Unable to write training example: " + outputPath.string());
     }
 
     output << "{\n";
@@ -229,7 +229,6 @@ void writeOptionBExample(
     output << "  \"action_zone_order\": ";
     writeJsonStringArray(output, actionEncoder.zoneOrder());
     output << ",\n";
-    output << "  \"max_combat_unit_count\": " << actionEncoder.maxCombatUnitCount() << ",\n";
     output << "  \"state_feature_labels\": ";
     writeJsonStringArray(output, stateFeatureLabels);
     output << ",\n";
@@ -247,7 +246,7 @@ void writeOptionBExample(
         writeJsonString(output, describeAction(action));
         output << ",\n";
         output << "      \"action_features\": ";
-        writeJsonNumberArray(output, actionEncoder.encode(action));
+        writeJsonNumberArray(output, actionEncoder.encode(gameState, action));
         output << "\n";
         output << "    }";
         if (index + 1 < legalActions.size()) {
@@ -265,16 +264,16 @@ int main(int argc, char** argv) {
     const auto defaultScenarioPath = std::filesystem::path("data/china_simplified_setup.json");
     const auto snapshotDirectory = std::filesystem::path("output/snapshots");
     const auto actionLogPath = std::filesystem::path("output/session_actions.txt");
-    const auto optionBExamplePath = std::filesystem::path("output/japan_option_b_example.json");
+    const auto trainingExamplePath = std::filesystem::path("output/japan_training_example.json");
 
     try {
         std::filesystem::create_directories(actionLogPath.parent_path());
 
         std::filesystem::path scenarioPath = defaultScenarioPath;
-        bool dumpOptionBExample = false;
+        bool dumpTrainingExample = false;
 
-        if (argc > 1 && std::string_view(argv[1]) == "--dump-option-b-example") {
-            dumpOptionBExample = true;
+        if (argc > 1 && std::string_view(argv[1]) == "--dump-training-example") {
+            dumpTrainingExample = true;
             if (argc > 2) {
                 scenarioPath = std::filesystem::path(argv[2]);
             }
@@ -282,9 +281,9 @@ int main(int argc, char** argv) {
             scenarioPath = std::filesystem::path(argv[1]);
         }
 
-        if (dumpOptionBExample) {
-            writeOptionBExample(scenarioPath, optionBExamplePath);
-            std::cout << "Option-B example written to " << optionBExamplePath.string() << "\n";
+        if (dumpTrainingExample) {
+            writeTrainingExample(scenarioPath, trainingExamplePath);
+            std::cout << "Training example written to " << trainingExamplePath.string() << "\n";
             return 0;
         }
 
