@@ -15,6 +15,8 @@ class JapanTrainingEnv {
   public:
     explicit JapanTrainingEnv(std::filesystem::path scenarioPath, std::string trackedNationId = "Japan");
 
+    JapanTrainingEnv clone() const;
+
     void reset();
 
     bool isTerminal() const { return gameState_.isTerminal(); }

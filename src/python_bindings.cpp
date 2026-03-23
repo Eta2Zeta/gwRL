@@ -83,6 +83,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return game::JapanTrainingEnv(std::filesystem::path(scenarioPath), trackedNationId);
         }), py::arg("scenario_path"), py::arg("tracked_nation_id") = "Japan")
         .def("reset", &game::JapanTrainingEnv::reset)
+        .def("clone", [](const game::JapanTrainingEnv& env) {
+            return std::make_unique<game::JapanTrainingEnv>(env.clone());
+        })
         .def("is_terminal", &game::JapanTrainingEnv::isTerminal)
         .def("current_nation", &game::JapanTrainingEnv::currentNation)
         .def("current_phase", &game::JapanTrainingEnv::currentPhase)

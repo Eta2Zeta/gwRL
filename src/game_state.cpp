@@ -34,6 +34,27 @@ int facilityOutput(std::string_view facilityId) {
 
 }  // namespace
 
+GameState GameState::clone() const {
+    GameState copy;
+    copy.nations_ = nations_;
+    copy.zones_ = zones_;
+    copy.units_.reserve(units_.size());
+    for (const auto& unit : units_) {
+        copy.units_.push_back(unit->clone());
+    }
+    copy.turnOrder_ = turnOrder_;
+    copy.phaseOrder_ = phaseOrder_;
+    copy.completedTurns_ = completedTurns_;
+    copy.enemyUnitValueDestroyedByNation_ = enemyUnitValueDestroyedByNation_;
+    copy.pendingPurchasesByNation_ = pendingPurchasesByNation_;
+    copy.placedUnitsThisPhaseByZone_ = placedUnitsThisPhaseByZone_;
+    copy.currentNationIndex_ = currentNationIndex_;
+    copy.currentPhaseIndex_ = currentPhaseIndex_;
+    copy.turnLimitPerNation_ = turnLimitPerNation_;
+    copy.terminal_ = terminal_;
+    return copy;
+}
+
 void GameState::addNation(Nation nation) {
     const auto nationId = nation.id();
     auto [it, inserted] = nations_.emplace(nationId, std::move(nation));

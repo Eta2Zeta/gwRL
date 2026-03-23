@@ -1,55 +1,89 @@
 Japan Torch training summary
-episodes=500
+episodes=100
 state_dim=446
 action_dim=26
-recent_average_reward=6.8950
-last_reward=7.0000
-last_japan_income=5
-last_japan_units=4
-last_japan_unit_value=14
-last_destroyed_enemy_unit_value=6
-last_loss=0.0286
-last_gradient_norm=2.9211
-encoder_match_with_cpp_export=no
-verification_note=state feature labels do not match C++ export
-verification_note=state feature values do not match C++ export
+note=self_play_rewards_are_stochastic_training_episodes; search_evaluation_is_the_current_deterministic_policy
+recent_average_self_play_reward=7.1100
+
+Training config
+- episodes=100
+- eval_every=5
+- learning_rate=0.001
+- state_hidden_dim=128
+- action_hidden_dim=64
+- joint_hidden_dim=128
+- search_simulations=200
+- c_puct=1.5
+- root_dirichlet_alpha=0.3
+- root_dirichlet_epsilon=0.25
+- self_play_temperature=1.0
+- value_loss_coef=0.25
+- entropy_coef=0.001
+- grad_clip_norm=5.0
+- seed=1936
+last_self_play_reward=7.2000
+last_self_play_japan_income=5
+last_self_play_japan_units=5
+last_self_play_japan_unit_value=22
+last_self_play_destroyed_enemy_unit_value=0
+last_training_loss=0.8408
+last_gradient_norm=1.3288
+best_search_evaluation_reward=9.0000
+best_search_evaluation_episode=25
+best_self_play_reward=7.5000
+best_self_play_episode=21
+
+Search evaluation checkpoints
+- episode=5 reward=3.5000 income=1 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=10 reward=4.2000 income=2 units=5 unit_value=22 destroyed_enemy_unit_value=0
+- episode=15 reward=5.2000 income=3 units=3 unit_value=16 destroyed_enemy_unit_value=6
+- episode=20 reward=7.9000 income=6 units=4 unit_value=13 destroyed_enemy_unit_value=6
+- episode=25 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=30 reward=7.9000 income=6 units=4 unit_value=13 destroyed_enemy_unit_value=6
+- episode=35 reward=6.5000 income=4 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=40 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=45 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=50 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=55 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=60 reward=6.5000 income=4 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=65 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=70 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=75 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=80 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=85 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=90 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=95 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=100 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
 
 First decision after declaration
-- purchase_unit(count=1, unit=Artillery): prob=0.8270 logit=4.4294
-- purchase_unit(count=1, unit=Infantry): prob=0.1510 logit=2.7292
-- purchase_unit(count=1, unit=Fighter): prob=0.0220 logit=0.8014
-- end_phase: prob=0.0000 logit=-13.2871
+- purchase_unit(count=1, unit=Fighter): search_prob=0.9050 prior=0.8654 visits=181 action_value=7.3398
+- purchase_unit(count=1, unit=Infantry): search_prob=0.0700 prior=0.0757 visits=14 action_value=7.2931
+- purchase_unit(count=1, unit=Artillery): search_prob=0.0250 prior=0.0449 visits=5 action_value=7.1775
+- end_phase: search_prob=0.0000 prior=0.0140 visits=0 action_value=0.0000
 
-Greedy evaluation
-- reward=7.0000
+Current deterministic search evaluation
+- reward=7.5000
 - japan_income=5
-- japan_units=4
-- japan_unit_value=14
-- destroyed_enemy_unit_value=6
-Japan turn 1 / declaration_of_war -> declare_war_on_china (value=6.7344)
+- japan_units=6
+- japan_unit_value=25
+- destroyed_enemy_unit_value=0
+Japan turn 1 / declaration_of_war -> declare_war_on_china (search_value=7.3346, visits=193)
     declaration result: all warlord lands and units transfer to KMT
-Japan turn 1 / purchase_units -> purchase_unit(count=1, unit=Artillery) (value=6.7404)
-    purchase: 1 Artillery for 4 treasury
-Japan turn 1 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4, unit=Infantry) (value=6.7250)
-    combat move: 4 Infantry committed from land_manchuria_rehe to pending battle at land_china_beiping
-Japan turn 1 / combat_resolve -> resolve_combat(to=land_china_beiping) (value=6.7310)
-    resolving pending battle at land_china_beiping: attackers=4, defenders=2
-    round 1: attacker 4 Inf (8/12=0.67), defender 2 Inf (10/12=0.83)
-      after casualties: attacker 3.17 Inf, defender 1.33 Inf, losses attacker=0.83, defender=0.67
-    round 2: attacker 3.17 Inf (6.33/12=0.53), defender 1.33 Inf (6.67/12=0.56)
-      after casualties: attacker 2.61 Inf, defender 0.81 Inf, losses attacker=0.56, defender=0.53
-    round 3: attacker 2.61 Inf (5.22/12=0.44), defender 0.81 Inf (4.03/12=0.34)
-      after casualties: attacker 2.28 Inf, defender 0.37 Inf, losses attacker=0.34, defender=0.44
-    round 4: attacker 2.28 Inf (4.55/12=0.38), defender 0.37 Inf (1.85/12=0.15)
-      after casualties: attacker 2.12 Inf, defender 0, losses attacker=0.15, defender=0.38
-    combat result: attackers won and occupy the territory
-Japan turn 1 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (value=6.7363)
-    place units: 1 Artillery placed at land_manchuria_rehe
-Japan turn 2 / purchase_units -> purchase_unit(count=1, unit=Artillery) (value=6.7343)
-    purchase: 1 Artillery for 4 treasury
-Japan turn 2 / combat_move -> move_combat_unit(from=land_china_beiping, to=land_china_hopeh, count=2, unit=Infantry) (value=6.7476)
+Japan turn 1 / purchase_units -> purchase_unit(count=1, unit=Fighter) (search_value=7.3398, visits=181)
+    purchase: 1 Fighter for 10 treasury
+Japan turn 1 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4, unit=Infantry) (search_value=7.3661, visits=97)
     combat: no defenders, territory occupied immediately
-Japan turn 2 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1, unit=Artillery) (value=6.7364)
+Japan turn 1 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Fighter) (search_value=7.4216, visits=200)
+    place units: 1 Fighter placed at land_manchuria_rehe
+Japan turn 2 / purchase_units -> purchase_unit(count=1, unit=Infantry) (search_value=7.4363, visits=181)
+    purchase: 1 Infantry for 3 treasury
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=2, unit=Infantry) (search_value=7.4937, visits=52)
     combat: no defenders, territory occupied immediately
-Japan turn 2 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (value=6.7551)
-    place units: 1 Artillery placed at land_manchuria_rehe
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=2, unit=Infantry) (search_value=7.4996, visits=112)
+    combat: no defenders, territory occupied immediately
+Japan turn 2 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Infantry) (search_value=7.5000, visits=200)
+    place units: 1 Infantry placed at land_manchuria_rehe
+
+Detailed trace files
+- best self-play episode trace: output/best_self_play_episode_trace.txt
+- best deterministic checkpoint trace: output/best_deterministic_checkpoint_trace.txt

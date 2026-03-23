@@ -14,6 +14,8 @@ namespace game {
 
 class GameState {
   public:
+    GameState clone() const;
+
     void addNation(Nation nation);
     void addZone(Zone zone);
     void addUnit(std::unique_ptr<Unit> unit);

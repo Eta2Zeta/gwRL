@@ -44,6 +44,14 @@ JapanTrainingEnv::JapanTrainingEnv(std::filesystem::path scenarioPath, std::stri
     reset();
 }
 
+JapanTrainingEnv JapanTrainingEnv::clone() const {
+    JapanTrainingEnv copy(scenarioPath_, trackedNationId_);
+    copy.gameState_ = gameState_.clone();
+    copy.stateEncoder_ = stateEncoder_;
+    copy.actionEncoder_ = actionEncoder_;
+    return copy;
+}
+
 void JapanTrainingEnv::reset() {
     gameState_ = SetupLoader::loadFromFile(scenarioPath_);
     advanceUntilTrackedNationDecision();

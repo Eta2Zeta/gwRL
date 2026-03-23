@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540">
+<rect width="100%" height="100%" fill="#fffaf2"/>
+<text x="50%" y="28" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#2b2b2b">Deterministic Search Reward Over Training</text>
+<line x1="70" y1="480" x2="930" y2="480" stroke="#666" stroke-width="2"/>
+<line x1="70" y1="40" x2="70" y2="480" stroke="#666" stroke-width="2"/>
+<line x1="70.0" y1="40" x2="70.0" y2="480" stroke="#e6dccb" stroke-width="1"/>
+<text x="70.0" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">5</text>
+<line x1="242.0" y1="40" x2="242.0" y2="480" stroke="#e6dccb" stroke-width="1"/>
+<text x="242.0" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">24</text>
+<line x1="414.0" y1="40" x2="414.0" y2="480" stroke="#e6dccb" stroke-width="1"/>
+<text x="414.0" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">43</text>
+<line x1="586.0" y1="40" x2="586.0" y2="480" stroke="#e6dccb" stroke-width="1"/>
+<text x="586.0" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">62</text>
+<line x1="758.0" y1="40" x2="758.0" y2="480" stroke="#e6dccb" stroke-width="1"/>
+<text x="758.0" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">81</text>
+<line x1="930.0" y1="40" x2="930.0" y2="480" stroke="#e6dccb" stroke-width="1"/>
+<text x="930.0" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">100</text>
+<line x1="70" y1="480.0" x2="930" y2="480.0" stroke="#e6dccb" stroke-width="1"/>
+<text x="60" y="484.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">3.50</text>
+<line x1="70" y1="370.0" x2="930" y2="370.0" stroke="#e6dccb" stroke-width="1"/>
+<text x="60" y="374.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">4.88</text>
+<line x1="70" y1="260.0" x2="930" y2="260.0" stroke="#e6dccb" stroke-width="1"/>
+<text x="60" y="264.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">6.25</text>
+<line x1="70" y1="150.0" x2="930" y2="150.0" stroke="#e6dccb" stroke-width="1"/>
+<text x="60" y="154.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">7.62</text>
+<line x1="70" y1="40.0" x2="930" y2="40.0" stroke="#e6dccb" stroke-width="1"/>
+<text x="60" y="44.0" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">9.00</text>
+<polyline fill="none" stroke="#0f766e" stroke-width="3" points="70.0,480.0 115.3,424.0 160.5,344.0 205.8,128.0 251.1,40.0 296.3,128.0 341.6,240.0 386.8,160.0 432.1,160.0 477.4,160.0 522.6,160.0 567.9,240.0 613.2,160.0 658.4,160.0 703.7,160.0 748.9,160.0 794.2,160.0 839.5,160.0 884.7,160.0 930.0,160.0"/>
+<circle cx="70.0" cy="480.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="115.3" cy="424.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="160.5" cy="344.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="205.8" cy="128.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="251.1" cy="40.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="296.3" cy="128.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="341.6" cy="240.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="386.8" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="432.1" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="477.4" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="522.6" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="567.9" cy="240.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="613.2" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="658.4" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="703.7" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="748.9" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="794.2" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="839.5" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="884.7" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="930.0" cy="160.0" r="4" fill="#115e59" stroke="#ffffff" stroke-width="1.5"/>
+<text x="500.0" y="525" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#444">Episode</text>
+<text x="18" y="260.0" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#444" transform="rotate(-90 18 260.0)">Final reward</text>
+</svg>
