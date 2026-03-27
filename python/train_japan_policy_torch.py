@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import sys
+from collections import deque
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
@@ -39,11 +41,23 @@ class TrainingConfig:
     c_puct: float = 1.5
     root_dirichlet_alpha: float = 0.3
     root_dirichlet_epsilon: float = 0.25
-    self_play_temperature: float = 0.5
+    self_play_temperature: float = 0.75
     value_loss_coef: float = 0.25
     entropy_coef: float = 0.001
     grad_clip_norm: float = 5.0
+    replay_buffer_capacity: int = 4096
+    replay_batch_size: int = 64
+    replay_updates_per_episode: int = 4
+    min_replay_size: int = 32
     seed: int = 1936
+
+
+@dataclass(slots=True)
+class ReplayExample:
+    state_features: list[float]
+    legal_action_features: list[list[float]]
+    target_policy: list[float]
+    target_value: float
 
 
 def evaluation_checkpoint_payload(episode: int, evaluation: dict[str, Any]) -> dict[str, float]:
@@ -170,6 +184,34 @@ def summarize_search_root(search: Any) -> list[dict[str, Any]]:
     ]
     entries.sort(key=lambda item: item["search_probability"], reverse=True)
     return entries
+
+
+def compute_replay_batch_losses(
+    model: LegalActionPolicyValueNet,
+    batch: list[ReplayExample],
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    policy_losses: list[torch.Tensor] = []
+    value_losses: list[torch.Tensor] = []
+    entropies: list[torch.Tensor] = []
+
+    for example in batch:
+        state_tensor, action_tensor = tensorize_state_and_actions(
+            example.state_features,
+            example.legal_action_features,
+        )
+        target_policy_tensor = torch.tensor(example.target_policy, dtype=torch.float32).unsqueeze(0)
+        target_value_tensor = torch.tensor([example.target_value], dtype=torch.float32)
+        logits, value = model(state_tensor, action_tensor)
+        log_probs = torch.log_softmax(logits, dim=-1)
+        policy_losses.append(-(target_policy_tensor * log_probs).sum(dim=-1).mean())
+        value_losses.append(F.mse_loss(value, target_value_tensor))
+        entropies.append(Categorical(logits=logits.squeeze(0)).entropy())
+
+    return (
+        torch.stack(policy_losses).mean(),
+        torch.stack(value_losses).mean(),
+        torch.stack(entropies).mean(),
+    )
 
 
 def snapshot_first_decision_policy(
@@ -303,8 +345,195 @@ def write_search_evaluation_svg(evaluations: list[dict[str, float]], output_path
     output_path.write_text("\n".join(parts), encoding="utf-8")
 
 
+def write_first_purchase_series_svg(
+    snapshots: list[dict[str, Any]],
+    output_path: Path,
+    value_key: str,
+    title: str,
+    y_label: str,
+) -> None:
+    width = 1100
+    height = 620
+    margin_left = 80
+    margin_right = 170
+    margin_top = 50
+    margin_bottom = 70
+
+    if not snapshots:
+        output_path.write_text(
+            (
+                f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">'
+                '<rect width="100%" height="100%" fill="#fffaf2"/>'
+                '<text x="50%" y="50%" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" '
+                f'font-size="22" fill="#444">No data recorded for {title}</text>'
+                "</svg>"
+            ),
+            encoding="utf-8",
+        )
+        return
+
+    series_order = [
+        ("purchase_unit(count=1, unit=Infantry)", "Infantry", "#2563eb"),
+        ("purchase_unit(count=1, unit=Artillery)", "Artillery", "#dc2626"),
+        ("purchase_unit(count=1, unit=Fighter)", "Fighter", "#16a34a"),
+        ("end_phase", "End phase", "#7c3aed"),
+    ]
+    snapshots_by_episode = {int(snapshot["episode"]): snapshot for snapshot in snapshots}
+    episodes = sorted(snapshots_by_episode)
+    action_series: dict[str, list[tuple[int, float]]] = {key: [] for key, _, _ in series_order}
+    all_values: list[float] = []
+
+    for episode in episodes:
+        action_map = {
+            entry["action"]: float(entry[value_key])
+            for entry in snapshots_by_episode[episode]["actions"]
+        }
+        for action_key, _, _ in series_order:
+            value = action_map.get(action_key, 0.0)
+            action_series[action_key].append((episode, value))
+            all_values.append(value)
+
+    min_episode = min(episodes)
+    max_episode = max(episodes)
+    min_value = min(all_values)
+    max_value = max(all_values)
+
+    if max_episode == min_episode:
+        max_episode += 1
+    if max_value == min_value:
+        min_value -= 1.0
+        max_value += 1.0
+
+    plot_width = width - margin_left - margin_right
+    plot_height = height - margin_top - margin_bottom
+
+    def x_pos(episode: int) -> float:
+        return margin_left + (episode - min_episode) / (max_episode - min_episode) * plot_width
+
+    def y_pos(value: float) -> float:
+        return margin_top + (max_value - value) / (max_value - min_value) * plot_height
+
+    x_ticks = min(6, len(episodes))
+    y_ticks = 6
+    x_tick_values = [
+        min_episode + (max_episode - min_episode) * tick / max(1, x_ticks - 1)
+        for tick in range(x_ticks)
+    ]
+    y_tick_values = [
+        min_value + (max_value - min_value) * tick / max(1, y_ticks - 1)
+        for tick in range(y_ticks)
+    ]
+
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">',
+        '<rect width="100%" height="100%" fill="#fffaf2"/>',
+        '<text x="50%" y="30" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" '
+        f'font-size="24" font-weight="700" fill="#2b2b2b">{title}</text>',
+        f'<line x1="{margin_left}" y1="{height - margin_bottom}" '
+        f'x2="{width - margin_right}" y2="{height - margin_bottom}" stroke="#666" stroke-width="2"/>',
+        f'<line x1="{margin_left}" y1="{margin_top}" '
+        f'x2="{margin_left}" y2="{height - margin_bottom}" stroke="#666" stroke-width="2"/>',
+    ]
+
+    for tick_value in x_tick_values:
+        x = x_pos(int(round(tick_value)))
+        parts.append(
+            f'<line x1="{x:.1f}" y1="{margin_top}" x2="{x:.1f}" y2="{height - margin_bottom}" '
+            'stroke="#e6dccb" stroke-width="1"/>'
+        )
+        parts.append(
+            f'<text x="{x:.1f}" y="{height - margin_bottom + 22}" text-anchor="middle" '
+            'font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">'
+            f'{int(round(tick_value))}</text>'
+        )
+
+    for tick_value in y_tick_values:
+        y = y_pos(tick_value)
+        parts.append(
+            f'<line x1="{margin_left}" y1="{y:.1f}" x2="{width - margin_right}" y2="{y:.1f}" '
+            'stroke="#e6dccb" stroke-width="1"/>'
+        )
+        parts.append(
+            f'<text x="{margin_left - 10}" y="{y + 4:.1f}" text-anchor="end" '
+            'font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#555">'
+            f'{tick_value:.2f}</text>'
+        )
+
+    legend_x = width - margin_right + 25
+    legend_y = margin_top + 20
+    for index, (action_key, label, color) in enumerate(series_order):
+        points = action_series[action_key]
+        polyline_points = " ".join(f"{x_pos(ep):.1f},{y_pos(val):.1f}" for ep, val in points)
+        parts.append(
+            f'<polyline fill="none" stroke="{color}" stroke-width="3" points="{polyline_points}"/>'
+        )
+        for episode, value in points:
+            parts.append(
+                f'<circle cx="{x_pos(episode):.1f}" cy="{y_pos(value):.1f}" r="3.5" '
+                f'fill="{color}" stroke="#ffffff" stroke-width="1"/>'
+            )
+        legend_entry_y = legend_y + index * 28
+        parts.append(
+            f'<line x1="{legend_x}" y1="{legend_entry_y}" x2="{legend_x + 20}" y2="{legend_entry_y}" '
+            f'stroke="{color}" stroke-width="3"/>'
+        )
+        parts.append(
+            f'<text x="{legend_x + 28}" y="{legend_entry_y + 4}" '
+            'font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#333">'
+            f'{label}</text>'
+        )
+
+    parts.extend(
+        [
+            f'<text x="{margin_left + plot_width / 2:.1f}" y="{height - 18}" text-anchor="middle" '
+            'font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#444">Episode</text>',
+            f'<text x="24" y="{margin_top + plot_height / 2:.1f}" text-anchor="middle" '
+            'font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#444" '
+            f'transform="rotate(-90 24 {margin_top + plot_height / 2:.1f})">{y_label}</text>',
+            "</svg>",
+        ]
+    )
+    output_path.write_text("\n".join(parts), encoding="utf-8")
+
+
+def write_first_purchase_action_value_svg(
+    snapshots: list[dict[str, Any]],
+    output_path: Path,
+) -> None:
+    write_first_purchase_series_svg(
+        snapshots,
+        output_path,
+        value_key="action_value",
+        title="First Purchase Action Values Over Training",
+        y_label="Root action value",
+    )
+
+
+def write_first_purchase_prior_svg(
+    snapshots: list[dict[str, Any]],
+    output_path: Path,
+) -> None:
+    write_first_purchase_series_svg(
+        snapshots,
+        output_path,
+        value_key="prior_probability",
+        title="First Purchase Priors Over Training",
+        y_label="Prior probability",
+    )
+
+
 def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
+    if config.replay_buffer_capacity <= 0:
+        raise ValueError("Replay buffer capacity must be positive")
+    if config.replay_batch_size <= 0:
+        raise ValueError("Replay batch size must be positive")
+    if config.replay_updates_per_episode <= 0:
+        raise ValueError("Replay updates per episode must be positive")
+    if config.min_replay_size <= 0:
+        raise ValueError("Minimum replay size must be positive")
+
     torch.manual_seed(config.seed)
+    random_generator = random.Random(config.seed)
     env = gwrl_cpp.JapanTrainingEnv(str(scenario_path), "Japan")
     state_dim = len(env.state_feature_labels())
     action_dim = len(env.action_feature_labels())
@@ -329,6 +558,8 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
 
     history: list[dict[str, float]] = []
     evaluation_history: list[dict[str, float]] = []
+    first_purchase_history: list[dict[str, Any]] = []
+    replay_buffer: deque[ReplayExample] = deque(maxlen=config.replay_buffer_capacity)
     best_search_evaluation: dict[str, Any] | None = None
     best_search_evaluation_episode: int | None = None
     best_self_play_episode: dict[str, Any] | None = None
@@ -386,35 +617,53 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
         else:
             final_reward = float(env.final_reward())
 
-        policy_losses: list[torch.Tensor] = []
-        value_losses: list[torch.Tensor] = []
-        entropies: list[torch.Tensor] = []
-        target_value = torch.tensor([final_reward], dtype=torch.float32)
-
-        for state_features, legal_action_features, target_policy in search_examples:
-            state_tensor, action_tensor = tensorize_state_and_actions(
-                state_features,
-                legal_action_features,
-            )
-            target_policy_tensor = torch.tensor(target_policy, dtype=torch.float32).unsqueeze(0)
-            logits, value = model(state_tensor, action_tensor)
-            log_probs = torch.log_softmax(logits, dim=-1)
-            policy_losses.append(-(target_policy_tensor * log_probs).sum(dim=-1).mean())
-            value_losses.append(F.mse_loss(value, target_value))
-            entropies.append(Categorical(logits=logits.squeeze(0)).entropy())
-
-        if not policy_losses:
+        if not search_examples:
             raise RuntimeError("Encountered an episode with no tracked-nation decisions")
 
-        policy_loss = torch.stack(policy_losses).mean()
-        value_loss = torch.stack(value_losses).mean()
-        entropy_bonus = torch.stack(entropies).mean()
-        loss = policy_loss + config.value_loss_coef * value_loss - config.entropy_coef * entropy_bonus
+        for state_features, legal_action_features, target_policy in search_examples:
+            replay_buffer.append(
+                ReplayExample(
+                    state_features=state_features,
+                    legal_action_features=legal_action_features,
+                    target_policy=target_policy,
+                    target_value=final_reward,
+                )
+            )
 
-        optimizer.zero_grad()
-        loss.backward()
-        grad_norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), config.grad_clip_norm))
-        optimizer.step()
+        replay_batch_size = min(config.replay_batch_size, len(replay_buffer))
+        updates_this_episode = (
+            config.replay_updates_per_episode
+            if len(replay_buffer) >= config.min_replay_size
+            else 1
+        )
+
+        batch_loss_values: list[float] = []
+        batch_policy_loss_values: list[float] = []
+        batch_value_loss_values: list[float] = []
+        batch_entropy_values: list[float] = []
+        batch_grad_norm_values: list[float] = []
+
+        for _ in range(updates_this_episode):
+            sampled_batch = random_generator.sample(list(replay_buffer), replay_batch_size)
+            policy_loss, value_loss, entropy_bonus = compute_replay_batch_losses(model, sampled_batch)
+            loss = policy_loss + config.value_loss_coef * value_loss - config.entropy_coef * entropy_bonus
+
+            optimizer.zero_grad()
+            loss.backward()
+            grad_norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), config.grad_clip_norm))
+            optimizer.step()
+
+            batch_loss_values.append(float(loss.item()))
+            batch_policy_loss_values.append(float(policy_loss.item()))
+            batch_value_loss_values.append(float(value_loss.item()))
+            batch_entropy_values.append(float(entropy_bonus.item()))
+            batch_grad_norm_values.append(grad_norm)
+
+        loss_value = sum(batch_loss_values) / len(batch_loss_values)
+        policy_loss_value = sum(batch_policy_loss_values) / len(batch_policy_loss_values)
+        value_loss_value = sum(batch_value_loss_values) / len(batch_value_loss_values)
+        entropy_value = sum(batch_entropy_values) / len(batch_entropy_values)
+        grad_norm_value = sum(batch_grad_norm_values) / len(batch_grad_norm_values)
 
         history.append(
             {
@@ -425,11 +674,13 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
                 "japan_unit_value": float(env.unit_value_for("Japan")),
                 "destroyed_enemy_unit_value": float(env.enemy_unit_value_destroyed_by_nation("Japan")),
                 "japan_decisions": float(len(search_examples)),
-                "loss": float(loss.item()),
-                "policy_loss": float(policy_loss.item()),
-                "value_loss": float(value_loss.item()),
-                "entropy": float(entropy_bonus.item()),
-                "gradient_norm": grad_norm,
+                "loss": loss_value,
+                "policy_loss": policy_loss_value,
+                "value_loss": value_loss_value,
+                "entropy": entropy_value,
+                "gradient_norm": grad_norm_value,
+                "replay_buffer_size": float(len(replay_buffer)),
+                "replay_updates": float(updates_this_episode),
             }
         )
         if best_self_play_episode is None or final_reward > float(best_self_play_episode["final_reward"]):
@@ -443,6 +694,12 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
                 "search_tables": list(episode_search_tables),
             }
             best_self_play_episode_index = episode_index + 1
+        first_purchase_history.append(
+            {
+                "episode": episode_index + 1,
+                "actions": snapshot_first_decision_policy(env, model, mcts_config),
+            }
+        )
 
         should_evaluate = (
             (episode_index + 1) % config.eval_every == 0
@@ -497,6 +754,7 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
         "action_dim": action_dim,
         "history": history,
         "evaluation_history": evaluation_history,
+        "first_purchase_history": first_purchase_history,
         "best_self_play_episode": best_self_play_episode,
         "best_self_play_episode_index": best_self_play_episode_index,
         "best_search_evaluation": best_search_evaluation,
@@ -552,6 +810,8 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
                 f"last_self_play_destroyed_enemy_unit_value={int(last['destroyed_enemy_unit_value'])}",
                 f"last_training_loss={last['loss']:.4f}",
                 f"last_gradient_norm={last['gradient_norm']:.4f}",
+                f"last_replay_buffer_size={int(last['replay_buffer_size'])}",
+                f"last_replay_updates={int(last['replay_updates'])}",
             ]
         )
     if best_search_evaluation is not None:
@@ -633,6 +893,7 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
         "action_dim": result["action_dim"],
         "history": result["history"],
         "evaluation_history": result["evaluation_history"],
+        "first_purchase_history": result["first_purchase_history"],
         "best_self_play_episode": result["best_self_play_episode"],
         "best_self_play_episode_index": result["best_self_play_episode_index"],
         "best_search_evaluation": result["best_search_evaluation"],
@@ -651,6 +912,14 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
     write_search_evaluation_svg(
         result["evaluation_history"],
         output_dir / "japan_search_reward_over_time.svg",
+    )
+    write_first_purchase_action_value_svg(
+        result["first_purchase_history"],
+        output_dir / "first_purchase_action_values_over_training.svg",
+    )
+    write_first_purchase_prior_svg(
+        result["first_purchase_history"],
+        output_dir / "first_purchase_priors_over_training.svg",
     )
     best_search_trace = result.get("best_search_evaluation")
     best_search_trace_episode = result.get("best_search_evaluation_episode")
@@ -729,24 +998,33 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
 
 
 def main() -> None:
+    defaults = TrainingConfig()
     parser = argparse.ArgumentParser(description="Train the Japan policy with PyTorch")
-    parser.add_argument("--episodes", type=int, default=800)
+    parser.add_argument("--episodes", type=int, default=defaults.episodes)
     parser.add_argument("--scenario", type=Path, default=Path("data/china_simplified_setup.json"))
     parser.add_argument("--output-dir", type=Path, default=Path("output"))
-    parser.add_argument("--learning-rate", type=float, default=0.001)
-    parser.add_argument("--state-hidden-dim", type=int, default=128)
-    parser.add_argument("--action-hidden-dim", type=int, default=64)
-    parser.add_argument("--joint-hidden-dim", type=int, default=128)
-    parser.add_argument("--search-simulations", type=int, default=64)
-    parser.add_argument("--eval-every", type=int, default=5)
-    parser.add_argument("--c-puct", type=float, default=1.5)
-    parser.add_argument("--root-dirichlet-alpha", type=float, default=0.3)
-    parser.add_argument("--root-dirichlet-epsilon", type=float, default=0.25)
-    parser.add_argument("--self-play-temperature", type=float, default=1.0)
-    parser.add_argument("--value-loss-coef", type=float, default=0.25)
-    parser.add_argument("--entropy-coef", type=float, default=0.001)
-    parser.add_argument("--grad-clip-norm", type=float, default=5.0)
-    parser.add_argument("--seed", type=int, default=1936)
+    parser.add_argument("--learning-rate", type=float, default=defaults.learning_rate)
+    parser.add_argument("--state-hidden-dim", type=int, default=defaults.state_hidden_dim)
+    parser.add_argument("--action-hidden-dim", type=int, default=defaults.action_hidden_dim)
+    parser.add_argument("--joint-hidden-dim", type=int, default=defaults.joint_hidden_dim)
+    parser.add_argument("--search-simulations", type=int, default=defaults.search_simulations)
+    parser.add_argument("--eval-every", type=int, default=defaults.eval_every)
+    parser.add_argument("--c-puct", type=float, default=defaults.c_puct)
+    parser.add_argument("--root-dirichlet-alpha", type=float, default=defaults.root_dirichlet_alpha)
+    parser.add_argument("--root-dirichlet-epsilon", type=float, default=defaults.root_dirichlet_epsilon)
+    parser.add_argument("--self-play-temperature", type=float, default=defaults.self_play_temperature)
+    parser.add_argument("--value-loss-coef", type=float, default=defaults.value_loss_coef)
+    parser.add_argument("--entropy-coef", type=float, default=defaults.entropy_coef)
+    parser.add_argument("--grad-clip-norm", type=float, default=defaults.grad_clip_norm)
+    parser.add_argument("--replay-buffer-capacity", type=int, default=defaults.replay_buffer_capacity)
+    parser.add_argument("--replay-batch-size", type=int, default=defaults.replay_batch_size)
+    parser.add_argument(
+        "--replay-updates-per-episode",
+        type=int,
+        default=defaults.replay_updates_per_episode,
+    )
+    parser.add_argument("--min-replay-size", type=int, default=defaults.min_replay_size)
+    parser.add_argument("--seed", type=int, default=defaults.seed)
     args = parser.parse_args()
 
     config = TrainingConfig(
@@ -764,6 +1042,10 @@ def main() -> None:
         value_loss_coef=args.value_loss_coef,
         entropy_coef=args.entropy_coef,
         grad_clip_norm=args.grad_clip_norm,
+        replay_buffer_capacity=args.replay_buffer_capacity,
+        replay_batch_size=args.replay_batch_size,
+        replay_updates_per_episode=args.replay_updates_per_episode,
+        min_replay_size=args.min_replay_size,
         seed=args.seed,
     )
     result = train(config, args.scenario)

@@ -160,6 +160,7 @@ def format_trace(
 
 
 def parse_args() -> argparse.Namespace:
+    mcts_defaults = MctsConfig()
     parser = argparse.ArgumentParser(description="Print a detailed trace of one MCTS root search.")
     parser.add_argument(
         "--scenario",
@@ -182,13 +183,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--simulations",
         type=int,
-        default=3,
+        default=mcts_defaults.simulations,
         help="Number of MCTS simulations to print.",
     )
     parser.add_argument(
         "--c-puct",
         type=float,
-        default=1.5,
+        default=mcts_defaults.c_puct,
         help="PUCT exploration constant.",
     )
     parser.add_argument(

@@ -1,3 +1,5 @@
 .venv/
 .easyocr-models/
 .easyocr-usernet/
+__pycache__/
+*.pyc

@@ -1,4 +1,5 @@
 #include "game/action.hpp"
+#include "game/composition_battle_env.hpp"
 #include "game/japan_training_env.hpp"
 #include "game/mdp.hpp"
 
@@ -49,6 +50,10 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .value("Infantry", game::UnitKind::Infantry)
         .value("Artillery", game::UnitKind::Artillery)
         .value("Marine", game::UnitKind::Marine)
+        .value("LightTank", game::UnitKind::LightTank)
+        .value("MechanizedInfantry", game::UnitKind::MechanizedInfantry)
+        .value("MediumTank", game::UnitKind::MediumTank)
+        .value("TankDestroyer", game::UnitKind::TankDestroyer)
         .value("Fighter", game::UnitKind::Fighter)
         .value("Transport", game::UnitKind::Transport);
 
@@ -102,4 +107,30 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("unit_count_for", &game::JapanTrainingEnv::unitCountFor)
         .def("unit_value_for", &game::JapanTrainingEnv::unitValueFor)
         .def("enemy_unit_value_destroyed_by_nation", &game::JapanTrainingEnv::enemyUnitValueDestroyedByNation);
+
+    py::class_<game::CompositionBattleEnv>(module, "CompositionBattleEnv")
+        .def(
+            py::init<int, int, std::string, bool>(),
+            py::arg("attacker_budget") = 10,
+            py::arg("defender_budget") = 10,
+            py::arg("terrain") = "normal",
+            py::arg("is_city") = false)
+        .def("reset", &game::CompositionBattleEnv::reset)
+        .def("clone", [](const game::CompositionBattleEnv& env) {
+            return std::make_unique<game::CompositionBattleEnv>(env.clone());
+        })
+        .def("is_terminal", &game::CompositionBattleEnv::isTerminal)
+        .def("current_nation", &game::CompositionBattleEnv::currentNation)
+        .def("current_phase", &game::CompositionBattleEnv::currentPhase)
+        .def("legal_actions", &game::CompositionBattleEnv::legalActions)
+        .def("encode_state", &game::CompositionBattleEnv::encodeState)
+        .def("encode_legal_actions", &game::CompositionBattleEnv::encodeLegalActions)
+        .def("state_feature_labels", &game::CompositionBattleEnv::stateFeatureLabels)
+        .def("action_feature_labels", &game::CompositionBattleEnv::actionFeatureLabels)
+        .def("step", &game::CompositionBattleEnv::step)
+        .def("final_reward", &game::CompositionBattleEnv::finalReward)
+        .def("terminal_reward_for", &game::CompositionBattleEnv::terminalRewardFor)
+        .def("winner_id", &game::CompositionBattleEnv::winnerId)
+        .def("budget_remaining", &game::CompositionBattleEnv::budgetRemaining)
+        .def("purchased_unit_count", &game::CompositionBattleEnv::purchasedUnitCount);
 }

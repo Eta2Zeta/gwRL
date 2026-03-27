@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/action.hpp"
+#include "game/battle_resolver.hpp"
 #include "game/game_state.hpp"
 
 #include <algorithm>
@@ -74,13 +75,25 @@ class SimplifiedChinaMdp {
     }
 
     static std::vector<UnitKind> combatMovableUnitKinds() {
-        return {UnitKind::Infantry, UnitKind::Artillery, UnitKind::Marine};
+        return {
+            UnitKind::Infantry,
+            UnitKind::Artillery,
+            UnitKind::Marine,
+            UnitKind::LightTank,
+            UnitKind::MechanizedInfantry,
+            UnitKind::MediumTank,
+            UnitKind::TankDestroyer,
+        };
     }
 
     struct ForceState {
         double infantry {0.0};
         double artillery {0.0};
         double marine {0.0};
+        double lightTank {0.0};
+        double mechanizedInfantry {0.0};
+        double mediumTank {0.0};
+        double tankDestroyer {0.0};
     };
 
     struct CombatOutcome {
@@ -93,30 +106,15 @@ class SimplifiedChinaMdp {
     };
 
     static bool isLandCombatUnit(const Unit& unit) {
-        return unit.kind() == UnitKind::Infantry
-            || unit.kind() == UnitKind::Artillery
-            || unit.kind() == UnitKind::Marine;
+        return BattleResolver::isLandCombatUnit(unit);
     }
 
     static bool isCombatMovableLandUnit(const Unit& unit) {
-        return unit.kind() == UnitKind::Infantry
-            || unit.kind() == UnitKind::Artillery
-            || unit.kind() == UnitKind::Marine;
+        return BattleResolver::isCombatMovableLandUnit(unit);
     }
 
     static int baseAttackValue(UnitKind kind) {
-        switch (kind) {
-            case UnitKind::Infantry:
-                return 2;
-            case UnitKind::Artillery:
-                return 3;
-            case UnitKind::Marine:
-                return 2;
-            case UnitKind::Fighter:
-            case UnitKind::Transport:
-                return 0;
-        }
-        throw std::runtime_error("Unknown unit kind for attack value");
+        return BattleResolver::baseAttackValue(kind);
     }
 
     static int baseAttackValue(const Unit& unit) {
@@ -124,18 +122,7 @@ class SimplifiedChinaMdp {
     }
 
     static int baseDefenseValue(UnitKind kind) {
-        switch (kind) {
-            case UnitKind::Infantry:
-                return 4;
-            case UnitKind::Artillery:
-                return 3;
-            case UnitKind::Marine:
-                return 4;
-            case UnitKind::Fighter:
-            case UnitKind::Transport:
-                return 0;
-        }
-        throw std::runtime_error("Unknown unit kind for defense value");
+        return BattleResolver::baseDefenseValue(kind);
     }
 
     static int baseDefenseValue(const Unit& unit) {
@@ -179,6 +166,18 @@ class SimplifiedChinaMdp {
                 case UnitKind::Marine:
                     force.marine += 1.0;
                     break;
+                case UnitKind::LightTank:
+                    force.lightTank += 1.0;
+                    break;
+                case UnitKind::MechanizedInfantry:
+                    force.mechanizedInfantry += 1.0;
+                    break;
+                case UnitKind::MediumTank:
+                    force.mediumTank += 1.0;
+                    break;
+                case UnitKind::TankDestroyer:
+                    force.tankDestroyer += 1.0;
+                    break;
                 case UnitKind::Fighter:
                 case UnitKind::Transport:
                     break;
@@ -188,7 +187,13 @@ class SimplifiedChinaMdp {
     }
 
     static double totalUnits(const ForceState& force) {
-        return force.infantry + force.artillery + force.marine;
+        return force.infantry
+            + force.artillery
+            + force.marine
+            + force.lightTank
+            + force.mechanizedInfantry
+            + force.mediumTank
+            + force.tankDestroyer;
     }
 
     static std::string formatCount(double value) {
@@ -213,6 +218,18 @@ class SimplifiedChinaMdp {
         if (force.marine > 0.0) {
             parts.push_back(formatCount(force.marine) + " Mar");
         }
+        if (force.lightTank > 0.0) {
+            parts.push_back(formatCount(force.lightTank) + " LT");
+        }
+        if (force.mechanizedInfantry > 0.0) {
+            parts.push_back(formatCount(force.mechanizedInfantry) + " Mech");
+        }
+        if (force.mediumTank > 0.0) {
+            parts.push_back(formatCount(force.mediumTank) + " MT");
+        }
+        if (force.tankDestroyer > 0.0) {
+            parts.push_back(formatCount(force.tankDestroyer) + " TD");
+        }
         if (parts.empty()) {
             return "0";
         }
@@ -234,6 +251,14 @@ class SimplifiedChinaMdp {
                 return force.artillery;
             case UnitKind::Marine:
                 return force.marine;
+            case UnitKind::LightTank:
+                return force.lightTank;
+            case UnitKind::MechanizedInfantry:
+                return force.mechanizedInfantry;
+            case UnitKind::MediumTank:
+                return force.mediumTank;
+            case UnitKind::TankDestroyer:
+                return force.tankDestroyer;
             case UnitKind::Fighter:
             case UnitKind::Transport:
                 return 0.0;
@@ -242,7 +267,15 @@ class SimplifiedChinaMdp {
     }
 
     static std::vector<UnitKind> casualtyPriorityOrder(const Zone& battleZone, bool attackers) {
-        std::vector<UnitKind> order{UnitKind::Infantry, UnitKind::Artillery, UnitKind::Marine};
+        std::vector<UnitKind> order{
+            UnitKind::Infantry,
+            UnitKind::Artillery,
+            UnitKind::Marine,
+            UnitKind::LightTank,
+            UnitKind::MechanizedInfantry,
+            UnitKind::MediumTank,
+            UnitKind::TankDestroyer,
+        };
         std::stable_sort(
             order.begin(),
             order.end(),
@@ -282,6 +315,26 @@ class SimplifiedChinaMdp {
                     force.marine -= removed;
                     return removed;
                 }
+                case UnitKind::LightTank: {
+                    const auto removed = std::min(force.lightTank, amount);
+                    force.lightTank -= removed;
+                    return removed;
+                }
+                case UnitKind::MechanizedInfantry: {
+                    const auto removed = std::min(force.mechanizedInfantry, amount);
+                    force.mechanizedInfantry -= removed;
+                    return removed;
+                }
+                case UnitKind::MediumTank: {
+                    const auto removed = std::min(force.mediumTank, amount);
+                    force.mediumTank -= removed;
+                    return removed;
+                }
+                case UnitKind::TankDestroyer: {
+                    const auto removed = std::min(force.tankDestroyer, amount);
+                    force.tankDestroyer -= removed;
+                    return removed;
+                }
                 case UnitKind::Fighter:
                 case UnitKind::Transport:
                     return 0.0;
@@ -299,13 +352,17 @@ class SimplifiedChinaMdp {
     }
 
     static double artillerySupportBonus(const ForceState& force) {
-        return std::min(force.infantry + force.marine, force.artillery);
+        return std::min(force.infantry + force.marine + force.mechanizedInfantry, force.artillery);
     }
 
     static double regularAttackValue(const ForceState& force, const Zone& battleZone, bool includeArtillery) {
         double total = 0.0;
         total += force.infantry * adjustedAttackValue(UnitKind::Infantry, battleZone);
         total += force.marine * adjustedAttackValue(UnitKind::Marine, battleZone);
+        total += force.lightTank * adjustedAttackValue(UnitKind::LightTank, battleZone);
+        total += force.mechanizedInfantry * adjustedAttackValue(UnitKind::MechanizedInfantry, battleZone);
+        total += force.mediumTank * adjustedAttackValue(UnitKind::MediumTank, battleZone);
+        total += force.tankDestroyer * adjustedAttackValue(UnitKind::TankDestroyer, battleZone);
         if (includeArtillery) {
             total += force.artillery * adjustedAttackValue(UnitKind::Artillery, battleZone);
         }
@@ -317,6 +374,10 @@ class SimplifiedChinaMdp {
         double total = 0.0;
         total += force.infantry * adjustedDefenseValue(UnitKind::Infantry, battleZone);
         total += force.marine * adjustedDefenseValue(UnitKind::Marine, battleZone);
+        total += force.lightTank * adjustedDefenseValue(UnitKind::LightTank, battleZone);
+        total += force.mechanizedInfantry * adjustedDefenseValue(UnitKind::MechanizedInfantry, battleZone);
+        total += force.mediumTank * adjustedDefenseValue(UnitKind::MediumTank, battleZone);
+        total += force.tankDestroyer * adjustedDefenseValue(UnitKind::TankDestroyer, battleZone);
         if (includeArtillery) {
             total += force.artillery * adjustedDefenseValue(UnitKind::Artillery, battleZone);
         }
@@ -350,7 +411,14 @@ class SimplifiedChinaMdp {
 
         std::vector<FractionalKindState> kindStates;
         int assignedSurvivors = 0;
-        for (const auto kind : {UnitKind::Infantry, UnitKind::Artillery, UnitKind::Marine}) {
+        for (const auto kind : {
+                 UnitKind::Infantry,
+                 UnitKind::Artillery,
+                 UnitKind::Marine,
+                 UnitKind::LightTank,
+                 UnitKind::MechanizedInfantry,
+                 UnitKind::MediumTank,
+                 UnitKind::TankDestroyer}) {
             const auto survivingCount = forceCountForKind(force, kind);
             if (survivingCount <= 1e-9) {
                 continue;

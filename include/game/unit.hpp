@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -14,9 +15,21 @@ enum class UnitKind {
     Infantry,
     Artillery,
     Marine,
+    LightTank,
+    MechanizedInfantry,
+    MediumTank,
+    TankDestroyer,
     Fighter,
     Transport,
 };
+
+inline constexpr std::size_t unitKindCount() {
+    return 9;
+}
+
+inline constexpr std::size_t unitKindIndex(UnitKind kind) {
+    return static_cast<std::size_t>(kind);
+}
 
 inline std::string_view toString(UnitKind kind) {
     switch (kind) {
@@ -26,6 +39,14 @@ inline std::string_view toString(UnitKind kind) {
             return "Artillery";
         case UnitKind::Marine:
             return "Marine";
+        case UnitKind::LightTank:
+            return "LightTank";
+        case UnitKind::MechanizedInfantry:
+            return "MechanizedInfantry";
+        case UnitKind::MediumTank:
+            return "MediumTank";
+        case UnitKind::TankDestroyer:
+            return "TankDestroyer";
         case UnitKind::Fighter:
             return "Fighter";
         case UnitKind::Transport:
@@ -43,6 +64,18 @@ inline UnitKind parseUnitKind(std::string_view value) {
     }
     if (value == "Marine") {
         return UnitKind::Marine;
+    }
+    if (value == "LightTank") {
+        return UnitKind::LightTank;
+    }
+    if (value == "MechanizedInfantry") {
+        return UnitKind::MechanizedInfantry;
+    }
+    if (value == "MediumTank") {
+        return UnitKind::MediumTank;
+    }
+    if (value == "TankDestroyer") {
+        return UnitKind::TankDestroyer;
     }
     if (value == "Fighter") {
         return UnitKind::Fighter;
@@ -133,6 +166,38 @@ class Marine final : public Unit {
     std::unique_ptr<Unit> clone() const override { return std::make_unique<Marine>(*this); }
 };
 
+class LightTank final : public Unit {
+  public:
+    LightTank(std::string ownerId, std::string zoneId)
+        : Unit(UnitKind::LightTank, std::move(ownerId), std::move(zoneId), 2) {}
+
+    std::unique_ptr<Unit> clone() const override { return std::make_unique<LightTank>(*this); }
+};
+
+class MechanizedInfantry final : public Unit {
+  public:
+    MechanizedInfantry(std::string ownerId, std::string zoneId)
+        : Unit(UnitKind::MechanizedInfantry, std::move(ownerId), std::move(zoneId), 2) {}
+
+    std::unique_ptr<Unit> clone() const override { return std::make_unique<MechanizedInfantry>(*this); }
+};
+
+class MediumTank final : public Unit {
+  public:
+    MediumTank(std::string ownerId, std::string zoneId)
+        : Unit(UnitKind::MediumTank, std::move(ownerId), std::move(zoneId), 2) {}
+
+    std::unique_ptr<Unit> clone() const override { return std::make_unique<MediumTank>(*this); }
+};
+
+class TankDestroyer final : public Unit {
+  public:
+    TankDestroyer(std::string ownerId, std::string zoneId)
+        : Unit(UnitKind::TankDestroyer, std::move(ownerId), std::move(zoneId), 2) {}
+
+    std::unique_ptr<Unit> clone() const override { return std::make_unique<TankDestroyer>(*this); }
+};
+
 class Fighter final : public Unit {
   public:
     Fighter(std::string ownerId, std::string zoneId)
@@ -172,6 +237,14 @@ inline std::unique_ptr<Unit> makeUnit(UnitKind kind, std::string ownerId, std::s
             return std::make_unique<Artillery>(std::move(ownerId), std::move(zoneId));
         case UnitKind::Marine:
             return std::make_unique<Marine>(std::move(ownerId), std::move(zoneId));
+        case UnitKind::LightTank:
+            return std::make_unique<LightTank>(std::move(ownerId), std::move(zoneId));
+        case UnitKind::MechanizedInfantry:
+            return std::make_unique<MechanizedInfantry>(std::move(ownerId), std::move(zoneId));
+        case UnitKind::MediumTank:
+            return std::make_unique<MediumTank>(std::move(ownerId), std::move(zoneId));
+        case UnitKind::TankDestroyer:
+            return std::make_unique<TankDestroyer>(std::move(ownerId), std::move(zoneId));
         case UnitKind::Fighter:
             return std::make_unique<Fighter>(std::move(ownerId), std::move(zoneId));
         case UnitKind::Transport:
@@ -185,6 +258,14 @@ inline int purchaseCost(UnitKind kind) {
         case UnitKind::Infantry:
             return 3;
         case UnitKind::Artillery:
+            return 4;
+        case UnitKind::LightTank:
+            return 4;
+        case UnitKind::MechanizedInfantry:
+            return 4;
+        case UnitKind::MediumTank:
+            return 6;
+        case UnitKind::TankDestroyer:
             return 4;
         case UnitKind::Fighter:
             return 10;
@@ -200,6 +281,14 @@ inline int rewardValue(UnitKind kind) {
         case UnitKind::Infantry:
             return 3;
         case UnitKind::Artillery:
+            return 4;
+        case UnitKind::LightTank:
+            return 4;
+        case UnitKind::MechanizedInfantry:
+            return 4;
+        case UnitKind::MediumTank:
+            return 6;
+        case UnitKind::TankDestroyer:
             return 4;
         case UnitKind::Marine:
             return 0;
