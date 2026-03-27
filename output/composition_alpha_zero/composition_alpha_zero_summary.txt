@@ -1,0 +1,78 @@
+Composition AlphaZero training summary
+episodes=20
+state_dim=20
+action_dim=11
+note=two_model_self_play_attacker_vs_defender_zero_sum_battle_composition
+recent_average_attacker_self_play_reward=-0.8000
+
+Training config
+- episodes=20
+- eval_every=10
+- learning_rate=0.001
+- state_hidden_dim=128
+- action_hidden_dim=64
+- joint_hidden_dim=128
+- search_simulations=12
+- c_puct=1.5
+- root_dirichlet_alpha=0.3
+- root_dirichlet_epsilon=0.25
+- self_play_temperature=1.0
+- value_loss_coef=0.25
+- entropy_coef=0.001
+- grad_clip_norm=5.0
+- attacker_budget=10
+- defender_budget=10
+- terrain=normal
+- is_city=False
+- seed=1936
+last_self_play_attacker_reward=-1.0000
+last_self_play_winner=Defender
+last_attacker_total_loss=1.2824
+last_defender_total_loss=1.6262
+best_deterministic_attacker_reward=-1.0000
+best_deterministic_episode=10
+best_self_play_attacker_reward=1.0000
+best_self_play_episode=6
+
+Deterministic evaluation checkpoints
+- episode=10 attacker_reward=-1.0000
+- episode=20 attacker_reward=-1.0000
+
+First attacker purchase root
+- purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.2500 prior=0.0799 visits=3 action_value=-0.7021
+- purchase_unit(count=1, unit=Infantry): search_prob=0.0833 prior=0.0768 visits=1 action_value=-0.7823
+- purchase_unit(count=2, unit=Infantry): search_prob=0.0833 prior=0.0783 visits=1 action_value=-0.7690
+- purchase_unit(count=3, unit=Infantry): search_prob=0.0833 prior=0.0799 visits=1 action_value=-0.7854
+- purchase_unit(count=1, unit=Artillery): search_prob=0.0833 prior=0.0759 visits=1 action_value=-0.7759
+- purchase_unit(count=2, unit=Artillery): search_prob=0.0833 prior=0.0764 visits=1 action_value=-0.7892
+- purchase_unit(count=2, unit=LightTank): search_prob=0.0833 prior=0.0759 visits=1 action_value=-0.7446
+- purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0833 prior=0.0783 visits=1 action_value=-0.7618
+- purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0833 prior=0.0776 visits=1 action_value=-0.7426
+- purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0833 prior=0.0792 visits=1 action_value=-0.7120
+- purchase_unit(count=1, unit=LightTank): search_prob=0.0000 prior=0.0746 visits=0 action_value=0.0000
+- purchase_unit(count=1, unit=MediumTank): search_prob=0.0000 prior=0.0716 visits=0 action_value=0.0000
+- end_phase: search_prob=0.0000 prior=0.0755 visits=0 action_value=0.0000
+
+Current deterministic evaluation
+- attacker_reward=-1.0000
+- winner_id=Defender
+Attacker / purchase_units -> purchase_unit(count=2, unit=MechanizedInfantry) (search_value=-0.7021, visits=3)
+    Attacker purchase: 2 MechanizedInfantry for 8 budget
+Attacker / purchase_units -> end_phase (search_value=-0.9466, visits=12)
+    attacker composition locked
+Defender / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=0.9610, visits=12)
+    Defender purchase: 3 Infantry for 9 budget
+Defender / purchase_units -> end_phase (search_value=1.0000, visits=12)
+    defender composition locked
+    resolving composition battle: attackers=2, defenders=3
+    round 1: attacker 2 Mech (4/12=0.33), defender 3 Inf (12/12=1)
+      after casualties: attacker 1 Mech, defender 2.67 Inf, losses attacker=1, defender=0.33
+    round 2: attacker 1 Mech (2/12=0.17), defender 2.67 Inf (10.67/12=0.89)
+      after casualties: attacker 0.11 Mech, defender 2.50 Inf, losses attacker=0.89, defender=0.17
+    round 3: attacker 0.11 Mech (0.22/12=0.02), defender 2.50 Inf (10/12=0.83)
+      after casualties: attacker 0, defender 2.48 Inf, losses attacker=0.83, defender=0.02
+    battle result: defenders won
+
+Detailed trace files
+- best self-play trace: output/best_composition_self_play_trace.txt
+- best deterministic trace: output/best_composition_deterministic_trace.txt

@@ -1,0 +1,983 @@
+{
+  "config": {
+    "episodes": 20,
+    "eval_every": 10,
+    "learning_rate": 0.001,
+    "state_hidden_dim": 128,
+    "action_hidden_dim": 64,
+    "joint_hidden_dim": 128,
+    "search_simulations": 12,
+    "c_puct": 1.5,
+    "root_dirichlet_alpha": 0.3,
+    "root_dirichlet_epsilon": 0.25,
+    "self_play_temperature": 1.0,
+    "value_loss_coef": 0.25,
+    "entropy_coef": 0.001,
+    "grad_clip_norm": 5.0,
+    "attacker_budget": 10,
+    "defender_budget": 10,
+    "terrain": "normal",
+    "is_city": false,
+    "seed": 1936
+  },
+  "state_dim": 20,
+  "action_dim": 11,
+  "history": [
+    {
+      "episode": 1.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 2.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 3.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 4.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 5.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 6.0,
+      "attacker_reward": 1.0,
+      "winner": "Attacker"
+    },
+    {
+      "episode": 7.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 8.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 9.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 10.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 11.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 12.0,
+      "attacker_reward": 1.0,
+      "winner": "Attacker"
+    },
+    {
+      "episode": 13.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 14.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 15.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 16.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 17.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 18.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 19.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    },
+    {
+      "episode": 20.0,
+      "attacker_reward": -1.0,
+      "winner": "Defender"
+    }
+  ],
+  "evaluation_history": [
+    {
+      "episode": 10.0,
+      "final_reward": -1.0
+    },
+    {
+      "episode": 20.0,
+      "final_reward": -1.0
+    }
+  ],
+  "best_self_play": {
+    "final_reward": 1.0,
+    "winner_id": "Attacker",
+    "trace": [
+      "Attacker / purchase_units -> purchase_unit(count=1, unit=TankDestroyer) (search_value=-0.6220, visits=5)",
+      "    Attacker purchase: 1 TankDestroyer for 4 budget",
+      "Attacker / purchase_units -> end_phase (search_value=-0.8038, visits=1)",
+      "    attacker composition locked",
+      "Defender / purchase_units -> end_phase (search_value=-1.0000, visits=1)",
+      "    defender composition locked",
+      "    resolving composition battle: attackers=1, defenders=0",
+      "    battle result: attackers won"
+    ],
+    "search_tables": [
+      {
+        "decision": "Attacker / purchase_units",
+        "chosen_action": "purchase_unit(count=1, unit=TankDestroyer)",
+        "actions": [
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.4166666666666667,
+            "prior_probability": 0.0768064484000206,
+            "visits": 5,
+            "action_value": -0.6219694912433624
+          },
+          {
+            "action": "purchase_unit(count=3, unit=Infantry)",
+            "search_probability": 0.16666666666666666,
+            "prior_probability": 0.07384898513555527,
+            "visits": 2,
+            "action_value": -0.6768350005149841
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Artillery)",
+            "search_probability": 0.16666666666666666,
+            "prior_probability": 0.07600101828575134,
+            "visits": 2,
+            "action_value": -0.6387391984462738
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07423685491085052,
+            "visits": 1,
+            "action_value": -0.7023746371269226
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07870805263519287,
+            "visits": 1,
+            "action_value": -0.7592280507087708
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07690256088972092,
+            "visits": 1,
+            "action_value": -0.694427490234375
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07462117075920105,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0770752802491188,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07677680999040604,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07660914957523346,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07861556112766266,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07677427679300308,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "end_phase",
+            "search_probability": 0.0,
+            "prior_probability": 0.0830237865447998,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      },
+      {
+        "decision": "Attacker / purchase_units",
+        "chosen_action": "end_phase",
+        "actions": [
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.3333333333333333,
+            "prior_probability": 0.125204935669899,
+            "visits": 4,
+            "action_value": -0.6326353177428246
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.16666666666666666,
+            "prior_probability": 0.1242767721414566,
+            "visits": 2,
+            "action_value": -0.6503957509994507
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.16666666666666666,
+            "prior_probability": 0.12295078486204147,
+            "visits": 2,
+            "action_value": -0.5987561941146851
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.12147699296474457,
+            "visits": 1,
+            "action_value": -0.6437980532646179
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.12113060802221298,
+            "visits": 1,
+            "action_value": -0.5605852007865906
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.1273624449968338,
+            "visits": 1,
+            "action_value": -0.6147359013557434
+          },
+          {
+            "action": "end_phase",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.1332280933856964,
+            "visits": 1,
+            "action_value": -0.8037698864936829
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.12436935305595398,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      },
+      {
+        "decision": "Defender / purchase_units",
+        "chosen_action": "end_phase",
+        "actions": [
+          {
+            "action": "purchase_unit(count=2, unit=LightTank)",
+            "search_probability": 0.5833333333333334,
+            "prior_probability": 0.07648471742868423,
+            "visits": 7,
+            "action_value": 0.9154054522514343
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.3333333333333333,
+            "prior_probability": 0.07782629132270813,
+            "visits": 4,
+            "action_value": 0.46472636610269547
+          },
+          {
+            "action": "end_phase",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07264363020658493,
+            "visits": 1,
+            "action_value": -1.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07867108285427094,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=3, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07974430173635483,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0764879584312439,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0773368775844574,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0756402239203453,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07691099494695663,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07782720774412155,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07605686038732529,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07671331614255905,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07765648514032364,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      }
+    ]
+  },
+  "best_self_play_episode": 6,
+  "best_eval": {
+    "final_reward": -1.0,
+    "winner_id": "Defender",
+    "trace": [
+      "Attacker / purchase_units -> end_phase (search_value=-0.8461, visits=2)",
+      "    attacker composition locked",
+      "Defender / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=0.9826, visits=12)",
+      "    Defender purchase: 3 Infantry for 9 budget",
+      "Defender / purchase_units -> end_phase (search_value=1.0000, visits=12)",
+      "    defender composition locked",
+      "    resolving composition battle: attackers=0, defenders=3",
+      "    battle result: defenders won"
+    ],
+    "search_tables": [
+      {
+        "decision": "Attacker / purchase_units",
+        "chosen_action": "end_phase",
+        "actions": [
+          {
+            "action": "end_phase",
+            "search_probability": 0.16666666666666666,
+            "prior_probability": 0.0813860222697258,
+            "visits": 2,
+            "action_value": -0.8460587859153748
+          },
+          {
+            "action": "purchase_unit(count=3, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07456579804420471,
+            "visits": 1,
+            "action_value": -0.7306771278381348
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07654605060815811,
+            "visits": 1,
+            "action_value": -0.784001350402832
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Artillery)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07572460174560547,
+            "visits": 1,
+            "action_value": -0.7440540790557861
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07670502364635468,
+            "visits": 1,
+            "action_value": -0.7660848498344421
+          },
+          {
+            "action": "purchase_unit(count=2, unit=LightTank)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07674169540405273,
+            "visits": 1,
+            "action_value": -0.7098484635353088
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.0790470764040947,
+            "visits": 1,
+            "action_value": -0.7737889289855957
+          },
+          {
+            "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07919702678918839,
+            "visits": 1,
+            "action_value": -0.733371376991272
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07590945065021515,
+            "visits": 1,
+            "action_value": -0.736112117767334
+          },
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07750649750232697,
+            "visits": 1,
+            "action_value": -0.7476816177368164
+          },
+          {
+            "action": "purchase_unit(count=2, unit=TankDestroyer)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07777957618236542,
+            "visits": 1,
+            "action_value": -0.6771306991577148
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0745033547282219,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07438790053129196,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      },
+      {
+        "decision": "Defender / purchase_units",
+        "chosen_action": "purchase_unit(count=3, unit=Infantry)",
+        "actions": [
+          {
+            "action": "purchase_unit(count=3, unit=Infantry)",
+            "search_probability": 1.0,
+            "prior_probability": 0.08190982788801193,
+            "visits": 12,
+            "action_value": 0.9825819134712219
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0784514993429184,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.08005174994468689,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07579999417066574,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07769845426082611,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0750284194946289,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07669039815664291,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07659946382045746,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07825282961130142,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07505591958761215,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07624351978302002,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0779898390173912,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "end_phase",
+            "search_probability": 0.0,
+            "prior_probability": 0.07022812217473984,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      },
+      {
+        "decision": "Defender / purchase_units",
+        "chosen_action": "end_phase",
+        "actions": [
+          {
+            "action": "end_phase",
+            "search_probability": 1.0,
+            "prior_probability": 1.0,
+            "visits": 12,
+            "action_value": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  "best_eval_episode": 10,
+  "final_eval": {
+    "final_reward": -1.0,
+    "winner_id": "Defender",
+    "trace": [
+      "Attacker / purchase_units -> purchase_unit(count=2, unit=MechanizedInfantry) (search_value=-0.7021, visits=3)",
+      "    Attacker purchase: 2 MechanizedInfantry for 8 budget",
+      "Attacker / purchase_units -> end_phase (search_value=-0.9466, visits=12)",
+      "    attacker composition locked",
+      "Defender / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=0.9610, visits=12)",
+      "    Defender purchase: 3 Infantry for 9 budget",
+      "Defender / purchase_units -> end_phase (search_value=1.0000, visits=12)",
+      "    defender composition locked",
+      "    resolving composition battle: attackers=2, defenders=3",
+      "    round 1: attacker 2 Mech (4/12=0.33), defender 3 Inf (12/12=1)",
+      "      after casualties: attacker 1 Mech, defender 2.67 Inf, losses attacker=1, defender=0.33",
+      "    round 2: attacker 1 Mech (2/12=0.17), defender 2.67 Inf (10.67/12=0.89)",
+      "      after casualties: attacker 0.11 Mech, defender 2.50 Inf, losses attacker=0.89, defender=0.17",
+      "    round 3: attacker 0.11 Mech (0.22/12=0.02), defender 2.50 Inf (10/12=0.83)",
+      "      after casualties: attacker 0, defender 2.48 Inf, losses attacker=0.83, defender=0.02",
+      "    battle result: defenders won"
+    ],
+    "search_tables": [
+      {
+        "decision": "Attacker / purchase_units",
+        "chosen_action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+        "actions": [
+          {
+            "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+            "search_probability": 0.25,
+            "prior_probability": 0.07993607968091965,
+            "visits": 3,
+            "action_value": -0.7020820577939352
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07684268802404404,
+            "visits": 1,
+            "action_value": -0.7823128700256348
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07827293127775192,
+            "visits": 1,
+            "action_value": -0.7690399885177612
+          },
+          {
+            "action": "purchase_unit(count=3, unit=Infantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07993502914905548,
+            "visits": 1,
+            "action_value": -0.7853540182113647
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07593202590942383,
+            "visits": 1,
+            "action_value": -0.775897741317749
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Artillery)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07643549144268036,
+            "visits": 1,
+            "action_value": -0.7891515493392944
+          },
+          {
+            "action": "purchase_unit(count=2, unit=LightTank)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07587650418281555,
+            "visits": 1,
+            "action_value": -0.7445924282073975
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.0783022865653038,
+            "visits": 1,
+            "action_value": -0.7618076801300049
+          },
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07759839296340942,
+            "visits": 1,
+            "action_value": -0.7426308393478394
+          },
+          {
+            "action": "purchase_unit(count=2, unit=TankDestroyer)",
+            "search_probability": 0.08333333333333333,
+            "prior_probability": 0.07915768027305603,
+            "visits": 1,
+            "action_value": -0.7120177745819092
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0745612233877182,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07160390913486481,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "end_phase",
+            "search_probability": 0.0,
+            "prior_probability": 0.07554573565721512,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      },
+      {
+        "decision": "Attacker / purchase_units",
+        "chosen_action": "end_phase",
+        "actions": [
+          {
+            "action": "end_phase",
+            "search_probability": 1.0,
+            "prior_probability": 1.0,
+            "visits": 12,
+            "action_value": -0.9465566575527191
+          }
+        ]
+      },
+      {
+        "decision": "Defender / purchase_units",
+        "chosen_action": "purchase_unit(count=3, unit=Infantry)",
+        "actions": [
+          {
+            "action": "purchase_unit(count=3, unit=Infantry)",
+            "search_probability": 1.0,
+            "prior_probability": 0.08282380551099777,
+            "visits": 12,
+            "action_value": 0.9609529674053192
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0781291052699089,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Infantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.08059217035770416,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07432089000940323,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=Artillery)",
+            "search_probability": 0.0,
+            "prior_probability": 0.0761699229478836,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07457292824983597,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=LightTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07600182294845581,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07683838903903961,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07876020669937134,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=MediumTank)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07596033811569214,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=1, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07585147768259048,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "purchase_unit(count=2, unit=TankDestroyer)",
+            "search_probability": 0.0,
+            "prior_probability": 0.07779776304960251,
+            "visits": 0,
+            "action_value": 0.0
+          },
+          {
+            "action": "end_phase",
+            "search_probability": 0.0,
+            "prior_probability": 0.07218114286661148,
+            "visits": 0,
+            "action_value": 0.0
+          }
+        ]
+      },
+      {
+        "decision": "Defender / purchase_units",
+        "chosen_action": "end_phase",
+        "actions": [
+          {
+            "action": "end_phase",
+            "search_probability": 1.0,
+            "prior_probability": 1.0,
+            "visits": 12,
+            "action_value": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  "first_purchase": [
+    {
+      "action": "purchase_unit(count=2, unit=MechanizedInfantry)",
+      "search_probability": 0.25,
+      "prior_probability": 0.07993607968091965,
+      "visits": 3,
+      "action_value": -0.7020820577939352
+    },
+    {
+      "action": "purchase_unit(count=1, unit=Infantry)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07684268802404404,
+      "visits": 1,
+      "action_value": -0.7823128700256348
+    },
+    {
+      "action": "purchase_unit(count=2, unit=Infantry)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07827293127775192,
+      "visits": 1,
+      "action_value": -0.7690399885177612
+    },
+    {
+      "action": "purchase_unit(count=3, unit=Infantry)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07993502914905548,
+      "visits": 1,
+      "action_value": -0.7853540182113647
+    },
+    {
+      "action": "purchase_unit(count=1, unit=Artillery)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07593202590942383,
+      "visits": 1,
+      "action_value": -0.775897741317749
+    },
+    {
+      "action": "purchase_unit(count=2, unit=Artillery)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07643549144268036,
+      "visits": 1,
+      "action_value": -0.7891515493392944
+    },
+    {
+      "action": "purchase_unit(count=2, unit=LightTank)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07587650418281555,
+      "visits": 1,
+      "action_value": -0.7445924282073975
+    },
+    {
+      "action": "purchase_unit(count=1, unit=MechanizedInfantry)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.0783022865653038,
+      "visits": 1,
+      "action_value": -0.7618076801300049
+    },
+    {
+      "action": "purchase_unit(count=1, unit=TankDestroyer)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07759839296340942,
+      "visits": 1,
+      "action_value": -0.7426308393478394
+    },
+    {
+      "action": "purchase_unit(count=2, unit=TankDestroyer)",
+      "search_probability": 0.08333333333333333,
+      "prior_probability": 0.07915768027305603,
+      "visits": 1,
+      "action_value": -0.7120177745819092
+    },
+    {
+      "action": "purchase_unit(count=1, unit=LightTank)",
+      "search_probability": 0.0,
+      "prior_probability": 0.0745612233877182,
+      "visits": 0,
+      "action_value": 0.0
+    },
+    {
+      "action": "purchase_unit(count=1, unit=MediumTank)",
+      "search_probability": 0.0,
+      "prior_probability": 0.07160390913486481,
+      "visits": 0,
+      "action_value": 0.0
+    },
+    {
+      "action": "end_phase",
+      "search_probability": 0.0,
+      "prior_probability": 0.07554573565721512,
+      "visits": 0,
+      "action_value": 0.0
+    }
+  ],
+  "last_attacker_losses": {
+    "policy_loss": 1.2723736763000488,
+    "value_loss": 0.04504841938614845,
+    "entropy_bonus": 1.2823134660720825,
+    "total_loss": 1.282353401184082
+  },
+  "last_defender_losses": {
+    "policy_loss": 1.59969162940979,
+    "value_loss": 0.11252675205469131,
+    "entropy_bonus": 1.6087050437927246,
+    "total_loss": 1.626214623451233
+  }
+}

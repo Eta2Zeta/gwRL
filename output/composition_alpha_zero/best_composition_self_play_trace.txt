@@ -1,0 +1,56 @@
+Best self-play episode
+episode=6
+attacker_reward=1.0000
+winner_id=Attacker
+
+Decision trace
+Attacker / purchase_units -> purchase_unit(count=1, unit=TankDestroyer) (search_value=-0.6220, visits=5)
+    Attacker purchase: 1 TankDestroyer for 4 budget
+Attacker / purchase_units -> end_phase (search_value=-0.8038, visits=1)
+    attacker composition locked
+Defender / purchase_units -> end_phase (search_value=-1.0000, visits=1)
+    defender composition locked
+    resolving composition battle: attackers=1, defenders=0
+    battle result: attackers won
+
+Root search tables
+
+Attacker / purchase_units -> chosen=purchase_unit(count=1, unit=TankDestroyer)
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.4167 prior=0.0768 visits=5 action_value=-0.6220
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.1667 prior=0.0738 visits=2 action_value=-0.6768
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.1667 prior=0.0760 visits=2 action_value=-0.6387
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0833 prior=0.0742 visits=1 action_value=-0.7024
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0833 prior=0.0787 visits=1 action_value=-0.7592
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0833 prior=0.0769 visits=1 action_value=-0.6944
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0000 prior=0.0746 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0000 prior=0.0771 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0000 prior=0.0768 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0000 prior=0.0766 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0000 prior=0.0786 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0000 prior=0.0768 visits=0 action_value=0.0000
+  - end_phase: search_prob=0.0000 prior=0.0830 visits=0 action_value=0.0000
+
+Attacker / purchase_units -> chosen=end_phase
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.3333 prior=0.1252 visits=4 action_value=-0.6326
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.1667 prior=0.1243 visits=2 action_value=-0.6504
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.1667 prior=0.1230 visits=2 action_value=-0.5988
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0833 prior=0.1215 visits=1 action_value=-0.6438
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0833 prior=0.1211 visits=1 action_value=-0.5606
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0833 prior=0.1274 visits=1 action_value=-0.6147
+  - end_phase: search_prob=0.0833 prior=0.1332 visits=1 action_value=-0.8038
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0000 prior=0.1244 visits=0 action_value=0.0000
+
+Defender / purchase_units -> chosen=end_phase
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.5833 prior=0.0765 visits=7 action_value=0.9154
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.3333 prior=0.0778 visits=4 action_value=0.4647
+  - end_phase: search_prob=0.0833 prior=0.0726 visits=1 action_value=-1.0000
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0000 prior=0.0787 visits=0 action_value=0.0000
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.0000 prior=0.0797 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0000 prior=0.0765 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0000 prior=0.0773 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0000 prior=0.0756 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0000 prior=0.0769 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0000 prior=0.0778 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0000 prior=0.0761 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0000 prior=0.0767 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0000 prior=0.0777 visits=0 action_value=0.0000

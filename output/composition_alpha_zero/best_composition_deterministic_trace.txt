@@ -1,0 +1,48 @@
+Best deterministic evaluation
+episode=10
+attacker_reward=-1.0000
+winner_id=Defender
+
+Attacker / purchase_units -> end_phase (search_value=-0.8461, visits=2)
+    attacker composition locked
+Defender / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=0.9826, visits=12)
+    Defender purchase: 3 Infantry for 9 budget
+Defender / purchase_units -> end_phase (search_value=1.0000, visits=12)
+    defender composition locked
+    resolving composition battle: attackers=0, defenders=3
+    battle result: defenders won
+
+Root search tables
+
+Attacker / purchase_units -> chosen=end_phase
+  - end_phase: search_prob=0.1667 prior=0.0814 visits=2 action_value=-0.8461
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.0833 prior=0.0746 visits=1 action_value=-0.7307
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0833 prior=0.0765 visits=1 action_value=-0.7840
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0833 prior=0.0757 visits=1 action_value=-0.7441
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0833 prior=0.0767 visits=1 action_value=-0.7661
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0833 prior=0.0767 visits=1 action_value=-0.7098
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0833 prior=0.0790 visits=1 action_value=-0.7738
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0833 prior=0.0792 visits=1 action_value=-0.7334
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0833 prior=0.0759 visits=1 action_value=-0.7361
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0833 prior=0.0775 visits=1 action_value=-0.7477
+  - purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0833 prior=0.0778 visits=1 action_value=-0.6771
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0000 prior=0.0745 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0000 prior=0.0744 visits=0 action_value=0.0000
+
+Defender / purchase_units -> chosen=purchase_unit(count=3, unit=Infantry)
+  - purchase_unit(count=3, unit=Infantry): search_prob=1.0000 prior=0.0819 visits=12 action_value=0.9826
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0000 prior=0.0785 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0000 prior=0.0801 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0000 prior=0.0758 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0000 prior=0.0777 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0000 prior=0.0750 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0000 prior=0.0767 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0000 prior=0.0766 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0000 prior=0.0783 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0000 prior=0.0751 visits=0 action_value=0.0000
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0000 prior=0.0762 visits=0 action_value=0.0000
+  - purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0000 prior=0.0780 visits=0 action_value=0.0000
+  - end_phase: search_prob=0.0000 prior=0.0702 visits=0 action_value=0.0000
+
+Defender / purchase_units -> chosen=end_phase
+  - end_phase: search_prob=1.0000 prior=1.0000 visits=12 action_value=1.0000
