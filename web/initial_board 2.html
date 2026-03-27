@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GW Simplified China Board</title>
+  <style>
+    :root {
+      --paper: #f2ebd9;
+      --paper-deep: #e6dcc6;
+      --ink: #1e2b28;
+      --muted: #5f675d;
+      --rail: #c5902e;
+      --link: #7b8076;
+      --panel: rgba(250, 246, 236, 0.94);
+      --shadow: rgba(31, 39, 34, 0.18);
+      --japan: #b43c2f;
+      --kmt: #24558c;
+      --ccp: #9a7a12;
+      --zhili: #3d7c74;
+      --mengjiang: #7d6b35;
+      --neutral: #808073;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Gill Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 28%),
+        linear-gradient(160deg, #f6f0e0 0%, #ebe0c7 48%, #e1d4b7 100%);
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 20px;
+      padding: 24px;
+    }
+
+    .stage,
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(60, 72, 67, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 22px 48px var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .stage {
+      padding: 18px 18px 10px;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      margin: 0;
+      font-family: Baskerville, "Palatino Linotype", serif;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle,
+    .meta {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nation-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .source-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 6px 0 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .load-file {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(35, 43, 39, 0.08);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+
+    .load-file input {
+      display: none;
+    }
+
+    .nation-card {
+      min-width: 112px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: white;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    .nation-card strong {
+      display: block;
+      font-size: 0.95rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .nation-card span {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .board-shell {
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(244, 239, 225, 0.98), rgba(233, 224, 199, 0.98)),
+        linear-gradient(90deg, rgba(142, 127, 100, 0.12) 1px, transparent 1px),
+        linear-gradient(rgba(142, 127, 100, 0.12) 1px, transparent 1px);
+      background-size: auto, 26px 26px, 26px 26px;
+      border: 1px solid rgba(60, 72, 67, 0.12);
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .edge {
+      stroke: var(--link);
+      stroke-width: 3;
+      opacity: 0.7;
+    }
+
+    .edge.railway {
+      stroke: var(--rail);
+      stroke-width: 4.5;
+      opacity: 0.95;
+    }
+
+    .node rect {
+      stroke: rgba(17, 25, 23, 0.38);
+      stroke-width: 1.5;
+      rx: 18;
+      ry: 18;
+      cursor: pointer;
+      transition: transform 140ms ease, stroke-width 140ms ease, filter 140ms ease;
+      filter: drop-shadow(0 6px 14px rgba(22, 28, 25, 0.14));
+    }
+
+    .node text {
+      pointer-events: none;
+      user-select: none;
+      fill: white;
+    }
+
+    .node .name {
+      font-size: 18px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      letter-spacing: 0.02em;
+    }
+
+    .node .badge {
+      font-size: 12px;
+      font-weight: 700;
+      text-anchor: end;
+      dominant-baseline: hanging;
+    }
+
+    .node:hover rect,
+    .node.selected rect {
+      transform: translateY(-3px);
+      stroke-width: 3;
+      filter: drop-shadow(0 10px 18px rgba(22, 28, 25, 0.22));
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-family: Baskerville, "Palatino Linotype", serif;
+      font-size: 1.7rem;
+    }
+
+    .panel p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(73, 85, 77, 0.12);
+    }
+
+    .section h3 {
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .pill-list,
+    .detail-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(35, 43, 39, 0.08);
+      font-size: 0.86rem;
+    }
+
+    .detail-list li {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(73, 85, 77, 0.12);
+      font-size: 0.92rem;
+    }
+
+    .detail-list strong {
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="stage">
+      <div class="header">
+        <div>
+          <h1 class="title">Simplified China Board</h1>
+          <p class="subtitle">Initial setup snapshot rendered as a node-link board.</p>
+        </div>
+        <div class="meta" id="meta"></div>
+      </div>
+
+      <div class="nation-strip" id="nation-strip"></div>
+      <div class="source-bar">
+        <div class="meta" id="source-label">Loading JSON...</div>
+        <label class="load-file">
+          Load JSON File
+          <input id="json-file" type="file" accept=".json,application/json">
+        </label>
+      </div>
+
+      <div class="board-shell">
+        <svg id="board" viewBox="0 0 900 560" aria-label="Board graph"></svg>
+      </div>
+
+      <div class="legend">
+        <span class="legend-item"><span class="legend-swatch" style="background: var(--rail);"></span>Railway link</span>
+        <span class="legend-item"><span class="legend-swatch" style="background: var(--link);"></span>Standard link</span>
+        <span class="legend-item"><span class="legend-swatch" style="background: rgba(35,43,39,0.08);"></span>Click a node for details</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2 id="tile-name">Select a Tile</h2>
+      <p id="tile-summary">Click any node on the board to inspect ownership, units, facilities, and neighbors.</p>
+
+      <div class="section">
+        <h3>Units</h3>
+        <ul class="pill-list" id="unit-list"></ul>
+      </div>
+
+      <div class="section">
+        <h3>Facilities</h3>
+        <ul class="pill-list" id="facility-list"></ul>
+      </div>
+
+      <div class="section">
+        <h3>Neighbors</h3>
+        <ul class="detail-list" id="neighbor-list"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const sourceLabel = document.getElementById("source-label");
+    const fileInput = document.getElementById("json-file");
+    const positions = {
+      land_china_suiyuan: { x: 210, y: 155 },
+      land_china_beiping: { x: 470, y: 150 },
+      land_manchuria_rehe: { x: 705, y: 120 },
+      land_china_hopeh: { x: 390, y: 305 },
+      land_china_shensi: { x: 190, y: 390 },
+      land_china_shantung: { x: 620, y: 405 }
+    };
+
+    const ownerColors = {
+      CCP: "var(--ccp)",
+      Japan: "var(--japan)",
+      KMT: "var(--kmt)",
+      ZhiliClique: "var(--zhili)",
+      Mengjiang: "var(--mengjiang)"
+    };
+
+    const svg = document.getElementById("board");
+    const meta = document.getElementById("meta");
+    const nationStrip = document.getElementById("nation-strip");
+    const tileName = document.getElementById("tile-name");
+    const tileSummary = document.getElementById("tile-summary");
+    const unitList = document.getElementById("unit-list");
+    const facilityList = document.getElementById("facility-list");
+    const neighborList = document.getElementById("neighbor-list");
+    let snapshot = null;
+    let nodeById = new Map();
+    let nodeGroups = new Map();
+
+    function renderPills(container, values, emptyText) {
+      container.innerHTML = "";
+      if (!values.length) {
+        const pill = document.createElement("li");
+        pill.className = "pill";
+        pill.textContent = emptyText;
+        container.appendChild(pill);
+        return;
+      }
+
+      values.forEach((value) => {
+        const pill = document.createElement("li");
+        pill.className = "pill";
+        pill.textContent = value;
+        container.appendChild(pill);
+      });
+    }
+
+    function movementLeftForType(unitType) {
+      if (unitType === "Infantry" || unitType === "Marine") {
+        return 1;
+      }
+      if (unitType === "Fighter") {
+        return 4;
+      }
+      if (unitType === "Transport") {
+        return 2;
+      }
+      return 0;
+    }
+
+    function buildInitialSnapshotFromSetup(setupData) {
+      const unitsByZone = new Map();
+      Object.entries(setupData.setup || {}).forEach(([nationId, nationSetup]) => {
+        (nationSetup.units || []).forEach((unit) => {
+          const owner = unit.owner || nationId;
+          const unitView = {
+            owner,
+            type: unit.type,
+            movement_left: movementLeftForType(unit.type)
+          };
+          if (!unitsByZone.has(unit.zone)) {
+            unitsByZone.set(unit.zone, []);
+          }
+          unitsByZone.get(unit.zone).push(unitView);
+        });
+      });
+
+      const incomeByNation = new Map();
+      (setupData.nations || []).forEach((nation) => incomeByNation.set(nation.id, 0));
+
+      const nodes = (setupData.zones || []).map((zone) => {
+        if (incomeByNation.has(zone.controller)) {
+          incomeByNation.set(zone.controller, incomeByNation.get(zone.controller) + (zone.income_value || 0));
+        }
+        return {
+          id: zone.id,
+          name: zone.display_name,
+          current_owner: zone.controller,
+          units: unitsByZone.get(zone.id) || [],
+          facilities: zone.facilities || [],
+          neighbors: zone.neighbors || []
+        };
+      });
+
+      const nations = (setupData.nations || []).map((nation) => ({
+        id: nation.id,
+        name: nation.display_name,
+        total_income: incomeByNation.get(nation.id) || 0,
+        at_war_with: nation.at_war_with || [],
+        allies: nation.allies || []
+      }));
+
+      return {
+        step_index: 0,
+        terminal: false,
+        current_nation: (setupData.turn_order || [])[0] || "",
+        current_phase: (setupData.phases || [])[0] || "setup",
+        nations,
+        nodes
+      };
+    }
+
+    function normalizeData(rawData) {
+      if (Array.isArray(rawData.nodes)) {
+        return rawData;
+      }
+      if (Array.isArray(rawData.zones) && rawData.setup) {
+        return buildInitialSnapshotFromSetup(rawData);
+      }
+      throw new Error("Unsupported JSON format. Expected a setup JSON or a snapshot JSON.");
+    }
+
+    function positionForNode(nodeId, index, total) {
+      if (positions[nodeId]) {
+        return positions[nodeId];
+      }
+
+      const radius = 180;
+      const centerX = 450;
+      const centerY = 280;
+      const angle = (Math.PI * 2 * index) / Math.max(1, total);
+      return {
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius
+      };
+    }
+
+    function renderBoard(data, sourceText) {
+      snapshot = data;
+      nodeById = new Map(snapshot.nodes.map((node) => [node.id, node]));
+      nodeGroups = new Map();
+      svg.innerHTML = "";
+      nationStrip.innerHTML = "";
+      sourceLabel.textContent = sourceText;
+
+      meta.textContent = `Step ${snapshot.step_index ?? 0} · ${snapshot.current_nation || "setup"} · ${snapshot.current_phase || "setup"}`;
+
+      snapshot.nations.forEach((nation) => {
+        const card = document.createElement("div");
+        card.className = "nation-card";
+        card.style.background = ownerColors[nation.id] || "var(--neutral)";
+        card.innerHTML = `<strong>${nation.id}</strong><span>${nation.name}</span><span>Income ${nation.total_income}</span>`;
+        nationStrip.appendChild(card);
+      });
+
+      const uniqueEdges = [];
+      const seenEdges = new Set();
+      snapshot.nodes.forEach((node) => {
+        node.neighbors.forEach((neighbor) => {
+          const key = [node.id, neighbor.id].sort().join("::");
+          if (!seenEdges.has(key)) {
+            seenEdges.add(key);
+            uniqueEdges.push({
+              source: node.id,
+              target: neighbor.id,
+              railway: neighbor.railway
+            });
+          }
+        });
+      });
+
+      uniqueEdges.forEach((edge) => {
+        const sourceIndex = snapshot.nodes.findIndex((node) => node.id === edge.source);
+        const targetIndex = snapshot.nodes.findIndex((node) => node.id === edge.target);
+        const source = positionForNode(edge.source, sourceIndex, snapshot.nodes.length);
+        const target = positionForNode(edge.target, targetIndex, snapshot.nodes.length);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", source.x);
+        line.setAttribute("y1", source.y);
+        line.setAttribute("x2", target.x);
+        line.setAttribute("y2", target.y);
+        line.setAttribute("class", edge.railway ? "edge railway" : "edge");
+        svg.appendChild(line);
+      });
+
+      snapshot.nodes.forEach((node, index) => {
+        const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        group.setAttribute("class", "node");
+        group.dataset.nodeId = node.id;
+
+        const width = 156;
+        const height = 66;
+        const position = positionForNode(node.id, index, snapshot.nodes.length);
+        const x = position.x - width / 2;
+        const y = position.y - height / 2;
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", width);
+        rect.setAttribute("height", height);
+        rect.setAttribute("fill", ownerColors[node.current_owner] || "var(--neutral)");
+
+        const name = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        name.setAttribute("x", position.x);
+        name.setAttribute("y", position.y + 2);
+        name.setAttribute("class", "name");
+        name.textContent = node.name;
+
+        const badge = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        badge.setAttribute("x", x + width - 12);
+        badge.setAttribute("y", y + 10);
+        badge.setAttribute("class", "badge");
+        badge.textContent = node.units.length > 0 ? `${node.units.length}u` : "";
+
+        group.appendChild(rect);
+        group.appendChild(name);
+        group.appendChild(badge);
+        group.addEventListener("click", () => selectNode(node.id));
+        svg.appendChild(group);
+        nodeGroups.set(node.id, group);
+      });
+
+      if (snapshot.nodes.length > 0) {
+        selectNode(snapshot.nodes[0].id);
+      }
+    }
+
+    function selectNode(nodeId) {
+      nodeGroups.forEach((group) => group.classList.remove("selected"));
+      const selectedGroup = nodeGroups.get(nodeId);
+      if (!selectedGroup) {
+        return;
+      }
+      selectedGroup.classList.add("selected");
+
+      const node = nodeById.get(nodeId);
+      tileName.textContent = node.name;
+      tileSummary.textContent = `Controlled by ${node.current_owner}. ${node.units.length} unit${node.units.length === 1 ? "" : "s"} on the tile.`;
+
+      renderPills(
+        unitList,
+        node.units.map((unit) => `${unit.owner} ${unit.type} (move ${unit.movement_left})`),
+        "No units"
+      );
+      renderPills(
+        facilityList,
+        node.facilities.length ? node.facilities : [],
+        "No facilities"
+      );
+
+      neighborList.innerHTML = "";
+      node.neighbors.forEach((neighbor) => {
+        const entry = document.createElement("li");
+        const neighborNode = nodeById.get(neighbor.id);
+        const label = neighborNode ? neighborNode.name : neighbor.id;
+        entry.innerHTML = `<strong>${label}</strong><span>${neighbor.railway ? "Railway" : "Standard link"}</span>`;
+        neighborList.appendChild(entry);
+      });
+    }
+
+    async function loadFromUrl(sourcePath) {
+      const response = await fetch(sourcePath);
+      if (!response.ok) {
+        throw new Error(`Unable to load ${sourcePath}: ${response.status}`);
+      }
+      const rawData = await response.json();
+      renderBoard(normalizeData(rawData), `Source: ${sourcePath}`);
+    }
+
+    fileInput.addEventListener("change", async (event) => {
+      const [file] = event.target.files || [];
+      if (!file) {
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const rawData = JSON.parse(text);
+        renderBoard(normalizeData(rawData), `Source: ${file.name}`);
+      } catch (error) {
+        sourceLabel.textContent = `Failed to read ${file.name}: ${error.message}`;
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const sourcePath = params.get("source") || "../data/china_simplified_setup.json";
+
+    loadFromUrl(sourcePath).catch((error) => {
+      sourceLabel.textContent = `Could not load ${sourcePath}. Use a local server or load a JSON file manually.`;
+      tileName.textContent = "JSON Load Required";
+      tileSummary.textContent = error.message;
+      renderPills(unitList, [], "No units");
+      renderPills(facilityList, [], "No facilities");
+      neighborList.innerHTML = "";
+    });
+  </script>
+</body>
+</html>

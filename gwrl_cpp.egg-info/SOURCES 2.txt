@@ -1,0 +1,13 @@
+pyproject.toml
+setup.py
+gwrl_cpp.egg-info/PKG-INFO
+gwrl_cpp.egg-info/SOURCES.txt
+gwrl_cpp.egg-info/dependency_links.txt
+gwrl_cpp.egg-info/top_level.txt
+src/action_encoder.cpp
+src/game_state.cpp
+src/japan_training_env.cpp
+src/python_bindings.cpp
+src/setup_loader.cpp
+src/simple_json.cpp
+src/state_encoder.cpp
