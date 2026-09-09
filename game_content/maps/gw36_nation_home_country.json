@@ -1,11 +1,11 @@
 {
   "_meta": {
     "game": "Global War 1936 v4.3",
-    "source_rulebook_section": "Home Country (rulebook.txt lines 187-214)",
+    "source_rulebook_section": "Home Country (game_content/rules/rulebook.txt lines 187-214)",
     "description": "Nation-level Home Country data extracted from the rulebook definition and mapped to land node ids.",
     "inputs": [
-      "gw36_manual_map.json",
-      "rulebook.txt"
+      "game_content/maps/gw36_manual_map.json",
+      "game_content/rules/rulebook.txt"
     ]
   },
   "non_listed_nation_rule": "Non-listed nations: all originally possessed land zones except offshore territories.",

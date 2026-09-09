@@ -52,8 +52,8 @@ class TrainingConfig:
     value_loss_coef: float = 0.25
     entropy_coef: float = 0.001
     grad_clip_norm: float = 5.0
-    attacker_budget: int = 10
-    defender_budget: int = 10
+    attacker_budget: int = 50
+    defender_budget: int = 30
     terrain: str = "normal"
     is_city: bool = False
     seed: int = 1936
@@ -105,6 +105,11 @@ def build_env(config: TrainingConfig) -> gwrl_cpp.CompositionBattleEnv:
 
 
 def summarize_search_root(search: Any) -> list[dict[str, Any]]:
+    action_scores = getattr(search, "action_scores", [0.0] * len(search.actions))
+    normalized_q_values = getattr(search, "normalized_q_values", [0.0] * len(search.actions))
+    exploration_terms = getattr(search, "exploration_terms", [0.0] * len(search.actions))
+    q_min = float(getattr(search, "q_min", 0.0))
+    q_max = float(getattr(search, "q_max", 0.0))
     entries = [
         {
             "action": action.describe(),
@@ -112,6 +117,12 @@ def summarize_search_root(search: Any) -> list[dict[str, Any]]:
             "prior_probability": float(search.priors[index]),
             "visits": int(search.visit_counts[index]),
             "action_value": float(search.action_values[index]),
+            "action_value_raw": float(search.action_values[index]) if int(search.visit_counts[index]) > 0 else None,
+            "normalized_q": float(normalized_q_values[index]),
+            "exploration_term": float(exploration_terms[index]),
+            "selection_score": float(action_scores[index]),
+            "q_min": q_min,
+            "q_max": q_max,
         }
         for index, action in enumerate(search.actions)
     ]
@@ -291,10 +302,14 @@ def train(config: TrainingConfig) -> dict[str, Any]:
 
     history: list[dict[str, Any]] = []
     evaluation_history: list[dict[str, float]] = []
-    best_self_play: dict[str, Any] | None = None
-    best_self_play_episode: int | None = None
-    best_eval: dict[str, Any] | None = None
-    best_eval_episode: int | None = None
+    best_self_play_attacker: dict[str, Any] | None = None
+    best_self_play_attacker_episode: int | None = None
+    best_self_play_defender: dict[str, Any] | None = None
+    best_self_play_defender_episode: int | None = None
+    best_eval_attacker: dict[str, Any] | None = None
+    best_eval_attacker_episode: int | None = None
+    best_eval_defender: dict[str, Any] | None = None
+    best_eval_defender_episode: int | None = None
     last_attacker_losses: dict[str, float] = {}
     last_defender_losses: dict[str, float] = {}
 
@@ -372,14 +387,22 @@ def train(config: TrainingConfig) -> dict[str, Any]:
             'winner': env.winner_id(),
         })
 
-        if best_self_play is None or attacker_outcome > float(best_self_play['final_reward']):
-            best_self_play = {
+        if best_self_play_attacker is None or attacker_outcome > float(best_self_play_attacker['final_reward']):
+            best_self_play_attacker = {
                 'final_reward': attacker_outcome,
                 'winner_id': env.winner_id(),
                 'trace': list(episode_trace),
                 'search_tables': list(episode_search_tables),
             }
-            best_self_play_episode = episode_index + 1
+            best_self_play_attacker_episode = episode_index + 1
+        if best_self_play_defender is None or attacker_outcome < float(best_self_play_defender['final_reward']):
+            best_self_play_defender = {
+                'final_reward': attacker_outcome,
+                'winner_id': env.winner_id(),
+                'trace': list(episode_trace),
+                'search_tables': list(episode_search_tables),
+            }
+            best_self_play_defender_episode = episode_index + 1
 
         should_eval = ((episode_index + 1) % config.eval_every == 0) or episode_index == config.episodes - 1
         if should_eval:
@@ -388,9 +411,12 @@ def train(config: TrainingConfig) -> dict[str, Any]:
                 'episode': float(episode_index + 1),
                 'final_reward': float(evaluation['final_reward']),
             })
-            if best_eval is None or float(evaluation['final_reward']) > float(best_eval['final_reward']):
-                best_eval = evaluation
-                best_eval_episode = episode_index + 1
+            if best_eval_attacker is None or float(evaluation['final_reward']) > float(best_eval_attacker['final_reward']):
+                best_eval_attacker = evaluation
+                best_eval_attacker_episode = episode_index + 1
+            if best_eval_defender is None or float(evaluation['final_reward']) < float(best_eval_defender['final_reward']):
+                best_eval_defender = evaluation
+                best_eval_defender_episode = episode_index + 1
 
     final_eval = run_deterministic_episode(build_env(config), attacker_model, defender_model, mcts_config)
     first_purchase = snapshot_first_attacker_purchase(build_env(config), attacker_model, defender_model, mcts_config)
@@ -400,10 +426,14 @@ def train(config: TrainingConfig) -> dict[str, Any]:
         'action_dim': action_dim,
         'history': history,
         'evaluation_history': evaluation_history,
-        'best_self_play': best_self_play,
-        'best_self_play_episode': best_self_play_episode,
-        'best_eval': best_eval,
-        'best_eval_episode': best_eval_episode,
+        'best_self_play_attacker': best_self_play_attacker,
+        'best_self_play_attacker_episode': best_self_play_attacker_episode,
+        'best_self_play_defender': best_self_play_defender,
+        'best_self_play_defender_episode': best_self_play_defender_episode,
+        'best_eval_attacker': best_eval_attacker,
+        'best_eval_attacker_episode': best_eval_attacker_episode,
+        'best_eval_defender': best_eval_defender,
+        'best_eval_defender_episode': best_eval_defender_episode,
         'final_eval': final_eval,
         'first_purchase': first_purchase,
         'last_attacker_losses': last_attacker_losses,
@@ -417,6 +447,16 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
     evaluation_history = result['evaluation_history']
     recent_window = history[-20:] if len(history) >= 20 else history
     recent_average_self_play_reward = sum(item['attacker_reward'] for item in recent_window) / len(recent_window) if recent_window else 0.0
+
+    def format_search_action(action: dict[str, Any]) -> str:
+        action_value_raw = action.get("action_value_raw")
+        action_value_text = f"{float(action_value_raw):.4f}" if action_value_raw is not None else "unvisited"
+        return (
+            f"{action['action']}: search_prob={action['search_probability']:.4f} "
+            f"prior={action['prior_probability']:.4f} visits={action['visits']} "
+            f"action_value={action_value_text} q_norm={action['normalized_q']:.4f} "
+            f"u={action['exploration_term']:.4f} score={action['selection_score']:.4f}"
+        )
 
     lines = [
         'Composition AlphaZero training summary',
@@ -441,15 +481,25 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
             f"last_attacker_total_loss={result['last_attacker_losses']['total_loss']:.4f}",
             f"last_defender_total_loss={result['last_defender_losses']['total_loss']:.4f}",
         ])
-    if result['best_eval'] is not None and result['best_eval_episode'] is not None:
+    if result['best_eval_attacker'] is not None and result['best_eval_attacker_episode'] is not None:
         lines.extend([
-            f"best_deterministic_attacker_reward={result['best_eval']['final_reward']:.4f}",
-            f"best_deterministic_episode={int(result['best_eval_episode'])}",
+            f"best_deterministic_attacker_reward={result['best_eval_attacker']['final_reward']:.4f}",
+            f"best_deterministic_attacker_episode={int(result['best_eval_attacker_episode'])}",
         ])
-    if result['best_self_play'] is not None and result['best_self_play_episode'] is not None:
+    if result['best_eval_defender'] is not None and result['best_eval_defender_episode'] is not None:
         lines.extend([
-            f"best_self_play_attacker_reward={result['best_self_play']['final_reward']:.4f}",
-            f"best_self_play_episode={int(result['best_self_play_episode'])}",
+            f"best_deterministic_defender_reward={-result['best_eval_defender']['final_reward']:.4f}",
+            f"best_deterministic_defender_episode={int(result['best_eval_defender_episode'])}",
+        ])
+    if result['best_self_play_attacker'] is not None and result['best_self_play_attacker_episode'] is not None:
+        lines.extend([
+            f"best_self_play_attacker_reward={result['best_self_play_attacker']['final_reward']:.4f}",
+            f"best_self_play_attacker_episode={int(result['best_self_play_attacker_episode'])}",
+        ])
+    if result['best_self_play_defender'] is not None and result['best_self_play_defender_episode'] is not None:
+        lines.extend([
+            f"best_self_play_defender_reward={-result['best_self_play_defender']['final_reward']:.4f}",
+            f"best_self_play_defender_episode={int(result['best_self_play_defender_episode'])}",
         ])
 
     if evaluation_history:
@@ -462,66 +512,87 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
 
     lines.append('')
     lines.append('First attacker purchase root')
+    if result['first_purchase']:
+        first_entry = result['first_purchase'][0]
+        lines.append(f"- q_range=[{first_entry.get('q_min', 0.0):.4f}, {first_entry.get('q_max', 0.0):.4f}]")
     for entry in result['first_purchase']:
-        lines.append(
-            f"- {entry['action']}: search_prob={entry['search_probability']:.4f} prior={entry['prior_probability']:.4f} visits={entry['visits']} action_value={entry['action_value']:.4f}"
-        )
+        lines.append(f"- {format_search_action(entry)}")
 
     lines.append('')
     lines.append('Current deterministic evaluation')
     lines.append(f"- attacker_reward={result['final_eval']['final_reward']:.4f}")
+    lines.append(f"- defender_reward={-result['final_eval']['final_reward']:.4f}")
     lines.append(f"- winner_id={result['final_eval']['winner_id']}")
     lines.extend(result['final_eval']['trace'])
 
     lines.append('')
     lines.append('Detailed trace files')
-    lines.append('- best self-play trace: output/best_composition_self_play_trace.txt')
-    lines.append('- best deterministic trace: output/best_composition_deterministic_trace.txt')
+    lines.append('- best self-play attacker trace: output/best_composition_self_play_attacker_trace.txt')
+    lines.append('- best self-play defender trace: output/best_composition_self_play_defender_trace.txt')
+    lines.append('- best deterministic attacker trace: output/best_composition_deterministic_attacker_trace.txt')
+    lines.append('- best deterministic defender trace: output/best_composition_deterministic_defender_trace.txt')
 
     (output_dir / 'composition_alpha_zero_summary.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
     (output_dir / 'composition_alpha_zero_metrics.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     write_reward_svg(evaluation_history, output_dir / 'composition_alpha_zero_reward_over_time.svg', 'Composition AlphaZero Attacker Reward Over Training')
 
-    if result['best_self_play'] is not None and result['best_self_play_episode'] is not None:
+    def write_best_trace(
+        heading: str,
+        key: str,
+        episode_key: str,
+        filename: str,
+    ) -> None:
+        best = result[key]
+        episode = result[episode_key]
+        if best is None or episode is None:
+            return
         trace_lines = [
-            'Best self-play episode',
-            f"episode={int(result['best_self_play_episode'])}",
-            f"attacker_reward={result['best_self_play']['final_reward']:.4f}",
-            f"winner_id={result['best_self_play']['winner_id']}",
+            heading,
+            f"episode={int(episode)}",
+            f"attacker_reward={best['final_reward']:.4f}",
+            f"defender_reward={-best['final_reward']:.4f}",
+            f"winner_id={best['winner_id']}",
             '',
             'Decision trace',
         ]
-        trace_lines.extend(result['best_self_play']['trace'])
+        trace_lines.extend(best['trace'])
         trace_lines.append('')
         trace_lines.append('Root search tables')
-        for decision in result['best_self_play']['search_tables']:
+        for decision in best['search_tables']:
             trace_lines.append('')
             trace_lines.append(f"{decision['decision']} -> chosen={decision['chosen_action']}")
-            for action in decision['actions']:
+            if decision['actions']:
                 trace_lines.append(
-                    f"  - {action['action']}: search_prob={action['search_probability']:.4f} prior={action['prior_probability']:.4f} visits={action['visits']} action_value={action['action_value']:.4f}"
+                    f"  q_range=[{decision['actions'][0].get('q_min', 0.0):.4f}, {decision['actions'][0].get('q_max', 0.0):.4f}]"
                 )
-        (output_dir / 'best_composition_self_play_trace.txt').write_text('\n'.join(trace_lines) + '\n', encoding='utf-8')
+            for action in decision['actions']:
+                trace_lines.append(f"  - {format_search_action(action)}")
+        (output_dir / filename).write_text('\n'.join(trace_lines) + '\n', encoding='utf-8')
 
-    if result['best_eval'] is not None and result['best_eval_episode'] is not None:
-        trace_lines = [
-            'Best deterministic evaluation',
-            f"episode={int(result['best_eval_episode'])}",
-            f"attacker_reward={result['best_eval']['final_reward']:.4f}",
-            f"winner_id={result['best_eval']['winner_id']}",
-            '',
-        ]
-        trace_lines.extend(result['best_eval']['trace'])
-        trace_lines.append('')
-        trace_lines.append('Root search tables')
-        for decision in result['best_eval']['search_tables']:
-            trace_lines.append('')
-            trace_lines.append(f"{decision['decision']} -> chosen={decision['chosen_action']}")
-            for action in decision['actions']:
-                trace_lines.append(
-                    f"  - {action['action']}: search_prob={action['search_probability']:.4f} prior={action['prior_probability']:.4f} visits={action['visits']} action_value={action['action_value']:.4f}"
-                )
-        (output_dir / 'best_composition_deterministic_trace.txt').write_text('\n'.join(trace_lines) + '\n', encoding='utf-8')
+    write_best_trace(
+        heading='Best self-play attacker episode',
+        key='best_self_play_attacker',
+        episode_key='best_self_play_attacker_episode',
+        filename='best_composition_self_play_attacker_trace.txt',
+    )
+    write_best_trace(
+        heading='Best self-play defender episode',
+        key='best_self_play_defender',
+        episode_key='best_self_play_defender_episode',
+        filename='best_composition_self_play_defender_trace.txt',
+    )
+    write_best_trace(
+        heading='Best deterministic attacker evaluation',
+        key='best_eval_attacker',
+        episode_key='best_eval_attacker_episode',
+        filename='best_composition_deterministic_attacker_trace.txt',
+    )
+    write_best_trace(
+        heading='Best deterministic defender evaluation',
+        key='best_eval_defender',
+        episode_key='best_eval_defender_episode',
+        filename='best_composition_deterministic_defender_trace.txt',
+    )
 
 
 def main() -> None:
@@ -577,6 +648,7 @@ def main() -> None:
     print(f"state_dim={result['state_dim']}")
     print(f"action_dim={result['action_dim']}")
     print(f"current_deterministic_attacker_reward={result['final_eval']['final_reward']:.4f}")
+    print(f"current_deterministic_defender_reward={-result['final_eval']['final_reward']:.4f}")
     print(f"current_winner={result['final_eval']['winner_id']}")
 
 

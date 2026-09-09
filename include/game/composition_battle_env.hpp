@@ -61,8 +61,13 @@ class CompositionBattleEnv {
             return {};
         }
         std::vector<Action> actions;
+        const auto sideIndex = currentSideIndex();
         const auto budgetRemaining = attackerTurn_ ? attackerBudgetRemaining_ : defenderBudgetRemaining_;
         for (const auto unitKind : BattleResolver::compositionPurchasableUnitKinds()) {
+            // Purchase overlap rule: each side can buy each unit kind at most once per purchase phase.
+            if (unitCounts_.at(sideIndex).at(unitKindIndex(unitKind)) > 0) {
+                continue;
+            }
             const auto cost = purchaseCost(unitKind);
             if (cost <= 0 || budgetRemaining < cost) {
                 continue;
@@ -76,7 +81,10 @@ class CompositionBattleEnv {
                 });
             }
         }
-        actions.push_back(Action{ActionKind::EndPhase});
+        // End phase is only legal when the side cannot buy the cheapest unit anymore.
+        if (budgetRemaining < 3 || actions.empty()) {
+            actions.push_back(Action{ActionKind::EndPhase});
+        }
         return actions;
     }
 
@@ -221,6 +229,9 @@ class CompositionBattleEnv {
         if (action.kind != ActionKind::PurchaseUnit || !action.unitKind.has_value()) {
             return 0.0;
         }
+        if (unitCounts_.at(currentSideIndex()).at(unitKindIndex(*action.unitKind)) > 0) {
+            return 0.0;
+        }
         const auto budgetRemaining = attackerTurn_ ? attackerBudgetRemaining_ : defenderBudgetRemaining_;
         const auto cost = purchaseCost(*action.unitKind);
         if (cost <= 0 || budgetRemaining < cost) {
@@ -238,9 +249,12 @@ class CompositionBattleEnv {
         if (unitCount <= 0) {
             throw std::runtime_error("PurchaseUnit count must be positive");
         }
+        if (unitCounts_.at(currentSideIndex()).at(unitKindIndex(unitKind)) > 0) {
+            throw std::runtime_error("PurchaseUnit for this unit kind is already committed this phase");
+        }
         const auto unitCost = purchaseCost(unitKind);
-        const auto totalCost = unitCost * unitCount;
         auto& budgetRemaining = attackerTurn_ ? attackerBudgetRemaining_ : defenderBudgetRemaining_;
+        const auto totalCost = unitCost * unitCount;
         if (unitCost <= 0 || totalCost > budgetRemaining) {
             throw std::runtime_error("PurchaseUnit exceeds remaining budget");
         }
@@ -261,6 +275,10 @@ class CompositionBattleEnv {
     }
 
     void applyEndPhase(StepResult& result) {
+        const auto budgetRemaining = attackerTurn_ ? attackerBudgetRemaining_ : defenderBudgetRemaining_;
+        if (budgetRemaining >= 3 && hasAnyPurchasableUnitTypeCurrentSide()) {
+            throw std::runtime_error("EndPhase is only legal when remaining budget is below 3");
+        }
         if (attackerTurn_) {
             attackerDone_ = true;
             attackerTurn_ = false;
@@ -293,20 +311,40 @@ class CompositionBattleEnv {
         const auto outcome = BattleResolver::resolveLandCombat(battleZone_, attackerRefs, defenderRefs);
         result.detailLines.insert(result.detailLines.end(), outcome.roundLogs.begin(), outcome.roundLogs.end());
 
+        const auto attackerInitialValue = totalPurchasedForceValueForSide(0U);
+        const auto defenderInitialValue = totalPurchasedForceValueForSide(1U);
+        const auto attackerSurvivingValue = totalSurvivingForceValue(outcome.survivingAttackerForce);
+        const auto defenderSurvivingValue = totalSurvivingForceValue(outcome.survivingDefenderForce);
+        const auto attackerLostValue = std::max(0.0, attackerInitialValue - attackerSurvivingValue);
+        const auto defenderLostValue = std::max(0.0, defenderInitialValue - defenderSurvivingValue);
+        const auto valueTradeTerm = 0.1 * (defenderLostValue - attackerLostValue);
+        auto resultBonus = 0.0;
+
         terminal_ = true;
         if (outcome.attackersWon) {
-            finalReward_ = 1.0;
+            resultBonus = 1.0;
             winnerId_ = std::string(kAttackerId);
             result.detailLines.push_back("battle result: attackers won");
         } else if (outcome.defendersWon) {
-            finalReward_ = -1.0;
+            resultBonus = -1.0;
             winnerId_ = std::string(kDefenderId);
             result.detailLines.push_back("battle result: defenders won");
         } else {
-            finalReward_ = 0.0;
             winnerId_ = "Draw";
             result.detailLines.push_back("battle result: draw");
         }
+        finalReward_ = resultBonus + valueTradeTerm;
+        result.detailLines.push_back(
+            "combined reward: result_bonus="
+            + std::to_string(resultBonus)
+            + ", value_trade_term="
+            + std::to_string(valueTradeTerm)
+            + ", defender_lost="
+            + std::to_string(defenderLostValue)
+            + ", attacker_lost="
+            + std::to_string(attackerLostValue)
+            + ", attacker_reward="
+            + std::to_string(finalReward_));
     }
 
     std::vector<std::unique_ptr<Unit>> buildUnitsForSide(std::string_view ownerId, std::size_t sideIndex) const {
@@ -332,6 +370,38 @@ class CompositionBattleEnv {
             return 1U;
         }
         throw std::runtime_error("Unknown nation id in sideIndexFor");
+    }
+
+    bool hasAnyPurchasableUnitTypeCurrentSide() const {
+        const auto sideIndex = currentSideIndex();
+        const auto budgetRemaining = attackerTurn_ ? attackerBudgetRemaining_ : defenderBudgetRemaining_;
+        for (const auto unitKind : BattleResolver::compositionPurchasableUnitKinds()) {
+            if (unitCounts_.at(sideIndex).at(unitKindIndex(unitKind)) > 0) {
+                continue;
+            }
+            const auto cost = purchaseCost(unitKind);
+            if (cost > 0 && budgetRemaining >= cost) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    double totalPurchasedForceValueForSide(std::size_t sideIndex) const {
+        double total = 0.0;
+        for (const auto unitKind : BattleResolver::compositionPurchasableUnitKinds()) {
+            const auto count = unitCounts_.at(sideIndex).at(unitKindIndex(unitKind));
+            total += static_cast<double>(count * rewardValue(unitKind));
+        }
+        return total;
+    }
+
+    static double totalSurvivingForceValue(const BattleResolver::ForceState& force) {
+        double total = 0.0;
+        for (const auto unitKind : BattleResolver::compositionPurchasableUnitKinds()) {
+            total += force[unitKind] * static_cast<double>(rewardValue(unitKind));
+        }
+        return total;
     }
 
     int initialAttackerBudget_ {0};

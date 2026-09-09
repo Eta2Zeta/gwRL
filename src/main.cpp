@@ -11,11 +11,12 @@
 #include <unordered_map>
 
 int main(int argc, char** argv) {
-    const auto defaultScenarioPath = std::filesystem::path("data/china_simplified_setup.json");
+    const auto defaultScenarioPath = std::filesystem::path("game_content/scenarios/china_simplified_setup.json");
     const auto snapshotDirectory = std::filesystem::path("output/snapshots");
     const auto actionLogPath = std::filesystem::path("output/session_actions.txt");
     const auto trainingExamplePath = std::filesystem::path("output/japan_training_example.json");
-    const auto defaultManualBattleSpecPath = std::filesystem::path("data/manual_battles/suiyuan_rehe_vs_beiping.json");
+    const auto defaultManualBattleSpecPath =
+        std::filesystem::path("game_content/scenarios/manual_battles/suiyuan_rehe_vs_beiping.json");
     const auto manualBattleOutputPath = std::filesystem::path("output/manual_battle_trace.txt");
 
     try {

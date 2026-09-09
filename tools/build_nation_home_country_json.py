@@ -1,8 +1,13 @@
 import json
 from collections import deque
+from pathlib import Path
 
-MAP_PATH = "gw36_manual_map.json"
-OUTPUT_PATH = "gw36_nation_home_country.json"
+ROOT = Path(__file__).resolve().parent.parent
+MAP_RELATIVE_PATH = Path("game_content/maps/gw36_manual_map.json")
+OUTPUT_RELATIVE_PATH = Path("game_content/maps/gw36_nation_home_country.json")
+RULEBOOK_RELATIVE_PATH = Path("game_content/rules/rulebook.txt")
+MAP_PATH = ROOT / MAP_RELATIVE_PATH
+OUTPUT_PATH = ROOT / OUTPUT_RELATIVE_PATH
 
 
 def load_nodes(path):
@@ -187,9 +192,11 @@ def build():
     doc = {
         "_meta": {
             "game": "Global War 1936 v4.3",
-            "source_rulebook_section": "Home Country (rulebook.txt lines 187-214)",
+            "source_rulebook_section": (
+                f"Home Country ({RULEBOOK_RELATIVE_PATH.as_posix()} lines 187-214)"
+            ),
             "description": "Nation-level Home Country data extracted from the rulebook definition and mapped to land node ids.",
-            "inputs": [MAP_PATH, "rulebook.txt"],
+            "inputs": [MAP_RELATIVE_PATH.as_posix(), RULEBOOK_RELATIVE_PATH.as_posix()],
         },
         "non_listed_nation_rule": (
             "Non-listed nations: all originally possessed land zones except offshore territories."

@@ -3,3 +3,19 @@
 .easyocr-usernet/
 __pycache__/
 *.pyc
+.DS_Store
+
+# C/C++ and Python extension build products
+build/
+*.o
+*.so
+*.dylib
+*.egg-info/
+/gw_simplified
+/gw_simplified_check
+
+# Volatile simulator/debug output
+output/snapshots/
+output/session_actions.txt
+output/japan_training_example.json
+output/manual_battle_trace.txt

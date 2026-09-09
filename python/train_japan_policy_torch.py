@@ -1001,7 +1001,11 @@ def main() -> None:
     defaults = TrainingConfig()
     parser = argparse.ArgumentParser(description="Train the Japan policy with PyTorch")
     parser.add_argument("--episodes", type=int, default=defaults.episodes)
-    parser.add_argument("--scenario", type=Path, default=Path("data/china_simplified_setup.json"))
+    parser.add_argument(
+        "--scenario",
+        type=Path,
+        default=Path("game_content/scenarios/china_simplified_setup.json"),
+    )
     parser.add_argument("--output-dir", type=Path, default=Path("output"))
     parser.add_argument("--learning-rate", type=float, default=defaults.learning_rate)
     parser.add_argument("--state-hidden-dim", type=int, default=defaults.state_hidden_dim)

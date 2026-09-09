@@ -55,6 +55,11 @@ class MctsSearchResult:
     priors: list[float]
     root_value: float
     action_values: list[float]
+    normalized_q_values: list[float]
+    exploration_terms: list[float]
+    action_scores: list[float]
+    q_min: float
+    q_max: float
 
 
 def _model_for_player(player_to_move: str, attacker_model: torch.nn.Module, defender_model: torch.nn.Module) -> torch.nn.Module:
@@ -131,7 +136,7 @@ def _select_child_index(node: MctsNode, config: MctsConfig, min_max_stats: MinMa
             q_value = node.value_sums[index] / visit_count
             normalized_q_value = min_max_stats.normalize(q_value)
         else:
-            normalized_q_value = 0.0
+            normalized_q_value = 1.0
         exploration = config.c_puct * prior * math.sqrt(total_visits + 1.0) / (visit_count + 1.0)
         score = normalized_q_value + exploration
         if score > best_score:
@@ -237,6 +242,21 @@ def run_mcts(
         value_sum / visit_count if visit_count > 0 else 0.0
         for value_sum, visit_count in zip(root.value_sums, root.visit_counts)
     ]
+    normalized_q_values: list[float] = []
+    exploration_terms: list[float] = []
+    action_scores: list[float] = []
+    for index, prior in enumerate(root.selection_priors):
+        visit_count = root.visit_counts[index]
+        if visit_count > 0:
+            normalized_q_value = min_max_stats.normalize(action_values[index])
+        else:
+            normalized_q_value = 1.0
+        exploration = config.c_puct * prior * math.sqrt(total_visits + 1.0) / (visit_count + 1.0)
+        normalized_q_values.append(normalized_q_value)
+        exploration_terms.append(exploration)
+        action_scores.append(normalized_q_value + exploration)
+    q_min = min_max_stats.minimum if math.isfinite(min_max_stats.minimum) else 0.0
+    q_max = min_max_stats.maximum if math.isfinite(min_max_stats.maximum) else 0.0
     return MctsSearchResult(
         player_to_move=root_player,
         state_features=root_state_features,
@@ -247,6 +267,11 @@ def run_mcts(
         priors=root.priors,
         root_value=root_value,
         action_values=action_values,
+        normalized_q_values=normalized_q_values,
+        exploration_terms=exploration_terms,
+        action_scores=action_scores,
+        q_min=q_min,
+        q_max=q_max,
     )
 
 

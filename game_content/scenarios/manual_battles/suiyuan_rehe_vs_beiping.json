@@ -1,6 +1,6 @@
 {
   "description": "2 infantry from Suiyuan and 1 artillery from Rehe attack 2 infantry in Beiping",
-  "scenario_path": "data/china_simplified_setup.json",
+  "scenario_path": "game_content/scenarios/china_simplified_setup.json",
   "acting_nation": "Japan",
   "phase": "combat_move",
   "clear_units": true,

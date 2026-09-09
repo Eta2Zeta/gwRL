@@ -6571,6 +6571,39 @@
         }
       ]
     },
+    "land_esp_balearic_islands": {
+      "id": "land_esp_balearic_islands",
+      "name": "Balearic Islands",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Republican Spain",
+      "current_owner": "Republican Spain",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_m1",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
     "land_esp_basque_country": {
       "id": "land_esp_basque_country",
       "name": "Basque Country",
@@ -6585,6 +6618,40 @@
       "node_facilities": [],
       "node_facility_ids": [],
       "neighbors": [
+        {
+          "neighbor_id": "land_esp_catalonia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_madrid",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
         {
           "neighbor_id": "sea_a28",
           "border_terrain": "coast",
@@ -6619,11 +6686,76 @@
       "is_city": false,
       "is_capital": false,
       "is_victory_city": false,
-      "node_facilities": [],
-      "node_facility_ids": [],
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_catalonia_airfield"
+      ],
       "neighbors": [
         {
-          "neighbor_id": "sea_a28",
+          "neighbor_id": "land_esp_basque_country",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_eastern_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_catalonia_eastern_andalucia",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_madrid",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_catalonia_madrid",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_m1",
           "border_terrain": "coast",
           "passable": true,
           "has_river": false,
@@ -6632,10 +6764,420 @@
           "gauge_change": false,
           "railroads": [],
           "naval_facilities": [
-            "minor_port"
+            "major_port"
           ],
           "naval_facility_ids": [
-            "facility_catalonia_minor_port"
+            "facility_catalonia_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_esp_eastern_andalucia": {
+      "id": "land_esp_eastern_andalucia",
+      "name": "Eastern Andalucia",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "Republican Spain",
+      "current_owner": "Republican Spain",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_esp_catalonia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_catalonia_eastern_andalucia",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_madrid",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_western_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_gibraltar",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_m1",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_m2",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_eastern_andalucia_minor_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_esp_galicia_and_leon": {
+      "id": "land_esp_galicia_and_leon",
+      "name": "Galicia and Leon",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Spain",
+      "current_owner": "Spain",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_esp_madrid",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_western_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_esp_madrid": {
+      "id": "land_esp_madrid",
+      "name": "Madrid",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Nationalist Spain",
+      "current_owner": "Nationalist Spain",
+      "is_city": true,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_esp_basque_country",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_catalonia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_catalonia_madrid",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_eastern_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_galicia_and_leon",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_western_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_esp_western_andalucia": {
+      "id": "land_esp_western_andalucia",
+      "name": "Western Andalucia",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Spain",
+      "current_owner": "Spain",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_esp_eastern_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_galicia_and_leon",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_madrid",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_gibraltar",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_portugal",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_land_portugal_western_andalucia",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_a44",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_western_andalucia_major_port"
           ],
           "port_or_dock_connection": true,
           "canal_or_strait": null,
@@ -9016,6 +9558,56 @@
             "facility_western_germany_minor_port"
           ],
           "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_gibraltar": {
+      "id": "land_gibraltar",
+      "name": "Gibraltar",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "current_owner": "United Kingdom",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_esp_eastern_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_western_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
           "canal_or_strait": null,
           "narrow_crossing": false,
           "narrow_crossings": 0,
@@ -16657,6 +17249,44 @@
           "railroads": [
             {
               "rail_id": "rail_warsaw_west_poland",
+              "gauge_change": false
+            }
+          ],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_portugal": {
+      "id": "land_portugal",
+      "name": "Portugal",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Portugal",
+      "current_owner": "Portugal",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_esp_western_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "railroads": [
+            {
+              "rail_id": "rail_land_portugal_western_andalucia",
               "gauge_change": false
             }
           ],
@@ -28927,27 +29557,6 @@
           "special_fortification": null
         },
         {
-          "neighbor_id": "land_esp_catalonia",
-          "border_terrain": "normal",
-          "passable": true,
-          "has_river": false,
-          "river_crossing": false,
-          "railway_connection": false,
-          "gauge_change": false,
-          "railroads": [],
-          "naval_facilities": [
-            "minor_port"
-          ],
-          "naval_facility_ids": [
-            "facility_catalonia_minor_port"
-          ],
-          "port_or_dock_connection": true,
-          "canal_or_strait": null,
-          "narrow_crossing": false,
-          "narrow_crossings": 0,
-          "special_fortification": null
-        },
-        {
           "neighbor_id": "land_fra_aquitaine",
           "border_terrain": "normal",
           "passable": true,
@@ -30023,6 +30632,27 @@
       "node_facilities": [],
       "node_facility_ids": [],
       "neighbors": [
+        {
+          "neighbor_id": "land_esp_western_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_western_andalucia_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
         {
           "neighbor_id": "sea_m1",
           "border_terrain": "normal",
@@ -31306,6 +31936,61 @@
       "node_facility_ids": [],
       "neighbors": [
         {
+          "neighbor_id": "land_esp_balearic_islands",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_catalonia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_catalonia_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_esp_eastern_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
           "neighbor_id": "land_fra_southern_france",
           "border_terrain": "normal",
           "passable": true,
@@ -31766,6 +32451,27 @@
       "node_facilities": [],
       "node_facility_ids": [],
       "neighbors": [
+        {
+          "neighbor_id": "land_esp_eastern_andalucia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "railroads": [],
+          "naval_facilities": [
+            "minor_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_eastern_andalucia_minor_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
         {
           "neighbor_id": "land_northern_algeria",
           "border_terrain": "normal",

@@ -135,7 +135,10 @@ ManualBattleSpec parseManualBattleSpec(const std::filesystem::path& specPath) {
     ManualBattleSpec spec;
     spec.description = readOptionalStringField(root, "description", specPath.stem().string());
     spec.scenarioPath = std::filesystem::path(
-        readOptionalStringField(root, "scenario_path", "data/china_simplified_setup.json"));
+        readOptionalStringField(
+            root,
+            "scenario_path",
+            "game_content/scenarios/china_simplified_setup.json"));
     spec.actingNation = readOptionalStringField(root, "acting_nation", "Japan");
     spec.phase = parsePhase(readOptionalStringField(root, "phase", "combat_move"));
     spec.clearUnits = readOptionalBoolField(root, "clear_units", true);

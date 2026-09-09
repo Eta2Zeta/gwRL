@@ -1,0 +1,271 @@
+Best deterministic attacker evaluation
+episode=300
+attacker_reward=3.0943
+defender_reward=-3.0943
+winner_id=Attacker
+
+Decision trace
+Attacker / purchase_units -> purchase_unit(count=10, unit=TankDestroyer) (search_value=1.3632, visits=144)
+    Attacker purchase: 10 TankDestroyer for 40 budget
+Attacker / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=1.7248, visits=721)
+    Attacker purchase: 3 Infantry for 9 budget
+Attacker / purchase_units -> end_phase (search_value=1.8110, visits=1000)
+    attacker composition locked
+Defender / purchase_units -> purchase_unit(count=1, unit=TankDestroyer) (search_value=-1.6734, visits=75)
+    Defender purchase: 1 TankDestroyer for 4 budget
+Defender / purchase_units -> purchase_unit(count=1, unit=Infantry) (search_value=-1.8215, visits=106)
+    Defender purchase: 1 Infantry for 3 budget
+Defender / purchase_units -> purchase_unit(count=1, unit=MediumTank) (search_value=-2.5240, visits=155)
+    Defender purchase: 1 MediumTank for 6 budget
+Defender / purchase_units -> purchase_unit(count=1, unit=Artillery) (search_value=-3.1229, visits=175)
+    Defender purchase: 1 Artillery for 4 budget
+Defender / purchase_units -> purchase_unit(count=1, unit=LightTank) (search_value=-3.1210, visits=389)
+    Defender purchase: 1 LightTank for 4 budget
+Defender / purchase_units -> purchase_unit(count=1, unit=MechanizedInfantry) (search_value=-3.0927, visits=887)
+    Defender purchase: 1 MechanizedInfantry for 4 budget
+Defender / purchase_units -> end_phase (search_value=-3.0943, visits=1000)
+    defender composition locked
+    resolving composition battle: attackers=13, defenders=6
+    first strike: attacker 0 Art (0/12=0), defender 1 Art (3/12=0.25)
+      after first strike: attacker 2.75 Inf + 10 TD, defender 1 Inf + 1 Art + 1 LT + 1 Mech + 1 MT + 1 TD, losses attacker=0.25, defender=0
+    targeted strike 1: attacker=30/12=2.50, defender=3/12=0.25
+      after targeted strike: attacker 2.75 Inf + 9.75 TD, defender 1 Inf + 1 Art + 1 LT + 0.50 TD, losses attacker=0.25, defender=2.50
+    round 1: attacker 2.75 Inf + 9.75 TD (5.50/12=0.46), defender 1 Inf + 1 Art + 1 LT + 0.50 TD (6.50/12=0.54)
+      after casualties: attacker 2.21 Inf + 9.75 TD, defender 1 Inf + 1 Art + 0.54 LT + 0.50 TD, losses attacker=0.54, defender=0.46
+    targeted strike 2: attacker=29.25/12=2.44, defender=1.50/12=0.12
+      after targeted strike: attacker 2.21 Inf + 9.62 TD, defender 0.06 Art + 0.54 LT, losses attacker=0.12, defender=2.44
+    round 2: attacker 2.21 Inf + 9.62 TD (4.42/12=0.37), defender 0.06 Art + 0.54 LT (0.73/12=0.06)
+      after casualties: attacker 2.15 Inf + 9.62 TD, defender 0.06 Art + 0.17 LT, losses attacker=0.06, defender=0.37
+    targeted strike 3: attacker=28.88/12=2.41, defender=0/12=0
+      after targeted strike: attacker 2.15 Inf + 9.62 TD, defender 0, losses attacker=0, defender=2.41
+    round 3: attacker 2.15 Inf + 9.62 TD (4.30/12=0.36), defender 0 (0/12=0)
+      after casualties: attacker 2.15 Inf + 9.62 TD, defender 0, losses attacker=0, defender=0.36
+    battle result: attackers won
+    combined reward: result_bonus=1.000000, value_trade_term=2.094271, defender_lost=25.000000, attacker_lost=4.057292, attacker_reward=3.094271
+
+Root search tables
+
+Attacker / purchase_units -> chosen=purchase_unit(count=10, unit=TankDestroyer)
+  q_range=[-3.1542, 1.6421]
+  - purchase_unit(count=10, unit=TankDestroyer): search_prob=0.1440 prior=0.1379 visits=144 action_value=1.3632 q_norm=0.9419 u=0.0451 score=0.9870
+  - purchase_unit(count=11, unit=TankDestroyer): search_prob=0.1300 prior=0.1313 visits=130 action_value=1.3525 q_norm=0.9396 u=0.0476 score=0.9872
+  - purchase_unit(count=9, unit=TankDestroyer): search_prob=0.0940 prior=0.0980 visits=94 action_value=1.3438 q_norm=0.9378 u=0.0489 score=0.9868
+  - purchase_unit(count=8, unit=TankDestroyer): search_prob=0.0930 prior=0.0538 visits=93 action_value=1.4481 q_norm=0.9596 u=0.0271 score=0.9867
+  - purchase_unit(count=7, unit=TankDestroyer): search_prob=0.0630 prior=0.0287 visits=63 action_value=1.4760 q_norm=0.9654 u=0.0213 score=0.9867
+  - purchase_unit(count=12, unit=TankDestroyer): search_prob=0.0530 prior=0.1247 visits=53 action_value=1.0440 q_norm=0.8753 u=0.1096 score=0.9849
+  - purchase_unit(count=6, unit=TankDestroyer): search_prob=0.0430 prior=0.0193 visits=43 action_value=1.4737 q_norm=0.9649 u=0.0208 score=0.9857
+  - purchase_unit(count=4, unit=TankDestroyer): search_prob=0.0280 prior=0.0142 visits=28 action_value=1.4612 q_norm=0.9623 u=0.0232 score=0.9855
+  - purchase_unit(count=5, unit=TankDestroyer): search_prob=0.0250 prior=0.0155 visits=25 action_value=1.4452 q_norm=0.9589 u=0.0283 score=0.9872
+  - purchase_unit(count=3, unit=TankDestroyer): search_prob=0.0210 prior=0.0132 visits=21 action_value=1.4412 q_norm=0.9581 u=0.0285 score=0.9867
+  - purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0150 prior=0.0124 visits=15 action_value=1.3742 q_norm=0.9442 u=0.0367 score=0.9808
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0130 prior=0.0113 visits=13 action_value=1.3968 q_norm=0.9489 u=0.0384 score=0.9872
+  - purchase_unit(count=12, unit=Infantry): search_prob=0.0120 prior=0.0186 visits=12 action_value=1.2135 q_norm=0.9107 u=0.0681 score=0.9787
+  - purchase_unit(count=11, unit=Infantry): search_prob=0.0110 prior=0.0129 visits=11 action_value=1.3263 q_norm=0.9342 u=0.0509 score=0.9851
+  - purchase_unit(count=13, unit=Infantry): search_prob=0.0100 prior=0.0211 visits=10 action_value=1.0755 q_norm=0.8819 u=0.0909 score=0.9727
+  - purchase_unit(count=14, unit=Infantry): search_prob=0.0100 prior=0.0200 visits=10 action_value=1.1443 q_norm=0.8962 u=0.0862 score=0.9824
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0100 prior=0.0037 visits=10 action_value=1.5121 q_norm=0.9729 u=0.0159 score=0.9888
+  - purchase_unit(count=9, unit=Artillery): search_prob=0.0100 prior=0.0128 visits=10 action_value=1.3099 q_norm=0.9307 u=0.0552 score=0.9859
+  - purchase_unit(count=10, unit=Infantry): search_prob=0.0090 prior=0.0078 visits=9 action_value=1.3803 q_norm=0.9454 u=0.0371 score=0.9826
+  - purchase_unit(count=8, unit=Artillery): search_prob=0.0090 prior=0.0093 visits=9 action_value=1.3288 q_norm=0.9347 u=0.0441 score=0.9788
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0080 prior=0.0020 visits=8 action_value=1.4932 q_norm=0.9690 u=0.0107 score=0.9797
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0080 prior=0.0022 visits=8 action_value=1.5184 q_norm=0.9742 u=0.0114 score=0.9856
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.0080 prior=0.0023 visits=8 action_value=1.5137 q_norm=0.9732 u=0.0121 score=0.9853
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0080 prior=0.0040 visits=8 action_value=1.4768 q_norm=0.9655 u=0.0211 score=0.9867
+  - purchase_unit(count=7, unit=Artillery): search_prob=0.0080 prior=0.0070 visits=8 action_value=1.4017 q_norm=0.9499 u=0.0369 score=0.9868
+  - purchase_unit(count=10, unit=Artillery): search_prob=0.0080 prior=0.0130 visits=8 action_value=1.2406 q_norm=0.9163 u=0.0684 score=0.9847
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0080 prior=0.0038 visits=8 action_value=1.4801 q_norm=0.9662 u=0.0202 score=0.9864
+  - purchase_unit(count=3, unit=Artillery): search_prob=0.0070 prior=0.0043 visits=7 action_value=1.4485 q_norm=0.9596 u=0.0254 score=0.9850
+  - purchase_unit(count=11, unit=Artillery): search_prob=0.0070 prior=0.0123 visits=7 action_value=1.1504 q_norm=0.8975 u=0.0732 score=0.9707
+  - purchase_unit(count=2, unit=MediumTank): search_prob=0.0070 prior=0.0045 visits=7 action_value=1.4131 q_norm=0.9523 u=0.0265 score=0.9787
+  - purchase_unit(count=4, unit=Infantry): search_prob=0.0060 prior=0.0024 visits=6 action_value=1.4753 q_norm=0.9652 u=0.0164 score=0.9816
+  - purchase_unit(count=5, unit=Infantry): search_prob=0.0060 prior=0.0025 visits=6 action_value=1.4562 q_norm=0.9612 u=0.0173 score=0.9785
+  - purchase_unit(count=6, unit=Infantry): search_prob=0.0060 prior=0.0027 visits=6 action_value=1.4921 q_norm=0.9687 u=0.0182 score=0.9869
+  - purchase_unit(count=15, unit=Infantry): search_prob=0.0060 prior=0.0191 visits=6 action_value=0.9055 q_norm=0.8464 u=0.1292 score=0.9756
+  - purchase_unit(count=4, unit=Artillery): search_prob=0.0060 prior=0.0046 visits=6 action_value=1.4147 q_norm=0.9526 u=0.0310 score=0.9836
+  - purchase_unit(count=5, unit=Artillery): search_prob=0.0060 prior=0.0049 visits=6 action_value=1.4022 q_norm=0.9500 u=0.0333 score=0.9832
+  - purchase_unit(count=3, unit=MediumTank): search_prob=0.0060 prior=0.0051 visits=6 action_value=1.3731 q_norm=0.9439 u=0.0345 score=0.9784
+  - purchase_unit(count=7, unit=Infantry): search_prob=0.0050 prior=0.0028 visits=5 action_value=1.4436 q_norm=0.9586 u=0.0224 score=0.9811
+  - purchase_unit(count=8, unit=Infantry): search_prob=0.0050 prior=0.0036 visits=5 action_value=1.4068 q_norm=0.9510 u=0.0287 score=0.9797
+  - purchase_unit(count=9, unit=Infantry): search_prob=0.0050 prior=0.0052 visits=5 action_value=1.3621 q_norm=0.9416 u=0.0409 score=0.9825
+  - purchase_unit(count=16, unit=Infantry): search_prob=0.0050 prior=0.0182 visits=5 action_value=0.6822 q_norm=0.7999 u=0.1439 score=0.9437
+  - purchase_unit(count=6, unit=Artillery): search_prob=0.0050 prior=0.0056 visits=5 action_value=1.3628 q_norm=0.9418 u=0.0443 score=0.9861
+  - purchase_unit(count=4, unit=MediumTank): search_prob=0.0050 prior=0.0052 visits=5 action_value=1.2829 q_norm=0.9251 u=0.0409 score=0.9660
+  - purchase_unit(count=5, unit=MediumTank): search_prob=0.0050 prior=0.0051 visits=5 action_value=1.2516 q_norm=0.9186 u=0.0407 score=0.9593
+  - purchase_unit(count=12, unit=Artillery): search_prob=0.0040 prior=0.0117 visits=4 action_value=0.7546 q_norm=0.8150 u=0.1107 score=0.9257
+  - purchase_unit(count=6, unit=MediumTank): search_prob=0.0040 prior=0.0051 visits=4 action_value=1.3303 q_norm=0.9350 u=0.0482 score=0.9832
+  - purchase_unit(count=3, unit=LightTank): search_prob=0.0030 prior=0.0020 visits=3 action_value=1.4486 q_norm=0.9597 u=0.0240 score=0.9836
+  - purchase_unit(count=7, unit=MediumTank): search_prob=0.0030 prior=0.0053 visits=3 action_value=1.2648 q_norm=0.9213 u=0.0628 score=0.9841
+  - purchase_unit(count=7, unit=LightTank): search_prob=0.0020 prior=0.0030 visits=2 action_value=1.2299 q_norm=0.9141 u=0.0476 score=0.9617
+  - purchase_unit(count=8, unit=LightTank): search_prob=0.0020 prior=0.0039 visits=2 action_value=1.1544 q_norm=0.8983 u=0.0623 score=0.9606
+  - purchase_unit(count=9, unit=LightTank): search_prob=0.0020 prior=0.0055 visits=2 action_value=1.0764 q_norm=0.8821 u=0.0870 score=0.9691
+  - purchase_unit(count=10, unit=LightTank): search_prob=0.0020 prior=0.0055 visits=2 action_value=0.9948 q_norm=0.8650 u=0.0866 score=0.9516
+  - purchase_unit(count=8, unit=MediumTank): search_prob=0.0020 prior=0.0052 visits=2 action_value=0.8241 q_norm=0.8295 u=0.0828 score=0.9123
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0010 prior=0.0018 visits=1 action_value=1.3751 q_norm=0.9443 u=0.0419 score=0.9863
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0010 prior=0.0019 visits=1 action_value=1.3594 q_norm=0.9411 u=0.0449 score=0.9860
+  - purchase_unit(count=4, unit=LightTank): search_prob=0.0010 prior=0.0022 visits=1 action_value=1.3346 q_norm=0.9359 u=0.0512 score=0.9870
+  - purchase_unit(count=5, unit=LightTank): search_prob=0.0010 prior=0.0023 visits=1 action_value=1.3138 q_norm=0.9316 u=0.0546 score=0.9862
+  - purchase_unit(count=6, unit=LightTank): search_prob=0.0010 prior=0.0025 visits=1 action_value=1.2848 q_norm=0.9255 u=0.0590 score=0.9845
+  - purchase_unit(count=11, unit=LightTank): search_prob=0.0010 prior=0.0054 visits=1 action_value=0.9194 q_norm=0.8493 u=0.1291 score=0.9784
+  - purchase_unit(count=12, unit=LightTank): search_prob=0.0010 prior=0.0054 visits=1 action_value=0.8367 q_norm=0.8321 u=0.1279 score=0.9599
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0013 visits=1 action_value=1.3724 q_norm=0.9438 u=0.0298 score=0.9736
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0013 visits=1 action_value=1.3573 q_norm=0.9406 u=0.0318 score=0.9724
+  - purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0014 visits=1 action_value=1.3520 q_norm=0.9395 u=0.0338 score=0.9733
+  - purchase_unit(count=4, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0015 visits=1 action_value=1.3422 q_norm=0.9375 u=0.0360 score=0.9735
+  - purchase_unit(count=5, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0016 visits=1 action_value=1.3202 q_norm=0.9329 u=0.0391 score=0.9720
+  - purchase_unit(count=6, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0019 visits=1 action_value=1.2973 q_norm=0.9281 u=0.0461 score=0.9742
+  - purchase_unit(count=7, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0024 visits=1 action_value=1.2577 q_norm=0.9199 u=0.0563 score=0.9762
+  - purchase_unit(count=8, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0022 visits=1 action_value=1.2104 q_norm=0.9100 u=0.0532 score=0.9632
+  - purchase_unit(count=9, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0023 visits=1 action_value=1.1483 q_norm=0.8971 u=0.0537 score=0.9508
+  - purchase_unit(count=10, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0022 visits=1 action_value=1.0648 q_norm=0.8796 u=0.0516 score=0.9312
+  - purchase_unit(count=11, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0021 visits=1 action_value=0.9559 q_norm=0.8569 u=0.0509 score=0.9078
+  - purchase_unit(count=12, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0021 visits=1 action_value=0.8403 q_norm=0.8328 u=0.0495 score=0.8823
+
+Attacker / purchase_units -> chosen=purchase_unit(count=3, unit=Infantry)
+  q_range=[-3.6875, 1.7256]
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.7210 prior=0.3738 visits=721 action_value=1.7248 q_norm=0.9998 u=0.0246 score=1.0244
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.1420 prior=0.2333 visits=142 action_value=1.4369 q_norm=0.9467 u=0.0774 score=1.0241
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0450 prior=0.1423 visits=45 action_value=1.0628 q_norm=0.8776 u=0.1468 score=1.0244
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0330 prior=0.0774 visits=33 action_value=1.2526 q_norm=0.9126 u=0.1080 score=1.0207
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0150 prior=0.0502 visits=15 action_value=1.0021 q_norm=0.8663 u=0.1490 score=1.0153
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0150 prior=0.0408 visits=15 action_value=1.1944 q_norm=0.9019 u=0.1209 score=1.0227
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0100 prior=0.0215 visits=10 action_value=1.2655 q_norm=0.9150 u=0.0926 score=1.0076
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0080 prior=0.0291 visits=8 action_value=0.9849 q_norm=0.8632 u=0.1533 score=1.0164
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0070 prior=0.0188 visits=7 action_value=1.1919 q_norm=0.9014 u=0.1115 score=1.0129
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0040 prior=0.0128 visits=4 action_value=0.8693 q_norm=0.8418 u=0.1216 score=0.9634
+
+Attacker / purchase_units -> chosen=end_phase
+  q_range=[-3.6875, 1.8119]
+  - end_phase: search_prob=1.0000 prior=1.0000 visits=1000 action_value=1.8110 q_norm=0.9998 u=0.0474 score=1.0473
+
+Defender / purchase_units -> chosen=purchase_unit(count=1, unit=TankDestroyer)
+  q_range=[-3.6875, -0.4367]
+  - purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0750 prior=0.0249 visits=75 action_value=-1.6734 q_norm=0.6196 u=0.0156 score=0.6351
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.0650 prior=0.0166 visits=65 action_value=-1.6613 q_norm=0.6233 u=0.0119 score=0.6352
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0650 prior=0.0176 visits=65 action_value=-1.6678 q_norm=0.6213 u=0.0127 score=0.6339
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0640 prior=0.0183 visits=64 action_value=-1.6695 q_norm=0.6208 u=0.0134 score=0.6342
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0620 prior=0.0229 visits=62 action_value=-1.6978 q_norm=0.6121 u=0.0172 score=0.6293
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.0530 prior=0.0233 visits=53 action_value=-1.6882 q_norm=0.6150 u=0.0205 score=0.6355
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0510 prior=0.0193 visits=51 action_value=-1.6803 q_norm=0.6175 u=0.0176 score=0.6351
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0460 prior=0.0129 visits=46 action_value=-1.6779 q_norm=0.6182 u=0.0130 score=0.6312
+  - purchase_unit(count=3, unit=Artillery): search_prob=0.0430 prior=0.0170 visits=43 action_value=-1.6827 q_norm=0.6167 u=0.0183 score=0.6350
+  - purchase_unit(count=10, unit=Infantry): search_prob=0.0320 prior=0.1563 visits=32 action_value=-2.3701 q_norm=0.4053 u=0.2248 score=0.6301
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0320 prior=0.0151 visits=32 action_value=-1.6983 q_norm=0.6119 u=0.0217 score=0.6336
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0320 prior=0.0144 visits=32 action_value=-1.7098 q_norm=0.6084 u=0.0208 score=0.6291
+  - purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0320 prior=0.0191 visits=32 action_value=-1.7122 q_norm=0.6076 u=0.0274 score=0.6351
+  - purchase_unit(count=2, unit=MediumTank): search_prob=0.0310 prior=0.0176 visits=31 action_value=-1.7077 q_norm=0.6090 u=0.0261 score=0.6351
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.0290 prior=0.0103 visits=29 action_value=-1.6871 q_norm=0.6154 u=0.0164 score=0.6317
+  - purchase_unit(count=4, unit=Artillery): search_prob=0.0250 prior=0.0165 visits=25 action_value=-1.7486 q_norm=0.5964 u=0.0300 score=0.6265
+  - purchase_unit(count=3, unit=LightTank): search_prob=0.0230 prior=0.0128 visits=23 action_value=-1.7251 q_norm=0.6037 u=0.0254 score=0.6291
+  - purchase_unit(count=5, unit=Artillery): search_prob=0.0210 prior=0.0201 visits=21 action_value=-1.8207 q_norm=0.5742 u=0.0434 score=0.6176
+  - purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.0210 prior=0.0119 visits=21 action_value=-1.7060 q_norm=0.6095 u=0.0258 score=0.6353
+  - purchase_unit(count=3, unit=TankDestroyer): search_prob=0.0210 prior=0.0150 visits=21 action_value=-1.7358 q_norm=0.6004 u=0.0323 score=0.6327
+  - purchase_unit(count=4, unit=Infantry): search_prob=0.0180 prior=0.0085 visits=18 action_value=-1.7074 q_norm=0.6091 u=0.0213 score=0.6304
+  - purchase_unit(count=3, unit=MediumTank): search_prob=0.0170 prior=0.0128 visits=17 action_value=-1.7327 q_norm=0.6013 u=0.0338 score=0.6351
+  - purchase_unit(count=6, unit=Artillery): search_prob=0.0160 prior=0.0418 visits=16 action_value=-2.0975 q_norm=0.4891 u=0.1168 score=0.6059
+  - purchase_unit(count=7, unit=Artillery): search_prob=0.0160 prior=0.1399 visits=16 action_value=-2.9730 q_norm=0.2198 u=0.3906 score=0.6104
+  - purchase_unit(count=4, unit=TankDestroyer): search_prob=0.0110 prior=0.0125 visits=11 action_value=-1.7840 q_norm=0.5856 u=0.0495 score=0.6350
+  - purchase_unit(count=9, unit=Infantry): search_prob=0.0090 prior=0.0472 visits=9 action_value=-2.4397 q_norm=0.3838 u=0.2242 score=0.6081
+  - purchase_unit(count=4, unit=LightTank): search_prob=0.0090 prior=0.0110 visits=9 action_value=-1.8871 q_norm=0.5538 u=0.0520 score=0.6059
+  - purchase_unit(count=4, unit=MechanizedInfantry): search_prob=0.0090 prior=0.0102 visits=9 action_value=-1.8187 q_norm=0.5749 u=0.0482 score=0.6231
+  - purchase_unit(count=7, unit=TankDestroyer): search_prob=0.0090 prior=0.0453 visits=9 action_value=-2.3543 q_norm=0.4101 u=0.2152 score=0.6253
+  - purchase_unit(count=5, unit=TankDestroyer): search_prob=0.0070 prior=0.0124 visits=7 action_value=-1.9250 q_norm=0.5422 u=0.0737 score=0.6158
+  - purchase_unit(count=5, unit=Infantry): search_prob=0.0060 prior=0.0072 visits=6 action_value=-1.7869 q_norm=0.5847 u=0.0490 score=0.6337
+  - purchase_unit(count=6, unit=Infantry): search_prob=0.0060 prior=0.0072 visits=6 action_value=-1.7802 q_norm=0.5867 u=0.0490 score=0.6358
+  - purchase_unit(count=6, unit=TankDestroyer): search_prob=0.0060 prior=0.0186 visits=6 action_value=-2.0489 q_norm=0.5041 u=0.1262 score=0.6302
+  - purchase_unit(count=5, unit=LightTank): search_prob=0.0050 prior=0.0102 visits=5 action_value=-2.1668 q_norm=0.4678 u=0.0808 score=0.5486
+  - purchase_unit(count=5, unit=MechanizedInfantry): search_prob=0.0050 prior=0.0097 visits=5 action_value=-2.0683 q_norm=0.4981 u=0.0768 score=0.5749
+  - purchase_unit(count=7, unit=Infantry): search_prob=0.0040 prior=0.0088 visits=4 action_value=-1.9061 q_norm=0.5480 u=0.0840 score=0.6320
+  - purchase_unit(count=8, unit=Infantry): search_prob=0.0040 prior=0.0151 visits=4 action_value=-2.0985 q_norm=0.4888 u=0.1433 score=0.6321
+  - purchase_unit(count=6, unit=LightTank): search_prob=0.0040 prior=0.0120 visits=4 action_value=-2.3055 q_norm=0.4251 u=0.1141 score=0.5393
+  - purchase_unit(count=6, unit=MechanizedInfantry): search_prob=0.0040 prior=0.0118 visits=4 action_value=-2.1240 q_norm=0.4810 u=0.1125 score=0.5934
+  - purchase_unit(count=4, unit=MediumTank): search_prob=0.0040 prior=0.0109 visits=4 action_value=-1.9946 q_norm=0.5208 u=0.1033 score=0.6240
+  - purchase_unit(count=7, unit=MechanizedInfantry): search_prob=0.0030 prior=0.0233 visits=3 action_value=-2.7236 q_norm=0.2965 u=0.2765 score=0.5730
+  - purchase_unit(count=5, unit=MediumTank): search_prob=0.0030 prior=0.0196 visits=3 action_value=-2.9302 q_norm=0.2329 u=0.2326 score=0.4655
+  - purchase_unit(count=7, unit=LightTank): search_prob=0.0020 prior=0.0215 visits=2 action_value=-2.7746 q_norm=0.2808 u=0.3406 score=0.6215
+
+Defender / purchase_units -> chosen=purchase_unit(count=1, unit=Infantry)
+  q_range=[-3.6609, -0.6749]
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.1060 prior=0.0248 visits=106 action_value=-1.8215 q_norm=0.6160 u=0.0110 score=0.6270
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.1000 prior=0.0368 visits=100 action_value=-1.8409 q_norm=0.6095 u=0.0173 score=0.6268
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0920 prior=0.0274 visits=92 action_value=-1.8333 q_norm=0.6121 u=0.0140 score=0.6261
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.0750 prior=0.0287 visits=75 action_value=-1.8513 q_norm=0.6060 u=0.0179 score=0.6240
+  - purchase_unit(count=2, unit=Infantry): search_prob=0.0740 prior=0.0186 visits=74 action_value=-1.8424 q_norm=0.6090 u=0.0118 score=0.6208
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.0730 prior=0.0368 visits=73 action_value=-1.8609 q_norm=0.6028 u=0.0236 score=0.6264
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0600 prior=0.0314 visits=60 action_value=-1.8638 q_norm=0.6018 u=0.0244 score=0.6262
+  - purchase_unit(count=3, unit=Infantry): search_prob=0.0490 prior=0.0144 visits=49 action_value=-1.8368 q_norm=0.6109 u=0.0136 score=0.6245
+  - purchase_unit(count=3, unit=Artillery): search_prob=0.0340 prior=0.0289 visits=34 action_value=-1.9082 q_norm=0.5870 u=0.0392 score=0.6262
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0340 prior=0.0226 visits=34 action_value=-1.8967 q_norm=0.5908 u=0.0306 score=0.6214
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0300 prior=0.0238 visits=30 action_value=-1.9163 q_norm=0.5843 u=0.0364 score=0.6207
+  - purchase_unit(count=2, unit=MediumTank): search_prob=0.0300 prior=0.0256 visits=30 action_value=-1.9422 q_norm=0.5756 u=0.0392 score=0.6148
+  - purchase_unit(count=4, unit=Artillery): search_prob=0.0280 prior=0.0313 visits=28 action_value=-1.9699 q_norm=0.5663 u=0.0513 score=0.6176
+  - purchase_unit(count=8, unit=Infantry): search_prob=0.0270 prior=0.1347 visits=27 action_value=-2.4837 q_norm=0.3942 u=0.2283 score=0.6226
+  - purchase_unit(count=4, unit=Infantry): search_prob=0.0250 prior=0.0117 visits=25 action_value=-1.8833 q_norm=0.5953 u=0.0214 score=0.6167
+  - purchase_unit(count=6, unit=Artillery): search_prob=0.0200 prior=0.1732 visits=20 action_value=-2.9928 q_norm=0.2238 u=0.3913 score=0.6151
+  - purchase_unit(count=3, unit=LightTank): search_prob=0.0180 prior=0.0203 visits=18 action_value=-1.9992 q_norm=0.5565 u=0.0507 score=0.6072
+  - purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.0170 prior=0.0189 visits=17 action_value=-1.9578 q_norm=0.5704 u=0.0498 score=0.6202
+  - purchase_unit(count=5, unit=Artillery): search_prob=0.0150 prior=0.0529 visits=15 action_value=-2.2963 q_norm=0.4570 u=0.1570 score=0.6140
+  - purchase_unit(count=5, unit=Infantry): search_prob=0.0140 prior=0.0113 visits=14 action_value=-1.9410 q_norm=0.5760 u=0.0357 score=0.6117
+  - purchase_unit(count=6, unit=Infantry): search_prob=0.0130 prior=0.0159 visits=13 action_value=-1.9479 q_norm=0.5737 u=0.0539 score=0.6276
+  - purchase_unit(count=3, unit=MediumTank): search_prob=0.0120 prior=0.0200 visits=12 action_value=-2.0296 q_norm=0.5463 u=0.0729 score=0.6192
+  - purchase_unit(count=7, unit=Infantry): search_prob=0.0110 prior=0.0416 visits=11 action_value=-2.2927 q_norm=0.4582 u=0.1646 score=0.6229
+  - purchase_unit(count=4, unit=LightTank): search_prob=0.0110 prior=0.0180 visits=11 action_value=-2.1187 q_norm=0.5165 u=0.0710 score=0.5875
+  - purchase_unit(count=4, unit=MechanizedInfantry): search_prob=0.0110 prior=0.0162 visits=11 action_value=-2.0372 q_norm=0.5438 u=0.0639 score=0.6077
+  - purchase_unit(count=5, unit=MechanizedInfantry): search_prob=0.0070 prior=0.0177 visits=7 action_value=-2.1718 q_norm=0.4987 u=0.1051 score=0.6038
+  - purchase_unit(count=5, unit=LightTank): search_prob=0.0040 prior=0.0173 visits=4 action_value=-2.3414 q_norm=0.4419 u=0.1641 score=0.6060
+  - purchase_unit(count=6, unit=MechanizedInfantry): search_prob=0.0040 prior=0.0293 visits=4 action_value=-2.7483 q_norm=0.3056 u=0.2783 score=0.5839
+  - purchase_unit(count=6, unit=LightTank): search_prob=0.0030 prior=0.0251 visits=3 action_value=-3.0166 q_norm=0.2158 u=0.2979 score=0.5137
+  - purchase_unit(count=4, unit=MediumTank): search_prob=0.0030 prior=0.0249 visits=3 action_value=-2.8189 q_norm=0.2820 u=0.2950 score=0.5770
+
+Defender / purchase_units -> chosen=purchase_unit(count=1, unit=MediumTank)
+  q_range=[-3.6109, -0.9990]
+  - purchase_unit(count=1, unit=MediumTank): search_prob=0.1550 prior=0.0481 visits=155 action_value=-2.5240 q_norm=0.4161 u=0.0146 score=0.4308
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.1300 prior=0.0666 visits=130 action_value=-2.5487 q_norm=0.4067 u=0.0241 score=0.4308
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.1290 prior=0.0511 visits=129 action_value=-2.5361 q_norm=0.4115 u=0.0187 score=0.4302
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.1280 prior=0.0476 visits=128 action_value=-2.5306 q_norm=0.4136 u=0.0175 score=0.4311
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0730 prior=0.0610 visits=73 action_value=-2.5926 q_norm=0.3899 u=0.0391 score=0.4290
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0640 prior=0.0396 visits=64 action_value=-2.5627 q_norm=0.4013 u=0.0289 score=0.4303
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0570 prior=0.0426 visits=57 action_value=-2.5818 q_norm=0.3940 u=0.0349 score=0.4289
+  - purchase_unit(count=5, unit=Artillery): search_prob=0.0500 prior=0.2298 visits=50 action_value=-3.0506 q_norm=0.2145 u=0.2138 score=0.4284
+  - purchase_unit(count=3, unit=Artillery): search_prob=0.0390 prior=0.0595 visits=39 action_value=-2.6782 q_norm=0.3571 u=0.0706 score=0.4277
+  - purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.0330 prior=0.0331 visits=33 action_value=-2.6115 q_norm=0.3826 u=0.0462 score=0.4288
+  - purchase_unit(count=2, unit=MediumTank): search_prob=0.0330 prior=0.0327 visits=33 action_value=-2.6046 q_norm=0.3853 u=0.0457 score=0.4309
+  - purchase_unit(count=4, unit=Artillery): search_prob=0.0250 prior=0.0854 visits=25 action_value=-2.8941 q_norm=0.2745 u=0.1560 score=0.4304
+  - purchase_unit(count=3, unit=LightTank): search_prob=0.0250 prior=0.0368 visits=25 action_value=-2.6925 q_norm=0.3516 u=0.0673 score=0.4189
+  - purchase_unit(count=4, unit=MechanizedInfantry): search_prob=0.0160 prior=0.0298 visits=16 action_value=-2.7272 q_norm=0.3384 u=0.0831 score=0.4214
+  - purchase_unit(count=5, unit=MechanizedInfantry): search_prob=0.0130 prior=0.0401 visits=13 action_value=-2.8638 q_norm=0.2860 u=0.1358 score=0.4219
+  - purchase_unit(count=3, unit=MediumTank): search_prob=0.0130 prior=0.0352 visits=13 action_value=-2.8311 q_norm=0.2986 u=0.1194 score=0.4180
+  - purchase_unit(count=4, unit=LightTank): search_prob=0.0110 prior=0.0283 visits=11 action_value=-2.8543 q_norm=0.2897 u=0.1120 score=0.4017
+  - purchase_unit(count=5, unit=LightTank): search_prob=0.0060 prior=0.0326 visits=6 action_value=-3.1931 q_norm=0.1600 u=0.2211 score=0.3811
+
+Defender / purchase_units -> chosen=purchase_unit(count=1, unit=Artillery)
+  q_range=[-3.6109, -0.9990]
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.1750 prior=0.1169 visits=175 action_value=-3.1229 q_norm=0.1868 u=0.0315 score=0.2184
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.1310 prior=0.0752 visits=131 action_value=-3.1115 q_norm=0.1912 u=0.0270 score=0.2183
+  - purchase_unit(count=4, unit=Artillery): search_prob=0.1250 prior=0.2527 visits=125 action_value=-3.2893 q_norm=0.1231 u=0.0952 score=0.2183
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.1230 prior=0.0635 visits=123 action_value=-3.1054 q_norm=0.1935 u=0.0243 score=0.2179
+  - purchase_unit(count=2, unit=Artillery): search_prob=0.0900 prior=0.1085 visits=90 action_value=-3.1874 q_norm=0.1622 u=0.0566 score=0.2187
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0780 prior=0.0525 visits=78 action_value=-3.1240 q_norm=0.1864 u=0.0315 score=0.2180
+  - purchase_unit(count=3, unit=Artillery): search_prob=0.0740 prior=0.1203 visits=74 action_value=-3.2385 q_norm=0.1426 u=0.0761 score=0.2187
+  - purchase_unit(count=4, unit=MechanizedInfantry): search_prob=0.0660 prior=0.0455 visits=66 action_value=-3.1240 q_norm=0.1864 u=0.0322 score=0.2187
+  - purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.0640 prior=0.0400 visits=64 action_value=-3.1172 q_norm=0.1890 u=0.0292 score=0.2182
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0450 prior=0.0556 visits=45 action_value=-3.1945 q_norm=0.1594 u=0.0574 score=0.2168
+  - purchase_unit(count=3, unit=LightTank): search_prob=0.0190 prior=0.0360 visits=19 action_value=-3.2694 q_norm=0.1308 u=0.0855 score=0.2163
+  - purchase_unit(count=4, unit=LightTank): search_prob=0.0100 prior=0.0332 visits=10 action_value=-3.4389 q_norm=0.0659 u=0.1430 score=0.2089
+
+Defender / purchase_units -> chosen=purchase_unit(count=1, unit=LightTank)
+  q_range=[-3.5474, -1.5804]
+  - purchase_unit(count=1, unit=LightTank): search_prob=0.3890 prior=0.2250 visits=389 action_value=-3.1210 q_norm=0.2168 u=0.0274 score=0.2442
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.3240 prior=0.2362 visits=324 action_value=-3.1352 q_norm=0.2095 u=0.0345 score=0.2440
+  - purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.1420 prior=0.1302 visits=142 action_value=-3.1524 q_norm=0.2008 u=0.0432 score=0.2440
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0790 prior=0.1674 visits=79 action_value=-3.2635 q_norm=0.1443 u=0.0993 score=0.2436
+  - purchase_unit(count=2, unit=LightTank): search_prob=0.0420 prior=0.1332 visits=42 action_value=-3.3623 q_norm=0.0941 u=0.1471 score=0.2412
+  - purchase_unit(count=3, unit=LightTank): search_prob=0.0240 prior=0.1079 visits=24 action_value=-3.4725 q_norm=0.0381 u=0.2049 score=0.2430
+
+Defender / purchase_units -> chosen=purchase_unit(count=1, unit=MechanizedInfantry)
+  q_range=[-3.3036, -1.7166]
+  - purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.8870 prior=0.6245 visits=887 action_value=-3.0927 q_norm=0.1329 u=0.0334 score=0.1663
+  - purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.1130 prior=0.3755 visits=113 action_value=-3.2896 q_norm=0.0088 u=0.1563 score=0.1652
+
+Defender / purchase_units -> chosen=end_phase
+  q_range=[-3.0943, -3.0943]
+  - end_phase: search_prob=1.0000 prior=1.0000 visits=1000 action_value=-3.0943 q_norm=1.0000 u=0.0474 score=1.0474

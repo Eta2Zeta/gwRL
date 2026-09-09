@@ -77,7 +77,10 @@ def format_trace(
 ) -> str:
     lines: list[str] = []
     lines.append("MCTS debug trace")
-    lines.append(f"scenario={env.scenario_path if hasattr(env, 'scenario_path') else 'data/china_simplified_setup.json'}")
+    lines.append(
+        "scenario="
+        f"{env.scenario_path if hasattr(env, 'scenario_path') else 'game_content/scenarios/china_simplified_setup.json'}"
+    )
     lines.append(f"checkpoint={checkpoint_path if checkpoint_path is not None else 'random_init'}")
     lines.append(f"root_current_nation={env.current_nation()}")
     lines.append(f"root_current_phase={env.current_phase()}")
@@ -165,7 +168,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--scenario",
         type=Path,
-        default=Path("data/china_simplified_setup.json"),
+        default=Path("game_content/scenarios/china_simplified_setup.json"),
         help="Scenario JSON used to build the C++ environment.",
     )
     parser.add_argument(

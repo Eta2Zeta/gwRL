@@ -1,18 +1,18 @@
 Composition AlphaZero training summary
-episodes=20
+episodes=1000
 state_dim=20
 action_dim=11
 note=two_model_self_play_attacker_vs_defender_zero_sum_battle_composition
-recent_average_attacker_self_play_reward=-0.8000
+recent_average_attacker_self_play_reward=1.6674
 
 Training config
-- episodes=20
+- episodes=1000
 - eval_every=10
 - learning_rate=0.001
 - state_hidden_dim=128
 - action_hidden_dim=64
 - joint_hidden_dim=128
-- search_simulations=12
+- search_simulations=1000
 - c_puct=1.5
 - root_dirichlet_alpha=0.3
 - root_dirichlet_epsilon=0.25
@@ -20,59 +20,239 @@ Training config
 - value_loss_coef=0.25
 - entropy_coef=0.001
 - grad_clip_norm=5.0
-- attacker_budget=10
-- defender_budget=10
+- attacker_budget=50
+- defender_budget=30
 - terrain=normal
 - is_city=False
 - seed=1936
-last_self_play_attacker_reward=-1.0000
-last_self_play_winner=Defender
-last_attacker_total_loss=1.2824
-last_defender_total_loss=1.6262
-best_deterministic_attacker_reward=-1.0000
-best_deterministic_episode=10
-best_self_play_attacker_reward=1.0000
-best_self_play_episode=6
+last_self_play_attacker_reward=1.9537
+last_self_play_winner=Attacker
+last_attacker_total_loss=1.3465
+last_defender_total_loss=0.8397
+best_deterministic_attacker_reward=3.0943
+best_deterministic_attacker_episode=300
+best_deterministic_defender_reward=-0.9722
+best_deterministic_defender_episode=40
+best_self_play_attacker_reward=3.4569
+best_self_play_attacker_episode=503
+best_self_play_defender_reward=4.1616
+best_self_play_defender_episode=72
 
 Deterministic evaluation checkpoints
-- episode=10 attacker_reward=-1.0000
-- episode=20 attacker_reward=-1.0000
+- episode=10 attacker_reward=1.3540
+- episode=20 attacker_reward=1.4036
+- episode=30 attacker_reward=2.0993
+- episode=40 attacker_reward=0.9722
+- episode=50 attacker_reward=2.9972
+- episode=60 attacker_reward=1.4036
+- episode=70 attacker_reward=1.4036
+- episode=80 attacker_reward=1.4036
+- episode=90 attacker_reward=1.3868
+- episode=100 attacker_reward=1.3868
+- episode=110 attacker_reward=1.5915
+- episode=120 attacker_reward=1.3868
+- episode=130 attacker_reward=1.5915
+- episode=140 attacker_reward=1.5915
+- episode=150 attacker_reward=1.5915
+- episode=160 attacker_reward=1.5915
+- episode=170 attacker_reward=1.6114
+- episode=180 attacker_reward=1.5915
+- episode=190 attacker_reward=1.5915
+- episode=200 attacker_reward=1.5915
+- episode=210 attacker_reward=1.6114
+- episode=220 attacker_reward=1.5915
+- episode=230 attacker_reward=1.6114
+- episode=240 attacker_reward=1.6114
+- episode=250 attacker_reward=1.6114
+- episode=260 attacker_reward=1.6114
+- episode=270 attacker_reward=2.3998
+- episode=280 attacker_reward=2.3998
+- episode=290 attacker_reward=2.3998
+- episode=300 attacker_reward=3.0943
+- episode=310 attacker_reward=2.3998
+- episode=320 attacker_reward=2.3998
+- episode=330 attacker_reward=2.3998
+- episode=340 attacker_reward=2.3998
+- episode=350 attacker_reward=2.3998
+- episode=360 attacker_reward=2.3998
+- episode=370 attacker_reward=2.3585
+- episode=380 attacker_reward=2.3998
+- episode=390 attacker_reward=2.5194
+- episode=400 attacker_reward=2.3891
+- episode=410 attacker_reward=2.3998
+- episode=420 attacker_reward=2.3981
+- episode=430 attacker_reward=2.3998
+- episode=440 attacker_reward=2.3998
+- episode=450 attacker_reward=2.3998
+- episode=460 attacker_reward=2.3998
+- episode=470 attacker_reward=2.3998
+- episode=480 attacker_reward=2.3998
+- episode=490 attacker_reward=2.3998
+- episode=500 attacker_reward=2.3998
+- episode=510 attacker_reward=2.3891
+- episode=520 attacker_reward=2.3998
+- episode=530 attacker_reward=2.3891
+- episode=540 attacker_reward=2.3981
+- episode=550 attacker_reward=2.3981
+- episode=560 attacker_reward=2.3998
+- episode=570 attacker_reward=2.3891
+- episode=580 attacker_reward=2.3998
+- episode=590 attacker_reward=2.3998
+- episode=600 attacker_reward=2.3998
+- episode=610 attacker_reward=2.3998
+- episode=620 attacker_reward=2.3998
+- episode=630 attacker_reward=2.3981
+- episode=640 attacker_reward=2.3981
+- episode=650 attacker_reward=2.3998
+- episode=660 attacker_reward=2.3998
+- episode=670 attacker_reward=2.3981
+- episode=680 attacker_reward=2.3981
+- episode=690 attacker_reward=2.3981
+- episode=700 attacker_reward=2.3891
+- episode=710 attacker_reward=2.3981
+- episode=720 attacker_reward=2.3981
+- episode=730 attacker_reward=2.3981
+- episode=740 attacker_reward=2.3981
+- episode=750 attacker_reward=2.3981
+- episode=760 attacker_reward=2.3981
+- episode=770 attacker_reward=2.3981
+- episode=780 attacker_reward=2.3998
+- episode=790 attacker_reward=2.3998
+- episode=800 attacker_reward=2.3998
+- episode=810 attacker_reward=2.3981
+- episode=820 attacker_reward=2.3981
+- episode=830 attacker_reward=2.3981
+- episode=840 attacker_reward=2.3981
+- episode=850 attacker_reward=2.3981
+- episode=860 attacker_reward=2.3981
+- episode=870 attacker_reward=2.3981
+- episode=880 attacker_reward=2.3981
+- episode=890 attacker_reward=2.3981
+- episode=900 attacker_reward=2.3981
+- episode=910 attacker_reward=2.3981
+- episode=920 attacker_reward=2.3981
+- episode=930 attacker_reward=2.3981
+- episode=940 attacker_reward=2.3981
+- episode=950 attacker_reward=2.3981
+- episode=960 attacker_reward=2.3981
+- episode=970 attacker_reward=2.4019
+- episode=980 attacker_reward=2.3981
+- episode=990 attacker_reward=2.4019
+- episode=1000 attacker_reward=2.3981
 
 First attacker purchase root
-- purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.2500 prior=0.0799 visits=3 action_value=-0.7021
-- purchase_unit(count=1, unit=Infantry): search_prob=0.0833 prior=0.0768 visits=1 action_value=-0.7823
-- purchase_unit(count=2, unit=Infantry): search_prob=0.0833 prior=0.0783 visits=1 action_value=-0.7690
-- purchase_unit(count=3, unit=Infantry): search_prob=0.0833 prior=0.0799 visits=1 action_value=-0.7854
-- purchase_unit(count=1, unit=Artillery): search_prob=0.0833 prior=0.0759 visits=1 action_value=-0.7759
-- purchase_unit(count=2, unit=Artillery): search_prob=0.0833 prior=0.0764 visits=1 action_value=-0.7892
-- purchase_unit(count=2, unit=LightTank): search_prob=0.0833 prior=0.0759 visits=1 action_value=-0.7446
-- purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0833 prior=0.0783 visits=1 action_value=-0.7618
-- purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0833 prior=0.0776 visits=1 action_value=-0.7426
-- purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0833 prior=0.0792 visits=1 action_value=-0.7120
-- purchase_unit(count=1, unit=LightTank): search_prob=0.0000 prior=0.0746 visits=0 action_value=0.0000
-- purchase_unit(count=1, unit=MediumTank): search_prob=0.0000 prior=0.0716 visits=0 action_value=0.0000
-- end_phase: search_prob=0.0000 prior=0.0755 visits=0 action_value=0.0000
+- q_range=[-4.0364, 2.8523]
+- purchase_unit(count=10, unit=TankDestroyer): search_prob=0.6240 prior=0.5272 visits=624 action_value=2.5365 q_norm=0.9542 u=0.0400 score=0.9942
+- purchase_unit(count=11, unit=TankDestroyer): search_prob=0.2330 prior=0.2475 visits=233 action_value=2.4595 q_norm=0.9430 u=0.0502 score=0.9932
+- purchase_unit(count=9, unit=TankDestroyer): search_prob=0.0540 prior=0.0919 visits=54 action_value=2.2587 q_norm=0.9138 u=0.0793 score=0.9931
+- purchase_unit(count=12, unit=TankDestroyer): search_prob=0.0140 prior=0.0463 visits=14 action_value=1.7773 q_norm=0.8439 u=0.1465 score=0.9905
+- purchase_unit(count=8, unit=TankDestroyer): search_prob=0.0080 prior=0.0164 visits=8 action_value=2.1408 q_norm=0.8967 u=0.0862 score=0.9829
+- purchase_unit(count=1, unit=Infantry): search_prob=0.0010 prior=0.0012 visits=1 action_value=1.8385 q_norm=0.8528 u=0.0274 score=0.8802
+- purchase_unit(count=2, unit=Infantry): search_prob=0.0010 prior=0.0011 visits=1 action_value=1.8070 q_norm=0.8482 u=0.0253 score=0.8735
+- purchase_unit(count=3, unit=Infantry): search_prob=0.0010 prior=0.0010 visits=1 action_value=1.7798 q_norm=0.8443 u=0.0234 score=0.8677
+- purchase_unit(count=4, unit=Infantry): search_prob=0.0010 prior=0.0009 visits=1 action_value=1.7486 q_norm=0.8398 u=0.0216 score=0.8614
+- purchase_unit(count=5, unit=Infantry): search_prob=0.0010 prior=0.0009 visits=1 action_value=1.7221 q_norm=0.8359 u=0.0204 score=0.8563
+- purchase_unit(count=6, unit=Infantry): search_prob=0.0010 prior=0.0009 visits=1 action_value=1.6883 q_norm=0.8310 u=0.0203 score=0.8513
+- purchase_unit(count=7, unit=Infantry): search_prob=0.0010 prior=0.0009 visits=1 action_value=1.6462 q_norm=0.8249 u=0.0202 score=0.8451
+- purchase_unit(count=8, unit=Infantry): search_prob=0.0010 prior=0.0009 visits=1 action_value=1.5966 q_norm=0.8177 u=0.0212 score=0.8390
+- purchase_unit(count=9, unit=Infantry): search_prob=0.0010 prior=0.0011 visits=1 action_value=1.5417 q_norm=0.8097 u=0.0272 score=0.8370
+- purchase_unit(count=10, unit=Infantry): search_prob=0.0010 prior=0.0017 visits=1 action_value=1.4912 q_norm=0.8024 u=0.0409 score=0.8433
+- purchase_unit(count=11, unit=Infantry): search_prob=0.0010 prior=0.0043 visits=1 action_value=1.4413 q_norm=0.7952 u=0.1013 score=0.8964
+- purchase_unit(count=12, unit=Infantry): search_prob=0.0010 prior=0.0067 visits=1 action_value=1.3765 q_norm=0.7858 u=0.1580 score=0.9437
+- purchase_unit(count=13, unit=Infantry): search_prob=0.0010 prior=0.0043 visits=1 action_value=1.3066 q_norm=0.7756 u=0.1016 score=0.8772
+- purchase_unit(count=14, unit=Infantry): search_prob=0.0010 prior=0.0021 visits=1 action_value=1.2426 q_norm=0.7663 u=0.0497 score=0.8160
+- purchase_unit(count=15, unit=Infantry): search_prob=0.0010 prior=0.0007 visits=1 action_value=1.1845 q_norm=0.7579 u=0.0159 score=0.7738
+- purchase_unit(count=16, unit=Infantry): search_prob=0.0010 prior=0.0002 visits=1 action_value=1.1396 q_norm=0.7514 u=0.0050 score=0.7564
+- purchase_unit(count=1, unit=Artillery): search_prob=0.0010 prior=0.0013 visits=1 action_value=1.8333 q_norm=0.8521 u=0.0311 score=0.8832
+- purchase_unit(count=2, unit=Artillery): search_prob=0.0010 prior=0.0012 visits=1 action_value=1.8013 q_norm=0.8474 u=0.0292 score=0.8766
+- purchase_unit(count=3, unit=Artillery): search_prob=0.0010 prior=0.0012 visits=1 action_value=1.7815 q_norm=0.8445 u=0.0274 score=0.8720
+- purchase_unit(count=4, unit=Artillery): search_prob=0.0010 prior=0.0011 visits=1 action_value=1.7497 q_norm=0.8399 u=0.0257 score=0.8657
+- purchase_unit(count=5, unit=Artillery): search_prob=0.0010 prior=0.0010 visits=1 action_value=1.7265 q_norm=0.8366 u=0.0242 score=0.8607
+- purchase_unit(count=6, unit=Artillery): search_prob=0.0010 prior=0.0011 visits=1 action_value=1.6900 q_norm=0.8313 u=0.0254 score=0.8567
+- purchase_unit(count=7, unit=Artillery): search_prob=0.0010 prior=0.0022 visits=1 action_value=1.6426 q_norm=0.8244 u=0.0527 score=0.8771
+- purchase_unit(count=8, unit=Artillery): search_prob=0.0010 prior=0.0031 visits=1 action_value=1.5778 q_norm=0.8150 u=0.0733 score=0.8882
+- purchase_unit(count=9, unit=Artillery): search_prob=0.0010 prior=0.0029 visits=1 action_value=1.4780 q_norm=0.8005 u=0.0687 score=0.8692
+- purchase_unit(count=10, unit=Artillery): search_prob=0.0010 prior=0.0014 visits=1 action_value=1.3616 q_norm=0.7836 u=0.0334 score=0.8170
+- purchase_unit(count=11, unit=Artillery): search_prob=0.0010 prior=0.0004 visits=1 action_value=1.1682 q_norm=0.7555 u=0.0103 score=0.7658
+- purchase_unit(count=12, unit=Artillery): search_prob=0.0010 prior=0.0001 visits=1 action_value=0.9471 q_norm=0.7234 u=0.0031 score=0.7265
+- purchase_unit(count=1, unit=LightTank): search_prob=0.0010 prior=0.0008 visits=1 action_value=1.8013 q_norm=0.8474 u=0.0190 score=0.8664
+- purchase_unit(count=2, unit=LightTank): search_prob=0.0010 prior=0.0007 visits=1 action_value=1.7271 q_norm=0.8367 u=0.0166 score=0.8533
+- purchase_unit(count=3, unit=LightTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.6607 q_norm=0.8270 u=0.0149 score=0.8419
+- purchase_unit(count=4, unit=LightTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.5870 q_norm=0.8163 u=0.0138 score=0.8302
+- purchase_unit(count=5, unit=LightTank): search_prob=0.0010 prior=0.0005 visits=1 action_value=1.5002 q_norm=0.8037 u=0.0130 score=0.8167
+- purchase_unit(count=6, unit=LightTank): search_prob=0.0010 prior=0.0005 visits=1 action_value=1.3546 q_norm=0.7826 u=0.0122 score=0.7948
+- purchase_unit(count=7, unit=LightTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.2076 q_norm=0.7612 u=0.0140 score=0.7752
+- purchase_unit(count=8, unit=LightTank): search_prob=0.0010 prior=0.0012 visits=1 action_value=1.0039 q_norm=0.7317 u=0.0277 score=0.7593
+- purchase_unit(count=9, unit=LightTank): search_prob=0.0010 prior=0.0017 visits=1 action_value=0.7298 q_norm=0.6919 u=0.0403 score=0.7322
+- purchase_unit(count=10, unit=LightTank): search_prob=0.0010 prior=0.0008 visits=1 action_value=0.3948 q_norm=0.6433 u=0.0201 score=0.6633
+- purchase_unit(count=11, unit=LightTank): search_prob=0.0010 prior=0.0002 visits=1 action_value=0.0585 q_norm=0.5944 u=0.0050 score=0.5995
+- purchase_unit(count=12, unit=LightTank): search_prob=0.0010 prior=0.0000 visits=1 action_value=-0.2222 q_norm=0.5537 u=0.0011 score=0.5548
+- purchase_unit(count=1, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0008 visits=1 action_value=1.7578 q_norm=0.8411 u=0.0196 score=0.8607
+- purchase_unit(count=2, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0007 visits=1 action_value=1.6429 q_norm=0.8244 u=0.0170 score=0.8414
+- purchase_unit(count=3, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.5137 q_norm=0.8057 u=0.0152 score=0.8209
+- purchase_unit(count=4, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.3493 q_norm=0.7818 u=0.0142 score=0.7960
+- purchase_unit(count=5, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.0273 q_norm=0.7351 u=0.0133 score=0.7484
+- purchase_unit(count=6, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0007 visits=1 action_value=0.6540 q_norm=0.6809 u=0.0156 score=0.6965
+- purchase_unit(count=7, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0010 visits=1 action_value=0.2202 q_norm=0.6179 u=0.0244 score=0.6423
+- purchase_unit(count=8, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0013 visits=1 action_value=-0.2779 q_norm=0.5456 u=0.0304 score=0.5760
+- purchase_unit(count=9, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0008 visits=1 action_value=-0.7286 q_norm=0.4802 u=0.0182 score=0.4984
+- purchase_unit(count=10, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0003 visits=1 action_value=-1.0916 q_norm=0.4275 u=0.0063 score=0.4338
+- purchase_unit(count=11, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0001 visits=1 action_value=-1.3693 q_norm=0.3872 u=0.0020 score=0.3891
+- purchase_unit(count=12, unit=MechanizedInfantry): search_prob=0.0010 prior=0.0000 visits=1 action_value=-1.5690 q_norm=0.3582 u=0.0008 score=0.3590
+- purchase_unit(count=1, unit=MediumTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.7511 q_norm=0.8401 u=0.0140 score=0.8541
+- purchase_unit(count=2, unit=MediumTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.6344 q_norm=0.8232 u=0.0138 score=0.8370
+- purchase_unit(count=3, unit=MediumTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.4722 q_norm=0.7997 u=0.0139 score=0.8136
+- purchase_unit(count=4, unit=MediumTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=1.2381 q_norm=0.7657 u=0.0140 score=0.7797
+- purchase_unit(count=5, unit=MediumTank): search_prob=0.0010 prior=0.0007 visits=1 action_value=0.8669 q_norm=0.7118 u=0.0163 score=0.7281
+- purchase_unit(count=6, unit=MediumTank): search_prob=0.0010 prior=0.0006 visits=1 action_value=0.4614 q_norm=0.6529 u=0.0139 score=0.6669
+- purchase_unit(count=7, unit=MediumTank): search_prob=0.0010 prior=0.0002 visits=1 action_value=-0.0280 q_norm=0.5819 u=0.0050 score=0.5869
+- purchase_unit(count=8, unit=MediumTank): search_prob=0.0010 prior=0.0001 visits=1 action_value=-0.4751 q_norm=0.5170 u=0.0021 score=0.5191
+- purchase_unit(count=1, unit=TankDestroyer): search_prob=0.0010 prior=0.0004 visits=1 action_value=1.8432 q_norm=0.8535 u=0.0100 score=0.8635
+- purchase_unit(count=2, unit=TankDestroyer): search_prob=0.0010 prior=0.0004 visits=1 action_value=1.8504 q_norm=0.8546 u=0.0090 score=0.8636
+- purchase_unit(count=3, unit=TankDestroyer): search_prob=0.0010 prior=0.0004 visits=1 action_value=1.8855 q_norm=0.8596 u=0.0084 score=0.8680
+- purchase_unit(count=4, unit=TankDestroyer): search_prob=0.0010 prior=0.0003 visits=1 action_value=1.9241 q_norm=0.8653 u=0.0080 score=0.8733
+- purchase_unit(count=5, unit=TankDestroyer): search_prob=0.0010 prior=0.0003 visits=1 action_value=1.9793 q_norm=0.8733 u=0.0078 score=0.8811
+- purchase_unit(count=6, unit=TankDestroyer): search_prob=0.0010 prior=0.0007 visits=1 action_value=2.0367 q_norm=0.8816 u=0.0157 score=0.8973
+- purchase_unit(count=7, unit=TankDestroyer): search_prob=0.0010 prior=0.0029 visits=1 action_value=2.1088 q_norm=0.8921 u=0.0692 score=0.9613
 
 Current deterministic evaluation
-- attacker_reward=-1.0000
-- winner_id=Defender
-Attacker / purchase_units -> purchase_unit(count=2, unit=MechanizedInfantry) (search_value=-0.7021, visits=3)
-    Attacker purchase: 2 MechanizedInfantry for 8 budget
-Attacker / purchase_units -> end_phase (search_value=-0.9466, visits=12)
+- attacker_reward=2.3981
+- defender_reward=-2.3981
+- winner_id=Attacker
+Attacker / purchase_units -> purchase_unit(count=10, unit=TankDestroyer) (search_value=2.5365, visits=624)
+    Attacker purchase: 10 TankDestroyer for 40 budget
+Attacker / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=2.4530, visits=387)
+    Attacker purchase: 3 Infantry for 9 budget
+Attacker / purchase_units -> end_phase (search_value=2.4233, visits=1000)
     attacker composition locked
-Defender / purchase_units -> purchase_unit(count=3, unit=Infantry) (search_value=0.9610, visits=12)
-    Defender purchase: 3 Infantry for 9 budget
-Defender / purchase_units -> end_phase (search_value=1.0000, visits=12)
+Defender / purchase_units -> purchase_unit(count=10, unit=Infantry) (search_value=-2.3981, visits=807)
+    Defender purchase: 10 Infantry for 30 budget
+Defender / purchase_units -> end_phase (search_value=-2.3981, visits=1000)
     defender composition locked
-    resolving composition battle: attackers=2, defenders=3
-    round 1: attacker 2 Mech (4/12=0.33), defender 3 Inf (12/12=1)
-      after casualties: attacker 1 Mech, defender 2.67 Inf, losses attacker=1, defender=0.33
-    round 2: attacker 1 Mech (2/12=0.17), defender 2.67 Inf (10.67/12=0.89)
-      after casualties: attacker 0.11 Mech, defender 2.50 Inf, losses attacker=0.89, defender=0.17
-    round 3: attacker 0.11 Mech (0.22/12=0.02), defender 2.50 Inf (10/12=0.83)
-      after casualties: attacker 0, defender 2.48 Inf, losses attacker=0.83, defender=0.02
-    battle result: defenders won
+    resolving composition battle: attackers=13, defenders=10
+    targeted strike 1: attacker=30/12=2.50, defender=0/12=0
+      after targeted strike: attacker 3 Inf + 10 TD, defender 7.50 Inf, losses attacker=0, defender=2.50
+    round 1: attacker 3 Inf + 10 TD (6/12=0.50), defender 7.50 Inf (30/12=2.50)
+      after casualties: attacker 0.50 Inf + 10 TD, defender 7 Inf, losses attacker=2.50, defender=0.50
+    targeted strike 2: attacker=30/12=2.50, defender=0/12=0
+      after targeted strike: attacker 0.50 Inf + 10 TD, defender 4.50 Inf, losses attacker=0, defender=2.50
+    round 2: attacker 0.50 Inf + 10 TD (1/12=0.08), defender 4.50 Inf (18/12=1.50)
+      after casualties: attacker 9 TD, defender 4.42 Inf, losses attacker=1.50, defender=0.08
+    targeted strike 3: attacker=27/12=2.25, defender=0/12=0
+      after targeted strike: attacker 9 TD, defender 2.17 Inf, losses attacker=0, defender=2.25
+    round 3: attacker 9 TD (0/12=0), defender 2.17 Inf (8.67/12=0.72)
+      after casualties: attacker 8.28 TD, defender 2.17 Inf, losses attacker=0.72, defender=0
+    targeted strike 4: attacker=24.83/12=2.07, defender=0/12=0
+      after targeted strike: attacker 8.28 TD, defender 0.10 Inf, losses attacker=0, defender=2.07
+    round 4: attacker 8.28 TD (0/12=0), defender 0.10 Inf (0.39/12=0.03)
+      after casualties: attacker 8.25 TD, defender 0.10 Inf, losses attacker=0.03, defender=0
+    targeted strike 5: attacker=24.74/12=2.06, defender=0/12=0
+      after targeted strike: attacker 8.25 TD, defender 0, losses attacker=0, defender=2.06
+    battle result: attackers won
+    combined reward: result_bonus=1.000000, value_trade_term=1.398148, defender_lost=30.000000, attacker_lost=16.018519, attacker_reward=2.398148
 
 Detailed trace files
-- best self-play trace: output/best_composition_self_play_trace.txt
-- best deterministic trace: output/best_composition_deterministic_trace.txt
+- best self-play attacker trace: output/best_composition_self_play_attacker_trace.txt
+- best self-play defender trace: output/best_composition_self_play_defender_trace.txt
+- best deterministic attacker trace: output/best_composition_deterministic_attacker_trace.txt
+- best deterministic defender trace: output/best_composition_deterministic_defender_trace.txt

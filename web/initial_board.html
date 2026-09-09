@@ -635,7 +635,7 @@
     });
 
     const params = new URLSearchParams(window.location.search);
-    const sourcePath = params.get("source") || "../data/china_simplified_setup.json";
+    const sourcePath = params.get("source") || "../game_content/scenarios/china_simplified_setup.json";
 
     loadFromUrl(sourcePath).catch((error) => {
       sourceLabel.textContent = `Could not load ${sourcePath}. Use a local server or load a JSON file manually.`;

@@ -222,7 +222,11 @@ def parse_args() -> argparse.Namespace:
     training_defaults = TrainingConfig()
     parser = argparse.ArgumentParser(description="Audit policy drift after the best deterministic checkpoint.")
     parser.add_argument("--episodes", type=int, default=training_defaults.episodes)
-    parser.add_argument("--scenario", type=Path, default=Path("data/china_simplified_setup.json"))
+    parser.add_argument(
+        "--scenario",
+        type=Path,
+        default=Path("game_content/scenarios/china_simplified_setup.json"),
+    )
     parser.add_argument("--learning-rate", type=float, default=training_defaults.learning_rate)
     parser.add_argument("--state-hidden-dim", type=int, default=training_defaults.state_hidden_dim)
     parser.add_argument("--action-hidden-dim", type=int, default=training_defaults.action_hidden_dim)

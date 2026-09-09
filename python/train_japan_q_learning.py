@@ -643,7 +643,11 @@ def main() -> None:
     defaults = QLearningConfig()
     parser = argparse.ArgumentParser(description="Train a separate Japan tabular Q-learning baseline")
     parser.add_argument("--episodes", type=int, default=defaults.episodes)
-    parser.add_argument("--scenario", type=Path, default=Path("data/china_simplified_setup.json"))
+    parser.add_argument(
+        "--scenario",
+        type=Path,
+        default=Path("game_content/scenarios/china_simplified_setup.json"),
+    )
     parser.add_argument("--output-dir", type=Path, default=Path("output/q_learning"))
     parser.add_argument("--eval-every", type=int, default=defaults.eval_every)
     parser.add_argument("--alpha", type=float, default=defaults.alpha)

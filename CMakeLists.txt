@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(gw_simplified
     src/action_encoder.cpp
+    src/debug_tools.cpp
     src/game_state.cpp
     src/japan_training_env.cpp
     src/main.cpp

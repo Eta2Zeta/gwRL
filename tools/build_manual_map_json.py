@@ -1,7 +1,9 @@
 import json
 from copy import deepcopy
+from pathlib import Path
 
-OUTPUT = "gw36_manual_map.json"
+ROOT = Path(__file__).resolve().parent.parent
+OUTPUT = ROOT / "game_content/maps/gw36_manual_map.json"
 
 DEFAULT_EDGE = {
     "neighbor_id": None,
@@ -613,6 +615,13 @@ def build():
         ("land_switzerland", "Switzerland", "mountain", 1, "Switzerland", False, False),
         ("land_esp_basque_country", "Basque Country", "mountain", 1, "Spain", False, False),
         ("land_esp_catalonia", "Catalonia", "mountain", 1, "Spain", False, False),
+        ("land_esp_galicia_and_leon", "Galicia and Leon", "normal", 1, "Spain", False, False),
+        ("land_portugal", "Portugal", "normal", 1, "Portugal", False, False),
+        ("land_esp_madrid", "Madrid", "city", 1, "Nationalist Spain", False, False),
+        ("land_esp_western_andalucia", "Western Andalucia", "normal", 1, "Spain", False, False),
+        ("land_esp_eastern_andalucia", "Eastern Andalucia", "mountain", 1, "Republican Spain", False, False),
+        ("land_gibraltar", "Gibraltar", "mountain", 0, "United Kingdom", False, False),
+        ("land_esp_balearic_islands", "Balearic Islands", "normal", 0, "Republican Spain", False, False),
 
         ("land_tur_istanbul", "Istanbul", "city", 2, "Turkey", True, True),
         ("land_tur_karadeniz", "Karadeniz", "mountain", 0, "Turkey", False, False),
@@ -892,6 +901,8 @@ def build():
     nodes["land_korea"]["node_facility_ids"] = ["facility_korea_airfield"]
     nodes["land_jap_tokyo"]["node_facilities"] = ["airfield"]
     nodes["land_jap_tokyo"]["node_facility_ids"] = ["facility_tokyo_airfield"]
+    nodes["land_esp_catalonia"]["node_facilities"] = ["airfield"]
+    nodes["land_esp_catalonia"]["node_facility_ids"] = ["facility_catalonia_airfield"]
 
     # Sea-sea framework (Europe basin)
     link(nodes, "sea_a6", "sea_a7", border_terrain="sea")
@@ -1044,6 +1055,20 @@ def build():
     link_rail(nodes, "land_fra_southern_france", "land_ita_northern_italy", border_terrain="mountain")
     link_rail(nodes, "land_fra_southern_france", "land_switzerland", border_terrain="mountain")
     link_rail(nodes, "land_switzerland", "land_ita_northern_italy", border_terrain="mountain")
+
+    # Spain
+    link_land(nodes, "land_esp_madrid", "land_esp_basque_country")
+    link_rail(nodes, "land_esp_madrid", "land_esp_catalonia")
+    link_land(nodes, "land_esp_madrid", "land_esp_eastern_andalucia")
+    link_land(nodes, "land_esp_madrid", "land_esp_western_andalucia")
+    link_land(nodes, "land_esp_madrid", "land_esp_galicia_and_leon")
+    link_rail(nodes, "land_esp_catalonia", "land_esp_eastern_andalucia")
+    link_land(nodes, "land_esp_catalonia", "land_esp_basque_country")
+    link_land(nodes, "land_esp_eastern_andalucia", "land_esp_western_andalucia")
+    link_land(nodes, "land_esp_eastern_andalucia", "land_gibraltar")
+    link_land(nodes, "land_esp_western_andalucia", "land_gibraltar")
+    link_land(nodes, "land_esp_western_andalucia", "land_esp_galicia_and_leon")
+    link_rail(nodes, "land_esp_western_andalucia", "land_portugal")
 
     link_rail(nodes, "land_ita_northern_italy", "land_ita_rome")
     link_rail(nodes, "land_ita_northern_italy", "land_ita_lazio")
@@ -1542,10 +1567,15 @@ def build():
     for lid in ["land_fin_lapland", "land_swe_norrland", "land_usr_kola"]:
         link_land_sea(nodes, lid, "sea_a14", port=False)
 
-    for lid in ["land_fra_aquitaine", "land_esp_basque_country", "land_esp_catalonia", "land_fra_southern_france"]:
+    for lid in ["land_fra_aquitaine", "land_esp_basque_country", "land_fra_southern_france"]:
         link_land_sea(nodes, lid, "sea_a28", port=True)
 
     link_land_sea(nodes, "land_fra_southern_france", "sea_m1", port=True)
+    link_land_sea(nodes, "land_esp_catalonia", "sea_m1", naval_facilities=["major_port"])
+    link_land_sea(nodes, "land_esp_eastern_andalucia", "sea_m1", port=False)
+    link_land_sea(nodes, "land_esp_eastern_andalucia", "sea_m2", naval_facilities=["minor_shipyard"])
+    link_land_sea(nodes, "land_esp_western_andalucia", "sea_a44", naval_facilities=["major_port"])
+    link_land_sea(nodes, "land_esp_balearic_islands", "sea_m1", port=False)
     link_land_sea(nodes, "land_fra_corsica", "sea_m3", port=True)
     link_land_sea(nodes, "land_ita_sardinia", "sea_m3", port=True)
     link_land_sea(nodes, "land_ita_northern_italy", "sea_m3", port=True)
