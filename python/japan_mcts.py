@@ -190,7 +190,9 @@ def _score_actions(
             normalized_q_value = min_max_stats.normalize(q_value)
         else:
             q_value = None
-            normalized_q_value = 0.0
+            # Optimistic first-play urgency: an unvisited action is unknown,
+            # rather than the worst action observed by the search.
+            normalized_q_value = 1.0
         exploration = config.c_puct * prior * math.sqrt(total_visits + 1.0) / (visit_count + 1.0)
         score = normalized_q_value + exploration
         action_scores.append(

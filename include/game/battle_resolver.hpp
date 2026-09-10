@@ -86,7 +86,7 @@ class BattleResolver {
             case UnitKind::LightTank:
                 return 3;
             case UnitKind::MechanizedInfantry:
-                return 2;
+                return 3;
             case UnitKind::MediumTank:
                 return 6;
             case UnitKind::TankDestroyer:
@@ -242,9 +242,9 @@ class BattleResolver {
         while (totalUnits(attackingForce) > 1e-9 && totalUnits(defendingForce) > 1e-9) {
             if (roundNumber == 1 && (attackingForce[UnitKind::Artillery] > 0.0 || defendingForce[UnitKind::Artillery] > 0.0)) {
                 const auto artilleryAttackValue =
-                    attackingForce[UnitKind::Artillery] * adjustedAttackValue(UnitKind::Artillery, battleZone);
+                    artilleryCombatValue(attackingForce, battleZone, true);
                 const auto artilleryDefenseValue =
-                    defendingForce[UnitKind::Artillery] * adjustedDefenseValue(UnitKind::Artillery, battleZone);
+                    artilleryCombatValue(defendingForce, battleZone, false);
                 const auto artilleryDefenderLosses = artilleryAttackValue / 12.0;
                 const auto artilleryAttackerLosses = artilleryDefenseValue / 12.0;
 
@@ -279,45 +279,27 @@ class BattleResolver {
                     + ", defender=" + formatCount(artilleryDefenderLosses));
             }
 
-            const auto targetedAttack = targetedCombatValue(attackingForce, battleZone, true);
-            const auto targetedDefense = targetedCombatValue(defendingForce, battleZone, false);
-            if (targetedAttack > 1e-9 || targetedDefense > 1e-9) {
-                const auto targetedDefenderLosses = targetedAttack / 12.0;
-                const auto targetedAttackerLosses = targetedDefense / 12.0;
-
-                outcome.roundLogs.push_back(
-                    "targeted strike "
-                    + std::to_string(roundNumber)
-                    + ": attacker="
-                    + formatCount(targetedAttack)
-                    + "/12="
-                    + formatCount(targetedDefenderLosses)
-                    + ", defender="
-                    + formatCount(targetedDefense)
-                    + "/12="
-                    + formatCount(targetedAttackerLosses));
-
-                auto attackerAfterTargeted = attackingForce;
-                auto defenderAfterTargeted = defendingForce;
-                applyTargetedCasualties(attackerAfterTargeted, battleZone, true, targetedAttackerLosses);
-                applyTargetedCasualties(defenderAfterTargeted, battleZone, false, targetedDefenderLosses);
-                attackingForce = attackerAfterTargeted;
-                defendingForce = defenderAfterTargeted;
-
-                outcome.roundLogs.push_back(
-                    "  after targeted strike: attacker "
-                    + describeForce(attackingForce)
-                    + ", defender "
-                    + describeForce(defendingForce)
-                    + ", losses attacker=" + formatCount(targetedAttackerLosses)
-                    + ", defender=" + formatCount(targetedDefenderLosses));
+            if (totalUnits(attackingForce) <= 1e-9 || totalUnits(defendingForce) <= 1e-9) {
+                break;
             }
 
+            // Target selection chooses casualties; unlike artillery first strike,
+            // it does not suppress return fire. Compute all fire before any losses.
+            const auto targetedAttack = targetedCombatValue(attackingForce, battleZone, true);
+            const auto targetedDefense = targetedCombatValue(defendingForce, battleZone, false);
             const auto includeArtillery = roundNumber > 1;
-            const auto roundAttack = regularCombatValue(attackingForce, battleZone, true, includeArtillery);
-            const auto roundDefense = regularCombatValue(defendingForce, battleZone, false, includeArtillery);
+            const auto regularAttack = regularCombatValue(attackingForce, battleZone, true, includeArtillery);
+            const auto regularDefense = regularCombatValue(defendingForce, battleZone, false, includeArtillery);
+            const auto roundAttack = targetedAttack + regularAttack;
+            const auto roundDefense = targetedDefense + regularDefense;
 
             if (roundAttack <= 1e-9 && roundDefense <= 1e-9) {
+                // Artillery already fired this round, but can fire normally next
+                // round. Two surviving artillery forces are not a stalemate.
+                if (!includeArtillery) {
+                    ++roundNumber;
+                    continue;
+                }
                 break;
             }
 
@@ -338,13 +320,24 @@ class BattleResolver {
                 + formatCount(roundDefense / 12.0)
                 + ")");
 
+            if (targetedAttack > 1e-9 || targetedDefense > 1e-9) {
+                outcome.roundLogs.push_back(
+                    "  target selection (included in round fire): attacker="
+                    + formatCount(targetedAttack)
+                    + "/12=" + formatCount(targetedAttack / 12.0)
+                    + ", defender=" + formatCount(targetedDefense)
+                    + "/12=" + formatCount(targetedDefense / 12.0));
+            }
+
             const auto defenderLosses = roundAttack / 12.0;
             const auto attackerLosses = roundDefense / 12.0;
 
             auto attackerAfterRound = attackingForce;
             auto defenderAfterRound = defendingForce;
-            applyStandardCasualties(attackerAfterRound, battleZone, true, attackerLosses);
-            applyStandardCasualties(defenderAfterRound, battleZone, false, defenderLosses);
+            applyTargetedCasualties(attackerAfterRound, battleZone, true, targetedDefense / 12.0);
+            applyTargetedCasualties(defenderAfterRound, battleZone, false, targetedAttack / 12.0);
+            applyStandardCasualties(attackerAfterRound, battleZone, true, regularDefense / 12.0);
+            applyStandardCasualties(defenderAfterRound, battleZone, false, regularAttack / 12.0);
             attackingForce = attackerAfterRound;
             defendingForce = defenderAfterRound;
 
@@ -394,22 +387,41 @@ class BattleResolver {
         throw std::runtime_error("Unknown unit kind for abbreviation");
     }
 
-    static bool artillerySupportable(UnitKind kind) {
-        return kind == UnitKind::Infantry || kind == UnitKind::Marine || kind == UnitKind::MechanizedInfantry;
+    static bool isInfantryClass(UnitKind kind) {
+        return kind == UnitKind::Infantry || kind == UnitKind::Marine;
     }
 
-    static double totalSupportedUnits(const ForceState& force) {
-        double total = 0.0;
+    static bool isVehicleClass(UnitKind kind) {
+        return kind == UnitKind::LightTank || kind == UnitKind::MechanizedInfantry
+            || kind == UnitKind::MediumTank || kind == UnitKind::TankDestroyer;
+    }
+
+    static double artilleryCombatValue(const ForceState& force, const Zone& battleZone, bool attackers) {
+        double partners = 0.0;
         for (const auto kind : landCombatUnitKinds()) {
-            if (artillerySupportable(kind)) {
-                total += force[kind];
+            if (isInfantryClass(kind) || isVehicleClass(kind)) {
+                partners += force[kind];
             }
         }
-        return total;
+        // Both classes prevent the unpaired-artillery penalty. Recompute from
+        // the surviving force for first strike and each later round.
+        const auto paired = std::min(force[UnitKind::Artillery], partners);
+        const auto unpaired = force[UnitKind::Artillery] - paired;
+        const auto value = attackers ? adjustedAttackValue(UnitKind::Artillery, battleZone)
+                                    : adjustedDefenseValue(UnitKind::Artillery, battleZone);
+        return paired * value + unpaired * std::max(0, value - 1);
     }
 
     static double artillerySupportBonus(const ForceState& force) {
-        return std::min(totalSupportedUnits(force), force[UnitKind::Artillery]);
+        double total = 0.0;
+        for (const auto kind : landCombatUnitKinds()) {
+            if (isInfantryClass(kind)) {
+                total += force[kind];
+            }
+        }
+        // Pair infantry first for the attack bonus; remaining artillery may
+        // pair with vehicles, which receive no support bonus themselves.
+        return std::min(total, force[UnitKind::Artillery]);
     }
 
     static std::vector<UnitKind> standardCasualtyPriorityOrder(const Zone& battleZone, bool attackers) {
@@ -432,6 +444,9 @@ class BattleResolver {
 
     static std::vector<UnitKind> targetedCasualtyPriorityOrder(const Zone& battleZone, bool attackers) {
         auto order = landCombatUnitKinds();
+        order.erase(
+            std::remove_if(order.begin(), order.end(), [](UnitKind kind) { return !isVehicleClass(kind); }),
+            order.end());
         std::stable_sort(
             order.begin(),
             order.end(),
@@ -448,22 +463,25 @@ class BattleResolver {
         return order;
     }
 
-    static void applyCasualtiesByOrder(
+    static double applyCasualtiesByOrder(
         ForceState& force,
         const std::vector<UnitKind>& casualtyOrder,
         double casualties) {
-        if (casualties <= 0.0 || totalUnits(force) <= 0.0) {
-            return;
+        if (casualties <= 0.0) {
+            return 0.0;
         }
         auto remaining = casualties;
         for (const auto kind : casualtyOrder) {
-            if (remaining <= 1e-9) {
+            // Apply even tiny hits so symmetric fractional battles keep making
+            // progress until the force-level termination threshold is reached.
+            if (remaining <= 0.0) {
                 break;
             }
             const auto removed = std::min(force[kind], remaining);
             force[kind] -= removed;
             remaining -= removed;
         }
+        return remaining;
     }
 
     static void applyStandardCasualties(
@@ -471,6 +489,9 @@ class BattleResolver {
         const Zone& battleZone,
         bool attackers,
         double casualties) {
+        if (casualties <= 0.0 || totalUnits(force) <= 0.0) {
+            return;
+        }
         applyCasualtiesByOrder(force, standardCasualtyPriorityOrder(battleZone, attackers), casualties);
     }
 
@@ -479,7 +500,14 @@ class BattleResolver {
         const Zone& battleZone,
         bool attackers,
         double casualties) {
-        applyCasualtiesByOrder(force, targetedCasualtyPriorityOrder(battleZone, attackers), casualties);
+        if (casualties <= 0.0 || totalUnits(force) <= 0.0) {
+            return;
+        }
+        const auto remaining =
+            applyCasualtiesByOrder(force, targetedCasualtyPriorityOrder(battleZone, attackers), casualties);
+        // Once eligible vehicles are exhausted, excess hits are ordinary
+        // casualties chosen by the receiving side's existing heuristic.
+        applyStandardCasualties(force, battleZone, attackers, remaining);
     }
 
     static double targetedCombatValueForKind(UnitKind kind, const Zone& battleZone, bool attackers) {
@@ -496,19 +524,6 @@ class BattleResolver {
         return total;
     }
 
-    static double regularCombatContributionForKind(
-        UnitKind kind,
-        const Zone& battleZone,
-        bool attackers,
-        bool includeArtillery) {
-        if (kind == UnitKind::Artillery && !includeArtillery) {
-            return 0.0;
-        }
-        const auto adjustedValue = attackers ? adjustedAttackValue(kind, battleZone)
-                                             : adjustedDefenseValue(kind, battleZone);
-        return static_cast<double>(adjustedValue) - targetedCombatValueForKind(kind, battleZone, attackers);
-    }
-
     static double regularCombatValue(
         const ForceState& force,
         const Zone& battleZone,
@@ -516,11 +531,17 @@ class BattleResolver {
         bool includeArtillery) {
         double total = 0.0;
         for (const auto kind : landCombatUnitKinds()) {
-            total += force[kind] * regularCombatContributionForKind(kind, battleZone, attackers, includeArtillery);
+            if (kind == UnitKind::Artillery) {
+                continue;
+            }
+            const auto value = attackers ? adjustedAttackValue(kind, battleZone)
+                                        : adjustedDefenseValue(kind, battleZone);
+            total += force[kind] * (value - targetedCombatValueForKind(kind, battleZone, attackers));
+        }
+        if (includeArtillery) {
+            total += artilleryCombatValue(force, battleZone, attackers);
         }
         if (attackers) {
-            total += artillerySupportBonus(force);
-        } else {
             total += artillerySupportBonus(force);
         }
         return total;

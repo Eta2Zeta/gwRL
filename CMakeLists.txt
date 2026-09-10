@@ -20,3 +20,14 @@ add_executable(gw_simplified
 )
 
 target_include_directories(gw_simplified PRIVATE include)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(combat_regression_tests
+        tests/combat_regression_tests.cpp
+        src/game_state.cpp
+    )
+    target_include_directories(combat_regression_tests PRIVATE include)
+    add_test(NAME combat_regression COMMAND combat_regression_tests)
+    set_tests_properties(combat_regression PROPERTIES TIMEOUT 10)
+endif()

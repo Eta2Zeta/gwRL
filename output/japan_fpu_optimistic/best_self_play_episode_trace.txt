@@ -1,0 +1,116 @@
+Best self-play episode
+episode=35
+reward=9.0000
+japan_income=7
+japan_units=4
+japan_unit_value=14
+destroyed_enemy_unit_value=6
+
+Decision trace
+Japan turn 1 / declaration_of_war -> declare_war_on_china (search_prob=0.8980, prior=0.6256, visits=449, action_value=7.3173)
+    declaration result: all warlord lands and units transfer to KMT
+Japan turn 1 / purchase_units -> purchase_unit(count=1, unit=Artillery) (search_prob=0.1180, prior=0.2271, visits=59, action_value=7.2414)
+    purchase: 1 Artillery for 4 treasury
+Japan turn 1 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4, unit=Infantry) (search_prob=0.6900, prior=0.4549, visits=345, action_value=7.2814)
+    combat: no defenders, territory occupied immediately
+Japan turn 1 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (search_prob=1.0000, prior=1.0000, visits=500, action_value=7.2519)
+    place units: 1 Artillery placed at land_manchuria_rehe
+Japan turn 2 / purchase_units -> purchase_unit(count=1, unit=Artillery) (search_prob=0.2200, prior=0.4713, visits=110, action_value=7.0526)
+    purchase: 1 Artillery for 4 treasury
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1, unit=Infantry) (search_prob=0.5480, prior=0.0824, visits=274, action_value=8.4559)
+    combat: no defenders, territory occupied immediately
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=2, unit=Infantry) (search_prob=0.5820, prior=0.1390, visits=291, action_value=8.8644)
+    combat move: 2 Infantry committed from land_china_suiyuan to pending battle at land_china_beiping
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1, unit=Infantry) (search_prob=0.9360, prior=0.8307, visits=468, action_value=8.9386)
+    combat: no defenders, territory occupied immediately
+Japan turn 2 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery) (search_prob=0.9660, prior=0.7077, visits=483, action_value=8.9926)
+    combat move: 1 Artillery committed from land_manchuria_rehe to pending battle at land_china_beiping
+Japan turn 2 / combat_resolve -> resolve_combat(to=land_china_beiping) (search_prob=1.0000, prior=1.0000, visits=500, action_value=8.9960)
+    resolving pending battle at land_china_beiping: attackers=3, defenders=2
+    first strike: attacker 1 Art (3/12=0.25), defender 0 Art (0/12=0)
+      after first strike: attacker 2 Inf + 1 Art, defender 1.75 Inf, losses attacker=0, defender=0.25
+    round 1: attacker 2 Inf + 1 Art (5/12=0.42), defender 1.75 Inf (8.75/12=0.73)
+      after casualties: attacker 1.27 Inf + 1 Art, defender 1.33 Inf, losses attacker=0.73, defender=0.42
+    round 2: attacker 1.27 Inf + 1 Art (6.54/12=0.55), defender 1.33 Inf (6.67/12=0.56)
+      after casualties: attacker 0.72 Inf + 1 Art, defender 0.79 Inf, losses attacker=0.56, defender=0.55
+    round 3: attacker 0.72 Inf + 1 Art (5.15/12=0.43), defender 0.79 Inf (3.94/12=0.33)
+      after casualties: attacker 0.39 Inf + 1 Art, defender 0.36 Inf, losses attacker=0.33, defender=0.43
+    round 4: attacker 0.39 Inf + 1 Art (4.16/12=0.35), defender 0.36 Inf (1.80/12=0.15)
+      after casualties: attacker 0.24 Inf + 1 Art, defender 0.01 Inf, losses attacker=0.15, defender=0.35
+    round 5: attacker 0.24 Inf + 1 Art (3.71/12=0.31), defender 0.01 Inf (0.06/12=0.01)
+      after casualties: attacker 0.23 Inf + 1 Art, defender 0, losses attacker=0.01, defender=0.31
+    combat result: attackers won and occupy the territory
+Japan turn 2 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (search_prob=1.0000, prior=1.0000, visits=500, action_value=9.0000)
+    place units: 1 Artillery placed at land_manchuria_rehe
+
+Root search tables
+
+Japan turn 1 / declaration_of_war -> chosen=declare_war_on_china (search_prob=0.8980, prior=0.6256, visits=449, action_value=7.3173)
+  - declare_war_on_china: search_prob=0.8980 prior=0.6256 visits=449 action_value=7.3173
+  - end_phase: search_prob=0.1020 prior=0.3744 visits=51 action_value=5.5551
+
+Japan turn 1 / purchase_units -> chosen=purchase_unit(count=1, unit=Artillery) (search_prob=0.1180, prior=0.2271, visits=59, action_value=7.2414)
+  - end_phase: search_prob=0.3040 prior=0.0777 visits=152 action_value=7.5415
+  - purchase_unit(count=1, unit=Fighter): search_prob=0.3000 prior=0.5182 visits=150 action_value=7.1447
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.2780 prior=0.1770 visits=139 action_value=7.5355
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.1180 prior=0.2271 visits=59 action_value=7.2414
+
+Japan turn 1 / combat_move -> chosen=move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4, unit=Infantry) (search_prob=0.6900, prior=0.4549, visits=345, action_value=7.2814)
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4, unit=Infantry): search_prob=0.6900 prior=0.4549 visits=345 action_value=7.2814
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=3, unit=Infantry): search_prob=0.1480 prior=0.1055 visits=74 action_value=7.1567
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=4, unit=Infantry): search_prob=0.0540 prior=0.2806 visits=27 action_value=6.1041
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=2, unit=Infantry): search_prob=0.0320 prior=0.0194 visits=16 action_value=6.6214
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=2, unit=Infantry): search_prob=0.0280 prior=0.0295 visits=14 action_value=6.8362
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=1, unit=Infantry): search_prob=0.0180 prior=0.0116 visits=9 action_value=6.6128
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=3, unit=Infantry): search_prob=0.0160 prior=0.0734 visits=8 action_value=6.3631
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Infantry): search_prob=0.0100 prior=0.0073 visits=5 action_value=7.1592
+  - end_phase: search_prob=0.0040 prior=0.0178 visits=2 action_value=6.4239
+
+Japan turn 1 / place_units -> chosen=place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (search_prob=1.0000, prior=1.0000, visits=500, action_value=7.2519)
+  - place_unit(to=land_manchuria_rehe, count=1, unit=Artillery): search_prob=1.0000 prior=1.0000 visits=500 action_value=7.2519
+
+Japan turn 2 / purchase_units -> chosen=purchase_unit(count=1, unit=Artillery) (search_prob=0.2200, prior=0.4713, visits=110, action_value=7.0526)
+  - end_phase: search_prob=0.4580 prior=0.1613 visits=229 action_value=7.3715
+  - purchase_unit(count=1, unit=Infantry): search_prob=0.3220 prior=0.3674 visits=161 action_value=7.3419
+  - purchase_unit(count=1, unit=Artillery): search_prob=0.2200 prior=0.4713 visits=110 action_value=7.0526
+
+Japan turn 2 / combat_move -> chosen=move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1, unit=Infantry) (search_prob=0.5480, prior=0.0824, visits=274, action_value=8.4559)
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1, unit=Infantry): search_prob=0.5480 prior=0.0824 visits=274 action_value=8.4559
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=2, unit=Infantry): search_prob=0.0940 prior=0.1854 visits=47 action_value=7.0962
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=3, unit=Infantry): search_prob=0.0860 prior=0.2743 visits=43 action_value=6.8541
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=1, unit=Infantry): search_prob=0.0700 prior=0.0092 visits=35 action_value=6.9212
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=2, unit=Infantry): search_prob=0.0560 prior=0.0306 visits=28 action_value=7.1049
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery): search_prob=0.0400 prior=0.0111 visits=20 action_value=7.3305
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=4, unit=Infantry): search_prob=0.0300 prior=0.2378 visits=15 action_value=6.0537
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=3, unit=Infantry): search_prob=0.0260 prior=0.0339 visits=13 action_value=7.0065
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1, unit=Infantry): search_prob=0.0200 prior=0.0161 visits=10 action_value=7.2701
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=4, unit=Infantry): search_prob=0.0100 prior=0.0342 visits=5 action_value=6.4819
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=2, unit=Infantry): search_prob=0.0060 prior=0.0218 visits=3 action_value=6.9164
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=3, unit=Infantry): search_prob=0.0060 prior=0.0274 visits=3 action_value=6.6763
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=4, unit=Infantry): search_prob=0.0060 prior=0.0311 visits=3 action_value=6.3441
+  - end_phase: search_prob=0.0020 prior=0.0046 visits=1 action_value=7.0108
+
+Japan turn 2 / combat_move -> chosen=move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=2, unit=Infantry) (search_prob=0.5820, prior=0.1390, visits=291, action_value=8.8644)
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=2, unit=Infantry): search_prob=0.5820 prior=0.1390 visits=291 action_value=8.8644
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=3, unit=Infantry): search_prob=0.2480 prior=0.1357 visits=124 action_value=8.1630
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery): search_prob=0.0460 prior=0.0640 visits=23 action_value=7.4784
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1, unit=Infantry): search_prob=0.0380 prior=0.1475 visits=19 action_value=7.4310
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=2, unit=Infantry): search_prob=0.0360 prior=0.2049 visits=18 action_value=7.1222
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=3, unit=Infantry): search_prob=0.0260 prior=0.2051 visits=13 action_value=6.9303
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=1, unit=Infantry): search_prob=0.0200 prior=0.0773 visits=10 action_value=7.3237
+  - end_phase: search_prob=0.0040 prior=0.0264 visits=2 action_value=6.6593
+
+Japan turn 2 / combat_move -> chosen=move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1, unit=Infantry) (search_prob=0.9360, prior=0.8307, visits=468, action_value=8.9386)
+  - move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1, unit=Infantry): search_prob=0.9360 prior=0.8307 visits=468 action_value=8.9386
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery): search_prob=0.0580 prior=0.1198 visits=29 action_value=8.7728
+  - end_phase: search_prob=0.0060 prior=0.0495 visits=3 action_value=6.2507
+
+Japan turn 2 / combat_move -> chosen=move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery) (search_prob=0.9660, prior=0.7077, visits=483, action_value=8.9926)
+  - move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery): search_prob=0.9660 prior=0.7077 visits=483 action_value=8.9926
+  - end_phase: search_prob=0.0340 prior=0.2923 visits=17 action_value=6.6849
+
+Japan turn 2 / combat_resolve -> chosen=resolve_combat(to=land_china_beiping) (search_prob=1.0000, prior=1.0000, visits=500, action_value=8.9960)
+  - resolve_combat(to=land_china_beiping): search_prob=1.0000 prior=1.0000 visits=500 action_value=8.9960
+
+Japan turn 2 / place_units -> chosen=place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (search_prob=1.0000, prior=1.0000, visits=500, action_value=9.0000)
+  - place_unit(to=land_manchuria_rehe, count=1, unit=Artillery): search_prob=1.0000 prior=1.0000 visits=500 action_value=9.0000

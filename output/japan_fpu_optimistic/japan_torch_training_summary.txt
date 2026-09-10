@@ -1,0 +1,194 @@
+Japan Torch training summary
+episodes=500
+state_dim=446
+action_dim=26
+note=self_play_rewards_are_stochastic_training_episodes; search_evaluation_is_the_current_deterministic_policy
+recent_average_self_play_reward=8.9500
+
+Training config
+- episodes=500
+- eval_every=5
+- learning_rate=0.001
+- state_hidden_dim=128
+- action_hidden_dim=64
+- joint_hidden_dim=128
+- search_simulations=500
+- c_puct=1.5
+- root_dirichlet_alpha=0.3
+- root_dirichlet_epsilon=0.25
+- self_play_temperature=0.75
+- value_loss_coef=0.25
+- entropy_coef=0.001
+- grad_clip_norm=5.0
+- replay_buffer_capacity=4096
+- replay_batch_size=64
+- replay_updates_per_episode=4
+- min_replay_size=32
+- seed=1936
+last_self_play_reward=9.0000
+last_self_play_japan_income=7
+last_self_play_japan_units=4
+last_self_play_japan_unit_value=14
+last_self_play_destroyed_enemy_unit_value=6
+last_training_loss=0.4102
+last_gradient_norm=2.1809
+last_replay_buffer_size=4096
+last_replay_updates=4
+best_search_evaluation_reward=9.0000
+best_search_evaluation_episode=55
+best_self_play_reward=9.0000
+best_self_play_episode=35
+
+Search evaluation checkpoints
+- episode=5 reward=3.5000 income=1 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=10 reward=6.5000 income=4 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=15 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=20 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=25 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=30 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=35 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=40 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=45 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=50 reward=7.5000 income=5 units=6 unit_value=25 destroyed_enemy_unit_value=0
+- episode=55 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=60 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=65 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=70 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=75 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=80 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=85 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=90 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=95 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=100 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=105 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=110 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=115 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=120 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=125 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=130 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=135 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=140 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=145 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=150 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=155 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=160 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=165 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=170 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=175 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=180 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=185 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=190 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=195 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=200 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=205 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=210 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=215 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=220 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=225 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=230 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=235 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=240 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=245 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=250 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=255 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=260 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=265 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=270 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=275 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=280 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=285 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=290 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=295 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=300 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=305 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=310 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=315 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=320 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=325 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=330 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=335 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=340 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=345 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=350 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=355 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=360 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=365 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=370 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=375 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=380 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=385 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=390 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=395 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=400 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=405 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=410 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=415 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=420 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=425 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=430 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=435 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=440 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=445 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=450 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=455 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=460 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=465 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=470 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=475 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=480 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=485 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=490 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=495 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+- episode=500 reward=9.0000 income=7 units=4 unit_value=14 destroyed_enemy_unit_value=6
+
+First decision after declaration
+- purchase_unit(count=1, unit=Artillery): search_prob=0.9840 prior=0.8835 visits=492 action_value=8.9289
+- purchase_unit(count=1, unit=Infantry): search_prob=0.0080 prior=0.0559 visits=4 action_value=7.7090
+- purchase_unit(count=1, unit=Fighter): search_prob=0.0040 prior=0.0339 visits=2 action_value=7.6887
+- end_phase: search_prob=0.0040 prior=0.0267 visits=2 action_value=7.9196
+
+Current deterministic search evaluation
+- reward=9.0000
+- japan_income=7
+- japan_units=4
+- japan_unit_value=14
+- destroyed_enemy_unit_value=6
+Japan turn 1 / declaration_of_war -> declare_war_on_china (search_value=8.9095, visits=499)
+    declaration result: all warlord lands and units transfer to KMT
+Japan turn 1 / purchase_units -> purchase_unit(count=1, unit=Artillery) (search_value=8.9289, visits=492)
+    purchase: 1 Artillery for 4 treasury
+Japan turn 1 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_suiyuan, count=4, unit=Infantry) (search_value=8.9470, visits=487)
+    combat: no defenders, territory occupied immediately
+Japan turn 1 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (search_value=8.9477, visits=500)
+    place units: 1 Artillery placed at land_manchuria_rehe
+Japan turn 2 / purchase_units -> purchase_unit(count=1, unit=Artillery) (search_value=8.9499, visits=464)
+    purchase: 1 Artillery for 4 treasury
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_shensi, count=1, unit=Infantry) (search_value=8.9803, visits=383)
+    combat: no defenders, territory occupied immediately
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_beiping, count=2, unit=Infantry) (search_value=8.9901, visits=355)
+    combat move: 2 Infantry committed from land_china_suiyuan to pending battle at land_china_beiping
+Japan turn 2 / combat_move -> move_combat_unit(from=land_china_suiyuan, to=land_china_hopeh, count=1, unit=Infantry) (search_value=8.9951, visits=360)
+    combat: no defenders, territory occupied immediately
+Japan turn 2 / combat_move -> move_combat_unit(from=land_manchuria_rehe, to=land_china_beiping, count=1, unit=Artillery) (search_value=9.0003, visits=498)
+    combat move: 1 Artillery committed from land_manchuria_rehe to pending battle at land_china_beiping
+Japan turn 2 / combat_resolve -> resolve_combat(to=land_china_beiping) (search_value=9.0002, visits=500)
+    resolving pending battle at land_china_beiping: attackers=3, defenders=2
+    first strike: attacker 1 Art (3/12=0.25), defender 0 Art (0/12=0)
+      after first strike: attacker 2 Inf + 1 Art, defender 1.75 Inf, losses attacker=0, defender=0.25
+    round 1: attacker 2 Inf + 1 Art (5/12=0.42), defender 1.75 Inf (8.75/12=0.73)
+      after casualties: attacker 1.27 Inf + 1 Art, defender 1.33 Inf, losses attacker=0.73, defender=0.42
+    round 2: attacker 1.27 Inf + 1 Art (6.54/12=0.55), defender 1.33 Inf (6.67/12=0.56)
+      after casualties: attacker 0.72 Inf + 1 Art, defender 0.79 Inf, losses attacker=0.56, defender=0.55
+    round 3: attacker 0.72 Inf + 1 Art (5.15/12=0.43), defender 0.79 Inf (3.94/12=0.33)
+      after casualties: attacker 0.39 Inf + 1 Art, defender 0.36 Inf, losses attacker=0.33, defender=0.43
+    round 4: attacker 0.39 Inf + 1 Art (4.16/12=0.35), defender 0.36 Inf (1.80/12=0.15)
+      after casualties: attacker 0.24 Inf + 1 Art, defender 0.01 Inf, losses attacker=0.15, defender=0.35
+    round 5: attacker 0.24 Inf + 1 Art (3.71/12=0.31), defender 0.01 Inf (0.06/12=0.01)
+      after casualties: attacker 0.23 Inf + 1 Art, defender 0, losses attacker=0.01, defender=0.31
+    combat result: attackers won and occupy the territory
+Japan turn 2 / place_units -> place_unit(to=land_manchuria_rehe, count=1, unit=Artillery) (search_value=9.0000, visits=500)
+    place units: 1 Artillery placed at land_manchuria_rehe
+
+Detailed trace files
+- best self-play episode trace: output/best_self_play_episode_trace.txt
+- best deterministic checkpoint trace: output/best_deterministic_checkpoint_trace.txt
