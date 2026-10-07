@@ -1,0 +1,15 @@
+{
+  "algorithm": "sha256",
+  "original_directory": "output/japan_fpu_optimistic",
+  "preserved_directory": "final_run",
+  "files": {
+    "best_deterministic_checkpoint_trace.txt": "f8ad09d8d2a77b896da94017bb2d29bc87b16aeadef18613c17cbf5bdf7b3b83",
+    "best_self_play_episode_trace.txt": "e5ba5126e689dd14d2170e4a9c61ff43e81873d451ebe068e841e7e0cdfe0d8d",
+    "first_purchase_action_values_over_training.svg": "098644a78c436d43a035f6e0b03ffc525b23d37346eaab0525a18263570e3a0a",
+    "first_purchase_priors_over_training.svg": "0a068a0c1ad111e6c680d3e6d9f217dbba8d7f63899ebb46912c57cceb2e4bff",
+    "japan_search_reward_over_time.svg": "32840635d38e557f198fc9b43e4d765e5e7ee72066a80333e968f07461c4ca3e",
+    "japan_torch_policy.pt": "25edfe402e921c4b18bbc77c221046125cd5693077fe27d98f467399f6036914",
+    "japan_torch_training_metrics.json": "72b5caef21b602380136779515299326870070ddbbde88d1f1609ff515e64c9b",
+    "japan_torch_training_summary.txt": "4ac46486f28104b6d306148051b62081d12b8c551950db155fbeb8f15b04c1f5"
+  }
+}

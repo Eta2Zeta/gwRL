@@ -1,0 +1,1252 @@
+[
+  {
+    "node_id": "sea_a1",
+    "printed_code": "A1",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a2",
+    "printed_code": "A2",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a3",
+    "printed_code": "A3",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-178",
+        "suggested_id": "sea_a3"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a4",
+    "printed_code": "A4",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-179",
+        "suggested_id": "sea_a4"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a5",
+    "printed_code": "A5",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "WG-032",
+        "suggested_id": "sea_a5"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a6",
+    "printed_code": "A6",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a7",
+    "printed_code": "A7",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a8",
+    "printed_code": "A8",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "WG-033",
+        "suggested_id": "sea_a8"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a9",
+    "printed_code": "A9",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "WG-034",
+        "suggested_id": "sea_a9"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a10",
+    "printed_code": "A10",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a11",
+    "printed_code": "A11",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a12",
+    "printed_code": "A12",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a13",
+    "printed_code": "A13",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a14",
+    "printed_code": "A14",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a15",
+    "printed_code": "A15",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a16",
+    "printed_code": "A16",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-180",
+        "suggested_id": "sea_a16"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a17",
+    "printed_code": "A17",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-181",
+        "suggested_id": "sea_a17"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a18",
+    "printed_code": "A18",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a19",
+    "printed_code": "A19",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a20",
+    "printed_code": "A20",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a21",
+    "printed_code": "A21",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a22",
+    "printed_code": "A22",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a23",
+    "printed_code": "A23",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a24",
+    "printed_code": "A24",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a25",
+    "printed_code": "A25",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a26",
+    "printed_code": "A26",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a27",
+    "printed_code": "A27",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-182",
+        "suggested_id": "sea_a27"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a28",
+    "printed_code": "A28",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a29",
+    "printed_code": "A29",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a30",
+    "printed_code": "A30",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-183",
+        "suggested_id": "sea_a30"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a31",
+    "printed_code": "A31",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a32",
+    "printed_code": "A32",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-184",
+        "suggested_id": "sea_a32"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a33",
+    "printed_code": "A33",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a34",
+    "printed_code": "A34",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-185",
+        "suggested_id": "sea_a34"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a35",
+    "printed_code": "A35",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a36",
+    "printed_code": "A36",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a37",
+    "printed_code": "A37",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-186",
+        "suggested_id": "sea_a37"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a38",
+    "printed_code": "A38",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a39",
+    "printed_code": "A39",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a40",
+    "printed_code": "A40",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a41",
+    "printed_code": "A41",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-187",
+        "suggested_id": "sea_a41"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a42",
+    "printed_code": "A42",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-188",
+        "suggested_id": "sea_a42"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a43",
+    "printed_code": "A43",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-189",
+        "suggested_id": "sea_a43"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a44",
+    "printed_code": "A44",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_a45",
+    "printed_code": "A45",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-190",
+        "suggested_id": "sea_a45"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a46",
+    "printed_code": "A46",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-191",
+        "suggested_id": "sea_a46"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a47",
+    "printed_code": "A47",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-192",
+        "suggested_id": "sea_a47"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a48",
+    "printed_code": "A48",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-193",
+        "suggested_id": "sea_a48"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a49",
+    "printed_code": "A49",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-194",
+        "suggested_id": "sea_a49"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a50",
+    "printed_code": "A50",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-195",
+        "suggested_id": "sea_a50"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a51",
+    "printed_code": "A51",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-196",
+        "suggested_id": "sea_a51"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a52",
+    "printed_code": "A52",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-197",
+        "suggested_id": "sea_a52"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a53",
+    "printed_code": "A53",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-198",
+        "suggested_id": "sea_a53"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_a54",
+    "printed_code": "A54",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-199",
+        "suggested_id": "sea_a54"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_i1",
+    "printed_code": "I1",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i2",
+    "printed_code": "I2",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i3",
+    "printed_code": "I3",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i4",
+    "printed_code": "I4",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i5",
+    "printed_code": "I5",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i6",
+    "printed_code": "I6",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i7",
+    "printed_code": "I7",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i8",
+    "printed_code": "I8",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i9",
+    "printed_code": "I9",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i10",
+    "printed_code": "I10",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i11",
+    "printed_code": "I11",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i12",
+    "printed_code": "I12",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i13",
+    "printed_code": "I13",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_i14",
+    "printed_code": "I14",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m1",
+    "printed_code": "M1",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m2",
+    "printed_code": "M2",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m3",
+    "printed_code": "M3",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m4",
+    "printed_code": "M4",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m5",
+    "printed_code": "M5",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m6",
+    "printed_code": "M6",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m7",
+    "printed_code": "M7",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m8",
+    "printed_code": "M8",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m9",
+    "printed_code": "M9",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m10",
+    "printed_code": "M10",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m11",
+    "printed_code": "M11",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_m12",
+    "printed_code": "M12",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p1",
+    "printed_code": "P1",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p2",
+    "printed_code": "P2",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p3",
+    "printed_code": "P3",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p4",
+    "printed_code": "P4",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-025",
+        "suggested_id": "sea_p4"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p4"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p5",
+    "printed_code": "P5",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p6",
+    "printed_code": "P6",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p7",
+    "printed_code": "P7",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p8",
+    "printed_code": "P8",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p9",
+    "printed_code": "P9",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p10",
+    "printed_code": "P10",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p11",
+    "printed_code": "P11",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p12",
+    "printed_code": "P12",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p13",
+    "printed_code": "P13",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p14",
+    "printed_code": "P14",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p15",
+    "printed_code": "P15",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p16",
+    "printed_code": "P16",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p17",
+    "printed_code": "P17",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p18",
+    "printed_code": "P18",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p19",
+    "printed_code": "P19",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p19"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p20",
+    "printed_code": "P20",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p20"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p21",
+    "printed_code": "P21",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p21"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p22",
+    "printed_code": "P22",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-023",
+        "suggested_id": "sea_p22"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p22"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p23",
+    "printed_code": "P23",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p23"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p24",
+    "printed_code": "P24",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p25",
+    "printed_code": "P25",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p26",
+    "printed_code": "P26",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p27",
+    "printed_code": "P27",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p27"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p28",
+    "printed_code": "P28",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p29",
+    "printed_code": "P29",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-024",
+        "suggested_id": "sea_p29"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p29"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p30",
+    "printed_code": "P30",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p31",
+    "printed_code": "P31",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p32",
+    "printed_code": "P32",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p33",
+    "printed_code": "P33",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p34",
+    "printed_code": "P34",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p35",
+    "printed_code": "P35",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p36",
+    "printed_code": "P36",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p37",
+    "printed_code": "P37",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p37"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p38",
+    "printed_code": "P38",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-027",
+        "suggested_id": "sea_p38"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p38"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p39",
+    "printed_code": "P39",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p39"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p40",
+    "printed_code": "P40",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p40"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p41",
+    "printed_code": "P41",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p42",
+    "printed_code": "P42",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p43",
+    "printed_code": "P43",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p44",
+    "printed_code": "P44",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p45",
+    "printed_code": "P45",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p46",
+    "printed_code": "P46",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p47",
+    "printed_code": "P47",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p48",
+    "printed_code": "P48",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p48"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p49",
+    "printed_code": "P49",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p49"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p50",
+    "printed_code": "P50",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p51",
+    "printed_code": "P51",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p52",
+    "printed_code": "P52",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p53",
+    "printed_code": "P53",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p54",
+    "printed_code": "P54",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p55",
+    "printed_code": "P55",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p55"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p56",
+    "printed_code": "P56",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-029",
+        "suggested_id": "sea_p56"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p56"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p57",
+    "printed_code": "P57",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p57"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p58",
+    "printed_code": "P58",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p58"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p59",
+    "printed_code": "P59",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p60",
+    "printed_code": "P60",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p61",
+    "printed_code": "P61",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p62",
+    "printed_code": "P62",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p63",
+    "printed_code": "P63",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p64",
+    "printed_code": "P64",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p65",
+    "printed_code": "P65",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p66",
+    "printed_code": "P66",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-030",
+        "suggested_id": "sea_p66"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p66"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p67",
+    "printed_code": "P67",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-031",
+        "suggested_id": "sea_p67"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p67"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p68",
+    "printed_code": "P68",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p69",
+    "printed_code": "P69",
+    "present_in_current_map": true,
+    "addition_findings": []
+  },
+  {
+    "node_id": "sea_p70",
+    "printed_code": "P70",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p70"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p71",
+    "printed_code": "P71",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p71"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p72",
+    "printed_code": "P72",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-036",
+        "suggested_id": "sea_p72"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p72"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p73",
+    "printed_code": "P73",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p73"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p74",
+    "printed_code": "P74",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p74"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p75",
+    "printed_code": "P75",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p75"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p76",
+    "printed_code": "P76",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-200",
+        "suggested_id": "sea_p76"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p77",
+    "printed_code": "P77",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-201",
+        "suggested_id": "sea_p77"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p78",
+    "printed_code": "P78",
+    "present_in_current_map": false,
+    "addition_findings": [
+      {
+        "finding_id": "AM-202",
+        "suggested_id": "sea_p78"
+      }
+    ]
+  }
+]

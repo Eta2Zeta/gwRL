@@ -1,0 +1,5580 @@
+[
+  {
+    "id": "AP-001",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Zuryenia",
+    "node_ids": [
+      "land_usr_zuryenia"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Zuryenia",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_zuryenia"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-002",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Ural",
+    "node_ids": [
+      "land_usr_ural"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Ural",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_ural"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-003",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Orenburg",
+    "node_ids": [
+      "land_usr_orenburg"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Orenburg",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_orenburg"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4300, 1200, 6400, 2500); evidence/ap_central_asia.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-004",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Western Kazakhstan",
+    "node_ids": [
+      "land_usr_western_kazakhstan"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Western Kazakhstan",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_western_kazakhstan"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4300, 1200, 6400, 2500); evidence/ap_central_asia.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-005",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Central Kazakhstan",
+    "node_ids": [
+      "land_usr_central_kazakhstan"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Central Kazakhstan",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_central_kazakhstan"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4300, 1200, 6400, 2500); evidence/ap_central_asia.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-006",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Turkmenistan",
+    "node_ids": [
+      "land_usr_turkmenistan"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Turkmenistan",
+      "terrain": "desert",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_turkmenistan",
+      "coastal_facilities": {
+        "sea_m12": [
+          "minor_port"
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4300, 1200, 6400, 2500); evidence/ap_central_asia.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain).",
+      "game_content/maps/gw36map.png rect (5050,1870,5940,2420); evidence/ap_rail_turkmenistan.png: Caspian minor-port symbol and broad-gauge rail."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json. A minor port is printed on the M12 Caspian coast and is reached by a broad-gauge railway from Turkestan.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-007",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Vyatka",
+    "node_ids": [
+      "land_usr_vyatka"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Vyatka",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_vyatka"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-008",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Yugria",
+    "node_ids": [
+      "land_usr_yugria"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Yugria",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_yugria"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-009",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Samoyedia",
+    "node_ids": [
+      "land_usr_samoyedia"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Samoyedia",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_samoyedia"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-010",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Lower Tunguska",
+    "node_ids": [
+      "land_usr_lower_tunguska"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Lower Tunguska",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_lower_tunguska"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-011",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Sibir",
+    "node_ids": [
+      "land_usr_sibir"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Sibir",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_sibir"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-012",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Tobolsk",
+    "node_ids": [
+      "land_usr_tobolsk"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Tobolsk",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_tobolsk"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-013",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Yenisei",
+    "node_ids": [
+      "land_usr_yenisei"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Yenisei",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_yenisei"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-014",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Evenkiland",
+    "node_ids": [
+      "land_usr_evenkiland"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Evenkiland",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_evenkiland"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-015",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Western Yakutia",
+    "node_ids": [
+      "land_usr_western_yakutia"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Western Yakutia",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_western_yakutia"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-016",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Northern Yakutia",
+    "node_ids": [
+      "land_usr_northern_yakutia"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Northern Yakutia",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_northern_yakutia"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-017",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Eastern Yakutia",
+    "node_ids": [
+      "land_usr_eastern_yakutia"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Eastern Yakutia",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_eastern_yakutia"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-018",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Chukotka",
+    "node_ids": [
+      "land_usr_chukotka"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Chukotka",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_chukotka"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-019",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Soviet land tile: Big Diomede Island",
+    "node_ids": [
+      "land_usr_big_diomede_island"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Big Diomede Island",
+      "terrain": "tundra",
+      "ipp_value": 0,
+      "original_owner": "Soviet Union",
+      "is_city": false,
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usr_big_diomede_island"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp11\u201312 (Yugria omitted from glossary; map supports normal roundel terrain)."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical neighbors are in data/asia_pacific_new_node_neighbors.json; all new land-border rail/gauge proposals are in data/asia_pacific_new_edge_rail_review.json. Express directional terrain/river combat requirements are in data/asia_pacific_directional_terrain.json. Named river transport is a separate proposed overlay."
+  },
+  {
+    "id": "AP-020",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Andaman Islands",
+    "node_ids": [
+      "land_andaman_islands",
+      "sea_i12"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Andaman Islands",
+      "terrain": "jungle",
+      "ipp_value": 0,
+      "original_owner": "FEC",
+      "coastal_seas": [
+        "sea_i12"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_andaman_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-021",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Maldive Islands",
+    "node_ids": [
+      "land_maldive_islands",
+      "sea_i7"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Maldive Islands",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "FEC",
+      "coastal_seas": [
+        "sea_i7"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_maldive_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-022",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Bonin",
+    "node_ids": [
+      "land_jap_bonin",
+      "sea_p35"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Bonin",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Japan",
+      "coastal_seas": [
+        "sea_p35"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_jap_bonin"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-023",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Midway",
+    "node_ids": [
+      "land_usa_midway",
+      "sea_p22"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Midway",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United States",
+      "coastal_seas": [
+        "sea_p22"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usa_midway"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-024",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Hawaii",
+    "node_ids": [
+      "land_usa_hawaii",
+      "sea_p29"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Hawaii",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "United States",
+      "coastal_seas": [
+        "sea_p29"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usa_hawaii"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-025",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Attu and Kiska",
+    "node_ids": [
+      "land_usa_attu_and_kiska",
+      "sea_p4"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Attu and Kiska",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "United States",
+      "coastal_seas": [
+        "sea_p4"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usa_attu_and_kiska"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-026",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Marshall Islands",
+    "node_ids": [
+      "land_jap_marshall_islands",
+      "sea_p47"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Marshall Islands",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Japan",
+      "coastal_seas": [
+        "sea_p47"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_jap_marshall_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-027",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Line Islands",
+    "node_ids": [
+      "land_line_islands",
+      "sea_p38"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Line Islands",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "FEC",
+      "coastal_seas": [
+        "sea_p38"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_line_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Great Britain versus FEC player allocation is separately uncertain in AP-094.",
+    "field_confidence": {
+      "node_identity": "high",
+      "terrain": "high",
+      "ipp_value": "high",
+      "original_owner": "requires political-allocation reconciliation"
+    }
+  },
+  {
+    "id": "AP-028",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Solomon Islands",
+    "node_ids": [
+      "land_solomon_islands",
+      "sea_p54"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Solomon Islands",
+      "terrain": "jungle",
+      "ipp_value": 0,
+      "original_owner": "FEC",
+      "coastal_seas": [
+        "sea_p54"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_solomon_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Great Britain versus FEC player allocation is separately uncertain in AP-094.",
+    "field_confidence": {
+      "node_identity": "high",
+      "terrain": "high",
+      "ipp_value": "high",
+      "original_owner": "requires political-allocation reconciliation"
+    }
+  },
+  {
+    "id": "AP-029",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Gilbert Islands",
+    "node_ids": [
+      "land_gilbert_islands",
+      "sea_p56"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Gilbert Islands",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "FEC",
+      "coastal_seas": [
+        "sea_p56"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_gilbert_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Great Britain versus FEC player allocation is separately uncertain in AP-094.",
+    "field_confidence": {
+      "node_identity": "high",
+      "terrain": "high",
+      "ipp_value": "high",
+      "original_owner": "requires political-allocation reconciliation"
+    }
+  },
+  {
+    "id": "AP-030",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Samoa",
+    "node_ids": [
+      "land_usa_samoa",
+      "sea_p66"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Samoa",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United States",
+      "coastal_seas": [
+        "sea_p66"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_usa_samoa"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-031",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Gambier Islands",
+    "node_ids": [
+      "land_gambier_islands",
+      "sea_p67"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Gambier Islands",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "France",
+      "coastal_seas": [
+        "sea_p67"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_gambier_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-032",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Pitcairn Island",
+    "node_ids": [
+      "land_pitcairn_island",
+      "sea_p68"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Pitcairn Island",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "FEC",
+      "coastal_seas": [
+        "sea_p68"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_pitcairn_island"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Great Britain versus FEC player allocation is separately uncertain in AP-094.",
+    "field_confidence": {
+      "node_identity": "high",
+      "terrain": "high",
+      "ipp_value": "high",
+      "original_owner": "requires political-allocation reconciliation"
+    }
+  },
+  {
+    "id": "AP-033",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Easter Island",
+    "node_ids": [
+      "land_easter_island",
+      "sea_p68"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Easter Island",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Chile",
+      "coastal_seas": [
+        "sea_p68"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_easter_island"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-034",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Maluku Islands",
+    "node_ids": [
+      "land_maluku_islands",
+      "sea_p51"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Maluku Islands",
+      "terrain": [
+        "mountain",
+        "jungle"
+      ],
+      "ipp_value": 0,
+      "original_owner": "Netherlands",
+      "coastal_seas": [
+        "sea_p51",
+        "sea_p52",
+        "sea_p62"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_maluku_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-035",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing island tile: Lesser Sunda Islands / West Timor",
+    "node_ids": [
+      "land_lesser_sunda_islands",
+      "sea_p63"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Lesser Sunda Islands / West Timor",
+      "terrain": [
+        "mountain",
+        "jungle"
+      ],
+      "ipp_value": 1,
+      "original_owner": "Netherlands",
+      "coastal_seas": [
+        "sea_p60",
+        "sea_p61",
+        "sea_p63"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_lesser_sunda_islands"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "confidence": "high",
+    "notes": "Complete physical coastline and land/narrow neighbor set is source-traced in data/asia_pacific_new_node_neighbors.json. Use printed identity and facilities, with the full perimeter rather than the first listed coast alone."
+  },
+  {
+    "id": "AP-036",
+    "category": "add",
+    "severity": "major",
+    "subject": "Sydney is a separate land zone, not a city inside New South Wales",
+    "node_ids": [
+      "land_aus_sydney",
+      "land_aus_new_south_wales",
+      "sea_p72"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Sydney",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "ANZAC",
+      "is_city": true,
+      "is_capital": true,
+      "is_victory_city": true,
+      "land_neighbors": [
+        "land_aus_new_south_wales"
+      ],
+      "sea_neighbors": [
+        "sea_p72"
+      ],
+      "node_facilities": [
+        "airfield"
+      ],
+      "neighbor_review": "data/asia_pacific_new_node_neighbors.json#land_aus_sydney",
+      "coastal_facilities": {
+        "sea_p72": [
+          "minor_shipyard"
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png",
+      "Terrain Glossary p3: Sydney mountain; map depicts separate outlined tile and red city/capital marker."
+    ],
+    "confidence": "high",
+    "notes": "Sydney contains one southern P72 minor shipyard and an airfield. The northern P72 minor shipyard is in New South Wales, above the circular Sydney boundary. Complete physical neighbors are NSW and P72.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-037",
+    "category": "change",
+    "severity": "major",
+    "subject": "Replace tundra/normal/jungle assignments with printed mountain terrain",
+    "node_ids": [
+      "land_usr_irkutsk",
+      "land_usr_angara",
+      "land_usr_yakutsk",
+      "land_usr_magadan",
+      "land_usr_kamchatka",
+      "land_usr_amur",
+      "land_usr_chita",
+      "land_usr_buryatia",
+      "land_usr_primorsky_krai",
+      "land_usr_north_sakhalin",
+      "land_usr_south_sakhalin",
+      "land_jap_kurile_islands",
+      "land_jap_volcanic_islands",
+      "land_nz_north_island",
+      "land_nz_south_island",
+      "land_aus_tasmania",
+      "land_luzon_and_the_visayas",
+      "land_mindanao"
+    ],
+    "field": "terrain",
+    "current": {
+      "land_usr_irkutsk": {
+        "terrain": "tundra"
+      },
+      "land_usr_angara": {
+        "terrain": "tundra"
+      },
+      "land_usr_yakutsk": {
+        "terrain": "tundra"
+      },
+      "land_usr_magadan": {
+        "terrain": "tundra"
+      },
+      "land_usr_kamchatka": {
+        "terrain": "tundra"
+      },
+      "land_usr_amur": {
+        "terrain": "tundra"
+      },
+      "land_usr_chita": {
+        "terrain": "tundra"
+      },
+      "land_usr_buryatia": {
+        "terrain": "tundra"
+      },
+      "land_usr_primorsky_krai": {
+        "terrain": "tundra"
+      },
+      "land_usr_north_sakhalin": {
+        "terrain": "tundra"
+      },
+      "land_usr_south_sakhalin": {
+        "terrain": "tundra"
+      },
+      "land_jap_kurile_islands": {
+        "terrain": "normal"
+      },
+      "land_jap_volcanic_islands": {
+        "terrain": "normal"
+      },
+      "land_nz_north_island": {
+        "terrain": "normal"
+      },
+      "land_nz_south_island": {
+        "terrain": "normal"
+      },
+      "land_aus_tasmania": {
+        "terrain": "normal"
+      },
+      "land_luzon_and_the_visayas": {
+        "terrain": "jungle"
+      },
+      "land_mindanao": {
+        "terrain": "jungle"
+      }
+    },
+    "proposed": {
+      "land_usr_irkutsk": "mountain",
+      "land_usr_angara": "mountain",
+      "land_usr_yakutsk": "mountain",
+      "land_usr_magadan": "mountain",
+      "land_usr_kamchatka": "mountain",
+      "land_usr_amur": "mountain",
+      "land_usr_chita": "mountain",
+      "land_usr_buryatia": "mountain",
+      "land_usr_primorsky_krai": "mountain",
+      "land_usr_north_sakhalin": "mountain",
+      "land_usr_south_sakhalin": "mountain",
+      "land_jap_kurile_islands": "mountain",
+      "land_jap_volcanic_islands": "mountain",
+      "land_nz_north_island": "mountain",
+      "land_nz_south_island": "mountain",
+      "land_aus_tasmania": "mountain",
+      "land_luzon_and_the_visayas": "mountain",
+      "land_mindanao": "mountain"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "evidence/ap_sakhalin.png; evidence/ap_se_asia.png; evidence/ap_australia.png; Terrain Glossary pp2\u20134,12."
+    ],
+    "confidence": "high",
+    "notes": "Philippine landing terrain needs the same correction on sea\u2192land edges, including previously reviewed P41\u2192Luzon. Do not infer jungle from green ownership fill. South Sakhalin also needs ownership correction below."
+  },
+  {
+    "id": "AP-038",
+    "category": "change",
+    "severity": "major",
+    "subject": "Local mountain/desert graphics do not make these entire land zones mountain/desert/tundra",
+    "node_ids": [
+      "land_usr_stalino",
+      "land_usr_vanavara",
+      "land_usr_southern_yakutia",
+      "land_aus_western_australia",
+      "land_aus_northern_territory",
+      "land_aus_south_australia"
+    ],
+    "field": "terrain",
+    "current": {
+      "land_usr_stalino": {
+        "terrain": "tundra"
+      },
+      "land_usr_vanavara": {
+        "terrain": "tundra"
+      },
+      "land_usr_southern_yakutia": {
+        "terrain": "tundra"
+      },
+      "land_aus_western_australia": {
+        "terrain": "desert"
+      },
+      "land_aus_northern_territory": {
+        "terrain": "desert"
+      },
+      "land_aus_south_australia": {
+        "terrain": "desert"
+      }
+    },
+    "proposed": {
+      "land_usr_stalino": "normal",
+      "land_usr_vanavara": "normal",
+      "land_usr_southern_yakutia": "normal",
+      "land_aus_western_australia": "normal",
+      "land_aus_northern_territory": "normal",
+      "land_aus_south_australia": "normal"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "evidence/ap_australia.png; Terrain Glossary pp3,12."
+    ],
+    "confidence": "high",
+    "notes": "Keep directional border mountains and impassable Outback segments separately. Northern Territory and Western Australia still have specific mountain approaches."
+  },
+  {
+    "id": "AP-039",
+    "category": "change",
+    "severity": "major",
+    "subject": "Land zones with simultaneous mountain and jungle terrain",
+    "node_ids": [
+      "land_hainan",
+      "land_annam_tonkin",
+      "land_british_malaya",
+      "land_sarawak",
+      "land_java",
+      "land_celebes",
+      "land_timor",
+      "land_dutch_new_guinea",
+      "land_new_guinea"
+    ],
+    "field": "terrain",
+    "current": {
+      "land_hainan": {
+        "terrain": "mountain"
+      },
+      "land_annam_tonkin": {
+        "terrain": "jungle"
+      },
+      "land_british_malaya": {
+        "terrain": "jungle"
+      },
+      "land_sarawak": {
+        "terrain": "jungle"
+      },
+      "land_java": {
+        "terrain": "jungle"
+      },
+      "land_celebes": {
+        "terrain": "jungle"
+      },
+      "land_timor": {
+        "terrain": "normal"
+      },
+      "land_dutch_new_guinea": {
+        "terrain": "jungle"
+      },
+      "land_new_guinea": {
+        "terrain": "jungle"
+      }
+    },
+    "proposed": {
+      "land_hainan": [
+        "mountain",
+        "jungle"
+      ],
+      "land_annam_tonkin": [
+        "mountain",
+        "jungle"
+      ],
+      "land_british_malaya": [
+        "mountain",
+        "jungle"
+      ],
+      "land_sarawak": [
+        "mountain",
+        "jungle"
+      ],
+      "land_java": [
+        "mountain",
+        "jungle"
+      ],
+      "land_celebes": [
+        "mountain",
+        "jungle"
+      ],
+      "land_timor": [
+        "mountain",
+        "jungle"
+      ],
+      "land_dutch_new_guinea": [
+        "mountain",
+        "jungle"
+      ],
+      "land_new_guinea": [
+        "mountain",
+        "jungle"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png",
+      "Terrain Glossary pp2\u20134."
+    ],
+    "confidence": "high",
+    "notes": "Current scalar node terrain cannot represent this faithfully. Use root schema proposal; preserve combined sea landing/border terrain rather than selecting one effect. Hainan presently only mountain; all others omit at least one printed terrain."
+  },
+  {
+    "id": "AP-040",
+    "category": "change",
+    "severity": "major",
+    "subject": "Ceylon is jungle terrain",
+    "node_ids": [
+      "land_india_ceylon"
+    ],
+    "field": "terrain",
+    "current": "normal",
+    "proposed": "jungle",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "Terrain Glossary p3."
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-041",
+    "category": "change",
+    "severity": "major",
+    "subject": "South Sakhalin is Japanese territory",
+    "node_ids": [
+      "land_usr_south_sakhalin"
+    ],
+    "field": "original_owner/current_owner",
+    "current": {
+      "land_usr_south_sakhalin": {
+        "original_owner": "Soviet Union",
+        "current_owner": "Soviet Union"
+      }
+    },
+    "proposed": {
+      "original_owner": "Japan",
+      "current_owner": "scenario setup"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7270, 1320, 8170, 2100); evidence/ap_sakhalin.png"
+    ],
+    "confidence": "high",
+    "notes": "Printed Japanese roundel is unambiguous. Prefix land_usr_ is misleading; if renamed, supply an alias/migration. Mutable current owner belongs to setup/state."
+  },
+  {
+    "id": "AP-042",
+    "category": "change",
+    "severity": "major",
+    "subject": "Kashmir uses the FEC roundel",
+    "node_ids": [
+      "land_kashmir"
+    ],
+    "field": "original_owner",
+    "current": "Kashmir",
+    "proposed": "FEC",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "Terrain Glossary p3 lists Kashmir under Far East Command."
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-043",
+    "category": "change",
+    "severity": "major",
+    "subject": "Novosibirsk is a mountain city worth 3 IPP",
+    "node_ids": [
+      "land_usr_novosibirsk"
+    ],
+    "field": "terrain/ipp_value/is_city",
+    "current": {
+      "land_usr_novosibirsk": {
+        "terrain": "normal",
+        "ipp_value": 1,
+        "is_city": true
+      }
+    },
+    "proposed": {
+      "terrain": "mountain",
+      "ipp_value": 3,
+      "is_city": true
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4300, 1200, 6400, 2500); evidence/ap_central_asia.png",
+      "Terrain Glossary p12; source roundel shows 3. Circular land boundary preserves city status under Rulebook \u00a71.7.7 p13."
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-044",
+    "category": "change",
+    "severity": "major",
+    "subject": "Printed IPP corrections across Soviet East, Malaya and Oceania",
+    "node_ids": [
+      "land_usr_amur",
+      "land_usr_chita",
+      "land_usr_buryatia",
+      "land_british_malaya",
+      "land_sarawak",
+      "land_aus_new_south_wales",
+      "land_nz_south_island",
+      "land_new_britain",
+      "land_timor"
+    ],
+    "field": "ipp_value",
+    "current": {
+      "land_usr_amur": {
+        "ipp_value": 0
+      },
+      "land_usr_chita": {
+        "ipp_value": 0
+      },
+      "land_usr_buryatia": {
+        "ipp_value": 0
+      },
+      "land_british_malaya": {
+        "ipp_value": 1
+      },
+      "land_sarawak": {
+        "ipp_value": 0
+      },
+      "land_aus_new_south_wales": {
+        "ipp_value": 2
+      },
+      "land_nz_south_island": {
+        "ipp_value": 0
+      },
+      "land_new_britain": {
+        "ipp_value": 1
+      },
+      "land_timor": {
+        "ipp_value": 1
+      }
+    },
+    "proposed": {
+      "land_usr_amur": 1,
+      "land_usr_chita": 1,
+      "land_usr_buryatia": 1,
+      "land_british_malaya": 2,
+      "land_sarawak": 1,
+      "land_aus_new_south_wales": 1,
+      "land_nz_south_island": 1,
+      "land_new_britain": 0,
+      "land_timor": 0
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "evidence/ap_se_asia.png; evidence/ap_australia.png; evidence/ap_indonesia.png."
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-045",
+    "category": "change",
+    "severity": "minor",
+    "subject": "Use the printed Volcano Islands label",
+    "node_ids": [
+      "land_jap_volcanic_islands"
+    ],
+    "field": "name",
+    "current": "Volcanic Islands",
+    "proposed": "Volcano Islands",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png"
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-046",
+    "category": "add",
+    "severity": "major",
+    "subject": "Restore missing Indian/Bengal land borders",
+    "node_ids": [
+      "land_burma",
+      "land_india_benares",
+      "land_india_bengal",
+      "land_india_calcutta",
+      "land_india_delhi",
+      "land_india_maharashtra",
+      "land_india_punjab",
+      "land_india_southern_india",
+      "land_nepal"
+    ],
+    "field": "neighbors",
+    "current": {
+      "missing_pairs": [
+        [
+          "land_india_bengal",
+          "land_india_benares"
+        ],
+        [
+          "land_india_bengal",
+          "land_india_calcutta"
+        ],
+        [
+          "land_india_bengal",
+          "land_burma"
+        ],
+        [
+          "land_india_bengal",
+          "land_nepal"
+        ],
+        [
+          "land_india_benares",
+          "land_nepal"
+        ],
+        [
+          "land_india_benares",
+          "land_india_punjab"
+        ],
+        [
+          "land_india_benares",
+          "land_india_southern_india"
+        ],
+        [
+          "land_india_delhi",
+          "land_india_southern_india"
+        ],
+        [
+          "land_india_punjab",
+          "land_india_maharashtra"
+        ]
+      ]
+    },
+    "proposed": {
+      "reciprocal_pairs": [
+        [
+          "land_india_bengal",
+          "land_india_benares"
+        ],
+        [
+          "land_india_bengal",
+          "land_india_calcutta"
+        ],
+        [
+          "land_india_bengal",
+          "land_burma"
+        ],
+        [
+          "land_india_bengal",
+          "land_nepal"
+        ],
+        [
+          "land_india_benares",
+          "land_nepal"
+        ],
+        [
+          "land_india_benares",
+          "land_india_punjab"
+        ],
+        [
+          "land_india_benares",
+          "land_india_southern_india"
+        ],
+        [
+          "land_india_delhi",
+          "land_india_southern_india"
+        ],
+        [
+          "land_india_punjab",
+          "land_india_maharashtra"
+        ]
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (5450, 2450, 6320, 3320); evidence/ap_india_borders.png",
+      "evidence/ap_india.png"
+    ],
+    "confidence": "high",
+    "notes": "Bengal was added as a China endpoint, leaving real India/Burma/Nepal borders absent. Benares\u2013Bengal and Bengal\u2013Burma show rail crossings; other rail booleans need line tracing. Glossary supplies directional rivers."
+  },
+  {
+    "id": "AP-047",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove four nonexistent Indian land shortcuts",
+    "node_ids": [
+      "land_burma",
+      "land_india_benares",
+      "land_india_calcutta",
+      "land_india_maharashtra",
+      "land_kashmir",
+      "land_nepal"
+    ],
+    "field": "neighbors",
+    "current": {
+      "pairs": [
+        [
+          "land_india_benares",
+          "land_burma"
+        ],
+        [
+          "land_india_calcutta",
+          "land_burma"
+        ],
+        [
+          "land_india_benares",
+          "land_india_maharashtra"
+        ],
+        [
+          "land_kashmir",
+          "land_nepal"
+        ]
+      ]
+    },
+    "proposed": {
+      "remove_pairs": [
+        [
+          "land_india_benares",
+          "land_burma"
+        ],
+        [
+          "land_india_calcutta",
+          "land_burma"
+        ],
+        [
+          "land_india_benares",
+          "land_india_maharashtra"
+        ],
+        [
+          "land_kashmir",
+          "land_nepal"
+        ]
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (5450, 2450, 6320, 3320); evidence/ap_india_borders.png",
+      "evidence/ap_india.png",
+      "game_content/maps/gw36map.png rect (5740, 2300, 6320, 2800); evidence/ap_nepal_kashmir.png"
+    ],
+    "confidence": "high",
+    "notes": "Native junction review resolves all four: Bengal intervenes between Burma and Benares/Calcutta; Delhi/Southern India intervene between Benares and Maharashtra; a finite Punjab strip reaches the Himalayas between Kashmir and Nepal."
+  },
+  {
+    "id": "AP-048",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove rail service fabricated in Afghanistan/Kashmir/Nepal",
+    "node_ids": [
+      "land_afghanistan",
+      "land_india_punjab",
+      "land_iran_northern_iran",
+      "land_iran_southern_iran",
+      "land_kashmir",
+      "land_nepal"
+    ],
+    "field": "railway_connection",
+    "current": {
+      "true_pairs": [
+        [
+          "land_afghanistan",
+          "land_india_punjab"
+        ],
+        [
+          "land_afghanistan",
+          "land_iran_northern_iran"
+        ],
+        [
+          "land_afghanistan",
+          "land_iran_southern_iran"
+        ],
+        [
+          "land_afghanistan",
+          "land_kashmir"
+        ],
+        [
+          "land_india_punjab",
+          "land_kashmir"
+        ],
+        [
+          "land_kashmir",
+          "land_nepal"
+        ]
+      ]
+    },
+    "proposed": {
+      "false_pairs": [
+        [
+          "land_afghanistan",
+          "land_india_punjab"
+        ],
+        [
+          "land_afghanistan",
+          "land_iran_northern_iran"
+        ],
+        [
+          "land_afghanistan",
+          "land_iran_southern_iran"
+        ],
+        [
+          "land_afghanistan",
+          "land_kashmir"
+        ],
+        [
+          "land_india_punjab",
+          "land_kashmir"
+        ],
+        [
+          "land_kashmir",
+          "land_nepal"
+        ]
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png"
+    ],
+    "confidence": "high",
+    "notes": "Rail visible in Southern Iran ends before the Punjab frontier, and no tracks enter Afghanistan, Kashmir or Nepal. Removing railway flags is distinct from removing legitimate political borders."
+  },
+  {
+    "id": "AP-049",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "Southern Iran\u2013Punjab printed rail gap",
+    "node_ids": [
+      "land_iran_southern_iran",
+      "land_india_punjab"
+    ],
+    "field": "railway_connection",
+    "current": true,
+    "proposed": "Likely false; verify high-resolution endpoints and whether special rule joins them.",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png"
+    ],
+    "confidence": "medium",
+    "notes": "Iranian line stops west of frontier and Punjab line begins inland east of it. No continuous crossing is visible.",
+    "uncertainty_kind": "source_interpretation_or_junction"
+  },
+  {
+    "id": "AP-050",
+    "category": "change",
+    "severity": "major",
+    "subject": "Southern India\u2013Ceylon is a capacity-1 narrow crossing without rail",
+    "node_ids": [
+      "land_india_southern_india",
+      "land_india_ceylon"
+    ],
+    "field": "edge",
+    "current": {
+      "neighbor_id": "land_india_ceylon",
+      "border_terrain": "normal",
+      "passable": true,
+      "has_river": false,
+      "river_crossing": false,
+      "railway_connection": true,
+      "gauge_change": false,
+      "naval_facilities": [],
+      "naval_facility_ids": [],
+      "port_or_dock_connection": false,
+      "canal_or_strait": null,
+      "narrow_crossing": false,
+      "narrow_crossings": 0,
+      "special_fortification": null
+    },
+    "proposed": {
+      "narrow_crossing": true,
+      "narrow_crossings": 1,
+      "railway_connection": false,
+      "narrow_crossing_sea_zones": [
+        "sea_i11"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png"
+    ],
+    "confidence": "high",
+    "notes": "Dotted crossing is wholly north of the I11/I12 boundary in evidence/ap_ceylon_andamans.png; use I11 blocker. Boundary traverses Ceylon farther south."
+  },
+  {
+    "id": "AP-051",
+    "category": "change",
+    "severity": "major",
+    "subject": "Correct Indian coastal sea IDs",
+    "node_ids": [
+      "land_india_ceylon",
+      "land_india_southern_india",
+      "land_india_maharashtra"
+    ],
+    "field": "sea_neighbors",
+    "current": {
+      "land_india_ceylon": {
+        "neighbors": [
+          {
+            "neighbor_id": "land_india_southern_india",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "sea_i11",
+            "border_terrain": "coast",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": false,
+            "gauge_change": false,
+            "naval_facilities": [
+              "minor_port"
+            ],
+            "naval_facility_ids": [
+              "facility_ceylon_minor_port"
+            ],
+            "port_or_dock_connection": true,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "sea_i6",
+            "border_terrain": "coast",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": false,
+            "gauge_change": false,
+            "naval_facilities": [
+              "minor_port"
+            ],
+            "naval_facility_ids": [
+              "facility_ceylon_minor_port"
+            ],
+            "port_or_dock_connection": true,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          }
+        ]
+      },
+      "land_india_southern_india": {
+        "neighbors": [
+          {
+            "neighbor_id": "land_india_calcutta",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": true,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "land_india_ceylon",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "land_india_maharashtra",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "sea_i11",
+            "border_terrain": "coast",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": false,
+            "gauge_change": false,
+            "naval_facilities": [
+              "minor_port"
+            ],
+            "naval_facility_ids": [
+              "facility_southern_india_minor_port"
+            ],
+            "port_or_dock_connection": true,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "sea_i6",
+            "border_terrain": "coast",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": false,
+            "gauge_change": false,
+            "naval_facilities": [
+              "minor_port"
+            ],
+            "naval_facility_ids": [
+              "facility_southern_india_minor_port"
+            ],
+            "port_or_dock_connection": true,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          }
+        ]
+      },
+      "land_india_maharashtra": {
+        "neighbors": [
+          {
+            "neighbor_id": "land_india_benares",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": true,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "land_india_delhi",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "land_india_southern_india",
+            "border_terrain": "normal",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": true,
+            "gauge_change": false,
+            "naval_facilities": [],
+            "naval_facility_ids": [],
+            "port_or_dock_connection": false,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          },
+          {
+            "neighbor_id": "sea_i6",
+            "border_terrain": "coast",
+            "passable": true,
+            "has_river": false,
+            "river_crossing": false,
+            "railway_connection": false,
+            "gauge_change": false,
+            "naval_facilities": [
+              "minor_port"
+            ],
+            "naval_facility_ids": [
+              "facility_maharashtra_minor_port"
+            ],
+            "port_or_dock_connection": true,
+            "canal_or_strait": null,
+            "narrow_crossing": false,
+            "narrow_crossings": 0,
+            "special_fortification": null
+          }
+        ]
+      }
+    },
+    "proposed": {
+      "land_india_ceylon": [
+        "sea_i11",
+        "sea_i12"
+      ],
+      "land_india_southern_india": [
+        "sea_i7",
+        "sea_i11",
+        "sea_i12"
+      ],
+      "land_india_maharashtra": [
+        "sea_i6",
+        "sea_i7"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png"
+    ],
+    "confidence": "high",
+    "notes": "Ceylon crosses the I11/I12 boundary: small northern coast in I11, main island in I12. Its dockyard is on I11. Narrow crossing blockers are distinct from coast adjacency. Southern India has the west I7 coast, east I11 coast and southern I12 coast. Maharashtra straddles the I6/I7 boundary."
+  },
+  {
+    "id": "AP-052",
+    "category": "change",
+    "severity": "major",
+    "subject": "Indian printed facilities need physical-instance records",
+    "node_ids": [
+      "land_india_maharashtra",
+      "land_india_southern_india",
+      "land_india_calcutta",
+      "land_india_ceylon"
+    ],
+    "field": "facilities",
+    "current": "Generic minor ports; no intrinsic airfields",
+    "proposed": {
+      "Maharashtra": {
+        "airfield": 1,
+        "I6": [
+          "minor_port",
+          "major_port"
+        ],
+        "I7": [
+          "major_dockyard"
+        ]
+      },
+      "Southern India": {
+        "I11": [
+          "minor_port"
+        ]
+      },
+      "Calcutta": {
+        "I11": [
+          "minor_shipyard",
+          "major_port"
+        ]
+      },
+      "Ceylon": {
+        "airfield": 1,
+        "I11": [
+          "major_dockyard"
+        ]
+      },
+      "physical_instances": {
+        "land_india_maharashtra": [
+          {
+            "id": "facility_maharashtra_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_i6"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  5480,
+                  2700,
+                  6020,
+                  3230
+                ],
+                "crop": "evidence/ap_naval_india_west.png"
+              }
+            ],
+            "notes": "White-square plain anchor on the northwest Maharashtra coast."
+          },
+          {
+            "id": "facility_maharashtra_major_port",
+            "type": "major_port",
+            "sea_accesses": [
+              "sea_i6"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  5480,
+                  2700,
+                  6020,
+                  3230
+                ],
+                "crop": "evidence/ap_naval_india_west.png"
+              }
+            ],
+            "notes": "Blue-square plain anchor lies north/west of the I6/I7 separator, inside Maharashtra. It is a separate physical port from the white-square minor port."
+          },
+          {
+            "id": "facility_maharashtra_major_dockyard",
+            "type": "major_dockyard",
+            "sea_accesses": [
+              "sea_i7"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  5480,
+                  2700,
+                  6020,
+                  3230
+                ],
+                "crop": "evidence/ap_naval_india_west.png"
+              },
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  4850,
+                  2150,
+                  6650,
+                  3700
+                ],
+                "crop": "evidence/ap_india.png"
+              }
+            ],
+            "notes": "Blue-square circular-anchor symbol is west of the Maharashtra/Southern India political border. Earlier AP-052 wrongly assigned it to Southern India."
+          }
+        ],
+        "land_india_southern_india": [
+          {
+            "id": "facility_southern_india_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_i11"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  4850,
+                  2150,
+                  6650,
+                  3700
+                ],
+                "crop": "evidence/ap_india.png"
+              }
+            ],
+            "notes": "White-square anchor on the east coast; the west-coast major dockyard belongs to Maharashtra."
+          }
+        ],
+        "land_india_calcutta": [
+          {
+            "id": "facility_calcutta_minor_shipyard",
+            "type": "minor_shipyard",
+            "sea_accesses": [
+              "sea_i11"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  5940,
+                  2680,
+                  6360,
+                  3160
+                ],
+                "crop": "evidence/ap_naval_calcutta.png"
+              }
+            ],
+            "notes": "White-square crane is inside the Calcutta city polygon; the rail line reaching it is not the city border."
+          },
+          {
+            "id": "facility_calcutta_major_port",
+            "type": "major_port",
+            "sea_accesses": [
+              "sea_i11"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  5940,
+                  2680,
+                  6360,
+                  3160
+                ],
+                "crop": "evidence/ap_naval_calcutta.png"
+              }
+            ],
+            "notes": "Blue-square plain anchor is north of the city polygon southern coastal endpoint, so belongs to Calcutta, not Southern India."
+          }
+        ],
+        "land_india_ceylon": [
+          {
+            "id": "facility_ceylon_major_dockyard",
+            "type": "major_dockyard",
+            "sea_accesses": [
+              "sea_i11"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6020,
+                  3270,
+                  6330,
+                  3510
+                ],
+                "crop": "evidence/ap_naval_ceylon.png"
+              }
+            ],
+            "notes": "Blue-square circular anchor is north of the I11/I12 sea seam; single physical dockyard, with no I12 access."
+          }
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (5480, 2700, 6020, 3230); evidence/ap_naval_india_west.png",
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "game_content/maps/gw36map.png rect (5940, 2680, 6360, 3160); evidence/ap_naval_calcutta.png",
+      "game_content/maps/gw36map.png rect (6020, 3270, 6330, 3510); evidence/ap_naval_ceylon.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh 2026-10-06 political-border and sea-seam trace corrects the previous proposal: the west-coast major dockyard is in Maharashtra, not Southern India; the separate Maharashtra major port is in I6, not I7. Calcutta has two distinct facilities inside its city polygon. Ceylon dockyard only accesses I11. Under \u00a713.2.8 rail access derives from whole-zone coverage, not an independently required port spur.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-053",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing Burma\u2013Annam-Tonkin / Siam\u2013Annam-Tonkin borders",
+    "node_ids": [
+      "land_burma",
+      "land_annam_tonkin",
+      "land_siam"
+    ],
+    "field": "neighbors",
+    "current": null,
+    "proposed": {
+      "reciprocal_pairs": [
+        [
+          "land_burma",
+          "land_annam_tonkin"
+        ],
+        [
+          "land_siam",
+          "land_annam_tonkin"
+        ]
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png",
+      "Terrain Glossary p3 specifically lists these approach boundaries."
+    ],
+    "confidence": "high",
+    "notes": "Apply directional mountain/river rules from glossary; both sides already have jungle/mountain terrain effects."
+  },
+  {
+    "id": "AP-054",
+    "category": "add",
+    "severity": "major",
+    "subject": "Restore central Siberian links into isolated endpoints",
+    "node_ids": [
+      "land_usr_novosibirsk",
+      "land_usr_eastern_kazakhstan",
+      "land_usr_stalino",
+      "land_usr_vanavara",
+      "land_usr_angara",
+      "land_usr_irkutsk",
+      "land_usr_turkestan"
+    ],
+    "field": "neighbors",
+    "current": "Novosibirsk has only Kobdo/Tannu Tuva; Eastern Kazakhstan only Sinkiang/Kobdo; Turkestan only Sinkiang",
+    "proposed": {
+      "certain_existing_pairs": [
+        [
+          "land_usr_novosibirsk",
+          "land_usr_eastern_kazakhstan"
+        ],
+        [
+          "land_usr_novosibirsk",
+          "land_usr_stalino"
+        ],
+        [
+          "land_usr_novosibirsk",
+          "land_usr_vanavara"
+        ],
+        [
+          "land_usr_novosibirsk",
+          "land_usr_angara"
+        ],
+        [
+          "land_usr_vanavara",
+          "land_usr_angara"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_southern_yakutia"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_yakutsk"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_chita"
+        ],
+        [
+          "land_usr_chita",
+          "land_usr_yakutsk"
+        ],
+        [
+          "land_usr_amur",
+          "land_usr_magadan"
+        ],
+        [
+          "land_usr_turkestan",
+          "land_usr_eastern_kazakhstan"
+        ]
+      ],
+      "new_node_perimeters": "data/asia_pacific_new_node_neighbors.json"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (5800, 350, 7200, 1570); evidence/ap_siberia_central.png",
+      "evidence/ap_siberia_east.png; evidence/ap_central_asia.png"
+    ],
+    "confidence": "high",
+    "notes": "All new Soviet physical perimeters are separately complete in the new-node ledger. Turkestan does not border Afghanistan: Turkmenistan intervenes. Trans-Siberian railway visibly follows Novosibirsk\u2013Angara\u2013Buryatia\u2013Chita\u2013Amur\u2013Primorsky Krai."
+  },
+  {
+    "id": "AP-055",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove invented rail network north of the Trans-Siberian route",
+    "node_ids": [
+      "land_usr_amur",
+      "land_usr_angara",
+      "land_usr_buryatia",
+      "land_usr_irkutsk",
+      "land_usr_kamchatka",
+      "land_usr_magadan",
+      "land_usr_north_sakhalin",
+      "land_usr_south_sakhalin",
+      "land_usr_southern_yakutia",
+      "land_usr_stalino",
+      "land_usr_vanavara",
+      "land_usr_yakutsk"
+    ],
+    "field": "railway_connection",
+    "current": {
+      "true_pairs": [
+        [
+          "land_usr_stalino",
+          "land_usr_vanavara"
+        ],
+        [
+          "land_usr_vanavara",
+          "land_usr_irkutsk"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_angara"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_buryatia"
+        ],
+        [
+          "land_usr_amur",
+          "land_usr_yakutsk"
+        ],
+        [
+          "land_usr_yakutsk",
+          "land_usr_magadan"
+        ],
+        [
+          "land_usr_yakutsk",
+          "land_usr_southern_yakutia"
+        ],
+        [
+          "land_usr_magadan",
+          "land_usr_kamchatka"
+        ],
+        [
+          "land_usr_north_sakhalin",
+          "land_usr_south_sakhalin"
+        ]
+      ]
+    },
+    "proposed": {
+      "false_pairs": [
+        [
+          "land_usr_stalino",
+          "land_usr_vanavara"
+        ],
+        [
+          "land_usr_vanavara",
+          "land_usr_irkutsk"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_angara"
+        ],
+        [
+          "land_usr_irkutsk",
+          "land_usr_buryatia"
+        ],
+        [
+          "land_usr_amur",
+          "land_usr_yakutsk"
+        ],
+        [
+          "land_usr_yakutsk",
+          "land_usr_magadan"
+        ],
+        [
+          "land_usr_yakutsk",
+          "land_usr_southern_yakutia"
+        ],
+        [
+          "land_usr_magadan",
+          "land_usr_kamchatka"
+        ],
+        [
+          "land_usr_north_sakhalin",
+          "land_usr_south_sakhalin"
+        ]
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "evidence/ap_siberia_central.png; evidence/ap_sakhalin.png"
+    ],
+    "confidence": "high",
+    "notes": "No track symbols cross these borders. Northern graph adjacency does not imply a railway."
+  },
+  {
+    "id": "AP-056",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove long-distance Soviet adjacency shortcuts",
+    "node_ids": [
+      "land_usr_angara",
+      "land_usr_buryatia",
+      "land_usr_chita",
+      "land_usr_primorsky_krai"
+    ],
+    "field": "neighbors",
+    "current": {
+      "pairs": [
+        [
+          "land_usr_angara",
+          "land_usr_chita"
+        ],
+        [
+          "land_usr_buryatia",
+          "land_usr_primorsky_krai"
+        ]
+      ]
+    },
+    "proposed": null,
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png"
+    ],
+    "confidence": "high",
+    "notes": "Buryatia lies between Angara and Chita; Chita/Amur lie between Buryatia and Primorsky Krai. These are not adjacent borders or rail shortcuts."
+  },
+  {
+    "id": "AP-057",
+    "category": "add",
+    "severity": "major",
+    "subject": "Amur coastal access and mainland\u2013North Sakhalin narrow crossing",
+    "node_ids": [
+      "land_usr_amur",
+      "land_usr_north_sakhalin",
+      "sea_p2"
+    ],
+    "field": "neighbors",
+    "current": {
+      "Amur": "no sea access"
+    },
+    "proposed": {
+      "coasts": [
+        [
+          "land_usr_amur",
+          "sea_p2"
+        ]
+      ],
+      "narrow_pair": [
+        "land_usr_amur",
+        "land_usr_north_sakhalin"
+      ],
+      "capacity": 1,
+      "blocking_seas": [
+        "sea_p2"
+      ],
+      "railway_connection": false
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "evidence/ap_sakhalin.png",
+      "game_content/maps/gw36map.png rect (7150, 1000, 7640, 1740); evidence/ap_naval_amur_primorsky_boundary.png",
+      "game_content/maps/gw36map.png rect (7200, 0, 8550, 1650); evidence/ap_sov_east_graph.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh naval review traces the Amur/Primorsky political boundary along the river to its mouth. Amur has only P2 coast. The minor shipyard and P7 coast belong to the Primorsky strip east of that boundary; corrected in AP-060. No Amur naval facility is printed.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-058",
+    "category": "add",
+    "severity": "major",
+    "subject": "South Sakhalin western coast touches P7",
+    "node_ids": [
+      "land_usr_south_sakhalin",
+      "sea_p7"
+    ],
+    "field": "neighbors",
+    "current": null,
+    "proposed": {
+      "reciprocal_pair": [
+        "land_usr_south_sakhalin",
+        "sea_p7"
+      ],
+      "sea_to_land_terrain": "mountain"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7270, 1320, 8170, 2100); evidence/ap_sakhalin.png"
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-059",
+    "category": "delete",
+    "severity": "major",
+    "subject": "South Sakhalin has no printed minor port",
+    "node_ids": [
+      "land_usr_south_sakhalin",
+      "sea_p8"
+    ],
+    "field": "naval_facilities",
+    "current": [
+      "minor_port"
+    ],
+    "proposed": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7270, 1320, 8170, 2100); evidence/ap_sakhalin.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh coast scan confirms no South Sakhalin naval facility. The nearby mainland minor shipyard belongs to Primorsky Krai, not Amur; the island strategic-objective emblem is not a port.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-060",
+    "category": "change",
+    "severity": "major",
+    "subject": "Primorsky Krai major port and separate northern minor shipyard",
+    "node_ids": [
+      "land_usr_primorsky_krai",
+      "sea_p2",
+      "sea_p7"
+    ],
+    "field": "facilities",
+    "current": {
+      "P7": [
+        "minor_port"
+      ],
+      "node": []
+    },
+    "proposed": {
+      "coastal_seas": [
+        "sea_p2",
+        "sea_p7"
+      ],
+      "naval_facilities": [
+        {
+          "id": "facility_primorsky_north_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_p2",
+            "sea_p7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7150,
+                1000,
+                7640,
+                1740
+              ],
+              "crop": "evidence/ap_naval_amur_primorsky_boundary.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7360,
+                1430,
+                7570,
+                1700
+              ],
+              "crop": "evidence/ap_naval_amur_yard.png"
+            }
+          ],
+          "notes": "White-square crane is east of the Amur river political boundary, on Primorsky Krai. P2/P7 separator meets its coastal location; one physical yard with both accesses, not an Amur facility."
+        },
+        {
+          "id": "facility_primorsky_krai_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7270,
+                1320,
+                8170,
+                2100
+              ],
+              "crop": "evidence/ap_sakhalin.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Vladivostok plain anchor in blue square."
+        }
+      ],
+      "node": [
+        "airfield"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7150, 1000, 7640, 1740); evidence/ap_naval_amur_primorsky_boundary.png",
+      "game_content/maps/gw36map.png rect (7360, 1430, 7570, 1700); evidence/ap_naval_amur_yard.png",
+      "game_content/maps/gw36map.png rect (7270, 1320, 8170, 2100); evidence/ap_sakhalin.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh political-boundary tracing places the northern white-square crane on Primorsky Krai, east of the Amur river border. The P2/P7 sea divider meets this one physical shipyard; share one ID across both access edges. Vladivostok is a separate P7 major port. The old Amur attribution is withdrawn.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-061",
+    "category": "add",
+    "severity": "major",
+    "subject": "Kamchatka\u2013Kurile capacity-1 narrow crossing",
+    "node_ids": [
+      "land_usr_kamchatka",
+      "land_jap_kurile_islands"
+    ],
+    "field": "neighbors",
+    "current": null,
+    "proposed": {
+      "narrow_crossing": true,
+      "narrow_crossings": 1,
+      "railway_connection": false,
+      "blocking_seas": [
+        "sea_p9"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7270, 1320, 8170, 2100); evidence/ap_sakhalin.png",
+      "game_content/maps/gw36map.png rect (7860, 1430, 8000, 1530); evidence/ap_narrow_kuriles.png"
+    ],
+    "confidence": "high",
+    "notes": "The white dotted crossing is east of the Kamchatka tip, wholly in P9. The west-facing P2/P8 boundary terminates on the other coast. Replace legacy land\u2013sea narrow flags with the explicit land pair."
+  },
+  {
+    "id": "AP-062",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove fabricated inter-island land/rail links",
+    "node_ids": [
+      "land_aus_new_south_wales",
+      "land_aus_northern_territory",
+      "land_aus_tasmania",
+      "land_borneo",
+      "land_celebes",
+      "land_java",
+      "land_new_britain",
+      "land_new_guinea",
+      "land_timor"
+    ],
+    "field": "neighbors",
+    "current": {
+      "pairs": [
+        [
+          "land_borneo",
+          "land_java"
+        ],
+        [
+          "land_borneo",
+          "land_celebes"
+        ],
+        [
+          "land_timor",
+          "land_aus_northern_territory"
+        ],
+        [
+          "land_new_guinea",
+          "land_new_britain"
+        ],
+        [
+          "land_aus_new_south_wales",
+          "land_aus_tasmania"
+        ]
+      ]
+    },
+    "proposed": null,
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "These pairs have neither an ordinary land border nor a printed narrow-crossing line. All currently carry railway_connection:true."
+  },
+  {
+    "id": "AP-063",
+    "category": "change",
+    "severity": "major",
+    "subject": "Actual narrow island pairs require capacity, sea blockers and no rail",
+    "node_ids": [
+      "land_sumatra",
+      "land_java",
+      "land_luzon_and_the_visayas",
+      "land_mindanao",
+      "land_nz_north_island",
+      "land_nz_south_island"
+    ],
+    "field": "edges",
+    "current": "Plain reciprocal land links with railway_connection:true",
+    "proposed": {
+      "pairs": [
+        {
+          "nodes": [
+            "land_sumatra",
+            "land_java"
+          ],
+          "capacity": 1,
+          "blocking_seas": [
+            "sea_i13",
+            "sea_p59"
+          ]
+        },
+        {
+          "nodes": [
+            "land_luzon_and_the_visayas",
+            "land_mindanao"
+          ],
+          "capacity": 1,
+          "blocking_seas": [
+            "sea_p42"
+          ]
+        },
+        {
+          "nodes": [
+            "land_nz_north_island",
+            "land_nz_south_island"
+          ],
+          "capacity": 2,
+          "blocking_seas": [
+            "sea_p73"
+          ]
+        }
+      ],
+      "railway_connection": false
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "evidence/ap_se_asia.png; evidence/ap_australia.png",
+      "game_content/maps/gw36map.png rect (6620, 3640, 7030, 3830); evidence/ap_narrow_sunda.png",
+      "game_content/maps/gw36map.png rect (6810, 2730, 7500, 3390); evidence/ap_philippines_edges.png"
+    ],
+    "confidence": "high",
+    "notes": "Native dotted-line trace resolves blockers: Sunda crosses I13/P59, the Philippine crossing is P42, and Cook Strait is P73. These do not gain railway connections."
+  },
+  {
+    "id": "AP-064",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing narrow land pairs at Malacca and Lesser Sunda chain",
+    "node_ids": [
+      "land_british_malaya",
+      "land_sumatra",
+      "land_java",
+      "land_lesser_sunda_islands"
+    ],
+    "field": "neighbors",
+    "current": null,
+    "proposed": {
+      "pairs": [
+        {
+          "nodes": [
+            "land_british_malaya",
+            "land_sumatra"
+          ],
+          "capacity": 1,
+          "blocking_seas": [
+            "sea_p50"
+          ]
+        },
+        {
+          "nodes": [
+            "land_java",
+            "land_lesser_sunda_islands"
+          ],
+          "capacity": 1,
+          "blocking_seas": [
+            "sea_p60",
+            "sea_p61"
+          ]
+        }
+      ],
+      "railway_connection": false
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "evidence/ap_se_asia.png",
+      "game_content/maps/gw36map.png rect (6500, 3350, 6740, 3510); evidence/ap_narrow_malacca.png",
+      "game_content/maps/gw36map.png rect (6620, 3640, 7030, 3830); evidence/ap_narrow_sunda.png"
+    ],
+    "confidence": "high",
+    "notes": "Close native trace resolves Malacca in P50 only; the Java\u2013Lesser Sunda dotted crossing bends across the P60/P61 boundary and touches both seas. Nearby I12/P59 are not blockers for the Malacca line."
+  },
+  {
+    "id": "AP-065",
+    "category": "change",
+    "severity": "major",
+    "subject": "Timor node conflates Portuguese Timor and Dutch West Timor",
+    "node_ids": [
+      "land_timor",
+      "land_lesser_sunda_islands"
+    ],
+    "field": "identity/ipp/coasts",
+    "current": {
+      "land_timor": {
+        "name": "Timor",
+        "terrain": "normal",
+        "ipp_value": 1,
+        "original_owner": "Portugal"
+      }
+    },
+    "proposed": {
+      "land_timor": {
+        "name": "Portuguese Timor",
+        "terrain": [
+          "mountain",
+          "jungle"
+        ],
+        "ipp_value": 0,
+        "owner": "Portugal",
+        "coasts": [
+          "sea_p63"
+        ]
+      },
+      "new_dutch_tile": {
+        "name": "West Timor / Lesser Sunda Islands",
+        "ipp_value": 1,
+        "owner": "Netherlands"
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "Terrain Glossary p4 names Lesser Sunda Islands and Portuguese Timor separately."
+    ],
+    "confidence": "high",
+    "notes": "The map labels the Dutch archipelago WEST TIMOR while glossary uses Lesser Sunda Islands. Preserve both names via alias until rules terminology is chosen. Portuguese/Dutch land boundary on Timor also must be added."
+  },
+  {
+    "id": "AP-066",
+    "category": "change",
+    "severity": "major",
+    "subject": "Philippine coasts and facilities need reassignment",
+    "node_ids": [
+      "land_luzon_and_the_visayas",
+      "land_mindanao"
+    ],
+    "field": "sea_neighbors/facilities",
+    "current": "Luzon P42 minor port; Mindanao P42/P50/P52 minor/major ports",
+    "proposed": {
+      "Luzon": [
+        "sea_p41",
+        "sea_p42",
+        "sea_p50"
+      ],
+      "Mindanao": [
+        "sea_p42",
+        "sea_p50",
+        "sea_p51"
+      ],
+      "Luzon_P50": [
+        "submarine_base"
+      ],
+      "P50_major_port_owner": "unresolved between Luzon/Visayas and Mindanao; AP-095"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png",
+      "game_content/maps/gw36map.png rect (6810, 2730, 7500, 3390); evidence/ap_philippines_edges.png"
+    ],
+    "confidence": "high",
+    "notes": "Mindanao has a finite P42 northeast coast and P51 south coast; P52 is separated by P51. The Luzon submarine base accesses P50. The separate major-port symbol in the western Philippine island group cannot be assigned to a land node confidently from this raster; AP-095 preserves that uncertainty. Fresh naval ledger separately deletes the fabricated Luzon and Mindanao minor-port instances (AP-103), retains the actual Luzon submarine base, and leaves the real P50 major port unassigned (AP-095).",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-067",
+    "category": "change",
+    "severity": "major",
+    "subject": "Correct Borneo and eastern Indies coast IDs",
+    "node_ids": [
+      "land_borneo",
+      "land_sarawak",
+      "land_java",
+      "land_celebes",
+      "land_dutch_new_guinea",
+      "land_new_guinea",
+      "land_new_britain"
+    ],
+    "field": "sea_neighbors",
+    "current": {
+      "source": "current JSON coast lists"
+    },
+    "proposed": {
+      "Borneo": [
+        "sea_p50",
+        "sea_p59",
+        "sea_p60"
+      ],
+      "Sarawak": [
+        "sea_p50",
+        "sea_p51"
+      ],
+      "Java": [
+        "sea_i13",
+        "sea_p59",
+        "sea_p60",
+        "sea_p61"
+      ],
+      "Celebes": [
+        "sea_p51",
+        "sea_p60",
+        "sea_p62"
+      ],
+      "Dutch New Guinea": [
+        "sea_p52",
+        "sea_p62"
+      ],
+      "New Guinea": [
+        "sea_p53",
+        "sea_p64"
+      ],
+      "New Britain": [
+        "sea_p53"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "evidence/ap_se_asia.png",
+      "game_content/maps/gw36map.png rect (6680, 3230, 7080, 3510); evidence/ap_sarawak_junction.png",
+      "game_content/maps/gw36map.png rect (6060, 3480, 7530, 4410); evidence/ap_java_indian_grid.png"
+    ],
+    "confidence": "high",
+    "notes": "Native coast trace confirms all listed sets. Borneo has a short gray northwest coast in P50 before the Sarawak land boundary; Sarawak P51 is a short northeast coast. Java has southwestern I13 and a small eastern P60 coast. Papua sea splits meet the political border on both coasts; do not add corner-only seas."
+  },
+  {
+    "id": "AP-068",
+    "category": "change",
+    "severity": "major",
+    "subject": "Indonesian/Papuan facilities are not generic minor ports",
+    "node_ids": [
+      "land_sumatra",
+      "land_java",
+      "land_borneo",
+      "land_new_britain"
+    ],
+    "field": "facilities",
+    "current": "Generic minor ports on almost every island",
+    "proposed": {
+      "Sumatra": {
+        "P50": [
+          "minor_port"
+        ],
+        "node": [
+          "airfield"
+        ]
+      },
+      "Java": {
+        "P59": [
+          "minor_dockyard"
+        ]
+      },
+      "Borneo": {
+        "P60": [
+          "minor_port",
+          "seaplane_base"
+        ]
+      },
+      "New Britain": {
+        "P53": [
+          "major_port"
+        ]
+      },
+      "physical_instances": {
+        "land_sumatra": [
+          {
+            "id": "facility_land_sumatra_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_p50"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6450,
+                  3330,
+                  6840,
+                  3720
+                ],
+                "crop": "evidence/ap_naval_malaya_sumatra.png"
+              }
+            ],
+            "notes": "One white-square anchor north of the P50/P59 separator, not a port shared across P50/P59."
+          }
+        ],
+        "land_java": [
+          {
+            "id": "facility_java_minor_dockyard",
+            "type": "minor_dockyard",
+            "sea_accesses": [
+              "sea_p59"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6650,
+                  3210,
+                  7380,
+                  3950
+                ],
+                "crop": "evidence/ap_borneo_java.png"
+              }
+            ],
+            "notes": "White-square circular anchor, not plain-anchor minor port."
+          }
+        ],
+        "land_borneo": [
+          {
+            "id": "facility_land_borneo_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_p60"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6700,
+                  3230,
+                  7110,
+                  3640
+                ],
+                "crop": "evidence/ap_naval_borneo.png"
+              }
+            ],
+            "notes": "White-square anchor is east of the P59/P60 seam endpoint; only P60 access."
+          },
+          {
+            "id": "facility_borneo_seaplane_base",
+            "type": "seaplane_base",
+            "sea_accesses": [
+              "sea_p60"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6700,
+                  3230,
+                  7110,
+                  3640
+                ],
+                "crop": "evidence/ap_naval_borneo.png"
+              }
+            ],
+            "notes": "Green seaplane symbol lies on gray Dutch Borneo, south of the Sarawak boundary and the P51/P60 sea separator."
+          }
+        ],
+        "land_new_britain": [
+          {
+            "id": "facility_new_britain_major_port",
+            "type": "major_port",
+            "sea_accesses": [
+              "sea_p53"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6250,
+                  2600,
+                  8250,
+                  4030
+                ],
+                "crop": "evidence/ap_se_asia.png"
+              }
+            ],
+            "notes": "Blue-square plain anchor inside the New Britain island outline, not P63."
+          }
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6450, 3330, 6840, 3720); evidence/ap_naval_malaya_sumatra.png",
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "game_content/maps/gw36map.png rect (6650, 3210, 7380, 3950); evidence/ap_borneo_java.png",
+      "game_content/maps/gw36map.png rect (6060, 3480, 7530, 4410); evidence/ap_java_indian_grid.png",
+      "game_content/maps/gw36map.png rect (6700, 3230, 7110, 3640); evidence/ap_naval_borneo.png",
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh native symbol/boundary review confirms the Borneo seaplane base on gray Dutch Borneo with P60 access, and its separate minor port also in P60. Sumatra has one minor port solely in P50, not shared with P59. Java is a circular-anchor minor dockyard. Facility-only removals for Celebes, Portuguese Timor and both New Guinea tiles are in AP-100.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-069",
+    "category": "change",
+    "severity": "major",
+    "subject": "Australian coastal sea IDs and facilities",
+    "node_ids": [
+      "land_aus_western_australia",
+      "land_aus_northern_territory",
+      "land_aus_south_australia",
+      "land_aus_queensland",
+      "land_aus_new_south_wales",
+      "land_aus_tasmania"
+    ],
+    "field": "sea_neighbors/facilities",
+    "current": "Current coast uses I6/P61/P62/P68; South Australia lacks sea access",
+    "proposed": {
+      "Western Australia": [
+        "sea_p61",
+        "sea_p63",
+        "sea_p69",
+        "sea_p70"
+      ],
+      "Northern Territory": [
+        "sea_p63"
+      ],
+      "South Australia": [
+        "sea_p70"
+      ],
+      "Queensland": [
+        "sea_p63",
+        "sea_p64",
+        "sea_p71",
+        "sea_p72"
+      ],
+      "New South Wales": [
+        "sea_p70",
+        "sea_p72"
+      ],
+      "Tasmania": [
+        "sea_p72"
+      ],
+      "facilities": {
+        "Northern Territory_P63": [
+          "seaplane_base"
+        ],
+        "Queensland_P63": [
+          "minor_port"
+        ],
+        "New South Wales_P72": [
+          "minor_shipyard"
+        ],
+        "South Australia_P70": [
+          "major_port"
+        ]
+      },
+      "physical_instances": {
+        "land_aus_northern_territory": [
+          {
+            "id": "facility_northern_territory_seaplane_base",
+            "type": "seaplane_base",
+            "sea_accesses": [
+              "sea_p63"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  7180,
+                  3890,
+                  7850,
+                  4230
+                ],
+                "crop": "evidence/ap_naval_australia_north.png"
+              }
+            ],
+            "notes": "Green seaplane silhouette; no anchor/minor port at this location."
+          }
+        ],
+        "land_aus_queensland": [
+          {
+            "id": "facility_queensland_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_p63"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  7180,
+                  3890,
+                  7850,
+                  4230
+                ],
+                "crop": "evidence/ap_naval_australia_north.png"
+              }
+            ],
+            "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+          }
+        ],
+        "land_aus_south_australia": [
+          {
+            "id": "facility_south_australia_major_port",
+            "type": "major_port",
+            "sea_accesses": [
+              "sea_p70"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  7660,
+                  4250,
+                  8110,
+                  4700
+                ],
+                "crop": "evidence/ap_naval_sydney_nsw.png"
+              }
+            ],
+            "notes": "Blue-square anchor lies west of the straight SA/NSW political border. The prior NSW assignment was wrong."
+          }
+        ],
+        "land_aus_new_south_wales": [
+          {
+            "id": "facility_new_south_wales_minor_shipyard",
+            "type": "minor_shipyard",
+            "sea_accesses": [
+              "sea_p72"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  7660,
+                  4250,
+                  8110,
+                  4700
+                ],
+                "crop": "evidence/ap_naval_sydney_nsw.png"
+              }
+            ],
+            "notes": "Northern white-square crane lies north of the circular Sydney boundary, within NSW."
+          }
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png",
+      "game_content/maps/gw36map.png rect (7180, 3890, 7850, 4230); evidence/ap_naval_australia_north.png",
+      "game_content/maps/gw36map.png rect (7660, 4250, 8110, 4700); evidence/ap_naval_sydney_nsw.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh naval trace corrects the P70 major port to South Australia: the blue anchor is west of the straight SA/NSW border. NSW has the northern P72 minor shipyard; Sydney has the separate southern one. NT has a seaplane base, not a minor port. Western Australia has no printed naval facility (AP-101). Other coast/reef findings are retained.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-070",
+    "category": "change",
+    "severity": "major",
+    "subject": "Outback blocks the whole Northern Territory\u2013South Australia border",
+    "node_ids": [
+      "land_aus_northern_territory",
+      "land_aus_south_australia"
+    ],
+    "field": "passable/railway_connection",
+    "current": {
+      "neighbor_id": "land_aus_south_australia",
+      "border_terrain": "normal",
+      "passable": true,
+      "has_river": false,
+      "river_crossing": false,
+      "railway_connection": true,
+      "gauge_change": false,
+      "naval_facilities": [],
+      "naval_facility_ids": [],
+      "port_or_dock_connection": false,
+      "canal_or_strait": null,
+      "narrow_crossing": false,
+      "narrow_crossings": 0,
+      "special_fortification": null
+    },
+    "proposed": {
+      "passable": false,
+      "railway_connection": false
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "Entire shared east\u2013west boundary is inside the explicitly impassable Outback Desert. Do not set the entire three Australian territories impassable; other traversable borders remain."
+  },
+  {
+    "id": "AP-071",
+    "category": "add",
+    "severity": "major",
+    "subject": "Northern Territory\u2013Queensland ordinary border",
+    "node_ids": [
+      "land_aus_northern_territory",
+      "land_aus_queensland"
+    ],
+    "field": "neighbors",
+    "current": null,
+    "proposed": {
+      "passable": true,
+      "railway_connection": false
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "Vertical border north of the Outback is finite and unobstructed. No railway into Northern Territory is printed."
+  },
+  {
+    "id": "AP-072",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Clear invented Australian/Papuan rail connections",
+    "node_ids": [
+      "land_aus_northern_territory",
+      "land_aus_western_australia",
+      "land_dutch_new_guinea",
+      "land_new_guinea"
+    ],
+    "field": "railway_connection",
+    "current": {
+      "pairs": [
+        [
+          "land_aus_northern_territory",
+          "land_aus_western_australia"
+        ],
+        [
+          "land_dutch_new_guinea",
+          "land_new_guinea"
+        ]
+      ]
+    },
+    "proposed": false,
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png",
+      "evidence/ap_indonesia.png"
+    ],
+    "confidence": "high",
+    "notes": ""
+  },
+  {
+    "id": "AP-073",
+    "category": "change",
+    "severity": "major",
+    "subject": "New Zealand and New Caledonia are in P73",
+    "node_ids": [
+      "land_nz_north_island",
+      "land_nz_south_island",
+      "land_new_caledonia"
+    ],
+    "field": "sea_neighbors/naval_facilities",
+    "current": {
+      "NZ": "P69",
+      "New Caledonia": "P65"
+    },
+    "proposed": {
+      "land_nz_north_island": [
+        "sea_p73"
+      ],
+      "land_nz_south_island": [
+        "sea_p73"
+      ],
+      "land_new_caledonia": [
+        "sea_p73"
+      ],
+      "naval_facilities": {
+        "land_nz_north_island": [
+          {
+            "id": "facility_north_island_major_port",
+            "type": "major_port",
+            "sea_accesses": [
+              "sea_p73"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  6100,
+                  3750,
+                  8650,
+                  4888
+                ],
+                "crop": "evidence/ap_australia.png"
+              },
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  8000,
+                  2750,
+                  9900,
+                  4888
+                ],
+                "crop": "evidence/ap_pacific_south.png"
+              }
+            ],
+            "notes": "Blue-square plain anchor, not minor-port white square."
+          }
+        ],
+        "land_nz_south_island": [],
+        "land_new_caledonia": [
+          {
+            "id": "facility_caledonia_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_p73"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  8000,
+                  2750,
+                  9900,
+                  4888
+                ],
+                "crop": "evidence/ap_pacific_south.png"
+              }
+            ],
+            "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+          }
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh native symbols confirm North Island major port (blue-square anchor) and New Caledonia minor port (white-square anchor), both P73. South Island has no facility (AP-074). One physical facility each, not generic minor ports.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-074",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove unsupported Pacific island ports",
+    "node_ids": [
+      "land_fiji",
+      "land_new_hebrides",
+      "land_usa_wake_island",
+      "land_aus_tasmania",
+      "land_nz_south_island"
+    ],
+    "field": "naval_facilities",
+    "current": "minor_port on each",
+    "proposed": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "evidence/ap_pacific_north.png; evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "No port facility symbols on these island outlines. Ownership and victory markers must not be treated as infrastructure.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-075",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing printed Pacific island infrastructure",
+    "node_ids": [
+      "land_jap_marshall_islands",
+      "land_usa_hawaii",
+      "land_usa_midway"
+    ],
+    "field": "facilities",
+    "current": null,
+    "proposed": {
+      "Marshall Islands": {
+        "airfield": 1,
+        "P47": [
+          "minor_port"
+        ]
+      },
+      "Hawaii": {
+        "airfield": 1,
+        "P29": [
+          "major_dockyard"
+        ]
+      },
+      "Midway": {
+        "P22": [
+          "minor_port",
+          "submarine_base"
+        ]
+      },
+      "physical_instances": {
+        "land_jap_marshall_islands": [
+          {
+            "id": "facility_marshall_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_p47"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  8490,
+                  2820,
+                  8870,
+                  3110
+                ],
+                "crop": "evidence/ap_naval_marshall.png"
+              }
+            ],
+            "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+          }
+        ],
+        "land_usa_hawaii": [
+          {
+            "id": "facility_hawaii_major_dockyard",
+            "type": "major_dockyard",
+            "sea_accesses": [
+              "sea_p29"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  8430,
+                  1950,
+                  9200,
+                  2540
+                ],
+                "crop": "evidence/ap_naval_pacific_facilities.png"
+              }
+            ],
+            "notes": "Blue-square circular anchor; one naval facility, plus a separately excluded airfield."
+          }
+        ],
+        "land_usa_midway": [
+          {
+            "id": "facility_midway_minor_port",
+            "type": "minor_port",
+            "sea_accesses": [
+              "sea_p22"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  8430,
+                  1950,
+                  9200,
+                  2540
+                ],
+                "crop": "evidence/ap_naval_pacific_facilities.png"
+              }
+            ],
+            "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+          },
+          {
+            "id": "facility_midway_submarine_base",
+            "type": "submarine_base",
+            "sea_accesses": [
+              "sea_p22"
+            ],
+            "evidence": [
+              {
+                "source": "game_content/maps/gw36map.png",
+                "rectangle": [
+                  8430,
+                  1950,
+                  9200,
+                  2540
+                ],
+                "crop": "evidence/ap_naval_pacific_facilities.png"
+              }
+            ],
+            "notes": "Blue-square vertical submarine silhouette, distinct from anchor or crane."
+          }
+        ]
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8490, 2820, 8870, 3110); evidence/ap_naval_marshall.png",
+      "game_content/maps/gw36map.png rect (8430, 1950, 9200, 2540); evidence/ap_naval_pacific_facilities.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh native inspection confirms Hawaii circular-anchor major dockyard, Midway separate minor port and vertical-submarine base, and Marshall minor port. Airfields remain separate, non-naval facilities.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-076",
+    "category": "change",
+    "severity": "major",
+    "subject": "Replace I6\u2013I14 Indian Ocean sea-neighbor sets from native perimeter trace",
+    "node_ids": [
+      "sea_i6",
+      "sea_i7",
+      "sea_i8",
+      "sea_i9",
+      "sea_i10",
+      "sea_i11",
+      "sea_i12",
+      "sea_i13",
+      "sea_i14"
+    ],
+    "field": "sea_neighbors",
+    "current": {
+      "sea_i6": [
+        "sea_i11",
+        "sea_i3",
+        "sea_i4",
+        "sea_i7"
+      ],
+      "sea_i7": [
+        "sea_i6"
+      ],
+      "sea_i8": [],
+      "sea_i9": [],
+      "sea_i10": [],
+      "sea_i11": [
+        "sea_i12",
+        "sea_i6"
+      ],
+      "sea_i12": [
+        "sea_i11",
+        "sea_p50"
+      ],
+      "sea_i13": [],
+      "sea_i14": []
+    },
+    "proposed": {
+      "sea_i6": [
+        "sea_i7"
+      ],
+      "sea_i7": [
+        "sea_i4",
+        "sea_i6",
+        "sea_i8",
+        "sea_i10",
+        "sea_i12"
+      ],
+      "sea_i8": [
+        "sea_i2",
+        "sea_i3",
+        "sea_i4",
+        "sea_i7",
+        "sea_i9",
+        "sea_i10"
+      ],
+      "sea_i9": [
+        "sea_i2",
+        "sea_i8",
+        "sea_i10",
+        "sea_i14"
+      ],
+      "sea_i10": [
+        "sea_i7",
+        "sea_i8",
+        "sea_i9",
+        "sea_i12",
+        "sea_i13",
+        "sea_i14"
+      ],
+      "sea_i11": [
+        "sea_i12"
+      ],
+      "sea_i12": [
+        "sea_i7",
+        "sea_i10",
+        "sea_i11",
+        "sea_i13",
+        "sea_p50"
+      ],
+      "sea_i13": [
+        "sea_i10",
+        "sea_i12",
+        "sea_i14",
+        "sea_p59",
+        "sea_p61"
+      ],
+      "sea_i14": [
+        "sea_i9",
+        "sea_i10",
+        "sea_i13",
+        "sea_p61",
+        "sea_p69"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4200, 2950, 6350, 4888); evidence/ap_indian_ocean.png",
+      "evidence/ap_india.png; evidence/ap_australia.png",
+      "data/asia_pacific_sea_neighbors.json: each row identifies native source rectangles."
+    ],
+    "confidence": "high",
+    "notes": "Complete sea-to-sea perimeter sets are in data/asia_pacific_sea_neighbors.json. Native second pass resolves offsets and coasts, with reciprocal within-domain validation. I7 does not touch I11; I9 does not touch I13; I10 touches I14. Indian/Pacific seams are included."
+  },
+  {
+    "id": "AP-077",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove I6 long-range adjacency to Western Australia/Ceylon",
+    "node_ids": [
+      "sea_i6",
+      "land_aus_western_australia",
+      "land_india_ceylon"
+    ],
+    "field": "neighbors",
+    "current": "I6 reaches Australia and Ceylon",
+    "proposed": null,
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4200, 2950, 6350, 4888); evidence/ap_indian_ocean.png",
+      "evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "I6 is the northern Arabian Sea/Persian Gulf polygon. These edges bypass several sea zones."
+  },
+  {
+    "id": "AP-078",
+    "category": "change",
+    "severity": "major",
+    "subject": "Persian Gulf coastal endpoints belong to I6, not I7",
+    "node_ids": [
+      "sea_i6",
+      "sea_i7",
+      "land_kuwait",
+      "land_qatar",
+      "land_southern_iraq",
+      "land_iran_southern_iran",
+      "land_oman"
+    ],
+    "field": "sea_neighbors",
+    "current": "Kuwait/Qatar/Southern Iraq on I7",
+    "proposed": {
+      "I6": [
+        "land_kuwait",
+        "land_qatar",
+        "land_southern_iraq",
+        "land_iran_southern_iran",
+        "land_oman",
+        "land_saudi_arabia",
+        "land_india_maharashtra"
+      ],
+      "I7_remove": [
+        "land_kuwait",
+        "land_qatar",
+        "land_southern_iraq",
+        "land_iran_southern_iran"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4200, 2950, 6350, 4888); evidence/ap_indian_ocean.png",
+      "evidence/ap_india.png"
+    ],
+    "confidence": "high",
+    "notes": "Oman has I4, I6 and I7 coasts (I4 short southwestern coast independently resolved by Europe/Africa agent); Gulf terminals are all northwest of I6/I7 boundary. I6\u2192Maharashtra already present; I7\u2192Southern India missing. Gulf coast facility identities handled by Europe/Middle East audit."
+  },
+  {
+    "id": "AP-079",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing numbered Pacific sea zones",
+    "node_ids": [
+      "sea_p4",
+      "sea_p19",
+      "sea_p20",
+      "sea_p21",
+      "sea_p22",
+      "sea_p23",
+      "sea_p27",
+      "sea_p29",
+      "sea_p37",
+      "sea_p38",
+      "sea_p39",
+      "sea_p40",
+      "sea_p48",
+      "sea_p49",
+      "sea_p55",
+      "sea_p56",
+      "sea_p57",
+      "sea_p58",
+      "sea_p66",
+      "sea_p67",
+      "sea_p70",
+      "sea_p71",
+      "sea_p72",
+      "sea_p73",
+      "sea_p74",
+      "sea_p75"
+    ],
+    "field": "nodes",
+    "current": null,
+    "proposed": {
+      "sea_p4": {
+        "type": "sea",
+        "name": "Sea Zone P4"
+      },
+      "sea_p19": {
+        "type": "sea",
+        "name": "Sea Zone P19"
+      },
+      "sea_p20": {
+        "type": "sea",
+        "name": "Sea Zone P20"
+      },
+      "sea_p21": {
+        "type": "sea",
+        "name": "Sea Zone P21"
+      },
+      "sea_p22": {
+        "type": "sea",
+        "name": "Sea Zone P22"
+      },
+      "sea_p23": {
+        "type": "sea",
+        "name": "Sea Zone P23"
+      },
+      "sea_p27": {
+        "type": "sea",
+        "name": "Sea Zone P27"
+      },
+      "sea_p29": {
+        "type": "sea",
+        "name": "Sea Zone P29"
+      },
+      "sea_p37": {
+        "type": "sea",
+        "name": "Sea Zone P37"
+      },
+      "sea_p38": {
+        "type": "sea",
+        "name": "Sea Zone P38"
+      },
+      "sea_p39": {
+        "type": "sea",
+        "name": "Sea Zone P39"
+      },
+      "sea_p40": {
+        "type": "sea",
+        "name": "Sea Zone P40"
+      },
+      "sea_p48": {
+        "type": "sea",
+        "name": "Sea Zone P48"
+      },
+      "sea_p49": {
+        "type": "sea",
+        "name": "Sea Zone P49"
+      },
+      "sea_p55": {
+        "type": "sea",
+        "name": "Sea Zone P55"
+      },
+      "sea_p56": {
+        "type": "sea",
+        "name": "Sea Zone P56"
+      },
+      "sea_p57": {
+        "type": "sea",
+        "name": "Sea Zone P57"
+      },
+      "sea_p58": {
+        "type": "sea",
+        "name": "Sea Zone P58"
+      },
+      "sea_p66": {
+        "type": "sea",
+        "name": "Sea Zone P66"
+      },
+      "sea_p67": {
+        "type": "sea",
+        "name": "Sea Zone P67"
+      },
+      "sea_p70": {
+        "type": "sea",
+        "name": "Sea Zone P70"
+      },
+      "sea_p71": {
+        "type": "sea",
+        "name": "Sea Zone P71"
+      },
+      "sea_p72": {
+        "type": "sea",
+        "name": "Sea Zone P72"
+      },
+      "sea_p73": {
+        "type": "sea",
+        "name": "Sea Zone P73"
+      },
+      "sea_p74": {
+        "type": "sea",
+        "name": "Sea Zone P74"
+      },
+      "sea_p75": {
+        "type": "sea",
+        "name": "Sea Zone P75"
+      }
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "evidence/ap_pacific_south.png; evidence/ap_australia.png; evidence/ap_siberia_east.png"
+    ],
+    "confidence": "high",
+    "notes": "Every listed number was seen on the map. This list is not generated by assuming all numbers must exist. P76\u2013P78 belong to the Americas audit."
+  },
+  {
+    "id": "AP-080",
+    "category": "change",
+    "severity": "major",
+    "subject": "Replace P1\u2013P75 Pacific sea-neighbor sets from native perimeter trace",
+    "node_ids": [
+      "sea_p1",
+      "sea_p2",
+      "sea_p3",
+      "sea_p4",
+      "sea_p5",
+      "sea_p6",
+      "sea_p7",
+      "sea_p8",
+      "sea_p9",
+      "sea_p10",
+      "sea_p11",
+      "sea_p12",
+      "sea_p13",
+      "sea_p14",
+      "sea_p15",
+      "sea_p16",
+      "sea_p17",
+      "sea_p18",
+      "sea_p19",
+      "sea_p20",
+      "sea_p21",
+      "sea_p22",
+      "sea_p23",
+      "sea_p24",
+      "sea_p25",
+      "sea_p26",
+      "sea_p27",
+      "sea_p28",
+      "sea_p29",
+      "sea_p30",
+      "sea_p31",
+      "sea_p32",
+      "sea_p33",
+      "sea_p34",
+      "sea_p35",
+      "sea_p36",
+      "sea_p37",
+      "sea_p38",
+      "sea_p39",
+      "sea_p40",
+      "sea_p41",
+      "sea_p42",
+      "sea_p43",
+      "sea_p44",
+      "sea_p45",
+      "sea_p46",
+      "sea_p47",
+      "sea_p48",
+      "sea_p49",
+      "sea_p50",
+      "sea_p51",
+      "sea_p52",
+      "sea_p53",
+      "sea_p54",
+      "sea_p55",
+      "sea_p56",
+      "sea_p57",
+      "sea_p58",
+      "sea_p59",
+      "sea_p60",
+      "sea_p61",
+      "sea_p62",
+      "sea_p63",
+      "sea_p64",
+      "sea_p65",
+      "sea_p66",
+      "sea_p67",
+      "sea_p68",
+      "sea_p69",
+      "sea_p70",
+      "sea_p71",
+      "sea_p72",
+      "sea_p73",
+      "sea_p74",
+      "sea_p75"
+    ],
+    "field": "sea_neighbors",
+    "current": "Many missing nodes; surviving nodes have partial or geographically wrong neighbor sets",
+    "proposed": {
+      "sea_p1": [
+        "sea_p3",
+        "sea_p4",
+        "sea_p5"
+      ],
+      "sea_p2": [
+        "sea_p7",
+        "sea_p8",
+        "sea_p9"
+      ],
+      "sea_p3": [
+        "sea_p1",
+        "sea_p4",
+        "sea_p9",
+        "sea_p10"
+      ],
+      "sea_p4": [
+        "sea_p1",
+        "sea_p3",
+        "sea_p5",
+        "sea_p10",
+        "sea_p11"
+      ],
+      "sea_p5": [
+        "sea_p1",
+        "sea_p4",
+        "sea_p6",
+        "sea_p11",
+        "sea_p12"
+      ],
+      "sea_p6": [
+        "sea_p5",
+        "sea_p12",
+        "sea_p13"
+      ],
+      "sea_p7": [
+        "sea_p2",
+        "sea_p8",
+        "sea_p15",
+        "sea_p16"
+      ],
+      "sea_p8": [
+        "sea_p2",
+        "sea_p7",
+        "sea_p9",
+        "sea_p16"
+      ],
+      "sea_p9": [
+        "sea_p2",
+        "sea_p3",
+        "sea_p8",
+        "sea_p10",
+        "sea_p16",
+        "sea_p17"
+      ],
+      "sea_p10": [
+        "sea_p3",
+        "sea_p4",
+        "sea_p9",
+        "sea_p11",
+        "sea_p17",
+        "sea_p19"
+      ],
+      "sea_p11": [
+        "sea_p4",
+        "sea_p5",
+        "sea_p10",
+        "sea_p12",
+        "sea_p19",
+        "sea_p21",
+        "sea_p23"
+      ],
+      "sea_p12": [
+        "sea_p5",
+        "sea_p6",
+        "sea_p11",
+        "sea_p13",
+        "sea_p23",
+        "sea_p24"
+      ],
+      "sea_p13": [
+        "sea_p6",
+        "sea_p12",
+        "sea_p24",
+        "sea_p25"
+      ],
+      "sea_p14": [
+        "sea_p15",
+        "sea_p32"
+      ],
+      "sea_p15": [
+        "sea_p7",
+        "sea_p14",
+        "sea_p16",
+        "sea_p32",
+        "sea_p33",
+        "sea_p34"
+      ],
+      "sea_p16": [
+        "sea_p7",
+        "sea_p8",
+        "sea_p9",
+        "sea_p15",
+        "sea_p17",
+        "sea_p18",
+        "sea_p26",
+        "sea_p34",
+        "sea_p35"
+      ],
+      "sea_p17": [
+        "sea_p9",
+        "sea_p10",
+        "sea_p16",
+        "sea_p18",
+        "sea_p19",
+        "sea_p20"
+      ],
+      "sea_p18": [
+        "sea_p16",
+        "sea_p17",
+        "sea_p20",
+        "sea_p26",
+        "sea_p27"
+      ],
+      "sea_p19": [
+        "sea_p10",
+        "sea_p11",
+        "sea_p17",
+        "sea_p20",
+        "sea_p21",
+        "sea_p22"
+      ],
+      "sea_p20": [
+        "sea_p17",
+        "sea_p18",
+        "sea_p19",
+        "sea_p22",
+        "sea_p27"
+      ],
+      "sea_p21": [
+        "sea_p11",
+        "sea_p19",
+        "sea_p22",
+        "sea_p23"
+      ],
+      "sea_p22": [
+        "sea_p19",
+        "sea_p20",
+        "sea_p21",
+        "sea_p23",
+        "sea_p27",
+        "sea_p28",
+        "sea_p29"
+      ],
+      "sea_p23": [
+        "sea_p11",
+        "sea_p12",
+        "sea_p21",
+        "sea_p22",
+        "sea_p24",
+        "sea_p29"
+      ],
+      "sea_p24": [
+        "sea_p12",
+        "sea_p13",
+        "sea_p23",
+        "sea_p25",
+        "sea_p29",
+        "sea_p30"
+      ],
+      "sea_p25": [
+        "sea_p13",
+        "sea_p24",
+        "sea_p30",
+        "sea_p31"
+      ],
+      "sea_p26": [
+        "sea_p16",
+        "sea_p18",
+        "sea_p27",
+        "sea_p35",
+        "sea_p36"
+      ],
+      "sea_p27": [
+        "sea_p18",
+        "sea_p20",
+        "sea_p22",
+        "sea_p26",
+        "sea_p28",
+        "sea_p36",
+        "sea_p37"
+      ],
+      "sea_p28": [
+        "sea_p22",
+        "sea_p27",
+        "sea_p29",
+        "sea_p37"
+      ],
+      "sea_p29": [
+        "sea_p22",
+        "sea_p23",
+        "sea_p24",
+        "sea_p28",
+        "sea_p30",
+        "sea_p37",
+        "sea_p38",
+        "sea_p39"
+      ],
+      "sea_p30": [
+        "sea_p24",
+        "sea_p25",
+        "sea_p29",
+        "sea_p31",
+        "sea_p39"
+      ],
+      "sea_p31": [
+        "sea_p25",
+        "sea_p30",
+        "sea_p39",
+        "sea_p40",
+        "sea_p76"
+      ],
+      "sea_p32": [
+        "sea_p14",
+        "sea_p15",
+        "sea_p33",
+        "sea_p41",
+        "sea_p42",
+        "sea_p43"
+      ],
+      "sea_p33": [
+        "sea_p15",
+        "sea_p32",
+        "sea_p34",
+        "sea_p43"
+      ],
+      "sea_p34": [
+        "sea_p15",
+        "sea_p16",
+        "sea_p33",
+        "sea_p35",
+        "sea_p43",
+        "sea_p45"
+      ],
+      "sea_p35": [
+        "sea_p16",
+        "sea_p26",
+        "sea_p34",
+        "sea_p36",
+        "sea_p45"
+      ],
+      "sea_p36": [
+        "sea_p26",
+        "sea_p27",
+        "sea_p35",
+        "sea_p37",
+        "sea_p45",
+        "sea_p47"
+      ],
+      "sea_p37": [
+        "sea_p27",
+        "sea_p28",
+        "sea_p29",
+        "sea_p36",
+        "sea_p38",
+        "sea_p47"
+      ],
+      "sea_p38": [
+        "sea_p29",
+        "sea_p37",
+        "sea_p39",
+        "sea_p47",
+        "sea_p48",
+        "sea_p56"
+      ],
+      "sea_p39": [
+        "sea_p29",
+        "sea_p30",
+        "sea_p31",
+        "sea_p38",
+        "sea_p40",
+        "sea_p48",
+        "sea_p49"
+      ],
+      "sea_p40": [
+        "sea_p31",
+        "sea_p39",
+        "sea_p49",
+        "sea_p76"
+      ],
+      "sea_p41": [
+        "sea_p32",
+        "sea_p42",
+        "sea_p50"
+      ],
+      "sea_p42": [
+        "sea_p32",
+        "sea_p41",
+        "sea_p43",
+        "sea_p44",
+        "sea_p51"
+      ],
+      "sea_p43": [
+        "sea_p32",
+        "sea_p33",
+        "sea_p34",
+        "sea_p42",
+        "sea_p44",
+        "sea_p45",
+        "sea_p46"
+      ],
+      "sea_p44": [
+        "sea_p42",
+        "sea_p43",
+        "sea_p46",
+        "sea_p51",
+        "sea_p52",
+        "sea_p53"
+      ],
+      "sea_p45": [
+        "sea_p34",
+        "sea_p35",
+        "sea_p36",
+        "sea_p43",
+        "sea_p46",
+        "sea_p47"
+      ],
+      "sea_p46": [
+        "sea_p43",
+        "sea_p44",
+        "sea_p45",
+        "sea_p47",
+        "sea_p53",
+        "sea_p54"
+      ],
+      "sea_p47": [
+        "sea_p36",
+        "sea_p37",
+        "sea_p38",
+        "sea_p45",
+        "sea_p46",
+        "sea_p54",
+        "sea_p55",
+        "sea_p56"
+      ],
+      "sea_p48": [
+        "sea_p38",
+        "sea_p39",
+        "sea_p49",
+        "sea_p56",
+        "sea_p57"
+      ],
+      "sea_p49": [
+        "sea_p39",
+        "sea_p40",
+        "sea_p48",
+        "sea_p57",
+        "sea_p58",
+        "sea_p76"
+      ],
+      "sea_p50": [
+        "sea_i12",
+        "sea_p41",
+        "sea_p51",
+        "sea_p59"
+      ],
+      "sea_p51": [
+        "sea_p42",
+        "sea_p44",
+        "sea_p50",
+        "sea_p52",
+        "sea_p60",
+        "sea_p62"
+      ],
+      "sea_p52": [
+        "sea_p44",
+        "sea_p51",
+        "sea_p53",
+        "sea_p62"
+      ],
+      "sea_p53": [
+        "sea_p44",
+        "sea_p46",
+        "sea_p52",
+        "sea_p54",
+        "sea_p64"
+      ],
+      "sea_p54": [
+        "sea_p46",
+        "sea_p47",
+        "sea_p53",
+        "sea_p55",
+        "sea_p64",
+        "sea_p65"
+      ],
+      "sea_p55": [
+        "sea_p47",
+        "sea_p54",
+        "sea_p56",
+        "sea_p65",
+        "sea_p66"
+      ],
+      "sea_p56": [
+        "sea_p38",
+        "sea_p47",
+        "sea_p48",
+        "sea_p55",
+        "sea_p57",
+        "sea_p66",
+        "sea_p67"
+      ],
+      "sea_p57": [
+        "sea_p48",
+        "sea_p49",
+        "sea_p56",
+        "sea_p58",
+        "sea_p67",
+        "sea_p68"
+      ],
+      "sea_p58": [
+        "sea_p49",
+        "sea_p57",
+        "sea_p68",
+        "sea_p77"
+      ],
+      "sea_p59": [
+        "sea_i13",
+        "sea_p50",
+        "sea_p60",
+        "sea_p61"
+      ],
+      "sea_p60": [
+        "sea_p51",
+        "sea_p59",
+        "sea_p61",
+        "sea_p62",
+        "sea_p63"
+      ],
+      "sea_p61": [
+        "sea_i13",
+        "sea_i14",
+        "sea_p59",
+        "sea_p60",
+        "sea_p63",
+        "sea_p69"
+      ],
+      "sea_p62": [
+        "sea_p51",
+        "sea_p52",
+        "sea_p60",
+        "sea_p63",
+        "sea_p64"
+      ],
+      "sea_p63": [
+        "sea_p60",
+        "sea_p61",
+        "sea_p62",
+        "sea_p64"
+      ],
+      "sea_p64": [
+        "sea_p53",
+        "sea_p54",
+        "sea_p62",
+        "sea_p63",
+        "sea_p65",
+        "sea_p71"
+      ],
+      "sea_p65": [
+        "sea_p54",
+        "sea_p55",
+        "sea_p64",
+        "sea_p66",
+        "sea_p71",
+        "sea_p73"
+      ],
+      "sea_p66": [
+        "sea_p55",
+        "sea_p56",
+        "sea_p65",
+        "sea_p67",
+        "sea_p73",
+        "sea_p74"
+      ],
+      "sea_p67": [
+        "sea_p56",
+        "sea_p57",
+        "sea_p66",
+        "sea_p68",
+        "sea_p74",
+        "sea_p75"
+      ],
+      "sea_p68": [
+        "sea_p57",
+        "sea_p58",
+        "sea_p67",
+        "sea_p75",
+        "sea_p77",
+        "sea_p78"
+      ],
+      "sea_p69": [
+        "sea_i14",
+        "sea_p61",
+        "sea_p70"
+      ],
+      "sea_p70": [
+        "sea_p69",
+        "sea_p72"
+      ],
+      "sea_p71": [
+        "sea_p64",
+        "sea_p65",
+        "sea_p72",
+        "sea_p73"
+      ],
+      "sea_p72": [
+        "sea_p70",
+        "sea_p71",
+        "sea_p73"
+      ],
+      "sea_p73": [
+        "sea_p65",
+        "sea_p66",
+        "sea_p71",
+        "sea_p72",
+        "sea_p74"
+      ],
+      "sea_p74": [
+        "sea_p66",
+        "sea_p67",
+        "sea_p73",
+        "sea_p75"
+      ],
+      "sea_p75": [
+        "sea_p67",
+        "sea_p68",
+        "sea_p74",
+        "sea_p78"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "evidence/ap_pacific_south.png; evidence/ap_australia.png",
+      "data/asia_pacific_sea_neighbors.json: each row identifies native source rectangles."
+    ],
+    "confidence": "high",
+    "notes": "Complete sea-to-sea perimeter sets are in data/asia_pacific_sea_neighbors.json. Native second pass resolves offsets and coasts, with reciprocal within-domain validation. P42\u2013P50 is the sole unresolved open-water island-group junction (AP-098); it is omitted from confirmed sets. P34\u2013P45 and P60\u2013P61 have finite short boundaries and must be retained. P35 does not touch P43. Americas P76\u2013P78 wraps are included from the shared source trace. A9\u2013P1 is a restricted route, modeled separately (MS-03)."
+  },
+  {
+    "id": "AP-081",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove seven confirmed Pacific sea shortcuts",
+    "node_ids": [
+      "sea_p11",
+      "sea_p25",
+      "sea_p28",
+      "sea_p30",
+      "sea_p50",
+      "sea_p52",
+      "sea_p6",
+      "sea_p61",
+      "sea_p62",
+      "sea_p65",
+      "sea_p68",
+      "sea_p69"
+    ],
+    "field": "sea_neighbors",
+    "current": {
+      "pairs": [
+        [
+          "sea_p11",
+          "sea_p6"
+        ],
+        [
+          "sea_p25",
+          "sea_p28"
+        ],
+        [
+          "sea_p28",
+          "sea_p30"
+        ],
+        [
+          "sea_p50",
+          "sea_p52"
+        ],
+        [
+          "sea_p61",
+          "sea_p62"
+        ],
+        [
+          "sea_p65",
+          "sea_p68"
+        ],
+        [
+          "sea_p68",
+          "sea_p69"
+        ]
+      ]
+    },
+    "proposed": {
+      "remove_pairs": [
+        [
+          "sea_p11",
+          "sea_p6"
+        ],
+        [
+          "sea_p25",
+          "sea_p28"
+        ],
+        [
+          "sea_p28",
+          "sea_p30"
+        ],
+        [
+          "sea_p50",
+          "sea_p52"
+        ],
+        [
+          "sea_p61",
+          "sea_p62"
+        ],
+        [
+          "sea_p65",
+          "sea_p68"
+        ],
+        [
+          "sea_p68",
+          "sea_p69"
+        ]
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "evidence/ap_se_asia.png; evidence/ap_australia.png; evidence/ap_pacific_south.png"
+    ],
+    "confidence": "high",
+    "notes": "All seven pairs lack a finite common boundary. P11/P6 have P5 between; P50/P52 have P51 between; P61/P62 are separated by islands and P60/P63. P65/P68 skip P66/P67; P68/P69 cross the Pacific. Native second pass specifically confirms that P34\u2013P45 and P60\u2013P61 are real short contacts and excludes them from deletion."
+  },
+  {
+    "id": "AP-082",
+    "category": "change",
+    "severity": "minor",
+    "subject": "Replace misleading sea-zone descriptions with printed IDs",
+    "node_ids": [
+      "sea_i1",
+      "sea_i10",
+      "sea_i11",
+      "sea_i12",
+      "sea_i13",
+      "sea_i14",
+      "sea_i2",
+      "sea_i3",
+      "sea_i4",
+      "sea_i5",
+      "sea_i6",
+      "sea_i7",
+      "sea_i8",
+      "sea_i9",
+      "sea_p1",
+      "sea_p10",
+      "sea_p11",
+      "sea_p12",
+      "sea_p13",
+      "sea_p14",
+      "sea_p15",
+      "sea_p16",
+      "sea_p17",
+      "sea_p18",
+      "sea_p2",
+      "sea_p24",
+      "sea_p25",
+      "sea_p26",
+      "sea_p28",
+      "sea_p3",
+      "sea_p30",
+      "sea_p31",
+      "sea_p32",
+      "sea_p33",
+      "sea_p34",
+      "sea_p35",
+      "sea_p36",
+      "sea_p41",
+      "sea_p42",
+      "sea_p43",
+      "sea_p44",
+      "sea_p45",
+      "sea_p46",
+      "sea_p47",
+      "sea_p5",
+      "sea_p50",
+      "sea_p51",
+      "sea_p52",
+      "sea_p53",
+      "sea_p54",
+      "sea_p59",
+      "sea_p6",
+      "sea_p60",
+      "sea_p61",
+      "sea_p62",
+      "sea_p63",
+      "sea_p64",
+      "sea_p65",
+      "sea_p68",
+      "sea_p69",
+      "sea_p7",
+      "sea_p8",
+      "sea_p9"
+    ],
+    "field": "name",
+    "current": "Descriptions such as P61 Arafura, P62 Coral, P63 Bismarck, P69 NZ Approaches, I3 Red Sea",
+    "proposed": "Use Sea Zone <ID> as canonical label; optional geographic aliases only after polygon check",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png",
+      "evidence/ap_se_asia.png; evidence/ap_indian_ocean.png"
+    ],
+    "confidence": "high",
+    "notes": "Current descriptions encode wrong geography, encouraging further incorrect connections. P61 lies west of Australia, P62 Banda Sea, P63 Timor Sea, P69 southwest Australia; NZ is P73."
+  },
+  {
+    "id": "AP-083",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "South China/India/Himalayan impassable boundary treatment",
+    "node_ids": [
+      "land_china_sinkiang",
+      "land_tibet",
+      "land_kashmir",
+      "land_nepal",
+      "land_india_bengal"
+    ],
+    "field": "passable/border_terrain",
+    "current": "Existing true defaults or incomplete endpoint edges",
+    "proposed": {
+      "confirmed_existing_impassable_pairs": [
+        [
+          "land_kashmir",
+          "land_tibet"
+        ],
+        [
+          "land_nepal",
+          "land_tibet"
+        ],
+        [
+          "land_india_bengal",
+          "land_tibet"
+        ],
+        [
+          "land_india_bengal",
+          "land_china_sikang"
+        ],
+        [
+          "land_india_bengal",
+          "land_china_yunnan"
+        ]
+      ],
+      "new_physical_impassable_contact": [
+        "land_usr_turkmenistan",
+        "land_china_sinkiang"
+      ],
+      "uncertainty": "Whether to encode physical contacts hidden inside the broad impassable mountain band as geography-only edges or use a barrier-area layer. Kashmir/Sinkiang and Afghanistan/Sinkiang contact interpretation should not create passable moves."
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "evidence/ap_central_asia.png",
+      "game_content/maps/gw36map.png rect (5500, 2030, 6120, 2480); evidence/ap_turkestan_himalaya.png",
+      "game_content/maps/gw36map.png rect (5740, 2300, 6320, 2800); evidence/ap_nepal_kashmir.png"
+    ],
+    "confidence": "medium",
+    "notes": "The native second pass checks every stored Himalayan pair. Confirmed passable:false borders remain geographically present. The residual uncertainty is representation of the broad black barrier area and its hidden political contact lines, not an uninspected stored edge.",
+    "uncertainty_kind": "source_interpretation_or_junction"
+  },
+  {
+    "id": "AP-084",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "Kobdo\u2013Novosibirsk tiny border and Tannu Tuva state identity",
+    "node_ids": [
+      "land_mongolia_kobdo",
+      "land_usr_novosibirsk",
+      "land_mongolia_tannu_tuva"
+    ],
+    "field": "neighbors/original_owner",
+    "current": "Kobdo\u2013Novosibirsk present; Tannu Tuva owned by Mongolia",
+    "proposed": "Confirm the narrow boundary junction and distinguish printed Tannu Tuva roundel from Mongolia setup affiliation.",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4300, 1200, 6400, 2500); evidence/ap_central_asia.png",
+      "evidence/ap_siberia_east.png",
+      "game_content/maps/gw36map.png rect (6040, 1330, 6500, 1680); evidence/ap_kobdo_junction.png",
+      "game_content/maps/gw36map.png rect (6250, 1300, 6890, 2040); evidence/ap_mongolia_north_edges.png"
+    ],
+    "confidence": "medium",
+    "notes": "Fresh native crop still leaves Kobdo\u2013Novosibirsk tiny city-arc contact visually ambiguous. Tannu Tuva has a distinct red outer/blue inner emblem roundel, unlike Mongolia's white circle with upright emblem; original political identity versus player/home-country affiliation needs source reconciliation.",
+    "uncertainty_kind": "source_interpretation_or_junction"
+  },
+  {
+    "id": "AP-085",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "Glossary/map ambiguity: Vyatka self-reference and omitted Yugria",
+    "node_ids": [
+      "land_usr_vyatka",
+      "land_usr_yugria"
+    ],
+    "field": "river_crossing",
+    "current": "Missing nodes; glossary says Vyatka river border from Vyatka",
+    "proposed": "Preserve raw citation; resolve which neighboring approach was intended by map trace or official errata.",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "Terrain Glossary p12."
+    ],
+    "confidence": "high",
+    "notes": "Do not turn the apparent glossary typo into a self-loop or silently substitute Yugria.",
+    "uncertainty_kind": "source_error"
+  },
+  {
+    "id": "AP-086",
+    "category": "uncertain",
+    "severity": "moderate",
+    "subject": "Represent river transport separately from combat river crossings",
+    "node_ids": [
+      "land_aus_new_south_wales",
+      "land_aus_northern_territory",
+      "land_aus_queensland",
+      "land_aus_south_australia",
+      "land_aus_tasmania",
+      "land_aus_western_australia",
+      "land_india_benares",
+      "land_india_bengal",
+      "land_india_calcutta",
+      "land_india_ceylon",
+      "land_india_delhi",
+      "land_india_maharashtra",
+      "land_india_punjab",
+      "land_india_southern_india",
+      "land_nz_north_island",
+      "land_nz_south_island",
+      "land_usr_amur",
+      "land_usr_angara",
+      "land_usr_buryatia",
+      "land_usr_chita",
+      "land_usr_crimea",
+      "land_usr_donets_kuban",
+      "land_usr_eastern_kazakhstan",
+      "land_usr_eastern_ukraine",
+      "land_usr_gorky",
+      "land_usr_irkutsk",
+      "land_usr_kalmytskaya",
+      "land_usr_kaluga_oblast",
+      "land_usr_kamchatka",
+      "land_usr_karelia",
+      "land_usr_kiev",
+      "land_usr_kola",
+      "land_usr_leningrad",
+      "land_usr_magadan",
+      "land_usr_moscow",
+      "land_usr_north_caucasia",
+      "land_usr_north_sakhalin",
+      "land_usr_northern_belorussia",
+      "land_usr_northern_russia",
+      "land_usr_novosibirsk",
+      "land_usr_orel_kursk",
+      "land_usr_primorsky_krai",
+      "land_usr_saratov",
+      "land_usr_smolensk",
+      "land_usr_south_sakhalin",
+      "land_usr_southern_belorussia",
+      "land_usr_southern_ukraine",
+      "land_usr_southern_yakutia",
+      "land_usr_stalingrad",
+      "land_usr_stalino",
+      "land_usr_taurida",
+      "land_usr_transcaucasia",
+      "land_usr_tula_lipetsk",
+      "land_usr_turkestan",
+      "land_usr_vanavara",
+      "land_usr_western_russia",
+      "land_usr_western_ukraine",
+      "land_usr_yakutsk",
+      "land_usr_yaroslavl"
+    ],
+    "field": "has_river/river_crossing and named river network",
+    "current": "Many defaults; many uniform rail=true flags",
+    "proposed": "Use the complete physical, railway/gauge and directional glossary ledgers. Model named river transport as a continuous network with banks and route permissions; a combat river-crossing requirement is not sufficient to infer that network.",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4250, 0, 6250, 1500); evidence/ap_siberia_west.png",
+      "evidence/ap_siberia_east.png; evidence/ap_india.png; evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "All 310 stored physical pairs and 64 proposed land/narrow pairs touching 36 new land tiles have now been source-checked for the relevant physical and railway/gauge questions. The remaining river transport item is a schema/representation decision, not a deferred physical-neighbor or railway review. Under \u00a713.2.8 p98, any printed border-crossing railway gives whole-zone rail coverage; individual port spurs are not prerequisites.",
+    "uncertainty_kind": "schema_representation"
+  },
+  {
+    "id": "AP-087",
+    "category": "add",
+    "severity": "major",
+    "subject": "Reconnect Wake/P36 to the six visible surrounding seas",
+    "node_ids": [
+      "sea_p36",
+      "sea_p26",
+      "sea_p27",
+      "sea_p35",
+      "sea_p37",
+      "sea_p45",
+      "sea_p47"
+    ],
+    "field": "sea_neighbors",
+    "current": [],
+    "proposed": [
+      "sea_p26",
+      "sea_p27",
+      "sea_p35",
+      "sea_p37",
+      "sea_p45",
+      "sea_p47"
+    ],
+    "evidence": [
+      "evidence/ap_pacific_grid.png source rect (7970,1500,8980,3000)"
+    ],
+    "confidence": "high",
+    "notes": "P36 currently has only Wake as neighbor, making a disconnected two-node component. P26 contact at northwestern edge and P47 contact at southeastern edge are short but finite; native crop resolves both. Add reciprocal sea edges."
+  },
+  {
+    "id": "AP-088",
+    "category": "add",
+    "severity": "major",
+    "subject": "Restore P18/P19/P20/P21/P26/P27 Pacific grid boundaries",
+    "node_ids": [
+      "sea_p18",
+      "sea_p19",
+      "sea_p20",
+      "sea_p21",
+      "sea_p26",
+      "sea_p27"
+    ],
+    "field": "sea_neighbors",
+    "current": "Partial endpoint nodes or absent nodes",
+    "proposed": {
+      "sea_p18": [
+        "sea_p16",
+        "sea_p17",
+        "sea_p20",
+        "sea_p26",
+        "sea_p27"
+      ],
+      "sea_p19": [
+        "sea_p10",
+        "sea_p11",
+        "sea_p17",
+        "sea_p20",
+        "sea_p21",
+        "sea_p22"
+      ],
+      "sea_p20": [
+        "sea_p17",
+        "sea_p18",
+        "sea_p19",
+        "sea_p22",
+        "sea_p27"
+      ],
+      "sea_p21": [
+        "sea_p11",
+        "sea_p19",
+        "sea_p22",
+        "sea_p23"
+      ],
+      "sea_p26": [
+        "sea_p16",
+        "sea_p18",
+        "sea_p27",
+        "sea_p35",
+        "sea_p36"
+      ],
+      "sea_p27": [
+        "sea_p18",
+        "sea_p20",
+        "sea_p22",
+        "sea_p26",
+        "sea_p28",
+        "sea_p36",
+        "sea_p37"
+      ]
+    },
+    "evidence": [
+      "evidence/ap_pacific_grid.png source rect (7970,1500,8980,3000); evidence/ap_pacific_north.png"
+    ],
+    "confidence": "high",
+    "notes": "Native crop resolves offset junctions: P27\u2013P37 is a short finite border because P28/P37 horizontal split is north of P27/P36 split. Reciprocal additions required."
+  },
+  {
+    "id": "AP-089",
+    "category": "change",
+    "severity": "major",
+    "subject": "Apply source-enumerated directional river and mountain/desert approaches",
+    "node_ids": [
+      "land_annam_tonkin",
+      "land_aus_new_south_wales",
+      "land_aus_northern_territory",
+      "land_aus_queensland",
+      "land_aus_south_australia",
+      "land_aus_western_australia",
+      "land_borneo",
+      "land_burma",
+      "land_china_hopeh",
+      "land_cochinchina",
+      "land_india_benares",
+      "land_india_calcutta",
+      "land_india_maharashtra",
+      "land_india_southern_india",
+      "land_manchuria_eastern",
+      "land_manchuria_northern",
+      "land_siam",
+      "land_usr_amur",
+      "land_usr_angara",
+      "land_usr_central_kazakhstan",
+      "land_usr_chita",
+      "land_usr_chukotka",
+      "land_usr_donets_kuban",
+      "land_usr_eastern_kazakhstan",
+      "land_usr_eastern_ukraine",
+      "land_usr_eastern_yakutia",
+      "land_usr_evenkiland",
+      "land_usr_gorky",
+      "land_usr_karelia",
+      "land_usr_kiev",
+      "land_usr_leningrad",
+      "land_usr_lower_tunguska",
+      "land_usr_moscow",
+      "land_usr_northern_russia",
+      "land_usr_northern_yakutia",
+      "land_usr_orenburg",
+      "land_usr_primorsky_krai",
+      "land_usr_samoyedia",
+      "land_usr_saratov",
+      "land_usr_sibir",
+      "land_usr_southern_belorussia",
+      "land_usr_stalingrad",
+      "land_usr_stalino",
+      "land_usr_taurida",
+      "land_usr_tobolsk",
+      "land_usr_tula_lipetsk",
+      "land_usr_turkestan",
+      "land_usr_turkmenistan",
+      "land_usr_ural",
+      "land_usr_vanavara",
+      "land_usr_vyatka",
+      "land_usr_western_kazakhstan",
+      "land_usr_western_ukraine",
+      "land_usr_yakutsk",
+      "land_usr_yenisei",
+      "land_usr_zuryenia"
+    ],
+    "field": "river_crossing / border_terrain",
+    "current": {
+      "reviewed_directed_requirements": 173,
+      "source_ambiguity_rows": 1,
+      "mismatches_or_absent_edges": 119
+    },
+    "proposed": "Apply the explicit from\u2192to rows in data/asia_pacific_directional_terrain.json; add real missing border pairs before decorating them. Preserve simultaneous terrain and use separate river boolean.",
+    "evidence": [
+      "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312"
+    ],
+    "confidence": "high",
+    "notes": "Complete transcription of express directional approach statements in glossary pp2\u20134 and11\u201312, including already-matching rows. Named approaches are source-backed; source with wording is retained as a direction ambiguity. Vyatka self-reference is a source_ambiguity row, not a self-edge. Additive border_terrain_contains must preserve intrinsic/composite terrains. Reef rows constrain amphibious assault only. River penalties do not establish has_river transport continuity."
+  },
+  {
+    "id": "AP-090",
+    "category": "add",
+    "severity": "major",
+    "subject": "Kamchatka and P3 are missing real Bering coasts and sea borders",
+    "node_ids": [
+      "land_usr_kamchatka",
+      "sea_p1",
+      "sea_p3",
+      "sea_p4",
+      "sea_p9",
+      "sea_p10"
+    ],
+    "field": "neighbors",
+    "current": {
+      "Kamchatka_seas": [
+        "sea_p2",
+        "sea_p9"
+      ],
+      "P3_seas": [
+        "sea_p9"
+      ]
+    },
+    "proposed": {
+      "Kamchatka_seas": [
+        "sea_p1",
+        "sea_p2",
+        "sea_p3",
+        "sea_p9"
+      ],
+      "P3_seas": [
+        "sea_p1",
+        "sea_p4",
+        "sea_p9",
+        "sea_p10"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7550,430,8680,1350); evidence/ap_bering.png"
+    ],
+    "confidence": "high",
+    "notes": "Kamchatka includes the northeastern mainland coast south of the Chukotka border. Its northern tip extends above the P1/P3 horizontal line. P3 has short southern contact with P9 and longer contact with P10. No rail follows any of these coasts."
+  },
+  {
+    "id": "AP-091",
+    "category": "change",
+    "severity": "major",
+    "subject": "Kola coast IDs and printed naval facilities",
+    "node_ids": [
+      "land_usr_kola",
+      "sea_a8",
+      "sea_a9"
+    ],
+    "field": "neighbors / naval_facilities",
+    "current": {
+      "sea_neighbors": [
+        "sea_a13",
+        "sea_a14"
+      ]
+    },
+    "proposed": {
+      "sea_neighbors": [
+        "sea_a8",
+        "sea_a9"
+      ],
+      "A8_facilities": [
+        "minor_shipyard",
+        "major_port"
+      ],
+      "A8_railway_connection": true,
+      "physical_instances": [
+        {
+          "id": "facility_kola_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                3970,
+                0,
+                4740,
+                620
+              ],
+              "crop": "evidence/ap_kola.png"
+            }
+          ],
+          "notes": "White-square crane by Murmansk. Distinct from the blue-square anchor farther east."
+        },
+        {
+          "id": "facility_kola_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                3970,
+                0,
+                4740,
+                620
+              ],
+              "crop": "evidence/ap_kola.png"
+            }
+          ],
+          "notes": "Blue-square plain anchor entirely west of the A8/A9 divider."
+        }
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (3970,0,4740,620); evidence/ap_kola.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh naval review confirms two distinct A8 facilities: Murmansk white-square minor shipyard and blue-square major port farther east. Neither has A9 access; both lie west of the sea divider. Retain the prior physical coast/terrain findings.",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-092",
+    "category": "uncertain",
+    "severity": "moderate",
+    "subject": "Unlabeled USA roundel inside P27 has no identified land outline",
+    "node_ids": [
+      "sea_p27"
+    ],
+    "field": "printed symbol interpretation",
+    "current": null,
+    "proposed": "Retain the crop/provenance and resolve the symbol; do not invent a named island or ownership of the sea zone.",
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8260,2240,8630,2510); evidence/ap_p27_roundel.png"
+    ],
+    "confidence": "high",
+    "uncertainty_kind": "source_unexplained_symbol",
+    "notes": "The USA roundel is clear, but no island outline, name, IPP or facility accompanies it. The terrain glossary does not supply a matching named tile. This is a real source ambiguity, distinct from an edge we have not yet traced."
+  },
+  {
+    "id": "AP-093",
+    "category": "uncertain",
+    "severity": "moderate",
+    "subject": "Manchurian printed original identity is different from Japan control",
+    "node_ids": [
+      "land_manchuria_northern",
+      "land_manchuria_western",
+      "land_manchuria_eastern",
+      "land_manchuria_rehe"
+    ],
+    "field": "original_owner versus controller",
+    "current": "original_owner and current_owner both Japan",
+    "proposed": "Preserve the Manchukuo printed roundel as original national identity; represent Japanese control separately according to rules/setup rather than silently replacing one field.",
+    "evidence": [
+      "evidence/ap_east_asia.png; Rulebook \u00a70.2 Home Country table includes Manchukuo roundels separately."
+    ],
+    "confidence": "high",
+    "uncertainty_kind": "schema_semantics_not_source_illegibility",
+    "notes": "Roundels are legible. Remaining question is the intended schema meaning of original_owner and scenario controller, not uncertainty about which symbol is printed. Coordinate with global identity/setup proposal."
+  },
+  {
+    "id": "AP-094",
+    "category": "uncertain",
+    "severity": "moderate",
+    "subject": "Remote British Pacific ownership allocation requires explicit reconciliation",
+    "node_ids": [
+      "land_fiji",
+      "land_new_hebrides",
+      "land_solomon_islands",
+      "land_gilbert_islands",
+      "land_line_islands",
+      "land_pitcairn_island"
+    ],
+    "field": "original_owner",
+    "current": "Existing Fiji/New Hebrides United Kingdom; added remote islands proposed FEC from terrain-table grouping",
+    "proposed": "Retain printed roundel and resolve Great Britain versus FEC player allocation using national setup; do not treat a terrain-table section heading as sufficient political state.",
+    "evidence": [
+      "evidence/ap_pacific_south.png; game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3 groups these under FEC."
+    ],
+    "confidence": "high",
+    "uncertainty_kind": "cross_source_classification",
+    "notes": "This is an allocation/model decision needing source reconciliation. Zero-IPP islands still matter to control, basing, home country and capture rules."
+  },
+  {
+    "id": "AP-095",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "Philippine major-port owner and Manila convoy endpoint land node",
+    "node_ids": [
+      "land_luzon_and_the_visayas",
+      "land_mindanao",
+      "sea_p50"
+    ],
+    "field": "physical_facility_owner/convoy_endpoint",
+    "current": "P50 western Philippine major-port symbol; earlier draft forced it into Luzon/Visayas",
+    "proposed": {
+      "id": "facility_philippines_p50_major_port_unassigned",
+      "type": "major_port",
+      "sea_accesses": [
+        "sea_p50"
+      ],
+      "candidate_land_ids": [
+        "land_luzon_and_the_visayas",
+        "land_mindanao"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6810,
+            2730,
+            7500,
+            3390
+          ],
+          "crop": "evidence/ap_philippines_edges.png"
+        }
+      ],
+      "notes": "The blue-square plain-anchor major port is definitely in P50. Raster island-group ownership is unresolved between Luzon/Visayas and Mindanao; do not silently assign it to either or count it twice.",
+      "convoy": "Manila Line endpoint uses this physical facility; its sea path is independently verified."
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6810, 2730, 7500, 3390); evidence/ap_philippines_edges.png",
+      "data/convoy_register.json; root WG-031/CV-14"
+    ],
+    "confidence": "high",
+    "notes": "Fresh 2026-10-06 review confirms major_port type and P50 access but retains island-group ownership uncertainty. The naval ledger records one unassigned physical facility with two candidate land nodes, never one duplicate in each territory. No dockyard symbol is present.",
+    "uncertainty_kind": "source_island_group_assignment",
+    "naval_reaudit": "data/naval_reaudit_asia_pacific.json",
+    "naval_review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-096",
+    "category": "change",
+    "severity": "major",
+    "subject": "Queensland\u2013South Australia shared border is entirely inside the Outback",
+    "node_ids": [
+      "land_aus_queensland",
+      "land_aus_south_australia"
+    ],
+    "field": "passable/railway_connection",
+    "current": {
+      "passable": true,
+      "railway_connection": true
+    },
+    "proposed": {
+      "passable": false,
+      "railway_connection": false
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png"
+    ],
+    "confidence": "high",
+    "notes": "The short shared segment is wholly covered by the printed impassable desert area. Physical adjacency can remain with passable:false. NSW\u2013Queensland and NSW\u2013South Australia have real railway borders outside this barrier."
+  },
+  {
+    "id": "AP-097",
+    "category": "add",
+    "severity": "major",
+    "subject": "Restore Siam west coast and complete Sumatra coastal perimeter",
+    "node_ids": [
+      "land_siam",
+      "land_sumatra",
+      "sea_i11",
+      "sea_i12",
+      "sea_i13",
+      "sea_p50",
+      "sea_p59"
+    ],
+    "field": "sea_neighbors",
+    "current": "Siam I11 omitted; Sumatra coast perimeter incomplete",
+    "proposed": {
+      "Siam": [
+        "sea_i11",
+        "sea_p50"
+      ],
+      "Sumatra": [
+        "sea_i12",
+        "sea_i13",
+        "sea_p50",
+        "sea_p59"
+      ]
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6410, 3030, 6780, 3430); evidence/ap_malaya_coast.png",
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "game_content/maps/gw36map.png rect (6060, 3480, 7530, 4410); evidence/ap_java_indian_grid.png"
+    ],
+    "confidence": "high",
+    "notes": "The I11/I12 line reaches Siam west of the isthmus north of the Malaya border. Malaya itself has I12/P50, without I11. Sumatra southwest is I13 below the I12/I13 line."
+  },
+  {
+    "id": "AP-098",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "P42\u2013P50 open-water contact at the Philippine island-group divide",
+    "node_ids": [
+      "sea_p42",
+      "sea_p50"
+    ],
+    "field": "sea_neighbors",
+    "current": "Stored reciprocal pair",
+    "proposed": {
+      "retain_pending_source_clarification": true,
+      "confirmed_matrix_excludes_this_pair": true
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6810, 2730, 7500, 3390); evidence/ap_philippines_edges.png"
+    ],
+    "confidence": "medium",
+    "notes": "Native inspection resolves the neighboring P41, P42, P50 and P51 polygons but does not expose a finite P42/P50 open-water segment distinct from island outlines and the implicit Luzon/Visayas\u2013Mindanao grouping. This is one of two unresolved stored physical pairs, with Kobdo\u2013Novosibirsk.",
+    "uncertainty_kind": "source_island_group_junction"
+  },
+  {
+    "id": "AP-099",
+    "category": "uncertain",
+    "severity": "moderate",
+    "subject": "Direct Saratov\u2013Ural railway connection at the dense Volga junction",
+    "node_ids": [
+      "land_usr_saratov",
+      "land_usr_ural"
+    ],
+    "field": "railway_connection/gauge_change",
+    "current": "Ural node absent; the newly proposed physical land border is real",
+    "proposed": {
+      "railway_connection": null,
+      "gauge_change": null,
+      "nearby_track_gauge": "broad",
+      "physical_adjacency": "confirmed"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4910,1160,5220,1460); evidence/ea_sov_new_rail_volga.png",
+      "data/europe_soviet_new_edge_rail_review.json; merged data/asia_pacific_new_edge_rail_review.json"
+    ],
+    "confidence": "medium",
+    "uncertainty_kind": "source_overprinted_rail_junction",
+    "notes": "The original artwork superimposes the Saratov/Gorky/Ural/Orenburg political boundaries, Volga tributaries and railway junction. Saratov-to-Ural direct passage versus an intervening short Gorky or Orenburg segment cannot be assigned confidently at native resolution. Nearby tracks have yellow broad-gauge checkers, but the direct edge remains unresolved. This is one source ambiguity among 64 reviewed new-node border rail cases, not uninspected work. Ural whole-zone railway coverage is independently established by its other confirmed rail borders."
+  },
+  {
+    "id": "AP-100",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove nonexistent naval facilities from Celebes, Portuguese Timor and both New Guinea territories",
+    "node_ids": [
+      "land_celebes",
+      "land_timor",
+      "land_dutch_new_guinea",
+      "land_new_guinea"
+    ],
+    "field": "naval_facilities",
+    "current": {
+      "land_celebes": [
+        {
+          "id": "facility_land_celebes_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p60"
+          ],
+          "storage": "coastal_edges"
+        }
+      ],
+      "land_timor": [
+        {
+          "id": "facility_land_timor_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p61"
+          ],
+          "storage": "coastal_edges"
+        }
+      ],
+      "land_dutch_new_guinea": [
+        {
+          "id": "facility_new_guinea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p61"
+          ],
+          "storage": "coastal_edges"
+        }
+      ],
+      "land_new_guinea": [
+        {
+          "id": "facility_guinea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p63"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    "proposed": {
+      "land_celebes": [],
+      "land_timor": [],
+      "land_dutch_new_guinea": [],
+      "land_new_guinea": []
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh full-coast source scan finds no naval facility symbols on these four territories. Delete the physical minor-port claims, not merely their wrong sea accesses. The New Britain major port is a separate neighboring island facility.",
+    "review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-101",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Delete Western Australia\u2019s unsupported minor port",
+    "node_ids": [
+      "land_aus_western_australia"
+    ],
+    "field": "naval_facilities",
+    "current": [
+      {
+        "id": "facility_western_australia_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_i6"
+        ],
+        "storage": "coastal_edges"
+      }
+    ],
+    "proposed": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png",
+      "game_content/maps/gw36map.png rect (7180, 3890, 7850, 4230); evidence/ap_naval_australia_north.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh source scan covers the complete P61/P63/P69/P70 coastline. No naval symbol is printed; the NT seaplane base and South Australia major port lie across distinct land borders.",
+    "review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-102",
+    "category": "change",
+    "severity": "major",
+    "subject": "Give the existing Caroline Islands major port explicit P46 access",
+    "node_ids": [
+      "land_jap_caroline_islands"
+    ],
+    "field": "naval_facility_storage/sea_accesses",
+    "current": [
+      {
+        "id": "facility_caroline_islands_major_port",
+        "type": "major_port",
+        "sea_accesses": [],
+        "storage": "node_facilities"
+      }
+    ],
+    "proposed": [
+      {
+        "id": "facility_caroline_islands_major_port",
+        "type": "major_port",
+        "sea_accesses": [
+          "sea_p46"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "rectangle": [
+              7730,
+              3010,
+              8250,
+              3260
+            ],
+            "crop": "evidence/ap_naval_caroline.png"
+          }
+        ],
+        "notes": "Existing intrinsic major-port type is correct, but the physical port must have explicit P46 access."
+      }
+    ],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7730, 3010, 8250, 3260); evidence/ap_naval_caroline.png",
+      "game_content/maps/gw36map.png rect (6250, 2600, 8250, 4030); evidence/ap_se_asia.png"
+    ],
+    "confidence": "high",
+    "notes": "The printed blue-square plain anchor is a major port in P46. Preserve one physical instance; migrate the intrinsic-only naval storage to explicit sea access rather than adding a second port.",
+    "review_date": "2026-10-06"
+  },
+  {
+    "id": "AP-103",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Delete fabricated Philippine minor-port instances",
+    "node_ids": [
+      "land_luzon_and_the_visayas",
+      "land_mindanao"
+    ],
+    "field": "naval_facilities",
+    "current": {
+      "remove_ids": [
+        "facility_and_the_visayas_minor_port",
+        "facility_land_mindanao_minor_port"
+      ]
+    },
+    "proposed": {
+      "remove_ids": [
+        "facility_and_the_visayas_minor_port",
+        "facility_land_mindanao_minor_port"
+      ],
+      "retain_luzon_submarine_base": true,
+      "retain_unassigned_p50_major_port": "AP-095"
+    },
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6810, 2730, 7500, 3390); evidence/ap_philippines_edges.png"
+    ],
+    "confidence": "high",
+    "notes": "Fresh icon review finds no plain-anchor minor port in either Philippine territory. The Luzon blue vertical symbol is its submarine base. The separate blue plain anchor is a real major port whose owner remains unresolved; this deletion does not remove that physical port.",
+    "review_date": "2026-10-06"
+  }
+]

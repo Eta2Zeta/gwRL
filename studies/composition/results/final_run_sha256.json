@@ -1,0 +1,14 @@
+{
+  "algorithm": "sha256",
+  "original_directory": "output/composition_alpha_zero",
+  "preserved_directory": "final_run",
+  "files": {
+    "best_composition_deterministic_attacker_trace.txt": "d2326e7c1660bc3d7af40dc7b9ddc93a7c94453bc3d45bd8afe971d25ee9879c",
+    "best_composition_deterministic_defender_trace.txt": "d7976b3ad8477b677b68ce931a1d0cad53a5e09cb9bfa0e61017a41125cf6d09",
+    "best_composition_self_play_attacker_trace.txt": "54a8f04ab258a8addc6596d334a3b4665f4351de7b124c4c31c940d2280fdc6f",
+    "best_composition_self_play_defender_trace.txt": "c0a55934004306549b6a15e6682f6d88badcaf0f0fe6551c4fc1bb80489b772a",
+    "composition_alpha_zero_metrics.json": "6043a971a6b6f5909e4ec3a116da0e8375de82b904f6f02b070921dd1ca05442",
+    "composition_alpha_zero_reward_over_time.svg": "44866bf62f00cb873435f93fdfe14dafe027fcac4a7998ace5fbe3d1454d9505",
+    "composition_alpha_zero_summary.txt": "4c0a84a45b475643e986bdcf6356291fe194b2065da84d962af68125f88ed524"
+  }
+}

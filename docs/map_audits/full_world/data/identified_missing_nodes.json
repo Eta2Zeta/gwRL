@@ -1,0 +1,1509 @@
+[
+  {
+    "node_id": "land_andaman_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-020",
+        "suggested_id": "land_andaman_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_ascension",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-084",
+        "suggested_id": "land_ascension"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_aus_sydney",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-036",
+        "suggested_id": "land_aus_sydney"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_azores",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-089",
+        "suggested_id": "land_azores"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_bahamas",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-090",
+        "suggested_id": "land_bahamas"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_canary_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-074",
+        "suggested_id": "land_canary_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_cape_verde",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-075",
+        "suggested_id": "land_cape_verde"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_dominican_republic",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-093",
+        "suggested_id": "land_dominican_republic"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_easter_island",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-033",
+        "suggested_id": "land_easter_island"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_falkland_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-098",
+        "suggested_id": "land_falkland_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_faroe_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-087",
+        "suggested_id": "land_faroe_islands"
+      },
+      {
+        "finding_id": "EA-063",
+        "suggested_id": "land_faroe_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_fin_helsinki",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-066",
+        "suggested_id": "land_fin_helsinki"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_french_guinea",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-078",
+        "suggested_id": "land_french_guinea"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_galapagos",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-099",
+        "suggested_id": "land_galapagos"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_gambier_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-031",
+        "suggested_id": "land_gambier_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_gbr_northern_ireland",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-060",
+        "suggested_id": "land_gbr_northern_ireland"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_gilbert_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-029",
+        "suggested_id": "land_gilbert_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_gold_coast",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-082",
+        "suggested_id": "land_gold_coast"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_gre_crete",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-071",
+        "suggested_id": "land_gre_crete"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_gre_peloponnese",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-070",
+        "suggested_id": "land_gre_peloponnese"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_greenland",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-085",
+        "suggested_id": "land_greenland"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_haiti",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-092",
+        "suggested_id": "land_haiti"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_iceland",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-086",
+        "suggested_id": "land_iceland"
+      },
+      {
+        "finding_id": "EA-062",
+        "suggested_id": "land_iceland"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_ifni",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-072",
+        "suggested_id": "land_ifni"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_ita_rhodes",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-069",
+        "suggested_id": "land_ita_rhodes"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_ita_sicily",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-067",
+        "suggested_id": "land_ita_sicily"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_ivory_coast",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-081",
+        "suggested_id": "land_ivory_coast"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_jamaica",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-091",
+        "suggested_id": "land_jamaica"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_jap_bonin",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-022",
+        "suggested_id": "land_jap_bonin"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_jap_marshall_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-026",
+        "suggested_id": "land_jap_marshall_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_leeward_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-094",
+        "suggested_id": "land_leeward_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_lesser_sunda_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-035",
+        "suggested_id": "land_lesser_sunda_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_liberia",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-080",
+        "suggested_id": "land_liberia"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_line_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-027",
+        "suggested_id": "land_line_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_maldive_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-021",
+        "suggested_id": "land_maldive_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_malta",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-068",
+        "suggested_id": "land_malta"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_maluku_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-034",
+        "suggested_id": "land_maluku_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_mauritania",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-076",
+        "suggested_id": "land_mauritania"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_netherlands_antilles",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-097",
+        "suggested_id": "land_netherlands_antilles"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_nor_northern_norway",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-065",
+        "suggested_id": "land_nor_northern_norway"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_pitcairn_island",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-032",
+        "suggested_id": "land_pitcairn_island"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_portuguese_guinea",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-077",
+        "suggested_id": "land_portuguese_guinea"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_reunion",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-085",
+        "suggested_id": "land_reunion"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_rio_de_oro",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-073",
+        "suggested_id": "land_rio_de_oro"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_saint_helena",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-087",
+        "suggested_id": "land_saint_helena"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_sao_tome_and_principe",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-083",
+        "suggested_id": "land_sao_tome_and_principe"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_shetland_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-088",
+        "suggested_id": "land_gbr_shetland_islands"
+      },
+      {
+        "finding_id": "EA-061",
+        "suggested_id": "land_gbr_shetland_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_sierra_leone",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-079",
+        "suggested_id": "land_sierra_leone"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_solomon_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-028",
+        "suggested_id": "land_solomon_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_svalbard",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-064",
+        "suggested_id": "land_svalbard"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_trinidad",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-096",
+        "suggested_id": "land_trinidad"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_aleutian_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-102",
+        "suggested_id": "land_usa_aleutian_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_attu_and_kiska",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-025",
+        "suggested_id": "land_usa_attu_and_kiska"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_hawaii",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-024",
+        "suggested_id": "land_usa_hawaii"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_kodiak_island",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-100",
+        "suggested_id": "land_usa_kodiak_island"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_midway",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-023",
+        "suggested_id": "land_usa_midway"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_samoa",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-030",
+        "suggested_id": "land_usa_samoa"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usa_st_lawrence_island",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-101",
+        "suggested_id": "land_usa_st_lawrence_island"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_big_diomede_island",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-019",
+        "suggested_id": "land_usr_big_diomede_island"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_central_kazakhstan",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-005",
+        "suggested_id": "land_usr_central_kazakhstan"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_chukotka",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-018",
+        "suggested_id": "land_usr_chukotka"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_eastern_yakutia",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-017",
+        "suggested_id": "land_usr_eastern_yakutia"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_evenkiland",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-014",
+        "suggested_id": "land_usr_evenkiland"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_lower_tunguska",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-010",
+        "suggested_id": "land_usr_lower_tunguska"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_northern_yakutia",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-016",
+        "suggested_id": "land_usr_northern_yakutia"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_orenburg",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-003",
+        "suggested_id": "land_usr_orenburg"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_samoyedia",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-009",
+        "suggested_id": "land_usr_samoyedia"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_sibir",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-011",
+        "suggested_id": "land_usr_sibir"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_tobolsk",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-012",
+        "suggested_id": "land_usr_tobolsk"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_turkmenistan",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-006",
+        "suggested_id": "land_usr_turkmenistan"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_ural",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-002",
+        "suggested_id": "land_usr_ural"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_vyatka",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-007",
+        "suggested_id": "land_usr_vyatka"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_western_kazakhstan",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-004",
+        "suggested_id": "land_usr_western_kazakhstan"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_western_yakutia",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-015",
+        "suggested_id": "land_usr_western_yakutia"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_yenisei",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-013",
+        "suggested_id": "land_usr_yenisei"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_yugria",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-008",
+        "suggested_id": "land_usr_yugria"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_usr_zuryenia",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AP-001",
+        "suggested_id": "land_usr_zuryenia"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_windward_islands",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "AM-095",
+        "suggested_id": "land_windward_islands"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "land_yemen",
+    "type": "land",
+    "proposal_references": [
+      {
+        "finding_id": "EA-086",
+        "suggested_id": "land_yemen"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a16",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-180",
+        "suggested_id": "sea_a16"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a17",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-181",
+        "suggested_id": "sea_a17"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a27",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-182",
+        "suggested_id": "sea_a27"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a3",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-178",
+        "suggested_id": "sea_a3"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a30",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-183",
+        "suggested_id": "sea_a30"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a32",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-184",
+        "suggested_id": "sea_a32"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a34",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-185",
+        "suggested_id": "sea_a34"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a37",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-186",
+        "suggested_id": "sea_a37"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a4",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-179",
+        "suggested_id": "sea_a4"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a41",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-187",
+        "suggested_id": "sea_a41"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a42",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-188",
+        "suggested_id": "sea_a42"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a43",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-189",
+        "suggested_id": "sea_a43"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a45",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-190",
+        "suggested_id": "sea_a45"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a46",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-191",
+        "suggested_id": "sea_a46"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a47",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-192",
+        "suggested_id": "sea_a47"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a48",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-193",
+        "suggested_id": "sea_a48"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a49",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-194",
+        "suggested_id": "sea_a49"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a5",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "WG-032",
+        "suggested_id": "sea_a5"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a50",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-195",
+        "suggested_id": "sea_a50"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a51",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-196",
+        "suggested_id": "sea_a51"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a52",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-197",
+        "suggested_id": "sea_a52"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a53",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-198",
+        "suggested_id": "sea_a53"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a54",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-199",
+        "suggested_id": "sea_a54"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a8",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "WG-033",
+        "suggested_id": "sea_a8"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_a9",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "WG-034",
+        "suggested_id": "sea_a9"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p19",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p19"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p20",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p20"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p21",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p21"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p22",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-023",
+        "suggested_id": "sea_p22"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p22"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p23",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p23"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p27",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p27"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p29",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-024",
+        "suggested_id": "sea_p29"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p29"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p37",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p37"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p38",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-027",
+        "suggested_id": "sea_p38"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p38"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p39",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p39"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p4",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-025",
+        "suggested_id": "sea_p4"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p4"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p40",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p40"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p48",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p48"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p49",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p49"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p55",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p55"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p56",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-029",
+        "suggested_id": "sea_p56"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p56"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p57",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p57"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p58",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p58"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p66",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-030",
+        "suggested_id": "sea_p66"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p66"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p67",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-031",
+        "suggested_id": "sea_p67"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p67"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p70",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p70"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p71",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p71"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p72",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-036",
+        "suggested_id": "sea_p72"
+      },
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p72"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p73",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p73"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p74",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p74"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p75",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AP-079",
+        "suggested_id": "sea_p75"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p76",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-200",
+        "suggested_id": "sea_p76"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p77",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-201",
+        "suggested_id": "sea_p77"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  },
+  {
+    "node_id": "sea_p78",
+    "type": "sea",
+    "proposal_references": [
+      {
+        "finding_id": "AM-202",
+        "suggested_id": "sea_p78"
+      }
+    ],
+    "scope": "Identified missing printed identity only; consult findings for attributes and contacts."
+  }
+]

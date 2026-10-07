@@ -1,0 +1,620 @@
+[
+  {
+    "source_id": "land_usr_central_kazakhstan",
+    "target_id": "land_usr_orenburg",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The north–south broad-gauge track crosses the Orenburg/Central Kazakhstan line east of the Western Kazakhstan junction. It continues in Central Kazakhstan, outside Western Kazakhstan."
+  },
+  {
+    "source_id": "land_usr_central_kazakhstan",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "Track remains east of the whole border, in Central Kazakhstan. No printed track enters Western Kazakhstan."
+  },
+  {
+    "source_id": "land_usr_gorky",
+    "target_id": "land_usr_ural",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5030,
+          790,
+          5680,
+          1350
+        ],
+        "crop": "evidence/ea_sov_new_rail_ural.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The southern east–west track crosses from Gorky into Ural before the Ural roundel; yellow checkers are visible."
+  },
+  {
+    "source_id": "land_usr_gorky",
+    "target_id": "land_usr_zuryenia",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4780,
+          640,
+          5580,
+          960
+        ],
+        "crop": "evidence/ea_sov_new_rail_north.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The northern east–west track crosses the Gorky/Zuryenia boundary at the western foot of the Urals; it is south of the Yaroslavl/Zuryenia boundary."
+  },
+  {
+    "source_id": "land_usr_kalmytskaya",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "The Caspian-west shoreline tracks stay in Kalmytskaya; no track crosses the short Western Kazakhstan border on the eastern side."
+  },
+  {
+    "source_id": "land_usr_northern_russia",
+    "target_id": "land_usr_zuryenia",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      }
+    ],
+    "notes": "The Northern Russia railway turns south into Yaroslavl, west of the Zuryenia border. No track crosses this shared border."
+  },
+  {
+    "source_id": "land_usr_orenburg",
+    "target_id": "land_usr_saratov",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4910,
+          1160,
+          5220,
+          1460
+        ],
+        "crop": "evidence/ea_sov_new_rail_volga.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The lower eastbound Saratov track crosses the political border into Orenburg below the dense northern river/rail junction; the black–yellow line is continuous."
+  },
+  {
+    "source_id": "land_usr_orenburg",
+    "target_id": "land_usr_sibir",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5030,
+          790,
+          5680,
+          1350
+        ],
+        "crop": "evidence/ea_sov_new_rail_ural.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The north–south railway crosses the wavy Orenburg/Sibir boundary west of the Tobolsk triple junction."
+  },
+  {
+    "source_id": "land_usr_orenburg",
+    "target_id": "land_usr_tobolsk",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5030,
+          790,
+          5680,
+          1350
+        ],
+        "crop": "evidence/ea_sov_new_rail_ural.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The eastbound Orenburg railway crosses the nearly vertical Tobolsk boundary south of the Sibir junction."
+  },
+  {
+    "source_id": "land_usr_orenburg",
+    "target_id": "land_usr_ural",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5030,
+          790,
+          5680,
+          1350
+        ],
+        "crop": "evidence/ea_sov_new_rail_ural.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The rail from the Ural western junction continues into Orenburg before turning east across Orenburg's northern interior. The crossing lies west of the Ural river loop."
+  },
+  {
+    "source_id": "land_usr_orenburg",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "The southbound Orenburg track crosses into Central Kazakhstan east of the Western Kazakhstan corner; it does not enter Western Kazakhstan."
+  },
+  {
+    "source_id": "land_usr_saratov",
+    "target_id": "land_usr_ural",
+    "review_status": "uncertain",
+    "railway_connection": null,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4910,
+          1160,
+          5220,
+          1460
+        ],
+        "crop": "evidence/ea_sov_new_rail_volga.png"
+      }
+    ],
+    "notes": "The original artwork superimposes the Saratov/Gorky/Ural/Orenburg political boundaries, Volga tributaries and railway junction. Saratov-to-Ural direct passage versus an intervening short Gorky or Orenburg segment cannot be assigned confidently at native resolution. Nearby tracks have yellow broad-gauge checkers, but the direct edge remains unresolved."
+  },
+  {
+    "source_id": "land_usr_saratov",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "The broad-gauge track stays west of the Saratov/Western Kazakhstan border and proceeds into Stalingrad."
+  },
+  {
+    "source_id": "land_usr_sibir",
+    "target_id": "land_usr_ural",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5030,
+          790,
+          5680,
+          1350
+        ],
+        "crop": "evidence/ea_sov_new_rail_ural.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The northeast-bound track from the Ural roundel crosses the near-vertical Ural/Sibir border before joining the north–south Sibir line."
+  },
+  {
+    "source_id": "land_usr_sibir",
+    "target_id": "land_usr_vyatka",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4780,
+          640,
+          5580,
+          960
+        ],
+        "crop": "evidence/ea_sov_new_rail_north.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The railway runs east inside Vyatka, turns south, and crosses the slanted Vyatka/Sibir boundary east of the Ural junction."
+  },
+  {
+    "source_id": "land_usr_stalingrad",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "The southern Stalingrad railway exits the circle into Kalmytskaya on the west side of the border; no track enters Western Kazakhstan."
+  },
+  {
+    "source_id": "land_usr_turkestan",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "The rail runs along the eastern Aral Sea side within Turkestan/Central Kazakhstan. Western Kazakhstan lies west of the border and has no crossing track."
+  },
+  {
+    "source_id": "land_usr_turkmenistan",
+    "target_id": "land_usr_western_kazakhstan",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1240,
+          6080,
+          2480
+        ],
+        "crop": "evidence/ea_sov_new_rail_kazakh.png"
+      }
+    ],
+    "notes": "The Turkmenistan railway runs south of their shared border, from the Caspian port toward Turkestan. It never enters Western Kazakhstan."
+  },
+  {
+    "source_id": "land_usr_ural",
+    "target_id": "land_usr_vyatka",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4780,
+          640,
+          5580,
+          960
+        ],
+        "crop": "evidence/ea_sov_new_rail_north.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "After leaving Zuryenia the northern track crosses the stepped Ural/Vyatka boundary, then bends northward inside Vyatka. This is distinct from the later Vyatka/Sibir crossing."
+  },
+  {
+    "source_id": "land_usr_ural",
+    "target_id": "land_usr_zuryenia",
+    "review_status": "confirmed",
+    "railway_connection": true,
+    "printed_gauge": "broad",
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4780,
+          640,
+          5580,
+          960
+        ],
+        "crop": "evidence/ea_sov_new_rail_north.png"
+      },
+      {
+        "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "section": "1.6",
+        "printed_page": 10,
+        "note": "Yellow checkered line denotes broad gauge; white denotes narrow/normal."
+      }
+    ],
+    "notes": "The northern track crosses the diagonal Zuryenia/Ural boundary in the Urals before it crosses the separate Ural/Vyatka stepped boundary."
+  },
+  {
+    "source_id": "land_usr_vyatka",
+    "target_id": "land_usr_yugria",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      }
+    ],
+    "notes": "No track crosses the entire north–south shared border; the southern railway stays west/south in Vyatka and Sibir."
+  },
+  {
+    "source_id": "land_usr_vyatka",
+    "target_id": "land_usr_zuryenia",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4780,
+          640,
+          5580,
+          960
+        ],
+        "crop": "evidence/ea_sov_new_rail_north.png"
+      }
+    ],
+    "notes": "The northern railway passes through an intervening Ural segment. No direct railway crosses the Zuryenia/Vyatka boundary north of its Ural triple junction."
+  },
+  {
+    "source_id": "land_usr_yaroslavl",
+    "target_id": "land_usr_zuryenia",
+    "review_status": "confirmed",
+    "railway_connection": false,
+    "printed_gauge": null,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": null,
+    "gauge_change_applicable": false,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4780,
+          640,
+          5580,
+          960
+        ],
+        "crop": "evidence/ea_sov_new_rail_north.png"
+      }
+    ],
+    "notes": "The eastbound Yaroslavl railway enters Gorky below the Yaroslavl/Zuryenia boundary. It reaches Zuryenia only through Gorky, so no direct rail edge exists."
+  }
+]

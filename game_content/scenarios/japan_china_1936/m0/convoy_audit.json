@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "status": "audited_specification_not_implemented",
+  "scenario_id": "japan_china_1936_1941",
+  "scope": "Visual convoy audit of P14, P15, P16, P32, P33 and P41 only. Does not add convoy data to the global map, extractor or engine.",
+  "sources": {
+    "map_image": {"path": "game_content/maps/gw36map.png", "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba", "review": "Original-image diagnostic crops inspected across Rehe/Kyushu, Tokyo/Okinawa, China coast and Singapore; no source image edits."},
+    "rulebook": {"path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf", "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d", "pdf_page_equals_printed_page": true}
+  },
+  "rules": {
+    "line_definition": {"source": {"id": "rulebook", "pdf_page": 10, "section": "1.5"}, "rule": "Printed roundel identifies owner; printed blue number is maximum potential IPP loss, not income. A line can end in land or a sea-zone arc. A land-ended line closes if either land endpoint is enemy-possessed; closed lines cannot be raided."},
+    "raiding": {"source": {"id": "rulebook", "pdf_pages": [71, 72], "section": "10.9"}, "rule": "Eligible enemy battlecruisers, submarines and MAP aircraft can raid an open line subject to combat/declaration conditions. The defender loses IPP to the bank, not to the raider. The printed maximum is shared for the whole line per Player Turn, not per sea zone or raiding unit."},
+    "no_income_creation": "Neither retained nor excluded convoy lines add printed loss-cap IPP to production, current income or treasury."
+  },
+  "audited_lines": [
+    {
+      "id": "convoy_japan_nagasaki",
+      "printed_name": "Nagasaki Line",
+      "owner": "japan",
+      "max_ipp_loss_per_player_turn": 5,
+      "endpoints": [{"type": "land", "node_id": "land_manchuria_rehe"}, {"type": "land", "node_id": "land_jap_kyushu"}],
+      "ordered_sea_zone_ids": ["sea_p14", "sea_p15"],
+      "retained_sea_zone_ids": ["sea_p14", "sea_p15"],
+      "excluded_sea_zone_ids": [],
+      "route_audit_complete": true,
+      "theatre_classification": "retained_conditionally_raidable",
+      "initial_endpoint_closure": "open_both_land_endpoints_japanese_possessed",
+      "initial_raiding_legality": "Japan begins at peace; no automatic enemy raid is authorized at setup.",
+      "evidence": "The dotted line runs from Rehe's bay facility across P14 and west of Korea, crosses into P15, and terminates on Kyushu. A Japanese roundel and blue 5 are printed beside its Nagasaki Line label in P14. Entire route and both land endpoints are selected.",
+      "source_refs": [{"id": "map_image", "region": "Rehe / Yellow Sea / Kyushu"}, {"id": "rulebook", "pdf_page": 10, "section": "1.5"}, {"id": "rulebook", "pdf_pages": [71, 72], "section": "10.9"}]
+    },
+    {
+      "id": "convoy_japan_tokyo",
+      "printed_name": "Tokyo Line",
+      "owner": "japan",
+      "max_ipp_loss_per_player_turn": 5,
+      "endpoints": [{"type": "land", "node_id": "land_jap_tokyo"}, {"type": "sea", "node_id": "sea_p50", "marker": "terminal_arc_near_singapore"}],
+      "ordered_sea_zone_ids": ["sea_p16", "sea_p34", "sea_p33", "sea_p32", "sea_p41", "sea_p50"],
+      "retained_sea_zone_ids": ["sea_p16", "sea_p33", "sea_p32", "sea_p41"],
+      "excluded_sea_zone_ids": ["sea_p34", "sea_p50"],
+      "route_audit_complete": true,
+      "theatre_classification": "excluded_cut_route_and_terminal_outside_theatre",
+      "evidence": "The dotted line leaves Tokyo south into P16, crosses below the P16 border into P34 before curving west through P33 and P32, then passes west of Formosa through P41 into P50. Its southern arc is in P50 near Singapore; it does not terminate in Hong Kong or Formosa. Japanese roundel and blue 5 are printed with Tokyo Line in P32.",
+      "projection_guardrail": "Do not join P16 directly to P33 for this convoy, truncate it into a new local line, or attach the southern end to a retained coast. Its retained fragments do not form a complete closed-theatre convoy.",
+      "source_refs": [{"id": "map_image", "region": "Tokyo / P34 / Okinawa / Formosa / P41 / Singapore"}, {"id": "rulebook", "pdf_page": 10, "section": "1.5"}]
+    }
+  ],
+  "selected_zone_coverage": {
+    "sea_p14": ["convoy_japan_nagasaki"],
+    "sea_p15": ["convoy_japan_nagasaki"],
+    "sea_p16": ["convoy_japan_tokyo"],
+    "sea_p32": ["convoy_japan_tokyo"],
+    "sea_p33": ["convoy_japan_tokyo"],
+    "sea_p41": ["convoy_japan_tokyo"]
+  },
+  "nearby_outside_lines": [
+    {"printed_name": "Manila Line", "owner": "usa", "max_ipp_loss_per_player_turn": 3, "theatre_classification": "no_intersection_observed_with_selected_sea_zones", "note": "Visible east/south of the retained region through P43/P42 toward P50 and the Philippines. Do not confuse it with the Tokyo Line crossing P41. A complete global route/endpoints audit is outside this bounded task."},
+    {"printed_name": "East Indies Line", "owner": "anzac", "max_ipp_loss_per_player_turn": 2, "theatre_classification": "no_intersection_observed_with_selected_sea_zones", "note": "Visible near Singapore and the southern Indonesian seas; not in any of the six selected sea zones. Complete global route audit not performed."}
+  ],
+  "remaining_implementation_gap": "Nagasaki is a reachable local mechanic, but the current map schema/extractor has no convoy-line records, endpoints, ownership or shared loss caps. Add a canonical convoy layer and project it in a later authorized milestone, with closure and shared-cap tests. M0 data here is evidence, not an alternate playable map.",
+  "acceptance_tests": [
+    "Nagasaki retained only when both endpoint nodes and every traversed sea zone exist.",
+    "Tokyo excluded without fabricating a shortcut across absent P34 or a replacement endpoint for P50.",
+    "Nagasaki opens at setup but raiding still requires an eligible enemy and proper declaration.",
+    "Enemy possession of either Rehe or Kyushu closes Nagasaki; recapture can reopen it.",
+    "Raids in P14 and P15 share one cumulative five-IPP loss cap per Player Turn.",
+    "Five-IPP convoy cap never creates five-IPP income or treasury; losses go to the bank.",
+    "Convoy-loss tracking, escort/MAP modifiers and reset timing follow rulebook 10.9 rather than independent per-zone damage counters."
+  ]
+}

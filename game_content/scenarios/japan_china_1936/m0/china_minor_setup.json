@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "status": "audited_specification_not_playable",
+  "scope": "Official July 1936 KMT, CCP, eight Chinese warlords, retained Mongolia and FEC forces on the 38-node closed theatre; Japanese forces are in japan_setup.json.",
+  "sources": {
+    "kmt_nrs": {"path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf", "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6", "version": "4.3", "printed_page_numbers": false},
+    "ccp_nrs": {"path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf", "sha256": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c", "version": "4.3", "printed_page_numbers": false},
+    "fec_nrs": {"path": "game_content/rules/GW36 - NRS - FEC v4.3.pdf", "sha256": "ce4a7fbe4712a0b389de0f87a4144db8c33ef3ee9f0081c608d8af738c790b37", "version": "4.3", "printed_page_numbers": false},
+    "japan_nrs": {"path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf", "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa", "version": "4.3", "printed_page_numbers": false, "use": "Setup cell-color convention cross-check only"},
+    "ussr_nrs": {"path": "game_content/rules/GW36 - NRS - USSR v4.3.1.pdf", "sha256": "ec9eb64c3e0589386e36d704f6a4de12387171c3d6461a7f2bb1e520092c655b", "version": "4.3.1", "printed_page_numbers": false},
+    "neutral_setup": {"path": "game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf", "sha256": "9d8b6382dfcd68e5d91ab48f2d81fef0bb61090dc951300bc19bea93f1a12512", "version": "4.3", "printed_page_numbers": false},
+    "rulebook": {"path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf", "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d", "version": "4.3", "pdf_page_equals_printed_page": true},
+    "global_map": {"path": "game_content/maps/gw36_manual_map.json", "sha256": "97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24", "status": "existing_audited_map_data_not_reaudited_in_this_setup_pass"}
+  },
+  "conventions": {
+    "citations": "Each territory's source_refs applies to its entire setup row including unit counts and absence of setup markers. PDF pages are one-based; printed_page null means the sheet has no printed page number.",
+    "facilities": "Facility records below refer to existing static-map IDs, not additional facility pieces. Count each ID once, even when it serves multiple sea edges. Rail borders are inherited from the map and are not duplicated here.",
+    "empty_rows": "An empty units array is a deliberate zero: the complete applicable setup table has no entry for that included land tile. Hainan remains owned by the Kwangtung/Hainan warlord despite no listed starting unit.",
+    "construction": "The complete KMT, CCP, FEC and relevant neutral setup charts list no in-scope construction queues. Empty construction arrays mean no listed queue, not an unverified build stage.",
+    "damage": "No retained unit or facility in these setup rows is marked damaged. Static map assets begin undamaged unless a later explicit scenario override says otherwise.",
+    "type_names": "Stable snake-case transcription labels; the static-map label airfield refers to the catalog Airbase (6 IPP), not an unpriced extra type.",
+    "minor_wealth": "User-confirmed: controlled/aligned minor assets aggregate into the legally controlling alliance; unaligned uncontrolled warlords count toward no side. This does not grant a minor treasury or collected income."
+  },
+  "factions": [
+    {"id": "kmt", "printed_name": "KMT", "map_owner_alias": "KMT", "alliance_id": "allies", "controller_id": "kmt", "status": "independent_minor_power", "aligned_with": [], "at_war_with": ["ccp"], "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 1, "printed_page": null, "section": "Overview"}, {"source_id": "rulebook", "pdf_page": 26, "printed_page": 26, "section": "4.3"}]},
+    {"id": "ccp", "printed_name": "CCP", "map_owner_alias": "CCP", "alliance_id": "comintern", "controller_id": "ccp", "status": "independent_minor_power", "aligned_with": [], "at_war_with": ["kmt"], "source_refs": [{"source_id": "ccp_nrs", "pdf_page": 1, "printed_page": null, "section": "Overview"}, {"source_id": "rulebook", "pdf_page": 26, "printed_page": 26, "section": "4.3"}]},
+    {"id": "fec", "printed_name": "FEC", "map_owner_alias": "FEC", "alliance_id": "allies", "controller_id": "british_commonwealth", "status": "british_commonwealth_constituent", "source_refs": [{"source_id": "fec_nrs", "pdf_page": 1, "printed_page": null, "section": "British Commonwealth"}]},
+    {"id": "mongolia", "printed_name": "Mongolia", "map_owner_alias": "Mongolia", "alliance_id": "comintern", "controller_id": "ussr", "status": "controlled_minor_not_incorporated", "aligned_with": [], "at_war_with": [], "included_node_ids": ["land_mongolia_central_mongolia", "land_mongolia_kerulen", "land_mongolia_kobdo", "land_mongolia_ulyassutai"], "source_refs": [{"source_id": "rulebook", "pdf_page": 29, "printed_page": 29, "section": "4.7 Mongolia and Tannu Tuva"}, {"source_id": "ussr_nrs", "pdf_page": 1, "printed_page": null, "section": "Controlled Minor Powers"}]},
+    {"id": "warlord_sinkiang", "printed_name": "Sinkiang", "map_owner_alias": "Sinkiang Clique", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_china_sinkiang"]},
+    {"id": "warlord_tsinghai", "printed_name": "Tsinghai", "map_owner_alias": "Ma Clique", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_china_tsinghai"]},
+    {"id": "warlord_suiyuan", "printed_name": "Suiyuan", "map_owner_alias": "Mengjiang", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_china_suiyuan"]},
+    {"id": "warlord_beiping_hopeh", "printed_name": "Beiping and Hopeh", "map_owner_alias": "Zhili Clique", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_china_beiping", "land_china_hopeh"]},
+    {"id": "warlord_tibet", "printed_name": "Tibet", "map_owner_alias": "Tibet", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_tibet"]},
+    {"id": "warlord_sikang", "printed_name": "Sikang", "map_owner_alias": "Szechwan Clique", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_china_sikang"]},
+    {"id": "warlord_yunnan", "printed_name": "Yunnan", "map_owner_alias": "Yunnan Clique", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_china_yunnan"]},
+    {"id": "warlord_kwangtung_hainan", "printed_name": "Kwangtung and Hainan", "map_owner_alias": "Guangxi Clique", "alliance_id": null, "controller_id": null, "status": "unaligned_uncontrolled_warlord", "included_node_ids": ["land_kwangtung", "land_hainan"]}
+  ],
+  "warlord_status_source_refs": [{"source_id": "rulebook", "pdf_page": 30, "printed_page": 30, "section": "4.9 China, eight warlords"}],
+  "territories": [
+    {
+      "node_id": "land_china_szechwan", "owner_id": "kmt", "controller_id": "kmt", "alliance_id": "allies",
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "infantry", "printed_name": "Infantry", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / KMT / Szechwan"}]
+    },
+    {
+      "node_id": "land_china_shantung", "owner_id": "kmt", "controller_id": "kmt", "alliance_id": "allies",
+      "units": [{"type": "infantry", "printed_name": "Infantry", "count": 2}],
+      "facilities": [{"type": "major_port", "facility_id": "facility_shantung_major_port", "sea_node_ids": ["sea_p14"], "source_id": "global_map"}, {"type": "minor_dockyard", "facility_id": "facility_shantung_minor_dockyard", "sea_node_ids": ["sea_p14"], "source_id": "global_map"}], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / KMT / Shantung"}]
+    },
+    {
+      "node_id": "land_china_kweichow", "owner_id": "kmt", "controller_id": "kmt", "alliance_id": "allies",
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 2}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / KMT / Kweichow"}]
+    },
+    {
+      "node_id": "land_china_hunan", "owner_id": "kmt", "controller_id": "kmt", "alliance_id": "allies",
+      "units": [{"type": "infantry", "printed_name": "Infantry", "count": 2}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / KMT / Hunan"}]
+    },
+    {
+      "node_id": "land_china_nanking", "owner_id": "kmt", "controller_id": "kmt", "alliance_id": "allies",
+      "units": [{"type": "infantry", "printed_name": "Infantry", "count": 4}],
+      "facilities": [{"type": "major_port", "facility_id": "port_nanking_major", "sea_node_ids": ["sea_p14", "sea_p32"], "source_id": "global_map"}], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / KMT / Nanking"}]
+    },
+    {
+      "node_id": "land_china_shensi", "owner_id": "ccp", "controller_id": "ccp", "alliance_id": "comintern",
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 2}, {"type": "mountain_infantry", "printed_name": "Mountain Infantry", "count": 2}, {"type": "cavalry", "printed_name": "Cavalry", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "ccp_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Shensi"}]
+    },
+    {
+      "node_id": "land_china_sinkiang", "owner_id": "warlord_sinkiang", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "infantry", "printed_name": "Infantry", "count": 2}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Sinkiang"}]
+    },
+    {
+      "node_id": "land_china_tsinghai", "owner_id": "warlord_tsinghai", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 2}, {"type": "infantry", "printed_name": "Infantry", "count": 1}, {"type": "cavalry", "printed_name": "Cavalry", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Tsinghai"}]
+    },
+    {
+      "node_id": "land_tibet", "owner_id": "warlord_tibet", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "mountain_infantry", "printed_name": "Mountain Infantry", "count": 1}, {"type": "cavalry", "printed_name": "Cavalry", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Tibet"}]
+    },
+    {
+      "node_id": "land_china_suiyuan", "owner_id": "warlord_suiyuan", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 2}, {"type": "infantry", "printed_name": "Infantry", "count": 2}, {"type": "cavalry", "printed_name": "Cavalry", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Suiyuan"}]
+    },
+    {
+      "node_id": "land_china_beiping", "owner_id": "warlord_beiping_hopeh", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "infantry", "printed_name": "Infantry", "count": 3}],
+      "facilities": [{"type": "minor_port", "facility_id": "facility_beiping_minor_port", "sea_node_ids": ["sea_p14"], "source_id": "global_map"}], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Beiping"}]
+    },
+    {
+      "node_id": "land_china_hopeh", "owner_id": "warlord_beiping_hopeh", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Hopeh"}]
+    },
+    {
+      "node_id": "land_china_sikang", "owner_id": "warlord_sikang", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "infantry", "printed_name": "Infantry", "count": 2}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Sikang"}]
+    },
+    {
+      "node_id": "land_china_yunnan", "owner_id": "warlord_yunnan", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 4}, {"type": "infantry", "printed_name": "Infantry", "count": 2}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Yunnan"}]
+    },
+    {
+      "node_id": "land_kwangtung", "owner_id": "warlord_kwangtung_hainan", "controller_id": null, "alliance_id": null,
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 4}, {"type": "infantry", "printed_name": "Infantry", "count": 2}],
+      "facilities": [{"type": "major_port", "facility_id": "facility_land_kwangtung_major_port", "sea_node_ids": ["sea_p41"], "source_id": "global_map"}], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords / Kwangtung"}]
+    },
+    {
+      "node_id": "land_hainan", "owner_id": "warlord_kwangtung_hainan", "controller_id": null, "alliance_id": null,
+      "units": [], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 7, "printed_page": null, "section": "Setup / Warlords, complete table; Hainan absent"}, {"source_id": "rulebook", "pdf_page": 30, "printed_page": 30, "section": "4.9 Kwangtung and Hainan share a warlord"}]
+    },
+    {
+      "node_id": "land_mongolia_central_mongolia", "owner_id": "mongolia", "controller_id": "ussr", "alliance_id": "comintern",
+      "units": [{"type": "cavalry", "printed_name": "Cavalry", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "neutral_setup", "pdf_page": 1, "printed_page": null, "section": "Mongolia - Central Mongolia"}]
+    },
+    {
+      "node_id": "land_mongolia_kerulen", "owner_id": "mongolia", "controller_id": "ussr", "alliance_id": "comintern",
+      "units": [{"type": "militia", "printed_name": "Militia", "count": 1}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "neutral_setup", "pdf_page": 1, "printed_page": null, "section": "Mongolia - Kerulen"}]
+    },
+    {
+      "node_id": "land_mongolia_kobdo", "owner_id": "mongolia", "controller_id": "ussr", "alliance_id": "comintern",
+      "units": [], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "neutral_setup", "pdf_page": 1, "printed_page": null, "section": "Complete Mongolia setup; Kobdo absent"}]
+    },
+    {
+      "node_id": "land_mongolia_ulyassutai", "owner_id": "mongolia", "controller_id": "ussr", "alliance_id": "comintern",
+      "units": [], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "neutral_setup", "pdf_page": 1, "printed_page": null, "section": "Complete Mongolia setup; Ulyassutai absent"}]
+    },
+    {
+      "node_id": "land_hong_kong", "owner_id": "fec", "controller_id": "british_commonwealth", "alliance_id": "allies",
+      "units": [{"type": "infantry", "printed_name": "Infantry", "count": 1}],
+      "facilities": [{"type": "airfield", "catalog_type": "airbase", "facility_id": "facility_hong_kong_airfield", "source_id": "global_map"}, {"type": "major_dockyard", "facility_id": "facility_hong_kong_major_dockyard", "sea_node_ids": ["sea_p41"], "source_id": "global_map"}], "construction": [],
+      "source_refs": [{"source_id": "fec_nrs", "pdf_page": 6, "printed_page": null, "section": "Setup / Hong Kong - Sea zone P41, land columns"}]
+    },
+    {
+      "node_id": "sea_p41", "owner_id": "fec", "controller_id": "british_commonwealth", "alliance_id": "allies", "ownership_applies_to": "listed_pieces_not_the_sea_zone",
+      "units": [{"type": "fighter", "printed_name": "Fighter", "count": 1, "embarked_on": "fec_light_carrier_p41_setup_1", "placement_basis": "Blue fighter count in mixed Hong Kong/P41 row indicates sea location, unlike the black land infantry count."}, {"type": "coastal_submarine", "printed_name": "Coastal Submarine", "count": 1, "purchase_price_ipp": null, "valuation_status": "requires_user_assigned_value"}, {"type": "light_carrier", "printed_name": "Light Carrier", "count": 1, "instance_id": "fec_light_carrier_p41_setup_1"}], "facilities": [], "construction": [],
+      "source_refs": [{"source_id": "fec_nrs", "pdf_page": 6, "printed_page": null, "section": "Setup / Hong Kong - Sea zone P41, blue sea counts"}, {"source_id": "japan_nrs", "pdf_page": 9, "printed_page": null, "section": "Setup, Formosa/P32 black Fighter versus P15 blue aircraft, color convention cross-check"}],
+      "notes": "The Fighter's count is blue, like the sea-unit counts, so it is placed in P41 on the sole FEC Light Carrier. This color convention is corroborated by Japan's mixed Formosa/P32 setup row (black Fighter on land) versus P15 (blue aircraft at sea). No in-port or damage condition is specified by the setup row."
+    }
+  ],
+  "audit_totals": {
+    "territory_records": 22,
+    "unit_pieces": 55,
+    "units_by_type": {"militia": 20, "infantry": 24, "mountain_infantry": 3, "cavalry": 5, "fighter": 1, "coastal_submarine": 1, "light_carrier": 1},
+    "units_by_group": {"kmt": 12, "ccp": 5, "eight_warlords": 32, "mongolia": 2, "fec": 4},
+    "unique_static_map_facilities": 7,
+    "additional_setup_facility_pieces": 0,
+    "construction_queue_items": 0,
+    "unpriced_unit_types_in_scope": ["coastal_submarine"]
+  },
+  "economy_findings": [
+    {"faction_id": "kmt", "official_starting_income_ipp": 6, "official_starting_treasury_ipp": 6, "included_original_land_ipp": 6, "theatre_starting_treasury_recommendation_ipp": 6, "notes": "All five original KMT land zones are included. No warlord income is added at setup. Burma Road wartime bonus is unavailable because Burma is not in the theatre.", "source_refs": [{"source_id": "kmt_nrs", "pdf_page": 1, "printed_page": null, "section": "Starting Income"}, {"source_id": "rulebook", "pdf_page": 18, "printed_page": 18, "section": "2.4"}]},
+    {"faction_id": "ccp", "official_starting_income_ipp": 2, "official_starting_treasury_ipp": 2, "included_original_land_ipp": 2, "theatre_starting_treasury_recommendation_ipp": 2, "notes": "Shensi is retained. Recruitment is not an extra IPP income stream. No Soviet Home Country is included, so the +2 railroad bonus is initially unavailable.", "source_refs": [{"source_id": "ccp_nrs", "pdf_page": 1, "printed_page": null, "section": "Starting Income"}, {"source_id": "ccp_nrs", "pdf_page": 2, "printed_page": null, "section": "Wartime Bonus Income"}, {"source_id": "rulebook", "pdf_page": 18, "printed_page": 18, "section": "2.4"}]},
+    {"faction_id": "fec", "official_starting_income_ipp": 5, "official_starting_treasury_ipp": 5, "official_full_production_ipp": 14, "included_original_land_ipp": 2, "theatre_starting_treasury_recommendation_ipp": 2, "notes": "Campaign convention: min(official starting cash, retained directly possessed printed territorial IPP) = min(5, 2) = 2; this is theatre adjustment, not official global starting cash. Keep national mobilization/war-state gates distinct from the local monetary cap. Retain separate FEC/BC diplomacy and no off-map treasury injection.", "source_refs": [{"source_id": "fec_nrs", "pdf_page": 1, "printed_page": null, "section": "Starting Income / Full Production / British Commonwealth"}, {"source_id": "rulebook", "pdf_page": 18, "printed_page": 18, "section": "2.4"}]},
+    {"faction_id": "mongolia", "official_starting_income_ipp": 0, "official_starting_treasury_ipp": 0, "included_original_land_ipp": 2, "theatre_starting_treasury_recommendation_ipp": 0, "initial_recruitment_target": 4, "notes": "Controlled minor: no IPP collection or income assignment to USSR. Four retained mainland territories yield a 4-in-12 recruitment success threshold, not 2 IPP income. Units and facilities still count toward Comintern wealth by user choice. Tannu Tuva excluded.", "source_refs": [{"source_id": "rulebook", "pdf_page": 29, "printed_page": 29, "section": "4.7"}, {"source_id": "rulebook", "pdf_page": 82, "printed_page": 82, "section": "12.7 / 12.9"}]},
+    {"faction_id": "all_eight_unaligned_warlords", "official_starting_income_ipp": 0, "official_starting_treasury_ipp": 0, "theatre_starting_treasury_recommendation_ipp": 0, "notes": "No independently spendable warlord treasury or income in setup. Neither alliance receives their wealth until rule-defined control/alignment. Do not mistake the foreign-relations description 'part of KMT' for KMT possession at setup.", "source_refs": [{"source_id": "rulebook", "pdf_page": 30, "printed_page": 30, "section": "4.9"}]}
+  ],
+  "adopted_rule_clarifications": [
+    {"id": "foreign_attack_warlord_alignment_granularity", "clarification_id": "RCL-003", "status": "adopted", "authority": "user_confirmed_2026-10-05", "source_refs": [{"source_id": "rulebook", "pdf_page": 30, "printed_page": 30, "section": "4.9 last paragraph"}, {"source_id": "rulebook", "pdf_page": 31, "printed_page": 31, "section": "alignment dice table"}], "ruling": "Resolve alignment once for each whole warlord. Evaluate qualifying neighbors across its territories, apply the existing alignment table once, and apply the single outcome to the entire faction and surviving forces. Preserve automatic KMT alignment where the table requires it. This is the shared RCL-003 rule."},
+    {"id": "ccp_brothers_rail_vs_supply_path", "clarification_id": "RCL-004", "status": "adopted", "authority": "user_confirmed_2026-10-05", "source_refs": [{"source_id": "ccp_nrs", "pdf_page": 3, "printed_page": null, "section": "Comintern Brothers / Minor Power Build Chart"}, {"source_id": "rulebook", "pdf_page": 103, "printed_page": 103, "section": "15.2"}], "ruling": "Comintern Brothers requires the specific undamaged railroad from CCP-possessed land to Soviet-possessed land during Production, with its placement restriction. Generic supply alone does not unlock Artillery/AAA. The income bonus has a separate Soviet Home Country requirement. The ability remains inactive in the current USSR-excluded campaign; Mongolia's USSR-position turn does not restore Soviet possession."}
+  ],
+  "open_rule_interpretations": [
+    {"id": "ccp_elimination_vs_never_surrender", "status": "needs_distinct_state_concepts", "source_refs": [{"source_id": "ccp_nrs", "pdf_page": 1, "printed_page": null, "section": "Surrender"}, {"source_id": "rulebook", "pdf_page": 30, "printed_page": 30, "section": "4.9 KMT attack revives CCP"}, {"source_id": "rulebook", "pdf_page": 101, "printed_page": 101, "section": "14.3 Duration"}], "issue": "No surviving units ends the civil war; CCP never surrenders, and a later eligible KMT attack on a warlord can revive CCP. Do not implement an irreversible removed-agent terminal state."}
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "status": "audited_specification_not_playable",
+  "scenario_id": "japan_china_1936_1941",
+  "nation": "japan",
+  "alliance": "axis",
+  "start": "1936-07",
+  "sources": {
+    "japan_nrs": {
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+      "version": "4.3",
+      "page_numbering": "PDF pages 1-9; no printed page numbers",
+      "review": "All nine pages rendered and visually reviewed; setup is an embedded image, not readable from PDF text extraction."
+    },
+    "rulebook": {
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "version": "4.3",
+      "page_numbering": "PDF and printed page numbers coincide"
+    },
+    "global_map": {
+      "path": "game_content/maps/gw36_manual_map.json",
+      "sha256": "97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24",
+      "role": "Canonical zone and physical map-facility IDs; selected Japanese starting income values."
+    }
+  },
+  "transcription_conventions": {
+    "source_inheritance": "A placement's source applies to every unit and factory listed in that placement.",
+    "condition": "The setup chart marks no damage on deployed units or factories; damage_points defaults to 0 for these records, not for unresolved construction.",
+    "mixed_land_sea_rows": "Land units in the Korea and Formosa rows belong to the land zone; blue naval entries belong to the sea zone explicitly printed in that row.",
+    "carrier_aircraft": "P15's blue aircraft entries are at sea. The chart does not assign each aircraft to an individual carrier; this legal attachment choice is left unresolved.",
+    "port_status": "The setup rows name sea zones and contain no in-port markers. No in-port, escort, raider, MAP or transport-cargo designation is invented.",
+    "facility_layer": "Only the three setup-chart factories are new placements. Printed ports, shipyards and airbases already represented in map.json are referenced separately, never duplicated as setup pieces.",
+    "unlisted_locations": "Western Manchuria, P33 and P41 have no Japanese setup-chart entry; absence means no placed Japanese pieces there, not missing transcription.",
+    "queues": "National construction is recorded separately from deployed pieces because the chart does not assign queue ships to a specific included tile. No ship is relocated into the theatre by this audit."
+  },
+  "placements": [
+    {"node_id": "land_jap_hokkaido", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Hokkaido"}, "units": [{"type": "infantry", "printed_name": "Infantry", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "land_jap_honshu", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Honshu"}, "units": [{"type": "motorized_infantry", "printed_name": "Motorized Infantry", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "land_jap_tokyo", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Tokyo"}, "units": [{"type": "infantry", "printed_name": "Infantry", "count": 1}, {"type": "fighter", "printed_name": "Fighter", "count": 1}, {"type": "tactical_bomber", "printed_name": "Tactical Bomber", "count": 2}], "facilities": [{"id": "setup_japan_tokyo_major_factory", "type": "major_factory", "printed_name": "Major Factory", "count": 1, "damage_points": 0}], "construction": []},
+    {"node_id": "land_jap_kyushu", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Kyushu"}, "units": [{"type": "infantry", "printed_name": "Infantry", "count": 1}], "facilities": [{"id": "setup_japan_kyushu_medium_factory", "type": "medium_factory", "printed_name": "Medium Factory", "count": 1, "damage_points": 0}], "construction": []},
+    {"node_id": "land_manchuria_northern", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Northern Manchuria"}, "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "mountain_infantry", "printed_name": "Mountain Infantry", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "land_manchuria_eastern", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Eastern Manchuria"}, "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "infantry", "printed_name": "Infantry", "count": 2}, {"type": "cavalry", "printed_name": "Cavalry", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "land_korea", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Korea - Sea zone P14 Yellow Sea"}, "units": [{"type": "infantry", "printed_name": "Infantry", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "sea_p14", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Korea - Sea zone P14 Yellow Sea"}, "units": [{"type": "light_cruiser", "printed_name": "Light Cruiser", "count": 1}, {"type": "heavy_cruiser", "printed_name": "Heavy Cruiser", "count": 1}, {"type": "coastal_submarine", "printed_name": "Coastal Submarine", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "land_manchuria_rehe", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Rehe"}, "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "infantry", "printed_name": "Infantry", "count": 2}], "facilities": [{"id": "setup_japan_rehe_minor_factory", "type": "minor_factory", "printed_name": "Minor Factory", "count": 1, "damage_points": 0}], "construction": []},
+    {"node_id": "land_jap_okinawa", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Okinawa"}, "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "seaplane", "printed_name": "Seaplane", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "land_formosa", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Formosa - Sea zone P32 East China Sea"}, "units": [{"type": "militia", "printed_name": "Militia", "count": 1}, {"type": "fighter", "printed_name": "Fighter", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "sea_p32", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Formosa - Sea zone P32 East China Sea"}, "units": [{"type": "naval_transport", "printed_name": "Naval Transport", "count": 1}, {"type": "destroyer", "printed_name": "Destroyer", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "sea_p15", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Sea zone P15 Sea of Japan"}, "units": [{"type": "fighter", "printed_name": "Fighter", "count": 2, "carrier_assignment": null}, {"type": "tactical_bomber", "printed_name": "Tactical Bomber", "count": 1, "carrier_assignment": null}, {"type": "naval_transport", "printed_name": "Naval Transport", "count": 3}, {"type": "torpedo_boat_destroyer", "printed_name": "Torpedo Boat Destroyer", "count": 1}, {"type": "destroyer", "printed_name": "Destroyer", "count": 2}, {"type": "light_cruiser", "printed_name": "Light Cruiser", "count": 1}, {"type": "heavy_cruiser", "printed_name": "Heavy Cruiser", "count": 1}, {"type": "battlecruiser", "printed_name": "Battlecruiser", "count": 1}, {"type": "battleship", "printed_name": "Battleship", "count": 2}, {"type": "submarine", "printed_name": "Submarine", "count": 2}, {"type": "light_carrier", "printed_name": "Light Carrier", "count": 1}, {"type": "fleet_carrier", "printed_name": "Fleet Carrier", "count": 1}], "facilities": [], "construction": []},
+    {"node_id": "sea_p16", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Sea zone P16"}, "units": [{"type": "naval_transport", "printed_name": "Naval Transport", "count": 1}, {"type": "torpedo_boat_destroyer", "printed_name": "Torpedo Boat Destroyer", "count": 1}, {"type": "heavy_cruiser", "printed_name": "Heavy Cruiser", "count": 1}, {"type": "coastal_submarine", "printed_name": "Coastal Submarine", "count": 1}], "facilities": [], "construction": []}
+  ],
+  "empty_retained_japanese_locations": ["land_manchuria_western", "sea_p33", "sea_p41"],
+  "map_facility_references": [
+    {"node_id": "land_formosa", "source_id": "global_map", "facility_ids": ["facility_land_formosa_major_port"]},
+    {"node_id": "land_jap_hokkaido", "source_id": "global_map", "facility_ids": [], "note": "Hokkaido's printed port is on the excluded P7 edge and is not retained."},
+    {"node_id": "land_jap_honshu", "source_id": "global_map", "facility_ids": ["facility_honshu_airfield", "facility_honshu_northwest_major_shipyard", "facility_honshu_south_major_shipyard", "facility_honshu_major_port"]},
+    {"node_id": "land_jap_kyushu", "source_id": "global_map", "facility_ids": ["facility_kyushu_major_port", "facility_kyushu_major_shipyard"]},
+    {"node_id": "land_jap_okinawa", "source_id": "global_map", "facility_ids": ["facility_okinawa_minor_port", "facility_okinawa_seaplane_base"]},
+    {"node_id": "land_jap_tokyo", "source_id": "global_map", "facility_ids": ["facility_tokyo_airfield", "facility_tokyo_major_shipyard"]},
+    {"node_id": "land_korea", "source_id": "global_map", "facility_ids": ["facility_korea_airfield", "facility_land_korea_minor_port"]},
+    {"node_id": "land_manchuria_rehe", "source_id": "global_map", "facility_ids": ["facility_rehe_major_port"]}
+  ],
+  "starting_construction": [
+    {"id": "japan_queue_heavy_cruiser", "type": "heavy_cruiser", "printed_name": "Heavy Cruiser", "count": 1, "printed_queue": "Build queue #2", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Build queue #2"}, "node_id": null, "included_in_deployed_totals": false, "theatre_inclusion": "unresolved_no_location_on_chart", "total_base_purchase_price": 10, "paid_construction_value": null, "nominal_paid_value_candidate": 5, "note": "5/5 build cost is sourced on NRS p7. Candidate 5 assumes queue #2 means first paid stage complete; actual setup paid amount is not explicitly printed. Requires a construction-stage convention and a theatre queue policy before play."},
+    {"id": "japan_queue_fleet_carrier", "type": "fleet_carrier", "printed_name": "Fleet Carrier", "count": 1, "printed_queue": "Build queue #3", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Build queue #3"}, "node_id": null, "included_in_deployed_totals": false, "theatre_inclusion": "unresolved_no_location_on_chart", "total_base_purchase_price": 15, "paid_construction_value": null, "nominal_paid_value_candidate": 5, "note": "5/5/5 build cost is sourced on NRS p7. Candidate 5 assumes queue #3 means first paid stage complete; actual setup paid amount is not explicitly printed."}
+  ],
+  "unresolved_setup_annotations": [
+    {"id": "japan_light_carrier_queue_annotations", "type": "light_carrier", "source": {"id": "japan_nrs", "pdf_page": 9}, "printed_cells": [{"row": "Build queue #1 - Place Unit", "text": "(1)"}, {"row": "Build queue #2", "text": "(2)"}], "interpreted_count": null, "included_in_deployed_totals": false, "issue": "Parenthesized cells in Light Carrier column lack an explanatory key in the supplied Japan NRS. Printed total is 1, already accounted for by the unparenthesized P15 Light Carrier. Do not silently add three carriers or treat parentheses as free units."},
+    {"id": "japan_p15_carrier_attachment", "source": {"id": "japan_nrs", "pdf_page": 9, "printed_row": "Sea zone P15 Sea of Japan"}, "issue": "P15 has two Fighters, one Tactical Bomber, one Fleet Carrier and one Light Carrier. Capacity is exactly three (rulebook pp90-91), but the printed chart does not specify which plane is on the Light Carrier. A deterministic setup choice or player setup action is needed before play."}
+  ],
+  "excluded_setup": [
+    {"printed_row": "South Sakhalin", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "outside_selected_map", "units": [{"type": "militia", "count": 1}]},
+    {"printed_row": "Bonin", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "outside_selected_map", "units": [{"type": "militia", "count": 1}]},
+    {"printed_row": "Volcano Islands", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "outside_selected_map", "units": [{"type": "militia", "count": 1}]},
+    {"printed_row": "Palau", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "outside_selected_map", "units": [{"type": "militia", "count": 1}]},
+    {"printed_row": "Caroline Islands - Sea zone P46", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "both_land_and_sea_outside_selected_map", "units": [{"type": "militia", "count": 1}, {"type": "heavy_cruiser", "count": 1}, {"type": "submarine", "count": 1}]},
+    {"printed_row": "Marshall Islands", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "outside_selected_map", "units": [{"type": "militia", "count": 1}]},
+    {"printed_row": "Off Board", "source": {"id": "japan_nrs", "pdf_page": 9}, "reason": "off_board_ability_counters_not_starting_units_and_USA_trigger_outside_profile", "units": [], "ability_counters": [{"type": "kamikaze", "count": 6}], "note": "Setup note says place on queue once at war with USA; special ability p4 says unlock when USA reaches Wartime Income. Both prerequisites are inactive in the closed theatre. Do not value these as six aircraft."}
+  ],
+  "totals": {
+    "deployed_units": 48,
+    "deployed_land_and_air_units": 24,
+    "deployed_naval_units": 24,
+    "setup_factories": 3,
+    "distinct_retained_map_facilities": 14,
+    "excluded_deployed_units": 8,
+    "unambiguous_unlocated_queue_units": 2,
+    "deployed_by_type": {"militia": 5, "infantry": 8, "mountain_infantry": 1, "motorized_infantry": 1, "cavalry": 1, "fighter": 4, "tactical_bomber": 3, "seaplane": 1, "naval_transport": 5, "torpedo_boat_destroyer": 2, "destroyer": 3, "light_cruiser": 2, "heavy_cruiser": 3, "battlecruiser": 1, "battleship": 2, "coastal_submarine": 2, "submarine": 2, "light_carrier": 1, "fleet_carrier": 1},
+    "printed_total_row_by_type": {"militia": 11, "infantry": 8, "mountain_infantry": 1, "motorized_infantry": 1, "cavalry": 1, "fighter": 4, "tactical_bomber": 3, "seaplane": 1, "naval_transport": 5, "torpedo_boat_destroyer": 2, "destroyer": 3, "light_cruiser": 2, "heavy_cruiser": 5, "battlecruiser": 1, "battleship": 2, "coastal_submarine": 2, "submarine": 3, "light_carrier": 1, "fleet_carrier": 2, "minor_factory": 1, "medium_factory": 1, "major_factory": 1, "kamikaze": 6},
+    "reconciliation": "Per type, deployed + outside deployed + two unambiguous queue ships + setup factories + off-board kamikaze counters equals every printed total. Parenthesized Light Carrier queue annotations are deliberately not interpreted as additional units."
+  },
+  "treasury_and_income": {
+    "official_starting_treasury": 16,
+    "official_starting_income_rate": 16,
+    "official_sources": [{"id": "japan_nrs", "pdf_page": 1}, {"id": "rulebook", "pdf_page": 18, "section": "2.4"}],
+    "theatre_adjustment_status": "scenario_profile_derivation_not_official_alternate_setup",
+    "theatre_starting_treasury_candidate": 15,
+    "theatre_base_income_rate": 15,
+    "method": "Minimum of official starting IPPs and printed IPP on retained directly possessed starting land. For Japan, min(16, 15) = 15. This drops South Sakhalin's off-map 1 IPP and does not import outside bonuses or income. The user authorized theatre adjustment; the precise capped-local-base formula is a documented scenario derivation.",
+    "income_by_node": {"land_jap_tokyo": 2, "land_jap_honshu": 2, "land_jap_hokkaido": 1, "land_jap_kyushu": 2, "land_jap_okinawa": 0, "land_formosa": 2, "land_korea": 2, "land_manchuria_eastern": 1, "land_manchuria_northern": 1, "land_manchuria_rehe": 1, "land_manchuria_western": 1},
+    "starting_local_occupation_bonus": 0,
+    "outside_oil_trade_bonus": "inactive_in_closed_theatre",
+    "future_local_occupation_bonus": {"source": {"id": "japan_nrs", "pdf_page": 2}, "ipp_each": 1, "node_ids": ["land_china_beiping", "land_china_hopeh", "land_china_shantung", "land_china_nanking", "land_china_hunan", "land_kwangtung"], "requires_war_with_major_power": false}
+  },
+  "unpriced_assets_requiring_user_value": [
+    {"type": "torpedo_boat_destroyer", "retained_count": 2, "locations": {"sea_p15": 1, "sea_p16": 1}, "printed_purchase_price": "N/A", "reference_value": null, "source": {"id": "rulebook", "pdf_page": 89, "section": "13.1.6"}},
+    {"type": "coastal_submarine", "retained_count": 2, "locations": {"sea_p14": 1, "sea_p16": 1}, "printed_purchase_price": "N/A", "reference_value": null, "source": {"id": "rulebook", "pdf_page": 91, "section": "13.1.6"}}
+  ]
+}

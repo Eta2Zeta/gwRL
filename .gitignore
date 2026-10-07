@@ -5,6 +5,22 @@ __pycache__/
 *.pyc
 .DS_Store
 
+# Local map sources, audit evidence, and generated image previews.
+*.[pP][nN][gG]
+*.[jJ][pP][gG]
+*.[jJ][pP][eE][gG]
+*.[gG][iI][fF]
+*.[wW][eE][bB][pP]
+*.[bB][mM][pP]
+*.[tT][iI][fF]
+*.[tT][iI][fF][fF]
+*.[sS][vV][gG]
+*.[hH][eE][iI][cC]
+*.[aA][vV][iI][fF]
+
+# Local extraction scripts, rendered pages, and other temporary audit work.
+/tmp/
+
 # C/C++ and Python extension build products
 build/
 *.o
@@ -19,3 +35,6 @@ output/snapshots/
 output/session_actions.txt
 output/japan_training_example.json
 output/manual_battle_trace.txt
+
+# New training/diagnostic runs are local scratch output. Curated results stay tracked.
+studies/*/runs/

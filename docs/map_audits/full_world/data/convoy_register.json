@@ -1,0 +1,518 @@
+[
+  {
+    "audit_id": "CV-01",
+    "printed_name": "Europe-America Line",
+    "observed_loss_cap": 5,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a18",
+      "sea_a19",
+      "sea_a20",
+      "sea_a21"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_can_nova_scotia"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_gbr_southern_england"
+      }
+    ],
+    "beneficiary_nation_id": "britain",
+    "evidence": [
+      "evidence/root_convoy_canada_start.jpg",
+      "evidence/root_atlantic_north.jpg"
+    ],
+    "notes": "Nova Scotia port to Southern England port; the land endpoints are not Canada/UK sea arcs.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-02",
+    "printed_name": "Atlantic Line",
+    "observed_loss_cap": 6,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a21",
+      "sea_a28",
+      "sea_a27",
+      "sea_a35",
+      "sea_a44"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_gbr_southern_england"
+      },
+      {
+        "kind": "sea",
+        "node_id": "sea_a44"
+      }
+    ],
+    "beneficiary_nation_id": "britain",
+    "evidence": [
+      "evidence/root_atlantic_north.jpg",
+      "evidence/root_convoy_atlantic_27_28.jpg",
+      "evidence/root_atlantic_middle.jpg"
+    ],
+    "notes": "The diagonal crosses A28 into the narrow southern extension of A27 before A35; do not shortcut A27.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-03",
+    "printed_name": "Mediterranean Line",
+    "observed_loss_cap": 6,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a44",
+      "sea_m2",
+      "sea_m4",
+      "sea_m8"
+    ],
+    "endpoints": [
+      {
+        "kind": "sea",
+        "node_id": "sea_a44"
+      },
+      {
+        "kind": "sea",
+        "node_id": "sea_m8"
+      }
+    ],
+    "beneficiary_nation_id": "britain",
+    "evidence": [
+      "evidence/root_atlantic_middle.jpg",
+      "evidence/root_convoy_med.jpg"
+    ],
+    "notes": "Both ends have sea-terminal arcs. The M8 arc is just above the Lower Egypt dockyard; it does not make this a land endpoint.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-04",
+    "printed_name": "West African Line",
+    "observed_loss_cap": 3,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a44",
+      "sea_a46",
+      "sea_a48",
+      "sea_a50",
+      "sea_a51",
+      "sea_a53",
+      "sea_a54"
+    ],
+    "endpoints": [
+      {
+        "kind": "sea",
+        "node_id": "sea_a44"
+      },
+      {
+        "kind": "sea",
+        "node_id": "sea_a54"
+      }
+    ],
+    "beneficiary_nation_id": "britain",
+    "evidence": [
+      "evidence/root_atlantic_middle.jpg",
+      "evidence/root_atlantic_south.jpg",
+      "evidence/root_convoy_south_africa.jpg"
+    ],
+    "notes": "Separate sea-terminal arcs at the Gibraltar-side junction and Cape Town-side junction.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-05",
+    "printed_name": "East African Line",
+    "observed_loss_cap": 1,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a54",
+      "sea_i1",
+      "sea_i3",
+      "sea_i4"
+    ],
+    "endpoints": [
+      {
+        "kind": "sea",
+        "node_id": "sea_a54"
+      },
+      {
+        "kind": "sea",
+        "node_id": "sea_i4"
+      }
+    ],
+    "beneficiary_nation_id": "britain",
+    "evidence": [
+      "evidence/root_convoy_south_africa.jpg",
+      "evidence/root_indian_ocean.jpg",
+      "evidence/root_convoy_aden_detail.jpg"
+    ],
+    "notes": "Passes west of Madagascar through I1/I3. The I4 terminal arc adjoins the continuing Indian Ocean Line off Aden.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-06",
+    "printed_name": "Indian Ocean Line",
+    "observed_loss_cap": 1,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_i5",
+      "sea_i4",
+      "sea_i7",
+      "sea_i12",
+      "sea_p50"
+    ],
+    "endpoints": [
+      {
+        "kind": "sea",
+        "node_id": "sea_i5"
+      },
+      {
+        "kind": "sea",
+        "node_id": "sea_p50"
+      }
+    ],
+    "beneficiary_nation_id": "fec",
+    "evidence": [
+      "evidence/root_convoy_suez_full.jpg",
+      "evidence/root_convoy_aden_detail.jpg",
+      "evidence/root_indian_ocean.jpg",
+      "evidence/root_convoy_singapore.jpg"
+    ],
+    "notes": "Starts at a Red Sea arc in I5 below Lower Egypt, continues past the East African terminal in I4, and ends at its own Singapore-side P50 arc. It does not enter I11.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-07",
+    "printed_name": "East Asian Line",
+    "observed_loss_cap": 2,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_p50",
+      "sea_p59",
+      "sea_p60",
+      "sea_p62",
+      "sea_p63",
+      "sea_p64",
+      "sea_p71",
+      "sea_p72"
+    ],
+    "endpoints": [
+      {
+        "kind": "sea",
+        "node_id": "sea_p50"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_aus_new_south_wales"
+      }
+    ],
+    "beneficiary_nation_id": "anzac",
+    "evidence": [
+      "evidence/root_convoy_singapore.jpg",
+      "evidence/root_convoy_east_asian_java.jpg",
+      "evidence/root_convoy_far_east.jpg",
+      "evidence/root_convoy_australia_end.jpg",
+      "evidence/root_convoy_sydney_end.jpg"
+    ],
+    "notes": "Printed name East Asian Line. Southern land endpoint is the New South Wales shipyard north of the separate Sydney city boundary. UK rectangular flag is a separate bonus reference.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-08",
+    "printed_name": "Caribbean Line",
+    "observed_loss_cap": 2,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a36",
+      "sea_a37"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_usa_texas"
+      },
+      {
+        "kind": "sea",
+        "node_id": "sea_a37"
+      }
+    ],
+    "beneficiary_nation_id": "usa",
+    "evidence": [
+      "evidence/root_convoy_caribbean.jpg"
+    ],
+    "notes": "Texas facility land endpoint; terminal arc in A37 southeast of Bahamas. A37 is absent from current JSON; this is not executable current-map data.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-09",
+    "printed_name": "Lend Lease to Britain Line",
+    "observed_loss_cap": 3,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a25",
+      "sea_a30",
+      "sea_a37",
+      "sea_a41",
+      "sea_a42",
+      "sea_a45",
+      "sea_a47"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_usa_new_york"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_brazil_rio_de_janeiro"
+      }
+    ],
+    "beneficiary_nation_id": "usa",
+    "evidence": [
+      "evidence/root_convoy_north_atlantic_start.jpg",
+      "evidence/root_convoy_caribbean.jpg",
+      "evidence/root_convoy_brazil.jpg"
+    ],
+    "notes": "New York to Rio de Janeiro. The line begins in A25 and passes west of A38 in A37/A41; it does not traverse A38 or A49.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-10",
+    "printed_name": "North Sea Line",
+    "observed_loss_cap": 2,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a11",
+      "sea_a10",
+      "sea_a7",
+      "sea_a5",
+      "sea_a8"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_ger_western_germany"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_nor_northern_norway"
+      }
+    ],
+    "beneficiary_nation_id": "germany",
+    "evidence": [
+      "evidence/root_convoy_north_sea_full.jpg",
+      "evidence/root_convoy_arctic.jpg",
+      "evidence/ea_naval_germany_denmark_20261006.png"
+    ],
+    "notes": "Western Germany A11 major shipyard to Narvik in Northern Norway. The northern stretch is A5/A8, not A6 or A9.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-11",
+    "printed_name": "Baltic Line",
+    "observed_loss_cap": 3,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a12",
+      "sea_a13"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_ger_eastern_germany"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_swe_norrland"
+      }
+    ],
+    "beneficiary_nation_id": "germany",
+    "evidence": [
+      "evidence/root_convoy_baltic_full.jpg"
+    ],
+    "notes": "The dashed line stays west of the curved A14 border throughout; A14 is not part of the Baltic Line.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-12",
+    "printed_name": "Liguria-Tripoli Line",
+    "observed_loss_cap": 1,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_m3",
+      "sea_m2",
+      "sea_m4"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_ita_lazio"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_tripoli"
+      }
+    ],
+    "beneficiary_nation_id": "italy",
+    "evidence": [
+      "evidence/root_convoy_italy_detail.jpg",
+      "evidence/root_convoy_med.jpg"
+    ],
+    "notes": "Despite its printed Liguria-Tripoli label, the northern facility lies on Lazio. The curve west of Sicily briefly crosses M2 between M3 and M4.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-13",
+    "printed_name": "Soviet Arctic Line",
+    "observed_loss_cap": null,
+    "status": "source_traced_proposed",
+    "complete_path": [
+      "sea_a20",
+      "sea_a17",
+      "sea_a4",
+      "sea_a6",
+      "sea_a5",
+      "sea_a8"
+    ],
+    "endpoints": [
+      {
+        "kind": "sea",
+        "node_id": "sea_a20"
+      },
+      {
+        "kind": "land",
+        "node_id": "land_usr_kola"
+      }
+    ],
+    "beneficiary_nation_id": "ussr",
+    "evidence": [
+      "evidence/root_convoy_soviet_start.jpg",
+      "evidence/root_convoy_arctic.jpg",
+      "evidence/root_convoy_north_sea_full.jpg",
+      "evidence/root_convoy_kola_end.jpg"
+    ],
+    "notes": "The sea arc is in A20; the curve west of Shetland passes through A6 before A5. Kola endpoint is its A8 minor shipyard. No numeric raid cap is printed. USSR NRS p2 separately gives a conditional +2 wartime bonus; do not use that as a raid cap.",
+    "printed_loss_cap_status": "no_numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-14",
+    "printed_name": "Manila Line",
+    "observed_loss_cap": 3,
+    "status": "sea_path_traced_land_endpoint_uncertain",
+    "complete_path": [
+      "sea_p25",
+      "sea_p24",
+      "sea_p29",
+      "sea_p37",
+      "sea_p36",
+      "sea_p35",
+      "sea_p45",
+      "sea_p43",
+      "sea_p42",
+      "sea_p51",
+      "sea_p50"
+    ],
+    "endpoints": [
+      {
+        "kind": "land",
+        "node_id": "land_usa_san_francisco"
+      },
+      {
+        "kind": "land",
+        "node_id": null,
+        "candidate_node_ids": [
+          "land_luzon_and_the_visayas",
+          "land_mindanao"
+        ],
+        "access_sea_id": "sea_p50",
+        "facility_type": "major_port"
+      }
+    ],
+    "beneficiary_nation_id": "usa",
+    "evidence": [
+      "evidence/root_convoy_manila_sf.jpg",
+      "evidence/root_convoy_western_pacific.jpg",
+      "evidence/root_pacific_east.jpg",
+      "evidence/root_convoy_manila_35_45_43.jpg",
+      "evidence/root_convoy_far_east.jpg",
+      "evidence/root_convoy_manila_west_end.jpg"
+    ],
+    "notes": "Entire sea path is traced, including P45 and the P51→P50 Philippine bend. The white-anchor-on-blue terminal is a major port, not a dockyard. It is drawn on the western Visayas island cluster; assignment to Luzon and the Visayas versus Mindanao is unresolved in the source interpretation. Do not infer the endpoint from the Manila label or proximity to the Mindanao label. Do not import as a complete usable route until the endpoint is resolved.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-15",
+    "printed_name": "Nagasaki Line",
+    "observed_loss_cap": 5,
+    "status": "inherited_complete_source_audit_not_new_certification",
+    "complete_path": [
+      "sea_p14",
+      "sea_p15"
+    ],
+    "endpoints": [
+      {
+        "node_id": "land_manchuria_rehe",
+        "kind": "land"
+      },
+      {
+        "node_id": "land_jap_kyushu",
+        "kind": "land"
+      }
+    ],
+    "beneficiary_nation_id": "japan",
+    "evidence": [
+      "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+    ],
+    "notes": "Prior fully traced source record; still absent from production world map.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  },
+  {
+    "audit_id": "CV-16",
+    "printed_name": "Tokyo Line",
+    "observed_loss_cap": 5,
+    "status": "inherited_complete_source_audit_not_new_certification",
+    "complete_path": [
+      "sea_p16",
+      "sea_p34",
+      "sea_p33",
+      "sea_p32",
+      "sea_p41",
+      "sea_p50"
+    ],
+    "endpoints": [
+      {
+        "node_id": "land_jap_tokyo",
+        "kind": "land"
+      },
+      {
+        "node_id": "sea_p50",
+        "marker": "terminal_arc_near_singapore",
+        "kind": "sea"
+      }
+    ],
+    "beneficiary_nation_id": "japan",
+    "evidence": [
+      "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+    ],
+    "notes": "Prior fully traced source record; still absent from production world map.",
+    "printed_loss_cap_status": "numeric_cap_printed",
+    "implementation_status": "proposal_only_requires_corrected_map_roster_and_profile_id_mapping"
+  }
+]

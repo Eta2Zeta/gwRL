@@ -1,0 +1,2713 @@
+[
+  {
+    "id": "ST-0001",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "land_cyprus"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0002",
+    "check": "non_rulebook_node_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Terrain category needs rules/source reconciliation",
+    "node_ids": [
+      "land_fin_southern_finland"
+    ],
+    "field": "terrain",
+    "current": "forest",
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0003",
+    "check": "non_rulebook_node_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Terrain category needs rules/source reconciliation",
+    "node_ids": [
+      "land_fin_viipuri_province"
+    ],
+    "field": "terrain",
+    "current": "forest",
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0004",
+    "check": "non_rulebook_node_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Terrain category needs rules/source reconciliation",
+    "node_ids": [
+      "land_gbr_scotland"
+    ],
+    "field": "terrain",
+    "current": "mountain_border",
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0005",
+    "check": "naval_facility_without_sea_access",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Node-held naval facility has no explicit access sea in this record",
+    "node_ids": [
+      "land_jap_caroline_islands"
+    ],
+    "field": "node_facilities",
+    "current": {
+      "type": "major_port",
+      "id": "facility_caroline_islands_major_port"
+    },
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0006",
+    "check": "non_rulebook_node_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Terrain category needs rules/source reconciliation",
+    "node_ids": [
+      "land_usa_pacific_northwest"
+    ],
+    "field": "terrain",
+    "current": "forest",
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0007",
+    "check": "non_rulebook_node_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Terrain category needs rules/source reconciliation",
+    "node_ids": [
+      "land_usr_karelia"
+    ],
+    "field": "terrain",
+    "current": "forest",
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0008",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i1"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0009",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i10"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0010",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i13"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0011",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i14"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0012",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i2"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0013",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i8"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0014",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_i9"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0015",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_m6"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0016",
+    "check": "isolated_node",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "No stored adjacency",
+    "node_ids": [
+      "sea_m7"
+    ],
+    "field": "neighbors",
+    "current": [],
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0017",
+    "check": "narrow_missing_blocking_seas",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow crossing lacks blocking sea references",
+    "node_ids": [
+      "land_can_baffin_island",
+      "land_can_district_of_keewatin"
+    ],
+    "field": "narrow_crossing_sea_zones",
+    "current": null,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0018",
+    "check": "narrow_missing_blocking_seas",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow crossing lacks blocking sea references",
+    "node_ids": [
+      "land_can_labrador",
+      "land_can_newfoundland"
+    ],
+    "field": "narrow_crossing_sea_zones",
+    "current": null,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0019",
+    "check": "narrow_missing_blocking_seas",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow crossing lacks blocking sea references",
+    "node_ids": [
+      "land_can_newfoundland",
+      "land_can_st_pierre_island"
+    ],
+    "field": "narrow_crossing_sea_zones",
+    "current": null,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0020",
+    "check": "narrow_missing_blocking_seas",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow crossing lacks blocking sea references",
+    "node_ids": [
+      "land_denmark",
+      "land_nor_southern_norway"
+    ],
+    "field": "narrow_crossing_sea_zones",
+    "current": null,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0021",
+    "check": "narrow_missing_blocking_seas",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow crossing lacks blocking sea references",
+    "node_ids": [
+      "land_denmark",
+      "land_swe_gotaland"
+    ],
+    "field": "narrow_crossing_sea_zones",
+    "current": null,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0022",
+    "check": "narrow_on_non_land_pair",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow capacity is attached to a coast/sea edge",
+    "node_ids": [
+      "land_jap_kurile_islands",
+      "sea_p9"
+    ],
+    "field": "narrow_crossings",
+    "current": 1,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0023",
+    "check": "narrow_on_non_land_pair",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Narrow capacity is attached to a coast/sea edge",
+    "node_ids": [
+      "land_usr_kamchatka",
+      "sea_p9"
+    ],
+    "field": "narrow_crossings",
+    "current": 1,
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0024",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a10",
+      "sea_a7"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0025",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a11",
+      "sea_a10"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0026",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a12",
+      "sea_a11"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0027",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a12",
+      "sea_a23"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0028",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a13",
+      "sea_a12"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0029",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a14",
+      "sea_a13"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0030",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a15",
+      "sea_a2"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0031",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a18",
+      "sea_a15"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0032",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a19",
+      "sea_a18"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0033",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a2",
+      "sea_a1"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0034",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a21",
+      "sea_a20"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0035",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a23",
+      "sea_a21"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0036",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a23",
+      "sea_a22"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0037",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a25",
+      "sea_a18"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0038",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a26",
+      "sea_a25"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0039",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a28",
+      "sea_a22"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0040",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a29",
+      "sea_a28"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0041",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a31",
+      "sea_a26"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0042",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a31",
+      "sea_a36"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0043",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a33",
+      "sea_a31"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0044",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a33",
+      "sea_a36"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0045",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a35",
+      "sea_a33"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0046",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a38",
+      "sea_a35"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0047",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a39",
+      "sea_a38"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0048",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a40",
+      "sea_a39"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0049",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a44",
+      "sea_m1"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0050",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_a7",
+      "sea_a6"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0051",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i11",
+      "sea_i6"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0052",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i12",
+      "sea_i11"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0053",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i3",
+      "sea_m9"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0054",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i4",
+      "sea_i5"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0055",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i5",
+      "sea_i3"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0056",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i5",
+      "sea_m9"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0057",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i6",
+      "sea_i3"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0058",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i6",
+      "sea_i4"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0059",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_i7",
+      "sea_i6"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0060",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m10",
+      "sea_m5"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0061",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m11",
+      "sea_m10"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0062",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m12",
+      "sea_m11"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0063",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m2",
+      "sea_m1"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0064",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m3",
+      "sea_m2"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0065",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m4",
+      "sea_m2"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0066",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m5",
+      "sea_m3"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0067",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m5",
+      "sea_m4"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0068",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_m9",
+      "sea_m10"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0069",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p10",
+      "sea_p9"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0070",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p11",
+      "sea_p6"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0071",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p12",
+      "sea_p11"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0072",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p12",
+      "sea_p6"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0073",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p13",
+      "sea_p12"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0074",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p17",
+      "sea_p9"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0075",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p24",
+      "sea_p12"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0076",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p25",
+      "sea_p13"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0077",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p25",
+      "sea_p24"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0078",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p28",
+      "sea_p25"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0079",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p30",
+      "sea_p28"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0080",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p31",
+      "sea_a36"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0081",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p31",
+      "sea_p30"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0082",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p35",
+      "sea_p34"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0083",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p43",
+      "sea_p34"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0084",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p43",
+      "sea_p42"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0085",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p44",
+      "sea_p42"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0086",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p44",
+      "sea_p43"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0087",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p45",
+      "sea_p34"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0088",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p45",
+      "sea_p43"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0089",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p46",
+      "sea_p43"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0090",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p46",
+      "sea_p44"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0091",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p46",
+      "sea_p45"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0092",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p47",
+      "sea_p46"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0093",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p50",
+      "sea_i12"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0094",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p50",
+      "sea_p42"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0095",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p51",
+      "sea_p42"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0096",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p51",
+      "sea_p44"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0097",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p51",
+      "sea_p50"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0098",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p52",
+      "sea_p44"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0099",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p52",
+      "sea_p50"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0100",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p53",
+      "sea_p44"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0101",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p53",
+      "sea_p46"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0102",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p54",
+      "sea_p46"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0103",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p59",
+      "sea_p50"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0104",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p6",
+      "sea_p5"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0105",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p60",
+      "sea_p59"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0106",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p61",
+      "sea_p60"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0107",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p62",
+      "sea_p61"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0108",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p63",
+      "sea_p62"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0109",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p64",
+      "sea_p63"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0110",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p65",
+      "sea_p64"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0111",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p68",
+      "sea_p65"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0112",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p69",
+      "sea_p68"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0113",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p8",
+      "sea_p2"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0114",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p9",
+      "sea_p2"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0115",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p9",
+      "sea_p3"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0116",
+    "check": "sea_edge_land_terrain",
+    "category": "uncertain",
+    "severity": "review",
+    "subject": "Sea-to-sea edge uses a land terrain default",
+    "node_ids": [
+      "sea_p9",
+      "sea_p8"
+    ],
+    "field": "border_terrain",
+    "current": "normal",
+    "proposed": "sea",
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0117",
+    "check": "facility_id_collision",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "Same physical facility ID used for different lands/types",
+    "node_ids": [
+      "land_british_somaliland",
+      "land_french_somaliland",
+      "land_italian_somaliland"
+    ],
+    "field": "facility_id",
+    "current": {
+      "id": "facility_somaliland_minor_port",
+      "records": [
+        {
+          "land": "land_british_somaliland",
+          "kind": "minor_port",
+          "sea": "sea_i4",
+          "source": "edge"
+        },
+        {
+          "land": "land_french_somaliland",
+          "kind": "minor_port",
+          "sea": "sea_i5",
+          "source": "edge"
+        },
+        {
+          "land": "land_italian_somaliland",
+          "kind": "minor_port",
+          "sea": "sea_i4",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0118",
+    "check": "facility_id_collision",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "Same physical facility ID used for different lands/types",
+    "node_ids": [
+      "land_french_morocco",
+      "land_spanish_morocco"
+    ],
+    "field": "facility_id",
+    "current": {
+      "id": "facility_morocco_minor_port",
+      "records": [
+        {
+          "land": "land_french_morocco",
+          "kind": "minor_port",
+          "sea": "sea_a28",
+          "source": "edge"
+        },
+        {
+          "land": "land_spanish_morocco",
+          "kind": "minor_port",
+          "sea": "sea_a28",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0119",
+    "check": "facility_id_collision",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "Same physical facility ID used for different lands/types",
+    "node_ids": [
+      "land_lower_egypt",
+      "land_upper_egypt",
+      "land_western_egypt"
+    ],
+    "field": "facility_id",
+    "current": {
+      "id": "facility_egypt_minor_port",
+      "records": [
+        {
+          "land": "land_lower_egypt",
+          "kind": "minor_port",
+          "sea": "sea_i5",
+          "source": "edge"
+        },
+        {
+          "land": "land_lower_egypt",
+          "kind": "minor_port",
+          "sea": "sea_m9",
+          "source": "edge"
+        },
+        {
+          "land": "land_upper_egypt",
+          "kind": "minor_port",
+          "sea": "sea_i5",
+          "source": "edge"
+        },
+        {
+          "land": "land_western_egypt",
+          "kind": "minor_port",
+          "sea": "sea_m9",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  },
+  {
+    "id": "ST-0120",
+    "check": "facility_id_collision",
+    "category": "uncertain",
+    "severity": "error",
+    "subject": "Same physical facility ID used for different lands/types",
+    "node_ids": [
+      "land_south_africa",
+      "land_southwest_africa"
+    ],
+    "field": "facility_id",
+    "current": {
+      "id": "facility_africa_minor_port",
+      "records": [
+        {
+          "land": "land_south_africa",
+          "kind": "minor_port",
+          "sea": "sea_a40",
+          "source": "edge"
+        },
+        {
+          "land": "land_southwest_africa",
+          "kind": "minor_port",
+          "sea": "sea_a39",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": null,
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36_manual_map.json",
+        "method": "exhaustive stored-graph check"
+      }
+    ],
+    "confidence": "certain_observation_not_necessarily_a_map_error",
+    "notes": "Diagnostic only; source inspection decides the correction."
+  }
+]

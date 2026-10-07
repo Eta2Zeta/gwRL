@@ -1,0 +1,89 @@
+[
+  {
+    "source_id": "land_aus_new_south_wales",
+    "target_id": "land_aus_sydney",
+    "review_status": "source_checked",
+    "railway_connection": true,
+    "source_rail_gauge": "narrow",
+    "target_rail_gauge": "narrow",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          3750,
+          8650,
+          4888
+        ],
+        "crop": "evidence/ap_australia.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The white/black checked coastal railway crosses the circular Sydney city border from NSW and continues through Sydney. Both sides use the narrow/normal gauge symbol; no gauge change."
+  },
+  {
+    "source_id": "land_lesser_sunda_islands",
+    "target_id": "land_timor",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6470,
+          3160,
+          7850,
+          4030
+        ],
+        "crop": "evidence/ap_indonesia.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The Dutch/Portuguese political border on Timor is ordinary land contact, with no checked railway on either side or through the border."
+  },
+  {
+    "source_id": "land_java",
+    "target_id": "land_lesser_sunda_islands",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6620,
+          3640,
+          7030,
+          3830
+        ],
+        "crop": "evidence/ap_narrow_sunda.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The white dotted connection is a capacity-1 narrow crossing, not the white/black checked railway symbol. No railway crosses between Java and the Lesser Sunda chain."
+  }
+]

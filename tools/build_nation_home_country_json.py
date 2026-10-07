@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MAP_RELATIVE_PATH = Path("game_content/maps/gw36_manual_map.json")
 OUTPUT_RELATIVE_PATH = Path("game_content/maps/gw36_nation_home_country.json")
-RULEBOOK_RELATIVE_PATH = Path("game_content/rules/rulebook.txt")
+RULEBOOK_RELATIVE_PATH = Path("game_content/rules/Global War 1936 v4.3 Rulebook.pdf")
 MAP_PATH = ROOT / MAP_RELATIVE_PATH
 OUTPUT_PATH = ROOT / OUTPUT_RELATIVE_PATH
 
@@ -193,7 +193,7 @@ def build():
         "_meta": {
             "game": "Global War 1936 v4.3",
             "source_rulebook_section": (
-                f"Home Country ({RULEBOOK_RELATIVE_PATH.as_posix()} lines 187-214)"
+                f"Home Country ({RULEBOOK_RELATIVE_PATH.as_posix()}, p. 6)"
             ),
             "description": "Nation-level Home Country data extracted from the rulebook definition and mapped to land node ids.",
             "inputs": [MAP_RELATIVE_PATH.as_posix(), RULEBOOK_RELATIVE_PATH.as_posix()],

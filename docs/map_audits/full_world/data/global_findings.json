@@ -1,0 +1,2162 @@
+[
+  {
+    "id": "WG-001",
+    "category": "change",
+    "severity": "major",
+    "subject": "Normalize terrain on 93 stored sea-to-sea directions after topology correction",
+    "node_ids": [
+      "sea_a1",
+      "sea_a10",
+      "sea_a11",
+      "sea_a12",
+      "sea_a13",
+      "sea_a14",
+      "sea_a15",
+      "sea_a18",
+      "sea_a19",
+      "sea_a2",
+      "sea_a20",
+      "sea_a21",
+      "sea_a22",
+      "sea_a23",
+      "sea_a25",
+      "sea_a26",
+      "sea_a28",
+      "sea_a29",
+      "sea_a31",
+      "sea_a33",
+      "sea_a35",
+      "sea_a36",
+      "sea_a38",
+      "sea_a39",
+      "sea_a40",
+      "sea_a44",
+      "sea_a6",
+      "sea_a7",
+      "sea_i11",
+      "sea_i12",
+      "sea_i3",
+      "sea_i4",
+      "sea_i5",
+      "sea_i6",
+      "sea_i7",
+      "sea_m1",
+      "sea_m10",
+      "sea_m11",
+      "sea_m12",
+      "sea_m2",
+      "sea_m3",
+      "sea_m4",
+      "sea_m5",
+      "sea_m9",
+      "sea_p10",
+      "sea_p11",
+      "sea_p12",
+      "sea_p13",
+      "sea_p17",
+      "sea_p2",
+      "sea_p24",
+      "sea_p25",
+      "sea_p28",
+      "sea_p3",
+      "sea_p30",
+      "sea_p31",
+      "sea_p34",
+      "sea_p35",
+      "sea_p42",
+      "sea_p43",
+      "sea_p44",
+      "sea_p45",
+      "sea_p46",
+      "sea_p47",
+      "sea_p5",
+      "sea_p50",
+      "sea_p51",
+      "sea_p52",
+      "sea_p53",
+      "sea_p54",
+      "sea_p59",
+      "sea_p6",
+      "sea_p60",
+      "sea_p61",
+      "sea_p62",
+      "sea_p63",
+      "sea_p64",
+      "sea_p65",
+      "sea_p68",
+      "sea_p69",
+      "sea_p8",
+      "sea_p9"
+    ],
+    "field": "neighbors[].border_terrain",
+    "current": [
+      {
+        "source_id": "sea_a10",
+        "target_id": "sea_a7",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a11",
+        "target_id": "sea_a10",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a12",
+        "target_id": "sea_a11",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a12",
+        "target_id": "sea_a23",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a13",
+        "target_id": "sea_a12",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a14",
+        "target_id": "sea_a13",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a15",
+        "target_id": "sea_a2",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a18",
+        "target_id": "sea_a15",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a19",
+        "target_id": "sea_a18",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a2",
+        "target_id": "sea_a1",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a21",
+        "target_id": "sea_a20",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a23",
+        "target_id": "sea_a21",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a23",
+        "target_id": "sea_a22",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a25",
+        "target_id": "sea_a18",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a26",
+        "target_id": "sea_a25",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a28",
+        "target_id": "sea_a22",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a29",
+        "target_id": "sea_a28",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a31",
+        "target_id": "sea_a26",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a31",
+        "target_id": "sea_a36",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a33",
+        "target_id": "sea_a31",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a33",
+        "target_id": "sea_a36",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a35",
+        "target_id": "sea_a33",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a38",
+        "target_id": "sea_a35",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a39",
+        "target_id": "sea_a38",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a40",
+        "target_id": "sea_a39",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a44",
+        "target_id": "sea_m1",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_a7",
+        "target_id": "sea_a6",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i11",
+        "target_id": "sea_i6",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i12",
+        "target_id": "sea_i11",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i3",
+        "target_id": "sea_m9",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i4",
+        "target_id": "sea_i5",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i5",
+        "target_id": "sea_i3",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i5",
+        "target_id": "sea_m9",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i6",
+        "target_id": "sea_i3",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i6",
+        "target_id": "sea_i4",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_i7",
+        "target_id": "sea_i6",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m10",
+        "target_id": "sea_m5",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m11",
+        "target_id": "sea_m10",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m12",
+        "target_id": "sea_m11",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m2",
+        "target_id": "sea_m1",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m3",
+        "target_id": "sea_m2",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m4",
+        "target_id": "sea_m2",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m5",
+        "target_id": "sea_m3",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m5",
+        "target_id": "sea_m4",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_m9",
+        "target_id": "sea_m10",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p10",
+        "target_id": "sea_p9",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p11",
+        "target_id": "sea_p6",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p12",
+        "target_id": "sea_p11",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p12",
+        "target_id": "sea_p6",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p13",
+        "target_id": "sea_p12",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p17",
+        "target_id": "sea_p9",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p24",
+        "target_id": "sea_p12",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p25",
+        "target_id": "sea_p13",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p25",
+        "target_id": "sea_p24",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p28",
+        "target_id": "sea_p25",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p30",
+        "target_id": "sea_p28",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p31",
+        "target_id": "sea_a36",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p31",
+        "target_id": "sea_p30",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p35",
+        "target_id": "sea_p34",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p43",
+        "target_id": "sea_p34",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p43",
+        "target_id": "sea_p42",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p44",
+        "target_id": "sea_p42",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p44",
+        "target_id": "sea_p43",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p45",
+        "target_id": "sea_p34",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p45",
+        "target_id": "sea_p43",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p46",
+        "target_id": "sea_p43",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p46",
+        "target_id": "sea_p44",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p46",
+        "target_id": "sea_p45",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p47",
+        "target_id": "sea_p46",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p50",
+        "target_id": "sea_i12",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p50",
+        "target_id": "sea_p42",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p51",
+        "target_id": "sea_p42",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p51",
+        "target_id": "sea_p44",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p51",
+        "target_id": "sea_p50",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p52",
+        "target_id": "sea_p44",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p52",
+        "target_id": "sea_p50",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p53",
+        "target_id": "sea_p44",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p53",
+        "target_id": "sea_p46",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p54",
+        "target_id": "sea_p46",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p59",
+        "target_id": "sea_p50",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p6",
+        "target_id": "sea_p5",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p60",
+        "target_id": "sea_p59",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p61",
+        "target_id": "sea_p60",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p62",
+        "target_id": "sea_p61",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p63",
+        "target_id": "sea_p62",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p64",
+        "target_id": "sea_p63",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p65",
+        "target_id": "sea_p64",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p68",
+        "target_id": "sea_p65",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p69",
+        "target_id": "sea_p68",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p8",
+        "target_id": "sea_p2",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p9",
+        "target_id": "sea_p2",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p9",
+        "target_id": "sea_p3",
+        "current": "normal"
+      },
+      {
+        "source_id": "sea_p9",
+        "target_id": "sea_p8",
+        "current": "normal"
+      }
+    ],
+    "proposed": "sea on every retained ordinary sea-to-sea transition",
+    "evidence": [
+      "data/structural_findings.json checks sea_edge_land_terrain",
+      "Current JSON schema uses terrain=sea for sea nodes and reviewed sea-to-sea approaches"
+    ],
+    "confidence": "high",
+    "notes": "This is representation consistency. Regional deletion proposals take precedence: do not preserve a false adjacency to normalize it. No claim that these 93 physical connections all exist."
+  },
+  {
+    "id": "WG-002",
+    "category": "change",
+    "severity": "major",
+    "subject": "Give the three printed Somaliland minor ports distinct IDs and their correct sea accesses",
+    "node_ids": [
+      "land_british_somaliland",
+      "land_french_somaliland",
+      "land_italian_somaliland"
+    ],
+    "field": "naval_facilities / naval_facility_ids",
+    "current": {
+      "id": "facility_somaliland_minor_port",
+      "records": [
+        {
+          "land": "land_british_somaliland",
+          "kind": "minor_port",
+          "sea": "sea_i4",
+          "source": "edge"
+        },
+        {
+          "land": "land_french_somaliland",
+          "kind": "minor_port",
+          "sea": "sea_i5",
+          "source": "edge"
+        },
+        {
+          "land": "land_italian_somaliland",
+          "kind": "minor_port",
+          "sea": "sea_i4",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": {
+      "retire_shared_id": "facility_somaliland_minor_port",
+      "verified_facilities": [
+        {
+          "id": "facility_british_somaliland_minor_port",
+          "land_id": "land_british_somaliland",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i4"
+          ]
+        },
+        {
+          "id": "facility_french_somaliland_minor_port",
+          "land_id": "land_french_somaliland",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i4"
+          ]
+        },
+        {
+          "id": "facility_italian_somaliland_minor_port",
+          "land_id": "land_italian_somaliland",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i3"
+          ]
+        }
+      ]
+    },
+    "evidence": [
+      "data/structural_findings.json ST-0117",
+      "evidence/ea_east_africa.png: three separate white-anchor symbols; French and British Somaliland face I4, Italian Somaliland faces I3.",
+      "data/europe_africa_middle_east_findings.json EA-333, EA-334, EA-335"
+    ],
+    "confidence": "high",
+    "notes": "These are three separately printed physical facilities, not just renamed old claims. Move the French port access from the old I5 claim to I4 and Italian port access from the old I4 claim to I3; each valid coast direction references the same physical ID. No extra port is implied on another coast of the same territory."
+  },
+  {
+    "id": "WG-003",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove the nonexistent French Morocco port and give the Spanish Morocco port its own ID",
+    "node_ids": [
+      "land_french_morocco",
+      "land_spanish_morocco"
+    ],
+    "field": "naval_facilities / naval_facility_ids",
+    "current": {
+      "id": "facility_morocco_minor_port",
+      "records": [
+        {
+          "land": "land_french_morocco",
+          "kind": "minor_port",
+          "sea": "sea_a28",
+          "source": "edge"
+        },
+        {
+          "land": "land_spanish_morocco",
+          "kind": "minor_port",
+          "sea": "sea_a28",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": {
+      "remove_facilities_from": [
+        "land_french_morocco"
+      ],
+      "rename_surviving_facility": {
+        "land_id": "land_spanish_morocco",
+        "type": "minor_port",
+        "old_id": "facility_morocco_minor_port",
+        "new_id": "facility_spanish_morocco_minor_port",
+        "sea_accesses": [
+          "sea_a44"
+        ]
+      },
+      "coast_corrections": "Apply EA-369 and EA-370 separately; do not carry the nonexistent French Morocco port onto its corrected A44 coast."
+    },
+    "evidence": [
+      "data/structural_findings.json ST-0118",
+      "tools/build_manual_map_json.py zone_name_part() and normalize_naval_facility_instances()",
+      "User correction, 6 October 2026: there is no port in French Morocco.",
+      "evidence/ea_north_africa.png: no French Morocco port; white minor-port anchor on Spanish Morocco."
+    ],
+    "confidence": "high",
+    "notes": "The old proposal was a conditional naming example, but misleadingly listed a new French Morocco port ID. That example is withdrawn. French Morocco has no printed port to rename. Only the real Spanish Morocco minor port receives its own ID. This is a proposal in the audit, not a production map edit. The Spanish Morocco minor port faces A44 only; its separate M2 coastline does not imply another port or another access of this port."
+  },
+  {
+    "id": "WG-004",
+    "category": "change",
+    "severity": "major",
+    "subject": "Replace the shared Egypt port ID with the actual printed facilities",
+    "node_ids": [
+      "land_lower_egypt",
+      "land_upper_egypt",
+      "land_western_egypt"
+    ],
+    "field": "naval_facilities / naval_facility_ids",
+    "current": {
+      "id": "facility_egypt_minor_port",
+      "records": [
+        {
+          "land": "land_lower_egypt",
+          "kind": "minor_port",
+          "sea": "sea_i5",
+          "source": "edge"
+        },
+        {
+          "land": "land_lower_egypt",
+          "kind": "minor_port",
+          "sea": "sea_m9",
+          "source": "edge"
+        },
+        {
+          "land": "land_upper_egypt",
+          "kind": "minor_port",
+          "sea": "sea_i5",
+          "source": "edge"
+        },
+        {
+          "land": "land_western_egypt",
+          "kind": "minor_port",
+          "sea": "sea_m9",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": {
+      "retire_shared_id": "facility_egypt_minor_port",
+      "verified_facilities": [
+        {
+          "id": "facility_western_egypt_major_port",
+          "land_id": "land_western_egypt",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m8"
+          ],
+          "source_finding": "EA-328"
+        },
+        {
+          "id": "facility_lower_egypt_major_dockyard",
+          "land_id": "land_lower_egypt",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_m8"
+          ],
+          "source_finding": "EA-329"
+        },
+        {
+          "id": "facility_lower_egypt_major_port",
+          "land_id": "land_lower_egypt",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i5"
+          ],
+          "source_finding": "EA-330"
+        }
+      ],
+      "remove_unprinted_facilities": [
+        {
+          "land_id": "land_upper_egypt",
+          "old_type": "minor_port",
+          "old_sea_access": "sea_i5",
+          "source_finding": "EA-331"
+        }
+      ]
+    },
+    "evidence": [
+      "data/structural_findings.json ST-0119",
+      "tools/build_manual_map_json.py zone_name_part() and normalize_naval_facility_instances()",
+      "data/europe_africa_middle_east_findings.json EA-328, EA-329, EA-330 and EA-331",
+      "evidence/ea_north_africa.png and evidence/ea_arabia.png: printed naval symbols and their territory/coast positions."
+    ],
+    "confidence": "high",
+    "notes": "The earlier territory-to-minor-port-ID dictionary was a naming illustration, not a verified facility roster; it is withdrawn. Correct facility existence, type and coast first, then give each physical instance its own ID. Lower Egypt has two different printed facilities, so those two records also need different IDs. Upper Egypt has no printed port. Update references on both directions of each valid coast edge, remove old facility attributes from replaced M9 edges, and do not create an Upper Egypt port. This reconciles WG-004 with EA-328–331; it adds no independent facilities beyond those regional proposals."
+  },
+  {
+    "id": "WG-005",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove the nonexistent Southwest Africa port and correct South Africa’s printed major port",
+    "node_ids": [
+      "land_south_africa",
+      "land_southwest_africa"
+    ],
+    "field": "naval_facilities / naval_facility_ids",
+    "current": {
+      "id": "facility_africa_minor_port",
+      "records": [
+        {
+          "land": "land_south_africa",
+          "kind": "minor_port",
+          "sea": "sea_a40",
+          "source": "edge"
+        },
+        {
+          "land": "land_southwest_africa",
+          "kind": "minor_port",
+          "sea": "sea_a39",
+          "source": "edge"
+        }
+      ]
+    },
+    "proposed": {
+      "retire_shared_id": "facility_africa_minor_port",
+      "remove_facilities_from": [
+        "land_southwest_africa"
+      ],
+      "verified_facilities": [
+        {
+          "id": "facility_south_africa_major_port",
+          "land_id": "land_south_africa",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i1"
+          ],
+          "source_finding": "EA-338"
+        }
+      ]
+    },
+    "evidence": [
+      "data/structural_findings.json ST-0120",
+      "User correction, 6 October 2026: there is no port in Southwest Africa.",
+      "evidence/ea_south_africa.png: Southwest Africa has no naval symbol; South Africa has a blue major-port anchor on its I1 coast.",
+      "data/europe_africa_middle_east_findings.json EA-338"
+    ],
+    "confidence": "high",
+    "notes": "Withdraw the earlier conditional ID-renaming example: it would retain a phantom Southwest Africa facility and the wrong South Africa type. Delete the Southwest Africa naval-facility claim; keep its real coast. Replace the South Africa minor-port claim with the actual major port on I1. Reconcile old A39/A40 coast corrections separately, and apply the same facility ID to both directions of its valid I1 coast. These are audit proposals only."
+  },
+  {
+    "id": "WG-006",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove spurious victory-city status from Denmark",
+    "node_ids": [
+      "land_denmark"
+    ],
+    "field": "is_victory_city",
+    "current": true,
+    "proposed": false,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Keep ordinary city/capital identity separate; this is only the victory-city flag."
+  },
+  {
+    "id": "WG-007",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove spurious victory-city status from Southern Finland",
+    "node_ids": [
+      "land_fin_southern_finland"
+    ],
+    "field": "is_victory_city",
+    "current": true,
+    "proposed": false,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Keep ordinary city/capital identity separate; this is only the victory-city flag."
+  },
+  {
+    "id": "WG-008",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove spurious victory-city status from Warsaw",
+    "node_ids": [
+      "land_pol_warsaw"
+    ],
+    "field": "is_victory_city",
+    "current": true,
+    "proposed": false,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Keep ordinary city/capital identity separate; this is only the victory-city flag."
+  },
+  {
+    "id": "WG-009",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove spurious victory-city status from Istanbul",
+    "node_ids": [
+      "land_tur_istanbul"
+    ],
+    "field": "is_victory_city",
+    "current": true,
+    "proposed": false,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Keep ordinary city/capital identity separate; this is only the victory-city flag."
+  },
+  {
+    "id": "WG-010",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove spurious victory-city status from Kiev",
+    "node_ids": [
+      "land_usr_kiev"
+    ],
+    "field": "is_victory_city",
+    "current": true,
+    "proposed": false,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Keep ordinary city/capital identity separate; this is only the victory-city flag."
+  },
+  {
+    "id": "WG-011",
+    "category": "change",
+    "severity": "major",
+    "subject": "Remove spurious victory-city status from Leningrad",
+    "node_ids": [
+      "land_usr_leningrad"
+    ],
+    "field": "is_victory_city",
+    "current": true,
+    "proposed": false,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Keep ordinary city/capital identity separate; this is only the victory-city flag."
+  },
+  {
+    "id": "WG-012",
+    "category": "change",
+    "severity": "major",
+    "subject": "Mark Calcutta as a victory city",
+    "node_ids": [
+      "land_india_calcutta"
+    ],
+    "field": "is_victory_city",
+    "current": false,
+    "proposed": true,
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf, section 3.2, PDF/printed p20"
+    ],
+    "confidence": "high",
+    "notes": "Sydney is also required but its missing-node proposal is tracked in the Asia/Pacific report."
+  },
+  {
+    "id": "WG-013",
+    "category": "change",
+    "severity": "major",
+    "subject": "Use printed sea-zone codes as canonical sea labels",
+    "node_ids": [
+      "sea_a1",
+      "sea_a10",
+      "sea_a11",
+      "sea_a12",
+      "sea_a13",
+      "sea_a14",
+      "sea_a15",
+      "sea_a18",
+      "sea_a19",
+      "sea_a2",
+      "sea_a20",
+      "sea_a21",
+      "sea_a22",
+      "sea_a23",
+      "sea_a24",
+      "sea_a25",
+      "sea_a26",
+      "sea_a28",
+      "sea_a29",
+      "sea_a31",
+      "sea_a33",
+      "sea_a35",
+      "sea_a36",
+      "sea_a38",
+      "sea_a39",
+      "sea_a40",
+      "sea_a44",
+      "sea_a6",
+      "sea_a7",
+      "sea_i1",
+      "sea_i10",
+      "sea_i11",
+      "sea_i12",
+      "sea_i13",
+      "sea_i14",
+      "sea_i2",
+      "sea_i3",
+      "sea_i4",
+      "sea_i5",
+      "sea_i6",
+      "sea_i7",
+      "sea_i8",
+      "sea_i9",
+      "sea_m1",
+      "sea_m10",
+      "sea_m11",
+      "sea_m12",
+      "sea_m2",
+      "sea_m3",
+      "sea_m4",
+      "sea_m5",
+      "sea_m6",
+      "sea_m7",
+      "sea_m8",
+      "sea_m9",
+      "sea_p1",
+      "sea_p10",
+      "sea_p11",
+      "sea_p12",
+      "sea_p13",
+      "sea_p14",
+      "sea_p15",
+      "sea_p16",
+      "sea_p17",
+      "sea_p18",
+      "sea_p2",
+      "sea_p24",
+      "sea_p25",
+      "sea_p26",
+      "sea_p28",
+      "sea_p3",
+      "sea_p30",
+      "sea_p31",
+      "sea_p32",
+      "sea_p33",
+      "sea_p34",
+      "sea_p35",
+      "sea_p36",
+      "sea_p41",
+      "sea_p42",
+      "sea_p43",
+      "sea_p44",
+      "sea_p45",
+      "sea_p46",
+      "sea_p47",
+      "sea_p5",
+      "sea_p50",
+      "sea_p51",
+      "sea_p52",
+      "sea_p53",
+      "sea_p54",
+      "sea_p59",
+      "sea_p6",
+      "sea_p60",
+      "sea_p61",
+      "sea_p62",
+      "sea_p63",
+      "sea_p64",
+      "sea_p65",
+      "sea_p68",
+      "sea_p69",
+      "sea_p7",
+      "sea_p8",
+      "sea_p9"
+    ],
+    "field": "name",
+    "current": "104 hand-authored descriptive sea names",
+    "proposed": "Display printed A#/M#/I#/P# code; retain only verified geographic aliases",
+    "evidence": [
+      "Global War 1936 v4.3 Rulebook.pdf section 1.2 p10",
+      "Original map image and regional sea-number corrections"
+    ],
+    "confidence": "high",
+    "notes": "Stable node IDs remain unchanged. This removes unsupported geographic implications from labels, not seas from the map."
+  },
+  {
+    "id": "WG-014",
+    "category": "change",
+    "severity": "major",
+    "subject": "Preserve source review information in the map authoring pipeline",
+    "node_ids": [],
+    "field": "generator confidence/source metadata",
+    "current": "confidence parameters accepted and discarded; reverse terrain/crossing defaulted",
+    "proposed": "Require separate directional source/review state; retain explicit unknown until verified",
+    "evidence": [
+      "tools/build_manual_map_json.py link(), link_rail(), link_land(), link_land_sea(), symmetric closure pass"
+    ],
+    "confidence": "high",
+    "notes": "Authoring proposal. Do not convert unknown terrain/crossings to false/normal or infer source confidence from graph symmetry."
+  },
+  {
+    "id": "WG-015",
+    "category": "change",
+    "severity": "major",
+    "subject": "Replace the Soviet-only rail-gauge heuristic",
+    "node_ids": [],
+    "field": "gauge_change generation",
+    "current": "True iff exactly one originally Soviet endpoint, for every stored rail",
+    "proposed": "Use independently verified printed gauges; compare gauges only on verified rails",
+    "evidence": [
+      "Rulebook section 1.6 p10, 11.2.1 p75 and 13.2.8 p98",
+      "tools/build_manual_map_json.py final gauge-change loop"
+    ],
+    "confidence": "high",
+    "notes": "Brazil/Spain/Finland/Mongolia/Tannu Tuva also appear in broad-gauge construction rules. Existing rail gauges must be checked from the printed board; do not silently apply construction defaults to unaudited rails."
+  },
+  {
+    "id": "WG-016",
+    "category": "change",
+    "severity": "major",
+    "subject": "Add blocking sea references for land_can_baffin_island ↔ land_can_district_of_keewatin",
+    "node_ids": [
+      "land_can_baffin_island",
+      "land_can_district_of_keewatin",
+      "sea_a1"
+    ],
+    "field": "narrow_crossing_sea_zones (both directed land entries)",
+    "current": null,
+    "proposed": [
+      "sea_a1"
+    ],
+    "evidence": [
+      "Original gw36map.png crop (0, 0, 2250, 1450); evidence/americas_arctic.png",
+      "Rulebook section 1.9 p16",
+      "Americas regional audit narrow-crossing inspection"
+    ],
+    "confidence": "high",
+    "notes": "Keep existing capacity 1. Labrador–Newfoundland line lies on the A15/A18 boundary; both seas can block it. This does not add or remove ordinary coastal access."
+  },
+  {
+    "id": "WG-017",
+    "category": "change",
+    "severity": "major",
+    "subject": "Add blocking sea references for land_can_labrador ↔ land_can_newfoundland",
+    "node_ids": [
+      "land_can_labrador",
+      "land_can_newfoundland",
+      "sea_a15",
+      "sea_a18"
+    ],
+    "field": "narrow_crossing_sea_zones (both directed land entries)",
+    "current": null,
+    "proposed": [
+      "sea_a15",
+      "sea_a18"
+    ],
+    "evidence": [
+      "Original gw36map.png crop (0, 0, 2250, 1450); evidence/americas_arctic.png",
+      "Rulebook section 1.9 p16",
+      "Americas regional audit narrow-crossing inspection"
+    ],
+    "confidence": "high",
+    "notes": "Keep existing capacity 1. Labrador–Newfoundland line lies on the A15/A18 boundary; both seas can block it. This does not add or remove ordinary coastal access."
+  },
+  {
+    "id": "WG-018",
+    "category": "change",
+    "severity": "major",
+    "subject": "Add blocking sea references for land_can_newfoundland ↔ land_can_st_pierre_island",
+    "node_ids": [
+      "land_can_newfoundland",
+      "land_can_st_pierre_island",
+      "sea_a18"
+    ],
+    "field": "narrow_crossing_sea_zones (both directed land entries)",
+    "current": null,
+    "proposed": [
+      "sea_a18"
+    ],
+    "evidence": [
+      "Original gw36map.png crop (0, 0, 2250, 1450); evidence/americas_arctic.png",
+      "Rulebook section 1.9 p16",
+      "Americas regional audit narrow-crossing inspection"
+    ],
+    "confidence": "high",
+    "notes": "Keep existing capacity 1. Labrador–Newfoundland line lies on the A15/A18 boundary; both seas can block it. This does not add or remove ordinary coastal access."
+  },
+  {
+    "id": "WG-019",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Europe-America Line",
+    "node_ids": [
+      "land_can_nova_scotia",
+      "land_gbr_southern_england",
+      "sea_a18",
+      "sea_a19",
+      "sea_a20",
+      "sea_a21"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Europe-America Line",
+      "observed_loss_cap": 5,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "britain",
+      "complete_path": [
+        "sea_a18",
+        "sea_a19",
+        "sea_a20",
+        "sea_a21"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_can_nova_scotia"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_gbr_southern_england"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_canada_start.jpg",
+      "evidence/root_atlantic_north.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Nova Scotia port to Southern England port; the land endpoints are not Canada/UK sea arcs. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-020",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Atlantic Line",
+    "node_ids": [
+      "land_gbr_southern_england",
+      "sea_a44",
+      "sea_a21",
+      "sea_a28",
+      "sea_a27",
+      "sea_a35"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Atlantic Line",
+      "observed_loss_cap": 6,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "britain",
+      "complete_path": [
+        "sea_a21",
+        "sea_a28",
+        "sea_a27",
+        "sea_a35",
+        "sea_a44"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_gbr_southern_england"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_a44"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_atlantic_north.jpg",
+      "evidence/root_convoy_atlantic_27_28.jpg",
+      "evidence/root_atlantic_middle.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "The diagonal crosses A28 into the narrow southern extension of A27 before A35; do not shortcut A27. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-021",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Mediterranean Line",
+    "node_ids": [
+      "sea_a44",
+      "sea_m8",
+      "sea_m2",
+      "sea_m4"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Mediterranean Line",
+      "observed_loss_cap": 6,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "britain",
+      "complete_path": [
+        "sea_a44",
+        "sea_m2",
+        "sea_m4",
+        "sea_m8"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a44"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_m8"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_atlantic_middle.jpg",
+      "evidence/root_convoy_med.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Both ends have sea-terminal arcs. The M8 arc is just above the Lower Egypt dockyard; it does not make this a land endpoint. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-022",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced West African Line",
+    "node_ids": [
+      "sea_a44",
+      "sea_a54",
+      "sea_a46",
+      "sea_a48",
+      "sea_a50",
+      "sea_a51",
+      "sea_a53"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "West African Line",
+      "observed_loss_cap": 3,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "britain",
+      "complete_path": [
+        "sea_a44",
+        "sea_a46",
+        "sea_a48",
+        "sea_a50",
+        "sea_a51",
+        "sea_a53",
+        "sea_a54"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a44"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_a54"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_atlantic_middle.jpg",
+      "evidence/root_atlantic_south.jpg",
+      "evidence/root_convoy_south_africa.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Separate sea-terminal arcs at the Gibraltar-side junction and Cape Town-side junction. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-023",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced East African Line",
+    "node_ids": [
+      "sea_a54",
+      "sea_i4",
+      "sea_i1",
+      "sea_i3"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "East African Line",
+      "observed_loss_cap": 1,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "britain",
+      "complete_path": [
+        "sea_a54",
+        "sea_i1",
+        "sea_i3",
+        "sea_i4"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a54"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_i4"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_south_africa.jpg",
+      "evidence/root_indian_ocean.jpg",
+      "evidence/root_convoy_aden_detail.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Passes west of Madagascar through I1/I3. The I4 terminal arc adjoins the continuing Indian Ocean Line off Aden. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-024",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Indian Ocean Line",
+    "node_ids": [
+      "sea_i5",
+      "sea_p50",
+      "sea_i4",
+      "sea_i7",
+      "sea_i12"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Indian Ocean Line",
+      "observed_loss_cap": 1,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "fec",
+      "complete_path": [
+        "sea_i5",
+        "sea_i4",
+        "sea_i7",
+        "sea_i12",
+        "sea_p50"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_i5"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_p50"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_suez_full.jpg",
+      "evidence/root_convoy_aden_detail.jpg",
+      "evidence/root_indian_ocean.jpg",
+      "evidence/root_convoy_singapore.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Starts at a Red Sea arc in I5 below Lower Egypt, continues past the East African terminal in I4, and ends at its own Singapore-side P50 arc. It does not enter I11. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-025",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced East Asian Line",
+    "node_ids": [
+      "sea_p50",
+      "land_aus_new_south_wales",
+      "sea_p59",
+      "sea_p60",
+      "sea_p62",
+      "sea_p63",
+      "sea_p64",
+      "sea_p71",
+      "sea_p72"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "East Asian Line",
+      "observed_loss_cap": 2,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "anzac",
+      "complete_path": [
+        "sea_p50",
+        "sea_p59",
+        "sea_p60",
+        "sea_p62",
+        "sea_p63",
+        "sea_p64",
+        "sea_p71",
+        "sea_p72"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_p50"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_aus_new_south_wales"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_singapore.jpg",
+      "evidence/root_convoy_east_asian_java.jpg",
+      "evidence/root_convoy_far_east.jpg",
+      "evidence/root_convoy_australia_end.jpg",
+      "evidence/root_convoy_sydney_end.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Printed name East Asian Line. Southern land endpoint is the New South Wales shipyard north of the separate Sydney city boundary. UK rectangular flag is a separate bonus reference. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-026",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Lend Lease to Britain Line",
+    "node_ids": [
+      "land_usa_new_york",
+      "land_brazil_rio_de_janeiro",
+      "sea_a25",
+      "sea_a30",
+      "sea_a37",
+      "sea_a41",
+      "sea_a42",
+      "sea_a45",
+      "sea_a47"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Lend Lease to Britain Line",
+      "observed_loss_cap": 3,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "usa",
+      "complete_path": [
+        "sea_a25",
+        "sea_a30",
+        "sea_a37",
+        "sea_a41",
+        "sea_a42",
+        "sea_a45",
+        "sea_a47"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_usa_new_york"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_brazil_rio_de_janeiro"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_north_atlantic_start.jpg",
+      "evidence/root_convoy_caribbean.jpg",
+      "evidence/root_convoy_brazil.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "New York to Rio de Janeiro. The line begins in A25 and passes west of A38 in A37/A41; it does not traverse A38 or A49. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-027",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced North Sea Line",
+    "node_ids": [
+      "land_ger_western_germany",
+      "land_nor_northern_norway",
+      "sea_a11",
+      "sea_a10",
+      "sea_a7",
+      "sea_a5",
+      "sea_a8"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "North Sea Line",
+      "observed_loss_cap": 2,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "germany",
+      "complete_path": [
+        "sea_a11",
+        "sea_a10",
+        "sea_a7",
+        "sea_a5",
+        "sea_a8"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_ger_western_germany"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_nor_northern_norway"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_north_sea_full.jpg",
+      "evidence/root_convoy_arctic.jpg",
+      "evidence/ea_naval_germany_denmark_20261006.png"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Western Germany A11 major shipyard to Narvik in Northern Norway. The northern stretch is A5/A8, not A6 or A9. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-028",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Baltic Line",
+    "node_ids": [
+      "land_ger_eastern_germany",
+      "land_swe_norrland",
+      "sea_a12",
+      "sea_a13"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Baltic Line",
+      "observed_loss_cap": 3,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "germany",
+      "complete_path": [
+        "sea_a12",
+        "sea_a13"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_ger_eastern_germany"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_swe_norrland"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_baltic_full.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "The dashed line stays west of the curved A14 border throughout; A14 is not part of the Baltic Line. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-029",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Liguria-Tripoli Line",
+    "node_ids": [
+      "land_ita_lazio",
+      "land_tripoli",
+      "sea_m3",
+      "sea_m2",
+      "sea_m4"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Liguria-Tripoli Line",
+      "observed_loss_cap": 1,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "italy",
+      "complete_path": [
+        "sea_m3",
+        "sea_m2",
+        "sea_m4"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_ita_lazio"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_tripoli"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_italy_detail.jpg",
+      "evidence/root_convoy_med.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Despite its printed Liguria-Tripoli label, the northern facility lies on Lazio. The curve west of Sicily briefly crosses M2 between M3 and M4. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-030",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add source-traced Soviet Arctic Line",
+    "node_ids": [
+      "sea_a20",
+      "land_usr_kola",
+      "sea_a17",
+      "sea_a4",
+      "sea_a6",
+      "sea_a5",
+      "sea_a8"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Soviet Arctic Line",
+      "observed_loss_cap": null,
+      "printed_loss_cap_status": "no_numeric_cap_printed",
+      "beneficiary_nation_id": "ussr",
+      "complete_path": [
+        "sea_a20",
+        "sea_a17",
+        "sea_a4",
+        "sea_a6",
+        "sea_a5",
+        "sea_a8"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a20"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_usr_kola"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_soviet_start.jpg",
+      "evidence/root_convoy_arctic.jpg",
+      "evidence/root_convoy_north_sea_full.jpg",
+      "evidence/root_convoy_kola_end.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "The sea arc is in A20; the curve west of Shetland passes through A6 before A5. Kola endpoint is its A8 minor shipyard. No numeric raid cap is printed. USSR NRS p2 separately gives a conditional +2 wartime bonus; do not use that as a raid cap. Geographic record is a proposal; validate against the corrected world roster and canonical nation IDs before implementation."
+  },
+  {
+    "id": "WG-031",
+    "category": "uncertain",
+    "severity": "major",
+    "subject": "Resolve Manila Line Philippine land endpoint",
+    "node_ids": [
+      "land_luzon_and_the_visayas",
+      "land_mindanao",
+      "land_usa_san_francisco",
+      "sea_p25",
+      "sea_p24",
+      "sea_p29",
+      "sea_p37",
+      "sea_p36",
+      "sea_p35",
+      "sea_p45",
+      "sea_p43",
+      "sea_p42",
+      "sea_p51",
+      "sea_p50"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production convoy layer; observed label and cap in audit register",
+    "proposed": {
+      "printed_name": "Manila Line",
+      "observed_loss_cap": 3,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "usa",
+      "complete_path": [
+        "sea_p25",
+        "sea_p24",
+        "sea_p29",
+        "sea_p37",
+        "sea_p36",
+        "sea_p35",
+        "sea_p45",
+        "sea_p43",
+        "sea_p42",
+        "sea_p51",
+        "sea_p50"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_usa_san_francisco"
+        },
+        {
+          "kind": "land",
+          "node_id": null,
+          "candidate_node_ids": [
+            "land_luzon_and_the_visayas",
+            "land_mindanao"
+          ],
+          "access_sea_id": "sea_p50",
+          "facility_type": "major_port"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_manila_sf.jpg",
+      "evidence/root_convoy_western_pacific.jpg",
+      "evidence/root_pacific_east.jpg",
+      "evidence/root_convoy_manila_35_45_43.jpg",
+      "evidence/root_convoy_far_east.jpg",
+      "evidence/root_convoy_manila_west_end.jpg"
+    ],
+    "confidence": "high_sea_path_unresolved_land_endpoint",
+    "notes": "Entire sea path is traced, including P45 and the P51→P50 Philippine bend. The white-anchor-on-blue terminal is a major port, not a dockyard. It is drawn on the western Visayas island cluster; assignment to Luzon and the Visayas versus Mindanao is unresolved in the source interpretation. Do not infer the endpoint from the Manila label or proximity to the Mindanao label. Do not import as a complete usable route until the endpoint is resolved."
+  },
+  {
+    "id": "WG-032",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing printed Atlantic/Arctic sea zone A5",
+    "node_ids": [
+      "sea_a5"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Sea Zone A5",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null
+    },
+    "evidence": [
+      "Original gw36map.png rectangle (1700, 0, 4600, 950); evidence/root_convoy_arctic.jpg"
+    ],
+    "confidence": "high",
+    "notes": "Printed zone identity is confirmed. Complete border ring still needs full native trace; EA/AP regional coast references require this missing node. Do not fill unspecified neighbors from a rectangular grid assumption."
+  },
+  {
+    "id": "WG-033",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing printed Atlantic/Arctic sea zone A8",
+    "node_ids": [
+      "sea_a8"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Sea Zone A8",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null
+    },
+    "evidence": [
+      "Original gw36map.png rectangle (1700, 0, 4600, 950); evidence/root_convoy_arctic.jpg"
+    ],
+    "confidence": "high",
+    "notes": "Printed zone identity is confirmed. Complete border ring still needs full native trace; EA/AP regional coast references require this missing node. Do not fill unspecified neighbors from a rectangular grid assumption."
+  },
+  {
+    "id": "WG-034",
+    "category": "add",
+    "severity": "major",
+    "subject": "Missing printed Atlantic/Arctic sea zone A9",
+    "node_ids": [
+      "sea_a9"
+    ],
+    "field": "node",
+    "current": null,
+    "proposed": {
+      "name": "Sea Zone A9",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null
+    },
+    "evidence": [
+      "Original gw36map.png rectangle (1700, 0, 4600, 950); evidence/root_convoy_arctic.jpg",
+      "A9 also expressly referenced by rulebook sections 1.8 p15 and 1.13 p17"
+    ],
+    "confidence": "high",
+    "notes": "Printed zone identity is confirmed. Complete border ring still needs full native trace; EA/AP regional coast references require this missing node. Do not fill unspecified neighbors from a rectangular grid assumption."
+  },
+  {
+    "id": "WG-035",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add Caribbean Line to the world convoy layer",
+    "node_ids": [
+      "land_usa_texas",
+      "sea_a37",
+      "sea_a36"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production world convoy layer",
+    "proposed": {
+      "printed_name": "Caribbean Line",
+      "observed_loss_cap": 2,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "usa",
+      "complete_path": [
+        "sea_a36",
+        "sea_a37"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_usa_texas"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_a37"
+        }
+      ]
+    },
+    "evidence": [
+      "evidence/root_convoy_caribbean.jpg"
+    ],
+    "confidence": "high_for_printed_geography",
+    "notes": "Texas facility land endpoint; terminal arc in A37 southeast of Bahamas. A37 is absent from current JSON; this is not executable current-map data. See convoy_review.md; this is a proposal, not executable map data."
+  },
+  {
+    "id": "WG-036",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add Nagasaki Line to the world convoy layer",
+    "node_ids": [
+      "land_manchuria_rehe",
+      "land_jap_kyushu",
+      "sea_p14",
+      "sea_p15"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production world convoy layer",
+    "proposed": {
+      "printed_name": "Nagasaki Line",
+      "observed_loss_cap": 5,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "japan",
+      "complete_path": [
+        "sea_p14",
+        "sea_p15"
+      ],
+      "endpoints": [
+        {
+          "node_id": "land_manchuria_rehe",
+          "kind": "land"
+        },
+        {
+          "node_id": "land_jap_kyushu",
+          "kind": "land"
+        }
+      ]
+    },
+    "evidence": [
+      "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+    ],
+    "confidence": "inherited_complete_source_audit",
+    "notes": "Prior fully traced source record; still absent from production world map. See convoy_review.md; this is a proposal, not executable map data."
+  },
+  {
+    "id": "WG-037",
+    "category": "add",
+    "severity": "major",
+    "subject": "Add Tokyo Line to the world convoy layer",
+    "node_ids": [
+      "land_jap_tokyo",
+      "sea_p50",
+      "sea_p16",
+      "sea_p34",
+      "sea_p33",
+      "sea_p32",
+      "sea_p41"
+    ],
+    "field": "convoy_lines endpoints / ordered seas / beneficiary",
+    "current": "No production world convoy layer",
+    "proposed": {
+      "printed_name": "Tokyo Line",
+      "observed_loss_cap": 5,
+      "printed_loss_cap_status": "numeric_cap_printed",
+      "beneficiary_nation_id": "japan",
+      "complete_path": [
+        "sea_p16",
+        "sea_p34",
+        "sea_p33",
+        "sea_p32",
+        "sea_p41",
+        "sea_p50"
+      ],
+      "endpoints": [
+        {
+          "node_id": "land_jap_tokyo",
+          "kind": "land"
+        },
+        {
+          "node_id": "sea_p50",
+          "marker": "terminal_arc_near_singapore",
+          "kind": "sea"
+        }
+      ]
+    },
+    "evidence": [
+      "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+    ],
+    "confidence": "inherited_complete_source_audit",
+    "notes": "Prior fully traced source record; still absent from production world map. See convoy_review.md; this is a proposal, not executable map data."
+  },
+  {
+    "id": "WG-038",
+    "category": "change",
+    "severity": "major",
+    "subject": "Restore New England to the USA Home Country sidecar",
+    "node_ids": [
+      "land_usa_new_england"
+    ],
+    "field": "nations.USA.home_country_land_zone_ids",
+    "current": [
+      "land_usa_appalachia",
+      "land_usa_chicago",
+      "land_usa_great_lakes",
+      "land_usa_great_plains",
+      "land_usa_heartlands",
+      "land_usa_midwest",
+      "land_usa_new_orleans",
+      "land_usa_new_york",
+      "land_usa_pacific_northwest",
+      "land_usa_san_francisco",
+      "land_usa_southeastern_united_states",
+      "land_usa_southwest_united_states",
+      "land_usa_texas",
+      "land_usa_the_carolinas",
+      "land_usa_the_northeast",
+      "land_usa_upper_midwest",
+      "land_usa_washington_dc",
+      "land_usa_western_united_states"
+    ],
+    "proposed": {
+      "add_land_zone_ids": [
+        "land_usa_new_england"
+      ]
+    },
+    "evidence": [
+      "game_content/rules/Global War 1936 v4.3 Rulebook.pdf p6",
+      "game_content/maps/gw36_nation_home_country.json",
+      "tools/build_nation_home_country_json.py",
+      "game_content/maps/gw36map.png"
+    ],
+    "confidence": "high",
+    "notes": "New England is contiguous mainland USA on the printed board. Its missing mainland connections cause contiguous_us_home() to omit it. Repair those borders before regenerating; do not let a broken graph define national Home Country."
+  },
+  {
+    "id": "WG-039",
+    "category": "delete",
+    "severity": "major",
+    "subject": "Remove South Sakhalin from USSR Home Country",
+    "node_ids": [
+      "land_usr_south_sakhalin"
+    ],
+    "field": "nations.USSR.home_country_land_zone_ids",
+    "current": "land_usr_south_sakhalin is included",
+    "proposed": {
+      "remove_land_zone_ids": [
+        "land_usr_south_sakhalin"
+      ]
+    },
+    "evidence": [
+      "game_content/rules/Global War 1936 v4.3 Rulebook.pdf p6",
+      "game_content/maps/gw36_nation_home_country.json",
+      "tools/build_nation_home_country_json.py",
+      "game_content/maps/gw36map.png"
+    ],
+    "confidence": "high",
+    "notes": "AP-041 confirms the Japanese printed roundel. USSR Home Country follows Soviet original roundels, not current possession or the historical-looking node prefix. Japan Home Country is the explicit four-zone list, so do not automatically add South Sakhalin there."
+  },
+  {
+    "id": "WG-040",
+    "category": "add",
+    "severity": "major",
+    "subject": "Include Northern Ireland in Great Britain Home Country",
+    "node_ids": [
+      "land_gbr_northern_ireland"
+    ],
+    "field": "nations.Great Britain.home_country_land_zone_ids",
+    "current": {
+      "rulebook_definition": "Explicit nation list from Home Country Land Zones table.",
+      "home_country_land_zone_ids": [
+        "land_gbr_london",
+        "land_gbr_northern_england",
+        "land_gbr_scotland",
+        "land_gbr_southern_england"
+      ],
+      "home_country_land_zone_names": [
+        "London",
+        "Northern England",
+        "Scotland",
+        "Southern England"
+      ],
+      "missing_named_zones_in_map": [
+        "Northern Ireland"
+      ]
+    },
+    "proposed": {
+      "add_land_zone_ids": [
+        "land_gbr_northern_ireland"
+      ],
+      "clear_missing_named_zones_after_resolution": [
+        "Northern Ireland"
+      ]
+    },
+    "evidence": [
+      "game_content/rules/Global War 1936 v4.3 Rulebook.pdf p6",
+      "game_content/maps/gw36_nation_home_country.json",
+      "tools/build_nation_home_country_json.py",
+      "game_content/maps/gw36map.png"
+    ],
+    "confidence": "high",
+    "notes": "Rulebook p6 explicitly lists Northern Ireland. The current sidecar reports it missing because the world node is absent; add the physical tile first and regenerate."
+  },
+  {
+    "id": "WG-041",
+    "category": "add",
+    "severity": "major",
+    "subject": "Include Sydney in ANZAC Home Country",
+    "node_ids": [
+      "land_aus_sydney"
+    ],
+    "field": "nations.ANZAC.home_country_land_zone_ids",
+    "current": "Sydney is absent",
+    "proposed": {
+      "add_land_zone_ids": [
+        "land_aus_sydney"
+      ]
+    },
+    "evidence": [
+      "game_content/rules/Global War 1936 v4.3 Rulebook.pdf p6",
+      "game_content/maps/gw36_nation_home_country.json",
+      "tools/build_nation_home_country_json.py",
+      "game_content/maps/gw36map.png"
+    ],
+    "confidence": "high",
+    "notes": "Rulebook p6 includes all Australian/New Zealand land zones. Sydney is a distinct printed city zone (AP-036); it must remain separate from New South Wales."
+  },
+  {
+    "id": "WG-042",
+    "category": "change",
+    "severity": "major",
+    "subject": "Rebuild Soviet Home Country from the repaired printed Soviet roster",
+    "node_ids": [
+      "land_usr_zuryenia",
+      "land_usr_ural",
+      "land_usr_orenburg",
+      "land_usr_western_kazakhstan",
+      "land_usr_central_kazakhstan",
+      "land_usr_turkmenistan",
+      "land_usr_vyatka",
+      "land_usr_yugria",
+      "land_usr_samoyedia",
+      "land_usr_lower_tunguska",
+      "land_usr_sibir",
+      "land_usr_tobolsk",
+      "land_usr_yenisei",
+      "land_usr_evenkiland",
+      "land_usr_western_yakutia",
+      "land_usr_northern_yakutia",
+      "land_usr_eastern_yakutia",
+      "land_usr_chukotka",
+      "land_usr_big_diomede_island"
+    ],
+    "field": "nations.USSR.home_country_land_zone_ids",
+    "current": "The sidecar inherits the incomplete 43-node Soviet owner selection from the current world map",
+    "proposed": {
+      "selection": "All originally Soviet-roundel land zones in the corrected complete world roster",
+      "include_missing_zones_from": "AP-001–AP-019",
+      "exclude_wrong_roundel": "land_usr_south_sakhalin"
+    },
+    "evidence": [
+      "game_content/rules/Global War 1936 v4.3 Rulebook.pdf p6",
+      "game_content/maps/gw36_nation_home_country.json",
+      "tools/build_nation_home_country_json.py",
+      "regions/asia_pacific.md"
+    ],
+    "confidence": "high_for_selection_rule",
+    "notes": "Do not hard-code the current list as complete. Keep Home Country in its existing rules-geography sidecar, with references validated after missing Siberian zones are added. Prefixes and current controller alone do not prove a printed Soviet roundel."
+  }
+]

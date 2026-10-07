@@ -1,0 +1,3772 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "scenario_id": "japan_china_1936_1941",
+    "artifact_type": "closed_theatre_map",
+    "boundary_policy": "closed",
+    "source_map_meta": {
+      "game": "Global War 1936 v4.3",
+      "description": "LLM-manual map graph built tile-by-tile from divided region images and rulebook terrain/connection semantics.",
+      "schema_notes": "Nodes are land/sea tiles. City status (`is_city`) is separate from terrain. Each neighbor entry describes source -> neighbor. `border_terrain` is a string or a list of simultaneous first-round terrains, e.g. [\"desert\", \"mountain\"], not inferred from node terrain. `has_river` describes a river route; `river_crossing` is a directional combat crossing. `naval_facilities` and matching `naval_facility_ids` are paired physical instances. Repeated types with distinct IDs are separate facilities; the same ID on two coast edges is one shared facility. Intrinsic facilities use `node_facilities` / `node_facility_ids`. Reviewed direct land narrow crossings have `narrow_crossing`, printed unit capacity in the legacy-named `narrow_crossings`, and `narrow_crossing_sea_zones` for all blocking seas. They are constrained crossings under rule 1.9, not unrestricted land adjacency. `railway_connection` is a reciprocal boolean regardless of the number of drawn tracks; `gauge_change` remains separate. Rule 10.6.2 (p. 67) bombs all railroads on a border together. Damage is mutable game state, not encoded by the static rail presence flag.",
+      "build": {
+        "method": "manual_llm_transcription",
+        "coverage": "manual_global_pass_v2"
+      },
+      "warnings": [
+        "This file is manually transcribed from the map image and is intended for iterative RL environment development.",
+        "Some IPP and terrain assignments remain best-effort where small labels were visually ambiguous.",
+        "Canadian map-edge adjacency Mackenzie-Keewatin and Alberta-Saskatchewan-Manitoba is user-approved; the existing Alberta-Manitoba railway remains unverified. Other Canadian seam links and Ottawa ordinary sea adjacency remain unaudited.",
+        "Alaska, Southeast Alaska, New England, and P1 were added as endpoints for the Canadian audit; their remaining non-Canadian connections are not fully transcribed.",
+        "The China theatre audit retains unresolved Kobdo-Novosibirsk adjacency, southern Sinkiang/Himalayan contacts, and Tannu Tuva identity/home-country membership. Sinkiang-to-Eastern Kazakhstan river_crossing remains an unverified false default.",
+        "Bengal and Turkestan were added as endpoints for the China audit; their non-China connections are not fully transcribed. Annam-Tonkin-to-Kwangtung jungle+mountain entry is an image interpretation, not an official edge ruling.",
+        "P18 and P26 were added only as P16 boundary endpoints; their other connections are not audited. South Sakhalin and Kurile node identity/terrain remain unaudited despite their reviewed narrow crossings to Hokkaido.",
+        "On reviewed direct land crossings, narrow_crossings is the printed unit capacity (legacy field name), not a count of crossings. narrow_crossing_sea_zones lists the seas that can block that crossing. Unaudited legacy coast/sea narrow flags are not sufficient movement rules.",
+        "Naval facility type/ID arrays are paired instances, not sets of types: Honshu has two separate major_shipyard IDs on P15. Count shared physical IDs only once across access edges."
+      ]
+    },
+    "scenario_manifest": {
+      "schema_version": 1,
+      "scenario_id": "japan_china_1936_1941",
+      "boundary_policy": "closed",
+      "artifact_scope": "Map projection and campaign specification only; playable setup and rules are not implemented by this manifest.",
+      "campaign": {
+        "start": "1936-07",
+        "end": "1941-07",
+        "end_timing": "after_full_calendar_round",
+        "calendar_rounds": 11,
+        "setup_basis": "Official July 1936 starting pieces on included tiles only; off-map pieces omitted. M0 records 103 deployed units and 3 setup factories separately from the static map. Unlocated Japanese national queues remain unresolved and are not deployed.",
+        "starting_piece_scope": "official_setup_on_included_tiles_only"
+      },
+      "agents": [
+        "axis",
+        "allies",
+        "comintern"
+      ],
+      "m0_specification": {
+        "status": "audit_ready_pending_decisions_not_playable",
+        "contract": "m0/scenario_contract.json",
+        "convoy_audit": "m0/convoy_audit.json",
+        "setup_files": [
+          "m0/japan_setup.json",
+          "m0/china_minor_setup.json"
+        ],
+        "starting_treasury_policy": "theatre_adjusted_cap_at_retained_directly_possessed_original_land_ipp",
+        "starting_treasury_ipp": {
+          "japan": 15,
+          "kmt": 6,
+          "ccp": 2,
+          "fec": 2
+        },
+        "treasury_authority": "Theatre adjustment user-approved; exact min(official starting IPP, retained direct land IPP) is a documented scenario derivation. Controlled and unaligned minors receive zero cash."
+      },
+      "agent_control": {
+        "status": "planned_not_implemented",
+        "nation_turns_and_treasuries": "remain_separate",
+        "minor_control": "assigned_only_when_game_rules_grant_control",
+        "notes": "Alliance agents do not merge nations, automatically align warlords, or automatically declare war."
+      },
+      "wealth_objective": {
+        "status": "planned_not_implemented",
+        "comparison": "own_wealth_minus_combined_other_two_sides",
+        "components": [
+          "income_rate",
+          "unit_value",
+          "infrastructure_value",
+          "treasury",
+          "paid_construction_value"
+        ],
+        "component_weights": {
+          "income_rate": 1,
+          "unit_value": 0.1,
+          "infrastructure_value": 0.1,
+          "treasury": 0.1,
+          "paid_construction_value": 0.1
+        },
+        "income_definition": "current_income_per_turn_rate_not_cumulative_collections",
+        "completed_asset_valuation": "purchase_price_minus_remaining_repair_price",
+        "include_setup_asset_value": true,
+        "confirmed": [
+          "three_alliance_sides",
+          "compare_with_both_other_sides",
+          "include_treasury",
+          "include_paid_construction_value",
+          "current_income_per_turn_rate",
+          "asset_weight_0.1_relative_to_income_1",
+          "purchase_price_minus_repair_price",
+          "include_setup_assets",
+          "official_starting_pieces_on_included_tiles_only",
+          "theatre_adjusted_starting_treasury",
+          "controlled_minor_assets_to_controlling_alliance_unaligned_to_nobody"
+        ],
+        "minor_asset_attribution": "controlled_or_aligned_to_controlling_alliance_uncontrolled_unaligned_to_nobody",
+        "interpretations": [
+          "Treasury and paid construction use the same 0.1 asset weight as completed units/facilities; this cash/construction weighting is an explicit interpretation, not a separately confirmed choice."
+        ],
+        "open_decisions": [
+          "two_unpriced_setup_ship_values",
+          "catalog_price_basis_and_cross_owner_rail_valuation",
+          "national_queue_inclusion_and_paid_stage_values",
+          "optional_reward_shaping"
+        ],
+        "accounting": "Count each physical facility once by ID; replace paid construction value with completed asset value on completion, never count both. Preserve national ledgers when aggregating a side."
+      },
+      "included_node_ids": [
+        "land_china_beiping",
+        "land_china_hopeh",
+        "land_china_hunan",
+        "land_china_kweichow",
+        "land_china_nanking",
+        "land_china_shantung",
+        "land_china_shensi",
+        "land_china_sikang",
+        "land_china_sinkiang",
+        "land_china_suiyuan",
+        "land_china_szechwan",
+        "land_china_tsinghai",
+        "land_china_yunnan",
+        "land_formosa",
+        "land_hainan",
+        "land_hong_kong",
+        "land_korea",
+        "land_kwangtung",
+        "land_manchuria_eastern",
+        "land_manchuria_northern",
+        "land_manchuria_rehe",
+        "land_manchuria_western",
+        "land_mongolia_central_mongolia",
+        "land_mongolia_kerulen",
+        "land_mongolia_kobdo",
+        "land_mongolia_ulyassutai",
+        "land_tibet",
+        "land_jap_tokyo",
+        "land_jap_honshu",
+        "land_jap_hokkaido",
+        "land_jap_kyushu",
+        "land_jap_okinawa",
+        "sea_p14",
+        "sea_p15",
+        "sea_p16",
+        "sea_p32",
+        "sea_p33",
+        "sea_p41"
+      ],
+      "known_limitations": [
+        "Tannu Tuva is excluded by user choice; its unresolved national identity remains a global-map issue and does not block this scenario.",
+        "The map itself does not contain starting units, setup factories, construction queues or mutable diplomacy. M0 files are source-audited specifications, not a playable initial state; pending decisions are listed in their contract.",
+        "Hokkaido's P7 port access is deliberately absent because P7 is outside this closed map.",
+        "Outside neighbors and any facilities carried solely on those edges are removed. Cut-edge provenance is not a movement, supply or reinforcement interface.",
+        "Rules whose prerequisites exist only outside this theatre are inactive in this profile; no external events or off-map income are supplied implicitly."
+      ]
+    },
+    "extracted_node_count": 38,
+    "excluded_neighbor_count": 45,
+    "boundary_cuts": [
+      {
+        "source_id": "land_china_sikang",
+        "excluded_neighbor_id": "land_india_bengal"
+      },
+      {
+        "source_id": "land_china_sinkiang",
+        "excluded_neighbor_id": "land_usr_eastern_kazakhstan"
+      },
+      {
+        "source_id": "land_china_sinkiang",
+        "excluded_neighbor_id": "land_usr_turkestan"
+      },
+      {
+        "source_id": "land_china_yunnan",
+        "excluded_neighbor_id": "land_annam_tonkin"
+      },
+      {
+        "source_id": "land_china_yunnan",
+        "excluded_neighbor_id": "land_burma"
+      },
+      {
+        "source_id": "land_china_yunnan",
+        "excluded_neighbor_id": "land_india_bengal"
+      },
+      {
+        "source_id": "land_jap_hokkaido",
+        "excluded_neighbor_id": "land_jap_kurile_islands"
+      },
+      {
+        "source_id": "land_jap_hokkaido",
+        "excluded_neighbor_id": "land_usr_south_sakhalin"
+      },
+      {
+        "source_id": "land_jap_hokkaido",
+        "excluded_neighbor_id": "sea_p7"
+      },
+      {
+        "source_id": "land_korea",
+        "excluded_neighbor_id": "land_usr_primorsky_krai"
+      },
+      {
+        "source_id": "land_kwangtung",
+        "excluded_neighbor_id": "land_annam_tonkin"
+      },
+      {
+        "source_id": "land_manchuria_eastern",
+        "excluded_neighbor_id": "land_usr_amur"
+      },
+      {
+        "source_id": "land_manchuria_eastern",
+        "excluded_neighbor_id": "land_usr_primorsky_krai"
+      },
+      {
+        "source_id": "land_manchuria_northern",
+        "excluded_neighbor_id": "land_usr_amur"
+      },
+      {
+        "source_id": "land_manchuria_northern",
+        "excluded_neighbor_id": "land_usr_chita"
+      },
+      {
+        "source_id": "land_manchuria_western",
+        "excluded_neighbor_id": "land_usr_chita"
+      },
+      {
+        "source_id": "land_mongolia_central_mongolia",
+        "excluded_neighbor_id": "land_mongolia_tannu_tuva"
+      },
+      {
+        "source_id": "land_mongolia_central_mongolia",
+        "excluded_neighbor_id": "land_usr_angara"
+      },
+      {
+        "source_id": "land_mongolia_central_mongolia",
+        "excluded_neighbor_id": "land_usr_buryatia"
+      },
+      {
+        "source_id": "land_mongolia_central_mongolia",
+        "excluded_neighbor_id": "land_usr_chita"
+      },
+      {
+        "source_id": "land_mongolia_kerulen",
+        "excluded_neighbor_id": "land_usr_chita"
+      },
+      {
+        "source_id": "land_mongolia_kobdo",
+        "excluded_neighbor_id": "land_mongolia_tannu_tuva"
+      },
+      {
+        "source_id": "land_mongolia_kobdo",
+        "excluded_neighbor_id": "land_usr_eastern_kazakhstan"
+      },
+      {
+        "source_id": "land_mongolia_kobdo",
+        "excluded_neighbor_id": "land_usr_novosibirsk"
+      },
+      {
+        "source_id": "land_tibet",
+        "excluded_neighbor_id": "land_india_bengal"
+      },
+      {
+        "source_id": "land_tibet",
+        "excluded_neighbor_id": "land_kashmir"
+      },
+      {
+        "source_id": "land_tibet",
+        "excluded_neighbor_id": "land_nepal"
+      },
+      {
+        "source_id": "sea_p15",
+        "excluded_neighbor_id": "sea_p34"
+      },
+      {
+        "source_id": "sea_p15",
+        "excluded_neighbor_id": "sea_p7"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p17"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p18"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p26"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p34"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p35"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p7"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p8"
+      },
+      {
+        "source_id": "sea_p16",
+        "excluded_neighbor_id": "sea_p9"
+      },
+      {
+        "source_id": "sea_p32",
+        "excluded_neighbor_id": "sea_p42"
+      },
+      {
+        "source_id": "sea_p32",
+        "excluded_neighbor_id": "sea_p43"
+      },
+      {
+        "source_id": "sea_p33",
+        "excluded_neighbor_id": "sea_p34"
+      },
+      {
+        "source_id": "sea_p33",
+        "excluded_neighbor_id": "sea_p43"
+      },
+      {
+        "source_id": "sea_p41",
+        "excluded_neighbor_id": "land_annam_tonkin"
+      },
+      {
+        "source_id": "sea_p41",
+        "excluded_neighbor_id": "land_luzon_and_the_visayas"
+      },
+      {
+        "source_id": "sea_p41",
+        "excluded_neighbor_id": "sea_p42"
+      },
+      {
+        "source_id": "sea_p41",
+        "excluded_neighbor_id": "sea_p50"
+      }
+    ],
+    "notes": [
+      "Static map projection only; not a playable scenario or initial unit setup.",
+      "Internal node/edge data is unchanged; all excluded neighbors are removed.",
+      "boundary_cuts is provenance only and must not create movement or supply routes."
+    ],
+    "source_map": "game_content/maps/gw36_manual_map.json",
+    "source_map_sha256": "97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24",
+    "manifest": "game_content/scenarios/japan_china_1936/manifest.json",
+    "manifest_sha256": "b2fbc9cd9d1852fc6b963d7e2bdc6fe83d36cb12221631a3c10aef32627fbd96"
+  },
+  "nodes": {
+    "land_china_beiping": {
+      "id": "land_china_beiping",
+      "name": "Beiping",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 2,
+      "original_owner": "Zhili Clique",
+      "current_owner": "Zhili Clique",
+      "is_city": true,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_beiping_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_hopeh": {
+      "id": "land_china_hopeh",
+      "name": "Hopeh",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Zhili Clique",
+      "current_owner": "Zhili Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_beiping",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shantung",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shensi",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_hunan": {
+      "id": "land_china_hunan",
+      "name": "Hunan",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 2,
+      "original_owner": "KMT",
+      "current_owner": "KMT",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_kweichow",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_nanking",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shantung",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_kwangtung",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_kweichow": {
+      "id": "land_china_kweichow",
+      "name": "Kweichow",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "KMT",
+      "current_owner": "KMT",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_sikang",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_yunnan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_kwangtung",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_nanking": {
+      "id": "land_china_nanking",
+      "name": "Nanking",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 2,
+      "original_owner": "KMT",
+      "current_owner": "KMT",
+      "is_city": true,
+      "is_capital": false,
+      "is_victory_city": true,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shantung",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "port_nanking_major"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "port_nanking_major"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_shantung": {
+      "id": "land_china_shantung",
+      "name": "Shantung",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 2,
+      "original_owner": "KMT",
+      "current_owner": "KMT",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_nanking",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port",
+            "minor_dockyard"
+          ],
+          "naval_facility_ids": [
+            "facility_shantung_major_port",
+            "facility_shantung_minor_dockyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_shensi": {
+      "id": "land_china_shensi",
+      "name": "Shensi",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "CCP",
+      "current_owner": "CCP",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_sikang": {
+      "id": "land_china_sikang",
+      "name": "Sikang",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Szechwan Clique",
+      "current_owner": "Szechwan Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_kweichow",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_yunnan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_tibet",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_sinkiang": {
+      "id": "land_china_sinkiang",
+      "name": "Sinkiang",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Sinkiang Clique",
+      "current_owner": "Sinkiang Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_kobdo",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_ulyassutai",
+          "border_terrain": "desert",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_suiyuan": {
+      "id": "land_china_suiyuan",
+      "name": "Suiyuan",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "Mengjiang",
+      "current_owner": "Mengjiang",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_beiping",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shensi",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_central_mongolia",
+          "border_terrain": "desert",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_kerulen",
+          "border_terrain": "desert",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_szechwan": {
+      "id": "land_china_szechwan",
+      "name": "Szechwan",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "KMT",
+      "current_owner": "KMT",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_kweichow",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shantung",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shensi",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_sikang",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_tsinghai": {
+      "id": "land_china_tsinghai",
+      "name": "Tsinghai",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Ma Clique",
+      "current_owner": "Ma Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_shensi",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_sikang",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_sinkiang",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_szechwan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_central_mongolia",
+          "border_terrain": "desert",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_ulyassutai",
+          "border_terrain": "desert",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_tibet",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_china_yunnan": {
+      "id": "land_china_yunnan",
+      "name": "Yunnan",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "Yunnan Clique",
+      "current_owner": "Yunnan Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_kweichow",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_sikang",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_kwangtung",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_formosa": {
+      "id": "land_formosa",
+      "name": "Formosa",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_formosa_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p41",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_hainan": {
+      "id": "land_hainan",
+      "name": "Hainan",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "Guangxi Clique",
+      "current_owner": "Guangxi Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_kwangtung",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": true,
+          "narrow_crossings": 1,
+          "special_fortification": null,
+          "narrow_crossing_sea_zones": [
+            "sea_p41"
+          ]
+        },
+        {
+          "neighbor_id": "sea_p41",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_hong_kong": {
+      "id": "land_hong_kong",
+      "name": "Hong Kong",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "FEC",
+      "current_owner": "FEC",
+      "is_city": true,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_hong_kong_airfield"
+      ],
+      "neighbors": [
+        {
+          "neighbor_id": "land_kwangtung",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p41",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_dockyard"
+          ],
+          "naval_facility_ids": [
+            "facility_hong_kong_major_dockyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_jap_hokkaido": {
+      "id": "land_jap_hokkaido",
+      "name": "Hokkaido",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_honshu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": true,
+          "narrow_crossings": 2,
+          "special_fortification": null,
+          "narrow_crossing_sea_zones": [
+            "sea_p16"
+          ]
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p16",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_jap_honshu": {
+      "id": "land_jap_honshu",
+      "name": "Honshu",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_honshu_airfield"
+      ],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_hokkaido",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": true,
+          "narrow_crossings": 2,
+          "special_fortification": null,
+          "narrow_crossing_sea_zones": [
+            "sea_p16"
+          ]
+        },
+        {
+          "neighbor_id": "land_jap_kyushu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_jap_tokyo",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_shipyard",
+            "major_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_honshu_northwest_major_shipyard",
+            "facility_honshu_south_major_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p16",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_honshu_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_jap_kyushu": {
+      "id": "land_jap_kyushu",
+      "name": "Kyushu",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_honshu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port",
+            "major_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_kyushu_major_port",
+            "facility_kyushu_major_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_jap_okinawa": {
+      "id": "land_jap_okinawa",
+      "name": "Okinawa",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [
+            "minor_port",
+            "seaplane_base"
+          ],
+          "naval_facility_ids": [
+            "facility_okinawa_minor_port",
+            "facility_okinawa_seaplane_base"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_jap_tokyo": {
+      "id": "land_jap_tokyo",
+      "name": "Tokyo",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": true,
+      "is_capital": true,
+      "is_victory_city": true,
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_tokyo_airfield"
+      ],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_honshu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p16",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_tokyo_major_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_korea": {
+      "id": "land_korea",
+      "name": "Korea",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [
+        "airfield"
+      ],
+      "node_facility_ids": [
+        "facility_korea_airfield"
+      ],
+      "neighbors": [
+        {
+          "neighbor_id": "land_manchuria_eastern",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_korea_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_kwangtung": {
+      "id": "land_kwangtung",
+      "name": "Kwangtung",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 2,
+      "original_owner": "Guangxi Clique",
+      "current_owner": "Guangxi Clique",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": true,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_kweichow",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": true,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_yunnan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_hainan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": true,
+          "narrow_crossings": 1,
+          "special_fortification": null,
+          "narrow_crossing_sea_zones": [
+            "sea_p41"
+          ]
+        },
+        {
+          "neighbor_id": "land_hong_kong",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p41",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_kwangtung_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_manchuria_eastern": {
+      "id": "land_manchuria_eastern",
+      "name": "Eastern Manchuria",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_korea",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_northern",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_western",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_manchuria_northern": {
+      "id": "land_manchuria_northern",
+      "name": "Northern Manchuria",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_manchuria_eastern",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_western",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_manchuria_rehe": {
+      "id": "land_manchuria_rehe",
+      "name": "Rehe",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_beiping",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_korea",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_eastern",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_western",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "coast",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_rehe_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_manchuria_western": {
+      "id": "land_manchuria_western",
+      "name": "Western Manchuria",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Japan",
+      "current_owner": "Japan",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_manchuria_eastern",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_northern",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_kerulen",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_mongolia_central_mongolia": {
+      "id": "land_mongolia_central_mongolia",
+      "name": "Central Mongolia",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Mongolia",
+      "current_owner": "Mongolia",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_kerulen",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_kobdo",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_ulyassutai",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_mongolia_kerulen": {
+      "id": "land_mongolia_kerulen",
+      "name": "Kerulen",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Mongolia",
+      "current_owner": "Mongolia",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_suiyuan",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_western",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_central_mongolia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_mongolia_kobdo": {
+      "id": "land_mongolia_kobdo",
+      "name": "Kobdo",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Mongolia",
+      "current_owner": "Mongolia",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_sinkiang",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_central_mongolia",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_ulyassutai",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_mongolia_ulyassutai": {
+      "id": "land_mongolia_ulyassutai",
+      "name": "Ulyassutai",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Mongolia",
+      "current_owner": "Mongolia",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_sinkiang",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": [
+            "desert",
+            "mountain"
+          ],
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_central_mongolia",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_mongolia_kobdo",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "land_tibet": {
+      "id": "land_tibet",
+      "name": "Tibet",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Tibet",
+      "current_owner": "Tibet",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_sikang",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": true,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_tsinghai",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p14": {
+      "id": "sea_p14",
+      "name": "Yellow Sea",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_beiping",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_beiping_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_hopeh",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_nanking",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "port_nanking_major"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_shantung",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port",
+            "minor_dockyard"
+          ],
+          "naval_facility_ids": [
+            "facility_shantung_major_port",
+            "facility_shantung_minor_dockyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_korea",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "minor_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_korea_minor_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_manchuria_rehe",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_rehe_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p15": {
+      "id": "sea_p15",
+      "name": "Sea of Japan",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_hokkaido",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_jap_honshu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_shipyard",
+            "major_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_honshu_northwest_major_shipyard",
+            "facility_honshu_south_major_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_jap_kyushu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port",
+            "major_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_kyushu_major_port",
+            "facility_kyushu_major_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_korea",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p16",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p16": {
+      "id": "sea_p16",
+      "name": "Sea Zone P16",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_hokkaido",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_jap_honshu",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_honshu_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_jap_tokyo",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_shipyard"
+          ],
+          "naval_facility_ids": [
+            "facility_tokyo_major_shipyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p32": {
+      "id": "sea_p32",
+      "name": "East China Sea",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_china_hunan",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_china_nanking",
+          "border_terrain": "normal",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "port_nanking_major"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_formosa",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_formosa_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p14",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p33",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p41",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p33": {
+      "id": "sea_p33",
+      "name": "Sea Zone P33",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_jap_okinawa",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [
+            "minor_port",
+            "seaplane_base"
+          ],
+          "naval_facility_ids": [
+            "facility_okinawa_minor_port",
+            "facility_okinawa_seaplane_base"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p15",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    },
+    "sea_p41": {
+      "id": "sea_p41",
+      "name": "South China Sea",
+      "type": "sea",
+      "terrain": "sea",
+      "ipp_value": null,
+      "original_owner": "Neutral",
+      "current_owner": "Neutral",
+      "is_city": false,
+      "is_capital": false,
+      "is_victory_city": false,
+      "node_facilities": [],
+      "node_facility_ids": [],
+      "neighbors": [
+        {
+          "neighbor_id": "land_formosa",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_hainan",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_hong_kong",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_dockyard"
+          ],
+          "naval_facility_ids": [
+            "facility_hong_kong_major_dockyard"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "land_kwangtung",
+          "border_terrain": "mountain",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": true,
+          "gauge_change": false,
+          "naval_facilities": [
+            "major_port"
+          ],
+          "naval_facility_ids": [
+            "facility_land_kwangtung_major_port"
+          ],
+          "port_or_dock_connection": true,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        },
+        {
+          "neighbor_id": "sea_p32",
+          "border_terrain": "sea",
+          "passable": true,
+          "has_river": false,
+          "river_crossing": false,
+          "railway_connection": false,
+          "gauge_change": false,
+          "naval_facilities": [],
+          "naval_facility_ids": [],
+          "port_or_dock_connection": false,
+          "canal_or_strait": null,
+          "narrow_crossing": false,
+          "narrow_crossings": 0,
+          "special_fortification": null
+        }
+      ]
+    }
+  }
+}

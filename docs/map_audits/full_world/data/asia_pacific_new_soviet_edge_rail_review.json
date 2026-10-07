@@ -1,0 +1,1844 @@
+[
+  {
+    "source_id": "land_afghanistan",
+    "target_id": "land_usr_turkmenistan",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5050,
+          1870,
+          5940,
+          2420
+        ],
+        "crop": "evidence/ap_rail_turkmenistan.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness. Turkmenistan's broad-gauge track stays inside its territory and turns toward the Caspian port; it does not continue across this frontier."
+  },
+  {
+    "source_id": "land_china_sinkiang",
+    "target_id": "land_usr_turkmenistan",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5050,
+          1870,
+          5940,
+          2420
+        ],
+        "crop": "evidence/ap_rail_turkmenistan.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_iran_northern_iran",
+    "target_id": "land_usr_turkmenistan",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5050,
+          1870,
+          5940,
+          2420
+        ],
+        "crop": "evidence/ap_rail_turkmenistan.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness. Turkmenistan's broad-gauge track stays inside its territory and turns toward the Caspian port; it does not continue across this frontier."
+  },
+  {
+    "source_id": "land_usr_central_kazakhstan",
+    "target_id": "land_usr_eastern_kazakhstan",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5230,
+          1330,
+          6080,
+          1900
+        ],
+        "crop": "evidence/ap_rail_central_kazakhstan.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_central_kazakhstan",
+    "target_id": "land_usr_tobolsk",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5230,
+          1330,
+          6080,
+          1900
+        ],
+        "crop": "evidence/ap_rail_central_kazakhstan.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness. The eastbound line passes north of this sloping border, through Orenburg\u2013Tobolsk."
+  },
+  {
+    "source_id": "land_usr_central_kazakhstan",
+    "target_id": "land_usr_turkestan",
+    "review_status": "source_checked",
+    "railway_connection": true,
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5230,
+          1330,
+          6080,
+          1900
+        ],
+        "crop": "evidence/ap_rail_central_kazakhstan.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "A continuous yellow/black checked railway visibly crosses the shared political boundary; yellow means broad gauge under \u00a71.6 p10. Both sides retain the same symbol, with no gauge transition."
+  },
+  {
+    "source_id": "land_usr_chukotka",
+    "target_id": "land_usr_eastern_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_chukotka",
+    "target_id": "land_usr_kamchatka",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_chukotka",
+    "target_id": "land_usr_magadan",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_chukotka",
+    "target_id": "land_usr_yakutsk",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_eastern_kazakhstan",
+    "target_id": "land_usr_tobolsk",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness. Track reaches Novosibirsk through Tobolsk north of this boundary; the southbound track crosses the city arc into Eastern Kazakhstan, not this pair."
+  },
+  {
+    "source_id": "land_usr_eastern_yakutia",
+    "target_id": "land_usr_northern_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_eastern_yakutia",
+    "target_id": "land_usr_southern_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_eastern_yakutia",
+    "target_id": "land_usr_yakutsk",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_lower_tunguska",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_northern_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_samoyedia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_stalino",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_vanavara",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_western_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_evenkiland",
+    "target_id": "land_usr_yenisei",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_lower_tunguska",
+    "target_id": "land_usr_samoyedia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_lower_tunguska",
+    "target_id": "land_usr_sibir",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_lower_tunguska",
+    "target_id": "land_usr_yenisei",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_lower_tunguska",
+    "target_id": "land_usr_yugria",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_northern_yakutia",
+    "target_id": "land_usr_southern_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_northern_yakutia",
+    "target_id": "land_usr_western_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_novosibirsk",
+    "target_id": "land_usr_tobolsk",
+    "review_status": "source_checked",
+    "railway_connection": true,
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "A continuous yellow/black checked railway visibly crosses the shared political boundary; yellow means broad gauge under \u00a71.6 p10. Both sides retain the same symbol, with no gauge transition."
+  },
+  {
+    "source_id": "land_usr_novosibirsk",
+    "target_id": "land_usr_yenisei",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness. The railway crosses the city arc west in Tobolsk and east in Angara; it never reaches the northern Yenisei arc."
+  },
+  {
+    "source_id": "land_usr_samoyedia",
+    "target_id": "land_usr_yugria",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_sibir",
+    "target_id": "land_usr_tobolsk",
+    "review_status": "source_checked",
+    "railway_connection": true,
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "A continuous yellow/black checked railway visibly crosses the shared political boundary; yellow means broad gauge under \u00a71.6 p10. Both sides retain the same symbol, with no gauge transition."
+  },
+  {
+    "source_id": "land_usr_sibir",
+    "target_id": "land_usr_yenisei",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_sibir",
+    "target_id": "land_usr_yugria",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_southern_yakutia",
+    "target_id": "land_usr_western_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_stalino",
+    "target_id": "land_usr_yenisei",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  },
+  {
+    "source_id": "land_usr_tobolsk",
+    "target_id": "land_usr_yenisei",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5320,
+          740,
+          6440,
+          1550
+        ],
+        "crop": "evidence/ap_rail_tobolsk_novosibirsk.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness. The eastbound railway stays south of the Yenisei boundary in Tobolsk before entering the Novosibirsk city arc."
+  },
+  {
+    "source_id": "land_usr_turkestan",
+    "target_id": "land_usr_turkmenistan",
+    "review_status": "source_checked",
+    "railway_connection": true,
+    "source_rail_gauge": "broad",
+    "target_rail_gauge": "broad",
+    "gauge_change": false,
+    "gauge_change_applicable": true,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5050,
+          1870,
+          5940,
+          2420
+        ],
+        "crop": "evidence/ap_rail_turkmenistan.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "A continuous yellow/black checked railway visibly crosses the shared political boundary; yellow means broad gauge under \u00a71.6 p10. Both sides retain the same symbol, with no gauge transition."
+  },
+  {
+    "source_id": "land_usr_vanavara",
+    "target_id": "land_usr_western_yakutia",
+    "review_status": "source_checked",
+    "railway_connection": false,
+    "source_rail_gauge": null,
+    "target_rail_gauge": null,
+    "gauge_change": false,
+    "gauge_change_applicable": false,
+    "checked_fields": [
+      "complete shared-boundary railway crossing",
+      "visible gauge symbol on both sides"
+    ],
+    "uncertain_fields": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "rule_evidence": "Rulebook \u00a71.6 p10: white checked line = narrow/normal, yellow checked line = broad.",
+    "notes": "The entire finite shared border was followed in native source crops. No checked railway intersects it; river artwork and ordinary border strokes were distinguished from railway marks. Absence is a source observation, not inferred from ownership or remoteness."
+  }
+]

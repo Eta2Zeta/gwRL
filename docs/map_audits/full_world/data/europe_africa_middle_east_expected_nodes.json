@@ -1,0 +1,910 @@
+{
+  "existing": {
+    "land_gbr_scotland": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_gbr_northern_england": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_gbr_southern_england": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_gbr_london": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_ireland": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_esp_galicia_and_leon": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_esp_basque_country": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_esp_catalonia": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_esp_madrid": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_esp_western_andalucia": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_esp_eastern_andalucia": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_esp_balearic_islands": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_gibraltar": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_portugal": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fra_normandy": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fra_picardy": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fra_paris": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_fra_aquitaine": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fra_southern_france": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fra_alsace_lorraine": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_neu_belgium": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_neu_netherlands": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_ger_western_germany": {
+      "terrain": "normal",
+      "ipp_value": 4
+    },
+    "land_ger_eastern_germany": {
+      "terrain": "normal",
+      "ipp_value": 4
+    },
+    "land_ger_bavaria": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_ger_berlin": {
+      "terrain": "normal",
+      "ipp_value": 8
+    },
+    "land_aut_austria": {
+      "terrain": "mountain",
+      "ipp_value": 2
+    },
+    "land_cze_bohemia": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_switzerland": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_ita_northern_italy": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_ita_rome": {
+      "terrain": "mountain",
+      "ipp_value": 2
+    },
+    "land_ita_lazio": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_ita_southern_italy": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fra_corsica": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_ita_sardinia": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_denmark": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_nor_southern_norway": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_nor_trondelag": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_swe_norrland": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_swe_gotaland": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fin_lapland": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fin_southern_finland": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_fin_viipuri_province": {
+      "terrain": "marsh",
+      "ipp_value": 0
+    },
+    "land_estonia": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_latvia": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_lithuania": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_ger_konigsberg": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_pol_west_poland": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_pol_podlachia": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_pol_lubelskie": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_pol_warsaw": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_pol_dolnoslaskie": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_pol_east_poland": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_cze_slovakia": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_hun_hungary": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_rom_central_romania": {
+      "terrain": "mountain",
+      "ipp_value": 2
+    },
+    "land_rom_bessarabia": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_bulgaria": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_yug_western_yugoslavia": {
+      "terrain": "mountain",
+      "ipp_value": 2
+    },
+    "land_yug_eastern_yugoslavia": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_albania": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_gre_macedonia": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_gre_thessaly": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_tur_istanbul": {
+      "terrain": "mountain",
+      "ipp_value": 2
+    },
+    "land_tur_karadeniz": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_tur_ankara": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_tur_akdeniz": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_tur_eastern_anatolia": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_azerbaijan": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_iran_northern_iran": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_iran_southern_iran": {
+      "terrain": "mountain",
+      "ipp_value": 2
+    },
+    "land_northern_iraq": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_syria": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_southern_iraq": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_transjordan": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_kuwait": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_qatar": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_oman": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_aden": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_saudi_arabia": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_spanish_morocco": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_french_morocco": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_northern_algeria": {
+      "terrain": [
+        "mountain",
+        "desert"
+      ],
+      "ipp_value": 1
+    },
+    "land_western_algeria": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_southern_algeria": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_tunisia": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_tripoli": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_tripolitania": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_cyrenaica": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_tobruk": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_western_egypt": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_lower_egypt": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_upper_egypt": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_nubia": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_cyprus": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_french_sudan": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_niger": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_dahomey": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_nigeria": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_cameroon": {
+      "terrain": "jungle",
+      "ipp_value": 1
+    },
+    "land_chad": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_oubangui_chari": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_belgian_congo": {
+      "terrain": "jungle",
+      "ipp_value": 1
+    },
+    "land_sudan": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_eritrea": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_abyssinia": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_french_somaliland": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_british_somaliland": {
+      "terrain": "desert",
+      "ipp_value": 0
+    },
+    "land_italian_somaliland": {
+      "terrain": "desert",
+      "ipp_value": 1
+    },
+    "land_tanganyika": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_angola": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_rhodesia": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_portuguese_east_africa": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_southwest_africa": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_bechuanaland": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_cape_town": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_south_africa": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_madagascar": {
+      "terrain": "mountain",
+      "ipp_value": 1
+    },
+    "land_mauritius": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_seychelles": {
+      "terrain": "mountain",
+      "ipp_value": 0
+    },
+    "land_usr_karelia": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_usr_northern_russia": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_yaroslavl": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_usr_leningrad": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_usr_western_russia": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_northern_belorussia": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_usr_southern_belorussia": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_smolensk": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_kaluga_oblast": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_usr_moscow": {
+      "terrain": "normal",
+      "ipp_value": 4
+    },
+    "land_usr_gorky": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_orel_kursk": {
+      "terrain": "normal",
+      "ipp_value": 2
+    },
+    "land_usr_tula_lipetsk": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_saratov": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_usr_kiev": {
+      "terrain": "normal",
+      "ipp_value": 3
+    },
+    "land_usr_western_ukraine": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_eastern_ukraine": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_southern_ukraine": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_usr_taurida": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_crimea": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_donets_kuban": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_usr_stalingrad": {
+      "terrain": "normal",
+      "ipp_value": 1
+    },
+    "land_usr_kalmytskaya": {
+      "terrain": "normal",
+      "ipp_value": 0
+    },
+    "land_usr_north_caucasia": {
+      "terrain": "mountain",
+      "ipp_value": 3
+    },
+    "land_usr_transcaucasia": {
+      "terrain": "mountain",
+      "ipp_value": 5
+    }
+  },
+  "missing": [
+    {
+      "id": "land_gbr_northern_ireland",
+      "name": "Northern Ireland",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_a17"
+      ]
+    },
+    {
+      "id": "land_gbr_shetland_islands",
+      "name": "Shetland Islands",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_a6"
+      ]
+    },
+    {
+      "id": "land_iceland",
+      "name": "Iceland",
+      "type": "land",
+      "terrain": [
+        "mountain",
+        "tundra"
+      ],
+      "ipp_value": 0,
+      "original_owner": "Denmark"
+    },
+    {
+      "id": "land_faroe_islands",
+      "name": "Faroe Islands",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Denmark",
+      "sea_neighbors_proposed": [
+        "sea_a4"
+      ]
+    },
+    {
+      "id": "land_svalbard",
+      "name": "Svalbard",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Norway",
+      "sea_neighbors_proposed": [
+        "sea_a5"
+      ]
+    },
+    {
+      "id": "land_nor_northern_norway",
+      "name": "Northern Norway",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 1,
+      "original_owner": "Norway",
+      "sea_neighbors_proposed": [
+        "sea_a5",
+        "sea_a8"
+      ]
+    },
+    {
+      "id": "land_fin_helsinki",
+      "name": "Helsinki",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "Finland",
+      "sea_neighbors_proposed": [
+        "sea_a13",
+        "sea_a14"
+      ]
+    },
+    {
+      "id": "land_ita_sicily",
+      "name": "Sicily",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Italy",
+      "sea_neighbors_proposed": [
+        "sea_m3",
+        "sea_m4",
+        "sea_m6"
+      ]
+    },
+    {
+      "id": "land_malta",
+      "name": "Malta",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_m4"
+      ]
+    },
+    {
+      "id": "land_ita_rhodes",
+      "name": "Rhodes",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Italy",
+      "sea_neighbors_proposed": [
+        "sea_m7"
+      ]
+    },
+    {
+      "id": "land_gre_peloponnese",
+      "name": "Peloponnese",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Greece",
+      "sea_neighbors_proposed": [
+        "sea_m6",
+        "sea_m7"
+      ]
+    },
+    {
+      "id": "land_gre_crete",
+      "name": "Crete",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Greece",
+      "sea_neighbors_proposed": [
+        "sea_m6",
+        "sea_m7",
+        "sea_m8"
+      ]
+    },
+    {
+      "id": "land_ifni",
+      "name": "Ifni",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Spain",
+      "sea_neighbors_proposed": [
+        "sea_a44"
+      ]
+    },
+    {
+      "id": "land_rio_de_oro",
+      "name": "Rio de Oro",
+      "type": "land",
+      "terrain": "desert",
+      "ipp_value": 0,
+      "original_owner": "Spain",
+      "sea_neighbors_proposed": [
+        "sea_a44",
+        "sea_a46"
+      ]
+    },
+    {
+      "id": "land_canary_islands",
+      "name": "Canary Islands",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Spain",
+      "sea_neighbors_proposed": [
+        "sea_a44"
+      ]
+    },
+    {
+      "id": "land_cape_verde",
+      "name": "Cape Verde",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "Portugal",
+      "sea_neighbors_proposed": [
+        "sea_a46"
+      ]
+    },
+    {
+      "id": "land_mauritania",
+      "name": "Mauritania",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "France",
+      "sea_neighbors_proposed": [
+        "sea_a46",
+        "sea_a48"
+      ]
+    },
+    {
+      "id": "land_portuguese_guinea",
+      "name": "Portuguese Guinea",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Portugal",
+      "sea_neighbors_proposed": [
+        "sea_a48"
+      ]
+    },
+    {
+      "id": "land_french_guinea",
+      "name": "French Guinea",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "France",
+      "sea_neighbors_proposed": [
+        "sea_a48"
+      ]
+    },
+    {
+      "id": "land_sierra_leone",
+      "name": "Sierra Leone",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_a48"
+      ]
+    },
+    {
+      "id": "land_liberia",
+      "name": "Liberia",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Liberia",
+      "sea_neighbors_proposed": [
+        "sea_a48"
+      ]
+    },
+    {
+      "id": "land_ivory_coast",
+      "name": "Ivory Coast",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "France",
+      "sea_neighbors_proposed": [
+        "sea_a51"
+      ]
+    },
+    {
+      "id": "land_gold_coast",
+      "name": "Gold Coast",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 1,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_a51"
+      ]
+    },
+    {
+      "id": "land_sao_tome_and_principe",
+      "name": "São Tomé and Príncipe",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "Portugal",
+      "sea_neighbors_proposed": [
+        "sea_a51"
+      ]
+    },
+    {
+      "id": "land_ascension",
+      "name": "Ascension",
+      "type": "land",
+      "terrain": "normal",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_a50"
+      ]
+    },
+    {
+      "id": "land_reunion",
+      "name": "Réunion",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "France",
+      "sea_neighbors_proposed": [
+        "sea_i2"
+      ]
+    },
+    {
+      "id": "land_yemen",
+      "name": "Yemen",
+      "type": "land",
+      "terrain": [
+        "mountain",
+        "desert"
+      ],
+      "ipp_value": 0,
+      "original_owner": "Yemen",
+      "sea_neighbors_proposed": [
+        "sea_i4",
+        "sea_i5"
+      ]
+    },
+    {
+      "id": "land_saint_helena",
+      "name": "Saint Helena",
+      "type": "land",
+      "terrain": "mountain",
+      "ipp_value": 0,
+      "original_owner": "United Kingdom",
+      "sea_neighbors_proposed": [
+        "sea_a53"
+      ]
+    }
+  ]
+}

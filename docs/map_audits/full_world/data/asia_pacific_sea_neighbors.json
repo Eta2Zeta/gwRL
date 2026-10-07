@@ -1,0 +1,4448 @@
+[
+  {
+    "node_id": "sea_p1",
+    "confirmed_sea_neighbors": [
+      "sea_p3",
+      "sea_p4",
+      "sea_p5"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "P1\u2013P5 has a finite short boundary east of the P4/P5 junction before Alaska, corroborated by Americas native Alaska crop. A9\u2013P1 arrow is a restricted Northern Sea Route, not ordinary adjacency.",
+    "restricted_routes": [
+      {
+        "target_id": "sea_a9",
+        "route_type": "northern_sea_route",
+        "source": "Rulebook \u00a71.13 p17",
+        "finding_id": "MS-03"
+      }
+    ]
+  },
+  {
+    "node_id": "sea_p2",
+    "confirmed_sea_neighbors": [
+      "sea_p7",
+      "sea_p8",
+      "sea_p9"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p3",
+    "confirmed_sea_neighbors": [
+      "sea_p1",
+      "sea_p4",
+      "sea_p9",
+      "sea_p10"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p4",
+    "confirmed_sea_neighbors": [
+      "sea_p1",
+      "sea_p3",
+      "sea_p5",
+      "sea_p10",
+      "sea_p11"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p5",
+    "confirmed_sea_neighbors": [
+      "sea_p1",
+      "sea_p4",
+      "sea_p6",
+      "sea_p11",
+      "sea_p12"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "P1\u2013P5 has a finite short boundary east of the P4/P5 junction before Alaska; corroborated by Americas native Alaska crop."
+  },
+  {
+    "node_id": "sea_p6",
+    "confirmed_sea_neighbors": [
+      "sea_p5",
+      "sea_p12",
+      "sea_p13"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p7",
+    "confirmed_sea_neighbors": [
+      "sea_p2",
+      "sea_p8",
+      "sea_p15",
+      "sea_p16"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p8",
+    "confirmed_sea_neighbors": [
+      "sea_p2",
+      "sea_p7",
+      "sea_p9",
+      "sea_p16"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p9",
+    "confirmed_sea_neighbors": [
+      "sea_p2",
+      "sea_p3",
+      "sea_p8",
+      "sea_p10",
+      "sea_p16",
+      "sea_p17"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p10",
+    "confirmed_sea_neighbors": [
+      "sea_p3",
+      "sea_p4",
+      "sea_p9",
+      "sea_p11",
+      "sea_p17",
+      "sea_p19"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p11",
+    "confirmed_sea_neighbors": [
+      "sea_p4",
+      "sea_p5",
+      "sea_p10",
+      "sea_p12",
+      "sea_p19",
+      "sea_p21",
+      "sea_p23"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p12",
+    "confirmed_sea_neighbors": [
+      "sea_p5",
+      "sea_p6",
+      "sea_p11",
+      "sea_p13",
+      "sea_p23",
+      "sea_p24"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p13",
+    "confirmed_sea_neighbors": [
+      "sea_p6",
+      "sea_p12",
+      "sea_p24",
+      "sea_p25"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7550,
+          430,
+          8680,
+          1350
+        ],
+        "crop": "evidence/ap_bering.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ],
+        "crop": "evidence/ap_north_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p14",
+    "confirmed_sea_neighbors": [
+      "sea_p15",
+      "sea_p32"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p15",
+    "confirmed_sea_neighbors": [
+      "sea_p7",
+      "sea_p14",
+      "sea_p16",
+      "sea_p32",
+      "sea_p33",
+      "sea_p34"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p16",
+    "confirmed_sea_neighbors": [
+      "sea_p7",
+      "sea_p8",
+      "sea_p9",
+      "sea_p15",
+      "sea_p17",
+      "sea_p18",
+      "sea_p26",
+      "sea_p34",
+      "sea_p35"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p17",
+    "confirmed_sea_neighbors": [
+      "sea_p9",
+      "sea_p10",
+      "sea_p16",
+      "sea_p18",
+      "sea_p19",
+      "sea_p20"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p18",
+    "confirmed_sea_neighbors": [
+      "sea_p16",
+      "sea_p17",
+      "sea_p20",
+      "sea_p26",
+      "sea_p27"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p19",
+    "confirmed_sea_neighbors": [
+      "sea_p10",
+      "sea_p11",
+      "sea_p17",
+      "sea_p20",
+      "sea_p21",
+      "sea_p22"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p20",
+    "confirmed_sea_neighbors": [
+      "sea_p17",
+      "sea_p18",
+      "sea_p19",
+      "sea_p22",
+      "sea_p27"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p21",
+    "confirmed_sea_neighbors": [
+      "sea_p11",
+      "sea_p19",
+      "sea_p22",
+      "sea_p23"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p22",
+    "confirmed_sea_neighbors": [
+      "sea_p19",
+      "sea_p20",
+      "sea_p21",
+      "sea_p23",
+      "sea_p27",
+      "sea_p28",
+      "sea_p29"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p23",
+    "confirmed_sea_neighbors": [
+      "sea_p11",
+      "sea_p12",
+      "sea_p21",
+      "sea_p22",
+      "sea_p24",
+      "sea_p29"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p24",
+    "confirmed_sea_neighbors": [
+      "sea_p12",
+      "sea_p13",
+      "sea_p23",
+      "sea_p25",
+      "sea_p29",
+      "sea_p30"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p25",
+    "confirmed_sea_neighbors": [
+      "sea_p13",
+      "sea_p24",
+      "sea_p30",
+      "sea_p31"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p26",
+    "confirmed_sea_neighbors": [
+      "sea_p16",
+      "sea_p18",
+      "sea_p27",
+      "sea_p35",
+      "sea_p36"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p27",
+    "confirmed_sea_neighbors": [
+      "sea_p18",
+      "sea_p20",
+      "sea_p22",
+      "sea_p26",
+      "sea_p28",
+      "sea_p36",
+      "sea_p37"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p28",
+    "confirmed_sea_neighbors": [
+      "sea_p22",
+      "sea_p27",
+      "sea_p29",
+      "sea_p37"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p29",
+    "confirmed_sea_neighbors": [
+      "sea_p22",
+      "sea_p23",
+      "sea_p24",
+      "sea_p28",
+      "sea_p30",
+      "sea_p37",
+      "sea_p38",
+      "sea_p39"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p30",
+    "confirmed_sea_neighbors": [
+      "sea_p24",
+      "sea_p25",
+      "sea_p29",
+      "sea_p31",
+      "sea_p39"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p31",
+    "confirmed_sea_neighbors": [
+      "sea_p25",
+      "sea_p30",
+      "sea_p39",
+      "sea_p40",
+      "sea_p76"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "Americas wrap endpoints P76/P77/P78 cross-checked against Americas agent source trace; those target rows are in the Americas report."
+  },
+  {
+    "node_id": "sea_p32",
+    "confirmed_sea_neighbors": [
+      "sea_p14",
+      "sea_p15",
+      "sea_p33",
+      "sea_p41",
+      "sea_p42",
+      "sea_p43"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p33",
+    "confirmed_sea_neighbors": [
+      "sea_p15",
+      "sea_p32",
+      "sea_p34",
+      "sea_p43"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p34",
+    "confirmed_sea_neighbors": [
+      "sea_p15",
+      "sea_p16",
+      "sea_p33",
+      "sea_p35",
+      "sea_p43",
+      "sea_p45"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p35",
+    "confirmed_sea_neighbors": [
+      "sea_p16",
+      "sea_p26",
+      "sea_p34",
+      "sea_p36",
+      "sea_p45"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6100,
+          1200,
+          8200,
+          2800
+        ],
+        "crop": "evidence/ap_east_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7060,
+          1660,
+          8340,
+          2940
+        ],
+        "crop": "evidence/ap_japan_sea_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8800,
+          1910,
+          9480,
+          2700
+        ],
+        "crop": "evidence/ap_hawaii_sea_junctions.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p36",
+    "confirmed_sea_neighbors": [
+      "sea_p26",
+      "sea_p27",
+      "sea_p35",
+      "sea_p37",
+      "sea_p45",
+      "sea_p47"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p37",
+    "confirmed_sea_neighbors": [
+      "sea_p27",
+      "sea_p28",
+      "sea_p29",
+      "sea_p36",
+      "sea_p38",
+      "sea_p47"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p38",
+    "confirmed_sea_neighbors": [
+      "sea_p29",
+      "sea_p37",
+      "sea_p39",
+      "sea_p47",
+      "sea_p48",
+      "sea_p56"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p39",
+    "confirmed_sea_neighbors": [
+      "sea_p29",
+      "sea_p30",
+      "sea_p31",
+      "sea_p38",
+      "sea_p40",
+      "sea_p48",
+      "sea_p49"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p40",
+    "confirmed_sea_neighbors": [
+      "sea_p31",
+      "sea_p39",
+      "sea_p49",
+      "sea_p76"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "Americas wrap endpoints P76/P77/P78 cross-checked against Americas agent source trace; those target rows are in the Americas report."
+  },
+  {
+    "node_id": "sea_p41",
+    "confirmed_sea_neighbors": [
+      "sea_p32",
+      "sea_p42",
+      "sea_p50"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p42",
+    "confirmed_sea_neighbors": [
+      "sea_p32",
+      "sea_p41",
+      "sea_p43",
+      "sea_p44",
+      "sea_p51"
+    ],
+    "uncertain_sea_neighbors": [
+      "sea_p50"
+    ],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "P42\u2013P50 remains an interpreted Philippine island-group junction; unlike all listed confirmed segments, a finite open-water segment is not separable from the outlines."
+  },
+  {
+    "node_id": "sea_p43",
+    "confirmed_sea_neighbors": [
+      "sea_p32",
+      "sea_p33",
+      "sea_p34",
+      "sea_p42",
+      "sea_p44",
+      "sea_p45",
+      "sea_p46"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p44",
+    "confirmed_sea_neighbors": [
+      "sea_p42",
+      "sea_p43",
+      "sea_p46",
+      "sea_p51",
+      "sea_p52",
+      "sea_p53"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p45",
+    "confirmed_sea_neighbors": [
+      "sea_p34",
+      "sea_p35",
+      "sea_p36",
+      "sea_p43",
+      "sea_p46",
+      "sea_p47"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p46",
+    "confirmed_sea_neighbors": [
+      "sea_p43",
+      "sea_p44",
+      "sea_p45",
+      "sea_p47",
+      "sea_p53",
+      "sea_p54"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p47",
+    "confirmed_sea_neighbors": [
+      "sea_p36",
+      "sea_p37",
+      "sea_p38",
+      "sea_p45",
+      "sea_p46",
+      "sea_p54",
+      "sea_p55",
+      "sea_p56"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p48",
+    "confirmed_sea_neighbors": [
+      "sea_p38",
+      "sea_p39",
+      "sea_p49",
+      "sea_p56",
+      "sea_p57"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p49",
+    "confirmed_sea_neighbors": [
+      "sea_p39",
+      "sea_p40",
+      "sea_p48",
+      "sea_p57",
+      "sea_p58",
+      "sea_p76"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "Americas wrap endpoints P76/P77/P78 cross-checked against Americas agent source trace; those target rows are in the Americas report."
+  },
+  {
+    "node_id": "sea_p50",
+    "confirmed_sea_neighbors": [
+      "sea_i12",
+      "sea_p41",
+      "sea_p51",
+      "sea_p59"
+    ],
+    "uncertain_sea_neighbors": [
+      "sea_p42"
+    ],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7970,
+          1500,
+          8980,
+          3000
+        ],
+        "crop": "evidence/ap_pacific_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6810,
+          2730,
+          7500,
+          3390
+        ],
+        "crop": "evidence/ap_philippines_edges.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "P42\u2013P50 remains an interpreted Philippine island-group junction; unlike all listed confirmed segments, a finite open-water segment is not separable from the outlines."
+  },
+  {
+    "node_id": "sea_p51",
+    "confirmed_sea_neighbors": [
+      "sea_p42",
+      "sea_p44",
+      "sea_p50",
+      "sea_p52",
+      "sea_p60",
+      "sea_p62"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p52",
+    "confirmed_sea_neighbors": [
+      "sea_p44",
+      "sea_p51",
+      "sea_p53",
+      "sea_p62"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p53",
+    "confirmed_sea_neighbors": [
+      "sea_p44",
+      "sea_p46",
+      "sea_p52",
+      "sea_p54",
+      "sea_p64"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p54",
+    "confirmed_sea_neighbors": [
+      "sea_p46",
+      "sea_p47",
+      "sea_p53",
+      "sea_p55",
+      "sea_p64",
+      "sea_p65"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p55",
+    "confirmed_sea_neighbors": [
+      "sea_p47",
+      "sea_p54",
+      "sea_p56",
+      "sea_p65",
+      "sea_p66"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p56",
+    "confirmed_sea_neighbors": [
+      "sea_p38",
+      "sea_p47",
+      "sea_p48",
+      "sea_p55",
+      "sea_p57",
+      "sea_p66",
+      "sea_p67"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p57",
+    "confirmed_sea_neighbors": [
+      "sea_p48",
+      "sea_p49",
+      "sea_p56",
+      "sea_p58",
+      "sea_p67",
+      "sea_p68"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p58",
+    "confirmed_sea_neighbors": [
+      "sea_p49",
+      "sea_p57",
+      "sea_p68",
+      "sea_p77"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "Americas wrap endpoints P76/P77/P78 cross-checked against Americas agent source trace; those target rows are in the Americas report."
+  },
+  {
+    "node_id": "sea_p59",
+    "confirmed_sea_neighbors": [
+      "sea_i13",
+      "sea_p50",
+      "sea_p60",
+      "sea_p61"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p60",
+    "confirmed_sea_neighbors": [
+      "sea_p51",
+      "sea_p59",
+      "sea_p61",
+      "sea_p62",
+      "sea_p63"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p61",
+    "confirmed_sea_neighbors": [
+      "sea_i13",
+      "sea_i14",
+      "sea_p59",
+      "sea_p60",
+      "sea_p63",
+      "sea_p69"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p62",
+    "confirmed_sea_neighbors": [
+      "sea_p51",
+      "sea_p52",
+      "sea_p60",
+      "sea_p63",
+      "sea_p64"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p63",
+    "confirmed_sea_neighbors": [
+      "sea_p60",
+      "sea_p61",
+      "sea_p62",
+      "sea_p64"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p64",
+    "confirmed_sea_neighbors": [
+      "sea_p53",
+      "sea_p54",
+      "sea_p62",
+      "sea_p63",
+      "sea_p65",
+      "sea_p71"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p65",
+    "confirmed_sea_neighbors": [
+      "sea_p54",
+      "sea_p55",
+      "sea_p64",
+      "sea_p66",
+      "sea_p71",
+      "sea_p73"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p66",
+    "confirmed_sea_neighbors": [
+      "sea_p55",
+      "sea_p56",
+      "sea_p65",
+      "sea_p67",
+      "sea_p73",
+      "sea_p74"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p67",
+    "confirmed_sea_neighbors": [
+      "sea_p56",
+      "sea_p57",
+      "sea_p66",
+      "sea_p68",
+      "sea_p74",
+      "sea_p75"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p68",
+    "confirmed_sea_neighbors": [
+      "sea_p57",
+      "sea_p58",
+      "sea_p67",
+      "sea_p75",
+      "sea_p77",
+      "sea_p78"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "Americas wrap endpoints P76/P77/P78 cross-checked against Americas agent source trace; those target rows are in the Americas report."
+  },
+  {
+    "node_id": "sea_p69",
+    "confirmed_sea_neighbors": [
+      "sea_i14",
+      "sea_p61",
+      "sea_p70"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p70",
+    "confirmed_sea_neighbors": [
+      "sea_p69",
+      "sea_p72"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p71",
+    "confirmed_sea_neighbors": [
+      "sea_p64",
+      "sea_p65",
+      "sea_p72",
+      "sea_p73"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p72",
+    "confirmed_sea_neighbors": [
+      "sea_p70",
+      "sea_p71",
+      "sea_p73"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p73",
+    "confirmed_sea_neighbors": [
+      "sea_p65",
+      "sea_p66",
+      "sea_p71",
+      "sea_p72",
+      "sea_p74"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p74",
+    "confirmed_sea_neighbors": [
+      "sea_p66",
+      "sea_p67",
+      "sea_p73",
+      "sea_p75"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_p75",
+    "confirmed_sea_neighbors": [
+      "sea_p67",
+      "sea_p68",
+      "sea_p74",
+      "sea_p78"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6250,
+          2600,
+          8250,
+          4030
+        ],
+        "crop": "evidence/ap_se_asia.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7760,
+          2780,
+          9900,
+          3790
+        ],
+        "crop": "evidence/ap_equatorial_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7560,
+          3700,
+          9900,
+          4888
+        ],
+        "crop": "evidence/ap_south_pacific_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-080"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering.",
+    "notes": "Americas wrap endpoints P76/P77/P78 cross-checked against Americas agent source trace; those target rows are in the Americas report."
+  },
+  {
+    "node_id": "sea_i6",
+    "confirmed_sea_neighbors": [
+      "sea_i7"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i7",
+    "confirmed_sea_neighbors": [
+      "sea_i4",
+      "sea_i6",
+      "sea_i8",
+      "sea_i10",
+      "sea_i12"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i8",
+    "confirmed_sea_neighbors": [
+      "sea_i2",
+      "sea_i3",
+      "sea_i4",
+      "sea_i7",
+      "sea_i9",
+      "sea_i10"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i9",
+    "confirmed_sea_neighbors": [
+      "sea_i2",
+      "sea_i8",
+      "sea_i10",
+      "sea_i14"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i10",
+    "confirmed_sea_neighbors": [
+      "sea_i7",
+      "sea_i8",
+      "sea_i9",
+      "sea_i12",
+      "sea_i13",
+      "sea_i14"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i11",
+    "confirmed_sea_neighbors": [
+      "sea_i12"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i12",
+    "confirmed_sea_neighbors": [
+      "sea_i7",
+      "sea_i10",
+      "sea_i11",
+      "sea_i13",
+      "sea_p50"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i13",
+    "confirmed_sea_neighbors": [
+      "sea_i10",
+      "sea_i12",
+      "sea_i14",
+      "sea_p59",
+      "sea_p61"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  },
+  {
+    "node_id": "sea_i14",
+    "confirmed_sea_neighbors": [
+      "sea_i9",
+      "sea_i10",
+      "sea_i13",
+      "sea_p61",
+      "sea_p69"
+    ],
+    "uncertain_sea_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5200,
+          3250,
+          6800,
+          4888
+        ],
+        "crop": "evidence/ap_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4200,
+          2950,
+          6350,
+          4888
+        ],
+        "crop": "evidence/ap_indian_ocean.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-076"
+    ],
+    "coverage": "Complete sea-to-sea perimeter trace in native-resolution regional and close crops. Land coast endpoints are in regional coast findings/new-node ledger; no inference of adjacency from regular numbering."
+  }
+]

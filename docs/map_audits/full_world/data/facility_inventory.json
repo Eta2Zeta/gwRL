@@ -1,0 +1,1490 @@
+{
+  "facility_catalonia_airfield": [
+    {
+      "land": "land_esp_catalonia",
+      "kind": "airfield",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_hong_kong_airfield": [
+    {
+      "land": "land_hong_kong",
+      "kind": "airfield",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_caroline_islands_major_port": [
+    {
+      "land": "land_jap_caroline_islands",
+      "kind": "major_port",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_caroline_islands_airfield": [
+    {
+      "land": "land_jap_caroline_islands",
+      "kind": "airfield",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_honshu_airfield": [
+    {
+      "land": "land_jap_honshu",
+      "kind": "airfield",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_tokyo_airfield": [
+    {
+      "land": "land_jap_tokyo",
+      "kind": "airfield",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_korea_airfield": [
+    {
+      "land": "land_korea",
+      "kind": "airfield",
+      "sea": null,
+      "source": "node"
+    }
+  ],
+  "facility_land_aden_minor_port": [
+    {
+      "land": "land_aden",
+      "kind": "minor_port",
+      "sea": "sea_i3",
+      "source": "edge"
+    }
+  ],
+  "facility_land_albania_minor_port": [
+    {
+      "land": "land_albania",
+      "kind": "minor_port",
+      "sea": "sea_m5",
+      "source": "edge"
+    }
+  ],
+  "facility_land_angola_minor_port": [
+    {
+      "land": "land_angola",
+      "kind": "minor_port",
+      "sea": "sea_a39",
+      "source": "edge"
+    }
+  ],
+  "facility_tonkin_minor_port": [
+    {
+      "land": "land_annam_tonkin",
+      "kind": "minor_port",
+      "sea": "sea_p41",
+      "source": "edge"
+    }
+  ],
+  "facility_new_south_wales_minor_port": [
+    {
+      "land": "land_aus_new_south_wales",
+      "kind": "minor_port",
+      "sea": "sea_p68",
+      "source": "edge"
+    }
+  ],
+  "facility_northern_territory_minor_port": [
+    {
+      "land": "land_aus_northern_territory",
+      "kind": "minor_port",
+      "sea": "sea_p61",
+      "source": "edge"
+    }
+  ],
+  "facility_queensland_minor_port": [
+    {
+      "land": "land_aus_queensland",
+      "kind": "minor_port",
+      "sea": "sea_p62",
+      "source": "edge"
+    }
+  ],
+  "facility_tasmania_minor_port": [
+    {
+      "land": "land_aus_tasmania",
+      "kind": "minor_port",
+      "sea": "sea_p68",
+      "source": "edge"
+    }
+  ],
+  "facility_western_australia_minor_port": [
+    {
+      "land": "land_aus_western_australia",
+      "kind": "minor_port",
+      "sea": "sea_i6",
+      "source": "edge"
+    }
+  ],
+  "facility_land_bermuda_minor_port": [
+    {
+      "land": "land_bermuda",
+      "kind": "minor_port",
+      "sea": "sea_a31",
+      "source": "edge"
+    }
+  ],
+  "facility_land_borneo_minor_port": [
+    {
+      "land": "land_borneo",
+      "kind": "minor_port",
+      "sea": "sea_p59",
+      "source": "edge"
+    }
+  ],
+  "facility_caatinga_minor_port": [
+    {
+      "land": "land_brazil_caatinga",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_pampas_minor_port": [
+    {
+      "land": "land_brazil_pampas",
+      "kind": "minor_port",
+      "sea": "sea_a39",
+      "source": "edge"
+    }
+  ],
+  "facility_rio_de_janeiro_minor_port": [
+    {
+      "land": "land_brazil_rio_de_janeiro",
+      "kind": "minor_port",
+      "sea": "sea_a39",
+      "source": "edge"
+    }
+  ],
+  "facility_malaya_major_dockyard": [
+    {
+      "land": "land_british_malaya",
+      "kind": "major_dockyard",
+      "sea": "sea_p50",
+      "source": "edge"
+    }
+  ],
+  "facility_somaliland_minor_port": [
+    {
+      "land": "land_british_somaliland",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    },
+    {
+      "land": "land_french_somaliland",
+      "kind": "minor_port",
+      "sea": "sea_i5",
+      "source": "edge"
+    },
+    {
+      "land": "land_italian_somaliland",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    }
+  ],
+  "facility_aires_minor_port": [
+    {
+      "land": "land_buenos_aires",
+      "kind": "minor_port",
+      "sea": "sea_a40",
+      "source": "edge"
+    }
+  ],
+  "facility_land_bulgaria_minor_port": [
+    {
+      "land": "land_bulgaria",
+      "kind": "minor_port",
+      "sea": "sea_m10",
+      "source": "edge"
+    }
+  ],
+  "facility_land_burma_minor_port": [
+    {
+      "land": "land_burma",
+      "kind": "minor_port",
+      "sea": "sea_i11",
+      "source": "edge"
+    }
+  ],
+  "facility_land_cameroon_minor_port": [
+    {
+      "land": "land_cameroon",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_british_columbia_major_port": [
+    {
+      "land": "land_can_british_columbia",
+      "kind": "major_port",
+      "sea": "sea_p13",
+      "source": "edge"
+    }
+  ],
+  "facility_british_columbia_minor_shipyard": [
+    {
+      "land": "land_can_british_columbia",
+      "kind": "minor_shipyard",
+      "sea": "sea_p13",
+      "source": "edge"
+    }
+  ],
+  "facility_nova_scotia_major_port": [
+    {
+      "land": "land_can_nova_scotia",
+      "kind": "major_port",
+      "sea": "sea_a18",
+      "source": "edge"
+    }
+  ],
+  "facility_nova_scotia_minor_shipyard": [
+    {
+      "land": "land_can_nova_scotia",
+      "kind": "minor_shipyard",
+      "sea": "sea_a18",
+      "source": "edge"
+    }
+  ],
+  "facility_ontario_minor_port": [
+    {
+      "land": "land_can_ontario",
+      "kind": "minor_port",
+      "sea": "sea_a1",
+      "source": "edge"
+    }
+  ],
+  "facility_quebec_minor_port": [
+    {
+      "land": "land_can_quebec",
+      "kind": "minor_port",
+      "sea": "sea_a1",
+      "source": "edge"
+    }
+  ],
+  "facility_quebec_major_port": [
+    {
+      "land": "land_can_quebec",
+      "kind": "major_port",
+      "sea": "sea_a18",
+      "source": "edge"
+    }
+  ],
+  "facility_quebec_minor_shipyard": [
+    {
+      "land": "land_can_quebec",
+      "kind": "minor_shipyard",
+      "sea": "sea_a18",
+      "source": "edge"
+    }
+  ],
+  "facility_town_minor_port": [
+    {
+      "land": "land_cape_town",
+      "kind": "minor_port",
+      "sea": "sea_a40",
+      "source": "edge"
+    }
+  ],
+  "facility_land_celebes_minor_port": [
+    {
+      "land": "land_celebes",
+      "kind": "minor_port",
+      "sea": "sea_p60",
+      "source": "edge"
+    }
+  ],
+  "facility_land_chile_minor_port": [
+    {
+      "land": "land_chile",
+      "kind": "minor_port",
+      "sea": "sea_p31",
+      "source": "edge"
+    }
+  ],
+  "facility_beiping_minor_port": [
+    {
+      "land": "land_china_beiping",
+      "kind": "minor_port",
+      "sea": "sea_p14",
+      "source": "edge"
+    }
+  ],
+  "port_nanking_major": [
+    {
+      "land": "land_china_nanking",
+      "kind": "major_port",
+      "sea": "sea_p14",
+      "source": "edge"
+    },
+    {
+      "land": "land_china_nanking",
+      "kind": "major_port",
+      "sea": "sea_p32",
+      "source": "edge"
+    }
+  ],
+  "facility_shantung_major_port": [
+    {
+      "land": "land_china_shantung",
+      "kind": "major_port",
+      "sea": "sea_p14",
+      "source": "edge"
+    }
+  ],
+  "facility_shantung_minor_dockyard": [
+    {
+      "land": "land_china_shantung",
+      "kind": "minor_dockyard",
+      "sea": "sea_p14",
+      "source": "edge"
+    }
+  ],
+  "facility_land_cochinchina_major_port": [
+    {
+      "land": "land_cochinchina",
+      "kind": "major_port",
+      "sea": "sea_p50",
+      "source": "edge"
+    }
+  ],
+  "facility_land_colombia_minor_port": [
+    {
+      "land": "land_colombia",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    }
+  ],
+  "facility_land_cuba_minor_port": [
+    {
+      "land": "land_cuba",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    }
+  ],
+  "facility_land_dahomey_minor_port": [
+    {
+      "land": "land_dahomey",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_land_denmark_minor_port": [
+    {
+      "land": "land_denmark",
+      "kind": "minor_port",
+      "sea": "sea_a10",
+      "source": "edge"
+    },
+    {
+      "land": "land_denmark",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    },
+    {
+      "land": "land_denmark",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_new_guinea_minor_port": [
+    {
+      "land": "land_dutch_new_guinea",
+      "kind": "minor_port",
+      "sea": "sea_p61",
+      "source": "edge"
+    }
+  ],
+  "facility_land_eritrea_minor_port": [
+    {
+      "land": "land_eritrea",
+      "kind": "minor_port",
+      "sea": "sea_i5",
+      "source": "edge"
+    }
+  ],
+  "facility_basque_country_minor_port": [
+    {
+      "land": "land_esp_basque_country",
+      "kind": "minor_port",
+      "sea": "sea_a28",
+      "source": "edge"
+    }
+  ],
+  "facility_catalonia_major_port": [
+    {
+      "land": "land_esp_catalonia",
+      "kind": "major_port",
+      "sea": "sea_m1",
+      "source": "edge"
+    }
+  ],
+  "facility_eastern_andalucia_minor_shipyard": [
+    {
+      "land": "land_esp_eastern_andalucia",
+      "kind": "minor_shipyard",
+      "sea": "sea_m2",
+      "source": "edge"
+    }
+  ],
+  "facility_western_andalucia_major_port": [
+    {
+      "land": "land_esp_western_andalucia",
+      "kind": "major_port",
+      "sea": "sea_a44",
+      "source": "edge"
+    }
+  ],
+  "facility_land_estonia_minor_port": [
+    {
+      "land": "land_estonia",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    },
+    {
+      "land": "land_estonia",
+      "kind": "minor_port",
+      "sea": "sea_a13",
+      "source": "edge"
+    }
+  ],
+  "facility_land_fiji_minor_port": [
+    {
+      "land": "land_fiji",
+      "kind": "minor_port",
+      "sea": "sea_p65",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_finland_minor_port": [
+    {
+      "land": "land_fin_southern_finland",
+      "kind": "minor_port",
+      "sea": "sea_a13",
+      "source": "edge"
+    }
+  ],
+  "facility_land_formosa_major_port": [
+    {
+      "land": "land_formosa",
+      "kind": "major_port",
+      "sea": "sea_p32",
+      "source": "edge"
+    }
+  ],
+  "facility_aquitaine_minor_port": [
+    {
+      "land": "land_fra_aquitaine",
+      "kind": "minor_port",
+      "sea": "sea_a28",
+      "source": "edge"
+    }
+  ],
+  "facility_corsica_minor_port": [
+    {
+      "land": "land_fra_corsica",
+      "kind": "minor_port",
+      "sea": "sea_m3",
+      "source": "edge"
+    }
+  ],
+  "facility_normandy_minor_port": [
+    {
+      "land": "land_fra_normandy",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_picardy_minor_port": [
+    {
+      "land": "land_fra_picardy",
+      "kind": "minor_port",
+      "sea": "sea_a22",
+      "source": "edge"
+    },
+    {
+      "land": "land_fra_picardy",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_france_minor_port": [
+    {
+      "land": "land_fra_southern_france",
+      "kind": "minor_port",
+      "sea": "sea_a28",
+      "source": "edge"
+    },
+    {
+      "land": "land_fra_southern_france",
+      "kind": "minor_port",
+      "sea": "sea_m1",
+      "source": "edge"
+    }
+  ],
+  "facility_guiana_minor_port": [
+    {
+      "land": "land_french_guiana",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_morocco_minor_port": [
+    {
+      "land": "land_french_morocco",
+      "kind": "minor_port",
+      "sea": "sea_a28",
+      "source": "edge"
+    },
+    {
+      "land": "land_spanish_morocco",
+      "kind": "minor_port",
+      "sea": "sea_a28",
+      "source": "edge"
+    }
+  ],
+  "facility_london_minor_port": [
+    {
+      "land": "land_gbr_london",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_northern_england_minor_port": [
+    {
+      "land": "land_gbr_northern_england",
+      "kind": "minor_port",
+      "sea": "sea_a21",
+      "source": "edge"
+    }
+  ],
+  "facility_scotland_minor_port": [
+    {
+      "land": "land_gbr_scotland",
+      "kind": "minor_port",
+      "sea": "sea_a10",
+      "source": "edge"
+    },
+    {
+      "land": "land_gbr_scotland",
+      "kind": "minor_port",
+      "sea": "sea_a6",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_england_minor_port": [
+    {
+      "land": "land_gbr_southern_england",
+      "kind": "minor_port",
+      "sea": "sea_a21",
+      "source": "edge"
+    },
+    {
+      "land": "land_gbr_southern_england",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_eastern_germany_minor_port": [
+    {
+      "land": "land_ger_eastern_germany",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    }
+  ],
+  "facility_konigsberg_minor_port": [
+    {
+      "land": "land_ger_konigsberg",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    }
+  ],
+  "facility_western_germany_minor_port": [
+    {
+      "land": "land_ger_western_germany",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    },
+    {
+      "land": "land_ger_western_germany",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_macedonia_minor_port": [
+    {
+      "land": "land_gre_macedonia",
+      "kind": "minor_port",
+      "sea": "sea_m5",
+      "source": "edge"
+    }
+  ],
+  "facility_land_guam_minor_port": [
+    {
+      "land": "land_guam",
+      "kind": "minor_port",
+      "sea": "sea_p43",
+      "source": "edge"
+    }
+  ],
+  "facility_land_guyana_minor_port": [
+    {
+      "land": "land_guyana",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_land_hispaniola_minor_port": [
+    {
+      "land": "land_hispaniola",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    }
+  ],
+  "facility_hong_kong_major_dockyard": [
+    {
+      "land": "land_hong_kong",
+      "kind": "major_dockyard",
+      "sea": "sea_p41",
+      "source": "edge"
+    }
+  ],
+  "facility_calcutta_minor_port": [
+    {
+      "land": "land_india_calcutta",
+      "kind": "minor_port",
+      "sea": "sea_i11",
+      "source": "edge"
+    }
+  ],
+  "facility_ceylon_minor_port": [
+    {
+      "land": "land_india_ceylon",
+      "kind": "minor_port",
+      "sea": "sea_i11",
+      "source": "edge"
+    },
+    {
+      "land": "land_india_ceylon",
+      "kind": "minor_port",
+      "sea": "sea_i6",
+      "source": "edge"
+    }
+  ],
+  "facility_maharashtra_minor_port": [
+    {
+      "land": "land_india_maharashtra",
+      "kind": "minor_port",
+      "sea": "sea_i6",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_india_minor_port": [
+    {
+      "land": "land_india_southern_india",
+      "kind": "minor_port",
+      "sea": "sea_i11",
+      "source": "edge"
+    },
+    {
+      "land": "land_india_southern_india",
+      "kind": "minor_port",
+      "sea": "sea_i6",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_iran_minor_port": [
+    {
+      "land": "land_iran_southern_iran",
+      "kind": "minor_port",
+      "sea": "sea_i6",
+      "source": "edge"
+    },
+    {
+      "land": "land_iran_southern_iran",
+      "kind": "minor_port",
+      "sea": "sea_i7",
+      "source": "edge"
+    }
+  ],
+  "facility_land_ireland_minor_port": [
+    {
+      "land": "land_ireland",
+      "kind": "minor_port",
+      "sea": "sea_a21",
+      "source": "edge"
+    },
+    {
+      "land": "land_ireland",
+      "kind": "minor_port",
+      "sea": "sea_a22",
+      "source": "edge"
+    }
+  ],
+  "facility_lazio_minor_port": [
+    {
+      "land": "land_ita_lazio",
+      "kind": "minor_port",
+      "sea": "sea_m4",
+      "source": "edge"
+    }
+  ],
+  "facility_northern_italy_minor_port": [
+    {
+      "land": "land_ita_northern_italy",
+      "kind": "minor_port",
+      "sea": "sea_m3",
+      "source": "edge"
+    }
+  ],
+  "facility_rome_minor_port": [
+    {
+      "land": "land_ita_rome",
+      "kind": "minor_port",
+      "sea": "sea_m3",
+      "source": "edge"
+    }
+  ],
+  "facility_sardinia_minor_port": [
+    {
+      "land": "land_ita_sardinia",
+      "kind": "minor_port",
+      "sea": "sea_m3",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_italy_minor_port": [
+    {
+      "land": "land_ita_southern_italy",
+      "kind": "minor_port",
+      "sea": "sea_m4",
+      "source": "edge"
+    },
+    {
+      "land": "land_ita_southern_italy",
+      "kind": "minor_port",
+      "sea": "sea_m5",
+      "source": "edge"
+    }
+  ],
+  "facility_hokkaido_major_port": [
+    {
+      "land": "land_jap_hokkaido",
+      "kind": "major_port",
+      "sea": "sea_p7",
+      "source": "edge"
+    }
+  ],
+  "facility_honshu_northwest_major_shipyard": [
+    {
+      "land": "land_jap_honshu",
+      "kind": "major_shipyard",
+      "sea": "sea_p15",
+      "source": "edge"
+    }
+  ],
+  "facility_honshu_south_major_shipyard": [
+    {
+      "land": "land_jap_honshu",
+      "kind": "major_shipyard",
+      "sea": "sea_p15",
+      "source": "edge"
+    }
+  ],
+  "facility_honshu_major_port": [
+    {
+      "land": "land_jap_honshu",
+      "kind": "major_port",
+      "sea": "sea_p16",
+      "source": "edge"
+    }
+  ],
+  "facility_kyushu_major_port": [
+    {
+      "land": "land_jap_kyushu",
+      "kind": "major_port",
+      "sea": "sea_p15",
+      "source": "edge"
+    }
+  ],
+  "facility_kyushu_major_shipyard": [
+    {
+      "land": "land_jap_kyushu",
+      "kind": "major_shipyard",
+      "sea": "sea_p15",
+      "source": "edge"
+    }
+  ],
+  "facility_mariana_islands_minor_port": [
+    {
+      "land": "land_jap_mariana_islands",
+      "kind": "minor_port",
+      "sea": "sea_p43",
+      "source": "edge"
+    }
+  ],
+  "facility_okinawa_minor_port": [
+    {
+      "land": "land_jap_okinawa",
+      "kind": "minor_port",
+      "sea": "sea_p33",
+      "source": "edge"
+    }
+  ],
+  "facility_okinawa_seaplane_base": [
+    {
+      "land": "land_jap_okinawa",
+      "kind": "seaplane_base",
+      "sea": "sea_p33",
+      "source": "edge"
+    }
+  ],
+  "facility_tokyo_major_shipyard": [
+    {
+      "land": "land_jap_tokyo",
+      "kind": "major_shipyard",
+      "sea": "sea_p16",
+      "source": "edge"
+    }
+  ],
+  "facility_land_java_minor_port": [
+    {
+      "land": "land_java",
+      "kind": "minor_port",
+      "sea": "sea_p59",
+      "source": "edge"
+    }
+  ],
+  "facility_land_korea_minor_port": [
+    {
+      "land": "land_korea",
+      "kind": "minor_port",
+      "sea": "sea_p14",
+      "source": "edge"
+    }
+  ],
+  "facility_land_kuwait_minor_port": [
+    {
+      "land": "land_kuwait",
+      "kind": "minor_port",
+      "sea": "sea_i7",
+      "source": "edge"
+    }
+  ],
+  "facility_land_kwangtung_major_port": [
+    {
+      "land": "land_kwangtung",
+      "kind": "major_port",
+      "sea": "sea_p41",
+      "source": "edge"
+    }
+  ],
+  "facility_egypt_minor_port": [
+    {
+      "land": "land_lower_egypt",
+      "kind": "minor_port",
+      "sea": "sea_i5",
+      "source": "edge"
+    },
+    {
+      "land": "land_lower_egypt",
+      "kind": "minor_port",
+      "sea": "sea_m9",
+      "source": "edge"
+    },
+    {
+      "land": "land_upper_egypt",
+      "kind": "minor_port",
+      "sea": "sea_i5",
+      "source": "edge"
+    },
+    {
+      "land": "land_western_egypt",
+      "kind": "minor_port",
+      "sea": "sea_m9",
+      "source": "edge"
+    }
+  ],
+  "facility_and_the_visayas_minor_port": [
+    {
+      "land": "land_luzon_and_the_visayas",
+      "kind": "minor_port",
+      "sea": "sea_p42",
+      "source": "edge"
+    }
+  ],
+  "facility_and_the_visayas_submarine_base": [
+    {
+      "land": "land_luzon_and_the_visayas",
+      "kind": "submarine_base",
+      "sea": "sea_p50",
+      "source": "edge"
+    }
+  ],
+  "facility_land_madagascar_minor_port": [
+    {
+      "land": "land_madagascar",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    }
+  ],
+  "facility_rehe_major_port": [
+    {
+      "land": "land_manchuria_rehe",
+      "kind": "major_port",
+      "sea": "sea_p14",
+      "source": "edge"
+    }
+  ],
+  "facility_land_mauritius_minor_port": [
+    {
+      "land": "land_mauritius",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    }
+  ],
+  "facility_western_mexico_minor_port": [
+    {
+      "land": "land_mex_western_mexico",
+      "kind": "minor_port",
+      "sea": "sea_p30",
+      "source": "edge"
+    },
+    {
+      "land": "land_mex_western_mexico",
+      "kind": "minor_port",
+      "sea": "sea_p31",
+      "source": "edge"
+    }
+  ],
+  "facility_land_mindanao_major_port": [
+    {
+      "land": "land_mindanao",
+      "kind": "major_port",
+      "sea": "sea_p50",
+      "source": "edge"
+    }
+  ],
+  "facility_land_mindanao_minor_port": [
+    {
+      "land": "land_mindanao",
+      "kind": "minor_port",
+      "sea": "sea_p52",
+      "source": "edge"
+    }
+  ],
+  "facility_belgium_minor_port": [
+    {
+      "land": "land_neu_belgium",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_netherlands_minor_port": [
+    {
+      "land": "land_neu_netherlands",
+      "kind": "minor_port",
+      "sea": "sea_a23",
+      "source": "edge"
+    }
+  ],
+  "facility_britain_minor_port": [
+    {
+      "land": "land_new_britain",
+      "kind": "minor_port",
+      "sea": "sea_p63",
+      "source": "edge"
+    }
+  ],
+  "facility_caledonia_minor_port": [
+    {
+      "land": "land_new_caledonia",
+      "kind": "minor_port",
+      "sea": "sea_p65",
+      "source": "edge"
+    }
+  ],
+  "facility_guinea_minor_port": [
+    {
+      "land": "land_new_guinea",
+      "kind": "minor_port",
+      "sea": "sea_p63",
+      "source": "edge"
+    }
+  ],
+  "facility_hebrides_minor_port": [
+    {
+      "land": "land_new_hebrides",
+      "kind": "minor_port",
+      "sea": "sea_p65",
+      "source": "edge"
+    }
+  ],
+  "facility_land_nigeria_minor_port": [
+    {
+      "land": "land_nigeria",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_southern_norway_minor_port": [
+    {
+      "land": "land_nor_southern_norway",
+      "kind": "minor_port",
+      "sea": "sea_a10",
+      "source": "edge"
+    },
+    {
+      "land": "land_nor_southern_norway",
+      "kind": "minor_port",
+      "sea": "sea_a6",
+      "source": "edge"
+    }
+  ],
+  "facility_trondelag_minor_port": [
+    {
+      "land": "land_nor_trondelag",
+      "kind": "minor_port",
+      "sea": "sea_a6",
+      "source": "edge"
+    }
+  ],
+  "facility_algeria_minor_port": [
+    {
+      "land": "land_northern_algeria",
+      "kind": "minor_port",
+      "sea": "sea_m2",
+      "source": "edge"
+    }
+  ],
+  "facility_north_island_minor_port": [
+    {
+      "land": "land_nz_north_island",
+      "kind": "minor_port",
+      "sea": "sea_p69",
+      "source": "edge"
+    }
+  ],
+  "facility_south_island_minor_port": [
+    {
+      "land": "land_nz_south_island",
+      "kind": "minor_port",
+      "sea": "sea_p69",
+      "source": "edge"
+    }
+  ],
+  "facility_land_oman_minor_port": [
+    {
+      "land": "land_oman",
+      "kind": "minor_port",
+      "sea": "sea_i6",
+      "source": "edge"
+    }
+  ],
+  "facility_land_panama_minor_port": [
+    {
+      "land": "land_panama",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    },
+    {
+      "land": "land_panama",
+      "kind": "minor_port",
+      "sea": "sea_p31",
+      "source": "edge"
+    }
+  ],
+  "facility_land_patagonia_minor_port": [
+    {
+      "land": "land_patagonia",
+      "kind": "minor_port",
+      "sea": "sea_a40",
+      "source": "edge"
+    }
+  ],
+  "facility_east_africa_minor_port": [
+    {
+      "land": "land_portuguese_east_africa",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    }
+  ],
+  "facility_rico_minor_port": [
+    {
+      "land": "land_puerto_rico",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    }
+  ],
+  "facility_land_qatar_minor_port": [
+    {
+      "land": "land_qatar",
+      "kind": "minor_port",
+      "sea": "sea_i7",
+      "source": "edge"
+    }
+  ],
+  "facility_bessarabia_minor_port": [
+    {
+      "land": "land_rom_bessarabia",
+      "kind": "minor_port",
+      "sea": "sea_m10",
+      "source": "edge"
+    }
+  ],
+  "facility_land_seychelles_minor_port": [
+    {
+      "land": "land_seychelles",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    }
+  ],
+  "facility_africa_minor_port": [
+    {
+      "land": "land_south_africa",
+      "kind": "minor_port",
+      "sea": "sea_a40",
+      "source": "edge"
+    },
+    {
+      "land": "land_southwest_africa",
+      "kind": "minor_port",
+      "sea": "sea_a39",
+      "source": "edge"
+    }
+  ],
+  "facility_iraq_minor_port": [
+    {
+      "land": "land_southern_iraq",
+      "kind": "minor_port",
+      "sea": "sea_i7",
+      "source": "edge"
+    }
+  ],
+  "facility_land_sumatra_minor_port": [
+    {
+      "land": "land_sumatra",
+      "kind": "minor_port",
+      "sea": "sea_p50",
+      "source": "edge"
+    },
+    {
+      "land": "land_sumatra",
+      "kind": "minor_port",
+      "sea": "sea_p59",
+      "source": "edge"
+    }
+  ],
+  "facility_land_suriname_minor_port": [
+    {
+      "land": "land_suriname",
+      "kind": "minor_port",
+      "sea": "sea_a38",
+      "source": "edge"
+    }
+  ],
+  "facility_gotaland_minor_port": [
+    {
+      "land": "land_swe_gotaland",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    },
+    {
+      "land": "land_swe_gotaland",
+      "kind": "minor_port",
+      "sea": "sea_a13",
+      "source": "edge"
+    }
+  ],
+  "facility_land_syria_minor_port": [
+    {
+      "land": "land_syria",
+      "kind": "minor_port",
+      "sea": "sea_m9",
+      "source": "edge"
+    }
+  ],
+  "facility_land_tanganyika_minor_port": [
+    {
+      "land": "land_tanganyika",
+      "kind": "minor_port",
+      "sea": "sea_i4",
+      "source": "edge"
+    }
+  ],
+  "facility_land_timor_minor_port": [
+    {
+      "land": "land_timor",
+      "kind": "minor_port",
+      "sea": "sea_p61",
+      "source": "edge"
+    }
+  ],
+  "facility_land_tobruk_minor_port": [
+    {
+      "land": "land_tobruk",
+      "kind": "minor_port",
+      "sea": "sea_m8",
+      "source": "edge"
+    },
+    {
+      "land": "land_tobruk",
+      "kind": "minor_port",
+      "sea": "sea_m9",
+      "source": "edge"
+    }
+  ],
+  "facility_land_transjordan_minor_port": [
+    {
+      "land": "land_transjordan",
+      "kind": "minor_port",
+      "sea": "sea_m9",
+      "source": "edge"
+    }
+  ],
+  "facility_land_tripoli_minor_port": [
+    {
+      "land": "land_tripoli",
+      "kind": "minor_port",
+      "sea": "sea_m4",
+      "source": "edge"
+    }
+  ],
+  "facility_land_tunisia_minor_port": [
+    {
+      "land": "land_tunisia",
+      "kind": "minor_port",
+      "sea": "sea_m2",
+      "source": "edge"
+    }
+  ],
+  "facility_istanbul_minor_port": [
+    {
+      "land": "land_tur_istanbul",
+      "kind": "minor_port",
+      "sea": "sea_m10",
+      "source": "edge"
+    }
+  ],
+  "facility_karadeniz_minor_port": [
+    {
+      "land": "land_tur_karadeniz",
+      "kind": "minor_port",
+      "sea": "sea_m11",
+      "source": "edge"
+    }
+  ],
+  "facility_land_uruguay_minor_port": [
+    {
+      "land": "land_uruguay",
+      "kind": "minor_port",
+      "sea": "sea_a39",
+      "source": "edge"
+    }
+  ],
+  "facility_great_lakes_minor_port": [
+    {
+      "land": "land_usa_great_lakes",
+      "kind": "minor_port",
+      "sea": "sea_a24",
+      "source": "edge"
+    }
+  ],
+  "facility_new_orleans_minor_port": [
+    {
+      "land": "land_usa_new_orleans",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    }
+  ],
+  "facility_new_york_minor_port": [
+    {
+      "land": "land_usa_new_york",
+      "kind": "minor_port",
+      "sea": "sea_a25",
+      "source": "edge"
+    }
+  ],
+  "facility_pacific_northwest_minor_port": [
+    {
+      "land": "land_usa_pacific_northwest",
+      "kind": "minor_port",
+      "sea": "sea_p6",
+      "source": "edge"
+    }
+  ],
+  "facility_san_francisco_minor_port": [
+    {
+      "land": "land_usa_san_francisco",
+      "kind": "minor_port",
+      "sea": "sea_p28",
+      "source": "edge"
+    }
+  ],
+  "facility_southeastern_united_states_minor_port": [
+    {
+      "land": "land_usa_southeastern_united_states",
+      "kind": "minor_port",
+      "sea": "sea_a31",
+      "source": "edge"
+    }
+  ],
+  "facility_southwest_united_states_minor_port": [
+    {
+      "land": "land_usa_southwest_united_states",
+      "kind": "minor_port",
+      "sea": "sea_p30",
+      "source": "edge"
+    }
+  ],
+  "facility_the_carolinas_minor_port": [
+    {
+      "land": "land_usa_the_carolinas",
+      "kind": "minor_port",
+      "sea": "sea_a26",
+      "source": "edge"
+    }
+  ],
+  "facility_wake_island_minor_port": [
+    {
+      "land": "land_usa_wake_island",
+      "kind": "minor_port",
+      "sea": "sea_p36",
+      "source": "edge"
+    }
+  ],
+  "facility_washington_dc_minor_port": [
+    {
+      "land": "land_usa_washington_dc",
+      "kind": "minor_port",
+      "sea": "sea_a26",
+      "source": "edge"
+    }
+  ],
+  "facility_crimea_minor_port": [
+    {
+      "land": "land_usr_crimea",
+      "kind": "minor_port",
+      "sea": "sea_m10",
+      "source": "edge"
+    },
+    {
+      "land": "land_usr_crimea",
+      "kind": "minor_port",
+      "sea": "sea_m11",
+      "source": "edge"
+    }
+  ],
+  "facility_kola_minor_port": [
+    {
+      "land": "land_usr_kola",
+      "kind": "minor_port",
+      "sea": "sea_a13",
+      "source": "edge"
+    }
+  ],
+  "facility_leningrad_minor_port": [
+    {
+      "land": "land_usr_leningrad",
+      "kind": "minor_port",
+      "sea": "sea_a12",
+      "source": "edge"
+    }
+  ],
+  "facility_north_caucasia_minor_port": [
+    {
+      "land": "land_usr_north_caucasia",
+      "kind": "minor_port",
+      "sea": "sea_m11",
+      "source": "edge"
+    }
+  ],
+  "facility_primorsky_krai_minor_port": [
+    {
+      "land": "land_usr_primorsky_krai",
+      "kind": "minor_port",
+      "sea": "sea_p7",
+      "source": "edge"
+    }
+  ],
+  "facility_south_sakhalin_minor_port": [
+    {
+      "land": "land_usr_south_sakhalin",
+      "kind": "minor_port",
+      "sea": "sea_p8",
+      "source": "edge"
+    }
+  ],
+  "facility_taurida_minor_port": [
+    {
+      "land": "land_usr_taurida",
+      "kind": "minor_port",
+      "sea": "sea_m11",
+      "source": "edge"
+    }
+  ],
+  "facility_transcaucasia_minor_port": [
+    {
+      "land": "land_usr_transcaucasia",
+      "kind": "minor_port",
+      "sea": "sea_m11",
+      "source": "edge"
+    }
+  ],
+  "facility_land_venezuela_minor_port": [
+    {
+      "land": "land_venezuela",
+      "kind": "minor_port",
+      "sea": "sea_a36",
+      "source": "edge"
+    }
+  ],
+  "facility_western_yugoslavia_minor_port": [
+    {
+      "land": "land_yug_western_yugoslavia",
+      "kind": "minor_port",
+      "sea": "sea_m5",
+      "source": "edge"
+    }
+  ]
+}

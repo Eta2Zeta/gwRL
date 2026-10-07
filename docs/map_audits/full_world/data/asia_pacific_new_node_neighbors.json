@@ -1,0 +1,1909 @@
+[
+  {
+    "node_id": "land_usr_zuryenia",
+    "confirmed_land_neighbors": [
+      "land_usr_northern_russia",
+      "land_usr_yaroslavl",
+      "land_usr_gorky",
+      "land_usr_ural",
+      "land_usr_vyatka"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_a9"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-001"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_gorky",
+      "land_usr_ural"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_ural",
+    "confirmed_land_neighbors": [
+      "land_usr_zuryenia",
+      "land_usr_gorky",
+      "land_usr_saratov",
+      "land_usr_orenburg",
+      "land_usr_sibir",
+      "land_usr_vyatka"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-002",
+      "AP-099"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_gorky",
+      "land_usr_orenburg",
+      "land_usr_sibir",
+      "land_usr_vyatka",
+      "land_usr_zuryenia"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [
+      "land_usr_saratov"
+    ]
+  },
+  {
+    "node_id": "land_usr_orenburg",
+    "confirmed_land_neighbors": [
+      "land_usr_ural",
+      "land_usr_saratov",
+      "land_usr_western_kazakhstan",
+      "land_usr_central_kazakhstan",
+      "land_usr_tobolsk",
+      "land_usr_sibir"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-003"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_central_kazakhstan",
+      "land_usr_saratov",
+      "land_usr_sibir",
+      "land_usr_tobolsk",
+      "land_usr_ural"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_western_kazakhstan",
+    "confirmed_land_neighbors": [
+      "land_usr_orenburg",
+      "land_usr_saratov",
+      "land_usr_stalingrad",
+      "land_usr_kalmytskaya",
+      "land_usr_turkmenistan",
+      "land_usr_turkestan",
+      "land_usr_central_kazakhstan"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_m12"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-004"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_central_kazakhstan",
+    "confirmed_land_neighbors": [
+      "land_usr_orenburg",
+      "land_usr_western_kazakhstan",
+      "land_usr_turkestan",
+      "land_usr_eastern_kazakhstan",
+      "land_usr_tobolsk"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-005"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_orenburg",
+      "land_usr_turkestan"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_turkmenistan",
+    "confirmed_land_neighbors": [
+      "land_usr_western_kazakhstan",
+      "land_usr_turkestan",
+      "land_iran_northern_iran",
+      "land_afghanistan",
+      "land_china_sinkiang"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_m12"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5500,
+          2030,
+          6120,
+          2480
+        ],
+        "crop": "evidence/ap_turkestan_himalaya.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-006"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "impassable_neighbors": [
+      "land_china_sinkiang"
+    ],
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_turkestan"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": [
+        "facility_turkmenistan_minor_port"
+      ]
+    }
+  },
+  {
+    "node_id": "land_usr_vyatka",
+    "confirmed_land_neighbors": [
+      "land_usr_zuryenia",
+      "land_usr_ural",
+      "land_usr_sibir",
+      "land_usr_yugria"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_a9"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-007"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_sibir",
+      "land_usr_ural"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_yugria",
+    "confirmed_land_neighbors": [
+      "land_usr_vyatka",
+      "land_usr_sibir",
+      "land_usr_lower_tunguska",
+      "land_usr_samoyedia"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_a9"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-008"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "notes": "A9 continues without a divider into the Ob gulf. The P1 red arrow is a wrap link. Finite gulf coastline is present.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_samoyedia",
+    "confirmed_land_neighbors": [
+      "land_usr_yugria",
+      "land_usr_lower_tunguska",
+      "land_usr_evenkiland"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_a9"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-009"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "notes": "A9 continues without a divider into the Ob gulf. The P1 red arrow is a wrap link. Finite gulf coastline is present.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_lower_tunguska",
+    "confirmed_land_neighbors": [
+      "land_usr_samoyedia",
+      "land_usr_yugria",
+      "land_usr_sibir",
+      "land_usr_yenisei",
+      "land_usr_evenkiland"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-010"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_sibir",
+    "confirmed_land_neighbors": [
+      "land_usr_vyatka",
+      "land_usr_yugria",
+      "land_usr_lower_tunguska",
+      "land_usr_yenisei",
+      "land_usr_tobolsk",
+      "land_usr_orenburg",
+      "land_usr_ural"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-011"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_orenburg",
+      "land_usr_tobolsk",
+      "land_usr_ural",
+      "land_usr_vyatka"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_tobolsk",
+    "confirmed_land_neighbors": [
+      "land_usr_sibir",
+      "land_usr_yenisei",
+      "land_usr_novosibirsk",
+      "land_usr_eastern_kazakhstan",
+      "land_usr_central_kazakhstan",
+      "land_usr_orenburg"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4550,
+          0,
+          6100,
+          1590
+        ],
+        "crop": "evidence/ap_sov_west_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          4900,
+          1300,
+          6500,
+          2800
+        ],
+        "crop": "evidence/ap_kazakh_graph.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-012"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_usr_novosibirsk",
+      "land_usr_orenburg",
+      "land_usr_sibir"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_yenisei",
+    "confirmed_land_neighbors": [
+      "land_usr_lower_tunguska",
+      "land_usr_sibir",
+      "land_usr_tobolsk",
+      "land_usr_novosibirsk",
+      "land_usr_stalino",
+      "land_usr_evenkiland"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-013"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_evenkiland",
+    "confirmed_land_neighbors": [
+      "land_usr_samoyedia",
+      "land_usr_lower_tunguska",
+      "land_usr_yenisei",
+      "land_usr_stalino",
+      "land_usr_vanavara",
+      "land_usr_western_yakutia",
+      "land_usr_northern_yakutia"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-014"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "notes": "Land continues to the top map frame, with no local sea coastline. Evenkiland\u2013Northern Yakutia is a finite short segment above Western Yakutia.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_western_yakutia",
+    "confirmed_land_neighbors": [
+      "land_usr_evenkiland",
+      "land_usr_northern_yakutia",
+      "land_usr_southern_yakutia",
+      "land_usr_vanavara"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-015"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "notes": "Land continues to the top map frame, with no local sea coastline. Evenkiland\u2013Northern Yakutia is a finite short segment above Western Yakutia.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_northern_yakutia",
+    "confirmed_land_neighbors": [
+      "land_usr_evenkiland",
+      "land_usr_western_yakutia",
+      "land_usr_southern_yakutia",
+      "land_usr_eastern_yakutia"
+    ],
+    "confirmed_coastal_seas": [],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-016"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "notes": "Land continues to the top map frame, with no local sea coastline. Evenkiland\u2013Northern Yakutia is a finite short segment above Western Yakutia.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": []
+  },
+  {
+    "node_id": "land_usr_eastern_yakutia",
+    "confirmed_land_neighbors": [
+      "land_usr_northern_yakutia",
+      "land_usr_southern_yakutia",
+      "land_usr_yakutsk",
+      "land_usr_chukotka"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_p1"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-017"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_chukotka",
+    "confirmed_land_neighbors": [
+      "land_usr_eastern_yakutia",
+      "land_usr_yakutsk",
+      "land_usr_magadan",
+      "land_usr_kamchatka"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_p1"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-018"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usr_big_diomede_island",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p1"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          5900,
+          0,
+          7350,
+          1500
+        ],
+        "crop": "evidence/ap_sov_middle_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          7200,
+          0,
+          8550,
+          1650
+        ],
+        "crop": "evidence/ap_sov_east_graph.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6020,
+          120,
+          6660,
+          750
+        ],
+        "crop": "evidence/ap_evenki_junction.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6350,
+          0,
+          6850,
+          450
+        ],
+        "crop": "evidence/ap_north_yakutia_junction.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-019"
+    ],
+    "coverage": "Complete physical polygon perimeter traced; this includes impassable geography. River combat directions are separately enumerated in asia_pacific_directional_terrain.json; has_river transport semantics are not inferred.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": "Continuous named river transport is a proposed separate overlay; this ledger does not infer it from combat river crossings.",
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_andaman_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_i12"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-020"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_maldive_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_i7"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (4850, 2150, 6650, 3700); evidence/ap_india.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-021"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_jap_bonin",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p35"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-022"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usa_midway",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p22"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-023"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": [
+        "facility_midway_minor_port",
+        "facility_midway_submarine_base"
+      ]
+    }
+  },
+  {
+    "node_id": "land_usa_hawaii",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p29"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-024"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": [
+        "facility_hawaii_major_dockyard"
+      ]
+    }
+  },
+  {
+    "node_id": "land_usa_attu_and_kiska",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p4"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6150, 0, 8600, 1600); evidence/ap_siberia_east.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-025"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_jap_marshall_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p47"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-026"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": [
+        "facility_marshall_minor_port"
+      ]
+    }
+  },
+  {
+    "node_id": "land_line_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p38"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (7900, 1000, 9900, 2850); evidence/ap_pacific_north.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-027"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_solomon_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p54"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-028"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_gilbert_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p56"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-029"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_usa_samoa",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p66"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-030"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_gambier_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p67"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-031"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_pitcairn_island",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p68"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-032"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_easter_island",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p68"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (8000, 2750, 9900, 4888); evidence/ap_pacific_south.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-033"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_maluku_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p51",
+      "sea_p52",
+      "sea_p62"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation."
+    ],
+    "finding_ids": [
+      "AP-034"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "absence of land/narrow cross-border railway (no such neighbor)"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_lesser_sunda_islands",
+    "confirmed_land_neighbors": [
+      "land_timor"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_p60",
+      "sea_p61",
+      "sea_p63"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6470, 3160, 7850, 4030); evidence/ap_indonesia.png",
+      "Terrain Glossary pp2\u20134; ownership category follows printed roundel, with FEC allocation for UK Pacific possessions requiring setup confirmation.",
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6060,
+          3480,
+          7530,
+          4410
+        ],
+        "crop": "evidence/ap_java_indian_grid.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          6650,
+          3210,
+          7380,
+          3950
+        ],
+        "crop": "evidence/ap_borneo_java.png"
+      }
+    ],
+    "finding_ids": [
+      "AP-035"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "narrow_crossings": [
+      {
+        "neighbor_id": "land_java",
+        "capacity": 1,
+        "blocking_seas": [
+          "sea_p60",
+          "sea_p61"
+        ],
+        "notes": "White dotted crossing bends above and below the P60/P61 boundary; both sea zones touch the line (\u00a71.9)."
+      }
+    ],
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [],
+    "railway_coverage": {
+      "initial_zone_rail_covered": false,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": []
+    }
+  },
+  {
+    "node_id": "land_aus_sydney",
+    "confirmed_land_neighbors": [
+      "land_aus_new_south_wales"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_p72"
+    ],
+    "uncertain_neighbors": [],
+    "evidence": [
+      "game_content/maps/gw36map.png rect (6100, 3750, 8650, 4888); evidence/ap_australia.png",
+      "Terrain Glossary p3: Sydney mountain; map depicts separate outlined tile and red city/capital marker."
+    ],
+    "finding_ids": [
+      "AP-036"
+    ],
+    "coverage": "Complete printed physical coastal/land neighbor set. Island-group outlines were followed rather than adding seas from proximity.",
+    "checked_fields": [
+      "complete physical shared-border/coast perimeter",
+      "printed ordinary versus island-group/narrow/impassable relation",
+      "all proposed land/narrow border railway crossings and gauges"
+    ],
+    "uninspected_fields": [],
+    "railway_edge_review": "data/asia_pacific_new_edge_rail_review.json",
+    "railway_neighbors": [
+      "land_aus_new_south_wales"
+    ],
+    "railway_coverage": {
+      "initial_zone_rail_covered": true,
+      "derivation": "A printed railway crossing any land-zone border makes the whole zone rail-covered under \u00a713.2.8 p98; coast access derives from that state rather than a sea-edge rail spur."
+    },
+    "schema_limitation": null,
+    "uncertain_railway_neighbors": [],
+    "naval_facility_review": {
+      "path": "data/naval_reaudit_asia_pacific.json",
+      "review_date": "2026-10-06",
+      "confirmed_physical_facility_ids": [
+        "facility_sydney_minor_shipyard"
+      ]
+    }
+  }
+]

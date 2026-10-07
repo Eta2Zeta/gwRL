@@ -1,0 +1,5603 @@
+{
+  "region": "Europe, Africa, Middle East and western USSR",
+  "scope": "Fresh source-image review of every current/proposed naval-facility claim and printed coasts in the listed territories, including missing land tiles. Symbols checked: minor/major ports, minor/major dockyards, minor/major shipyards, seaplane bases and submarine bases. Every empty roster is an inspected absence. Iceland/Faroe/Shetland are covered by Americas/Atlantic; Kola and new eastern Soviet territories by Asia/Pacific. Interior land zones without coast or a prior naval claim are not separately listed. No production data changed.",
+  "review_date": "2026-10-06",
+  "entries": [
+    {
+      "land_id": "land_gbr_scotland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_scotland_major_port_north",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a4",
+            "sea_a6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_scotland_20261006.png",
+              "rectangle": [
+                2090,
+                550,
+                2520,
+                1070
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_scotland_major_shipyard_west",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_scotland_20261006.png",
+              "rectangle": [
+                2090,
+                550,
+                2520,
+                1070
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_scotland_major_shipyard_east",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_scotland_20261006.png",
+              "rectangle": [
+                2090,
+                550,
+                2520,
+                1070
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a10",
+        "sea_a17",
+        "sea_a4",
+        "sea_a6"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-561"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_scotland_20261006.png",
+          "rectangle": [
+            2090,
+            550,
+            2520,
+            1070
+          ]
+        }
+      ],
+      "notes": "Northern blue-anchor port lies on the A4/A6 sea divider, one physical port with two accesses. West/east blue cranes are separate shipyards."
+    },
+    {
+      "land_id": "land_gbr_northern_england",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_northern_england_major_shipyard_east",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_northern_england_major_shipyard_west",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a17"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a17",
+        "sea_a21",
+        "sea_a6"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-562"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_britain_channels.png",
+          "rectangle": [
+            1690,
+            680,
+            2720,
+            1770
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_gbr_southern_england",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_england_minor_dockyard",
+          "type": "minor_dockyard",
+          "sea_accesses": [
+            "sea_a17"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_southern_england_major_shipyard_southwest",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a21"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_southern_england_major_shipyard_south",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a22"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_southern_england_seaplane_base_west",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_a17"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_southern_england_seaplane_base_east",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_a23"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a17",
+        "sea_a21",
+        "sea_a22",
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-563"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_britain_channels.png",
+          "rectangle": [
+            1690,
+            680,
+            2720,
+            1770
+          ]
+        }
+      ],
+      "notes": "Two separate blue cranes, two separate green airplane-over-waves bases and one white circled-anchor dockyard. Do not merge symbols or infer further facilities from coastline."
+    },
+    {
+      "land_id": "land_gbr_london",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_london_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a22",
+            "sea_a23"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a22",
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-564"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_britain_channels.png",
+          "rectangle": [
+            1690,
+            680,
+            2720,
+            1770
+          ]
+        }
+      ],
+      "notes": "The single blue crane sits at the A22/A23 sea divider; both accesses refer to one physical shipyard."
+    },
+    {
+      "land_id": "land_gbr_northern_ireland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_northern_ireland_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a17"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a17"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-565"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_britain_channels.png",
+          "rectangle": [
+            1690,
+            680,
+            2720,
+            1770
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_ireland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_ireland_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_a17"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a17",
+        "sea_a21",
+        "sea_a22"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-566"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_britain_channels.png",
+          "rectangle": [
+            1690,
+            680,
+            2720,
+            1770
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_fra_normandy",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_normandy_major_shipyard_west",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a21"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_normandy_major_shipyard_north",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a22"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_britain_channels.png",
+              "rectangle": [
+                1690,
+                680,
+                2720,
+                1770
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a21",
+        "sea_a22",
+        "sea_a23",
+        "sea_a29"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-567"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_britain_channels.png",
+          "rectangle": [
+            1690,
+            680,
+            2720,
+            1770
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_fra_picardy",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_picardy_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a22"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_france.png",
+              "rectangle": [
+                2220,
+                1180,
+                3070,
+                2110
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a22",
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-568"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_france.png",
+          "rectangle": [
+            2220,
+            1180,
+            3070,
+            2110
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_fra_aquitaine",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_aquitaine_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a29"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_france.png",
+              "rectangle": [
+                2220,
+                1180,
+                3070,
+                2110
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_aquitaine_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_a29"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_france.png",
+              "rectangle": [
+                2220,
+                1180,
+                3070,
+                2110
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a28",
+        "sea_a29"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-569"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_france.png",
+          "rectangle": [
+            2220,
+            1180,
+            3070,
+            2110
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_fra_southern_france",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_france_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_m1"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a28",
+        "sea_m1"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-570"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_fra_corsica",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m1",
+        "sea_m3"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-300",
+        "EA-301",
+        "EA-571"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_ita_sardinia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m1",
+        "sea_m3"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-302",
+        "EA-303",
+        "EA-572"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_neu_belgium",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_belgium_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a23"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_france.png",
+              "rectangle": [
+                2220,
+                1180,
+                3070,
+                2110
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-573"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_france.png",
+          "rectangle": [
+            2220,
+            1180,
+            3070,
+            2110
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_neu_netherlands",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_netherlands_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a23"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a11",
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-574"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+          "rectangle": [
+            2640,
+            740,
+            3650,
+            1330
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_ger_western_germany",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_western_germany_major_shipyard_west",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_western_germany_major_shipyard_east",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_western_germany_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_a11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_western_germany_submarine_base",
+          "type": "submarine_base",
+          "sea_accesses": [
+            "sea_a11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a11",
+        "sea_a12",
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-575"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+          "rectangle": [
+            2640,
+            740,
+            3650,
+            1330
+          ]
+        }
+      ],
+      "notes": "Two separate blue cranes (A11 and A12); green airplane-over-waves base and blue vertical-submarine silhouette on A11. None is a generic minor port."
+    },
+    {
+      "land_id": "land_ger_eastern_germany",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_eastern_germany_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-576"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+          "rectangle": [
+            2640,
+            740,
+            3650,
+            1330
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_ger_konigsberg",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_konigsberg_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-577"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_denmark",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_denmark_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_denmark_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a10",
+        "sea_a11",
+        "sea_a12",
+        "sea_a23"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-578"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+          "rectangle": [
+            2640,
+            740,
+            3650,
+            1330
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_swe_gotaland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_gotaland_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+              "rectangle": [
+                2640,
+                740,
+                3650,
+                1330
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a10",
+        "sea_a12",
+        "sea_a13"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-417",
+        "EA-579"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_germany_denmark_20261006.png",
+          "rectangle": [
+            2640,
+            740,
+            3650,
+            1330
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_swe_norrland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_norrland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a13"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a13",
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-416",
+        "EA-580"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_nor_southern_norway",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_norway_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_north_seas.png",
+              "rectangle": [
+                2100,
+                0,
+                4570,
+                1550
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_southern_norway_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_north_seas.png",
+              "rectangle": [
+                2100,
+                0,
+                4570,
+                1550
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a10",
+        "sea_a6",
+        "sea_a7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-412",
+        "EA-413",
+        "EA-581"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_seas.png",
+          "rectangle": [
+            2100,
+            0,
+            4570,
+            1550
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_nor_trondelag",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a5",
+        "sea_a6",
+        "sea_a7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-414",
+        "EA-415",
+        "EA-582"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_norway_finland_20261006.png",
+          "rectangle": [
+            2890,
+            0,
+            4520,
+            690
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_nor_northern_norway",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_northern_norway_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_norway_finland_20261006.png",
+              "rectangle": [
+                2890,
+                0,
+                4520,
+                690
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a5",
+        "sea_a8"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-583"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_norway_finland_20261006.png",
+          "rectangle": [
+            2890,
+            0,
+            4520,
+            690
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_svalbard",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_seas.png",
+          "rectangle": [
+            2100,
+            0,
+            4570,
+            1550
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_fin_lapland",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a13",
+        "sea_a14",
+        "sea_a8"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_norway_finland_20261006.png",
+          "rectangle": [
+            2890,
+            0,
+            4520,
+            690
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_fin_southern_finland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_finland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a13"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a13",
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-418",
+        "EA-584"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_fin_helsinki",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_helsinki_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a13",
+            "sea_a14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a13",
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-585"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "White crane sits at the A13/A14 sea-divider endpoint. One physical minor shipyard with two sea accesses."
+    },
+    {
+      "land_id": "land_fin_viipuri_province",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-419"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_estonia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_estonia_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a12",
+        "sea_a13",
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-420",
+        "EA-586"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_latvia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_latvia_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a12",
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-421",
+        "EA-422",
+        "EA-587"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_lithuania",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-423"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_pol_west_poland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_west_poland_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-424",
+        "EA-588"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_usr_leningrad",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_leningrad_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_baltic_20261006.png",
+              "rectangle": [
+                3340,
+                430,
+                4300,
+                1130
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a12",
+        "sea_a14"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-425",
+        "EA-589"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_baltic_20261006.png",
+          "rectangle": [
+            3340,
+            430,
+            4300,
+            1130
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_usr_karelia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_karelia_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a9"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_white_sea.png",
+              "rectangle": [
+                4300,
+                0,
+                5910,
+                620
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-590"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_white_sea.png",
+          "rectangle": [
+            4300,
+            0,
+            5910,
+            620
+          ]
+        }
+      ],
+      "notes": "The White Sea white anchor is west of the Karelia/Northern Russia land border, on the Karelia side."
+    },
+    {
+      "land_id": "land_usr_northern_russia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_white_sea.png",
+          "rectangle": [
+            4300,
+            0,
+            5910,
+            620
+          ]
+        }
+      ],
+      "notes": "White Sea coast scanned. The nearby white-anchor port west of the land border belongs to Karelia, not Northern Russia."
+    },
+    {
+      "land_id": "land_esp_galicia_and_leon",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_galicia_and_leon_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a28"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_iberia.png",
+              "rectangle": [
+                1700,
+                2000,
+                2850,
+                2800
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_galicia_and_leon_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_a35"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_iberia.png",
+              "rectangle": [
+                1700,
+                2000,
+                2850,
+                2800
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a28",
+        "sea_a35"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-591"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_esp_basque_country",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a28",
+        "sea_a29"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-592"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_esp_catalonia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_catalonia_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m1"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_iberia.png",
+              "rectangle": [
+                1700,
+                2000,
+                2850,
+                2800
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m1"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-593"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_esp_balearic_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m1"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_esp_eastern_andalucia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_eastern_andalucia_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m2"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_iberia.png",
+              "rectangle": [
+                1700,
+                2000,
+                2850,
+                2800
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m1",
+        "sea_m2"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-594"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_esp_western_andalucia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_western_andalucia_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a44"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_iberia.png",
+              "rectangle": [
+                1700,
+                2000,
+                2850,
+                2800
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a44"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-595"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_portugal",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_portugal_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a35"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_iberia.png",
+              "rectangle": [
+                1700,
+                2000,
+                2850,
+                2800
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a35",
+        "sea_a44"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-596"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_iberia.png",
+          "rectangle": [
+            1700,
+            2000,
+            2850,
+            2800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_gibraltar",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_gibraltar_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_a44",
+            "sea_m2"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a44",
+        "sea_m2"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-597"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "Single blue circled anchor sits on the A44/M2 dividing line; one physical major dockyard with two accesses."
+    },
+    {
+      "land_id": "land_ita_northern_italy",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_northern_italy_major_shipyard_west",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_m3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_northern_italy_major_shipyard_east",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_m5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m3",
+        "sea_m5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-304",
+        "EA-305",
+        "EA-598"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_ita_rome",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_rome_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_m3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_rome_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m3",
+        "sea_m5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-306",
+        "EA-307",
+        "EA-599"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_ita_lazio",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_lazio_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_m3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m3",
+        "sea_m4",
+        "sea_m5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-308",
+        "EA-600"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_ita_southern_italy",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_italy_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_southern_italy_20261006.png",
+              "rectangle": [
+                3050,
+                2270,
+                3560,
+                2840
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m3",
+        "sea_m4",
+        "sea_m5",
+        "sea_m6"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-309",
+        "EA-601"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_southern_italy_20261006.png",
+          "rectangle": [
+            3050,
+            2270,
+            3560,
+            2840
+          ]
+        }
+      ],
+      "notes": "Single white-crane minor shipyard on the Tyrrhenian (M3) coast well north of the Sicily/Southern Italy narrow crossing. No additional facility on M5/M6."
+    },
+    {
+      "land_id": "land_ita_sicily",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_sicily_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m3",
+        "sea_m4",
+        "sea_m6"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-602"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_malta",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_malta_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_m4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-603"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_yug_western_yugoslavia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_western_yugoslavia_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_western_yugoslavia_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-310",
+        "EA-604"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_albania",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_albania_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m5",
+        "sea_m6"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-605"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_gre_macedonia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m5",
+        "sea_m7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-606"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_gre_thessaly",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_thessaly_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m6",
+        "sea_m7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-607"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_gre_peloponnese",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_peloponnese_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m6",
+            "sea_m7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m6",
+        "sea_m7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-608"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Single white anchor sits on the M6/M7 dividing line; one physical minor port with two accesses."
+    },
+    {
+      "land_id": "land_gre_crete",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m7",
+        "sea_m8"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_ita_rhodes",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_rhodes_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-609"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_cyprus",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_cyprus_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m9"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-299",
+        "EA-610"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_bulgaria",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_bulgaria_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m10"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-611"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_rom_central_romania",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_central_romania_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_greece_mediterranean.png",
+              "rectangle": [
+                2800,
+                1850,
+                4470,
+                3200
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m10"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-311",
+        "EA-612"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_greece_mediterranean.png",
+          "rectangle": [
+            2800,
+            1850,
+            4470,
+            3200
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_rom_bessarabia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m10"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-613"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_usr_southern_ukraine",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_ukraine_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m10"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-312",
+        "EA-614"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_usr_taurida",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_taurida_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m11"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-313",
+        "EA-615"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_usr_crimea",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_crimea_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_m11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m10",
+        "sea_m11"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-314",
+        "EA-616"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_usr_donets_kuban",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_donets_kuban_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m11"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-315",
+        "EA-617"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Blue anchor is the sole facility. The separate airplane-over-waves icon south of the territorial border belongs to North-Caucasia."
+    },
+    {
+      "land_id": "land_usr_north_caucasia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_north_caucasia_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_m11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m11",
+        "sea_m12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-618"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Airplane-over-waves symbol is on North-Caucasia M11 coast. The white-anchor port farther south belongs to Transcaucasia; remove the current generic minor-port claim."
+    },
+    {
+      "land_id": "land_usr_kalmytskaya",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_kalmytskaya_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-619"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_usr_transcaucasia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_transcaucasia_minor_port_black_sea",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_transcaucasia_minor_port_caspian",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_western_ussr_south.png",
+              "rectangle": [
+                3980,
+                1375,
+                5380,
+                2300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m11",
+        "sea_m12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-316",
+        "EA-620"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_western_ussr_south.png",
+          "rectangle": [
+            3980,
+            1375,
+            5380,
+            2300
+          ]
+        }
+      ],
+      "notes": "Distinct white anchors on Black Sea and Caspian shores; two physical minor ports, not one two-sea port."
+    },
+    {
+      "land_id": "land_tur_istanbul",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_istanbul_major_port_aegean",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_istanbul_major_port_black_sea",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m10"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_istanbul_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_m7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m10",
+        "sea_m7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-621"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_tur_karadeniz",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_karadeniz_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m11"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-622"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_tur_eastern_anatolia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m11"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_tur_akdeniz",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_akdeniz_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m9"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m11",
+        "sea_m7",
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-318",
+        "EA-623"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_syria",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_syria_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m9"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_turkey_iran.png",
+              "rectangle": [
+                3850,
+                2050,
+                5580,
+                2980
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-319",
+        "EA-624"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_azerbaijan",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_iran_northern_iran",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m12"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-317"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_turkey_iran.png",
+          "rectangle": [
+            3850,
+            2050,
+            5580,
+            2980
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_iran_southern_iran",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_iran_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_arabia.png",
+              "rectangle": [
+                4230,
+                2760,
+                5460,
+                3910
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i6",
+        "sea_i7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-625"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "White ordinary anchor is on I6; no facility is shown on the erroneous old I7 access."
+    },
+    {
+      "land_id": "land_southern_iraq",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i6",
+        "sea_i7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-626"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_kuwait",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_kuwait_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_arabia.png",
+              "rectangle": [
+                4230,
+                2760,
+                5460,
+                3910
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i6",
+        "sea_i7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-321",
+        "EA-627"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_qatar",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i6",
+        "sea_i7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-322",
+        "EA-628"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_oman",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i4",
+        "sea_i6",
+        "sea_i7"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-323",
+        "EA-629"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_saudi_arabia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i3",
+        "sea_i5",
+        "sea_i6"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_aden",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_aden_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_arabia.png",
+              "rectangle": [
+                4230,
+                2760,
+                5460,
+                3910
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i3",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-324",
+        "EA-630"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_yemen",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i4",
+        "sea_i5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_transjordan",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_transjordan_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_arabia.png",
+              "rectangle": [
+                4230,
+                2760,
+                5460,
+                3910
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m8",
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-320",
+        "EA-631"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_arabia.png",
+          "rectangle": [
+            4230,
+            2760,
+            5460,
+            3910
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_lower_egypt",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_lower_egypt_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_m8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_nile.png",
+              "rectangle": [
+                3800,
+                2990,
+                4790,
+                4000
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        },
+        {
+          "id": "facility_lower_egypt_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_nile.png",
+              "rectangle": [
+                3800,
+                2990,
+                4790,
+                4000
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i5",
+        "sea_m8",
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-329",
+        "EA-330",
+        "EA-632"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_nile.png",
+          "rectangle": [
+            3800,
+            2990,
+            4790,
+            4000
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_upper_egypt",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-331",
+        "EA-633"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_nile.png",
+          "rectangle": [
+            3800,
+            2990,
+            4790,
+            4000
+          ]
+        }
+      ],
+      "notes": "No naval facility printed on its I5 shore; the major anchor at the northern end belongs to Lower Egypt."
+    },
+    {
+      "land_id": "land_western_egypt",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_western_egypt_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_nile.png",
+              "rectangle": [
+                3800,
+                2990,
+                4790,
+                4000
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m8",
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-328",
+        "EA-634"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_nile.png",
+          "rectangle": [
+            3800,
+            2990,
+            4790,
+            4000
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_nubia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-332"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_nile.png",
+          "rectangle": [
+            3800,
+            2990,
+            4790,
+            4000
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_tobruk",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tobruk_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m4",
+            "sea_m8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_round2_nile.png",
+              "rectangle": [
+                3800,
+                2990,
+                4790,
+                4000
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m4",
+        "sea_m8",
+        "sea_m9"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-327",
+        "EA-635"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_round2_nile.png",
+          "rectangle": [
+            3800,
+            2990,
+            4790,
+            4000
+          ]
+        }
+      ],
+      "notes": "White-anchor symbol sits on the M4/M8 sea divider; one minor port with two accesses, correcting the earlier M4-only facility proposal."
+    },
+    {
+      "land_id": "land_cyrenaica",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_africa.png",
+          "rectangle": [
+            1650,
+            2700,
+            4550,
+            3800
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_tripolitania",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tripolitania_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-326",
+        "EA-636"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_tripoli",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tripoli_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-325",
+        "EA-637"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_tunisia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tunisia_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m2",
+        "sea_m4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-638"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "White anchor is on the M4-facing eastern coast below the M2/M4 dividing-line endpoint."
+    },
+    {
+      "land_id": "land_northern_algeria",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_northern_algeria_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_m2"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m2"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-639"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_spanish_morocco",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_spanish_morocco_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a44"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_mediterranean_west.png",
+              "rectangle": [
+                2050,
+                1900,
+                3950,
+                3300
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a28",
+        "sea_a44",
+        "sea_m2"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-640"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_mediterranean_west.png",
+          "rectangle": [
+            2050,
+            1900,
+            3950,
+            3300
+          ]
+        }
+      ],
+      "notes": "White-anchor minor port faces A44 only, west of the A44/M2 dividing line. The separate M2 coast does not share that facility."
+    },
+    {
+      "land_id": "land_french_morocco",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a28",
+        "sea_a44"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-641"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_africa_west_detail.png",
+          "rectangle": [
+            1730,
+            2890,
+            3030,
+            3850
+          ]
+        }
+      ],
+      "notes": "No printed naval facility. The user explicitly corrected this phantom-port claim; remove it, not rename it."
+    },
+    {
+      "land_id": "land_ifni",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a44"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_africa_west_detail.png",
+          "rectangle": [
+            1730,
+            2890,
+            3030,
+            3850
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_rio_de_oro",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a44",
+        "sea_a46"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_africa_west_detail.png",
+          "rectangle": [
+            1730,
+            2890,
+            3030,
+            3850
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_canary_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a44"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_north_africa_west_detail.png",
+          "rectangle": [
+            1730,
+            2890,
+            3030,
+            3850
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_cape_verde",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a46"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_mauritania",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a46",
+        "sea_a48"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_portuguese_guinea",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a48"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_french_guinea",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a48"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_sierra_leone",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_sierra_leone_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a48"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a48"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-642"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_liberia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a48"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_ivory_coast",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_ivory_coast_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a51"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-643"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_gold_coast",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_gold_coast_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a51"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-644"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_dahomey",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_dahomey_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a51"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a38",
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-645"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_nigeria",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_nigeria_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a51"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a38",
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-646"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_cameroon",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_cameroon_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a51"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a38",
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-647"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_sao_tome_and_principe",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_ascension",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_ascension_minor_dockyard",
+          "type": "minor_dockyard",
+          "sea_accesses": [
+            "sea_a50"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_west_africa.png",
+              "rectangle": [
+                1530,
+                3480,
+                3380,
+                4310
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a50"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-648"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_west_africa.png",
+          "rectangle": [
+            1530,
+            3480,
+            3380,
+            4310
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_saint_helena",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_saint_helena_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a53"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_naval_atlantic_islands_20261006.png",
+              "rectangle": [
+                1650,
+                3700,
+                3050,
+                4600
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a53"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-649"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_naval_atlantic_islands_20261006.png",
+          "rectangle": [
+            1650,
+            3700,
+            3050,
+            4600
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_belgian_congo",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a51"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_angola",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a39",
+        "sea_a51",
+        "sea_a53"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-650"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "No printed naval facility anywhere on the inspected Atlantic coast; a railway reaching the coast is not a port symbol."
+    },
+    {
+      "land_id": "land_southwest_africa",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a39",
+        "sea_a53",
+        "sea_a54"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-651"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "No printed naval facility on either Atlantic coast. User correction preserved; the South Africa blue anchor is a different territory and physical symbol."
+    },
+    {
+      "land_id": "land_cape_town",
+      "review_status": "uncertain",
+      "expected_facilities": [
+        {
+          "id": "facility_cape_town_minor_dockyard",
+          "type": "minor_dockyard",
+          "sea_accesses": [
+            "sea_a54"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_south_africa.png",
+              "rectangle": [
+                3180,
+                4120,
+                5330,
+                4840
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a40",
+        "sea_a54",
+        "sea_i1"
+      ],
+      "uncertainties": [
+        {
+          "field": "map_vs_rule_example",
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 16,
+          "details": "The printed board clearly shows a white circled-anchor minor-dockyard symbol, while the supply-path example calls Cape Town a Minor Port. Expected facilities here transcribe the board symbol; reconcile edition/source precedence before applying a different type."
+        }
+      ],
+      "finding_ids": [
+        "EA-652"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "White circled-anchor symbol is a minor dockyard on A54, west of the A54/I1 divider. Rulebook p16 supply example calls Cape Town a minor port, but the printed board symbol differs; this roster records the board symbol and retains that source-version discrepancy in notes."
+    },
+    {
+      "land_id": "land_south_africa",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_south_africa_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i1"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_south_africa.png",
+              "rectangle": [
+                3180,
+                4120,
+                5330,
+                4840
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a40",
+        "sea_i1"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-338",
+        "EA-653"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_portuguese_east_africa",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i1",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-337",
+        "EA-654"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_tanganyika",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tanganyika_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_east_africa.png",
+              "rectangle": [
+                3990,
+                3480,
+                5190,
+                4540
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i3",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-336",
+        "EA-655"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_east_africa.png",
+          "rectangle": [
+            3990,
+            3480,
+            5190,
+            4540
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_italian_somaliland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_italian_somaliland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_east_africa.png",
+              "rectangle": [
+                3990,
+                3480,
+                5190,
+                4540
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i3",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-334",
+        "EA-335",
+        "EA-656"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_east_africa.png",
+          "rectangle": [
+            3990,
+            3480,
+            5190,
+            4540
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_british_somaliland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_british_somaliland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_east_africa.png",
+              "rectangle": [
+                3990,
+                3480,
+                5190,
+                4540
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-657"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_east_africa.png",
+          "rectangle": [
+            3990,
+            3480,
+            5190,
+            4540
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_french_somaliland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_french_somaliland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i4"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_east_africa.png",
+              "rectangle": [
+                3990,
+                3480,
+                5190,
+                4540
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i4",
+        "sea_i5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-333",
+        "EA-658"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_east_africa.png",
+          "rectangle": [
+            3990,
+            3480,
+            5190,
+            4540
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_eritrea",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_eritrea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i5"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_east_africa.png",
+              "rectangle": [
+                3990,
+                3480,
+                5190,
+                4540
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i5"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-659"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_east_africa.png",
+          "rectangle": [
+            3990,
+            3480,
+            5190,
+            4540
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_madagascar",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_madagascar_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_south_africa.png",
+              "rectangle": [
+                3180,
+                4120,
+                5330,
+                4840
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i1",
+        "sea_i2",
+        "sea_i3",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-339",
+        "EA-340",
+        "EA-341",
+        "EA-660"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_reunion",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i2"
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. No such symbol is printed; an available coast does not imply a facility."
+    },
+    {
+      "land_id": "land_mauritius",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_mauritius_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i2"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_south_africa.png",
+              "rectangle": [
+                3180,
+                4120,
+                5330,
+                4840
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i2",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-342",
+        "EA-661"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    },
+    {
+      "land_id": "land_seychelles",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_seychelles_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i3"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "crop": "evidence/ea_south_africa.png",
+              "rectangle": [
+                3180,
+                4120,
+                5330,
+                4840
+              ]
+            }
+          ],
+          "notes": "Printed symbol; facility identity is independent of sea-access edges."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i3",
+        "sea_i4"
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "EA-343",
+        "EA-662"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "crop": "evidence/ea_south_africa.png",
+          "rectangle": [
+            3180,
+            4120,
+            5330,
+            4840
+          ]
+        }
+      ],
+      "notes": "Full printed coast scanned for port, dockyard, shipyard, seaplane-base and submarine-base symbols. Distinct symbols remain separate physical facilities."
+    }
+  ]
+}

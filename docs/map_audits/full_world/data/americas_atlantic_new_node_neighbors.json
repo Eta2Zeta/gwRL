@@ -1,0 +1,579 @@
+[
+  {
+    "node_id": "land_greenland",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a2",
+      "sea_a3"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          0,
+          2250,
+          1450
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_arctic.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-085"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_iceland",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a3",
+      "sea_a4"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          1300,
+          0,
+          2700,
+          2070
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_atlantic_north.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-086"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_iceland_minor_port_map_1",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_a3"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "docs/map_audits/full_world/evidence/americas_naval_iceland_20261006.png",
+            "rectangle": [
+              1780,
+              285,
+              2170,
+              530
+            ]
+          }
+        ],
+        "notes": "Plain blue anchor on white square on Iceland southwest coast, northwest of the A3/A4 boundary line. Its square does not bridge the sea boundary; A3 access only."
+      }
+    ],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_faroe_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a4"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          1300,
+          0,
+          2700,
+          2070
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_atlantic_north.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-087"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_gbr_shetland_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a6"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          1300,
+          0,
+          2700,
+          2070
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_atlantic_north.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-088"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "canonical_alias": "land_shetland_islands",
+    "notes": "Root reconciliation chooses unprefixed canonical; this is one physical tile, not a second addition.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_azores",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a39"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          1080,
+          1700,
+          2500,
+          3400
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_atlantic_mid.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-089"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_bahamas",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a37"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-090"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_jamaica",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a40"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-091"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_haiti",
+    "confirmed_land_neighbors": [
+      "land_dominican_republic"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_a37",
+      "sea_a40"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "docs/map_audits/full_world/evidence/americas_hispaniola_coasts.png",
+        "rectangle": [
+          640,
+          2490,
+          950,
+          2680
+        ]
+      }
+    ],
+    "finding_ids": [
+      "AM-092"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_dominican_republic",
+    "confirmed_land_neighbors": [
+      "land_haiti"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_a37",
+      "sea_a41"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "docs/map_audits/full_world/evidence/americas_hispaniola_coasts.png",
+        "rectangle": [
+          640,
+          2490,
+          950,
+          2680
+        ]
+      }
+    ],
+    "finding_ids": [
+      "AM-093"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_leeward_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a41"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-094"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_windward_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a41"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-095"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_trinidad",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a41"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-096"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_netherlands_antilles",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a41"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-097"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_falkland_islands",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_a49"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          3500,
+          1500,
+          4600
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_south_south.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-098"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_galapagos",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p76"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          0,
+          2260,
+          1470,
+          3150
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_central.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-099"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_usa_kodiak_island",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p5"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8500,
+          0,
+          9900,
+          1460
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_alaska.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-100"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_usa_st_lawrence_island",
+    "confirmed_land_neighbors": [],
+    "confirmed_coastal_seas": [
+      "sea_p1"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8500,
+          0,
+          9900,
+          1460
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_alaska.png"
+      }
+    ],
+    "finding_ids": [
+      "AM-101"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  },
+  {
+    "node_id": "land_usa_aleutian_islands",
+    "confirmed_land_neighbors": [
+      "land_usa_alaska"
+    ],
+    "confirmed_coastal_seas": [
+      "sea_p5"
+    ],
+    "uncertain_neighbors": [],
+    "railway_connections": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "rectangle": [
+          8500,
+          0,
+          9900,
+          1460
+        ],
+        "crop": "docs/map_audits/full_world/evidence/americas_alaska.png"
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "docs/map_audits/full_world/evidence/americas_alaska_coasts.png",
+        "rectangle": [
+          8680,
+          575,
+          9250,
+          930
+        ]
+      },
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "docs/map_audits/full_world/evidence/ap_north_pacific_grid.png",
+        "rectangle": [
+          8080,
+          850,
+          9800,
+          2130
+        ]
+      }
+    ],
+    "finding_ids": [
+      "AM-102"
+    ],
+    "coverage": "Complete printed physical neighbor set; political flags and nonphysical movement rules are separate.",
+    "expected_naval_facilities": [],
+    "naval_review_date": "2026-10-06",
+    "naval_review_file": "data/naval_reaudit_americas_atlantic.json"
+  }
+]

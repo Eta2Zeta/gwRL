@@ -1,0 +1,4259 @@
+{
+  "region": "Asia, Siberia, Indian Ocean and Pacific",
+  "scope": "Fresh original-board naval-facility re-audit: all 48 currently facility-bearing AP territories, all prior AP facility proposals, all newly proposed coastal land tiles, and a coast scan for omitted or nonexistent facilities. Airfields excluded; seaplane/submarine bases included. Each expected facility is a physical instance, potentially with multiple sea accesses.",
+  "review_date": "2026-10-06",
+  "entries": [
+    {
+      "land_id": "land_india_maharashtra",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_maharashtra_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                5480,
+                2700,
+                6020,
+                3230
+              ],
+              "crop": "evidence/ap_naval_india_west.png"
+            }
+          ],
+          "notes": "White-square plain anchor on the northwest Maharashtra coast."
+        },
+        {
+          "id": "facility_maharashtra_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i6"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                5480,
+                2700,
+                6020,
+                3230
+              ],
+              "crop": "evidence/ap_naval_india_west.png"
+            }
+          ],
+          "notes": "Blue-square plain anchor lies north/west of the I6/I7 separator, inside Maharashtra. It is a separate physical port from the white-square minor port."
+        },
+        {
+          "id": "facility_maharashtra_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_i7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                5480,
+                2700,
+                6020,
+                3230
+              ],
+              "crop": "evidence/ap_naval_india_west.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                4850,
+                2150,
+                6650,
+                3700
+              ],
+              "crop": "evidence/ap_india.png"
+            }
+          ],
+          "notes": "Blue-square circular-anchor symbol is west of the Maharashtra/Southern India political border. Earlier AP-052 wrongly assigned it to Southern India."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i6",
+        "sea_i7"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            5480,
+            2700,
+            6020,
+            3230
+          ],
+          "crop": "evidence/ap_naval_india_west.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4850,
+            2150,
+            6650,
+            3700
+          ],
+          "crop": "evidence/ap_india.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-052"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_maharashtra_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i6"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_india_southern_india",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_southern_india_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                4850,
+                2150,
+                6650,
+                3700
+              ],
+              "crop": "evidence/ap_india.png"
+            }
+          ],
+          "notes": "White-square anchor on the east coast; the west-coast major dockyard belongs to Maharashtra."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i7",
+        "sea_i11",
+        "sea_i12"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4850,
+            2150,
+            6650,
+            3700
+          ],
+          "crop": "evidence/ap_india.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            5940,
+            2680,
+            6360,
+            3160
+          ],
+          "crop": "evidence/ap_naval_calcutta.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-052"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_southern_india_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i11",
+            "sea_i6"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_india_calcutta",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_calcutta_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                5940,
+                2680,
+                6360,
+                3160
+              ],
+              "crop": "evidence/ap_naval_calcutta.png"
+            }
+          ],
+          "notes": "White-square crane is inside the Calcutta city polygon; the rail line reaching it is not the city border."
+        },
+        {
+          "id": "facility_calcutta_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                5940,
+                2680,
+                6360,
+                3160
+              ],
+              "crop": "evidence/ap_naval_calcutta.png"
+            }
+          ],
+          "notes": "Blue-square plain anchor is north of the city polygon southern coastal endpoint, so belongs to Calcutta, not Southern India."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i11"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            5940,
+            2680,
+            6360,
+            3160
+          ],
+          "crop": "evidence/ap_naval_calcutta.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-052"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_calcutta_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_india_ceylon",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_ceylon_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6020,
+                3270,
+                6330,
+                3510
+              ],
+              "crop": "evidence/ap_naval_ceylon.png"
+            }
+          ],
+          "notes": "Blue-square circular anchor is north of the I11/I12 sea seam; single physical dockyard, with no I12 access."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i11",
+        "sea_i12"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6020,
+            3270,
+            6330,
+            3510
+          ],
+          "crop": "evidence/ap_naval_ceylon.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-052"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_ceylon_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i11",
+            "sea_i6"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_india_bengal",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i11"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4850,
+            2150,
+            6650,
+            3700
+          ],
+          "crop": "evidence/ap_india.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_burma",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_burma_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                4850,
+                2150,
+                6650,
+                3700
+              ],
+              "crop": "evidence/ap_india.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i11"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4850,
+            2150,
+            6650,
+            3700
+          ],
+          "crop": "evidence/ap_india.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_burma_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i11"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_siam",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i11",
+        "sea_p50"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_british_malaya",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_malaya_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6450,
+                3330,
+                6840,
+                3720
+              ],
+              "crop": "evidence/ap_naval_malaya_sumatra.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i12",
+        "sea_p50"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6450,
+            3330,
+            6840,
+            3720
+          ],
+          "crop": "evidence/ap_naval_malaya_sumatra.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_malaya_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_annam_tonkin",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tonkin_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p41"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p41"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_tonkin_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p41"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_cochinchina",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_cochinchina_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p50"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_cochinchina_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_kwangtung",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_kwangtung_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p41"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p41"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_kwangtung_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p41"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_hong_kong",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_hong_kong_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_p41"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p41"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_hong_kong_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_p41"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_hainan",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p41"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_formosa",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_formosa_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p32"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p32",
+        "sea_p41"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_formosa_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p32"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_china_hunan",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p32"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            1200,
+            8200,
+            2800
+          ],
+          "crop": "evidence/ap_east_asia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_china_nanking",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "port_nanking_major",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p14",
+            "sea_p32"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6550,
+                1910,
+                7380,
+                2630
+              ],
+              "crop": "evidence/ap_naval_china_north.png"
+            }
+          ],
+          "notes": "One physical blue-square anchor is located on the P14/P32 sea seam. Preserve the adopted shared ID across both access edges; do not duplicate it."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p14",
+        "sea_p32"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6550,
+            1910,
+            7380,
+            2630
+          ],
+          "crop": "evidence/ap_naval_china_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "port_nanking_major",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p14",
+            "sea_p32"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_china_shantung",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_shantung_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6550,
+                1910,
+                7380,
+                2630
+              ],
+              "crop": "evidence/ap_naval_china_north.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        },
+        {
+          "id": "facility_shantung_minor_dockyard",
+          "type": "minor_dockyard",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6550,
+                1910,
+                7380,
+                2630
+              ],
+              "crop": "evidence/ap_naval_china_north.png"
+            }
+          ],
+          "notes": "White-square circular-anchor dockyard is distinct from the plain-anchor major port farther south."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p14"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6550,
+            1910,
+            7380,
+            2630
+          ],
+          "crop": "evidence/ap_naval_china_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_shantung_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_shantung_minor_dockyard",
+          "type": "minor_dockyard",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_china_hopeh",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p14"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6550,
+            1910,
+            7380,
+            2630
+          ],
+          "crop": "evidence/ap_naval_china_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_china_beiping",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_beiping_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6550,
+                1910,
+                7380,
+                2630
+              ],
+              "crop": "evidence/ap_naval_china_north.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p14"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6550,
+            1910,
+            7380,
+            2630
+          ],
+          "crop": "evidence/ap_naval_china_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_beiping_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_manchuria_rehe",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_rehe_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6550,
+                1910,
+                7380,
+                2630
+              ],
+              "crop": "evidence/ap_naval_china_north.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p14"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6550,
+            1910,
+            7380,
+            2630
+          ],
+          "crop": "evidence/ap_naval_china_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_rehe_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_korea",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_korea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6550,
+                1910,
+                7380,
+                2630
+              ],
+              "crop": "evidence/ap_naval_china_north.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p14",
+        "sea_p15"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6550,
+            1910,
+            7380,
+            2630
+          ],
+          "crop": "evidence/ap_naval_china_north.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            1870,
+            8110,
+            2630
+          ],
+          "crop": "evidence/ap_naval_japan.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_korea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p14"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_jap_honshu",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_honshu_northwest_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Blue-square crane on the northwest Honshu coast. Distinct from the southern crane on the same P15 coast."
+        },
+        {
+          "id": "facility_honshu_south_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Second blue-square crane at southern Honshu; do not deduplicate by type and sea zone."
+        },
+        {
+          "id": "facility_honshu_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p16"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p15",
+        "sea_p16"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            1870,
+            8110,
+            2630
+          ],
+          "crop": "evidence/ap_naval_japan.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_honshu_northwest_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_honshu_south_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_honshu_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p16"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_jap_tokyo",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_tokyo_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p16"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p16"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            1870,
+            8110,
+            2630
+          ],
+          "crop": "evidence/ap_naval_japan.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_tokyo_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p16"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_jap_kyushu",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_kyushu_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        },
+        {
+          "id": "facility_kyushu_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p15"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            1870,
+            8110,
+            2630
+          ],
+          "crop": "evidence/ap_naval_japan.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_kyushu_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_kyushu_major_shipyard",
+          "type": "major_shipyard",
+          "sea_accesses": [
+            "sea_p15"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_jap_hokkaido",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_hokkaido_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7270,
+                1320,
+                8170,
+                2100
+              ],
+              "crop": "evidence/ap_sakhalin.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p7",
+        "sea_p8",
+        "sea_p16"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7270,
+            1320,
+            8170,
+            2100
+          ],
+          "crop": "evidence/ap_sakhalin.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_hokkaido_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p7"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_jap_kurile_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7270,
+            1320,
+            8170,
+            2100
+          ],
+          "crop": "evidence/ap_sakhalin.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7900,
+            1000,
+            9900,
+            2850
+          ],
+          "crop": "evidence/ap_pacific_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_jap_okinawa",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_okinawa_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p33"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        },
+        {
+          "id": "facility_okinawa_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_p33"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Green seaplane silhouette is a naval base; the slanted airfield symbol is different."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p33"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_okinawa_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p33"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_okinawa_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_p33"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_jap_volcanic_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p34"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_jap_bonin",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p35"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7900,
+            1000,
+            9900,
+            2850
+          ],
+          "crop": "evidence/ap_pacific_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_jap_mariana_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_mariana_islands_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p43"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p43"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_mariana_islands_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p43"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_guam",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_guam_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p43"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p43"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_guam_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p43"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_palau",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p44"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_jap_caroline_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_caroline_islands_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p46"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7730,
+                3010,
+                8250,
+                3260
+              ],
+              "crop": "evidence/ap_naval_caroline.png"
+            }
+          ],
+          "notes": "Existing intrinsic major-port type is correct, but the physical port must have explicit P46 access."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p46"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7730,
+            3010,
+            8250,
+            3260
+          ],
+          "crop": "evidence/ap_naval_caroline.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-102"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_caroline_islands_major_port",
+          "type": "major_port",
+          "sea_accesses": [],
+          "storage": "node_facilities"
+        }
+      ]
+    },
+    {
+      "land_id": "land_luzon_and_the_visayas",
+      "review_status": "uncertain",
+      "expected_facilities": [
+        {
+          "id": "facility_and_the_visayas_submarine_base",
+          "type": "submarine_base",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6810,
+                2730,
+                7500,
+                3390
+              ],
+              "crop": "evidence/ap_philippines_edges.png"
+            }
+          ],
+          "notes": "Blue-square white submarine silhouette south of the P41/P50 seam. The separate plain-anchor port farther south remains unassigned."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p41",
+        "sea_p42",
+        "sea_p50"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6810,
+            2730,
+            7500,
+            3390
+          ],
+          "crop": "evidence/ap_philippines_edges.png"
+        }
+      ],
+      "uncertainties": [
+        {
+          "facility_id": "facility_philippines_p50_major_port_unassigned",
+          "issue": "land ownership of P50 major port",
+          "candidate_land_ids": [
+            "land_luzon_and_the_visayas",
+            "land_mindanao"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6810,
+                2730,
+                7500,
+                3390
+              ],
+              "crop": "evidence/ap_philippines_edges.png"
+            }
+          ]
+        }
+      ],
+      "finding_ids": [
+        "AP-066",
+        "AP-095",
+        "AP-103"
+      ],
+      "notes": "See the single unassigned_facilities record. Expected_facilities contains only facilities whose territory is confirmed; an empty list does not resolve the unassigned major-port owner.",
+      "current_facilities": [
+        {
+          "id": "facility_and_the_visayas_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p42"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_and_the_visayas_submarine_base",
+          "type": "submarine_base",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_mindanao",
+      "review_status": "uncertain",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p42",
+        "sea_p50",
+        "sea_p51"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6810,
+            2730,
+            7500,
+            3390
+          ],
+          "crop": "evidence/ap_philippines_edges.png"
+        }
+      ],
+      "uncertainties": [
+        {
+          "facility_id": "facility_philippines_p50_major_port_unassigned",
+          "issue": "land ownership of P50 major port",
+          "candidate_land_ids": [
+            "land_luzon_and_the_visayas",
+            "land_mindanao"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6810,
+                2730,
+                7500,
+                3390
+              ],
+              "crop": "evidence/ap_philippines_edges.png"
+            }
+          ]
+        }
+      ],
+      "finding_ids": [
+        "AP-066",
+        "AP-095",
+        "AP-103"
+      ],
+      "notes": "See the single unassigned_facilities record. Expected_facilities contains only facilities whose territory is confirmed; an empty list does not resolve the unassigned major-port owner.",
+      "current_facilities": [
+        {
+          "id": "facility_land_mindanao_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "storage": "coastal_edges"
+        },
+        {
+          "id": "facility_land_mindanao_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p52"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_sumatra",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_sumatra_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p50"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6450,
+                3330,
+                6840,
+                3720
+              ],
+              "crop": "evidence/ap_naval_malaya_sumatra.png"
+            }
+          ],
+          "notes": "One white-square anchor north of the P50/P59 separator, not a port shared across P50/P59."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i12",
+        "sea_i13",
+        "sea_p50",
+        "sea_p59"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6450,
+            3330,
+            6840,
+            3720
+          ],
+          "crop": "evidence/ap_naval_malaya_sumatra.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6470,
+            3160,
+            7850,
+            4030
+          ],
+          "crop": "evidence/ap_indonesia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-068"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_sumatra_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p50",
+            "sea_p59"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_sarawak",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p50",
+        "sea_p51"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6700,
+            3230,
+            7110,
+            3640
+          ],
+          "crop": "evidence/ap_naval_borneo.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_borneo",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_land_borneo_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p60"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6700,
+                3230,
+                7110,
+                3640
+              ],
+              "crop": "evidence/ap_naval_borneo.png"
+            }
+          ],
+          "notes": "White-square anchor is east of the P59/P60 seam endpoint; only P60 access."
+        },
+        {
+          "id": "facility_borneo_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_p60"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6700,
+                3230,
+                7110,
+                3640
+              ],
+              "crop": "evidence/ap_naval_borneo.png"
+            }
+          ],
+          "notes": "Green seaplane symbol lies on gray Dutch Borneo, south of the Sarawak boundary and the P51/P60 sea separator."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p50",
+        "sea_p59",
+        "sea_p60"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6700,
+            3230,
+            7110,
+            3640
+          ],
+          "crop": "evidence/ap_naval_borneo.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-068"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_borneo_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p59"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_java",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_java_minor_dockyard",
+          "type": "minor_dockyard",
+          "sea_accesses": [
+            "sea_p59"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6650,
+                3210,
+                7380,
+                3950
+              ],
+              "crop": "evidence/ap_borneo_java.png"
+            }
+          ],
+          "notes": "White-square circular anchor, not plain-anchor minor port."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_i13",
+        "sea_p59",
+        "sea_p60",
+        "sea_p61"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6650,
+            3210,
+            7380,
+            3950
+          ],
+          "crop": "evidence/ap_borneo_java.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6060,
+            3480,
+            7530,
+            4410
+          ],
+          "crop": "evidence/ap_java_indian_grid.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-068"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_java_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p59"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_celebes",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p51",
+        "sea_p60",
+        "sea_p62"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6470,
+            3160,
+            7850,
+            4030
+          ],
+          "crop": "evidence/ap_indonesia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-100"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_celebes_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p60"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_lesser_sunda_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p60",
+        "sea_p61",
+        "sea_p63"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6470,
+            3160,
+            7850,
+            4030
+          ],
+          "crop": "evidence/ap_indonesia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6060,
+            3480,
+            7530,
+            4410
+          ],
+          "crop": "evidence/ap_java_indian_grid.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_timor",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p63"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6470,
+            3160,
+            7850,
+            4030
+          ],
+          "crop": "evidence/ap_indonesia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-100"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_timor_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p61"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_maluku_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p51",
+        "sea_p52",
+        "sea_p62"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6470,
+            3160,
+            7850,
+            4030
+          ],
+          "crop": "evidence/ap_indonesia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_dutch_new_guinea",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p52",
+        "sea_p62"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6470,
+            3160,
+            7850,
+            4030
+          ],
+          "crop": "evidence/ap_indonesia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-100"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_new_guinea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p61"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_new_guinea",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p53",
+        "sea_p64"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-100"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_guinea_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p63"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_new_britain",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_new_britain_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p53"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6250,
+                2600,
+                8250,
+                4030
+              ],
+              "crop": "evidence/ap_se_asia.png"
+            }
+          ],
+          "notes": "Blue-square plain anchor inside the New Britain island outline, not P63."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p53"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-068"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_britain_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p63"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_aus_western_australia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p61",
+        "sea_p63",
+        "sea_p69",
+        "sea_p70"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            3750,
+            8650,
+            4888
+          ],
+          "crop": "evidence/ap_australia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            3890,
+            7850,
+            4230
+          ],
+          "crop": "evidence/ap_naval_australia_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-069",
+        "AP-101"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_western_australia_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_i6"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_aus_northern_territory",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_northern_territory_seaplane_base",
+          "type": "seaplane_base",
+          "sea_accesses": [
+            "sea_p63"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                3890,
+                7850,
+                4230
+              ],
+              "crop": "evidence/ap_naval_australia_north.png"
+            }
+          ],
+          "notes": "Green seaplane silhouette; no anchor/minor port at this location."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p63"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            3890,
+            7850,
+            4230
+          ],
+          "crop": "evidence/ap_naval_australia_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-069"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_northern_territory_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p61"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_aus_south_australia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_south_australia_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p70"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7660,
+                4250,
+                8110,
+                4700
+              ],
+              "crop": "evidence/ap_naval_sydney_nsw.png"
+            }
+          ],
+          "notes": "Blue-square anchor lies west of the straight SA/NSW political border. The prior NSW assignment was wrong."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p70"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7660,
+            4250,
+            8110,
+            4700
+          ],
+          "crop": "evidence/ap_naval_sydney_nsw.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            3750,
+            8650,
+            4888
+          ],
+          "crop": "evidence/ap_australia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-069"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_aus_queensland",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_queensland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p63"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                3890,
+                7850,
+                4230
+              ],
+              "crop": "evidence/ap_naval_australia_north.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p63",
+        "sea_p64",
+        "sea_p71",
+        "sea_p72"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7180,
+            3890,
+            7850,
+            4230
+          ],
+          "crop": "evidence/ap_naval_australia_north.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            3750,
+            8650,
+            4888
+          ],
+          "crop": "evidence/ap_australia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-069"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_queensland_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p62"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_aus_new_south_wales",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_new_south_wales_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_p72"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7660,
+                4250,
+                8110,
+                4700
+              ],
+              "crop": "evidence/ap_naval_sydney_nsw.png"
+            }
+          ],
+          "notes": "Northern white-square crane lies north of the circular Sydney boundary, within NSW."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p70",
+        "sea_p72"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7660,
+            4250,
+            8110,
+            4700
+          ],
+          "crop": "evidence/ap_naval_sydney_nsw.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-036",
+        "AP-069"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_new_south_wales_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p68"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_aus_sydney",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_sydney_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_p72"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7660,
+                4250,
+                8110,
+                4700
+              ],
+              "crop": "evidence/ap_naval_sydney_nsw.png"
+            }
+          ],
+          "notes": "Southern white-square crane lies east of the city boundary coastal endpoint, inside Sydney. One yard in Sydney, one separate yard in NSW."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p72"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7660,
+            4250,
+            8110,
+            4700
+          ],
+          "crop": "evidence/ap_naval_sydney_nsw.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-036"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_aus_tasmania",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p72"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            3750,
+            8650,
+            4888
+          ],
+          "crop": "evidence/ap_australia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7660,
+            4250,
+            8110,
+            4700
+          ],
+          "crop": "evidence/ap_naval_sydney_nsw.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-069",
+        "AP-074"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_tasmania_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p68"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_nz_north_island",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_north_island_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p73"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                6100,
+                3750,
+                8650,
+                4888
+              ],
+              "crop": "evidence/ap_australia.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                8000,
+                2750,
+                9900,
+                4888
+              ],
+              "crop": "evidence/ap_pacific_south.png"
+            }
+          ],
+          "notes": "Blue-square plain anchor, not minor-port white square."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p73"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            3750,
+            8650,
+            4888
+          ],
+          "crop": "evidence/ap_australia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-073"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_north_island_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p69"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_nz_south_island",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p73"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6100,
+            3750,
+            8650,
+            4888
+          ],
+          "crop": "evidence/ap_australia.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-073",
+        "AP-074"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_south_island_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p69"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_new_caledonia",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_caledonia_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p73"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                8000,
+                2750,
+                9900,
+                4888
+              ],
+              "crop": "evidence/ap_pacific_south.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p73"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-073"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_caledonia_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p65"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_fiji",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p65"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-074"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_land_fiji_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p65"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_new_hebrides",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p65"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-074"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_hebrides_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p65"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_usa_midway",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_midway_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p22"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                8430,
+                1950,
+                9200,
+                2540
+              ],
+              "crop": "evidence/ap_naval_pacific_facilities.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        },
+        {
+          "id": "facility_midway_submarine_base",
+          "type": "submarine_base",
+          "sea_accesses": [
+            "sea_p22"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                8430,
+                1950,
+                9200,
+                2540
+              ],
+              "crop": "evidence/ap_naval_pacific_facilities.png"
+            }
+          ],
+          "notes": "Blue-square vertical submarine silhouette, distinct from anchor or crane."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p22"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8430,
+            1950,
+            9200,
+            2540
+          ],
+          "crop": "evidence/ap_naval_pacific_facilities.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-075"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usa_hawaii",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_hawaii_major_dockyard",
+          "type": "major_dockyard",
+          "sea_accesses": [
+            "sea_p29"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                8430,
+                1950,
+                9200,
+                2540
+              ],
+              "crop": "evidence/ap_naval_pacific_facilities.png"
+            }
+          ],
+          "notes": "Blue-square circular anchor; one naval facility, plus a separately excluded airfield."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p29"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8430,
+            1950,
+            9200,
+            2540
+          ],
+          "crop": "evidence/ap_naval_pacific_facilities.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-075"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_jap_marshall_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_marshall_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p47"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                8490,
+                2820,
+                8870,
+                3110
+              ],
+              "crop": "evidence/ap_naval_marshall.png"
+            }
+          ],
+          "notes": "Printed symbol class and its side of the political/coastal boundary independently checked in the native source."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p47"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8490,
+            2820,
+            8870,
+            3110
+          ],
+          "crop": "evidence/ap_naval_marshall.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-075"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usa_attu_and_kiska",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p4"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7900,
+            1000,
+            9900,
+            2850
+          ],
+          "crop": "evidence/ap_pacific_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usa_wake_island",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p36"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7900,
+            1000,
+            9900,
+            2850
+          ],
+          "crop": "evidence/ap_pacific_north.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-074"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_wake_island_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p36"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_line_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p38"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7900,
+            1000,
+            9900,
+            2850
+          ],
+          "crop": "evidence/ap_pacific_north.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_solomon_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p54"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_gilbert_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p56"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usa_samoa",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p66"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_gambier_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p67"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_pitcairn_island",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p68"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_easter_island",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p68"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            8000,
+            2750,
+            9900,
+            4888
+          ],
+          "crop": "evidence/ap_pacific_south.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_andaman_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i12"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4850,
+            2150,
+            6650,
+            3700
+          ],
+          "crop": "evidence/ap_india.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6250,
+            2600,
+            8250,
+            4030
+          ],
+          "crop": "evidence/ap_se_asia.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_maldive_islands",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_i7"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4850,
+            2150,
+            6650,
+            3700
+          ],
+          "crop": "evidence/ap_india.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_kola",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_kola_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_a8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                3970,
+                0,
+                4740,
+                620
+              ],
+              "crop": "evidence/ap_kola.png"
+            }
+          ],
+          "notes": "White-square crane by Murmansk. Distinct from the blue-square anchor farther east."
+        },
+        {
+          "id": "facility_kola_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_a8"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                3970,
+                0,
+                4740,
+                620
+              ],
+              "crop": "evidence/ap_kola.png"
+            }
+          ],
+          "notes": "Blue-square plain anchor entirely west of the A8/A9 divider."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_a8",
+        "sea_a9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            3970,
+            0,
+            4740,
+            620
+          ],
+          "crop": "evidence/ap_kola.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-091"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_kola_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_a13"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_usr_zuryenia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4550,
+            0,
+            6100,
+            1590
+          ],
+          "crop": "evidence/ap_sov_west_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_vyatka",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4550,
+            0,
+            6100,
+            1590
+          ],
+          "crop": "evidence/ap_sov_west_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_yugria",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4550,
+            0,
+            6100,
+            1590
+          ],
+          "crop": "evidence/ap_sov_west_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_samoyedia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_a9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4550,
+            0,
+            6100,
+            1590
+          ],
+          "crop": "evidence/ap_sov_west_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_eastern_yakutia",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p1"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_chukotka",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p1"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_big_diomede_island",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p1"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_magadan",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p2"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_kamchatka",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p1",
+        "sea_p2",
+        "sea_p3",
+        "sea_p9"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_amur",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p2"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7150,
+            1000,
+            7640,
+            1740
+          ],
+          "crop": "evidence/ap_naval_amur_primorsky_boundary.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-057"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_primorsky_krai",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_primorsky_north_minor_shipyard",
+          "type": "minor_shipyard",
+          "sea_accesses": [
+            "sea_p2",
+            "sea_p7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7150,
+                1000,
+                7640,
+                1740
+              ],
+              "crop": "evidence/ap_naval_amur_primorsky_boundary.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7360,
+                1430,
+                7570,
+                1700
+              ],
+              "crop": "evidence/ap_naval_amur_yard.png"
+            }
+          ],
+          "notes": "White-square crane is east of the Amur river political boundary, on Primorsky Krai. P2/P7 separator meets its coastal location; one physical yard with both accesses, not an Amur facility."
+        },
+        {
+          "id": "facility_primorsky_krai_major_port",
+          "type": "major_port",
+          "sea_accesses": [
+            "sea_p7"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7270,
+                1320,
+                8170,
+                2100
+              ],
+              "crop": "evidence/ap_sakhalin.png"
+            },
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                7180,
+                1870,
+                8110,
+                2630
+              ],
+              "crop": "evidence/ap_naval_japan.png"
+            }
+          ],
+          "notes": "Vladivostok plain anchor in blue square."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_p2",
+        "sea_p7"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7150,
+            1000,
+            7640,
+            1740
+          ],
+          "crop": "evidence/ap_naval_amur_primorsky_boundary.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7360,
+            1430,
+            7570,
+            1700
+          ],
+          "crop": "evidence/ap_naval_amur_yard.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7270,
+            1320,
+            8170,
+            2100
+          ],
+          "crop": "evidence/ap_sakhalin.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-060"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_primorsky_krai_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p7"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_usr_north_sakhalin",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p2",
+        "sea_p8"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7270,
+            1320,
+            8170,
+            2100
+          ],
+          "crop": "evidence/ap_sakhalin.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7200,
+            0,
+            8550,
+            1650
+          ],
+          "crop": "evidence/ap_sov_east_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-057"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_south_sakhalin",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_p7",
+        "sea_p8"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            7270,
+            1320,
+            8170,
+            2100
+          ],
+          "crop": "evidence/ap_sakhalin.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-059"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": [
+        {
+          "id": "facility_south_sakhalin_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_p8"
+          ],
+          "storage": "coastal_edges"
+        }
+      ]
+    },
+    {
+      "land_id": "land_usr_western_kazakhstan",
+      "review_status": "confirmed",
+      "expected_facilities": [],
+      "reviewed_sea_ids": [
+        "sea_m12"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4900,
+            1300,
+            6500,
+            2800
+          ],
+          "crop": "evidence/ap_kazakh_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    },
+    {
+      "land_id": "land_usr_turkmenistan",
+      "review_status": "confirmed",
+      "expected_facilities": [
+        {
+          "id": "facility_turkmenistan_minor_port",
+          "type": "minor_port",
+          "sea_accesses": [
+            "sea_m12"
+          ],
+          "evidence": [
+            {
+              "source": "game_content/maps/gw36map.png",
+              "rectangle": [
+                5040,
+                2010,
+                5270,
+                2200
+              ],
+              "crop": "evidence/ap_naval_turkmenistan.png"
+            }
+          ],
+          "notes": "White-square plain anchor on Turkmenistan shore; single Caspian access."
+        }
+      ],
+      "reviewed_sea_ids": [
+        "sea_m12"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            5040,
+            2010,
+            5270,
+            2200
+          ],
+          "crop": "evidence/ap_naval_turkmenistan.png"
+        },
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            4900,
+            1300,
+            6500,
+            2800
+          ],
+          "crop": "evidence/ap_kazakh_graph.png"
+        }
+      ],
+      "uncertainties": [],
+      "finding_ids": [
+        "AP-006"
+      ],
+      "notes": "Fresh source scan: no additional naval facility symbol appears on the reviewed coastline. Airfields, national roundels, IPP/convoy markers and narrow-crossing diamonds are not naval facilities.",
+      "current_facilities": []
+    }
+  ],
+  "unassigned_facilities": [
+    {
+      "id": "facility_philippines_p50_major_port_unassigned",
+      "type": "major_port",
+      "sea_accesses": [
+        "sea_p50"
+      ],
+      "candidate_land_ids": [
+        "land_luzon_and_the_visayas",
+        "land_mindanao"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6810,
+            2730,
+            7500,
+            3390
+          ],
+          "crop": "evidence/ap_philippines_edges.png"
+        }
+      ],
+      "notes": "The blue-square plain-anchor major port is definitely in P50. Raster island-group ownership is unresolved between Luzon/Visayas and Mindanao; do not silently assign it to either or count it twice."
+    }
+  ],
+  "summary": {
+    "reviewed_land_entries": 88,
+    "current_unique_facilities": 55,
+    "current_facility_bearing_territories": 48,
+    "confirmed_expected_physical_facilities": 54,
+    "unassigned_physical_facilities": 1,
+    "confirmed_expected_facility_bearing_territories": 42,
+    "expected_type_counts": {
+      "minor_port": 16,
+      "major_port": 17,
+      "major_dockyard": 5,
+      "minor_shipyard": 5,
+      "minor_dockyard": 2,
+      "major_shipyard": 4,
+      "seaplane_base": 3,
+      "submarine_base": 2
+    },
+    "unsupported_current_physical_claims_to_delete": 13
+  }
+}

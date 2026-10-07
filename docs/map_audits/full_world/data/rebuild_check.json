@@ -1,0 +1,20 @@
+[
+  {
+    "builder": "tools/build_manual_map_json.py",
+    "source": "game_content/maps/gw36_manual_map.json",
+    "byte_equal": true,
+    "json_equal": true,
+    "source_unchanged": true,
+    "sha256": "97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24",
+    "method": "Builder output redirected to a temporary directory before invocation"
+  },
+  {
+    "builder": "tools/build_nation_home_country_json.py",
+    "source": "game_content/maps/gw36_nation_home_country.json",
+    "byte_equal": true,
+    "json_equal": true,
+    "source_unchanged": true,
+    "sha256": "2f9112387486e21c53e5e72b585c9128838d32aff556815d3328dd9ae343b83e",
+    "method": "Builder output redirected to a temporary directory before invocation"
+  }
+]

@@ -1,0 +1,1152 @@
+[
+  {
+    "node_id": "land_gbr_northern_ireland",
+    "name": "Northern Ireland",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_ireland",
+        "kind": "land_border",
+        "railway_connection": true,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_gbr_scotland",
+        "kind": "narrow_crossing",
+        "narrow_crossings": 2,
+        "railway_connection": false
+      },
+      {
+        "neighbor_id": "land_gbr_northern_england",
+        "kind": "narrow_crossing",
+        "narrow_crossings": 2,
+        "railway_connection": false
+      },
+      {
+        "neighbor_id": "sea_a17",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_britain_channels.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-516",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_northern_ireland_major_shipyard",
+        "type": "major_shipyard",
+        "sea_accesses": [
+          "sea_a17"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_round2_britain_channels.png",
+            "rectangle": [
+              1690,
+              680,
+              2720,
+              1770
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_shetland_islands",
+    "name": "Shetland Islands",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a6",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_atlantic_islands.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics.",
+    "finding_id": "EA-517"
+  },
+  {
+    "node_id": "land_iceland",
+    "name": "Iceland",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a3",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_a4",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_atlantic_islands.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics.",
+    "finding_id": "EA-518"
+  },
+  {
+    "node_id": "land_faroe_islands",
+    "name": "Faroe Islands",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a4",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_atlantic_islands.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics.",
+    "finding_id": "EA-519"
+  },
+  {
+    "node_id": "land_svalbard",
+    "name": "Svalbard",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a5",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_arctic.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-520",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_nor_northern_norway",
+    "name": "Northern Norway",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_nor_trondelag",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_swe_norrland",
+        "kind": "land_border",
+        "railway_connection": true,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_fin_lapland",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a5",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_a8",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_arctic.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-521",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_northern_norway_major_port",
+        "type": "major_port",
+        "sea_accesses": [
+          "sea_a8"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_naval_norway_finland_20261006.png",
+            "rectangle": [
+              2890,
+              0,
+              4520,
+              690
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_fin_helsinki",
+    "name": "Helsinki",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_fin_southern_finland",
+        "kind": "land_border",
+        "railway_connection": true,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a13",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_a14",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_finland_baltic.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-522",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_helsinki_minor_shipyard",
+        "type": "minor_shipyard",
+        "sea_accesses": [
+          "sea_a13",
+          "sea_a14"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_naval_baltic_20261006.png",
+            "rectangle": [
+              3340,
+              430,
+              4300,
+              1130
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_ita_sicily",
+    "name": "Sicily",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_ita_southern_italy",
+        "kind": "narrow_crossing",
+        "narrow_crossings": 2,
+        "railway_connection": false
+      },
+      {
+        "neighbor_id": "sea_m3",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_m4",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_m6",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_greece_mediterranean.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-523",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_sicily_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_m3"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_greece_mediterranean.png",
+            "rectangle": [
+              2800,
+              1850,
+              4470,
+              3200
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_malta",
+    "name": "Malta",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_m4",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_greece_mediterranean.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-524",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_malta_major_dockyard",
+        "type": "major_dockyard",
+        "sea_accesses": [
+          "sea_m4"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_greece_mediterranean.png",
+            "rectangle": [
+              2800,
+              1850,
+              4470,
+              3200
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_ita_rhodes",
+    "name": "Rhodes",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_tur_akdeniz",
+        "kind": "narrow_crossing",
+        "narrow_crossings": 2,
+        "railway_connection": false
+      },
+      {
+        "neighbor_id": "sea_m7",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_greece_mediterranean.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-525",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_rhodes_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_m7"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_turkey_iran.png",
+            "rectangle": [
+              3850,
+              2050,
+              5580,
+              2980
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_gre_peloponnese",
+    "name": "Peloponnese",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_gre_thessaly",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_m6",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_m7",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [
+      {
+        "field": "railway_connection",
+        "neighbor_id": "land_gre_thessaly",
+        "reason": "No clear rail crossing through the tiny isthmus is resolved at source resolution; do not infer rail from neighboring Greek network."
+      }
+    ],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_greece_mediterranean.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-526",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_peloponnese_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_m6",
+          "sea_m7"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_greece_mediterranean.png",
+            "rectangle": [
+              2800,
+              1850,
+              4470,
+              3200
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_gre_crete",
+    "name": "Crete",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_m7",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_m8",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_greece_mediterranean.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-527",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_ifni",
+    "name": "Ifni",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_french_morocco",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a44",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_north_africa_west_detail.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-528",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_rio_de_oro",
+    "name": "Rio de Oro",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_french_morocco",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_mauritania",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a44",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_a46",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [
+      {
+        "neighbor_id": "land_western_algeria",
+        "reason": "Possible political-border point at the Sahara junction; no positive-length passable boundary is established."
+      }
+    ],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_sahara.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-529",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_canary_islands",
+    "name": "Canary Islands",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a44",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_north_africa_west_detail.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-530",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_cape_verde",
+    "name": "Cape Verde",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a46",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_west_africa.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-531",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_mauritania",
+    "name": "Mauritania",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_rio_de_oro",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_portuguese_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_sudan",
+        "kind": "land_border",
+        "railway_connection": true,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_western_algeria",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": false
+      },
+      {
+        "neighbor_id": "sea_a46",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_a48",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [
+      {
+        "neighbor_id": "land_french_morocco",
+        "reason": "Possible point-only contact at the Rio de Oro/Western Algeria junction; do not create a movement edge from a point."
+      }
+    ],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_sahara.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-532",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_portuguese_guinea",
+    "name": "Portuguese Guinea",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_mauritania",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a48",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_senegal_coast.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-533",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_french_guinea",
+    "name": "French Guinea",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_mauritania",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_portuguese_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_sierra_leone",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_liberia",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_ivory_coast",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_sudan",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a48",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_senegal_coast.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-534",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_sierra_leone",
+    "name": "Sierra Leone",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_french_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_liberia",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a48",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_senegal_coast.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-535",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_sierra_leone_major_port",
+        "type": "major_port",
+        "sea_accesses": [
+          "sea_a48"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_west_africa.png",
+            "rectangle": [
+              1530,
+              3480,
+              3380,
+              4310
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_liberia",
+    "name": "Liberia",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_sierra_leone",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_ivory_coast",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a48",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_senegal_coast.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-536",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_ivory_coast",
+    "name": "Ivory Coast",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_liberia",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_guinea",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_french_sudan",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_niger",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_gold_coast",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a51",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [
+      {
+        "field": "railway_connection",
+        "neighbor_id": "land_french_sudan",
+        "reason": "Rail spur enters the northern roundel boundary near the Guinea/Sudan/Ivory junction; exact border crossing needs finer source resolution."
+      }
+    ],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_sudan_west.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-537",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_ivory_coast_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_a51"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_west_africa.png",
+            "rectangle": [
+              1530,
+              3480,
+              3380,
+              4310
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_gold_coast",
+    "name": "Gold Coast",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_ivory_coast",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_niger",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_dahomey",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "sea_a51",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_round2_sudan_west.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-538",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_gold_coast_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_a51"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_west_africa.png",
+            "rectangle": [
+              1530,
+              3480,
+              3380,
+              4310
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_sao_tome_and_principe",
+    "name": "São Tomé and Príncipe",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a51",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_west_africa.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-539",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_ascension",
+    "name": "Ascension",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a50",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_africa_west_south.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-540",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_ascension_minor_dockyard",
+        "type": "minor_dockyard",
+        "sea_accesses": [
+          "sea_a50"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_west_africa.png",
+            "rectangle": [
+              1530,
+              3480,
+              3380,
+              4310
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_reunion",
+    "name": "Réunion",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_i2",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_south_africa.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-541",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_yemen",
+    "name": "Yemen",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "land_saudi_arabia",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_aden",
+        "kind": "land_border",
+        "railway_connection": false,
+        "passable": true
+      },
+      {
+        "neighbor_id": "land_eritrea",
+        "kind": "narrow_crossing",
+        "narrow_crossings": 1,
+        "railway_connection": false
+      },
+      {
+        "neighbor_id": "sea_i4",
+        "kind": "coast"
+      },
+      {
+        "neighbor_id": "sea_i5",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_arabia.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-542",
+    "expected_naval_facilities": [],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  },
+  {
+    "node_id": "land_saint_helena",
+    "name": "Saint Helena",
+    "definite_neighbors": [
+      {
+        "neighbor_id": "sea_a53",
+        "kind": "coast"
+      }
+    ],
+    "ambiguous_contacts": [],
+    "evidence": [
+      {
+        "source": "game_content/maps/gw36map.png",
+        "crop": "evidence/ea_africa_west_south.png"
+      }
+    ],
+    "notes": "Physical and narrow contacts are separate; no adjacency is implied by an island group being nearby. Apply destination terrain and directional combat rivers from the glossary independently. The rail values concern printed border-crossing rail, not facility connection heuristics. Naval facilities rechecked from printed symbols on 2026-10-06; see the exact expected_naval_facilities roster.",
+    "finding_id": "EA-543",
+    "expected_naval_facilities": [
+      {
+        "id": "facility_saint_helena_minor_port",
+        "type": "minor_port",
+        "sea_accesses": [
+          "sea_a53"
+        ],
+        "evidence": [
+          {
+            "source": "game_content/maps/gw36map.png",
+            "crop": "evidence/ea_naval_atlantic_islands_20261006.png",
+            "rectangle": [
+              1650,
+              3700,
+              3050,
+              4600
+            ]
+          }
+        ],
+        "notes": "Printed symbol; facility identity is independent of sea-access edges."
+      }
+    ],
+    "naval_reaudit_reference": "data/naval_reaudit_europe_africa_middle_east.json"
+  }
+]

@@ -1,23 +1,40 @@
 # gwRL
 
-`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning experiments. The current playable model focuses on a simplified China theater, while the repository also contains a larger manually transcribed world map for future expansion.
+`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The current playable models are simplified; the larger full-rules China campaign is still being specified.
+
+## Start here
+
+- [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.
+- [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md): neural MCTS trainer, search diagnostic and completed results.
+- [Full-campaign plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) and [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): the future 1936–1941 campaign, not a runnable training environment yet.
+- [Game content](/Users/home/Desktop/gwRL/game_content/README.md): maps, rules and canonical scenarios.
+- [Rule clarifications](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md): unclear official rules and adopted project interpretations, separate from scenario choices.
 
 ## Repository layout
 
 ```text
 game_content/
   maps/          Global map data and source map images
-  rules/         Rulebooks and extracted rule text
+  rules/         Official PDFs and the project rule-clarification register
   scenarios/     Simulator setups and manual battle fixtures
 include/game/    C++ public headers and game rules
 src/             C++ implementation and Python bindings
-python/          Training, MCTS, policy models, and analysis tools
+studies/
+  composition/   Trainer, search and preserved composition results
+  mini_japan_two_turn/  Trainer, search, tools and results
+  shared/        Shared neural model and path helpers
+tests/           Data, search and organization checks; C++ combat regressions
+docs/            Map audits, implementation plan and M0 specification
 tools/           Game-content generation utilities
 web/             Browser-based board visualization
-output/          Training summaries, traces, metrics, and checkpoints
+output/          Disposable C++ simulator/debug exports only
 ```
 
-See [game_content/README.md](game_content/README.md) for details about the maps, rules, and scenarios.
+Each study has a `README.md`, preserved `results/`, and a fresh `runs/` destination
+for new output. See the [study index](/Users/home/Desktop/gwRL/studies/README.md)
+for the cleanup record and result-retention conventions. Old results preserve
+their original bytes and historical engine behavior; organizing them does not
+revalidate those results against today's rules.
 
 ## Build and run
 
@@ -35,12 +52,11 @@ Build the Python extension in the project virtual environment:
 ./.venv/bin/python -m pip install -e .
 ```
 
-Example training commands:
+Training entry points (run from the repository root):
 
 ```sh
-./.venv/bin/python python/train_japan_policy_torch.py
-./.venv/bin/python python/train_japan_q_learning.py
-./.venv/bin/python python/train_composition_alpha_zero.py
+./.venv/bin/python -m studies.mini_japan_two_turn.train --help
+./.venv/bin/python -m studies.composition.train --help
 ```
 
 ## Combat model and checks
@@ -67,13 +83,13 @@ terrain/city rules, retreat decisions, and scenario purchase/availability limits
 remain simplified. Saved training results from before combat-rule changes describe
 the earlier environment and need reevaluation under the current rules.
 
-Run the focused C++ regressions and existing Python search tests:
+Run the focused C++ regressions and all Python data/search/organization checks:
 
 ```sh
 cmake -S . -B build -DBUILD_TESTING=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
-PYTHONPATH=python ./.venv/bin/python -m unittest discover -s python/tests
+./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
 ```
 
 After editing C++ headers, rebuild the Python bindings before training:

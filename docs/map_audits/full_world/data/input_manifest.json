@@ -1,0 +1,120 @@
+{
+  "audit_date": "2026-10-05",
+  "files": [
+    {
+      "path": "game_content/maps/gw36_manual_map.json",
+      "bytes": 1051862,
+      "sha256": "97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24"
+    },
+    {
+      "path": "game_content/maps/gw36_nation_home_country.json",
+      "bytes": 11492,
+      "sha256": "2f9112387486e21c53e5e72b585c9128838d32aff556815d3328dd9ae343b83e"
+    },
+    {
+      "path": "game_content/maps/gw36map.png",
+      "bytes": 76192930,
+      "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba"
+    },
+    {
+      "path": "tools/build_manual_map_json.py",
+      "bytes": 122273,
+      "sha256": "b397e875725ee199ca06dbb1c4679b0ada87061321e44042a1013f06bac1c514"
+    },
+    {
+      "path": "tools/build_nation_home_country_json.py",
+      "bytes": 6538,
+      "sha256": "6ffae9104d8251928e04361d90956a474d05d4175f8381c31b2d0f6a5fde82a0"
+    },
+    {
+      "path": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf",
+      "bytes": 6447719,
+      "sha256": "3f9e222630be3f9168969b9c8184ad2cf72571ece4ee93c7f54672ee6bb3801b"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - ANZAC v4.3.pdf",
+      "bytes": 2045790,
+      "sha256": "6b3b6a12e1fc76b4b6f8fb9de68174afa3b57744a0e20032b29b0f2449e4fe3d"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf",
+      "bytes": 2115371,
+      "sha256": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - FEC v4.3.pdf",
+      "bytes": 2059279,
+      "sha256": "ce4a7fbe4712a0b389de0f87a4144db8c33ef3ee9f0081c608d8af738c790b37"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - France v4.3.pdf",
+      "bytes": 1998130,
+      "sha256": "ea0f9874326bcadad4e016eaf87466ae9064288a1035cecb9c7a67c874bb13c9"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Free France v4.3.pdf",
+      "bytes": 1377885,
+      "sha256": "0019b7504fefe1a2d1098adf155af787eade2096f365a5aef834b3f5e6d50343"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Germany v4.3 Iron Cross Version.pdf",
+      "bytes": 1522420,
+      "sha256": "58c2b2731d138267f27483f435ef28bf91d3c715fa237d61e04629717927c3e9"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Great Britain v4.3.1.pdf",
+      "bytes": 408751,
+      "sha256": "5d8f9e424498ef550b2aade377c7642f09d91e892d93d13ed11f01977cd93a54"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Italy v4.3.pdf",
+      "bytes": 1989564,
+      "sha256": "5d5e22edbeb3853c51def0a574730a893cac98db2bbc35ab153f50c2171530f0"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "bytes": 2050835,
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+      "bytes": 1178194,
+      "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - USA v4.3.pdf",
+      "bytes": 4109273,
+      "sha256": "614a467fd7fce1d78451e508cacf7d555fd738bb874dcf24290f15733259ffe5"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - USSR v4.3.1.pdf",
+      "bytes": 785216,
+      "sha256": "ec9eb64c3e0589386e36d704f6a4de12387171c3d6461a7f2bb1e520092c655b"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Vichy v4.3.pdf",
+      "bytes": 1650267,
+      "sha256": "deb92ebe67c1098951bc9d89bd52a299d75ed5c00a02f4de9e268843868df4da"
+    },
+    {
+      "path": "game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf",
+      "bytes": 1184426,
+      "sha256": "9d8b6382dfcd68e5d91ab48f2d81fef0bb61090dc951300bc19bea93f1a12512"
+    },
+    {
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "bytes": 28568876,
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "path": "game_content/scenarios/japan_china_1936/m0/convoy_audit.json",
+      "bytes": 6331,
+      "sha256": "637cc2824460852c5c097decc1dab5295fba2b9f67958c341cd43876376ef4d7"
+    },
+    {
+      "path": "docs/map_audits/japan_and_nearby_seas.md",
+      "bytes": 7881,
+      "sha256": "d8750c5852aea029ffc49d2a319aed2d6500663341cba3c794596806e308cd01"
+    }
+  ]
+}

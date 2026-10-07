@@ -1,0 +1,93 @@
+{
+  "scope": "Every stored node and every directed edge; no source-image completeness implied",
+  "node_count": 407,
+  "node_types": {
+    "land": 303,
+    "sea": 104
+  },
+  "directed_edge_count": 1612,
+  "undirected_pair_count": 806,
+  "edge_kinds": {
+    "land->land": 920,
+    "land->sea": 227,
+    "sea->land": 227,
+    "sea->sea": 238
+  },
+  "component_sizes": [
+    395,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "diagnostic_counts": {
+    "isolated_node": 10,
+    "non_rulebook_node_terrain": 5,
+    "naval_facility_without_sea_access": 1,
+    "narrow_missing_blocking_seas": 5,
+    "narrow_on_non_land_pair": 2,
+    "sea_edge_land_terrain": 93,
+    "facility_id_collision": 4
+  },
+  "node_terrain_counts": {
+    "mountain": 70,
+    "desert": 30,
+    "normal": 153,
+    "jungle": 26,
+    "tundra": 19,
+    "forest": 4,
+    "mountain_border": 1,
+    "sea": 104
+  },
+  "edge_terrain_counts": {
+    "desert": 13,
+    "mountain": 188,
+    "normal": 1000,
+    "coast": 229,
+    "jungle": 14,
+    "['jungle', 'mountain']": 1,
+    "tundra": 8,
+    "['desert', 'mountain']": 12,
+    "sea": 145,
+    "['tundra', 'mountain']": 2
+  },
+  "unique_facility_ids": 165,
+  "node_facility_count": 7,
+  "directed_river_route_edges": 32,
+  "directed_river_crossing_edges": 87,
+  "directed_rail_edges": 752,
+  "directed_special_fortification_edges": 0,
+  "convoy_layer_present": false,
+  "top_level_keys": [
+    "_meta",
+    "nodes"
+  ],
+  "checks_with_zero_findings": [
+    "node_key_mismatch",
+    "duplicate_neighbor",
+    "invalid_land_ipp",
+    "node_facility_pair_length",
+    "dangling_edge",
+    "self_edge",
+    "missing_reverse",
+    "reciprocal_field_mismatch",
+    "invalid_blocking_sea",
+    "gauge_without_rail",
+    "rail_across_impassable",
+    "edge_facility_pair_length",
+    "facility_boolean_mismatch"
+  ],
+  "limitations": [
+    "Graph consistency cannot establish printed adjacency, terrain, income or facility correctness.",
+    "Missing printed nodes are outside this inventory and listed in the regional findings.",
+    "Directional terrain and river_crossing are intentionally not required to be symmetric.",
+    "A rail/coast flag may mean access to a facility; it does not itself authorize a land unit to enter the sea."
+  ]
+}

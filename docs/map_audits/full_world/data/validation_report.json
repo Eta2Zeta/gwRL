@@ -1,0 +1,70 @@
+{
+  "audit_date": "2026-10-05",
+  "status": "passed",
+  "scope": "Validation of audit artifacts and source preservation; not a certification that unresolved map attributes are correct.",
+  "finding_count": 1051,
+  "unique_finding_ids": true,
+  "finding_node_references_resolve_to_existing_or_proposed_ids": true,
+  "stored_nodes_reviewed": 407,
+  "stored_directions_inventoried": 1612,
+  "stored_pairs_source_reviewed": 806,
+  "pair_status_counts": {
+    "confirmed": 640,
+    "proposed_delete": 159,
+    "uncertain": 7
+  },
+  "conflicting_regional_pair_conclusions": 0,
+  "missing_land_identities_with_neighbor_rows": 79,
+  "new_land_reciprocal_and_overlap_checks": "passed",
+  "proposed_sea_roster_count": 158,
+  "asia_pacific_sea_rows_reciprocal": 84,
+  "new_asia_soviet_land_narrow_pairs_with_rail_review": 64,
+  "new_rail_result_counts": {
+    "absent": 47,
+    "present": 16,
+    "uncertain": 1
+  },
+  "exceptional_routes_excluded_from_ordinary_adjacency": true,
+  "convoy_route_and_sea_matrix_consistency": "passed",
+  "a44_convoy_cap_crosscheck": 15,
+  "exact_scalar_before_values_checked": 95,
+  "json_files_parsed": 42,
+  "broken_markdown_links": [],
+  "source_hashes_checked": 23,
+  "changed_source_files": [],
+  "generator_rebuild_evidence": "rebuild_check.json",
+  "clarification_checks_2026_10_06": {
+    "status": "passed",
+    "findings": [
+      "WG-003",
+      "WG-004"
+    ],
+    "generated_registers_match_authored_proposals": true,
+    "three_distinct_verified_egyptian_facility_ids": true,
+    "french_morocco_and_upper_egypt_phantom_ports_removed_from_proposals": true,
+    "source_hashes_checked": 23,
+    "changed_source_files": []
+  },
+  "last_revalidated": "2026-10-06",
+  "naval_facility_reaudit_2026_10_06": {
+    "status": "passed",
+    "territories_reviewed": 295,
+    "all_current_facility_bearing_territories_reviewed": 154,
+    "current_and_proposed_claim_coverage_gaps": [],
+    "assigned_proposed_facilities": 208,
+    "unassigned_printed_facilities": 1,
+    "empty_proposed_inventories_for_current_claimed_records": 30,
+    "uncertain_territory_rows": [
+      "land_cape_town",
+      "land_luzon_and_the_visayas",
+      "land_mindanao"
+    ],
+    "shore_proposals_checked": 79,
+    "complete_inventory_comparisons": 130,
+    "nested_physical_objects_checked": 193,
+    "unique_physical_ids": true,
+    "evidence_paths_and_declared_rectangles_valid": true,
+    "current_claims_read_from_both_shore_directions": true,
+    "scope": "Artifact consistency and source preservation; printed geography was reviewed visually in the regional ledgers. Original non-naval validation fields retain their stated 5 October scope."
+  }
+}

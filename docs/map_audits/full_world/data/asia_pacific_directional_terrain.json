@@ -1,0 +1,1690 @@
+[
+  {
+    "source": "land_burma",
+    "destination": "land_annam_tonkin",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_cochinchina",
+    "destination": "land_annam_tonkin",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_siam",
+    "destination": "land_annam_tonkin",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "sea_p72",
+    "destination": "land_aus_new_south_wales",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_aus_western_australia",
+    "destination": "land_aus_northern_territory",
+    "field": "border_terrain_contains",
+    "current": "normal",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_p64",
+    "destination": "land_aus_queensland",
+    "field": "amphibious_assault_allowed",
+    "current": null,
+    "proposed": false,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3"
+  },
+  {
+    "source": "sea_p71",
+    "destination": "land_aus_queensland",
+    "field": "amphibious_assault_allowed",
+    "current": null,
+    "proposed": false,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3"
+  },
+  {
+    "source": "sea_p72",
+    "destination": "land_aus_queensland",
+    "field": "amphibious_assault_allowed",
+    "current": null,
+    "proposed": false,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3"
+  },
+  {
+    "source": "land_aus_new_south_wales",
+    "destination": "land_aus_south_australia",
+    "field": "border_terrain_contains",
+    "current": "normal",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_aus_northern_territory",
+    "destination": "land_aus_western_australia",
+    "field": "border_terrain_contains",
+    "current": "normal",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_aus_south_australia",
+    "destination": "land_aus_western_australia",
+    "field": "border_terrain_contains",
+    "current": "normal",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_p61",
+    "destination": "land_aus_western_australia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_p69",
+    "destination": "land_aus_western_australia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_p70",
+    "destination": "land_aus_western_australia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_sarawak",
+    "destination": "land_borneo",
+    "field": "border_terrain_contains",
+    "current": "jungle",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_annam_tonkin",
+    "destination": "land_burma",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_india_bengal",
+    "destination": "land_burma",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_china_shantung",
+    "destination": "land_china_hopeh",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_shensi",
+    "destination": "land_china_hopeh",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_szechwan",
+    "destination": "land_china_hopeh",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "sea_p14",
+    "destination": "land_china_hopeh",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_kweichow",
+    "destination": "land_china_hunan",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_shantung",
+    "destination": "land_china_hunan",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_szechwan",
+    "destination": "land_china_hunan",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_kwangtung",
+    "destination": "land_china_hunan",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_hunan",
+    "destination": "land_china_kweichow",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_kwangtung",
+    "destination": "land_china_kweichow",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_shantung",
+    "destination": "land_china_nanking",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_kweichow",
+    "destination": "land_china_sikang",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_szechwan",
+    "destination": "land_china_sikang",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_tsinghai",
+    "destination": "land_china_sikang",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_mongolia_kobdo",
+    "destination": "land_china_sinkiang",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_ulyassutai",
+    "destination": "land_china_sinkiang",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_shensi",
+    "destination": "land_china_suiyuan",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_tsinghai",
+    "destination": "land_china_suiyuan",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_central_mongolia",
+    "destination": "land_china_suiyuan",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_kerulen",
+    "destination": "land_china_suiyuan",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_shensi",
+    "destination": "land_china_tsinghai",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_china_sinkiang",
+    "destination": "land_china_tsinghai",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_suiyuan",
+    "destination": "land_china_tsinghai",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_szechwan",
+    "destination": "land_china_tsinghai",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_mongolia_central_mongolia",
+    "destination": "land_china_tsinghai",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_ulyassutai",
+    "destination": "land_china_tsinghai",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_kweichow",
+    "destination": "land_china_yunnan",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_annam_tonkin",
+    "destination": "land_cochinchina",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_bengal",
+    "destination": "land_india_benares",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_nepal",
+    "destination": "land_india_benares",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_bengal",
+    "destination": "land_india_calcutta",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_delhi",
+    "destination": "land_india_maharashtra",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_punjab",
+    "destination": "land_india_maharashtra",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_benares",
+    "destination": "land_india_southern_india",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_calcutta",
+    "destination": "land_india_southern_india",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_india_delhi",
+    "destination": "land_india_southern_india",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "sea_i11",
+    "destination": "land_india_southern_india",
+    "field": "border_terrain_contains",
+    "current": "normal",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_i12",
+    "destination": "land_india_southern_india",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_i7",
+    "destination": "land_india_southern_india",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_korea",
+    "destination": "land_manchuria_eastern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_manchuria_northern",
+    "destination": "land_manchuria_eastern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_amur",
+    "destination": "land_manchuria_eastern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_amur",
+    "destination": "land_manchuria_eastern",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_usr_primorsky_krai",
+    "destination": "land_manchuria_eastern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_manchuria_eastern",
+    "destination": "land_manchuria_northern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_amur",
+    "destination": "land_manchuria_northern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_amur",
+    "destination": "land_manchuria_northern",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2"
+  },
+  {
+    "source": "land_usr_chita",
+    "destination": "land_manchuria_northern",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_kerulen",
+    "destination": "land_manchuria_western",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_chita",
+    "destination": "land_manchuria_western",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p2",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_suiyuan",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "desert",
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_tsinghai",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "desert",
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_kobdo",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_mongolia_tannu_tuva",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_angara",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_buryatia",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_chita",
+    "destination": "land_mongolia_central_mongolia",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_suiyuan",
+    "destination": "land_mongolia_kerulen",
+    "field": "border_terrain_contains",
+    "current": "desert",
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_chita",
+    "destination": "land_mongolia_kerulen",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_sinkiang",
+    "destination": "land_mongolia_ulyassutai",
+    "field": "border_terrain_contains",
+    "current": "desert",
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_tsinghai",
+    "destination": "land_mongolia_ulyassutai",
+    "field": "border_terrain_contains",
+    "current": "desert",
+    "proposed": "desert",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p3",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_burma",
+    "destination": "land_siam",
+    "field": "border_terrain_contains",
+    "current": "normal",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_manchuria_eastern",
+    "destination": "land_usr_amur",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_manchuria_northern",
+    "destination": "land_usr_amur",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_primorsky_krai",
+    "destination": "land_usr_amur",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_mongolia_central_mongolia",
+    "destination": "land_usr_angara",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_mongolia_tannu_tuva",
+    "destination": "land_usr_angara",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_angara",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_angara",
+    "destination": "land_usr_buryatia",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_irkutsk",
+    "destination": "land_usr_buryatia",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_turkestan",
+    "destination": "land_usr_central_kazakhstan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "desert",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_irkutsk",
+    "destination": "land_usr_chita",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "sea_p1",
+    "destination": "land_usr_chukotka",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_kalmytskaya",
+    "destination": "land_usr_donets_kuban",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_north_caucasia",
+    "destination": "land_usr_donets_kuban",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "sea_m11",
+    "destination": "land_usr_donets_kuban",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_m11",
+    "destination": "land_usr_donets_kuban",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_china_sinkiang",
+    "destination": "land_usr_eastern_kazakhstan",
+    "field": "border_terrain_contains",
+    "current": "mountain",
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_china_sinkiang",
+    "destination": "land_usr_eastern_kazakhstan",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_eastern_kazakhstan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_eastern_kazakhstan",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_turkestan",
+    "destination": "land_usr_eastern_kazakhstan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "desert",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_southern_ukraine",
+    "destination": "land_usr_eastern_ukraine",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_northern_yakutia",
+    "destination": "land_usr_eastern_yakutia",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "source_wording": "River Border with",
+    "direction_uncertain": true,
+    "notes": "Glossary uses with rather than from. This row records named approach; reciprocal application requires artwork review, not an invented reverse default."
+  },
+  {
+    "source": "land_usr_southern_yakutia",
+    "destination": "land_usr_eastern_yakutia",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "source_wording": "River Border with",
+    "direction_uncertain": true,
+    "notes": "Glossary uses with rather than from. This row records named approach; reciprocal application requires artwork review, not an invented reverse default."
+  },
+  {
+    "source": "sea_p1",
+    "destination": "land_usr_eastern_yakutia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_northern_yakutia",
+    "destination": "land_usr_evenkiland",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_samoyedia",
+    "destination": "land_usr_evenkiland",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_moscow",
+    "destination": "land_usr_gorky",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_saratov",
+    "destination": "land_usr_gorky",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_leningrad",
+    "destination": "land_usr_karelia",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "source_wording": "River Border with",
+    "direction_uncertain": true,
+    "notes": "Glossary uses with rather than from. This row records named approach; reciprocal application requires artwork review, not an invented reverse default."
+  },
+  {
+    "source": "land_usr_northern_russia",
+    "destination": "land_usr_karelia",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "source_wording": "River Border with",
+    "direction_uncertain": true,
+    "notes": "Glossary uses with rather than from. This row records named approach; reciprocal application requires artwork review, not an invented reverse default."
+  },
+  {
+    "source": "land_usr_western_russia",
+    "destination": "land_usr_karelia",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "source_wording": "River Border with",
+    "direction_uncertain": true,
+    "notes": "Glossary uses with rather than from. This row records named approach; reciprocal application requires artwork review, not an invented reverse default."
+  },
+  {
+    "source": "land_usr_eastern_ukraine",
+    "destination": "land_usr_kiev",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_fin_viipuri_province",
+    "destination": "land_usr_leningrad",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_evenkiland",
+    "destination": "land_usr_lower_tunguska",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_samoyedia",
+    "destination": "land_usr_lower_tunguska",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_sibir",
+    "destination": "land_usr_lower_tunguska",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_yugria",
+    "destination": "land_usr_lower_tunguska",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_gorky",
+    "destination": "land_usr_moscow",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_kaluga_oblast",
+    "destination": "land_usr_moscow",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_western_russia",
+    "destination": "land_usr_moscow",
+    "field": "river_crossing",
+    "current": true,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_yaroslavl",
+    "destination": "land_usr_moscow",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "sea_a9",
+    "destination": "land_usr_northern_russia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_evenkiland",
+    "destination": "land_usr_northern_yakutia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_evenkiland",
+    "destination": "land_usr_northern_yakutia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_western_yakutia",
+    "destination": "land_usr_northern_yakutia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_saratov",
+    "destination": "land_usr_orenburg",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_amur",
+    "destination": "land_usr_primorsky_krai",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_evenkiland",
+    "destination": "land_usr_samoyedia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_evenkiland",
+    "destination": "land_usr_samoyedia",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_orenburg",
+    "destination": "land_usr_saratov",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_ural",
+    "destination": "land_usr_saratov",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_western_kazakhstan",
+    "destination": "land_usr_saratov",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_orenburg",
+    "destination": "land_usr_sibir",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_ural",
+    "destination": "land_usr_sibir",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_vyatka",
+    "destination": "land_usr_sibir",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_orel_kursk",
+    "destination": "land_usr_southern_belorussia",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_western_kazakhstan",
+    "destination": "land_usr_stalingrad",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_stalino",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_stalino",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_southern_ukraine",
+    "destination": "land_usr_taurida",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_central_kazakhstan",
+    "destination": "land_usr_tobolsk",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_eastern_kazakhstan",
+    "destination": "land_usr_tobolsk",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_orenburg",
+    "destination": "land_usr_tobolsk",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_donets_kuban",
+    "destination": "land_usr_tula_lipetsk",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_kalmytskaya",
+    "destination": "land_usr_tula_lipetsk",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_orel_kursk",
+    "destination": "land_usr_tula_lipetsk",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_stalingrad",
+    "destination": "land_usr_tula_lipetsk",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_china_sinkiang",
+    "destination": "land_usr_turkestan",
+    "field": "border_terrain_contains",
+    "current": [
+      "desert",
+      "mountain"
+    ],
+    "proposed": "mountain",
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_central_kazakhstan",
+    "destination": "land_usr_turkestan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "desert",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_eastern_kazakhstan",
+    "destination": "land_usr_turkestan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "desert",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_turkmenistan",
+    "destination": "land_usr_turkestan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "desert",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_western_kazakhstan",
+    "destination": "land_usr_turkestan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "desert",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_m12",
+    "destination": "land_usr_turkmenistan",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_gorky",
+    "destination": "land_usr_ural",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_orenburg",
+    "destination": "land_usr_ural",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_saratov",
+    "destination": "land_usr_ural",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_zuryenia",
+    "destination": "land_usr_ural",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_angara",
+    "destination": "land_usr_vanavara",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_vanavara",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3\u20134,11\u201312",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_vanavara",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_ural",
+    "destination": "land_usr_vyatka",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_vyatka",
+    "destination": "land_usr_vyatka",
+    "field": "source_ambiguity",
+    "current": null,
+    "proposed": null,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "source_wording": "River Border from Zuryenia, Ural, Vyatka, & A9",
+    "notes": "Source self-reference recorded as an error/ambiguity, not a requested self-loop or automatic river-crossing rule."
+  },
+  {
+    "source": "land_usr_zuryenia",
+    "destination": "land_usr_vyatka",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "sea_a9",
+    "destination": "land_usr_vyatka",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_a9",
+    "destination": "land_usr_vyatka",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_kalmytskaya",
+    "destination": "land_usr_western_kazakhstan",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_eastern_ukraine",
+    "destination": "land_usr_western_ukraine",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11"
+  },
+  {
+    "source": "land_usr_irkutsk",
+    "destination": "land_usr_yakutsk",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_southern_yakutia",
+    "destination": "land_usr_yakutsk",
+    "field": "river_crossing",
+    "current": false,
+    "proposed": true,
+    "edge_exists": true,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf pp3,11\u201312"
+  },
+  {
+    "source": "land_usr_novosibirsk",
+    "destination": "land_usr_yenisei",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_sibir",
+    "destination": "land_usr_yenisei",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_tobolsk",
+    "destination": "land_usr_yenisei",
+    "field": "river_crossing",
+    "current": null,
+    "proposed": true,
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p12"
+  },
+  {
+    "source": "land_usr_ural",
+    "destination": "land_usr_zuryenia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "land_usr_vyatka",
+    "destination": "land_usr_zuryenia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "mountain",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  },
+  {
+    "source": "sea_a9",
+    "destination": "land_usr_zuryenia",
+    "field": "border_terrain_contains",
+    "current": null,
+    "proposed": "tundra",
+    "edge_exists": false,
+    "evidence": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf p11",
+    "merge_semantics": "Add this terrain requirement to the validated intrinsic/directional approach set; do not overwrite simultaneous jungle/mountain/desert effects."
+  }
+]
