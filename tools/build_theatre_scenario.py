@@ -1,7 +1,8 @@
 """Extract a closed map projection without changing any retained game data.
 
 This builds map data, not a playable scenario or an initial unit setup. Campaign
-configuration is retained as provenance and is not interpreted by this tool.
+configuration is retained as provenance. Explicit feature-layer exclusions are
+applied without changing the authoritative world map or retained node/edge data.
 
     ./.venv/bin/python tools/build_theatre_scenario.py
 
@@ -18,6 +19,11 @@ import os
 from pathlib import Path
 import tempfile
 
+try:
+    from world_map_features import project_features, validate_features
+except ModuleNotFoundError:
+    from tools.world_map_features import project_features, validate_features
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MAP = ROOT / "game_content/maps/gw36_manual_map.json"
@@ -28,6 +34,9 @@ BOOLEAN_EDGE_FIELDS = (
     "passable", "has_river", "river_crossing", "railway_connection",
     "gauge_change", "port_or_dock_connection", "narrow_crossing",
 )
+NULLABLE_EDGE_FIELDS = {
+    "passable", "has_river", "river_crossing", "railway_connection", "gauge_change",
+}
 RECIPROCAL_EDGE_FIELDS = (
     "passable", "has_river", "railway_connection", "gauge_change",
     "naval_facilities", "naval_facility_ids", "port_or_dock_connection",
@@ -81,6 +90,9 @@ def validate_source(source):
         raise ValueError("Source map must contain a nonempty 'nodes' object")
     if not isinstance(source.get("_meta", {}), dict):
         raise ValueError("Source map '_meta' must be an object")
+    version = source.get("_meta", {}).get("schema_version", 1)
+    if type(version) is not int or version not in (1, 2):
+        raise ValueError("Source map schema_version must be 1 or 2")
     edges = {}
     for node_id, node in nodes.items():
         if not isinstance(node_id, str) or not node_id:
@@ -89,6 +101,11 @@ def validate_source(source):
             raise ValueError(f"Source node key/id mismatch: {node_id}")
         if node.get("type") not in ("land", "sea"):
             raise ValueError(f"{node_id}: type must be 'land' or 'sea'")
+        terrain = node.get("terrain")
+        terrains = terrain if isinstance(terrain, list) else [terrain]
+        if not (version == 2 and terrain is None) and (
+                not terrains or any(not isinstance(value, str) or not value for value in terrains)):
+            raise ValueError(f"{node_id}: terrain must be a string or nonempty string list")
         if not isinstance(node.get("neighbors"), list):
             raise ValueError(f"{node_id}: neighbors must be a list")
         validate_facilities(node, "node_facilities", "node_facility_ids", node_id)
@@ -108,9 +125,15 @@ def validate_source(source):
                 raise ValueError(f"{node_id}: duplicate neighbor {neighbor_id}")
             location = f"{node_id} -> {neighbor_id}"
             for field in BOOLEAN_EDGE_FIELDS:
-                if type(edge.get(field)) is not bool:
+                value = edge.get(field)
+                unknown = version == 2 and field in NULLABLE_EDGE_FIELDS and value is None and field in edge
+                if (version == 2 and field == "port_or_dock_connection"
+                        and value is None and field in edge
+                        and edge.get("naval_facility_inventory_status") == "partial"):
+                    unknown = True
+                if type(value) is not bool and not unknown:
                     raise ValueError(f"{location}: {field} must be a boolean")
-            if edge["gauge_change"] and not edge["railway_connection"]:
+            if edge["gauge_change"] and edge["railway_connection"] is not True:
                 raise ValueError(f"{location}: gauge_change requires a railway")
             count = edge.get("narrow_crossings")
             if type(count) is not int or count < 0:
@@ -132,13 +155,15 @@ def validate_source(source):
                     raise ValueError(f"{location}: strategic rail cannot cross a narrow crossing")
             terrain = edge.get("border_terrain")
             terrains = terrain if isinstance(terrain, list) else [terrain]
-            if not terrains or any(not isinstance(item, str) or not item for item in terrains):
+            if not (version == 2 and terrain is None and "border_terrain" in edge) and (
+                    not terrains or any(not isinstance(item, str) or not item for item in terrains)):
                 raise ValueError(f"{location}: border_terrain must be a string or nonempty string list")
             validate_facilities(edge, "naval_facilities", "naval_facility_ids", location)
             edges[pair] = edge
     for source_id, target_id in edges:
         if (target_id, source_id) not in edges:
             raise ValueError(f"Missing reverse neighbor: {target_id} -> {source_id}")
+    validate_features(source)
     return nodes, edges
 
 
@@ -159,6 +184,11 @@ def validate_manifest(manifest, nodes):
     missing = sorted(set(requested) - nodes.keys())
     if missing:
         raise ValueError("Manifest requests missing source nodes: " + ", ".join(missing))
+    excluded_layers = manifest.get("excluded_feature_layers", [])
+    if (not isinstance(excluded_layers, list)
+            or any(layer != "convoy_lines" for layer in excluded_layers)
+            or len(excluded_layers) != len(set(excluded_layers))):
+        raise ValueError("Manifest excluded_feature_layers must be a unique list containing only 'convoy_lines'")
     return set(requested)
 
 
@@ -196,9 +226,22 @@ def extract_document(source, manifest):
             if edge["neighbor_id"] not in included
         )
     cuts.sort(key=lambda cut: (cut["source_id"], cut["excluded_neighbor_id"]))
-    return {
+    feature_layers, feature_cuts = project_features(source, included, extracted)
+    feature_exclusions = []
+    for layer in manifest.get("excluded_feature_layers", []):
+        # Disable the entire campaign layer, including routes whose complete
+        # geography is inside the boundary. Keep source records and their IDs
+        # available in world data; no clipped or locally active convoy is made.
+        if layer in feature_layers:
+            feature_exclusions.append({
+                "layer": layer,
+                "reason": "disabled_by_scenario_manifest",
+                "excluded_feature_ids": [record["id"] for record in feature_layers[layer]],
+            })
+            feature_layers[layer] = []
+    result = {
         "_meta": {
-            "schema_version": 1,
+            "schema_version": source.get("_meta", {}).get("schema_version", 1),
             "scenario_id": manifest["scenario_id"],
             "artifact_type": "closed_theatre_map",
             "boundary_policy": "closed",
@@ -215,6 +258,19 @@ def extract_document(source, manifest):
         },
         "nodes": extracted,
     }
+    result.update(feature_layers)
+    if feature_layers:
+        result["_meta"]["feature_cuts"] = feature_cuts
+        result["_meta"]["notes"].append(
+            "Complete geographic routes are retained only when all endpoints, path nodes and controllers are included; facility sea accesses follow retained coasts."
+        )
+    if feature_exclusions:
+        result["_meta"]["feature_exclusions"] = feature_exclusions
+        result["_meta"]["notes"].append(
+            "Manifest-disabled feature layers remain empty even when their complete geography is retained."
+        )
+    validate_features(result)
+    return result
 
 
 def portable_path(path):

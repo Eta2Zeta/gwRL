@@ -1,11 +1,12 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 6 October 2026.
+Updated: 23 October 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
 An adopted project clarification is not evidence that the publisher endorsed it.
-Source PDFs remain unchanged. This document does not implement any rule.
+Record each rule conflict with its source, decision and developer clarification
+status. Implementation details and verification belong in milestone documents.
 
 Campaign-specific exclusions, controllers, setup choices and reward definitions
 belong in the [M0 campaign review](/Users/home/Desktop/gwRL/docs/m0/README.md),
@@ -22,6 +23,11 @@ uncertain artwork is not automatically an error in the official rules.
   its own explicit convention without settling the general rule.
 - **Closed after checking:** the source already answers the question, or the
   supposed conflict was an error in our earlier audit.
+- **Closed — developer fix reported:** the user reports that the developers
+  resolved the issue for the next version. Record the report and date separately
+  from any subsequently published correction.
+- **Closed — developer clarification reported:** the user reports that the
+  developers clarified the rule. Record the clarified rule and report date.
 
 `RB` means [Global War 1936 v4.3 Rulebook](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>);
 its printed and PDF page numbers coincide. `Japan`, `CCP` and `KMT` mean their
@@ -30,84 +36,55 @@ v4.3 national reference sheets, using one-based PDF pages:
 [CCP](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - CCP v4.3.pdf>),
 [KMT](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - KMT v4.3.pdf>).
 Discord messages are community evidence unless publisher authority is verified.
-
-This register supersedes the interpretation/status wording of the older M0
-audits for the issues below. Those audits retain source inventories and future
-fixture IDs. The JSON interpretation notes for RCL-003/004 are also corrected;
-full scenario-data synchronization and engine implementation remain separate.
+A new entry requires a genuine omission or incompatible applicable rules after
+checking definitions, examples, cross-references and national exceptions.
+Source-answered questions are kept in the [archived checks](source_answered_questions.md),
+including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 
 ## Issue index
 
 | ID | Official-rule question | Status |
 | --- | --- | --- |
-| RCL-001 | Airborne assault: AAA appears in steps 4 and 5 | Adopted: attacker in 4, defender in 5 |
+| RCL-001 | Airborne assault: AAA appears in steps 4 and 5 | Closed: developer correction for v4.4; both sides fire in step 4 |
 | RCL-002 | Influence: meaning of the pre-roll spending cap | Adopted: unmodified success threshold |
 | RCL-003 | Foreign invasion: alignment of a whole warlord | Adopted: one roll per warlord |
-| RCL-004 | CCP purchases: railroad versus supply-path wording | Adopted: specific railroad requirement |
-| RCL-005 | Blockade: enemy surface warships versus any enemy units | Proposed: detailed surface-warship rule |
-| RCL-006 | Chinese major-power evolution: trigger timing | Closed after checking: immediate at 13+ possessed land IPP |
-| RCL-007 | Chinese Truce: breaking it versus earlier separation moves | Open |
-| RCL-008 | Ordinary diplomacy: do Chinese warlords qualify? | Proposed: not ordinary neutral-nation targets |
-| RCL-009 | Japan-Soviet border clashes: named zones or broader borders | Open |
+| RCL-004 | CCP purchases: railroad versus supply-path wording | Closed: developer fix for next version, reported by user |
+| RCL-005 | Blockade: enemy surface warships versus any enemy units | Closed: only enemy Surface Warships prevent a blockade; developer clarification reported by user |
+| RCL-009 | Japan-Soviet border clashes: named zones or broader borders | Adopted: Japan reference-sheet target list |
+| RCL-010 | Dadao lend-lease: recipient has no original Home Country | Adopted: Dadao-possessed Chinese Home Country destinations; pending developer clarification |
+| RCL-012 | Chinese Truce combat and retreat | Closed: developer-confirmed roles; same KMT elimination after voluntary or automatic termination |
+| RCL-013 | Does artillery city bombing use attrition's range and movement restrictions? | Adopted: use the same starting-adjacency and no-movement conditions |
+| RCL-014 | Combat roles when ships evacuate into a third party's fleet | Provisionally adopted: evacuating fleet attacks; fleet already at sea defends |
+| RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
+
+## Pilot discussion review
+
+The [26 August–26 September 2025 audit](discord_audits/2025-08-26_2025-09-26/README.md)
+reviewed all 1,129 visible messages and their attachment context. No additional
+genuine missing rule, verified fix or confirmed unresolved conflict qualified.
+The entries below come from the earlier register, outside those pilot dates.
+The [HTML rules reader](html/index.html) places these notes beside the source rules,
+with separate colors and explicit authority labels.
 
 ## RCL-001: AAA in the airborne-assault sequence
 
-**Status: adopted by the user, 5 October 2026.**
+**Status: closed — developer correction for v4.4, posted 6 October 2026; applied to this project at the user's request, 23 October 2026.**
 
-**Sources:** RB §10.6.1, pp65-66; §10.2, pp61-62; §13.1.4, p87.
-Related old fixture: R087.
+**Sources:** RB §10.6.1 pp65–66; [developer's corrected sequence](https://discord.com/channels/876158750870863964/1409991574292795392/1557027622016516186).
 
-**Problem:** the printed step 4 includes attacking and defending AAA, while
-step 5 separately orders defending AAA to fire. Reading both literally would
-give defending AAA two volleys.
+**Correction:** both sides' Fighters and AAA resolve in step 4; each AAA fires
+once. Step 5 moves the surviving transporting aircraft to a suitable landing
+spot. It does not give defending AAA another volley.
 
-**Adopted clarification, limited to the airborne sequence in §10.6.1:**
-
-1. **Step 4:** attacking and defending fighters resolve air superiority;
-   **attacking AAA** fires here. Defending AAA does not fire in this step.
-2. **Step 5:** **defending AAA** fires here.
-3. Each regular AAA unit fires its first-round volley once, with one shot per
-   eligible opposing aircraft, up to three shots per AAA. It does not fire
-   again in the later ordinary-unit steps or subsequent rounds.
-
-This changes which side's AAA fires in each step, not the fighters' participation
-or the printed first-strike sequence. Normal land combat still uses §10.5;
-do not replace its step 5 with an airborne-specific defender-AAA step.
-
-Keep three different defenses separate:
-
-- **Movable AAA units** may attack or defend; base attack/defense is 3/3.
-- **Inherent city AA** is a separate pre-first-round airborne defense: one die
-  per attacking aircraft carrying airborne infantry, without the regular
-  three-shot cap. A hit destroys the aircraft and cargo before combat. Airborne
-  Doctrine disables this city defense, not regular AAA units.
-- **Facility-inherent AA** does not fire merely because an airborne assault
-  attacks a zone containing that facility. Its strategic-bombing/port-attack
-  defenses are different rules, not extra airborne volleys.
-
-Retain the transport/cargo casualty linkage and the printed step-5 permission
-for eligible non-transport attacking casualties to make their attack before
-removal. A destroyed transport and its airborne cargo do not get to land and
-attack. This clarification does not turn ordinary AA into first strike or
-resolve unrelated casualty-selection questions by implication.
-
-**Research provenance:** the previously reviewed
-[18 January 2023 Discord discussion](https://discord.com/channels/876158750870863964/959237427149537311/1065244552912449536)
-addresses an older airborne casualty sequence. It does not independently prove
-the correction to the current v4.3 duplicate AAA wording. Authority for the
-step-4/step-5 split above is the user's explicit ruling.
-
-**Future checks:** both sides have AAA and aircraft; each AAA fires once at its
-assigned step; zero aircraft gives zero AAA shots; surviving AAA cannot fire
-next round; city AA is separate and disabled only by the relevant doctrine;
-a facility alone adds no airborne AA; a destroyed transport loses its cargo.
+In steps 3 and 4, airborne infantry and its transporting aircraft are linked:
+selecting that casualty destroys both and counts as one casualty. Destroyed cargo
+does not land or attack.
 
 ## RCL-002: influence spending before the die roll
 
 **Status: adopted by the user, 5 October 2026.**
 
 **Sources:** RB §§15.2 and 15.4, pp104-105; CCP p3; Japan p4.
-Related old fixtures: R133, R136.
 
 **Problem:** both abilities require payment before rolling but describe the
 spending cap by reference to the original influence roll, which has not happened.
@@ -122,14 +99,11 @@ requirements and the one-attempt-per-turn limit are unchanged.
 Example: a base threshold of 3 allows spending up to 3 IPP. Spending 2 makes
 raw rolls 1-5 successful, but a raw 12 still backfires.
 
-**Future checks:** spend at the cap; reject cap+1 or insufficient funds; pay
-before seeing the roll; preserve natural-12 backfire even at a high threshold.
-
 ## RCL-003: whole-warlord alignment after foreign invasion
 
 **Status: adopted by the user, 5 October 2026.**
 
-**Sources:** RB §4.9, pp30-31. Related old fixture: R030.
+**Sources:** RB §4.9, pp30-31.
 
 **Adopted clarification:** resolve foreign-invasion alignment for each **whole
 warlord**, with one roll whenever the alignment table calls for a roll. Determine
@@ -143,181 +117,162 @@ Foreign-invasion alignment and ordinary CCP/Japanese influence retain their
 distinct triggers, eligibility, probabilities and timing; both keep the warlord
 intact. This is the adopted shared rule, not a campaign-only exception.
 
-**Future checks:** one roll for Beiping/Hopeh even when the two territories have
-different neighbors; one result for Kwangtung/Hainan even if the island lacks a
-qualifying border; a CCP neighbor at one territory and Dadao neighbor at another
-select the both-neighbor category for the whole warlord; automatic KMT alignment
-where applicable; all surviving territories and forces receive the same result.
-
 ## RCL-004: CCP Comintern Brothers, rail versus supply
 
-**Status: adopted by the user, 5 October 2026.**
+**Status: closed, 17 October 2026.**
+
+**Resolution:** the user spoke with the developers and reports that they have
+fixed the wording for the next version. This closes the issue; it is no longer
+classified as an adopted project interpretation.
 
 **Sources:** RB §15.2, p103; CCP p3 ability text and minor build chart.
-Related old fixture: R134.
 
 **Problem:** the full ability requires an undamaged railroad from CCP-possessed
 land to Soviet-possessed land during Production; the same national sheet's
 purchase notes say supply path.
 
-**Adopted clarification:** use the specific railroad condition and its placement
+**Recorded rule:** use the specific railroad condition and its placement
 restriction; a sea-only or river-only supply path does not unlock Artillery/AAA
 purchases.
 Do not confuse this Soviet-**possessed** land requirement with the separate
 income bonus's Soviet **Home Country** requirement (CCP p2).
 
-**Future checks:** qualifying rail, damaged rail, supply without rail, correct
-placement zone, and a Soviet-possessed zone that is not Soviet Home Country.
-The clarification applies to the shared rules. The ability is inactive in the
-current campaign because the USSR is excluded; directly Comintern-controlled
-Mongolia taking the USSR turn position does not supply Soviet-possessed land.
-
 ## RCL-005: what prevents a blockade?
 
-**Status: proposed reading; no new approval claimed.**
+**Status: closed, 18 October 2026.**
+
+**Resolution:** the user clarified this with the developers and reports that
+only enemy **Surface Warships** prevent a blockade under the enemy-presence
+condition. The broader naval-unit summary wording does not expand that condition
+to every enemy unit type.
 
 **Sources:** RB §9.4.6, p60 versus §13.1.6, p89.
-Related old fixture: R076.
 
 **Problem:** the detailed blockade rule excludes enemy Surface Warships from
 the sea zone; the naval-unit summary instead excludes any enemy units.
 
-**Proposal:** follow the detailed §9.4.6 condition. Enemy submarines alone do
+**Clarified rule:** follow the detailed §9.4.6 condition. Enemy submarines alone do
 not prevent a qualifying surface fleet from blockading. Preserve the fleet
 size/alliance requirements and coverage of every sea access of a shared facility.
 
-**Future checks:** enemy submarine only, enemy surface warship, and a facility
-with two sea accesses where only one is blockaded. Campaign inclusion of
-blockades is a separate decision from resolving this wording difference.
-
-## RCL-006: when does Chinese major-power evolution trigger?
-
-**Status: closed after checking, 6 October 2026. The earlier note overstated an
-implementation detail as a rule ambiguity.**
-
-**Sources:** RB §14.3.1, p101; KMT/CCP p1; RB §10.10, p73 (possession and IPP
-chart updates), §12.9, p82 (income collection). Related old fixture: R132.
-
-**Source-backed conclusion:** KMT or CCP evolves immediately once the IPP values
-of its possessed land zones total **13 or more**. A legal capture, alignment or
-influence transfer updates possession at that event's specified time; evaluate
-the threshold as that transfer resolves, including during another nation's turn.
-The trigger does not wait for income collection, the end of the current turn or
-the start of the faction's next turn. Treasury and income bonuses do not count
-toward this possessed-land threshold.
-
-No contradictory rule has been identified. Evolution changes the faction's
-abilities and automatically terminates a Chinese Truce as specified by the
-rules. The explicit exception preserves decentralized production for the
-remainder of its own turn if it evolves during that turn. Neither consequence
-delays evolution or repeats a phase already completed.
-
-Applying the ownership transfer, updating the land total, resolving evolution
-and then continuing play is implementation sequencing, not an outstanding
-user ruling. Retain this entry to prevent the false timing question recurring.
-
-**Future checks:** crossing 12 to 13 by capture and by influence; capital choice
-and factory award occur once; abilities and Chinese Truce change consistently;
-the printed same-turn production exception is preserved.
-
-## RCL-007: breaking the Chinese Truce
-
-**Status: open timing detail.**
-
-**Source:** RB §6.6, p42. Related old fixture: R041.
-
-**Problem:** the truce is broken during Combat, but the breaking player is
-allowed to move units out of shared land zones during the preceding Combat
-Movement phase. An executable sequence needs to say when the intention to break
-is committed and which separation moves are then legal.
-
-The older ledger suggests declaring the intent during Combat Movement and
-resolving the break in Combat; that remains a proposal, not a published timing
-rule or an adopted clarification. Preserve the special co-location combat and
-KMT Low Morale consequences while resolving this question.
-
-**Future checks after resolution:** separation versus a shared stack left to
-fight; the agreed declaration/commitment timing; the printed
-no-truce-after-evolution restriction.
-
-## RCL-008: ordinary diplomacy with Chinese warlords
-
-**Status: proposed exclusion; eligibility question, not a proven contradiction.**
-
-**Sources:** RB §8.8, p53; §§4.8-4.9, p30.
-Related old fixture: R064.
-
-**Question:** ordinary diplomacy targets neutral nations, whereas outsiders
-treat the warlord provinces as part of KMT. The Sinkiang example in §4.8 also
-distinguishes warlord territory from territory originally possessed by a neutral
-Minor Power.
-
-**Proposal:** independent Chinese warlords are not ordinary neutral-nation
-diplomacy targets. Their specifically defined influence/alignment mechanics
-remain available when legal. This is supported by their classification, rather
-than a newly discovered sentence explicitly banning diplomacy with warlords.
-
-**Future checks:** reject a generic diplomacy marker for a Chinese warlord;
-allow eligible ordinary neutral nations; keep CCP/Japanese influence separate.
-
 ## RCL-009: Japan-Soviet border-clash geography
 
-**Status: open for a larger map.**
+**Status: adopted by the user, 21 October 2026. The geography question is
+resolved by following Japan's national reference sheet.**
 
 **Sources:** Japan p1; RB §10.5.2, pp64-65.
-Related old fixture: R084.
 
-**Problem:** Japan's sheet names Chita, Amur and Primorsky Krai. The main rule
-describes Japan (Manchukuo) and USSR attacking across a jointly held land border.
-Would an additional Soviet-possessed border, such as incorporated Mongolia,
-qualify, or is the national sheet's list exhaustive?
+**Adopted resolution:** treat Japan's printed border-clash target list as
+exhaustive. Japanese border-clash attacks may target Soviet units only in
+**Chita, Amur and Primorsky Krai**. Soviet possession of another territory,
+including incorporated Mongolian territory, does not add that territory to
+Japan's permitted target list.
 
-Do not grant clashes at extra borders from the general sentence alone while
-this is unresolved. A campaign without a USSR participant cannot answer the
-general question merely by disabling the event.
+Retain the shared-border, unit-eligibility, single-round, no-conquest and
+Japanese-Soviet Non-Aggression Pact restrictions in §10.5.2. This resolution
+follows Japan's attack permissions; it does not create a new list of permitted
+USSR attack origins. The mechanic remains inactive in the current campaign
+because USSR is excluded.
 
-**Future checks after resolution:** named Soviet zones, additional Soviet-owned
-border zones, and the non-aggression-pact restriction.
+## RCL-010: Dadao Home Country destination for Japanese lend-lease
 
-## Closed after checking: not new official errata
+**Status: adopted by the user, 22 October 2026; pending developer clarification.**
 
-These notes prevent earlier misunderstandings from returning as open questions.
+**Sources:** Japan p4, Dadao Government; RB §15.4 p105; §12.4 p80;
+Home Country and Originally Possessed definitions, pp6-7.
 
-| Topic | Source-backed conclusion |
-| --- | --- |
-| AAA attack and facility/city distinction | Movable AAA attacks and defends (RB §13.1.4 p87). Facility AA is not an airborne defense; city AA is expressly separate (RB §10.6.1 p66, §§10.6.2/10.6.4, §13.2). The remaining duplicate-step issue is resolved for the project in RCL-001. |
-| Chinese Major strategic naval capacity | KMT/CCP p1 explicitly grant capacity 1 after evolution; this is a national exception to the generic table in RB §11.4.2 p76, not an unknown zero-versus-one choice. |
-| Japan lending to Dadao | The explicit permission in Japan p4 and RB §8.7 p52 must not be suppressed by the condensed Japan p3 table. |
-| Several tracks on one border | RB §10.6.2 p67 applies bombing damage to all railroads on the selected border. The boolean border connection does not need separately named tracks; live damage/repair state remains separate. |
-| Parenthesized Japanese Light Carriers | Japan p9's parenthesized footnote explains the `(1)` and `(2)` build-queue entries: available once at war with USA. Our earlier claim that no explanatory key existed was wrong. Whether that trigger can occur in a campaign is a scenario question. |
-| Ship queues without a starting tile | Units enter the national build queue and are placed at eligible locations; fixed construction-site markers apply to facilities (RB §§8.3.1-8.3.2 pp50-51, §12.1 p79). Ships need an eligible, supplied, beginning-of-turn-owned shipyard and capacity; Capital Ships require a Major Shipyard. No printed starting tile is needed to interpret a national ship queue, and placement is not literally unrestricted. |
-| Supposed Kamikaze trigger conflict | RB §15.4 p105 and Japan p4 use USA reaching Wartime Income. Japan p9's parenthesized build-queue footnote belongs to the Light Carrier entries, not the unparenthesized six off-board Kamikaze counters. Our earlier war-with-USA alternative for Kamikaze was a misattribution, not a genuine source conflict. |
-| One China objective versus troop award | RB §3.3 p23 has different explicit conditions for the objective and the material award at KMT surrender. Meeting the objective does not by itself award the troops. These are separate clauses, not contradictory triggers. |
-| CCP elimination versus surrender | CCP's never-surrender rule (CCP p1), the no-surviving-units end of the civil war (RB §14.3 p101), and possible revival after a KMT attack on a warlord (§4.9 p30) are distinct concepts; do not collapse them into an irreversible removed-player flag. |
+**Problem:** Japan's Dadao ability explicitly permits lend-lease to its controlled
+Dadao Government. The ordinary delivery rule requires the recipient's possessed
+Home Country as the destination. Dadao forms during play and has no originally
+possessed territories, so the ordinary Home Country definition supplies no
+destination. The aid permission itself is settled; the missing destination is
+the issue to report to the developers.
 
-## What is deliberately elsewhere
+**Adopted project ruling:** Japan may deliver lend-lease to **any land zone
+currently possessed by Dadao within Chinese Home Country**. Retain the ordinary
+supply-route, possession-timing, blockade, item and per-recipient limits. This
+settles delivery and subsequent placement of that aid; it does not redefine
+Dadao's Home Country for unrelated rules or permit aid without a real route.
+The user will report this issue to the developers. This is a user-approved
+campaign interpretation, not a reported developer ruling.
 
-- **Campaign rules:** retained tiles/nations, Mongolia's controller, convoy and
-  interdiction exclusions, MAP/blockade inclusion, Kido Butai exclusion, dates,
-  starting cash and carrier assignments. Whole-warlord alignment is the shared
-  adopted clarification RCL-003 above.
-  See the M0 campaign review.
-- **Training/accounting choices:** wealth weights, setup-only reference prices,
-  damaged/completed asset valuation, paid construction, cities and rail ownership.
-  These are not official game-rule corrections.
-- **Map-source work:** tiny corner contacts, land-map wraparound and unresolved
-  named borders, river tracing, and Tannu Tuva's ownership/control/home-country
-  treatment. See the map notes; do not call an unverified map interpretation an
-  official erratum. Excluding a tile does not certify its global-map data.
-- **Missing transcription:** exact research-chart/damaged-ship data and further
-  rail repair/ownership checks remain audit work until an actual source ambiguity
-  is demonstrated.
+## RCL-012: Chinese Truce combat and retreat
+
+**Status: closed, 22 October 2026. Third-party roles are developer-confirmed as
+reported by the user; applying the same Low Morale consequence after automatic
+termination is the user's clarification.**
+
+**Sources:** RB §0.2 p5; §6.6 p42; §10.3 p62; §10.10.1 p73; §15.7 p107;
+city/tundra limits, pp12-13.
+
+**Resolved rules:**
+
+- On CCP's or KMT's turn, the active faction attacks and the other defends,
+  regardless of land possession.
+- **Developer clarification:** when a third party triggers evolution, the
+  possessor of the shared land defends and the other Chinese faction attacks.
+- Eligible attacking minor-KMT regular Infantry and Cavalry in shared zones
+  are eliminated on their attack rolls of 10+. This applies after both voluntary
+  and automatic termination. There is no additional preliminary roll.
+  Defending KMT does not suffer Low Morale; Major-Power KMT is exempt.
+
+**Related clarification:** the
+[26 February Discord announcement](https://discord.com/channels/876158750870863964/1409991574292795392/1476578711062057104)
+reports a v4.4 amendment granting possession to the surviving faction, including
+a victorious defender. The
+[22 June discussion](https://discord.com/channels/876158750870863964/1409991574292795392/1518702751113150535)
+also identifies the voluntary breaker as attacker.
+
+## RCL-013: Applying attrition restrictions to artillery city bombing
+
+**Status: adopted by the user, 22 October 2026.**
+
+**Sources:** RB §10.5.3 p65; §10.6.2 pp66-67; §13.1.3 p86.
+
+**Already explicit:** attrition attacks require adjacency since the start of the
+Player Turn, last one combat round, allow no defending return fire, ignore terrain
+modifiers, and prohibit movement that turn. Their attack value is 2, reduced by
+fortifications. Ordinary attrition needs no clarification.
+
+**Adopted rule:** Advanced Artillery's city bombardment uses the same
+starting-adjacency and no-movement conditions as attrition: remain in the original
+zone and fire at a city adjacent since the Player Turn began. City bombardment
+still deals 1D6 strategic damage under §10.6.2 and §13.1.3; it does not use the
+attrition hit-at-2 roll against units.
+
+## RCL-014: Third-party combat after damaged-port evacuation
+
+**Status: provisionally adopted by the user, 23 October 2026; pending developer clarification.**
+
+**Sources:** RB §0.2 p5; §11.5 p78.
+
+**Question:** Japan bombs a KMT port during Japan's turn. KMT evacuates ships
+into a sea zone containing enemy CCP warships, with no Japanese ships present.
+The port rule requires combat, but the normal active-player definition assigns
+neither Chinese faction as attacker. Who attacks and who defends?
+
+**Adopted ruling:** the evacuating fleet attacks; the fleet already at sea defends.
+This is a provisional project interpretation, not a developer-confirmed rule.
+
+## RCL-015: Neutral relocation with no Friendly destination
+
+**Status: provisionally adopted by the user, 23 October 2026; pending developer clarification.**
+
+**Sources:** RB §0.3 p8; §4.5 p27; §5.1 p35; §6.6 p42; §15.4 p105; CCP reference sheet p1.
+
+**Question:** CCP has surviving units but no possessed land. Its units share KMT
+land under the Chinese Truce. KMT previously attacked Dadao; CCP did not join
+that war. Dadao later captures KMT's last land. The neutral CCP units must
+relocate to the nearest Friendly land, but none remains. CCP never surrenders. What happens to these units?
+
+**Adopted ruling:** eliminate the nonparticipating units only when no Friendly
+relocation destination exists. Otherwise use the printed nearest-Friendly-land
+relocation rule. The elimination consequence is a provisional project
+interpretation, not a developer-confirmed rule.
 
 ## Maintenance
 
-Keep the IDs stable. For a new issue, record the exact source/version, question,
-status, adopted wording (if any), authority, and a small distinguishing test case.
-Do not silently promote a proposal or a Discord answer into an official ruling.
-If a publisher clarification is verified later, link it and explain whether it
-supersedes a project interpretation. Future rule handlers/tests should cite the
-relevant RCL ID; a Markdown entry alone is not a passing implementation test.
+Keep issue IDs stable. Record sources, the rule question, resolution or remaining
+question, and the authority for any ruling. Keep implementation history and
+checks in the milestone documents. Do not promote community discussion to a
+publisher ruling without verifying its authority.

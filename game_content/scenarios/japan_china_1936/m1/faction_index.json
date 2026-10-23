@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "scenario_id": "japan_china_1936_1941",
+  "artifact_type": "scenario_faction_index",
+  "status": "bridge_identity_data_not_playable",
+  "alias_normalization": "remove_whitespace_then_casefold; preserve_punctuation_and_spelling",
+  "scope": "Original national identity and approved setup control are separate. This index does not align factions, transfer possession or implement runtime state.",
+  "factions": {
+    "ccp": {
+      "id": "ccp",
+      "display_name": "CCP",
+      "printed_name": "CCP",
+      "map_owner_alias": "CCP",
+      "aliases": [
+        "CCP"
+      ],
+      "initial_control": {
+        "controller_id": "ccp",
+        "alliance_id": "comintern",
+        "status": "independent_minor_power"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/1"
+      }
+    },
+    "japan": {
+      "id": "japan",
+      "display_name": "Japan",
+      "map_owner_alias": "Japan",
+      "aliases": [
+        "Japan"
+      ],
+      "initial_control": {
+        "alliance_id": "axis"
+      },
+      "source_record": {
+        "source_id": "japan_setup",
+        "json_pointer": "/nation"
+      }
+    },
+    "kmt": {
+      "id": "kmt",
+      "display_name": "KMT",
+      "printed_name": "KMT",
+      "map_owner_alias": "KMT",
+      "aliases": [
+        "KMT"
+      ],
+      "initial_control": {
+        "controller_id": "kmt",
+        "alliance_id": "allies",
+        "status": "independent_minor_power"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/0"
+      }
+    },
+    "mongolia": {
+      "id": "mongolia",
+      "display_name": "Mongolia",
+      "printed_name": "Mongolia",
+      "map_owner_alias": "Mongolia",
+      "aliases": [
+        "Mongolia"
+      ],
+      "initial_control": {
+        "controller_id": "comintern",
+        "alliance_id": "comintern",
+        "status": "controlled_minor_not_incorporated",
+        "source_controller_id": "ussr",
+        "turn_slot": "mongolia",
+        "source_turn_slot": "ussr",
+        "national_identity_retained": true
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/2"
+      }
+    },
+    "warlord_beiping_hopeh": {
+      "id": "warlord_beiping_hopeh",
+      "display_name": "Zhili Clique",
+      "printed_name": "Beiping and Hopeh",
+      "map_owner_alias": "Zhili Clique",
+      "aliases": [
+        "Beiping and Hopeh",
+        "Zhili Clique"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/6"
+      }
+    },
+    "warlord_kwangtung_hainan": {
+      "id": "warlord_kwangtung_hainan",
+      "display_name": "Guangxi Clique",
+      "printed_name": "Kwangtung and Hainan",
+      "map_owner_alias": "Guangxi Clique",
+      "aliases": [
+        "Guangxi Clique",
+        "Kwangtung and Hainan"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/10"
+      }
+    },
+    "warlord_sikang": {
+      "id": "warlord_sikang",
+      "display_name": "Szechwan Clique",
+      "printed_name": "Sikang",
+      "map_owner_alias": "Szechwan Clique",
+      "aliases": [
+        "Sikang",
+        "Szechwan Clique"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/8"
+      }
+    },
+    "warlord_sinkiang": {
+      "id": "warlord_sinkiang",
+      "display_name": "Sinkiang Clique",
+      "printed_name": "Sinkiang",
+      "map_owner_alias": "Sinkiang Clique",
+      "aliases": [
+        "Sinkiang",
+        "Sinkiang Clique"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/3"
+      }
+    },
+    "warlord_suiyuan": {
+      "id": "warlord_suiyuan",
+      "display_name": "Mengjiang",
+      "printed_name": "Suiyuan",
+      "map_owner_alias": "Mengjiang",
+      "aliases": [
+        "Mengjiang",
+        "Suiyuan"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/5"
+      }
+    },
+    "warlord_tibet": {
+      "id": "warlord_tibet",
+      "display_name": "Tibet",
+      "printed_name": "Tibet",
+      "map_owner_alias": "Tibet",
+      "aliases": [
+        "Tibet"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/7"
+      }
+    },
+    "warlord_tsinghai": {
+      "id": "warlord_tsinghai",
+      "display_name": "Ma Clique",
+      "printed_name": "Tsinghai",
+      "map_owner_alias": "Ma Clique",
+      "aliases": [
+        "Ma Clique",
+        "Tsinghai"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/4"
+      }
+    },
+    "warlord_yunnan": {
+      "id": "warlord_yunnan",
+      "display_name": "Yunnan Clique",
+      "printed_name": "Yunnan",
+      "map_owner_alias": "Yunnan Clique",
+      "aliases": [
+        "Yunnan",
+        "Yunnan Clique"
+      ],
+      "initial_control": {
+        "controller_id": null,
+        "alliance_id": null,
+        "status": "unaligned_uncontrolled_warlord"
+      },
+      "source_record": {
+        "source_id": "china_setup",
+        "json_pointer": "/factions/9"
+      }
+    }
+  },
+  "alias_to_id": {
+    "beipingandhopeh": "warlord_beiping_hopeh",
+    "ccp": "ccp",
+    "guangxiclique": "warlord_kwangtung_hainan",
+    "japan": "japan",
+    "kmt": "kmt",
+    "kwangtungandhainan": "warlord_kwangtung_hainan",
+    "maclique": "warlord_tsinghai",
+    "mengjiang": "warlord_suiyuan",
+    "mongolia": "mongolia",
+    "sikang": "warlord_sikang",
+    "sinkiang": "warlord_sinkiang",
+    "sinkiangclique": "warlord_sinkiang",
+    "suiyuan": "warlord_suiyuan",
+    "szechwanclique": "warlord_sikang",
+    "tibet": "warlord_tibet",
+    "tsinghai": "warlord_tsinghai",
+    "warlord_beiping_hopeh": "warlord_beiping_hopeh",
+    "warlord_kwangtung_hainan": "warlord_kwangtung_hainan",
+    "warlord_sikang": "warlord_sikang",
+    "warlord_sinkiang": "warlord_sinkiang",
+    "warlord_suiyuan": "warlord_suiyuan",
+    "warlord_tibet": "warlord_tibet",
+    "warlord_tsinghai": "warlord_tsinghai",
+    "warlord_yunnan": "warlord_yunnan",
+    "yunnan": "warlord_yunnan",
+    "yunnanclique": "warlord_yunnan",
+    "zhiliclique": "warlord_beiping_hopeh"
+  },
+  "land_original_owners": {
+    "land_china_beiping": {
+      "source_original_owner": "Zhili Clique",
+      "original_faction_id": "warlord_beiping_hopeh"
+    },
+    "land_china_hopeh": {
+      "source_original_owner": "Zhili Clique",
+      "original_faction_id": "warlord_beiping_hopeh"
+    },
+    "land_china_hunan": {
+      "source_original_owner": "KMT",
+      "original_faction_id": "kmt"
+    },
+    "land_china_kweichow": {
+      "source_original_owner": "KMT",
+      "original_faction_id": "kmt"
+    },
+    "land_china_nanking": {
+      "source_original_owner": "KMT",
+      "original_faction_id": "kmt"
+    },
+    "land_china_shantung": {
+      "source_original_owner": "KMT",
+      "original_faction_id": "kmt"
+    },
+    "land_china_shensi": {
+      "source_original_owner": "CCP",
+      "original_faction_id": "ccp"
+    },
+    "land_china_sikang": {
+      "source_original_owner": "Szechwan Clique",
+      "original_faction_id": "warlord_sikang"
+    },
+    "land_china_sinkiang": {
+      "source_original_owner": "Sinkiang Clique",
+      "original_faction_id": "warlord_sinkiang"
+    },
+    "land_china_suiyuan": {
+      "source_original_owner": "Mengjiang",
+      "original_faction_id": "warlord_suiyuan"
+    },
+    "land_china_szechwan": {
+      "source_original_owner": "KMT",
+      "original_faction_id": "kmt"
+    },
+    "land_china_tsinghai": {
+      "source_original_owner": "Ma Clique",
+      "original_faction_id": "warlord_tsinghai"
+    },
+    "land_china_yunnan": {
+      "source_original_owner": "Yunnan Clique",
+      "original_faction_id": "warlord_yunnan"
+    },
+    "land_formosa": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_hainan": {
+      "source_original_owner": "Guangxi Clique",
+      "original_faction_id": "warlord_kwangtung_hainan"
+    },
+    "land_jap_hokkaido": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_jap_honshu": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_jap_kyushu": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_jap_okinawa": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_jap_tokyo": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_korea": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_kwangtung": {
+      "source_original_owner": "Guangxi Clique",
+      "original_faction_id": "warlord_kwangtung_hainan"
+    },
+    "land_manchuria_eastern": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_manchuria_northern": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_manchuria_rehe": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_manchuria_western": {
+      "source_original_owner": "Japan",
+      "original_faction_id": "japan"
+    },
+    "land_mongolia_central_mongolia": {
+      "source_original_owner": "Mongolia",
+      "original_faction_id": "mongolia"
+    },
+    "land_mongolia_kerulen": {
+      "source_original_owner": "Mongolia",
+      "original_faction_id": "mongolia"
+    },
+    "land_mongolia_kobdo": {
+      "source_original_owner": "Mongolia",
+      "original_faction_id": "mongolia"
+    },
+    "land_mongolia_ulyassutai": {
+      "source_original_owner": "Mongolia",
+      "original_faction_id": "mongolia"
+    },
+    "land_tibet": {
+      "source_original_owner": "Tibet",
+      "original_faction_id": "warlord_tibet"
+    }
+  },
+  "sources": {
+    "theatre_map": {
+      "path": "game_content/scenarios/japan_china_1936/map.json",
+      "sha256": "27c9e9cd007dfa5e290ec816d6e1be962f50ab2a8a5b541cbc52d70bd1373670"
+    },
+    "japan_setup": {
+      "path": "game_content/scenarios/japan_china_1936/m0/japan_setup.json",
+      "sha256": "e812bbaa0c19bc2049f2aa0fae95161316c38282b06561620ff22e9ec7be288c"
+    },
+    "china_setup": {
+      "path": "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json",
+      "sha256": "6ee467595f6aad4ceab5292900eb97c0d8ab1a5d41f55719eebdc07ffb4d142d"
+    }
+  }
+}

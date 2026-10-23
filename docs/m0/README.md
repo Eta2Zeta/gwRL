@@ -1,20 +1,20 @@
 # M0 review: July 1936–July 1941 closed China campaign
 
-Updated: 6 October 2026. **User decisions recorded; M0 still has open review
-items.** This is a scenario specification, not an implemented full-rules game.
+Updated: 21 October 2026. **M0 complete: specification frozen and verified as
+`M0-2026-10-21`.** This is a scenario specification, not an implemented
+full-rules game. No campaign choices or rule-clarification questions remain open
+for M0.
 
-**Revision scope:** this README records the latest campaign decisions; the shared
+**Revision scope:** this README records the approved campaign decisions; the shared
 [rule clarification register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
-separately records unclear official rules. Together they
-supersede conflicting recommendations in the earlier M0 audit. Related rule
-notes, including the JSON interpretation notes for RCL-003/004, have been
-corrected. The setup inventories, scenario contract, manifest and extracted map
-have **not yet been fully synchronized** with this revision. They still describe the
-earlier 38-node, 103-piece scope, including FEC and Soviet control of Mongolia.
-Do not treat those older counts or pending-price fields as the approved new setup.
-The detailed audits/plan now link to the rule register but otherwise retain
-historical scope unless explicitly corrected. No engine changes or training were
-performed in this revision.
+records adopted and closed official-rule interpretations. The setup inventories,
+scenario contract, manifest, extracted map, detailed audits, milestone plan and
+data tests now agree with these decisions. Excluded FEC and convoy records remain
+as clearly labeled source evidence. The
+[frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
+records the verified files and their SHA-256 hashes. Later changes to the approved
+specification should explicitly revise this baseline. No full-rules engine or
+training was implemented in this work.
 
 ## Confirmed campaign decisions
 
@@ -59,9 +59,9 @@ performed in this revision.
   Ships still require a Major Shipyard, with supply, age and capacity checks.
 - **Score unfinished ships by the cumulative IPP already paid into them.**
   Apply the 0.1 asset coefficient to that amount. On completion, replace it
-  with the completed ship's full catalog value; never count both. Determining
-  each starting queue's numeric paid amount is source reconciliation, not an
-  outstanding choice of scoring method.
+  with the completed ship's full catalog value; never count both. Source
+  reconciliation confirms **5 IPP already paid into each starting ship**, with
+  no additional debit from the opening treasury.
 - **Use full catalog value for completed assets**, including setup/recruited
   assets. The already-agreed damage deduction remains; this is not permission
   to score a damaged asset as undamaged.
@@ -160,10 +160,9 @@ be worth **−2**; no zero floor has been added. These are disclosed consequence
 of the selected formula, not new unanswered price questions. Changing them would
 be a separate scoring adjustment.
 
-## Projected inventory after the exclusions
+## Verified retained inventory
 
-These are reconciled projections from the earlier source audit, **not a claim
-that the JSON or extracted map has already changed**.
+These counts agree across the setup data, contract, manifest and extracted map.
 
 | Group | Deployed pieces |
 | --- | ---: |
@@ -183,12 +182,12 @@ are additional to those 19; rail borders are counted separately. Aircraft count
 separately from carriers. Unlocated queue ships and off-board ability markers
 are not included in these deployed-piece totals.
 
-## Remaining campaign-specific details
+## Approved city and railway scoring
 
-**City and cross-owner rail assets** remain a scoring choice. Completed units
-already use full catalog value. The two recommendations awaiting a decision are:
+**Approved by the user, 21 October 2026.** These settle the final two campaign
+choices in this review. Completed units already use full catalog value.
 
-- **Cities:** give the city itself no extra standalone asset price. Its income
+- **Cities:** the city label has no extra standalone asset price. Its income
   still contributes to wealth, and factories, ports and other facilities in it
   still count separately. For example, a city territory with a legally
   collectable 2-IPP income rate and a factory contributes 2 plus 0.1 times the
@@ -198,13 +197,17 @@ already use full catalog value. The two recommendations awaiting a decision are:
   possessors. For example, an undamaged 2-IPP connection between Japanese and
   KMT territory would assign 1 IPP of assets to each, contributing 0.1 to each
   side's wealth. If both ends belong to one side, it receives the full value.
-  This proposal assigns score; movement, supply and repair permissions still
-  follow their own rules.
+  An uncontrolled, unaligned minor's endpoint share counts toward nobody.
+  This approved attribution assigns score; movement, supply and repair
+  permissions still follow their own rules.
 
 Mongolia scheduling, paid-construction scoring and whole-warlord alignment are
-settled above. The exact starting paid-stage amounts still need source
-reconciliation before initializing the queues; the earlier 5-IPP-per-ship
-figures remain candidates, not newly approved numeric setup values.
+settled above. **The decision-review checklist item is complete.** The
+[source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md)
+confirms the initial queue amounts: Heavy Cruiser **5 IPP paid / 5 remaining**;
+Fleet Carrier **5 paid / 10 remaining**. Both are national queues with no initial
+tile. Their already-paid total is **10 IPP**, separate from the **23 IPP** opening
+cash. Placement still requires an eligible retained shipyard.
 
 ## Shared official-rule clarifications
 
@@ -219,56 +222,86 @@ not a second set of rulings embedded in this scenario README.
   threshold, with payment before rolling and natural-12 backfire preserved.
 - **RCL-003 adopted:** one alignment roll and one result for each whole warlord,
   using the faction's qualifying neighbors across all its territories.
-- **RCL-004 adopted:** CCP Comintern Brothers requires the specified undamaged
-  railroad to Soviet-possessed land, with the stated placement restriction;
-  generic supply is insufficient. It remains inactive in this USSR-excluded
-  campaign, including when Mongolia acts at the USSR turn position.
-- **RCL-009:** Soviet border-clash geography remains open for larger scenarios;
-  this campaign removes its prerequisites.
+- **RCL-004 closed:** on 17 October 2026, the user reported that the developers
+  fixed the wording for the next version. The recorded rule requires the
+  specified undamaged railroad to Soviet-possessed land, with the stated
+  placement restriction; generic supply is insufficient. It remains inactive in
+  this USSR-excluded campaign, including when Mongolia acts at the USSR turn
+  position.
+- **RCL-009 adopted:** follow Japan's national reference sheet. Japanese
+  border-clash attacks may target Soviet units only in Chita, Amur and Primorsky
+  Krai; Soviet possession of Mongolian territory adds no Japanese target. Normal
+  clash and pact restrictions still apply. This campaign removes the mechanic's
+  prerequisites by excluding USSR.
 - **RCL-006 closed after checking:** evolution is immediate when possessed land
   totals 13+ IPP, including during another nation's turn. Income collection is
   separate; implementation sequencing is not an additional ruling to approve.
-- **RCL-005, RCL-007 and RCL-008:** blockade wording, Chinese Truce
-  breaking/separation timing and ordinary warlord diplomacy remain proposed/open.
+- **RCL-005 closed:** on 18 October 2026, the user reported the developers'
+  clarification that only enemy Surface Warships prevent a blockade under the
+  enemy-presence condition. Enemy submarines alone do not prevent one; all other
+  blockade requirements still apply.
+- **RCL-008 closed after checking:** the rulebook's nation/warlord classifications
+  exclude Chinese warlords from ordinary neutral-nation diplomacy. No new ruling
+  is needed; their special influence/alignment mechanics remain available.
+- **RCL-007 closed after checking:** §6.6 already permits separation during
+  Combat Movement, followed by breaking the truce during Combat and fighting
+  in remaining shared zones. No declaration or prior commitment to breaking the
+  truce is required during Combat Movement; the decision may be made in Combat.
+  No retroactive movement is granted. Preserve normal movement/combat rules and the special
+  KMT Low Morale consequence.
+- **The current shared-rule register has no remaining open questions.**
+  City/rail scoring is approved. Source reconciliation, scenario-data
+  synchronization, verification and the M0 freeze are complete.
 
 Future acceptance tests must check legal actions, prohibited actions and phase
 ordering against the adopted interpretation. These are implementation tasks,
 not additional tests the user must write. Documentation does not claim that
 those handlers or tests already exist.
 
-## Earlier audit deliverables and verification status
+## Final deliverables and verification
 
-These remain useful source evidence, but **their campaign applicability and
-pending decisions must be updated to match this README before M0 is frozen**.
-Their original source transcriptions should not be destroyed just because this
-smaller scenario excludes a faction or system.
+The following artifacts reflect the frozen campaign. Original source
+transcriptions for excluded factions and systems remain separately labeled;
+they do not activate those mechanics in this scenario.
 
 | File | Purpose / revision status |
 | --- | --- |
-| [Scenario contract](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/scenario_contract.json) | Earlier machine-readable contract; exclusions, values, carrier allocation and pending items need synchronization |
-| [Japan setup data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/japan_setup.json) / [audit](/Users/home/Desktop/gwRL/docs/m0/japan_setup_audit.md) | Source units, factories and queues; the missing-price, USA-carrier and attachment questions are resolved above |
-| [China/minor setup data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/china_minor_setup.json) / [audit](/Users/home/Desktop/gwRL/docs/m0/china_minor_setup_audit.md) | Earlier inventory includes FEC and Soviet-controlled Mongolia; preserve the user owner-name mappings |
-| [Core rules ledger](/Users/home/Desktop/gwRL/docs/m0/core_rules_ledger.md) | Source-linked rule coverage; disable excluded-system requirements for this profile |
-| [Asset price audit](/Users/home/Desktop/gwRL/docs/m0/asset_price_audit.md) | Published catalog/repair costs; the two user-supplied reference values are recorded above |
+| [Scenario contract](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/scenario_contract.json) | Frozen machine-readable scope, scoring, accounts and decisions; no pending decisions |
+| [Japan setup data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/japan_setup.json) / [audit](/Users/home/Desktop/gwRL/docs/m0/japan_setup_audit.md) | 48 deployed units, three factories, carrier assignments, setup-only values and two reconciled national queues |
+| [China/minor setup data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/china_minor_setup.json) / [audit](/Users/home/Desktop/gwRL/docs/m0/china_minor_setup_audit.md) | 51 retained units, direct Comintern control of Mongolia, preserved owner names and separately excluded FEC records |
+| [Core rules ledger](/Users/home/Desktop/gwRL/docs/m0/core_rules_ledger.md) | Source-linked coverage and campaign applicability, including the settled clarification register |
+| [Asset price audit](/Users/home/Desktop/gwRL/docs/m0/asset_price_audit.md) | Published catalog/repair costs, confirmed setup-only values and city/rail scoring |
 | [Convoy audit](/Users/home/Desktop/gwRL/docs/m0/convoy_audit.md) / [data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/convoy_audit.json) | Reference only for a future expanded profile; no longer required for this campaign |
-| [Manifest](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/manifest.json) / [M0 data tests](/Users/home/Desktop/gwRL/tests/test_m0_spec.py) | Still target the earlier scope; update and regenerate before claiming the revised setup is verified |
-| [Full milestone plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) | Earlier dependency plan; convoy/Soviet/FEC requirements are superseded here |
+| [Manifest](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/manifest.json) / [extracted map](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/map.json) | 37 nodes, 19 static facilities, no active convoy lines; deterministic extraction from the reviewed world map |
+| [Source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md) / [catalog source checks](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json) | Queue payments, research chart and rule/price source checks, with later catalog work identified |
+| [M0 data tests](/Users/home/Desktop/gwRL/tests/test_m0_spec.py) | Verified setup, scope, provenance, accounts, queues, carrier assignments, scoring and exclusions |
+| [Full milestone plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) | M0 closed; subsequent state, catalog and rule implementation work remains |
+| [Frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json) | Versioned file hashes and verification record for this completed M0 specification |
 
 The original setup audit inspected embedded setup-table images as well as text;
 row-level citations and PDF hashes are in the JSON. It inherited geography from
 the earlier map audit rather than independently re-tracing every border.
 
-The original M0 batch passed **72 Python tests, including 15 M0 data tests**.
-That historical result validates the earlier data snapshot, not the new scope
-or future game mechanics. This documentation-only revision does not certify the
-unsynchronized scenario files or execute training.
+The final verification passes **all 106 Python tests**, including the revised
+M0 and map-extraction checks:
+
+```sh
+./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
+```
+
+The extracted map is reproducible, source hashes match, and `git diff --check`
+passes. This verifies the data and specification boundary. Shared engine state,
+the complete executable unit/damage catalog and rule handlers remain later
+milestone work; these checks do not certify full-game play or training readiness.
 
 - [x] Source setup and rule/price audits delivered.
 - [x] Latest exclusions, preserved owner names, ship values, carrier setup,
-  Mongolia timing, paid-construction scoring and adopted RCL-003/004 recorded.
-- [x] Answered questions replaced with decisions; remaining choices explained above.
-- [ ] Settle the remaining campaign choices and affected rule interpretations.
-- [ ] Synchronize the contract, setup data, manifest, extracted map, ledgers, plan
-  and data tests; then re-run the short verification suite.
-- [ ] Freeze the approved M0 contract before proceeding to the affected shared
-  state/catalog and rule implementations. No full-rules training is ready yet.
+  Mongolia timing, paid-construction scoring, adopted RCL-003 and closed RCL-004
+  recorded.
+- [x] Answered questions replaced with decisions and source reconciliation completed.
+- [x] Settle the remaining campaign choices and affected rule interpretations
+  (completed 21 October 2026, including city and railway scoring).
+- [x] Synchronize the contract, setup data, manifest, extracted map, ledgers, plan
+  and data tests; pass the complete Python verification suite.
+- [x] Freeze the approved M0 contract as `M0-2026-10-21` with a hashed baseline.
+  No additional user action is needed to finish M0.

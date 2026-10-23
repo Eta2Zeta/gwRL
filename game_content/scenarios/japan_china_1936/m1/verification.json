@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "milestone": "M1",
+  "version": "M1-2026-10-21",
+  "scenario_id": "japan_china_1936_1941",
+  "status": "complete_static_map_and_identity_bridge_not_playable",
+  "verified_on": "2026-10-21",
+  "scope": "World-to-theatre projection and canonical faction identity bridge. Does not certify mutable full-rules state, movement, supply, production, combat or training.",
+  "acceptance_review": "all_m1_criteria_met_no_user_action_required",
+  "inventory": {
+    "map_nodes": 37,
+    "land_nodes": 31,
+    "internal_directed_edges": 160,
+    "canonical_map_facilities": 19,
+    "boundary_cuts": 47,
+    "active_convoy_lines": 0,
+    "canonical_factions": 12,
+    "normalized_aliases": 27
+  },
+  "verification": {
+    "python_tests": 119,
+    "test_command": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "focused_bridge_feature_identity_tests": 52,
+    "focused_command": "./.venv/bin/python -m unittest tests.test_theatre_extractor tests.test_theatre_scenario tests.test_world_map_features tests.test_scenario_factions",
+    "new_identity_tests": 13,
+    "temporary_map_regeneration_byte_identical": true,
+    "temporary_faction_index_regeneration_byte_identical": true,
+    "source_hashes_match": true,
+    "diff_check_command": "git diff --check",
+    "independent_review": "no_blockers"
+  },
+  "m0_preservation": {
+    "historical_baseline": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+    "approved_specification_unchanged": true,
+    "unchanged_frozen_files": [
+      "docs/m0/README.md",
+      "docs/m0/source_reconciliation.md",
+      "docs/m0/core_rules_ledger.md",
+      "docs/m0/japan_setup_audit.md",
+      "docs/m0/china_minor_setup_audit.md",
+      "docs/m0/asset_price_audit.md",
+      "docs/m0/convoy_audit.md",
+      "game_content/README.md",
+      "game_content/rules/clarifications.md",
+      "game_content/scenarios/japan_china_1936/README.md",
+      "game_content/scenarios/japan_china_1936/manifest.json",
+      "game_content/scenarios/japan_china_1936/map.json",
+      "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+      "game_content/scenarios/japan_china_1936/m0/japan_setup.json",
+      "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json",
+      "game_content/scenarios/japan_china_1936/m0/convoy_audit.json",
+      "game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json",
+      "tools/build_theatre_scenario.py",
+      "tests/test_m0_spec.py",
+      "tests/test_theatre_scenario.py",
+      "tests/test_theatre_extractor.py"
+    ],
+    "progress_document_updates": [
+      {
+        "path": "docs/plans/japan_china_full_rules_plan.md",
+        "m0_freeze_sha256": "80e0a157cd20f16e7e9f01820c97afd8db125f7f1522e67f10de57d0008931be",
+        "current_sha256": "3304b08dbf5c7d9f7441c832122a09740fefd9dedbd44a96baa618b67479a711",
+        "reason": "M1 completion and acceptance evidence added; approved M0 scenario specification unchanged."
+      }
+    ],
+    "source_world_map_unchanged": true
+  },
+  "source_unknowns": {
+    "preserved": [
+      "rail_region_memberships",
+      "navigable_river_routes"
+    ],
+    "meaning": "Projection retains explicit source uncertainty. No routing behavior is inferred by M1."
+  },
+  "file_sha256": {
+    "docs/m1/README.md": "052505e5d5fc0997a1e155f5f6e6900cb8fccf262dda56eff85d4663ae1c1634",
+    "docs/plans/japan_china_full_rules_plan.md": "3304b08dbf5c7d9f7441c832122a09740fefd9dedbd44a96baa618b67479a711",
+    "tools/build_theatre_scenario.py": "850cfc5bfe378e22d5e99d93bea60e299f08157aae6aa6db98a6ce508d460170",
+    "tools/world_map_features.py": "0e51d7d0c74460c46b03efcbced68c84ea102e6fd2fc360ff6822cde81997ba2",
+    "tools/scenario_factions.py": "fc89d81c7ba42f5fd878518e3d2f444106dd4691a3d2556e00edc324a7a29c87",
+    "tests/test_theatre_extractor.py": "aff623d3f2d109becb0a72d6c338223fd03f3a9d746151de758e2d9daffdebcc",
+    "tests/test_theatre_scenario.py": "b812800223007f29ced90c1a9309f700df6bac8e94cf5bf502312070d7322697",
+    "tests/test_world_map_features.py": "3a9427e34be6c0b10e161f41b7039e8b0d8b5a1cf99f3bd015e538025c581784",
+    "tests/test_scenario_factions.py": "c6222e365a414032c870d9e7bbd25af57a80382440c490b51af1a35e054bdd8a",
+    "game_content/scenarios/japan_china_1936/manifest.json": "57d35100b04d00682f1cd31713492278dcc75372272a0062f667877bc081f4b0",
+    "game_content/scenarios/japan_china_1936/map.json": "27c9e9cd007dfa5e290ec816d6e1be962f50ab2a8a5b541cbc52d70bd1373670",
+    "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2",
+    "game_content/scenarios/japan_china_1936/m1/faction_index.json": "1cb2e77200703bc0fbe73ec582a2d2bfb0693ae649119db15052074e593b245a"
+  }
+}

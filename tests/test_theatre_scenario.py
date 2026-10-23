@@ -32,7 +32,7 @@ EXPECTED_LAND_IDS = {
 } | {
     f"land_manchuria_{name}" for name in ("northern", "western", "eastern", "rehe")
 } | {
-    f"land_{name}" for name in ("tibet", "kwangtung", "hainan", "formosa", "hong_kong", "korea")
+    f"land_{name}" for name in ("tibet", "kwangtung", "hainan", "formosa", "korea")
 } | {
     f"land_jap_{name}" for name in ("hokkaido", "honshu", "tokyo", "kyushu", "okinawa")
 }
@@ -83,16 +83,16 @@ class TheatreScenarioIntegrationTests(unittest.TestCase):
         cls.source_edges = indexed_edges(cls.source["nodes"])
         cls.scenario_edges = indexed_edges(cls.scenario["nodes"])
 
-    def test_manifest_is_exactly_the_requested_closed_38_tile_theatre(self):
+    def test_manifest_is_exactly_the_approved_closed_37_tile_theatre(self):
         requested = self.manifest["included_node_ids"]
-        self.assertEqual(len(EXPECTED_LAND_IDS), 32)
-        self.assertEqual(len(EXPECTED_IDS), 38)
-        self.assertEqual(len(requested), 38)
+        self.assertEqual(len(EXPECTED_LAND_IDS), 31)
+        self.assertEqual(len(EXPECTED_IDS), 37)
+        self.assertEqual(len(requested), 37)
         self.assertEqual(set(requested), EXPECTED_IDS)
         self.assertEqual(set(self.scenario["nodes"]), EXPECTED_IDS)
         self.assertEqual(self.manifest["boundary_policy"], "closed")
         self.assertEqual(self.scenario["_meta"]["boundary_policy"], "closed")
-        self.assertEqual(self.scenario["_meta"]["extracted_node_count"], 38)
+        self.assertEqual(self.scenario["_meta"]["extracted_node_count"], 37)
         self.assertEqual(
             {node_id for node_id, node in self.scenario["nodes"].items() if node["type"] == "sea"},
             EXPECTED_SEA_IDS,
@@ -106,7 +106,7 @@ class TheatreScenarioIntegrationTests(unittest.TestCase):
         objective = self.manifest["wealth_objective"]
         self.assertEqual(objective["status"], "planned_not_implemented")
         self.assertEqual(objective["income_definition"], "current_income_per_turn_rate_not_cumulative_collections")
-        self.assertEqual(objective["completed_asset_valuation"], "purchase_price_minus_remaining_repair_price")
+        self.assertEqual(objective["completed_asset_valuation"], "undiscounted_catalog_price_minus_remaining_repair_price")
         self.assertTrue(objective["include_setup_asset_value"])
         self.assertEqual(objective["component_weights"], {
             "income_rate": 1,
@@ -115,8 +115,50 @@ class TheatreScenarioIntegrationTests(unittest.TestCase):
             "treasury": 0.1,
             "paid_construction_value": 0.1,
         })
-        self.assertTrue(objective["interpretations"])
+        self.assertEqual(objective["standalone_city_asset_value_ipp"], 0)
+        self.assertTrue(objective["railway_valuation"]["count_once"])
+        self.assertEqual(objective["railway_valuation"]["endpoint_owner_share"], 0.5)
+        self.assertEqual(objective["open_decisions"], [])
+        specification = self.manifest["m0_specification"]
+        self.assertIn(specification["status"], {
+            "synchronized_pending_verification_not_playable", "frozen_specification_not_playable",
+        })
+        self.assertEqual(specification["starting_treasury_ipp"], {"japan": 15, "kmt": 6, "ccp": 2})
+        self.assertEqual(specification["inventory"], {
+            "deployed_units": 99, "additional_setup_factories": 3,
+            "unique_retained_map_facilities": 19, "national_queue_ships_not_deployed": 2,
+        })
+        self.assertEqual(self.manifest["campaign"]["national_turn_order"], ["ccp", "mongolia", "japan", "kmt"])
         self.assertEqual(self.scenario["_meta"]["scenario_manifest"]["wealth_objective"], objective)
+
+    def test_hong_kong_is_excluded_and_p41_remains_without_deleting_world_data(self):
+        self.assertIn("land_hong_kong", self.source["nodes"])
+        self.assertNotIn("land_hong_kong", self.scenario["nodes"])
+        self.assertIn("sea_p41", self.scenario["nodes"])
+        self.assertIn(
+            {"source_id": "sea_p41", "excluded_neighbor_id": "land_hong_kong"},
+            self.scenario["_meta"]["boundary_cuts"],
+        )
+
+    def test_campaign_disables_convoys_even_when_a_complete_line_is_local(self):
+        self.assertIn("convoy_lines", self.manifest["excluded_feature_layers"])
+        self.assertIn("convoys", self.manifest["campaign_mechanics"]["excluded"])
+        self.assertIn("interdiction", self.manifest["campaign_mechanics"]["excluded"])
+        self.assertIn("kido_butai", self.manifest["campaign_mechanics"]["excluded"])
+        self.assertIn("blockades", self.manifest["campaign_mechanics"]["retained"])
+        self.assertIn("maritime_air_patrol", self.manifest["campaign_mechanics"]["retained"])
+        self.assertEqual(self.scenario["convoy_lines"], [])
+        local_line = next(line for line in self.source["convoy_lines"] if line["id"] == "convoy_nagasaki_line")
+        self.assertTrue(set(local_line["sea_zone_ids"]) <= EXPECTED_IDS)
+        exclusion = next(row for row in self.scenario["_meta"]["feature_exclusions"] if row["layer"] == "convoy_lines")
+        self.assertIn(local_line["id"], exclusion["excluded_feature_ids"])
+        self.assertEqual(exclusion["reason"], "disabled_by_scenario_manifest")
+        # Other reviewed geographic layers remain a faithful projection.
+        generic_manifest = copy.deepcopy(self.manifest)
+        generic_manifest.pop("excluded_feature_layers")
+        generic = builder.extract_document(self.source, generic_manifest)
+        for layer in ("facilities", "passages", "exceptional_routes", "narrow_crossings", "coast_restrictions", "rail_geography"):
+            self.assertEqual(self.scenario[layer], generic[layer])
 
     def test_tannu_tuva_is_excluded_without_deleting_it_from_the_world_map(self):
         excluded_id = "land_mongolia_tannu_tuva"

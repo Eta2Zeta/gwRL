@@ -1,96 +1,386 @@
 {
   "schema_version": 1,
   "scenario_id": "japan_china_1936_1941",
-  "status": "m0_audit_ready_pending_decisions_not_playable",
+  "status": "m0_frozen_specification_not_playable",
   "scope": "Specification and source-audit data only. No engine state, reward evaluator, search or training is implemented here.",
-  "setup_files": ["japan_setup.json", "china_minor_setup.json"],
-  "convoy_audit_file": "convoy_audit.json",
+  "setup_files": [
+    "japan_setup.json",
+    "china_minor_setup.json"
+  ],
   "review_document": "docs/m0/README.md",
-  "calendar": {"start": "1936-07", "end": "1941-07", "calendar_rounds": 11, "terminal_timing": "after_complete_july_1941_round", "early_terminal_rule": "none_selected"},
+  "decision_review": {
+    "status": "complete",
+    "completed_on": "2026-10-21",
+    "remaining_work": []
+  },
+  "calendar": {
+    "start": "1936-07",
+    "end": "1941-07",
+    "calendar_rounds": 11,
+    "terminal_timing": "after_complete_july_1941_round",
+    "early_terminal_rule": "none_selected"
+  },
   "boundary": {
     "policy": "closed",
-    "selected_node_count": 38,
+    "selected_node_count": 37,
     "off_map_starting_pieces": "omit_without_relocation",
     "external_events_income_supply_reinforcements": "none",
     "absent_capitals": "not_captured_or_surrendered_merely_because_excluded",
-    "logical_controllers": "Retain USSR for Mongolia and British Commonwealth for FEC diplomacy without adding outside territories, units, income or extra turns beyond the five projected national slots."
+    "logical_controllers": "No off-map USSR or Commonwealth participant is created. Mongolia is directly controlled by the Comintern player and retains its separate identity."
   },
-  "agents": ["axis", "allies", "comintern"],
-  "national_turn_order": [
-    {"slot": "ccp", "agent": "comintern"},
-    {"slot": "ussr", "agent": "comintern", "initial_local_participant": "mongolia"},
-    {"slot": "japan", "agent": "axis"},
-    {"slot": "british_commonwealth", "agent": "allies", "initial_local_participant": "fec"},
-    {"slot": "kmt", "agent": "allies"}
+  "agents": [
+    "axis",
+    "allies",
+    "comintern"
   ],
-  "turn_source": {"path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf", "pdf_page": 43, "section": "7.1"},
+  "national_turn_order": [
+    {
+      "slot": "ccp",
+      "agent": "comintern"
+    },
+    {
+      "slot": "mongolia",
+      "agent": "comintern",
+      "source_turn_slot": "ussr",
+      "timing": "normal_ussr_position_and_phases_for_mongolia"
+    },
+    {
+      "slot": "japan",
+      "agent": "axis"
+    },
+    {
+      "slot": "kmt",
+      "agent": "allies"
+    }
+  ],
+  "turn_source": {
+    "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+    "pdf_page": 43,
+    "section": "7.1"
+  },
   "politics": {
-    "initial_chinese_civil_war": ["kmt", "ccp"],
+    "initial_chinese_civil_war": [
+      "kmt",
+      "ccp"
+    ],
     "initial_japan_at_war": false,
     "initial_chinese_truce": false,
-    "mongolia": {"controller": "ussr", "agent": "comintern", "incorporated_into_ussr": false, "collects_income": false},
-    "warlords": {"faction_count": 8, "initial_controller": null, "initial_wealth_agent": null},
+    "mongolia": {
+      "controller": "comintern",
+      "agent": "comintern",
+      "national_identity": "mongolia",
+      "incorporated_into_ussr": false,
+      "soviet_alignment_enabled": false,
+      "collects_income": false,
+      "turn_slot": "mongolia",
+      "source_turn_slot": "ussr",
+      "authority": "user_confirmed"
+    },
+    "warlords": {
+      "faction_count": 8,
+      "initial_controller": null,
+      "initial_wealth_agent": null
+    },
     "alliance_labels": "Scoring and decision routing do not declare war, incorporate minors, merge national accounts, permit joint attacks, or bypass the Chinese Truce."
   },
   "starting_accounts": {
     "authority": "User authorized theatre-adjusted starting treasury; exact capped-local-base formula is a documented scenario derivation, not an official alternate setup.",
     "formula": "For independent national accounts: min(official starting IPP, retained directly possessed original land printed IPP). Controlled and unaligned minors start with zero treasury.",
     "national_accounts": [
-      {"nation": "japan", "map_owner": "Japan", "agent": "axis", "official_starting_ipp": 16, "retained_direct_land_ipp": 15, "treasury_ipp": 15, "source": {"path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf", "pdf_page": 1}},
-      {"nation": "kmt", "map_owner": "KMT", "agent": "allies", "official_starting_ipp": 6, "retained_direct_land_ipp": 6, "treasury_ipp": 6, "source": {"path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf", "pdf_page": 1}},
-      {"nation": "ccp", "map_owner": "CCP", "agent": "comintern", "official_starting_ipp": 2, "retained_direct_land_ipp": 2, "treasury_ipp": 2, "source": {"path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf", "pdf_page": 1}},
-      {"nation": "fec", "map_owner": "FEC", "agent": "allies", "official_starting_ipp": 5, "retained_direct_land_ipp": 2, "treasury_ipp": 2, "source": {"path": "game_content/rules/GW36 - NRS - FEC v4.3.pdf", "pdf_page": 1}}
+      {
+        "nation": "japan",
+        "map_owner": "Japan",
+        "agent": "axis",
+        "official_starting_ipp": 16,
+        "retained_direct_land_ipp": 15,
+        "treasury_ipp": 15,
+        "source": {
+          "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+          "pdf_page": 1
+        }
+      },
+      {
+        "nation": "kmt",
+        "map_owner": "KMT",
+        "agent": "allies",
+        "official_starting_ipp": 6,
+        "retained_direct_land_ipp": 6,
+        "treasury_ipp": 6,
+        "source": {
+          "path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+          "pdf_page": 1
+        }
+      },
+      {
+        "nation": "ccp",
+        "map_owner": "CCP",
+        "agent": "comintern",
+        "official_starting_ipp": 2,
+        "retained_direct_land_ipp": 2,
+        "treasury_ipp": 2,
+        "source": {
+          "path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf",
+          "pdf_page": 1
+        }
+      }
     ],
     "controlled_minor_treasury_ipp": 0,
     "unaligned_minor_treasury_ipp": 0,
-    "local_ussr_initial_treasury_ipp": 0,
-    "income_not_cash": "Cash adjustment is not a war declaration or a full-production flag. Current income is the legally collectable recurring rate, including reachable modifiers, not the sum of printed IPP of every controlled minor.",
-    "fec_income_profile_status": "proposed_local_cap_pending_political_contract",
-    "fec_income_profile_proposal": "Start the local rate at 2 and cap peacetime local production at retained eligible land income; keep global full-production and war-trigger concepts separate. Do not import the other 12 printed IPP or manufacture a Home Country supply path."
+    "income_not_cash": "Cash adjustment is not a war declaration or a full-production flag. Current income is the legally collectable recurring rate, including reachable modifiers, not the sum of printed IPP of every controlled minor."
   },
   "wealth": {
-    "weights": {"income_rate": 1, "unit_value": 0.1, "infrastructure_value": 0.1, "treasury": 0.1, "paid_construction_value": 0.1},
+    "weights": {
+      "income_rate": 1,
+      "unit_value": 0.1,
+      "infrastructure_value": 0.1,
+      "treasury": 0.1,
+      "paid_construction_value": 0.1
+    },
     "comparison": "own_wealth_minus_combined_other_two_sides",
     "income_definition": "current_legally_collectable_income_per_turn_rate",
-    "completed_asset_value": "purchase_price_minus_remaining_repair_price",
+    "completed_asset_value": "undiscounted_catalog_price_minus_remaining_repair_price",
     "include_setup_assets": true,
     "minor_attribution": "legally_controlled_or_aligned_to_controlling_alliance_uncontrolled_unaligned_to_nobody",
     "minor_attribution_authority": "user_confirmed",
-    "cash_and_construction_weight_authority": "explicit_interpretation_of_asset_weight",
-    "completed_price_basis": {"status": "proposed", "value": "undiscounted_catalog_price", "note": "Keeps setup and free recruited units comparable; actual purchase discounts still change payments. User review needed before reward implementation."},
+    "cash_and_construction_weight_authority": "recorded_user_approved_scenario_interpretation",
+    "completed_price_basis": {
+      "status": "user_confirmed",
+      "value": "undiscounted_catalog_price",
+      "note": "Approved completed-asset policy recorded in the M0 README: setup, recruited and purchased units use full catalog value, subject to the existing remaining-repair-price deduction. Actual purchase discounts still change payments."
+    },
     "minimum_surviving_asset_value": null,
     "free_capital_ship_repair": "Deducts zero IPP under the literal formula; do not invent a damage discount.",
     "negative_facility_value": "Possible under literal formula: Major Factory price18 minus repair20 equals -2. Null minimum means no clamp, not zero.",
-    "standalone_city_asset_value": {"status": "proposed", "value_ipp": 0, "note": "City is not a purchasable facility; count its current income and distinct facilities, not a second city-capital asset."},
+    "standalone_city_asset_value": {
+      "status": "user_confirmed",
+      "approved_on": "2026-10-21",
+      "value_ipp": 0,
+      "note": "The city label has no additional asset price. Count its legally collectable current income and distinct facilities."
+    },
     "deduplication": "One physical facility ID or undirected rail border is one asset. Never count both paid construction and its completed replacement.",
-    "cross_owner_rail_attribution": {"status": "proposed", "rule": "Half of one undirected border asset to each endpoint possessor; same-alliance endpoints aggregate once. Uncontrolled minor shares count toward nobody. This is scoring only, not control or repair permission."},
+    "cross_owner_rail_attribution": {
+      "status": "user_confirmed",
+      "approved_on": "2026-10-21",
+      "rule": "Half of one undirected border asset to each endpoint possessor; same-alliance endpoints aggregate once. Uncontrolled, unaligned minor shares count toward nobody. This is scoring only, not control or repair permission."
+    },
     "terminal_reward": "score_once_after_complete_final_round",
-    "dense_reward_shaping": "not_selected"
+    "dense_reward_shaping": "not_selected",
+    "paid_construction_definition": "cumulative_already_paid_ipp; replace with completed catalog asset value on completion; never count both"
   },
-  "unpriced_setup_types": [
-    {"type": "torpedo_boat_destroyer", "count": 2, "valuation_ipp_per_piece": null, "purchasable": false, "by_nation": {"japan": 2}, "source": {"path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf", "pdf_page": 89, "section": "13.1.6"}},
-    {"type": "coastal_submarine", "count": 3, "valuation_ipp_per_piece": null, "purchasable": false, "by_nation": {"japan": 2, "fec": 1}, "source": {"path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf", "pdf_page": 91, "section": "13.1.6"}}
-  ],
-  "facility_type_aliases": {"airfield": "airbase"},
-  "inventory": {"deployed_units": 103, "japan_units": 48, "other_units": 55, "additional_setup_factories": 3, "unique_retained_map_facilities": 21, "unlocated_national_queue_ships_not_deployed": 2},
+  "facility_type_aliases": {
+    "airfield": "airbase"
+  },
+  "inventory": {
+    "deployed_units": 99,
+    "japan_units": 48,
+    "other_units": 51,
+    "additional_setup_factories": 3,
+    "unique_retained_map_facilities": 19,
+    "paid_starting_construction_ipp": 10,
+    "units_by_group": {
+      "japan": 48,
+      "kmt": 12,
+      "ccp": 5,
+      "eight_warlords": 32,
+      "mongolia": 2
+    },
+    "national_queue_ships_not_deployed": 2
+  },
   "rule_reachability": [
-    {"rule": "convoy_raiding", "status": "conditional", "reason": "Audited Nagasaki Line is fully retained: Rehe-P14-P15-Kyushu, one shared 5-IPP loss cap. Tokyo Line crosses excluded P34 and terminates in excluded P50, so its fragments are omitted by closed-profile policy. Convoy metadata is audited here but canonical map projection and gameplay remain unimplemented."},
-    {"rule": "ccp_plus_two_soviet_income_bonus", "status": "inactive", "reason": "Requires Soviet-possessed Home Country endpoint, none of which is in the theatre."},
-    {"rule": "ccp_comintern_brothers_artillery_aaa_purchase", "status": "conditional", "reason": "Specific ability requires rail to Soviet-possessed land, not Home Country. Mongolia could become Soviet-possessed after alignment; supply-path shorthand requires an explicit ruling."},
-    {"rule": "kmt_burma_road_income_and_burma_road_purchase_gate", "status": "inactive", "reason": "Burma endpoint outside closed map; do not infer all KMT artillery availability is absent after Major-Power evolution."},
-    {"rule": "japan_surprise_attack_and_allies_major_war_triggers", "status": "conditional", "reason": "FEC Hong Kong and its fleet remain; KMT can evolve. Absence of USA does not exclude war with all Allied Major Powers."},
-    {"rule": "japan_kido_butai", "status": "conditional_pending_projection_ruling", "reason": "Allies-Major war is reachable, but Pacific-wide fleet comparison must have an explicit closed-theatre evaluation convention."},
-    {"rule": "japan_kamikaze_and_us_oil_trade", "status": "inactive", "reason": "USA and required outside states absent; no synthetic US war or trade schedule."},
-    {"rule": "fec_militia_and_colonial_infantry", "status": "conditional", "reason": "Special placement can bypass factories in eligible Hong Kong; absence of Calcutta is not capture or surrender."}
+    {
+      "rule": "convoy_raiding",
+      "status": "out_of_scope",
+      "reason": "User excludes all convoys and convoy-raiding/loss/escort mechanics. Geographically local routes do not activate them; convoy audit is reference-only."
+    },
+    {
+      "rule": "ccp_plus_two_soviet_income_bonus",
+      "status": "inactive",
+      "reason": "USSR is excluded. Mongolia is never Soviet-possessed in this profile."
+    },
+    {
+      "rule": "ccp_comintern_brothers_artillery_aaa_purchase",
+      "status": "inactive",
+      "reason": "RCL-004 is resolved; the railroad rule requires Soviet-possessed land. USSR is excluded, and Mongolia direct Comintern control does not satisfy that condition."
+    },
+    {
+      "rule": "kmt_burma_road_income_and_burma_road_purchase_gate",
+      "status": "inactive",
+      "reason": "Burma endpoint outside closed map; do not infer all KMT artillery availability is absent after Major-Power evolution."
+    },
+    {
+      "rule": "japan_surprise_attack_and_allies_major_war_triggers",
+      "status": "conditional",
+      "reason": "FEC is excluded, but KMT may evolve into an Allied Major Power. Evaluate ordinary national triggers against retained legal participants."
+    },
+    {
+      "rule": "japan_kido_butai",
+      "status": "out_of_scope",
+      "reason": "Explicit user exclusion; no Pacific-wide fleet-comparison convention is needed."
+    },
+    {
+      "rule": "japan_kamikaze_and_us_oil_trade",
+      "status": "inactive",
+      "reason": "USA and required outside states absent; no synthetic US war or trade schedule."
+    },
+    {
+      "rule": "fec_militia_and_colonial_infantry",
+      "status": "out_of_scope",
+      "reason": "FEC and Hong Kong are excluded; no account, production, diplomacy or turn slot remains."
+    },
+    {
+      "rule": "interdiction",
+      "status": "out_of_scope",
+      "reason": "Explicit user exclusion across supply, lend-lease and strategic movement."
+    },
+    {
+      "rule": "blockades",
+      "status": "conditional",
+      "reason": "Retained ordinary naval mechanic. RCL-005 resolves the enemy-presence condition to enemy Surface Warships only."
+    },
+    {
+      "rule": "maritime_air_patrol",
+      "status": "conditional",
+      "reason": "Retained patrol, movement and combat permissions; excluded convoy/interdiction effects remain disabled."
+    },
+    {
+      "rule": "japan_soviet_border_clashes",
+      "status": "inactive",
+      "reason": "RCL-009 follows Japan NRS targets Chita/Amur/Primorsky Krai; USSR and these target territories are absent."
+    }
   ],
-  "pending_decisions": [
-    {"id": "unpriced_setup_values", "gate": "wealth_evaluator", "issue": "User to provide the two valuation-only prices above."},
-    {"id": "japan_national_queue_scope", "gate": "initial_state", "issue": "Two definite national queue ships have no printed location. Strict included-tile setup does not establish their theatre inclusion; recommend excluding unlocated queues unless explicitly admitted."},
-    {"id": "japan_light_carrier_annotations", "gate": "initial_state_queue_policy", "issue": "Parenthesized (1)/(2) entries do not reconcile as extra Light Carriers with the printed total. Do not instantiate them without clarification."},
-    {"id": "japan_p15_carrier_attachment", "gate": "initial_state", "proposal": "Let Axis choose legal aircraft-to-carrier attachment at setup; no extra turn, movement or pieces."},
-    {"id": "wealth_price_and_rail_conventions", "gate": "wealth_evaluator", "issue": "Review proposed catalog-price basis, city exclusion and split attribution of cross-owner rail assets; retain literal damage formula unless changed."},
-    {"id": "fec_peacetime_income_projection", "gate": "economy", "issue": "Review proposed local income cap without treating starting cash as full global production."},
-    {"id": "political_and_combat_source_conflicts", "gate": "applicable_rule_handlers", "issue": "RCL-001 through RCL-004 are adopted in game_content/rules/clarifications.md: airborne AAA sequence, influence spending cap, one alignment roll per whole warlord, and the specific CCP undamaged-railroad requirement. RCL-006 is closed after source checking: evolution is immediate when possessed land totals 13+ IPP, without waiting for income collection or a turn boundary. Remaining applicable questions are RCL-005 blockade conditions, RCL-007 Chinese Truce breaking/separation timing and RCL-008 warlord diplomacy eligibility. Scenario-data synchronization remains outstanding."},
-    {"id": "japan_pacific_objective_projection", "gate": "national_objectives", "issue": "Recommend evaluate fleet comparisons over retained Pacific seas and ships in port at their retained coastal facilities, counting heavy capital types twice; mark missing named-place objectives inactive. This is a scenario projection, not a full-world result."}
-  ]
+  "pending_decisions": [],
+  "source_reconciliation": {
+    "status": "complete",
+    "date": "2026-10-21",
+    "document": "docs/m0/source_reconciliation.md",
+    "catalog_source_checks": "catalog_source_checks.json",
+    "starting_queue_paid_ipp": 10,
+    "opening_treasury_debit_ipp": 0
+  },
+  "reference_only_convoy_audit_file": "convoy_audit.json",
+  "excluded_participants": [
+    "ussr",
+    "fec",
+    "british_commonwealth",
+    "usa"
+  ],
+  "setup_only_unit_values": [
+    {
+      "type": "torpedo_boat_destroyer",
+      "count": 2,
+      "valuation_ipp_per_piece": 5,
+      "purchasable": false,
+      "by_nation": {
+        "japan": 2
+      },
+      "source": {
+        "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "pdf_page": 89,
+        "section": "13.1.6"
+      },
+      "authority": "user_confirmed"
+    },
+    {
+      "type": "coastal_submarine",
+      "count": 2,
+      "valuation_ipp_per_piece": 4,
+      "purchasable": false,
+      "by_nation": {
+        "japan": 2
+      },
+      "source": {
+        "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "pdf_page": 91,
+        "section": "13.1.6"
+      },
+      "authority": "user_confirmed"
+    }
+  ],
+  "mechanics": {
+    "enabled": [
+      "ordinary_naval_combat",
+      "transports",
+      "amphibious_assaults",
+      "supply_path_legality",
+      "strategic_bombing",
+      "anti_aircraft_defenses",
+      "blockades",
+      "maritime_air_patrol",
+      "ccp_major_power_evolution",
+      "kmt_major_power_evolution"
+    ],
+    "disabled": [
+      "convoys",
+      "convoy_raiding",
+      "convoy_escorts",
+      "interdiction",
+      "kido_butai",
+      "soviet_border_clashes",
+      "ccp_soviet_income_bonus",
+      "ccp_soviet_artillery_aaa_unlock",
+      "usa_triggered_light_carriers"
+    ],
+    "authority": "user_confirmed_campaign_profile"
+  },
+  "resolved_decisions": [
+    {
+      "id": "unpriced_setup_values",
+      "status": "resolved",
+      "resolution": "Torpedo Boat Destroyer 5 IPP and Coastal Submarine 4 IPP, valuation only; both unbuildable."
+    },
+    {
+      "id": "japan_national_queue_scope",
+      "status": "resolved",
+      "resolution": "Both ordinary national ship queues retained, with no starting tile; Heavy Cruiser and Fleet Carrier each have 5 IPP already paid, source-reconciled."
+    },
+    {
+      "id": "japan_light_carrier_annotations",
+      "status": "resolved",
+      "resolution": "The parenthesized Light Carriers require war with USA; they are excluded conditional reinforcements."
+    },
+    {
+      "id": "japan_p15_carrier_attachment",
+      "status": "resolved",
+      "resolution": "Fleet Carrier carries one Fighter and one Tactical Bomber; Light Carrier carries one Fighter."
+    },
+    {
+      "id": "wealth_price_and_rail_conventions",
+      "status": "resolved",
+      "resolution": "Full catalog completed-asset value with existing repair deduction; city label 0 additional price; each undirected rail asset split equally between endpoint possessors, deduplicated, unaligned uncontrolled shares to nobody."
+    },
+    {
+      "id": "fec_peacetime_income_projection",
+      "status": "resolved",
+      "resolution": "Superseded by exclusion of FEC/Hong Kong; no FEC account or income rule in profile."
+    },
+    {
+      "id": "political_and_combat_source_conflicts",
+      "status": "resolved",
+      "resolution": "RCL-001/002/003/009 adopted; RCL-004/005 developer reports and RCL-006/007/008 source checks close the rest. Canonical wording: game_content/rules/clarifications.md."
+    },
+    {
+      "id": "japan_pacific_objective_projection",
+      "status": "resolved",
+      "resolution": "Superseded by explicit Kido Butai exclusion; no local substitute fleet comparison."
+    }
+  ],
+  "verification": {
+    "status": "passed",
+    "date": "2026-10-21",
+    "python_tests": 106,
+    "test_command": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "other_checks": [
+      "deterministic_theatre_map_regeneration",
+      "source_hash_and_setup_consistency",
+      "git_diff_check"
+    ],
+    "scope": "Specification, source data and map bridge only; not full-game mechanics or training."
+  },
+  "freeze": {
+    "version": "M0-2026-10-21",
+    "date": "2026-10-21",
+    "status": "frozen_specification_not_playable",
+    "baseline": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+    "revision_policy": "Subsequent changes to the approved specification must explicitly revise the baseline."
+  }
 }

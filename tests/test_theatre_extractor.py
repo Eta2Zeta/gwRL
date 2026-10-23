@@ -117,10 +117,32 @@ class TheatreExtractorTests(unittest.TestCase):
             ({"included_node_ids": ["missing"]}, "missing source nodes"),
             ({"included_node_ids": [1]}, "nonempty strings"),
             ({"boundary_policy": "open"}, "boundary_policy"),
+            ({"excluded_feature_layers": "convoy_lines"}, "excluded_feature_layers"),
+            ({"excluded_feature_layers": ["passages"]}, "excluded_feature_layers"),
+            ({"excluded_feature_layers": ["convoy_lines", "convoy_lines"]}, "excluded_feature_layers"),
         ):
             with self.subTest(updates=updates):
                 with self.assertRaisesRegex(ValueError, message):
                     builder.extract_document(self.source, {**self.manifest, **updates})
+
+    def test_manifest_can_disable_a_complete_convoy_without_mutating_source(self):
+        self.source["convoy_lines"] = [{
+            "id": "local_line", "sea_zone_ids": ["b"],
+            "endpoints": [{"kind": "land", "node_id": "a"}, {"kind": "sea", "node_id": "b"}],
+            "maximum_ipp_loss": 1, "loss_cap_status": "numeric_cap_printed",
+        }]
+        original = copy.deepcopy(self.source)
+        generic = builder.extract_document(self.source, self.manifest)
+        self.assertEqual(generic["convoy_lines"], self.source["convoy_lines"])
+        self.manifest["excluded_feature_layers"] = ["convoy_lines"]
+        result = builder.extract_document(self.source, self.manifest)
+        self.assertEqual(result["convoy_lines"], [])
+        self.assertEqual(result["_meta"]["feature_exclusions"], [{
+            "layer": "convoy_lines", "reason": "disabled_by_scenario_manifest",
+            "excluded_feature_ids": ["local_line"],
+        }])
+        self.assertEqual(result["nodes"], generic["nodes"])
+        self.assertEqual(self.source, original)
 
     def test_bad_source_graphs_fail_even_outside_selection(self):
         mutations = (

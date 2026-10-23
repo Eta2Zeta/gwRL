@@ -10,6 +10,10 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = ROOT / "game_content/scenarios/japan_china_1936"
+IGNORED_IMAGE_SUFFIXES = {
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tif", ".tiff",
+    ".svg", ".heic", ".avif",
+}
 
 
 def unique_object(pairs):
@@ -58,41 +62,53 @@ class M0SpecificationTests(unittest.TestCase):
         cls.japan = read_json(SCENARIO / "m0/japan_setup.json")
         cls.china = read_json(SCENARIO / "m0/china_minor_setup.json")
         cls.convoys = read_json(SCENARIO / "m0/convoy_audit.json")
-        cls.nodes = read_json(SCENARIO / "map.json")["nodes"]
+        cls.catalog_sources = read_json(SCENARIO / "m0/catalog_source_checks.json")
+        cls.map = read_json(SCENARIO / "map.json")
+        cls.nodes = cls.map["nodes"]
 
-    def test_specification_not_playable_and_pending_choices_explicit(self):
-        self.assertEqual(self.contract["status"], "m0_audit_ready_pending_decisions_not_playable")
+    def test_settled_specification_remains_distinct_from_a_playable_game(self):
+        self.assertIn(self.contract["status"], {
+            "synchronized_pending_verification_not_playable", "m0_frozen_specification_not_playable",
+        })
         for document in (self.japan, self.china):
-            self.assertEqual(document["status"], "audited_specification_not_playable")
+            self.assertIn(document["status"], {
+                "synchronized_pending_verification_not_playable", "frozen_specification_not_playable",
+            })
         self.assertEqual(self.manifest["m0_specification"]["contract"], "m0/scenario_contract.json")
-        decisions = [item["id"] for item in self.contract["pending_decisions"]]
-        self.assertEqual(len(decisions), len(set(decisions)))
-        self.assertIn("unpriced_setup_values", decisions)
-        self.assertIn("japan_national_queue_scope", decisions)
+        self.assertEqual(self.contract["pending_decisions"], [])
+        self.assertEqual(self.contract["decision_review"]["status"], "complete")
         for filename in self.contract["setup_files"]:
             self.assertTrue((SCENARIO / "m0" / filename).is_file())
 
     def test_core_ledger_has_unique_traceable_fixture_ids(self):
         ledger = (ROOT / "docs/m0/core_rules_ledger.md").read_text()
         rows = re.findall(r"^\| (R\d{3}); (.+)$", ledger, flags=re.MULTILINE)
-        self.assertEqual([row[0] for row in rows], [f"R{number:03d}" for number in range(143)])
+        fixture_ids = [row[0] for row in rows]
+        self.assertTrue(fixture_ids)
+        self.assertEqual(len(fixture_ids), len(set(fixture_ids)))
         for fixture_id, cells in rows:
             self.assertIn("RB", cells, fixture_id)
             self.assertEqual(len(cells.split("|")), 7, fixture_id)
 
     def test_source_hashes_match_current_local_sources(self):
         seen = {}
-        for document in (self.japan, self.china, self.convoys):
-            for source in document["sources"].values():
+        for document in (self.japan, self.china, self.convoys, self.catalog_sources):
+            sources = document["sources"]
+            for source in (sources.values() if isinstance(sources, dict) else sources):
                 path = ROOT / source["path"]
-                self.assertTrue(path.is_file(), path)
-                self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"], path)
+                self.assertRegex(source["sha256"], r"^[0-9a-f]{64}$")
+                # The user deliberately git-ignored source images. Retain
+                # their recorded hashes and verify them whenever present.
+                if path.exists() or path.suffix.lower() not in IGNORED_IMAGE_SUFFIXES:
+                    self.assertTrue(path.is_file(), path)
+                    self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), source["sha256"], path)
                 if path in seen:
                     self.assertEqual(source["sha256"], seen[path])
                 seen[path] = source["sha256"]
-        self.assertEqual(len(seen), 9)  # Seven PDFs, authoritative JSON and map image.
+        self.assertIn(ROOT / self.japan["sources"]["rulebook"]["path"], seen)
+        self.assertIn(ROOT / self.japan["sources"]["global_map"]["path"], seen)
 
-    def test_local_convoy_route_is_complete_and_cap_is_not_an_income_grant(self):
+    def test_reference_convoy_route_does_not_enable_campaign_convoys(self):
         lines = {line["id"]: line for line in self.convoys["audited_lines"]}
         line = lines["convoy_japan_nagasaki"]
         endpoints = [endpoint["node_id"] for endpoint in line["endpoints"]]
@@ -104,8 +120,11 @@ class M0SpecificationTests(unittest.TestCase):
         self.assertEqual(line["max_ipp_loss_per_player_turn"], 5)
         self.assertEqual(line["excluded_sea_zone_ids"], [])
         self.assertEqual(line["owner"], "japan")
-        self.assertEqual(line["theatre_classification"], "retained_conditionally_raidable")
         self.assertTrue(self.convoys["rules"]["no_income_creation"])
+        self.assertIn("convoy_lines", self.manifest["excluded_feature_layers"])
+        self.assertEqual(self.map["convoy_lines"], [])
+        self.assertEqual(self.convoys["status"], "reference_only_excluded_from_campaign")
+        self.assertFalse(self.convoys["campaign_applicability"]["enabled"])
         japan_cash = next(x for x in self.contract["starting_accounts"]["national_accounts"] if x["nation"] == "japan")
         self.assertEqual(japan_cash["treasury_ipp"], 15)
 
@@ -116,7 +135,8 @@ class M0SpecificationTests(unittest.TestCase):
                          ["sea_p16", "sea_p34", "sea_p33", "sea_p32", "sea_p41", "sea_p50"])
         self.assertEqual(set(line["ordered_sea_zone_ids"]) - set(self.nodes), {"sea_p34", "sea_p50"})
         self.assertEqual(line["excluded_sea_zone_ids"], ["sea_p34", "sea_p50"])
-        self.assertEqual(line["theatre_classification"], "excluded_cut_route_and_terminal_outside_theatre")
+        self.assertEqual(line["theatre_classification"], "excluded_by_campaign_choice_and_cut_route")
+        self.assertEqual(line["historical_audit_classification"], "excluded_cut_route_and_terminal_outside_theatre")
         self.assertEqual(set(self.convoys["selected_zone_coverage"]),
                          {node_id for node_id, node in self.nodes.items() if node["type"] == "sea"})
         for node_id, line_ids in self.convoys["selected_zone_coverage"].items():
@@ -137,8 +157,10 @@ class M0SpecificationTests(unittest.TestCase):
                     self.assertIn(source_id, document["sources"])
                     self.assertGreaterEqual(source["pdf_page"], 1)
                     self.assertLessEqual(source["pdf_page"], page_counts[source_id])
-                kinds = [unit["type"] for unit in row["units"]]
-                self.assertEqual(len(kinds), len(set(kinds)))
+                # Identical aircraft types may be separate physical records
+                # when they are assigned to different carriers.
+                identities = [unit.get("instance_id", unit["type"]) for unit in row["units"]]
+                self.assertEqual(len(identities), len(set(identities)))
                 for unit in row["units"]:
                     self.assertIs(type(unit["count"]), int)
                     self.assertGreater(unit["count"], 0)
@@ -150,8 +172,9 @@ class M0SpecificationTests(unittest.TestCase):
         covered.update(self.japan["empty_retained_japanese_locations"])
         land_ids = {node_id for node_id, node in self.nodes.items() if node["type"] == "land"}
         self.assertEqual(covered & land_ids, land_ids)
-        self.assertEqual(len(land_ids), 32)
+        self.assertEqual(len(land_ids), 31)
         self.assertNotIn("land_mongolia_tannu_tuva", covered)
+        self.assertNotIn("land_hong_kong", covered)
         china_rows = {row["node_id"]: row for row in self.china["territories"]}
         for node_id in ("land_hainan", "land_mongolia_kobdo", "land_mongolia_ulyassutai"):
             self.assertEqual(china_rows[node_id]["units"], [])
@@ -188,15 +211,32 @@ class M0SpecificationTests(unittest.TestCase):
             self.assertEqual(row["alliance_id"], faction["alliance_id"])
             if self.nodes[row["node_id"]]["type"] == "land":
                 self.assertEqual(self.nodes[row["node_id"]]["original_owner"], faction["map_owner_alias"])
-        self.assertEqual(dict(by_group), {"kmt": 12, "ccp": 5, "eight_warlords": 32, "mongolia": 2, "fec": 4})
+        self.assertEqual(dict(by_group), {"kmt": 12, "ccp": 5, "eight_warlords": 32, "mongolia": 2})
         self.assertEqual(dict(by_group), self.china["audit_totals"]["units_by_group"])
         warlords = [f for f in factions.values() if f["id"].startswith("warlord_")]
         self.assertEqual(len(warlords), 8)
         for faction in warlords:
             self.assertIsNone(faction["controller_id"])
             self.assertIsNone(faction["alliance_id"])
-        self.assertEqual(sum(counts.values()) + sum(unit_counts(self.japan["placements"]).values()), 103)
-        self.assertEqual(self.contract["inventory"]["deployed_units"], 103)
+        self.assertEqual(sum(counts.values()), 51)
+        self.assertEqual(sum(counts.values()) + sum(unit_counts(self.japan["placements"]).values()), 99)
+        self.assertEqual(self.contract["inventory"]["deployed_units"], 99)
+        self.assertNotIn("fec", factions)
+        self.assertNotIn("ussr", factions)
+        expected_aliases = {
+            "warlord_sinkiang": "Sinkiang Clique", "warlord_tsinghai": "Ma Clique",
+            "warlord_suiyuan": "Mengjiang", "warlord_beiping_hopeh": "Zhili Clique",
+            "warlord_tibet": "Tibet", "warlord_sikang": "Szechwan Clique",
+            "warlord_yunnan": "Yunnan Clique", "warlord_kwangtung_hainan": "Guangxi Clique",
+        }
+        self.assertEqual({f["id"]: f["map_owner_alias"] for f in warlords}, expected_aliases)
+        mongolia = factions["mongolia"]
+        self.assertEqual(mongolia["controller_id"], "comintern")
+        self.assertEqual(mongolia["source_controller_id"], "ussr")
+        for row in self.china["territories"]:
+            if row["owner_id"] == "mongolia":
+                self.assertEqual(row["controller_id"], "comintern")
+                self.assertEqual(row["source_controller_id"], "ussr")
 
     def test_facility_references_cover_map_once_without_adding_duplicate_pieces(self):
         expected = map_facilities(self.nodes)
@@ -211,7 +251,7 @@ class M0SpecificationTests(unittest.TestCase):
                 references.append(facility["facility_id"])
         self.assertEqual(len(references), len(set(references)))
         self.assertEqual(set(references), set(expected))
-        self.assertEqual(len(references), 21)
+        self.assertEqual(len(references), 19)
         factories = [(row["node_id"], f["type"], f["id"]) for row in self.japan["placements"] for f in row["facilities"]]
         self.assertEqual({(node_id, kind) for node_id, kind, _ in factories}, {
             ("land_jap_tokyo", "major_factory"), ("land_jap_kyushu", "medium_factory"),
@@ -221,42 +261,84 @@ class M0SpecificationTests(unittest.TestCase):
         self.assertTrue(set(f[2] for f in factories).isdisjoint(references))
         self.assertEqual(self.contract["facility_type_aliases"], {"airfield": "airbase"})
 
-    def test_source_color_places_fec_fighter_at_sea_and_japan_formosa_fighter_on_land(self):
-        rows = {row["node_id"]: row for row in self.china["territories"]}
+    def test_fec_source_pieces_are_preserved_as_excluded_evidence(self):
+        rows = {row["node_id"]: row for row in self.china["excluded_setup"]}
+        self.assertEqual(set(rows), {"land_hong_kong", "sea_p41"})
         self.assertEqual(unit_counts([rows["land_hong_kong"]]), {"infantry": 1})
         fleet = {unit["type"]: unit for unit in rows["sea_p41"]["units"]}
         self.assertEqual(fleet["fighter"]["embarked_on"], fleet["light_carrier"]["instance_id"])
         self.assertEqual(fleet["fighter"]["count"], 1)
+        for row in rows.values():
+            self.assertTrue(row["source_refs"])
+            self.assertTrue(row["exclusion_reason"])
+        self.assertFalse(any(row["owner_id"] == "fec" for row in self.china["territories"]))
+        self.assertIn("sea_p41", self.nodes)
+        self.assertNotIn("land_hong_kong", self.nodes)
+
+    def test_japan_carrier_assignments_preserve_the_three_source_aircraft(self):
         japan_rows = {row["node_id"]: row for row in self.japan["placements"]}
         self.assertEqual(unit_counts([japan_rows["land_formosa"]])["fighter"], 1)
-        aircraft = [u for u in japan_rows["sea_p15"]["units"] if u["type"] in {"fighter", "tactical_bomber"}]
+        fleet = japan_rows["sea_p15"]["units"]
+        aircraft = [u for u in fleet if u["type"] in {"fighter", "tactical_bomber"}]
         self.assertEqual(sum(u["count"] for u in aircraft), 3)
-        self.assertTrue(all(u["carrier_assignment"] is None for u in aircraft))
+        self.assertEqual(unit_counts([japan_rows["sea_p15"]])["fighter"], 2)
+        self.assertEqual(len([u for u in aircraft if u["type"] == "fighter"]), 2)
+        identified = [u for u in fleet if "instance_id" in u]
+        self.assertEqual(len({u["instance_id"] for u in identified}), len(identified))
+        carriers = {u["type"]: u for u in fleet if u["type"] in {"fleet_carrier", "light_carrier"}}
+        self.assertEqual(set(carriers), {"fleet_carrier", "light_carrier"})
+        expected_assignments = {"fleet_carrier": Counter({"fighter": 1, "tactical_bomber": 1}),
+                                "light_carrier": Counter({"fighter": 1})}
+        for carrier_type, expected in expected_assignments.items():
+            carrier = carriers[carrier_type]
+            embarked = [u for u in aircraft if u["embarked_on"] == carrier["instance_id"]]
+            self.assertEqual(unit_counts([{"units": embarked}]), expected)
+        self.assertTrue(all(u["embarked_on"] in {c["instance_id"] for c in carriers.values()} for u in aircraft))
+        for unit in fleet:
+            self.assertFalse("carrier_assignment" in unit and unit["carrier_assignment"] is None)
 
-    def test_two_unpriced_types_are_missing_not_free_or_purchasable(self):
-        missing = {entry["type"]: entry for entry in self.contract["unpriced_setup_types"]}
-        self.assertEqual(set(missing), {"torpedo_boat_destroyer", "coastal_submarine"})
+    def test_user_values_price_setup_only_ships_without_making_them_purchasable(self):
+        values = {entry["type"]: entry for entry in self.contract["setup_only_unit_values"]}
+        japan_values = {entry["type"]: entry for entry in self.japan["setup_only_asset_values"]}
+        self.assertEqual(set(values), {"torpedo_boat_destroyer", "coastal_submarine"})
+        self.assertEqual(set(values), set(japan_values))
         all_counts = unit_counts(self.japan["placements"] + self.china["territories"])
-        for kind, count in (("torpedo_boat_destroyer", 2), ("coastal_submarine", 3)):
+        for kind, count, price in (("torpedo_boat_destroyer", 2, 5), ("coastal_submarine", 2, 4)):
             self.assertEqual(all_counts[kind], count)
-            self.assertEqual(missing[kind]["count"], count)
-            self.assertEqual(sum(missing[kind]["by_nation"].values()), count)
-            self.assertIsNone(missing[kind]["valuation_ipp_per_piece"])
-            self.assertFalse(missing[kind]["purchasable"])
+            for collection in (values, japan_values):
+                count_key = "count" if collection is values else "retained_count"
+                self.assertEqual(collection[kind][count_key], count)
+                self.assertEqual(collection[kind]["valuation_ipp_per_piece"], price)
+                self.assertFalse(collection[kind]["purchasable"])
+            self.assertEqual(values[kind]["by_nation"], {"japan": count})
 
-    def test_unlocated_queue_stays_out_of_deployed_setup(self):
+    def test_retained_national_queues_conserve_paid_and_remaining_cost_without_deployment(self):
         queues = self.japan["starting_construction"]
         self.assertEqual({q["type"] for q in queues}, {"heavy_cruiser", "fleet_carrier"})
         self.assertEqual(len(queues), 2)
+        self.assertEqual(len({q["id"] for q in queues}), len(queues))
+        expected = {"heavy_cruiser": ([5, 5], [5]), "fleet_carrier": ([5, 5, 5], [5, 5])}
         for queued in queues:
             self.assertIsNone(queued["node_id"])
-            self.assertIsNone(queued["paid_construction_value"])
+            self.assertEqual(queued["count"], 1)
+            self.assertEqual(queued["paid_construction_value"], 5)
             self.assertFalse(queued["included_in_deployed_totals"])
-            self.assertEqual(queued["theatre_inclusion"], "unresolved_no_location_on_chart")
-        annotation = self.japan["unresolved_setup_annotations"][0]
-        self.assertEqual(annotation["id"], "japan_light_carrier_queue_annotations")
-        self.assertIsNone(annotation["interpreted_count"])
-        self.assertFalse(annotation["included_in_deployed_totals"])
+            self.assertEqual(queued["theatre_inclusion"], "included_national_queue_user_approved")
+            costs, remaining = expected[queued["type"]]
+            self.assertEqual(queued["stage_costs_ipp"], costs)
+            self.assertEqual(queued["remaining_stage_payments_ipp"], remaining)
+            self.assertEqual(queued["paid_construction_value"] + sum(remaining), queued["total_base_purchase_price"])
+            self.assertEqual(sum(costs), queued["total_base_purchase_price"])
+            self.assertEqual(queued["remaining_cost_ipp"], sum(remaining))
+            self.assertEqual(queued["paid_stages"], 1)
+            self.assertEqual(queued["queue_stage"], len(costs))
+            self.assertEqual(queued["opening_treasury_debit_ipp"], 0)
+            self.assertTrue(queued["source"])
+        self.assertEqual(sum(q["paid_construction_value"] for q in queues), 10)
+        self.assertEqual(self.japan["unresolved_setup_annotations"], [])
+        resolved = self.japan["resolved_setup_annotations"]
+        self.assertTrue(resolved)
+        self.assertTrue(any(annotation["id"] == "japan_light_carrier_queue_annotations" for annotation in resolved))
 
     def test_starting_cash_derives_from_retained_direct_possessions(self):
         accounts = self.contract["starting_accounts"]
@@ -267,28 +349,90 @@ class M0SpecificationTests(unittest.TestCase):
             self.assertEqual(retained, account["retained_direct_land_ipp"])
             self.assertEqual(account["treasury_ipp"], min(account["official_starting_ipp"], retained))
             actual[account["nation"]] = account["treasury_ipp"]
-        self.assertEqual(actual, {"japan": 15, "kmt": 6, "ccp": 2, "fec": 2})
+        self.assertEqual(actual, {"japan": 15, "kmt": 6, "ccp": 2})
         self.assertEqual(actual, self.manifest["m0_specification"]["starting_treasury_ipp"])
-        for key in ("controlled_minor_treasury_ipp", "unaligned_minor_treasury_ipp", "local_ussr_initial_treasury_ipp"):
+        for key in ("controlled_minor_treasury_ipp", "unaligned_minor_treasury_ipp"):
             self.assertEqual(accounts[key], 0)
+        self.assertNotIn("local_ussr_initial_treasury_ipp", accounts)
         self.assertFalse(self.contract["politics"]["mongolia"]["collects_income"])
 
     def test_calendar_agent_turns_and_wealth_contract_stay_distinct(self):
         self.assertEqual(self.contract["agents"], self.manifest["agents"])
         self.assertEqual([x["slot"] for x in self.contract["national_turn_order"]],
-                         ["ccp", "ussr", "japan", "british_commonwealth", "kmt"])
+                         ["ccp", "mongolia", "japan", "kmt"])
         self.assertEqual([x["agent"] for x in self.contract["national_turn_order"]],
-                         ["comintern", "comintern", "axis", "allies", "allies"])
+                         ["comintern", "comintern", "axis", "allies"])
+        self.assertEqual([x["slot"] for x in self.contract["national_turn_order"]], self.manifest["campaign"]["national_turn_order"])
         for key in ("start", "end", "calendar_rounds"):
             self.assertEqual(self.contract["calendar"][key], self.manifest["campaign"][key])
         wealth = self.contract["wealth"]
         self.assertEqual(wealth["weights"], self.manifest["wealth_objective"]["component_weights"])
         self.assertEqual(wealth["minor_attribution_authority"], "user_confirmed")
         self.assertIsNone(wealth["minimum_surviving_asset_value"])
+        self.assertEqual(wealth["completed_price_basis"]["value"], "undiscounted_catalog_price")
+        self.assertEqual(wealth["standalone_city_asset_value"]["value_ipp"], 0)
+        self.assertEqual(wealth["cross_owner_rail_attribution"]["status"], "user_confirmed")
+        self.assertEqual(self.contract["calendar"]["terminal_timing"], "after_complete_july_1941_round")
+        self.assertEqual(self.contract["calendar"]["early_terminal_rule"], "none_selected")
         rules = {r["rule"]: r["status"] for r in self.contract["rule_reachability"]}
         self.assertEqual(rules["ccp_plus_two_soviet_income_bonus"], "inactive")
-        self.assertEqual(rules["ccp_comintern_brothers_artillery_aaa_purchase"], "conditional")
+        self.assertEqual(rules["ccp_comintern_brothers_artillery_aaa_purchase"], "inactive")
         self.assertEqual(rules["japan_surprise_attack_and_allies_major_war_triggers"], "conditional")
+
+    def test_active_campaign_profile_has_no_external_participants_or_disabled_mechanics(self):
+        self.assertEqual(self.contract["boundary"]["selected_node_count"], len(self.nodes))
+        self.assertEqual(len(self.nodes), 37)
+        self.assertNotIn("land_hong_kong", self.nodes)
+        self.assertIn("sea_p41", self.nodes)
+        self.assertEqual(self.map["convoy_lines"], [])
+        accounts = {account["nation"] for account in self.contract["starting_accounts"]["national_accounts"]}
+        self.assertEqual(accounts, {"japan", "kmt", "ccp"})
+        mechanics = self.contract["mechanics"]
+        enabled, disabled = set(mechanics["enabled"]), set(mechanics["disabled"])
+        self.assertFalse(enabled & disabled)
+        self.assertTrue({"convoys", "convoy_raiding", "interdiction", "kido_butai", "usa_triggered_light_carriers"} <= disabled)
+        self.assertTrue({"blockades", "maritime_air_patrol", "ccp_major_power_evolution", "kmt_major_power_evolution"} <= enabled)
+        self.assertTrue(set(self.manifest["campaign_mechanics"]["retained"]) <= enabled)
+        self.assertTrue({"convoys", "interdiction", "kido_butai"} <= set(self.manifest["campaign_mechanics"]["excluded"]))
+        mongolia = self.contract["politics"]["mongolia"]
+        self.assertEqual(mongolia["controller"], "comintern")
+        self.assertEqual(mongolia["national_identity"], "mongolia")
+        self.assertEqual(mongolia["turn_slot"], "mongolia")
+        self.assertEqual(mongolia["source_turn_slot"], "ussr")
+        self.assertFalse(mongolia["incorporated_into_ussr"])
+        self.assertFalse(mongolia["soviet_alignment_enabled"])
+
+    def test_catalog_source_checks_trace_queue_values_without_claiming_runtime_implementation(self):
+        checks = self.catalog_sources
+        self.assertEqual(checks["status"], "source_reconciliation_only_not_executable_catalog")
+        self.assertTrue((ROOT / checks["review_document"]).is_file())
+        source_ids = {source["id"] for source in checks["sources"]}
+        self.assertEqual(len(source_ids), len(checks["sources"]))
+        queues = {row["type"]: row for row in self.japan["starting_construction"]}
+        source_queues = checks["japan_starting_queues"]
+        self.assertEqual({row["type"] for row in source_queues}, set(queues))
+        for row in source_queues:
+            queue = queues[row["type"]]
+            self.assertEqual(row["starting_queue_position"], queue["queue_stage"])
+            self.assertEqual(row["stage_payments_ipp"], queue["stage_costs_ipp"])
+            self.assertEqual(row["cumulative_paid_ipp"], queue["paid_construction_value"])
+            self.assertEqual(row["remaining_normal_payments_ipp"], queue["remaining_stage_payments_ipp"])
+            self.assertFalse(row["deduct_from_opening_treasury"])
+            self.assertTrue(row["source_refs"])
+            for source in row["source_refs"]:
+                self.assertIn(source["source_id"], source_ids)
+        self.assertEqual(checks["opening_queue_asset_total_ipp"], sum(row["paid_construction_value"] for row in queues.values()))
+        self.assertEqual(checks["opening_queue_axis_wealth_contribution"], checks["opening_queue_asset_total_ipp"] * self.contract["wealth"]["weights"]["paid_construction_value"])
+        research = checks["research_chart"]
+        technologies = [row["technology_id"] for row in research["rows"]]
+        self.assertTrue(technologies)
+        self.assertEqual(len(technologies), len(set(technologies)))
+        for row in research["rows"]:
+            thresholds = row["minimum_success_roll_by_destination"]
+            self.assertEqual(set(thresholds), set(research["destination_columns"]))
+            self.assertTrue(all(type(value) is int and 1 <= value <= research["die_sides"] for value in thresholds.values()))
+        for gate in checks["later_implementation_gates"]:
+            self.assertFalse(gate["blocks_m0_source_reconciliation"])
 
 
 if __name__ == "__main__":

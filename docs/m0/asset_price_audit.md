@@ -1,27 +1,36 @@
 # M0 asset purchase-price and repair audit
 
-Audit date: 12 September 2026. Specification only; no reward evaluator or unit
-catalog has been implemented by this document.
+Original audit: 12 September 2026; campaign synchronization: 21 October 2026.
+**M0 specification verified and frozen on 21 October 2026**; no reward evaluator
+or unit catalog has been implemented by this document.
 
 **5 October 2026 accounting update:** the [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md)
 records the adopted setup-only values (Torpedo Boat Destroyer 5 IPP; Coastal
 Submarine 4), full catalog valuation for completed assets, and cumulative
-already-paid value for unfinished construction. The source inventory below
-predates the exclusion of FEC/USSR. City and cross-owner rail valuation remain
-proposed accounting details.
+already-paid value for unfinished construction. The retained inventory below
+uses the approved FEC/USSR-excluded campaign; excluded source entries are labeled.
 
-## Result: two unit types need the user's values
+**21 October 2026 scoring approval:** city labels have no additional asset price.
+Each undirected railway border counts once, with its value split equally between
+the endpoint possessors. Two endpoints credited to the same alliance aggregate
+to the full value; an uncontrolled minor's share counts toward nobody. This is
+scoring attribution only and does not change railway access or control rules.
+
+## Approved values for the two setup-only unit types
 
 These are **valuation-only** choices. Giving them a wealth value must not make
 them purchasable; the rules explicitly say they cannot be built.
 
-| Type without a purchase price | Included official starting instances | Published entry | Decision needed |
+| Type without a purchase price | Included official starting instances | Published entry | Approved scoring value |
 | --- | --- | --- | --- |
-| Torpedo Boat Destroyer | Japan: one in P15 and one in P16; **2 total** | RB p89, §13.1.6: price N/A, cannot be built | Wealth value in IPP per surviving ship |
-| Coastal Submarine | Japan: one at Korea/P14 and one in P16; FEC: one in P41; **3 total** | RB p91, §13.1.6: price N/A, cannot be built | Wealth value in IPP per surviving submarine |
+| Torpedo Boat Destroyer | Japan: one in P15 and one in P16; **2 total** | RB p89, §13.1.6: price N/A, cannot be built | **5 IPP** per surviving ship |
+| Coastal Submarine | Japan: one at Korea/P14 and one in P16; **2 total** | RB p91, §13.1.6: price N/A, cannot be built | **4 IPP** per surviving submarine |
+
+The FEC Coastal Submarine printed in P41 is excluded with all FEC forces; it is
+preserved only in the setup audit's source evidence.
 
 The generic catalog also lists **Coastal Defense Ships** at N/A (RB p89), but the
-included Japan, Chinese, Mongolian and FEC starting inventories do not contain one,
+included Japan, Chinese and Mongolian starting inventories do not contain one,
 and none can be purchased or supplied from outside this closed theatre. It is not
 a valuation decision needed for this scenario. Do not silently substitute the
 price of a Destroyer, Battleship or regular Submarine for a different unit type.
@@ -46,8 +55,8 @@ status, calendar, technology, placement and capacity remain independent gates.
 
 ## Priced land, air and rocket units
 
-These are undiscounted catalog values, not a decision to use historical cost or
-current discounted replacement cost in the eventual reward evaluator. J/K/C
+These are the approved full catalog values for completed assets; purchase
+discounts do not reduce their completed scoring value. J/K/C
 Major-Power charts agree with the generic prices below. KMT and CCP retain their
 separate, much narrower Minor-Power build charts until evolution. Setup Mountain
 Infantry still has its catalog price even where a Minor Power cannot buy it.
@@ -60,7 +69,7 @@ Infantry still has its catalog price even where a Minor Power cannot buy it.
 | Elite Airborne Infantry | 3 | RB pp47,83; J p5; K/C p4 | Airborne Doctrine; cap 2; existing airborne converts automatically |
 | Marines | 4 | RB p84; J p5; K/C p4 | Cap 2; no separate priced Japanese SNLF type in v4.3 chart |
 | Mountain Infantry | 4 | RB p84; J p5; K/C p4 | Cap 2; official CCP/warlord setup instances count |
-| Colonial Infantry | 4 | RB p84; FEC build chart | FEC; only eligible original outside-Home-Country IPP zones, cap 2 |
+| Colonial Infantry | 4 | RB p84; FEC build chart | Source-only catalog entry; unavailable here because FEC is excluded |
 | Cavalry | 3 | RB p85; J p5; K/C p3-4 | Major Powers cannot purchase after July 1939; setup cavalry remains |
 | Motorized Infantry | 4 | RB p85; J p5; K/C p4 | Also obtainable by eligible Infantry upgrade |
 | Mechanized Infantry | 4 | RB p85; J p5; K/C p4 | January 1940 gate for these nations |
@@ -147,8 +156,12 @@ A river crossing is not by itself an additional railroad price tier. Determine
 rail terrain by the printed direct border route (§13.2.8), not blindly by one
 destination's intrinsic terrain. Railroad damage is one state per physical
 border, and all artwork tracks on that border are affected together (§10.6.2
-p67). For wealth, deduplicate that border and decide attribution when opposite
-ends have different owners; do not sum two directed-neighbor copies.
+p67). Under the scoring policy approved on 21 October 2026, count each undirected
+railway border once and assign 50% of its value to each endpoint possessor.
+Endpoints credited to the same alliance aggregate to the full border value;
+an uncontrolled minor's share counts toward nobody. Do not sum two
+directed-neighbor copies. This allocation affects scoring only, not railway
+access, ownership or movement permissions.
 
 ## Repair and accounting consequences that need to remain explicit
 
@@ -161,9 +174,9 @@ ends have different owners; do not sum two directed-neighbor copies.
    Factory costs 18 but may sustain 20 damage; its resulting value is -2 before
    the 0.1 weight. No zero floor has been authorized. Destroyed/removed assets
    are absent, and are not negative-valued surviving facilities.
-3. **Cities are terrain/economy, not purchasable facilities.** They have no build
-   price. Recommended scope is to account for their current IPP rate and all
-   distinct facilities within them, with no extra standalone city-asset value.
+3. **City scoring approved on 21 October 2026:** the city label has no additional
+   asset price. Account for its current IPP rate and all distinct facilities
+   within it, with no extra standalone city-asset value.
    City bombing/repair (RB pp66-67,51) remains real even without a city asset price.
 4. **Discounts versus valuation are distinct.** Improved Construction reduces
    facility/naval payments by 1 per stage, or accelerates early stages; Kido Butai
@@ -180,20 +193,22 @@ ends have different owners; do not sum two directed-neighbor copies.
    Minor to Major Shipyard +5 (RB pp51,93-96).
 6. **Adopted construction value is the cumulative already-paid amount**, replacing
    that ledger entry with full completed catalog value at completion. Official
-   setup queues must identify the correct stage and paid amount; initial amounts
-   require source reconciliation rather than a new user choice. Japan's
+   setup queues identify the correct stage and paid amount: the Heavy Cruiser in
+   #2 and Fleet Carrier in #3 each begin with 5 IPP paid, as documented in the
+   [source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md).
+   These past payments do not debit starting cash. Japan's
    USA-triggered Light Carrier queue entries are excluded from this campaign.
-   Repairs purchased but not yet completed and construction
-   pushed backward by bombing require an explicit accounting convention before
-   implementing dense rewards.
+   The later economy/reward implementation must represent pending repairs and
+   construction pushed backward by bombing explicitly, applying the approved
+   cumulative-paid policy and preventing duplicate completed/project value.
 7. **Temporary ship-crew Militia is not a second purchased asset.** RB §11.5 p78
    temporarily supplies Militia in land combat; count the ship once. Likewise,
    inherent facility AAA is part of the facility, not a free 4-IPP AAA unit.
 
 ## Future acceptance tests (not implemented here)
 
-- `VALUE-001`: exactly two missing in-scope type values are requested; a null
-  value fails valuation validation rather than silently becoming zero.
+- `VALUE-001`: the two retained setup-only types use approved reference values
+  (Torpedo Boat Destroyer 5, Coastal Submarine 4); a null value fails validation.
 - `VALUE-002`: setup Infantry, purchased Infantry and free recruited Infantry
   follow the same approved completed-asset valuation convention.
 - `VALUE-003`: two directed edges and two sea accesses to one facility contribute
@@ -206,7 +221,10 @@ ends have different owners; do not sum two directed-neighbor copies.
 - `VALUE-006`: neutral warlord assets count toward nobody; rule-controlled minor
   assets aggregate once to its controlling alliance without creating treasury or
   income collection forbidden by the minor's rules.
-- `VALUE-007`: physical city IPP loss changes income rate; inherent AAA and
-  temporary crew Militia create no additional wealth.
+- `VALUE-007`: a city label creates no extra asset value; physical city IPP loss
+  changes income rate; inherent AAA and temporary crew Militia create no additional wealth.
 - `VALUE-008`: applying a price discount changes expenditure without silently
-  changing the selected catalog/historical/replacement valuation policy.
+  changing the approved full-catalog completed-asset valuation.
+- `VALUE-009`: one undirected rail border is split 50/50 between endpoint
+  possessors; same-alliance shares sum to full value and uncontrolled minor
+  shares count toward nobody, without changing movement/access rules.

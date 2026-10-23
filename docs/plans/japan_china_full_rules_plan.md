@@ -1,22 +1,39 @@
 # Japan-China full-rules theatre: implementation and RL plan
 
-Status: **M0 source audit produced; remaining decisions await review. Map bridge implemented; broader engine and training remain planned.**
+Status: **M0 frozen; M1–M11 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 and RCL-015 are provisionally adopted by the user; developer clarification remains pending. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and training operations remain next.**
 
-Prepared 11 September; revised 12 September 2026 against the current repository,
+Prepared 11 September; synchronized 23 October 2026 against the current repository,
 the local Global War 1936 v4.3 rulebook/national sheets, and the user's decisions.
-The user has authorized M0 in addition to the map/closed-scenario extractor.
+The user has authorized continuing M0 through M11, including the map/closed-scenario extractor,
+faction identity bridge, shared C++ foundation, catalog, politics, movement, economy,
+land combat, air and naval operations, campaign integration and the following multi-agent/search milestone.
 The [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) and source-linked setup
-files record the audit results and outstanding decisions. This does not authorize
-new combat, economy, reward, search or training implementation in this batch;
-no training run is being launched.
+files record the audit results and approved decisions. The [M3 catalog](/Users/home/Desktop/gwRL/docs/m3/README.md) records definitions,
+source coverage and availability checks. M5–M10 supply the integrated gameplay
+layers; M11 supplies the explicit API, approved terminal wealth calculation and
+vector search. Full-campaign neural learning and evaluation remain M12 work;
+no training run has been launched.
 
-**5 October 2026 handoff:** the current
-[M0 campaign review](/Users/home/Desktop/gwRL/docs/m0/README.md) supersedes older
-scenario choices in this plan. Reusable official-rule questions and adopted
-interpretations now live in the
+On 22 October the user authorized completing M5-M8 autonomously until a real
+decision or blocker is encountered. Source audits and public module interfaces
+have started. Battle continuation data is now serialized, cloned and included in
+planning identity, with regression coverage. The user settled the Dadao lend-lease delivery conflict on 22 October:
+Japan may deliver aid to any Dadao-possessed Chinese Home Country land, retaining
+ordinary legal supply-route conditions. RCL-010 records the sources and adopted
+project ruling pending developer clarification. This is a delivery exception,
+not a general redefinition of Dadao Home Country. Record future rule conflicts
+in the shared clarification register for the user's developer reports.
+
+**21 October 2026 handoff:** the
+[M0 campaign review](/Users/home/Desktop/gwRL/docs/m0/README.md) records completed
+verification and the [frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json).
+Reusable official-rule decisions and source checks
+live in the
 [shared rule clarification register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md),
-with stable RCL IDs. Do not treat the older mixed decision list below as a second
-source of rulings or a claim that the campaign data has been synchronized.
+with stable RCL IDs. RCL-013 is adopted; RCL-014 and RCL-015 are provisionally
+adopted project interpretations pending developer clarification. This plan defines
+the regional implementation and its scoped verification gates. The M0 historical
+review predates the implemented gameplay layers.
 
 ## 1. Target and boundaries
 
@@ -44,12 +61,13 @@ outside connections; only the extracted copy is closed.
 
 | Decision | Current contract | Consequence |
 | --- | --- | --- |
-| Start | **July 1936**, using only official starting pieces/construction on included tiles | The historical audit inventories 103 deployed units before FEC exclusion. Both ordinary Japanese queue ships are retained; their initial paid amounts need source reconciliation. Off-map pieces are omitted. |
+| Start | **July 1936**, using the approved official setup projection | 99 deployed pieces: Japan 48, KMT 12, CCP 5, warlords 32, Mongolia 2; 3 setup factories and 19 static facilities. Both ordinary Japanese queue ships are retained with 5 IPP already paid each. |
 | Finish | **After the complete July 1941 round** | Eleven half-year rounds: July 1936, January/July 1937-1940, January/July 1941. Finish all included nation turns, reactions and collection before scoring. |
 | Learning agents | **Axis, Allies and Comintern** | Three alliance-level policies, not one policy per nation. Nation turns, treasuries, legal relationships and minor controllers remain separate game concepts. |
 | Objective | Each alliance maximizes its wealth minus the other two alliances' combined wealth | This is a three-player general-sum benchmark, not territorial conquest or the official global victory condition. |
 | Boundary | Closed induced subgraph with all excluded neighbors deleted | No external agents, boundary contracts, aid interfaces or fabricated connections are required. |
-| Geography | Previous China/Mongolia area **excluding Tannu Tuva**, including Manchuria and Korea; Tokyo, Honshu, Hokkaido, Kyushu, Okinawa; P14, P15, P16, P32, P33, P41 | 38 nodes; the explicit manifest is authoritative. No automatic addition of reachable global neighbors. |
+| Geography | China/Mongolia area **excluding Tannu Tuva and Hong Kong**, including Manchuria and Korea; Tokyo, Honshu, Hokkaido, Kyushu, Okinawa; P14, P15, P16, P32, P33, P41 | 37 nodes: 31 land and 6 sea; the explicit manifest is authoritative. No automatic addition of reachable global neighbors. |
+| Excluded participants/mechanics | No FEC or USSR accounts; no convoy play, interdiction or Kido Butai | Mongolia retains direct Comintern control and the USSR turn position; normal MAP, blockades and independently applicable naval movement/combat remain. |
 | Small benchmark | Keep the tiny two-round scenario's budget, target, horizon and reward configuration separate | Replace/update all reusable mechanics in the shared engine; do not preserve a second incomplete game implementation. |
 
 The default decision mapping is Axis -> Japan, Allies -> KMT, Comintern -> CCP.
@@ -64,7 +82,7 @@ recruitment phases in the normal USSR turn position, as if USSR were present:
 **CCP -> Mongolia (USSR slot) -> Japan -> KMT**. Its identity remains Mongolian;
 this timing does not create a Soviet participant, account, possession or unlock.
 
-### Wealth definition and remaining accounting details
+### Wealth definition and approved accounting decisions
 
 For alliance `i`, the approved income/asset weighting gives:
 
@@ -87,23 +105,30 @@ price; undamaged assets have zero repair deduction. Official setup units and
 facilities count even though the learner did not buy them. A destroyed piece is
 absent, not a surviving asset. No extra depreciation/floor convention is assumed.
 
-Treasury and paid unfinished construction remain included. Applying the same
-0.1 weight to cash and unfinished construction is an **explicit interpretation**
-of the asset block, communicated to the user, rather than a separately confirmed
-cash coefficient. This keeps spending cash on a normally priced asset from
+Treasury and paid unfinished construction remain included at the same 0.1 asset
+weight in the approved contract. This keeps spending cash on a normally priced asset from
 changing wealth merely because its category changed. Repairing an asset similarly
 reduces cash while increasing its net value. Do not substitute historical income
 or pay the full wealth score repeatedly every turn. The adopted construction
 policy scores cumulative already-paid amounts while a project is unfinished.
 At completion, replace that entry with the full completed catalog value; do not
-count both. Initial payments for setup queues require source reconciliation,
-not another user choice of scoring policy. Shared facility IDs and rail borders are
+count both. The [source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md)
+establishes 5 IPP already paid for each setup queue ship; do not debit these past
+payments from initial cash. Shared facility IDs and rail borders are
 valued once, not once per directed access edge. Purchase-price tables for setup-only
 types/discounts remain in section 6 and the M0 review. The user approved controlled
 minor assets going to their controlling alliance and uncontrolled unaligned
 assets going to nobody, without granting extra collection rights. Starting cash
-is theatre-adjusted: Japan 15, KMT 6, CCP 2, FEC 2; minors zero. The capped-local
+is theatre-adjusted: Japan 15, KMT 6, CCP 2; minors zero; no FEC/USSR accounts. The capped-local
 formula is documented in M0 as a scenario derivation, not an official setup rule.
+
+On **21 October 2026**, the user approved the remaining city and railway scoring
+choices. A city label has no additional asset price; its income and distinct
+facilities still count. Count each undirected railway border once and split its
+value 50/50 between the endpoint possessors. Endpoints credited to the same
+alliance aggregate to the full value; an uncontrolled minor's share counts
+toward nobody. This is scoring attribution only, with no change to railway
+access, ownership or movement permissions.
 
 These returns do **not** sum to zero: `sum(R_i) = -sum(W_i)`. Total wealth changes
 with production, collection and destruction, so a three-value vector is required;
@@ -174,15 +199,20 @@ complete catalog shared by loading, rules, encoders and tests.
 
 Audit deliverables are now in [docs/m0](/Users/home/Desktop/gwRL/docs/m0/README.md).
 They include source hashes, setup rows and totals, a core/national rules checklist,
-price/repair tables and proposed accounting rulings. The exit gate is **not yet
-closed**: city/rail accounting proposals, remaining RCL-005–008 interpretations,
-source transcription and artifact synchronization still need completion. Setup-only
-ship values, ordinary queue inclusion, paid construction scoring, Mongolia timing
-and RCL-001–004 are decided. No audit data is being presented as an executable
-initial state.
+price/repair tables and approved accounting decisions. The **decision review is
+complete as of 21 October 2026**, including city and railway scoring. The **M0 exit
+gate is closed**: the synchronized contract, setup, manifest, map, ledgers and
+source checks passed final consistency review, and the full 106-test repository
+suite passed. The specification is frozen in the baseline. Queue payments and
+exact research thresholds are documented in the source reconciliation. No open
+RCL applies to the current campaign.
+Setup-only ship values, ordinary queue inclusion, paid construction scoring,
+Mongolia timing, city/rail scoring and RCL-002–003/009 are adopted; RCL-001 and RCL-004–008 are closed. No audit data
+is being presented as an executable initial state.
 
-Depends on: the approved geography/calendar/agent contract; remaining setup and
-valuation decisions must be settled before those mechanics or training targets.
+Depends on: the approved geography/calendar/agent and scoring decisions; verified
+artifacts must precede those mechanics or training
+targets.
 
 - Create a rule ledger: source/version/page/section, applicability condition,
   required state, decision owner, timing, implementing module and acceptance test.
@@ -196,27 +226,35 @@ valuation decisions must be settled before those mechanics or training targets.
   and independently check the retained totals.
 - Exclude Tannu Tuva by user decision. Its political identity and other outside
   ambiguities remain recorded on the global source but do not block this profile.
-- Confirm the political rule ambiguities in section 6 below.
+- Carry the resolved political rule decisions in section 6 into the synchronized
+  specification and verification fixtures.
 
 **Exit gate:** approved scenario contract and a traceable, complete rule checklist.
 The output is a specification and test inventory, not a large training job.
 
 ### M1. Build the world-to-theatre bridge
 
-Current authorized first implementation batch. Geography/extractor can finish
-before the rest of M0; full initial-state certification still depends on M0.
+**Complete and verified, 21 October 2026.** The
+[M1 review](/Users/home/Desktop/gwRL/docs/m1/README.md) records the acceptance
+evidence, outputs and regeneration commands. The existing map projection passes
+its acceptance checks; the added faction identity index closes the remaining
+name/ID normalization requirement. All 52 focused bridge/feature/identity tests
+and all 119 repository Python tests pass. The
+[M1 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m1/verification.json)
+records the checked artifacts. No user action remains for M1. The frozen M0
+contract, setup data, manifest and map are unchanged; this plan's progress update
+is subsequent to the historical M0 baseline.
 
-M0 follow-up: a [convoy audit](/Users/home/Desktop/gwRL/docs/m0/convoy_audit.md)
-identified the fully local Nagasaki Line (Rehe-P14-P15-Kyushu; shared 5-IPP loss
-cap) and the cut Tokyo Line. Add a canonical convoy layer and validated projection
-before declaring the bridge complete for all mechanics; the current extractor
-copies nodes/edges/facilities, not convoy identity, route, endpoints or loss caps.
+The [convoy audit](/Users/home/Desktop/gwRL/docs/m0/convoy_audit.md) preserves the
+printed Nagasaki and Tokyo routes as source reference only. The global map and
+general extractor support convoy data, but this campaign disables that layer
+by explicit choice. Do not activate Nagasaki merely because its route is local.
 
 - Select explicit canonical IDs, not names or rectangular image coordinates.
   Include the existing Chinese theatre/warlords, Mongolia **without Tannu Tuva**, Manchuria,
-  Korea, Formosa, Hainan, Hong Kong; Tokyo, Honshu, Hokkaido, Kyushu, Okinawa; and
+  Korea, Formosa and Hainan; Tokyo, Honshu, Hokkaido, Kyushu, Okinawa; and
   only P14, P15, P16, P32, P33, P41. The manifest records the exact selected IDs.
-  Audit Japanese areas not covered by the China map review.
+  Hong Kong and all FEC forces are excluded.
 - Do not add outside support nodes or interfaces. Retain nationality/control
   metadata; Mongolia remains distinct from the Chinese warlords.
 - Copy every selected node and internal directed edge without re-transcription.
@@ -232,17 +270,33 @@ copies nodes/edges/facilities, not convoy identity, route, endpoints or loss cap
   the global map to restore shortcuts. Never invent a new sea or land connection.
 - Keep scenario setup/control separate from static `original_owner` and terrain.
   Normalize faction IDs once, including `Zhili Clique` versus `ZhiliClique`.
+  The generated `m1/faction_index.json` derives canonical IDs and aliases from
+  approved setup data, preserving the user's display names and recording all
+  31 retained land identities. Its shared resolver rejects unknown and ambiguous
+  aliases; a valid starting-owner override does not rewrite original nationality.
 - Save deterministic map/manifest hashes, source metadata, exact manifest and
   boundary cuts with the generated theatre. Preserve source warnings. Keep
   political/initial-state overrides out of the static projection.
 
-**Exit gate:** projection tests prove field parity, reciprocal infrastructure,
+**Exit gate met:** projection tests prove field parity, reciprocal infrastructure,
 directional differences, shared-facility identity, valid references and explicit
 handling of every cut; output reproduction must be byte-stable. The current
 artifact is map data only. M0 now inventories forces/queues as specifications;
 passing projection tests must not be presented as a playable full-rules scenario.
 
 ### M2. Define complete state, actions, time and randomness
+
+**Exit gate met, 21 October 2026.** The
+[M2 review](/Users/home/Desktop/gwRL/docs/m2/README.md) and
+[verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m2/verification.json)
+document the shared `gw_engine` library, actual setup loader, state/serialization,
+authoritative action validation, five-phase clock, defender decisions, pending
+battles/chance, separate RNG streams, exact replay and measured throughput.
+`Engine::start` initializes the first CCP turn once; clone/restore do not repeat
+the hook. The explicit synthetic rules used in protocol tests do not implement
+campaign gameplay. M3 now supplies source-backed catalog movement; national
+income evaluation remains explicitly unresolved until M6. M4 now resolves
+unlisted-nation Home Country memberships from original mainland possessions.
 
 Depends on: M0-M1; can start alongside catalog transcription in M3.
 
@@ -279,7 +333,7 @@ Depends on: M0-M1; can start alongside catalog transcription in M3.
   with pathfinding and casualty-choice branching as modules arrive. Do not wait
   until the completed campaign to discover an unusable action representation.
 
-**Exit gate:** clone isolation, serialization round-trip, legal-action/application
+**Exit gate met:** clone isolation, serialization round-trip, legal-action/application
 agreement, invalid-action rejection, deterministic replay and decision-owner tests.
 
 ### M3. Implement complete unit and facility definitions
@@ -303,8 +357,8 @@ Coverage must include:
 - Naval units: submarines, advanced submarines, destroyers, light/heavy cruisers,
   battlecruisers, battleships/heavy battleships, light/fleet/heavy fleet carriers,
   naval transports and attack naval transports. Include setup-only torpedo boat
-  destroyers and coastal submarines; support coastal defense ships if foreign
-  setup/capture brings them into the approved scenario.
+  destroyers and coastal submarines. No Coastal Defense Ship enters this closed
+  scenario; broader source-only types may be supported by the shared catalog.
 - Facilities: minor/medium/major factories; ports, dockyards, shipyards; airbases
   (the map's `airfield` alias); seaplane/submarine bases; fortifications, coastal artillery and
   rail infrastructure. Add strategic rockets and other chart-listed unlocks.
@@ -314,10 +368,20 @@ is organizational, not permission to omit an unlisted chart entry. Distinguish
 "may exist through setup/capture/lend-lease" from "may currently be purchased".
 Foreign-exclusive units need not become purchase options for Japan or China.
 
-**Exit gate:** every setup type loads, every chart row has an availability test,
-and every registered unit/status can be represented in state and observations.
+**Exit gate met (21 October 2026):** every setup type loads, all 181 printed
+chart rows have availability tests, and every registered surviving unit damage
+state can be represented in state and observations. See the
+[M3 catalog record](/Users/home/Desktop/gwRL/docs/m3/README.md).
 
 ### M4. Implement the turn scheduler, politics and warlords
+
+**Complete and verified, 21 October 2026.** The
+[M4 record](/Users/home/Desktop/gwRL/docs/m4/README.md) covers political
+transitions, timed declarations, pending end-of-phase work, Home Country
+membership, warlord/influence/recruitment rules, truce/evolution and surrender.
+It also records the user-approved direct Axis control of separate Dadao after
+Japan surrenders. Capture callbacks consume results of later movement/combat
+modules; income collection requires an evaluated rate or later accounting module.
 
 Depends on: M2-M3.
 
@@ -326,6 +390,9 @@ Depends on: M2-M3.
   permitted ordering within phases; do not force an arbitrary order where the
   rulebook allows choices. Declarations of war are timed rule events, not simply
   a mandatory standalone opening phase.
+- Use the M2 clock and reaction machinery. Resolve the rulebook's unlisted-nation
+  home-country predicate from source geography before any action relies on those
+  memberships; an explicitly unknown membership does not grant permission.
 - Use the adopted order CCP -> Mongolia (normal USSR slot) -> Japan -> KMT,
   including Mongolia's movement and recruitment phases as if USSR were present.
   The three agents receive those decisions without turning the calendar into
@@ -351,10 +418,13 @@ Depends on: M2-M3.
   surrender, loss of forces, revival, capture/liberation and national objectives
   with their distinct triggers; zero units is not a universal terminal condition.
 
-**Exit gate:** scripted political timelines cover ordinary and exceptional
-alignment, two-zone warlords, truce formation/breaking, evolution, and Dadao.
+**Exit gate met:** scripted political timelines cover ordinary and exceptional
+alignment, two-zone warlords, truce formation/breaking, evolution, and Dadao,
+including pending-decision serialization/replay and the direct Axis fallback.
 
 ### M5. Implement movement and shared logistics services
+
+Status: complete, 22 October 2026; 14 movement fixture groups and a dated verification record.
 
 Depends on: M1-M4. Complete this before final production legality in M6.
 
@@ -367,11 +437,12 @@ Depends on: M1-M4. Complete this before final production legality in M6.
   movement and supply paths. They have different eligibility and capacity rules.
 - Implement regional rail capacities, gauge changes, rail damage and river-bank
   restrictions. The map's rail boolean remains infrastructure presence, not damage.
-- Build reusable route queries for supply, naval-facility range refresh, blockade,
-  interdiction, closed straits/canals and required possession timing.
+- Build reusable route queries for supply, naval-facility range refresh, blockade
+  and required possession timing. Interdiction is disabled; named straits/canals
+  absent from the selected map remain inactive.
 - Implement reusable Burma/Ledo and Soviet-connectivity predicates with their
   specific conditions. Burma and Soviet Home Country endpoints are absent, so
-  those bonuses are inactive. The adopted RCL-004 purchase rule requires an
+  those bonuses are inactive. The purchase rule retained in closed RCL-004 requires an
   undamaged railroad from CCP-possessed to Soviet-possessed land during Production,
   with placement in connected CCP-possessed territory. It is also inactive here
   because USSR is excluded. Mongolia's turn timing does not change possession.
@@ -383,6 +454,8 @@ bombed rail, hostile river banks, shared ports, cut boundaries and supply-only r
 
 ### M6. Implement economy, production, construction and research
 
+Status: complete, 22 October 2026; 14 economy fixture groups and a dated verification record.
+
 Depends on: M3-M5.
 
 - Explicitly approved local starting treasury/queues, normal collection,
@@ -391,7 +464,7 @@ Depends on: M3-M5.
 - Purchases, date/technology/national caps, staged build queues, uncompleted builds,
   facilities and upgrades, research limits/stages and calendar gates.
 - Production and repair capacity, beginning-of-turn possession, supply checks,
-  interdiction, placement restrictions and newly upgraded-facility timing.
+  placement restrictions and newly upgraded-facility timing; no interdiction.
 - Chinese decentralized production and CCP recruitment; correct changes on
   evolution to Major Power. KMT Burma Road and CCP Soviet-Home-Country income
   bonuses are inactive here. CCP artillery/AAA rail access has the distinct
@@ -410,6 +483,8 @@ Depends on: M3-M5.
 several turns. Captured-on-this-turn and repaired-on-this-turn examples match sources.
 
 ### M7. Implement the authoritative land-battle state machine
+
+Status: complete, 22 October 2026; 32 land-combat and 15 shared-zone truce fixture groups, including developer-confirmed third-party roles, corrected voluntary truce roles, attack-roll Low Morale, ordinary retreat origins and exact replay.
 
 Depends on: M2-M6.
 
@@ -436,6 +511,8 @@ is **not** completion of the Japan-China theatre.
 
 ### M8. Implement air operations, bombing and defensive reactions
 
+Status: complete, 22 October 2026; 40 air fixture groups. RCL-013 is adopted and implemented. See docs/m8/README.md and its verification record.
+
 Depends on: M5-M7.
 
 - Aircraft movement/range, flight permissions, legal landing plans and remaining
@@ -456,13 +533,16 @@ and failed-landing scenarios with full decision/replay traces.
 
 ### M9. Implement naval, carrier and amphibious operations
 
+Status: complete, 23 October 2026; source exit verified with four combined naval/landing traces. RCL-014 is provisionally adopted. See docs/m9/README.md.
+
 Depends on: M3, M5-M8.
 
 - Naval movement, transport loading/unloading, capacity, multi-hit ships, carrier
   aircraft, naval combat, screening/continuing forces and retreat.
-- Submarines/submerging, escorts/raiders, maritime air patrol, blockade, convoy
-  raiding and interdiction where their required targets/routes exist in this
-  closed scenario. Absence of a convoy is not permission to invent an outside one.
+- Submarines/submerging, normal maritime air patrol and blockade. Preserve
+  independently applicable Battlecruiser raider/slip movement and combat rules.
+  Convoy raiding, interdiction and their dependent escort responses are disabled;
+  do not create missions from the reference-only convoy layer.
 - In-port operations, scrambling, port attacks, capture/scuttling, skeleton crews,
   dockyard repairs and strategic naval movement.
 - Complete amphibious sequence: naval clearance, shore bombardment, coastal
@@ -473,9 +553,12 @@ Depends on: M3, M5-M8.
   predicates for future larger maps rather than granting them for fighting China.
 
 **Exit gate:** scripted Japan-to-China reinforcement voyage and amphibious landing,
-including contested/interdicted and retreat variants, reproduce expected rules.
+including contested movement and retreat variants, reproduce expected rules;
+convoy/interdiction exclusions are enforced.
 
 ### M10. Integrate a complete regional campaign and certify coverage
+
+Status: complete, 23 October 2026; two full 44-turn campaign traces, exact replay, transition invariants and all 143 M0 ledger rows indexed to executable evidence or profile exclusions. RCL-015 is provisionally adopted. See docs/m10/README.md.
 
 Depends on: M0-M9.
 
@@ -500,6 +583,8 @@ Depends on: M0-M9.
 map's existing structural tests are useful but are not proof of gameplay fidelity.
 
 ### M11. Expose the multi-agent environment and upgrade MCTS
+
+Status: correctness exit complete, 23 October 2026; actual campaign API and wealth checks pass, with 16 exact-oracle/search tests and six Python binding tests. See docs/m11/README.md. Batched neural inference and performance profiling remain follow-ups with M12's model and training work.
 
 Depends on: M2; tactical integration can begin at M7; campaign use requires M10.
 
@@ -526,9 +611,10 @@ Depends on: M2; tactical integration can begin at M7; campaign use requires M10.
 - Keep tested optimistic first-play urgency and PUCT diagnostics; **do not force
   every legal child to be visited once**. Training-only root noise and evaluation
   settings must be separate. Tune exploration only against measured tests.
-- After correctness, add root reuse, complete-state transpositions, batched model
-  inference and profiled action generation. Do not retain a subtree for a different
-  observed dice outcome, rule profile or opponent-policy version.
+- Root reuse and complete-state transpositions are implemented. Do not retain a
+  subtree for a different observed dice outcome, rule profile or opponent-policy
+  version. Batched model inference and action-generation profiling are explicitly
+  carried into M12's performance work before expensive training.
 
 **Exit gate:** compare MCTS with checked-in exact solvers on tiny deterministic and
 stochastic games using stated value-error/regret tolerances and confidence across
@@ -538,6 +624,9 @@ not have identical visit counts. This is empirical validation, not proof of a
 globally optimal full-campaign strategy.
 
 ### M12. Add rewards, evaluation, curriculum and training operations
+
+Status: next. The approved terminal wealth evaluator is already implemented in
+M11; model training, evaluation and operational tooling remain outstanding.
 
 Depends on: finalized wealth valuation/local setup in M0; M10-M11 for training.
 
@@ -572,21 +661,32 @@ Depends on: finalized wealth valuation/local setup in M0; M10-M11 for training.
 - Provide flushed live progress, per-phase/debug traces, periodic resumable
   checkpoints including optimizer/replay/RNG/configuration, graceful interrupt,
   run manifests and schema/hash compatibility checks.
-- Profile clone, rules, action generation and network inference. Estimate runtime
+- Complete batched neural inference and further factorization of large action
+  menus; profile clone, rules, action generation and network inference. Estimate runtime
   from a short foreground smoke run before proposing expensive settings.
 
 **Exit gate:** a reproducible smoke run can be interrupted/resumed and evaluated
 against fixed baselines. Supply commands for the user to start and monitor large
 runs in the foreground. Do not launch large or background runs automatically.
 
-## 5. Recommended training: multiplayer AlphaZero-style self-play, then a small league
+## 5. Training candidates: search-guided self-play and direct policy learning
 
-**Three sides do not make AlphaZero-style learning unusable.** Keep the useful
-loop of neural policy/value guidance, MCTS-improved move targets and self-play.
-Replace two-player scalar/sign-flip assumptions with three alliance returns and
-handle dice explicitly. This is the recommended starting point for this project,
-given its existing MCTS work and inspectable turn-based simulator, not a claim
-that any algorithm is provably best for the full campaign.
+No learning algorithm has yet been established as best for the full campaign.
+The user discussion on 21 October keeps two serious candidates: modern
+AlphaZero-style neural-guided stochastic search, and a masked/factorized PPO
+policy trained against the same opponent pool without search at every training
+decision. Compare strength under equal hardware, training time and decision-time
+budgets, using held-out positions, opponents and dice seeds. PPO is a competing
+baseline, not merely a fallback. See the [PPO paper](https://arxiv.org/abs/1707.06347).
+
+Three sides do not make search-guided self-play unusable. Its candidate branch
+keeps neural policy/value guidance, search-improved move targets and self-play,
+with three alliance returns and explicit dice. Consider limited-budget search
+and sampled-action improvements after the exact tiny search tests pass; neither
+newer algorithms nor existing prototype results establish a winner for GW36.
+The following stages describe that search-guided candidate and its opponent
+pool; comparable direct-policy training uses the same authoritative engine,
+objectives and evaluation conditions.
 
 AlphaZero did not permanently assign a frozen policy to one color while training
 the other. One network played both sides, guided by MCTS. Search produced policy
@@ -662,7 +762,7 @@ This borrows the opponent-mixture motivation of Policy-Space Response Oracles
 payoff estimation across many policy combinations and a meta-solver; that is
 unnecessary for the first local implementation. [Lanctot et al., NeurIPS 2017](https://papers.nips.cc/paper_files/paper/2017/hash/3323fe11e9595c09af38fe67567a9394-Abstract.html).
 
-### What success means, and the compute fallback
+### What success means, and the compute comparison
 
 - First learn the small two-round task and short shared-engine tactical/campaign
   fixtures, then increase horizon to the full July 1941 scenario. Do not substitute
@@ -677,9 +777,10 @@ unnecessary for the first local implementation. [Lanctot et al., NeurIPS 2017](h
 - Start with terminal wealth targets and no arbitrary kill/purchase bonus. Any
   later dense shaping must preserve the stated terminal objective. Test accounting
   for repair, construction completion, setup pieces and captured facilities.
-- If profiling shows search is too expensive, compare against masked PPO with
-  side-specific policies/value estimates and the same opponent pool and objectives.
-  This is a compute baseline/fallback, not a claim that three players require PPO.
+- Compare search-guided training against masked PPO with side-specific
+  policies/value estimates and the same opponent pool and objectives. Measure
+  strength per training time and decision cost; also test search added to a
+  directly learned policy. No candidate is assumed to win beforehand.
   A cooperative shared-reward algorithm is not a drop-in fit for these rival sides.
 
 The aim is **robust performance against a stated, measured opponent distribution**.
@@ -700,40 +801,51 @@ resources, routes or active abilities. Record the corresponding rule as inactive
 with its missing prerequisite. The shared engine may implement/test such handlers
 on separate complete fixtures for future expanded maps.
 
-Included Hong Kong, Formosa and Mongolia retain their source national
+Included Formosa and Mongolia retain their source national
 identity; Chinese home-country membership alone does not transfer ownership or
 give permission to attack. Setup/political interpretation must be resolved where
 needed, rather than answered by expanding the map or inventing an outside turn.
 Tannu Tuva is not included and its political ambiguity is deferred.
 
-## 6. Rule decisions and known risks to resolve explicitly
+## 6. Recorded rule decisions and later implementation responsibilities
 
 1. **Remaining valuation-table details:** current income rate, asset weight 0.1,
    purchase-price-minus-repair valuation and inclusion of setup assets are decided.
-   Transcribe prices/repair costs; resolve non-purchasable setup types, discounts,
-   upgrades and rail-border valuations without assigning setup assets zero merely
+   Transcribe prices/repair costs and reconcile non-purchasable setup types,
+   discounts and upgrades without assigning setup assets zero merely
    because they were initially free. Cash and paid construction use the same 0.1
    coefficient as the explicit interpretation in section 1. Unpaid future
    construction obligations are not completed assets.
    Minor attribution is now approved: controlled/aligned assets go to the legal
    controller's alliance; uncontrolled unaligned assets go to nobody. Setup-only
    values are adopted: Torpedo Boat Destroyer 5 IPP and Coastal Submarine 4 IPP.
+   City and railway scoring were approved on 21 October 2026: city labels have no
+   additional asset price; each undirected railway border counts once, split
+   50/50 between endpoint possessors. Same-alliance endpoints aggregate to full
+   value, and an uncontrolled minor's share counts toward nobody. The railway
+   split affects scoring only.
 2. **Initial local accounts/setup:** theatre-adjusted cash is authorized and M0
    uses Japan 15, KMT 6 and CCP 2; FEC is excluded. Both ordinary Japanese national
    queue ships are retained and score their cumulative already-paid amounts.
-   Initial payment values need source reconciliation. USA-triggered Light Carrier
+   Source reconciliation establishes 5 IPP paid for each ship, with 5 remaining
+   for the Heavy Cruiser and 10 for the Fleet Carrier. USA-triggered Light Carrier
    entries are excluded and carrier attachments are recorded in M0.
    The user chose official pieces on included tiles only; do not import outside
    forces or an assumed full-global budget.
-   Decide any permitted early terminal state; otherwise use the fixed July 1941
-   full-round deadline. These questions do not block static map extraction.
+   Use the fixed July 1941 full-round deadline; no extra early terminal rule is
+   introduced. Both ships use eligible supplied shipyards; Fleet Carrier placement
+   requires a Major Shipyard. P15's Fleet Carrier carries one Fighter and one
+   Tactical Bomber; the Light Carrier carries one Fighter.
 3. **Warlord foreign-war rolls, adopted RCL-003:** always resolve each whole
    warlord once. Evaluate relevant neighbors across its territories and apply the
    existing alignment table once; the result covers all its territories and units.
 4. **Influence spending, adopted RCL-002:** pre-roll spending is capped by the
    unmodified success threshold. Preserve the natural-12 backfire and
    beginning-of-turn influencing-zone requirement.
-5. **CCP Soviet route, adopted RCL-004:** during Production require an undamaged
+5. **CCP Soviet route, closed RCL-004:** the user reported on 17 October 2026 that
+   the developers fixed the wording for the next version; no publication or version
+   number has been independently checked. The mechanic remains unchanged:
+   during Production require an undamaged
    railroad from CCP-possessed to Soviet-possessed land, and place qualifying
    purchases in connected CCP-possessed territory. Generic river/sea supply is
    insufficient. The separate **income bonus** requires Soviet Home Country.
@@ -744,11 +856,12 @@ Tannu Tuva is not included and its political ambiguity is deferred.
    unresolved in the source map. Excluded external edges are cut away, not
    certified by copying. Tannu Tuva is explicitly excluded; defer its national
    identity/home-country/controller interpretation to a future expanded profile.
-7. **Rail damage:** all drawn tracks on the chosen border are affected; confirm
-   targeted-side ownership, repair responsibility and terrain cap without bringing
-   back named railroad segments.
-8. **In-scope Japanese setup:** verify starting forces, in-port status and build
-   queues on the selected islands/seas, including setup-only ships.
+7. **Rail damage implementation:** all drawn tracks on the chosen border are
+   affected. Implement targeted-side ownership, repair responsibility and terrain
+   caps from the reconciled sources in the later catalog/movement/economy/combat
+   milestones, without bringing back named railroad segments.
+8. **In-scope Japanese setup:** preserve the audited starting forces and queue
+   stages; no unprinted in-port, damage, cargo or MAP status is invented.
    Printed setup totals include queued ships; do not also instantiate them on-map.
 9. **Choice explosion:** player-selected casualties, paths and grouped attacks can
    dominate search. Use equivalent-unit grouping and staged choices, never illegal
@@ -770,11 +883,11 @@ The main dependency chain is:
 **Contract -> bridge/state/catalog -> politics/movement/logistics -> economy ->
 land/air/naval mechanics -> complete campaign -> validated search -> training.**
 
-The map/extractor and M0 audit data are delivered; remaining M0 decisions precede
-initial-state, mechanics and reward implementation. Catalog transcription can
-later proceed alongside approved state work. After the M2 interfaces stabilize,
-rule modules and their tests can be developed
-in parallel. Integration follows the dependencies above. RL adapters and tiny
+The map/extractor and M0 audit data are verified and the specification is frozen.
+M2 now loads the actual initial state and supplies the shared execution contracts.
+M3 now supplies the shared unit/facility/technology catalog, complete national
+build-chart coverage and verified availability queries. The shared interfaces
+support later rule modules and their tests developed in parallel. Integration follows the dependencies above. RL adapters and tiny
 oracle tests may be prepared early, but a partial land-only milestone must not be
 presented as completed full-rule training.
 
@@ -798,9 +911,9 @@ must be labeled correctly. Replace obsolete deterministic-combat expectations
 as the shared engine is upgraded; keep the tiny scenario, not a legacy resolver.
 Port the underlying artillery/TD timing lessons into new dice-based fixtures.
 
-## 8. Current deliverables, sources and next approval
+## 8. Current deliverables, sources and next work
 
-The present map-only implementation batch comprises:
+The map bridge and M0 specification deliverables comprise:
 
 - The updated authoritative global JSON/generator for the selected Japanese
   islands and nearby seas; existing global outside neighbors are not cropped.
@@ -808,7 +921,8 @@ The present map-only implementation batch comprises:
   documenting inspected changes and qualifications rather than claiming every
   historic global boundary has been certified.
 - [Scenario manifest](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/manifest.json)
-  selecting 38 nodes: 32 land tiles and the six requested sea zones, without Tannu Tuva.
+  selecting 37 nodes: 31 land tiles and the six requested sea zones, without
+  Tannu Tuva or Hong Kong.
 - [Extractor](/Users/home/Desktop/gwRL/tools/build_theatre_scenario.py),
   [extracted map](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/map.json)
   and [usage/scope notes](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/README.md).
@@ -817,7 +931,8 @@ The present map-only implementation batch comprises:
   writing and never overwrites the source or manifest.
 - [Extractor tests](/Users/home/Desktop/gwRL/tests/test_theatre_extractor.py)
   and main-map regressions. These test projection/topology/data, not combat,
-  official setup completeness or the proposed wealth reward.
+  runtime combat or reward evaluation. M0 specification tests separately check
+  the approved setup, source reconciliation and campaign decisions.
 
 Rebuild the map projection only:
 
@@ -866,12 +981,21 @@ Rule sources in `game_content/rules/`:
 This planning review is not a completed line-by-line rules certification; M0
 exists to make completeness testable before implementation.
 
-**Next M0 work:** resolve the remaining city/rail accounting proposals and
-RCL-005–008, reconcile source data including queue payments, and synchronize and
-verify the scenario artifacts before freezing the contract. Ship values, queue
+**Next implementation work:** M12 model training, held-out evaluation, curriculum
+and interruptible training operations. The approved terminal wealth evaluator is
+already available through M11. M9–M11 verification records link the full campaign
+traces and exact-oracle search checks; these checks do not establish playing strength.
+M0 is verified and frozen; source
+reconciliation records numeric queue payments and research thresholds. Ship values, queue
 scope and scoring, Mongolia timing, starting-cash adjustment, controlled-minor
-attribution and RCL-001–004 are recorded decisions. M2/M3 state/catalog contracts
-and their tests follow M0.
+attribution, city/rail scoring and RCL-002–003/009 are recorded decisions;
+RCL-001 now follows the developer’s corrected airborne sequence;
+RCL-004–008 and RCL-011 are closed after source/developer checks. RCL-010
+remains a campaign interpretation pending developer clarification. RCL-012 is closed: combat roles follow the reported developer ruling, and the
+user clarified that attacking KMT has the same elimination consequence after
+automatic termination.
+RCL-013 is adopted and implemented. RCL-014 and RCL-015 were provisionally adopted
+by the user on 23 October 2026, pending developer clarification.
 Tannu Tuva is excluded and is not a blocker.
-No reward evaluator, mechanics migration, training agent or large run is being
-implemented as part of the present M0 specification/source-audit request.
+The M2-M4 deliveries do not implement a reward evaluator, full gameplay handlers,
+training agent or large training run.

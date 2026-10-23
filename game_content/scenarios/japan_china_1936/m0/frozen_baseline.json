@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scenario_id": "japan_china_1936_1941",
+  "version": "M0-2026-10-21",
+  "frozen_on": "2026-10-21",
+  "status": "frozen_specification_not_playable",
+  "scope": "Approved M0 specification, source reconciliation and map bridge. Does not certify a playable full-rules engine, complete executable catalog, or training readiness.",
+  "revision_policy": "Preserve this record as the verified snapshot. Deliberate subsequent changes to the approved specification must explicitly record a new baseline revision.",
+  "inventory": {
+    "map_nodes": 37,
+    "land_nodes": 31,
+    "sea_nodes": 6,
+    "deployed_units": 99,
+    "additional_setup_factories": 3,
+    "unique_retained_map_facilities": 19,
+    "national_queue_ships": 2,
+    "paid_starting_construction_ipp": 10,
+    "starting_treasury_ipp": 23
+  },
+  "verification": {
+    "status": "passed",
+    "python_tests": 106,
+    "test_command": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "deterministic_map_regeneration": true,
+    "source_world_map_unchanged": true,
+    "diff_check_command": "git diff --check",
+    "source_and_setup_integrity": "passed",
+    "approved_decision_consistency_review": "no_m0_blockers"
+  },
+  "source_world_map": {
+    "path": "game_content/maps/gw36_manual_map.json",
+    "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed"
+  },
+  "file_sha256": {
+    "docs/m0/README.md": "271860570abff2fdc1d4ec4e156d61236c616367f9933cec53836f9ed4a3977b",
+    "docs/m0/source_reconciliation.md": "53fa1dba34aa274b96dfea29fe7549a7a6a54a348a70c907b8f44dca7422deed",
+    "docs/m0/core_rules_ledger.md": "60d3bb48dde159698d855796884895d087042137ebabdeaf4f3d8bdf5e10200e",
+    "docs/m0/japan_setup_audit.md": "a2abd4d37212a83512c6bde6ef2c7bf687b3cd12de13b7d9241314ade65ce599",
+    "docs/m0/china_minor_setup_audit.md": "470c3fbcbd1582be2fc1da60cdb7814ed0541800754795cdc817c347748aa18d",
+    "docs/m0/asset_price_audit.md": "4dcd8a439ce1c9500dc1f668e380ba12b85174a3f3f5977e88b6a5a7aa19984a",
+    "docs/m0/convoy_audit.md": "3ff3e3faaadb1368860ac3e81958ea8e23eea7069059aaef2f42ccb0ba09f99c",
+    "docs/plans/japan_china_full_rules_plan.md": "80e0a157cd20f16e7e9f01820c97afd8db125f7f1522e67f10de57d0008931be",
+    "game_content/README.md": "486a854ba69e7b6a838fb56b771309e2854db1e9cd8593e6b49705058b992b51",
+    "game_content/rules/clarifications.md": "06b0b3afaa0e23e9a12a487d90453ebbd151e4e941b52a04bc534ca3ecfdc7f4",
+    "game_content/scenarios/japan_china_1936/README.md": "dc097c732280789a890112048c9b1df280521541507ae8c14da6205e08cb9879",
+    "game_content/scenarios/japan_china_1936/manifest.json": "57d35100b04d00682f1cd31713492278dcc75372272a0062f667877bc081f4b0",
+    "game_content/scenarios/japan_china_1936/map.json": "27c9e9cd007dfa5e290ec816d6e1be962f50ab2a8a5b541cbc52d70bd1373670",
+    "game_content/scenarios/japan_china_1936/m0/scenario_contract.json": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+    "game_content/scenarios/japan_china_1936/m0/japan_setup.json": "e812bbaa0c19bc2049f2aa0fae95161316c38282b06561620ff22e9ec7be288c",
+    "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json": "6ee467595f6aad4ceab5292900eb97c0d8ab1a5d41f55719eebdc07ffb4d142d",
+    "game_content/scenarios/japan_china_1936/m0/convoy_audit.json": "3e9e17a91f6563d3e68bc569796fe1dcc144d77d83263ab295c74a0993833add",
+    "game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json": "d9e308d6f3d4277a4edbf429ebc100cef602aeea6c54b2b6d6138da806942770",
+    "tools/build_theatre_scenario.py": "850cfc5bfe378e22d5e99d93bea60e299f08157aae6aa6db98a6ce508d460170",
+    "tests/test_m0_spec.py": "1583d9ae568bfbc93fc2f10b2e333b96a52ce2fd92fb56afb238353a51699e79",
+    "tests/test_theatre_scenario.py": "b812800223007f29ced90c1a9309f700df6bac8e94cf5bf502312070d7322697",
+    "tests/test_theatre_extractor.py": "aff623d3f2d109becb0a72d6c338223fd03f3a9d746151de758e2d9daffdebcc"
+  }
+}

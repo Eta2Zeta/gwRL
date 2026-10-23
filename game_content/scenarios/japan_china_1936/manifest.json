@@ -8,29 +8,61 @@
     "end": "1941-07",
     "end_timing": "after_full_calendar_round",
     "calendar_rounds": 11,
-    "setup_basis": "Official July 1936 starting pieces on included tiles only; off-map pieces omitted. M0 records 103 deployed units and 3 setup factories separately from the static map. Unlocated Japanese national queues remain unresolved and are not deployed.",
-    "starting_piece_scope": "official_setup_on_included_tiles_only"
+    "setup_basis": "Official July 1936 starting pieces on included tiles only; off-map pieces omitted. M0 records 99 deployed units, 3 additional setup factories and 19 distinct static map facilities. The user retains the national Heavy Cruiser in queue #2 and Fleet Carrier in queue #3 without inventing a starting tile; their source-audited paid values are in the Japan setup specification.",
+    "starting_piece_scope": "official_setup_on_included_tiles_only",
+    "national_turn_order": [
+      "ccp",
+      "mongolia",
+      "japan",
+      "kmt"
+    ],
+    "mongolia_turn_policy": "Separate Mongolia acts under direct Comintern control at the original USSR turn position, including movement and recruitment. No USSR participant account or territory incorporation is created."
   },
-  "agents": ["axis", "allies", "comintern"],
+  "agents": [
+    "axis",
+    "allies",
+    "comintern"
+  ],
   "m0_specification": {
-    "status": "audit_ready_pending_decisions_not_playable",
+    "status": "frozen_specification_not_playable",
     "contract": "m0/scenario_contract.json",
     "convoy_audit": "m0/convoy_audit.json",
-    "setup_files": ["m0/japan_setup.json", "m0/china_minor_setup.json"],
+    "setup_files": [
+      "m0/japan_setup.json",
+      "m0/china_minor_setup.json"
+    ],
     "starting_treasury_policy": "theatre_adjusted_cap_at_retained_directly_possessed_original_land_ipp",
-    "starting_treasury_ipp": {"japan": 15, "kmt": 6, "ccp": 2, "fec": 2},
-    "treasury_authority": "Theatre adjustment user-approved; exact min(official starting IPP, retained direct land IPP) is a documented scenario derivation. Controlled and unaligned minors receive zero cash."
+    "starting_treasury_ipp": {
+      "japan": 15,
+      "kmt": 6,
+      "ccp": 2
+    },
+    "treasury_authority": "Theatre adjustment user-approved; use min(official starting IPP, retained directly possessed original land IPP) for Japan, KMT and CCP. Controlled and unaligned minors have no treasury. FEC, British Commonwealth and USSR participant accounts are excluded.",
+    "inventory": {
+      "deployed_units": 99,
+      "additional_setup_factories": 3,
+      "unique_retained_map_facilities": 19,
+      "national_queue_ships_not_deployed": 2
+    },
+    "version": "M0-2026-10-21",
+    "baseline": "m0/frozen_baseline.json"
   },
   "agent_control": {
     "status": "planned_not_implemented",
     "nation_turns_and_treasuries": "remain_separate",
-    "minor_control": "assigned_only_when_game_rules_grant_control",
-    "notes": "Alliance agents do not merge nations, automatically align warlords, or automatically declare war."
+    "minor_control": "Mongolia is directly assigned to Comintern; other minors and Chinese warlords follow the retained control, alignment and influence rules.",
+    "notes": "Alliance agents preserve distinct national possessions and turns. Mongolia retains its minor identity and uses the USSR turn position; no USSR or FEC participant account exists. One alignment roll applies to the whole warlord."
   },
   "wealth_objective": {
     "status": "planned_not_implemented",
     "comparison": "own_wealth_minus_combined_other_two_sides",
-    "components": ["income_rate", "unit_value", "infrastructure_value", "treasury", "paid_construction_value"],
+    "components": [
+      "income_rate",
+      "unit_value",
+      "infrastructure_value",
+      "treasury",
+      "paid_construction_value"
+    ],
     "component_weights": {
       "income_rate": 1,
       "unit_value": 0.1,
@@ -39,13 +71,37 @@
       "paid_construction_value": 0.1
     },
     "income_definition": "current_income_per_turn_rate_not_cumulative_collections",
-    "completed_asset_valuation": "purchase_price_minus_remaining_repair_price",
+    "completed_asset_valuation": "undiscounted_catalog_price_minus_remaining_repair_price",
     "include_setup_asset_value": true,
-    "confirmed": ["three_alliance_sides", "compare_with_both_other_sides", "include_treasury", "include_paid_construction_value", "current_income_per_turn_rate", "asset_weight_0.1_relative_to_income_1", "purchase_price_minus_repair_price", "include_setup_assets", "official_starting_pieces_on_included_tiles_only", "theatre_adjusted_starting_treasury", "controlled_minor_assets_to_controlling_alliance_unaligned_to_nobody"],
+    "confirmed": [
+      "three_alliance_sides",
+      "compare_with_both_other_sides",
+      "include_treasury",
+      "include_paid_construction_value",
+      "current_income_per_turn_rate",
+      "asset_weight_0.1_relative_to_income_1",
+      "include_setup_assets",
+      "official_starting_pieces_on_included_tiles_only",
+      "theatre_adjusted_starting_treasury",
+      "controlled_minor_assets_to_controlling_alliance_unaligned_to_nobody",
+      "undiscounted_catalog_price_minus_remaining_repair_price",
+      "zero_additional_city_label_price",
+      "one_rail_connection_counted_once_and_split_between_endpoint_owners",
+      "cumulative_paid_construction_value",
+      "treasury_and_paid_construction_weight_0.1"
+    ],
     "minor_asset_attribution": "controlled_or_aligned_to_controlling_alliance_uncontrolled_unaligned_to_nobody",
-    "interpretations": ["Treasury and paid construction use the same 0.1 asset weight as completed units/facilities; this cash/construction weighting is an explicit interpretation, not a separately confirmed choice."],
-    "open_decisions": ["two_unpriced_setup_ship_values", "catalog_price_basis_and_cross_owner_rail_valuation", "national_queue_inclusion_and_paid_stage_values", "optional_reward_shaping"],
-    "accounting": "Count each physical facility once by ID; replace paid construction value with completed asset value on completion, never count both. Preserve national ledgers when aggregating a side."
+    "interpretations": [],
+    "open_decisions": [],
+    "accounting": "Count each physical facility once by ID and each undirected land-border railway connection once. Split rail value equally between endpoint possessors, then aggregate alliance shares. Value unfinished construction at cumulative payments already made; on completion replace that value with full catalog value less any remaining repair price. Never count both. Preserve national ledgers when aggregating a side.",
+    "standalone_city_asset_value_ipp": 0,
+    "railway_valuation": {
+      "physical_unit": "one_undirected_land_border_railway_connection",
+      "count_once": true,
+      "endpoint_owner_share": 0.5,
+      "same_alliance_shares_aggregate": true,
+      "uncontrolled_unaligned_share_to_nobody": true
+    }
   },
   "included_node_ids": [
     "land_china_beiping",
@@ -63,7 +119,6 @@
     "land_china_yunnan",
     "land_formosa",
     "land_hainan",
-    "land_hong_kong",
     "land_korea",
     "land_kwangtung",
     "land_manchuria_eastern",
@@ -88,10 +143,28 @@
     "sea_p41"
   ],
   "known_limitations": [
-    "Tannu Tuva is excluded by user choice; its unresolved national identity remains a global-map issue and does not block this scenario.",
-    "The map itself does not contain starting units, setup factories, construction queues or mutable diplomacy. M0 files are source-audited specifications, not a playable initial state; pending decisions are listed in their contract.",
+    "Tannu Tuva is excluded by user choice; global source uncertainties are preserved and do not create scenario possessions.",
+    "The map itself does not contain starting units, setup factories, construction queues or mutable diplomacy. Frozen M0 files define a specification, not an implemented playable initial state or runtime rules.",
+    "Hong Kong/FEC and USSR are excluded. Mongolia retains its separate identity under direct Comintern control and is not Soviet-possessed.",
     "Hokkaido's P7 port access is deliberately absent because P7 is outside this closed map.",
     "Outside neighbors and any facilities carried solely on those edges are removed. Cut-edge provenance is not a movement, supply or reinforcement interface.",
+    "Convoy lines are disabled by the manifest even when a complete line is local. No convoy or interdiction mechanism operates in this profile; the world map keeps its source convoy data.",
     "Rules whose prerequisites exist only outside this theatre are inactive in this profile; no external events or off-map income are supplied implicitly."
-  ]
+  ],
+  "excluded_feature_layers": [
+    "convoy_lines"
+  ],
+  "campaign_mechanics": {
+    "excluded": [
+      "convoys",
+      "interdiction",
+      "kido_butai",
+      "usa_triggered_carrier_queues"
+    ],
+    "retained": [
+      "blockades",
+      "maritime_air_patrol"
+    ],
+    "scope": "Retain other applicable rules; external prerequisites are inactive and no off-map nation, income or event is supplied implicitly."
+  }
 }

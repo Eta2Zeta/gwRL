@@ -1,0 +1,572 @@
+{
+  "schema_version": 1,
+  "status": "source_reconciliation_only_not_executable_catalog",
+  "reconciled_on": "2026-10-21",
+  "review_document": "docs/m0/source_reconciliation.md",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "version": "v4.3",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "id": "japan_nrs",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "version": "v4.3",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa"
+    },
+    {
+      "id": "map_build_queue",
+      "path": "game_content/maps/gw36map.png",
+      "version": "v4.0 printed on queue artwork",
+      "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba"
+    }
+  ],
+  "japan_starting_queues": [
+    {
+      "type": "heavy_cruiser",
+      "printed_name": "Heavy Cruiser",
+      "count": 1,
+      "starting_queue_position": 2,
+      "stage_payments_ipp": [
+        5,
+        5
+      ],
+      "completed_installments": 1,
+      "cumulative_paid_ipp": 5,
+      "remaining_normal_payments_ipp": [
+        5
+      ],
+      "total_catalog_price_ipp": 10,
+      "deduct_from_opening_treasury": false,
+      "eligible_shipyard_types": [
+        "minor_shipyard",
+        "major_shipyard"
+      ],
+      "fixed_starting_location": null,
+      "derivation": "The map places this type in its normal starting stage; entering it consumes the first installment. Position 1 is the fully paid Place Units box. paid_installments = stage_count - queue_position + 1.",
+      "source_refs": [
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 7,
+          "section": "Naval build chart"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 9,
+          "section": "Setup: Build queue #2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 18,
+          "section": "2.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 44,
+          "section": "7.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 50,
+          "section": "8.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.3.2 stage direction example"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 79,
+          "section": "12.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 96,
+          "section": "13.2.5"
+        },
+        {
+          "source_id": "map_build_queue",
+          "image_region_xyxy": [
+            8620,
+            4510,
+            9900,
+            4888
+          ],
+          "section": "Stage 3 -> Stage 2 -> Place Units Box"
+        }
+      ]
+    },
+    {
+      "type": "fleet_carrier",
+      "printed_name": "Fleet Carrier",
+      "count": 1,
+      "starting_queue_position": 3,
+      "stage_payments_ipp": [
+        5,
+        5,
+        5
+      ],
+      "completed_installments": 1,
+      "cumulative_paid_ipp": 5,
+      "remaining_normal_payments_ipp": [
+        5,
+        5
+      ],
+      "total_catalog_price_ipp": 15,
+      "deduct_from_opening_treasury": false,
+      "eligible_shipyard_types": [
+        "major_shipyard"
+      ],
+      "fixed_starting_location": null,
+      "derivation": "The map places this type in its normal starting stage; entering it consumes the first installment. Position 1 is the fully paid Place Units box. paid_installments = stage_count - queue_position + 1.",
+      "source_refs": [
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 7,
+          "section": "Naval build chart"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 9,
+          "section": "Setup: Build queue #3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 18,
+          "section": "2.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 44,
+          "section": "7.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 50,
+          "section": "8.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.3.2 stage direction example"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 79,
+          "section": "12.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 96,
+          "section": "13.2.5"
+        },
+        {
+          "source_id": "map_build_queue",
+          "image_region_xyxy": [
+            8620,
+            4510,
+            9900,
+            4888
+          ],
+          "section": "Stage 3 -> Stage 2 -> Place Units Box"
+        }
+      ]
+    }
+  ],
+  "opening_queue_asset_total_ipp": 10,
+  "opening_queue_axis_wealth_contribution": 1.0,
+  "research_chart": {
+    "source_refs": [
+      {
+        "source_id": "rulebook",
+        "pdf_page": 45,
+        "section": "8.2: embedded technology chart and accompanying text"
+      }
+    ],
+    "source_image_note": "Embedded chart inspected at its native 1342x1098 resolution; printed chart version v4.1 inside the v4.3 rulebook.",
+    "destination_columns": [
+      "stage_i",
+      "stage_ii",
+      "stage_iii",
+      "complete"
+    ],
+    "printed_destination_columns": [
+      "Stage I",
+      "Stage II",
+      "Stage III",
+      "Complete"
+    ],
+    "die_sides": 12,
+    "success_comparison": "roll_greater_than_or_equal_to_threshold",
+    "stage_iii_earliest_calendar": "1939-07",
+    "attempts_per_undamaged_possessed_major_factory": 1,
+    "maximum_attempts_per_technology_per_calendar_turn": 1,
+    "available_immediately_on_completion": true,
+    "rows": [
+      {
+        "technology_id": "advanced_mechanized_infantry",
+        "printed_name": "Advanced Mechanized Infantry",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "advanced_artillery",
+        "printed_name": "Advanced Artillery",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "radar",
+        "printed_name": "Radar",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "anti_submarine_warfare",
+        "printed_name": "Anti-Submarine Warfare",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "improved_factories",
+        "printed_name": "Improved Factories",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "improved_construction",
+        "printed_name": "Improved Construction",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "airborne_doctrine",
+        "printed_name": "Airborne Doctrine",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "amphibious_doctrine",
+        "printed_name": "Amphibious Doctrine",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 7,
+          "stage_ii": 7,
+          "stage_iii": 7,
+          "complete": 7
+        }
+      },
+      {
+        "technology_id": "heavy_armor",
+        "printed_name": "Heavy Armor",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 8,
+          "stage_ii": 8,
+          "stage_iii": 8,
+          "complete": 8
+        }
+      },
+      {
+        "technology_id": "jet_fighters",
+        "printed_name": "Jet Fighters",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 8,
+          "stage_ii": 8,
+          "stage_iii": 8,
+          "complete": 8
+        }
+      },
+      {
+        "technology_id": "long_range_aircraft",
+        "printed_name": "Long-range Aircraft",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 8,
+          "stage_ii": 8,
+          "stage_iii": 8,
+          "complete": 8
+        }
+      },
+      {
+        "technology_id": "advanced_submarines",
+        "printed_name": "Advanced Submarines",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 8,
+          "stage_ii": 8,
+          "stage_iii": 8,
+          "complete": 8
+        }
+      },
+      {
+        "technology_id": "large_ship_construction",
+        "printed_name": "Large Ship Construction",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 8,
+          "stage_ii": 8,
+          "stage_iii": 8,
+          "complete": 8
+        }
+      },
+      {
+        "technology_id": "improved_logistics",
+        "printed_name": "Improved Logistics",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 8,
+          "stage_ii": 8,
+          "stage_iii": 8,
+          "complete": 8
+        }
+      },
+      {
+        "technology_id": "heavy_strategic_bombers",
+        "printed_name": "Heavy Strategic Bombers",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 9,
+          "stage_ii": 9,
+          "stage_iii": 9,
+          "complete": 9
+        }
+      },
+      {
+        "technology_id": "strategic_rockets",
+        "printed_name": "Strategic Rockets",
+        "minimum_success_roll_by_destination": {
+          "stage_i": 9,
+          "stage_ii": 9,
+          "stage_iii": 9,
+          "complete": 9
+        }
+      }
+    ],
+    "excluded_context": "USA/USSR objective symbols and national income prerequisites are not starting technologies or extra participants in this closed campaign."
+  },
+  "capital_ship_source_statements": [
+    {
+      "type": "battleship",
+      "undamaged": {
+        "attack": 8,
+        "attack_null_means": null,
+        "defense": 8,
+        "movement": 2
+      },
+      "hits_to_sink": 2,
+      "printed_damage_effect": {
+        "movement_reduction": 1,
+        "combat_effectiveness_reduction": 2
+      },
+      "damage_effect_scope": "These are the printed prose modifiers, not a complete per-damage-state battle-board matrix. No additional carrier-capacity or bombardment rule is inferred.",
+      "repair_price_ipp_per_hit": 0,
+      "repair_slots_per_hit": 1,
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 90,
+          "section": "13.1.6"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.6"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 7,
+          "section": "Naval build chart"
+        }
+      ]
+    },
+    {
+      "type": "heavy_battleship",
+      "undamaged": {
+        "attack": 10,
+        "attack_null_means": null,
+        "defense": 10,
+        "movement": 3
+      },
+      "hits_to_sink": 3,
+      "printed_damage_effect": {
+        "movement_reduction": 1,
+        "combat_effectiveness_reduction": 2
+      },
+      "damage_effect_scope": "These are the printed prose modifiers, not a complete per-damage-state battle-board matrix. No additional carrier-capacity or bombardment rule is inferred.",
+      "repair_price_ipp_per_hit": 0,
+      "repair_slots_per_hit": 1,
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 90,
+          "section": "13.1.6"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.6"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 7,
+          "section": "Naval build chart"
+        }
+      ]
+    },
+    {
+      "type": "fleet_carrier",
+      "undamaged": {
+        "attack": null,
+        "attack_null_means": "N/A",
+        "defense": 2,
+        "movement": 3
+      },
+      "hits_to_sink": 2,
+      "printed_damage_effect": {
+        "movement_reduction": 1,
+        "combat_effectiveness_reduction": 1
+      },
+      "damage_effect_scope": "These are the printed prose modifiers, not a complete per-damage-state battle-board matrix. No additional carrier-capacity or bombardment rule is inferred.",
+      "repair_price_ipp_per_hit": 0,
+      "repair_slots_per_hit": 1,
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 90,
+          "section": "13.1.6"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.6"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 7,
+          "section": "Naval build chart"
+        }
+      ]
+    },
+    {
+      "type": "heavy_fleet_carrier",
+      "undamaged": {
+        "attack": null,
+        "attack_null_means": "N/A",
+        "defense": 2,
+        "movement": 3
+      },
+      "hits_to_sink": 2,
+      "printed_damage_effect": {
+        "movement_reduction": 1,
+        "combat_effectiveness_reduction": 1
+      },
+      "damage_effect_scope": "These are the printed prose modifiers, not a complete per-damage-state battle-board matrix. No additional carrier-capacity or bombardment rule is inferred.",
+      "repair_price_ipp_per_hit": 0,
+      "repair_slots_per_hit": 1,
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 91,
+          "section": "13.1.6"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.6"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 7,
+          "section": "Naval build chart"
+        }
+      ]
+    }
+  ],
+  "rail_source_checks": {
+    "source_refs": [
+      {
+        "source_id": "rulebook",
+        "pdf_page": 67,
+        "section": "10.6.2 rail bombing"
+      },
+      {
+        "source_id": "rulebook",
+        "pdf_page": 98,
+        "section": "13.2.8 rail table"
+      },
+      {
+        "source_id": "rulebook",
+        "pdf_page": 99,
+        "section": "13.2.8 terrain route"
+      },
+      {
+        "source_id": "japan_nrs",
+        "pdf_page": 8,
+        "section": "Railroads purchase notes"
+      }
+    ],
+    "normal_terrain": {
+      "price_ipp": 2,
+      "maximum_damage": 1
+    },
+    "desert_jungle_marsh_mountain_tundra": {
+      "price_ipp": 4,
+      "maximum_damage": 2
+    },
+    "repair_price_ipp_per_damage": 1,
+    "terrain_rule": "Use terrain at the border on the most direct roundel-to-roundel route; do not substitute a single endpoint terrain.",
+    "bombing_rule": "Select one border of the targeted land zone; all tracks on it are affected. War with only the targeted land-zone owner is sufficient. The source example marks damage on that owner's side.",
+    "build_permission": "Other-nation border construction requires permission; non-controlled neutral nations disallow construction into their zones. Japan NRS also explicitly requires peace with the other nation.",
+    "score_does_not_define_repair_permission": true
+  },
+  "later_implementation_gates": [
+    {
+      "milestone": "M3",
+      "item": "Complete executable unit/facility catalog, including battle-board damage-state matrix, capacity and bombardment interactions.",
+      "blocks_m0_source_reconciliation": false
+    },
+    {
+      "milestones": [
+        "M3",
+        "M5",
+        "M6",
+        "M8"
+      ],
+      "item": "Encode route-derived rail cost and targeted-side damage/repair semantics with executable rule fixtures.",
+      "blocks_m0_source_reconciliation": false
+    },
+    {
+      "milestones": [
+        "M3",
+        "M6"
+      ],
+      "item": "Implement the transcribed research chart, state progression, calendar gate, national availability and effects.",
+      "blocks_m0_source_reconciliation": false
+    }
+  ]
+}
