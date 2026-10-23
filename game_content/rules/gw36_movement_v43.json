@@ -1,0 +1,542 @@
+{
+  "schema_version": 1,
+  "version": "M5-2026-10-22",
+  "scenario_id": "japan_china_1936_1941",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "id": "map",
+      "path": "game_content/maps/gw36map.png",
+      "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba"
+    }
+  ],
+  "review": {
+    "date": "2026-10-22",
+    "rail_region_source": "RB 11.2 p74 printed geographic-region map; all retained land lies in Asia, including Mongolia. Ownership has no effect.",
+    "rail_gauge_source": "RB 1.6 p10 white checkered narrow gauge. Native-source retained Chinese/Manchurian/Japanese track artwork inspected; no broad track or gauge boundary in this closed profile.",
+    "river_source": "RB 1.7 p11 and 1.7.6 p12; independently directional shortest path after starting on border. Recorded false values fill retained unknowns only; existing adopted true/false values remain authoritative.",
+    "river_route_source": "Existing adopted has_river route graph is retained separately from river_crossing. Review tests test_china_river_routes_are_distinct_from_combat_crossings list the exact intended routes; no off-map continuation is invented.",
+    "inspected_map_crops": [
+      "docs/map_audits/full_world/evidence/ap_china_graph.png",
+      "docs/map_audits/full_world/evidence/ap_naval_japan.png",
+      "docs/map_audits/full_world/evidence/ap_mongolia_north_edges.png"
+    ],
+    "scope": "Overlay only; frozen M0 map and M1 bridge are unchanged."
+  },
+  "rail_regions": {
+    "land_china_beiping": "asia",
+    "land_china_hopeh": "asia",
+    "land_china_hunan": "asia",
+    "land_china_kweichow": "asia",
+    "land_china_nanking": "asia",
+    "land_china_shantung": "asia",
+    "land_china_shensi": "asia",
+    "land_china_sikang": "asia",
+    "land_china_sinkiang": "asia",
+    "land_china_suiyuan": "asia",
+    "land_china_szechwan": "asia",
+    "land_china_tsinghai": "asia",
+    "land_china_yunnan": "asia",
+    "land_formosa": "asia",
+    "land_hainan": "asia",
+    "land_jap_hokkaido": "asia",
+    "land_jap_honshu": "asia",
+    "land_jap_kyushu": "asia",
+    "land_jap_okinawa": "asia",
+    "land_jap_tokyo": "asia",
+    "land_korea": "asia",
+    "land_kwangtung": "asia",
+    "land_manchuria_eastern": "asia",
+    "land_manchuria_northern": "asia",
+    "land_manchuria_rehe": "asia",
+    "land_manchuria_western": "asia",
+    "land_mongolia_central_mongolia": "asia",
+    "land_mongolia_kerulen": "asia",
+    "land_mongolia_kobdo": "asia",
+    "land_mongolia_ulyassutai": "asia",
+    "land_tibet": "asia"
+  },
+  "rail_gauges": [
+    {
+      "endpoints": [
+        "land_china_beiping",
+        "land_china_hopeh"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_beiping",
+        "land_china_suiyuan"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_beiping",
+        "land_manchuria_rehe"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_hopeh",
+        "land_china_shantung"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_hopeh",
+        "land_china_shensi"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_hunan",
+        "land_china_nanking"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_hunan",
+        "land_china_shantung"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_hunan",
+        "land_kwangtung"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_china_nanking",
+        "land_china_shantung"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_jap_honshu",
+        "land_jap_kyushu"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_jap_honshu",
+        "land_jap_tokyo"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_korea",
+        "land_manchuria_eastern"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_korea",
+        "land_manchuria_rehe"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_manchuria_eastern",
+        "land_manchuria_rehe"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_manchuria_eastern",
+        "land_manchuria_western"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_manchuria_northern",
+        "land_manchuria_western"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    },
+    {
+      "endpoints": [
+        "land_manchuria_rehe",
+        "land_manchuria_western"
+      ],
+      "gauge_change": false,
+      "gauge": "narrow",
+      "evidence": "native_map_track_colour"
+    }
+  ],
+  "river_crossings": [
+    {
+      "from": "land_china_beiping",
+      "to": "land_china_hopeh",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_beiping",
+      "to": "land_china_suiyuan",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_beiping",
+      "to": "land_manchuria_rehe",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_hopeh",
+      "to": "land_china_suiyuan",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_shensi",
+      "to": "land_china_szechwan",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_sinkiang",
+      "to": "land_china_tsinghai",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_sinkiang",
+      "to": "land_mongolia_kobdo",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_sinkiang",
+      "to": "land_mongolia_ulyassutai",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_suiyuan",
+      "to": "land_manchuria_rehe",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_suiyuan",
+      "to": "land_mongolia_central_mongolia",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_suiyuan",
+      "to": "land_mongolia_kerulen",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_szechwan",
+      "to": "land_china_kweichow",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_szechwan",
+      "to": "land_china_shantung",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_tsinghai",
+      "to": "land_tibet",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_china_yunnan",
+      "to": "land_china_sikang",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_jap_hokkaido",
+      "to": "land_jap_honshu",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_jap_honshu",
+      "to": "land_jap_tokyo",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_jap_kyushu",
+      "to": "land_jap_honshu",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_korea",
+      "to": "land_manchuria_eastern",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_kwangtung",
+      "to": "land_china_yunnan",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_kwangtung",
+      "to": "land_hainan",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_eastern",
+      "to": "land_manchuria_northern",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_eastern",
+      "to": "land_manchuria_rehe",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_eastern",
+      "to": "land_manchuria_western",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_rehe",
+      "to": "land_korea",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_rehe",
+      "to": "land_manchuria_western",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_western",
+      "to": "land_manchuria_northern",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_manchuria_western",
+      "to": "land_mongolia_kerulen",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_mongolia_central_mongolia",
+      "to": "land_china_tsinghai",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_mongolia_central_mongolia",
+      "to": "land_mongolia_ulyassutai",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_mongolia_kerulen",
+      "to": "land_mongolia_central_mongolia",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_mongolia_kobdo",
+      "to": "land_mongolia_central_mongolia",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_mongolia_ulyassutai",
+      "to": "land_china_tsinghai",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_mongolia_ulyassutai",
+      "to": "land_mongolia_kobdo",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    },
+    {
+      "from": "land_tibet",
+      "to": "land_china_sikang",
+      "river_crossing": false,
+      "evidence": "native_map_directional_shortest_path"
+    }
+  ],
+  "rules": [
+    {
+      "id": "terrain_movement",
+      "source_id": "rulebook",
+      "pages": [
+        10,
+        11,
+        12,
+        13
+      ],
+      "sections": [
+        "1.7"
+      ]
+    },
+    {
+      "id": "supply",
+      "source_id": "rulebook",
+      "pages": [
+        16,
+        17
+      ],
+      "sections": [
+        "1.11",
+        "1.12"
+      ]
+    },
+    {
+      "id": "blockade",
+      "source_id": "rulebook",
+      "pages": [
+        60
+      ],
+      "sections": [
+        "9.4.6"
+      ],
+      "clarification": "RCL-005 surface warships only"
+    },
+    {
+      "id": "strategic_rail",
+      "source_id": "rulebook",
+      "pages": [
+        74,
+        75
+      ],
+      "sections": [
+        "11.2",
+        "11.2.1"
+      ]
+    },
+    {
+      "id": "narrow_crossing",
+      "source_id": "rulebook",
+      "pages": [
+        16
+      ],
+      "sections": [
+        "1.9"
+      ]
+    },
+    {
+      "id": "liberation_withdrawal",
+      "source_id": "rulebook",
+      "pages": [
+        73,
+        74,
+        76
+      ],
+      "sections": [
+        "10.10.1",
+        "11.1",
+        "11.4.1"
+      ]
+    },
+    {
+      "id": "improved_logistics",
+      "source_id": "rulebook",
+      "pages": [
+        49
+      ],
+      "sections": [
+        "8.2.1"
+      ],
+      "effects": [
+        "regional_rail_capacity_plus_one",
+        "supply_range_plus_one",
+        "factory_relocation"
+      ]
+    },
+    {
+      "id": "motorized_towing",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        85,
+        86,
+        87
+      ],
+      "parameters": {
+        "ratio": "1:1",
+        "must_start_same_zone": true,
+        "towed_movement": 2,
+        "eligible": [
+          "artillery",
+          "advanced_artillery",
+          "anti_aircraft_artillery"
+        ],
+        "shared_route_and_approach": true,
+        "persistent_pairing": true
+      },
+      "status": "implemented",
+      "test_suite": "movement"
+    }
+  ]
+}

@@ -1,0 +1,5608 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "version": "4.3"
+    },
+    {
+      "id": "japan_nrs",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+      "version": "4.3"
+    }
+  ],
+  "facilities": [
+    {
+      "id": "minor_factory",
+      "name": "Minor Factory",
+      "purchase_costs": [
+        8
+      ],
+      "asset_value": 8,
+      "max_damage": 5,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 1,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "factory_production",
+        "facility_capacity_snapshot",
+        "factory_capture",
+        "improved_construction_facility",
+        "facility_damage_disables_use",
+        "factory_technology_development_unavailable",
+        "minor_factory_outside_home_country_supply",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": false,
+            "multiple_factories_per_zone": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": false,
+            "port_attack_disabled_at_max_damage": false,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "factory_production",
+          "parameters": {
+            "unit_classes": [
+              "land",
+              "aircraft"
+            ],
+            "requires_supply_path": true,
+            "improved_factories_capacity": 2,
+            "technology": "improved_factories",
+            "requires_possession_since_turn_start": true,
+            "technology_benefit_transfers_on_capture": false
+          },
+          "description": "Factories produce land units and aircraft within their capacity. Capturing an improved factory does not grant its former owner's technology benefit.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "production"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "factory_capture",
+          "parameters": {
+            "captured_type": "minor_factory",
+            "preserve_damage": true,
+            "max_damage_tracks_original_factory_level": true,
+            "original_owner_repossession_restores_original_level": true
+          },
+          "description": "Captured Medium and Major Factories operate as Minor Factories, retaining their original damage ceiling and restoring their original level when repossessed by their original owner.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 1
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "factory_technology_development_unavailable",
+          "parameters": {
+            "permits_technology_development": false
+          },
+          "description": "Minor and Medium Factories do not provide technology-development capability.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "minor_factory_outside_home_country_supply",
+          "parameters": {
+            "outside_home_country_requires_supply_path": true,
+            "blocked_supply_disables_production": true
+          },
+          "description": "An overseas Minor Factory cannot produce without its required Supply Path.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [
+        {
+          "to": "medium_factory",
+          "cost_ipp": 7,
+          "requires_technology": [],
+          "automatic": false,
+          "parameters": {
+            "requires_target_build_eligibility": true,
+            "requires_supply_path": true,
+            "requires_home_country": true,
+            "completion_phase": "place_units",
+            "may_upgrade_after_use": true
+          },
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 80,
+              "section": "12.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.1"
+        }
+      ]
+    },
+    {
+      "id": "medium_factory",
+      "name": "Medium Factory",
+      "purchase_costs": [
+        7,
+        7
+      ],
+      "asset_value": 14,
+      "max_damage": 10,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 3,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "factory_production",
+        "facility_capacity_snapshot",
+        "factory_capture",
+        "improved_construction_facility",
+        "facility_damage_disables_use",
+        "factory_technology_development_unavailable",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": true,
+            "coastal_border": false,
+            "multiple_factories_per_zone": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": false,
+            "port_attack_disabled_at_max_damage": false,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "factory_production",
+          "parameters": {
+            "unit_classes": [
+              "land",
+              "aircraft"
+            ],
+            "requires_supply_path": true,
+            "improved_factories_capacity": 5,
+            "technology": "improved_factories",
+            "requires_possession_since_turn_start": true,
+            "technology_benefit_transfers_on_capture": false
+          },
+          "description": "Factories produce land units and aircraft within their capacity. Capturing an improved factory does not grant its former owner's technology benefit.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "production"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "factory_capture",
+          "parameters": {
+            "captured_type": "minor_factory",
+            "preserve_damage": true,
+            "max_damage_tracks_original_factory_level": true,
+            "original_owner_repossession_restores_original_level": true
+          },
+          "description": "Captured Medium and Major Factories operate as Minor Factories, retaining their original damage ceiling and restoring their original level when repossessed by their original owner.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 3
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "factory_technology_development_unavailable",
+          "parameters": {
+            "permits_technology_development": false
+          },
+          "description": "Minor and Medium Factories do not provide technology-development capability.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [
+        {
+          "to": "major_factory",
+          "cost_ipp": 6,
+          "requires_technology": [],
+          "automatic": false,
+          "parameters": {
+            "requires_target_build_eligibility": true,
+            "requires_supply_path": true,
+            "requires_home_country": true,
+            "completion_phase": "place_units",
+            "may_upgrade_after_use": true
+          },
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 80,
+              "section": "12.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.1"
+        }
+      ]
+    },
+    {
+      "id": "major_factory",
+      "name": "Major Factory",
+      "purchase_costs": [
+        6,
+        6,
+        6
+      ],
+      "asset_value": 18,
+      "max_damage": 20,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 5,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "factory_production",
+        "facility_capacity_snapshot",
+        "factory_capture",
+        "improved_construction_facility",
+        "major_factory_damage_capacity",
+        "major_factory_technology_development",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": true,
+            "coastal_border": false,
+            "multiple_factories_per_zone": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": false,
+            "port_attack_disabled_at_max_damage": false,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "factory_production",
+          "parameters": {
+            "unit_classes": [
+              "land",
+              "aircraft"
+            ],
+            "requires_supply_path": true,
+            "improved_factories_capacity": 8,
+            "technology": "improved_factories",
+            "requires_possession_since_turn_start": true,
+            "technology_benefit_transfers_on_capture": false
+          },
+          "description": "Factories produce land units and aircraft within their capacity. Capturing an improved factory does not grant its former owner's technology benefit.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "production"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "factory_capture",
+          "parameters": {
+            "captured_type": "minor_factory",
+            "preserve_damage": true,
+            "max_damage_tracks_original_factory_level": true,
+            "original_owner_repossession_restores_original_level": true
+          },
+          "description": "Captured Medium and Major Factories operate as Minor Factories, retaining their original damage ceiling and restoring their original level when repossessed by their original owner.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 5
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "major_factory_damage_capacity",
+          "parameters": {
+            "production_capacity_loss_per_damage": 1,
+            "minimum_production_capacity": 0
+          },
+          "description": "Each damage point removes one production slot; negative production capacity cannot produce units.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "major_factory_technology_development",
+          "parameters": {
+            "permits_technology_development": true
+          },
+          "description": "Only Major Factories have the printed Technology Development capability.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.1"
+        }
+      ]
+    },
+    {
+      "id": "airbase",
+      "name": "Airbase",
+      "purchase_costs": [
+        3,
+        3
+      ],
+      "asset_value": 6,
+      "max_damage": 3,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "base_movement_bonus",
+        "base_scramble",
+        "base_in_port_and_lend_lease",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": false,
+            "maximum_per_land_zone": 1,
+            "unlimited_per_land_zone": false
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": false,
+            "port_attack_disabled_at_max_damage": false,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "base_movement_bonus",
+          "parameters": {
+            "target_class": "aircraft_except_seaplanes",
+            "movement_bonus": 1,
+            "requires_supply_path": true,
+            "stacks_with_same_type": false,
+            "starts_in_same_land_zone": true,
+            "starts_in_adjacent_sea_zone": false,
+            "first_sea_zone_must_adjoin_base": false
+          },
+          "description": "A qualifying unit starting at the base gains one movement point; multiple bases of the same type do not stack.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "base_scramble",
+          "parameters": {
+            "target_class": "fighter",
+            "maximum_units": 3,
+            "radar_unlimited": true
+          },
+          "description": "The base may scramble up to three qualifying units, or an unlimited number with Radar.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "base_in_port_and_lend_lease",
+          "parameters": {
+            "in_port_unit_class": null,
+            "can_send_or_receive_lend_lease": false
+          },
+          "description": "Submarine Bases can berth submarines. Bases do not send or receive Lend-lease.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 94,
+          "section": "13.2.2"
+        }
+      ]
+    },
+    {
+      "id": "seaplane_base",
+      "name": "Seaplane Base",
+      "purchase_costs": [
+        3
+      ],
+      "asset_value": 3,
+      "max_damage": 3,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "base_movement_bonus",
+        "base_scramble",
+        "base_in_port_and_lend_lease",
+        "seaplane_base_map_bonus",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "maximum_per_land_zone": null,
+            "unlimited_per_land_zone": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": false,
+            "port_attack_disabled_at_max_damage": false,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "base_movement_bonus",
+          "parameters": {
+            "target_class": "seaplane",
+            "movement_bonus": 1,
+            "requires_supply_path": true,
+            "stacks_with_same_type": false,
+            "starts_in_same_land_zone": true,
+            "starts_in_adjacent_sea_zone": false,
+            "first_sea_zone_must_adjoin_base": true
+          },
+          "description": "A qualifying unit starting at the base gains one movement point; multiple bases of the same type do not stack.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "base_scramble",
+          "parameters": {
+            "target_class": "seaplane",
+            "maximum_units": 3,
+            "radar_unlimited": true
+          },
+          "description": "The base may scramble up to three qualifying units, or an unlimited number with Radar.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "base_in_port_and_lend_lease",
+          "parameters": {
+            "in_port_unit_class": null,
+            "can_send_or_receive_lend_lease": false
+          },
+          "description": "Submarine Bases can berth submarines. Bases do not send or receive Lend-lease.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "seaplane_base_map_bonus",
+          "parameters": {
+            "technology": "long_range_aircraft",
+            "map_range_bonus": 1
+          },
+          "description": "Long-range Aircraft adds one to Seaplane MAP range when using the Seaplane Base benefit.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 94,
+          "section": "13.2.2"
+        }
+      ]
+    },
+    {
+      "id": "submarine_base",
+      "name": "Submarine Base",
+      "purchase_costs": [
+        3
+      ],
+      "asset_value": 3,
+      "max_damage": 3,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "base_movement_bonus",
+        "base_scramble",
+        "base_in_port_and_lend_lease",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "maximum_per_land_zone": null,
+            "unlimited_per_land_zone": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": false,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. The in-port rule separately suppresses protection at maximum damage, including a Submarine Base used as a port. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 78,
+              "section": "11.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "base_movement_bonus",
+          "parameters": {
+            "target_class": "submarine",
+            "movement_bonus": 1,
+            "requires_supply_path": true,
+            "stacks_with_same_type": false,
+            "starts_in_same_land_zone": false,
+            "starts_in_adjacent_sea_zone": true,
+            "first_sea_zone_must_adjoin_base": false
+          },
+          "description": "A qualifying unit starting at the base gains one movement point; multiple bases of the same type do not stack.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "base_scramble",
+          "parameters": {
+            "target_class": "submarine",
+            "maximum_units": 3,
+            "radar_unlimited": true
+          },
+          "description": "The base may scramble up to three qualifying units, or an unlimited number with Radar.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "base_in_port_and_lend_lease",
+          "parameters": {
+            "in_port_unit_class": "submarine",
+            "can_send_or_receive_lend_lease": false
+          },
+          "description": "Submarine Bases can berth submarines. Bases do not send or receive Lend-lease.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 94,
+          "section": "13.2.2"
+        }
+      ]
+    },
+    {
+      "id": "minor_port",
+      "name": "Minor Port",
+      "purchase_costs": [
+        3
+      ],
+      "asset_value": 3,
+      "max_damage": 1,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "naval_facility_movement_supply",
+        "naval_facility_scramble_and_in_port",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "city_maximum_minor_naval_facilities": 1,
+            "city_maximum_major_naval_facilities": 1,
+            "naval_size": "minor"
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": true,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_movement_supply",
+          "parameters": {
+            "surface_ship_movement_bonus": 0,
+            "movement_bonus_requires_supply_path": true,
+            "movement_bonus_stacks": false,
+            "bonus_start": "adjacent_sea_zone",
+            "strategic_naval_movement_range": null,
+            "strategic_naval_movement_requires_supply_path": true,
+            "supply_path_range": 2
+          },
+          "description": "Major Naval Facilities provide a supplied Surface Ship movement bonus and Strategic Naval Movement; minor and major facilities have distinct Supply Path ranges.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_scramble_and_in_port",
+          "parameters": {
+            "scramble_unit_class": null,
+            "scramble_maximum_units": 0,
+            "radar_unlimited": false,
+            "in_port_unit_class": null
+          },
+          "description": "Only major Naval Facilities provide the printed Surface Ship scramble and in-port capabilities.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [
+        {
+          "to": "major_port",
+          "cost_ipp": 4,
+          "requires_technology": [],
+          "automatic": false,
+          "parameters": {
+            "requires_target_build_eligibility": true,
+            "requires_supply_path": true,
+            "requires_home_country": false,
+            "completion_phase": "place_units",
+            "may_upgrade_after_use": true
+          },
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 80,
+              "section": "12.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 94,
+          "section": "13.2.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 95,
+          "section": "13.2.3"
+        }
+      ]
+    },
+    {
+      "id": "major_port",
+      "name": "Major Port",
+      "purchase_costs": [
+        3,
+        3
+      ],
+      "asset_value": 6,
+      "max_damage": 3,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "naval_facility_movement_supply",
+        "naval_facility_scramble_and_in_port",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "city_maximum_minor_naval_facilities": 1,
+            "city_maximum_major_naval_facilities": 1,
+            "naval_size": "major"
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": true,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_movement_supply",
+          "parameters": {
+            "surface_ship_movement_bonus": 1,
+            "movement_bonus_requires_supply_path": true,
+            "movement_bonus_stacks": false,
+            "bonus_start": "adjacent_sea_zone",
+            "strategic_naval_movement_range": 4,
+            "strategic_naval_movement_requires_supply_path": true,
+            "supply_path_range": 4
+          },
+          "description": "Major Naval Facilities provide a supplied Surface Ship movement bonus and Strategic Naval Movement; minor and major facilities have distinct Supply Path ranges.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_scramble_and_in_port",
+          "parameters": {
+            "scramble_unit_class": "surface_ship",
+            "scramble_maximum_units": 3,
+            "radar_unlimited": true,
+            "in_port_unit_class": "surface_ship"
+          },
+          "description": "Only major Naval Facilities provide the printed Surface Ship scramble and in-port capabilities.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 94,
+          "section": "13.2.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 95,
+          "section": "13.2.3"
+        }
+      ]
+    },
+    {
+      "id": "minor_dockyard",
+      "name": "Minor Dockyard",
+      "purchase_costs": [
+        2,
+        2
+      ],
+      "asset_value": 4,
+      "max_damage": 2,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 1,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "naval_facility_movement_supply",
+        "naval_facility_scramble_and_in_port",
+        "capital_ship_repair",
+        "facility_capacity_snapshot",
+        "naval_facility_outside_home_country_supply",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "city_maximum_minor_naval_facilities": 1,
+            "city_maximum_major_naval_facilities": 1,
+            "naval_size": "minor"
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": true,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_movement_supply",
+          "parameters": {
+            "surface_ship_movement_bonus": 0,
+            "movement_bonus_requires_supply_path": true,
+            "movement_bonus_stacks": false,
+            "bonus_start": "adjacent_sea_zone",
+            "strategic_naval_movement_range": null,
+            "strategic_naval_movement_requires_supply_path": true,
+            "supply_path_range": 2
+          },
+          "description": "Major Naval Facilities provide a supplied Surface Ship movement bonus and Strategic Naval Movement; minor and major facilities have distinct Supply Path ranges.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_scramble_and_in_port",
+          "parameters": {
+            "scramble_unit_class": null,
+            "scramble_maximum_units": 0,
+            "radar_unlimited": false,
+            "in_port_unit_class": null
+          },
+          "description": "Only major Naval Facilities provide the printed Surface Ship scramble and in-port capabilities.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "capital_ship_repair",
+          "parameters": {
+            "repair_ipp_per_damage": 0,
+            "repair_slots_per_damage": 1,
+            "maximum_damage_repaired_on_one_ship_per_player_turn": 2,
+            "improved_factories_repair_capacity": 2,
+            "technology": "improved_factories",
+            "ship_location": [
+              "adjacent_sea_zone",
+              "in_port_at_facility"
+            ],
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "restrict_other_actions": true,
+            "permitted_action_during_repair": "move_in_port_to_repairing_facility",
+            "ship_must_be_at_friendly_repair_facility_since_turn_start": true
+          },
+          "description": "Capital-ship repairs are free in IPP but consume one repair slot for each damage point. Repairing ships can only optionally move in port to the repairing facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "repair"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_outside_home_country_supply",
+          "parameters": {
+            "outside_home_country_requires_supply_path": true,
+            "blocked_supply_disables_repair": true,
+            "blocked_supply_disables_production": false
+          },
+          "description": "Overseas dockyards and shipyards require a Supply Path for repairs; shipyards also require it for production.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [
+        {
+          "to": "major_dockyard",
+          "cost_ipp": 5,
+          "requires_technology": [],
+          "automatic": false,
+          "parameters": {
+            "requires_target_build_eligibility": true,
+            "requires_supply_path": true,
+            "requires_home_country": true,
+            "completion_phase": "place_units",
+            "may_upgrade_after_use": true
+          },
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 80,
+              "section": "12.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 95,
+          "section": "13.2.4"
+        }
+      ]
+    },
+    {
+      "id": "major_dockyard",
+      "name": "Major Dockyard",
+      "purchase_costs": [
+        4,
+        4
+      ],
+      "asset_value": 8,
+      "max_damage": 4,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 5,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "naval_facility_movement_supply",
+        "naval_facility_scramble_and_in_port",
+        "capital_ship_repair",
+        "facility_capacity_snapshot",
+        "naval_facility_outside_home_country_supply",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": true,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "city_maximum_minor_naval_facilities": 1,
+            "city_maximum_major_naval_facilities": 1,
+            "naval_size": "major"
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": true,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_movement_supply",
+          "parameters": {
+            "surface_ship_movement_bonus": 1,
+            "movement_bonus_requires_supply_path": true,
+            "movement_bonus_stacks": false,
+            "bonus_start": "adjacent_sea_zone",
+            "strategic_naval_movement_range": 4,
+            "strategic_naval_movement_requires_supply_path": true,
+            "supply_path_range": 4
+          },
+          "description": "Major Naval Facilities provide a supplied Surface Ship movement bonus and Strategic Naval Movement; minor and major facilities have distinct Supply Path ranges.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_scramble_and_in_port",
+          "parameters": {
+            "scramble_unit_class": "surface_ship",
+            "scramble_maximum_units": 3,
+            "radar_unlimited": true,
+            "in_port_unit_class": "surface_ship"
+          },
+          "description": "Only major Naval Facilities provide the printed Surface Ship scramble and in-port capabilities.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "capital_ship_repair",
+          "parameters": {
+            "repair_ipp_per_damage": 0,
+            "repair_slots_per_damage": 1,
+            "maximum_damage_repaired_on_one_ship_per_player_turn": 2,
+            "improved_factories_repair_capacity": 8,
+            "technology": "improved_factories",
+            "ship_location": [
+              "adjacent_sea_zone",
+              "in_port_at_facility"
+            ],
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "restrict_other_actions": true,
+            "permitted_action_during_repair": "move_in_port_to_repairing_facility",
+            "ship_must_be_at_friendly_repair_facility_since_turn_start": true
+          },
+          "description": "Capital-ship repairs are free in IPP but consume one repair slot for each damage point. Repairing ships can only optionally move in port to the repairing facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "repair"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_outside_home_country_supply",
+          "parameters": {
+            "outside_home_country_requires_supply_path": true,
+            "blocked_supply_disables_repair": true,
+            "blocked_supply_disables_production": false
+          },
+          "description": "Overseas dockyards and shipyards require a Supply Path for repairs; shipyards also require it for production.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 95,
+          "section": "13.2.4"
+        }
+      ]
+    },
+    {
+      "id": "minor_shipyard",
+      "name": "Minor Shipyard",
+      "purchase_costs": [
+        3,
+        3
+      ],
+      "asset_value": 6,
+      "max_damage": 3,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 1,
+      "repair_capacity": 1,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "naval_facility_movement_supply",
+        "naval_facility_scramble_and_in_port",
+        "capital_ship_repair",
+        "facility_capacity_snapshot",
+        "naval_facility_outside_home_country_supply",
+        "shipyard_production",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "city_maximum_minor_naval_facilities": 1,
+            "city_maximum_major_naval_facilities": 1,
+            "naval_size": "minor"
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": true,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true,
+            "aligned_use_only": [
+              "movement_bonus",
+              "in_port",
+              "repair",
+              "scramble"
+            ],
+            "aligned_production": false
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_movement_supply",
+          "parameters": {
+            "surface_ship_movement_bonus": 0,
+            "movement_bonus_requires_supply_path": true,
+            "movement_bonus_stacks": false,
+            "bonus_start": "adjacent_sea_zone",
+            "strategic_naval_movement_range": null,
+            "strategic_naval_movement_requires_supply_path": true,
+            "supply_path_range": 2
+          },
+          "description": "Major Naval Facilities provide a supplied Surface Ship movement bonus and Strategic Naval Movement; minor and major facilities have distinct Supply Path ranges.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_scramble_and_in_port",
+          "parameters": {
+            "scramble_unit_class": null,
+            "scramble_maximum_units": 0,
+            "radar_unlimited": false,
+            "in_port_unit_class": null
+          },
+          "description": "Only major Naval Facilities provide the printed Surface Ship scramble and in-port capabilities.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "capital_ship_repair",
+          "parameters": {
+            "repair_ipp_per_damage": 0,
+            "repair_slots_per_damage": 1,
+            "maximum_damage_repaired_on_one_ship_per_player_turn": 2,
+            "improved_factories_repair_capacity": 2,
+            "technology": "improved_factories",
+            "ship_location": [
+              "adjacent_sea_zone",
+              "in_port_at_facility"
+            ],
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "restrict_other_actions": true,
+            "permitted_action_during_repair": "move_in_port_to_repairing_facility",
+            "ship_must_be_at_friendly_repair_facility_since_turn_start": true
+          },
+          "description": "Capital-ship repairs are free in IPP but consume one repair slot for each damage point. Repairing ships can only optionally move in port to the repairing facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "shared_production_and_repair"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_outside_home_country_supply",
+          "parameters": {
+            "outside_home_country_requires_supply_path": true,
+            "blocked_supply_disables_repair": true,
+            "blocked_supply_disables_production": true
+          },
+          "description": "Overseas dockyards and shipyards require a Supply Path for repairs; shipyards also require it for production.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "shipyard_production",
+          "parameters": {
+            "unit_class": "naval",
+            "requires_supply_path": true,
+            "requires_possession_since_turn_start": true,
+            "produce_capital_ships": false,
+            "improved_factories_capacity": 2,
+            "production_and_repair_share_capacity": true,
+            "technology_benefit_transfers_on_capture": false,
+            "surface_ships_may_be_placed_in_port": false
+          },
+          "description": "Ship construction and capital-ship repair consume the same slot pool. Capital Ships require a Major Shipyard.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [
+        {
+          "to": "major_shipyard",
+          "cost_ipp": 5,
+          "requires_technology": [],
+          "automatic": false,
+          "parameters": {
+            "requires_target_build_eligibility": true,
+            "requires_supply_path": true,
+            "requires_home_country": true,
+            "completion_phase": "place_units",
+            "may_upgrade_after_use": true
+          },
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 80,
+              "section": "12.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 96,
+          "section": "13.2.5"
+        }
+      ]
+    },
+    {
+      "id": "major_shipyard",
+      "name": "Major Shipyard",
+      "purchase_costs": [
+        5,
+        5
+      ],
+      "asset_value": 10,
+      "max_damage": 5,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 5,
+      "repair_capacity": 5,
+      "aaa": {
+        "threshold": 3,
+        "dice": 1,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "inherent_facility_aaa",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "naval_facility_movement_supply",
+        "naval_facility_scramble_and_in_port",
+        "capital_ship_repair",
+        "facility_capacity_snapshot",
+        "naval_facility_outside_home_country_supply",
+        "shipyard_production",
+        "japanese_surprise_attack_port_aaa_suppression"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": true,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": 2
+            },
+            "city_maximum_minor_naval_facilities": 1,
+            "city_maximum_major_naval_facilities": 1,
+            "naval_size": "major"
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "inherent_facility_aaa",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "shots_per_attacking_bomber": 1,
+            "maximum_shots": null,
+            "unlimited_shots": true,
+            "strategic_rockets_require_radar": true,
+            "shots_per_strategic_rocket_with_radar": 1,
+            "bombers_resolve_damage_before_aaa": true,
+            "rockets_face_aaa_before_damage": true,
+            "port_attack_shots_per_attacking_aircraft": 1,
+            "port_attack_requires_ships_in_port": true,
+            "disabled_under_construction": true,
+            "cannot_be_taken_as_casualty": true,
+            "normal_land_or_airborne_combat": false,
+            "strategic_bombing_disabled_at_max_damage": true,
+            "port_attack_disabled_at_max_damage": true,
+            "port_attack_requires_this_facility_to_berth_targeted_ships": true
+          },
+          "description": "Inherent facility AA uses the Anti-aircraft Artillery defense value, with one die per eligible attacker and no three-shot cap. It is distinct from movable AAA and inherent city AA. Port-attack AA belongs only to the facility berthing the targeted ships, not other facilities in the same land zone.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 68,
+              "section": "10.6.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 87,
+              "section": "13.1.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true,
+            "aligned_use_only": [
+              "movement_bonus",
+              "in_port",
+              "repair",
+              "scramble"
+            ],
+            "aligned_production": false
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_movement_supply",
+          "parameters": {
+            "surface_ship_movement_bonus": 1,
+            "movement_bonus_requires_supply_path": true,
+            "movement_bonus_stacks": false,
+            "bonus_start": "adjacent_sea_zone",
+            "strategic_naval_movement_range": 4,
+            "strategic_naval_movement_requires_supply_path": true,
+            "supply_path_range": 4
+          },
+          "description": "Major Naval Facilities provide a supplied Surface Ship movement bonus and Strategic Naval Movement; minor and major facilities have distinct Supply Path ranges.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 92,
+              "section": "13.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_scramble_and_in_port",
+          "parameters": {
+            "scramble_unit_class": "surface_ship",
+            "scramble_maximum_units": 3,
+            "radar_unlimited": true,
+            "in_port_unit_class": "surface_ship"
+          },
+          "description": "Only major Naval Facilities provide the printed Surface Ship scramble and in-port capabilities.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "capital_ship_repair",
+          "parameters": {
+            "repair_ipp_per_damage": 0,
+            "repair_slots_per_damage": 1,
+            "maximum_damage_repaired_on_one_ship_per_player_turn": 2,
+            "improved_factories_repair_capacity": 8,
+            "technology": "improved_factories",
+            "ship_location": [
+              "adjacent_sea_zone",
+              "in_port_at_facility"
+            ],
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "restrict_other_actions": true,
+            "permitted_action_during_repair": "move_in_port_to_repairing_facility",
+            "ship_must_be_at_friendly_repair_facility_since_turn_start": true
+          },
+          "description": "Capital-ship repairs are free in IPP but consume one repair slot for each damage point. Repairing ships can only optionally move in port to the repairing facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "facility_capacity_snapshot",
+          "parameters": {
+            "capacity_measured_at": "start_of_player_turn",
+            "built_this_turn_can_produce": false,
+            "captured_this_turn_can_produce": false,
+            "upgrade_or_repair_does_not_increase_same_turn_capacity": true,
+            "capacity_kind": "shared_production_and_repair"
+          },
+          "description": "Production and repair capacity retains the applicable start-of-turn limit after an upgrade or repair.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1-12.2"
+            }
+          ]
+        },
+        {
+          "id": "naval_facility_outside_home_country_supply",
+          "parameters": {
+            "outside_home_country_requires_supply_path": true,
+            "blocked_supply_disables_repair": true,
+            "blocked_supply_disables_production": true
+          },
+          "description": "Overseas dockyards and shipyards require a Supply Path for repairs; shipyards also require it for production.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "shipyard_production",
+          "parameters": {
+            "unit_class": "naval",
+            "requires_supply_path": true,
+            "requires_possession_since_turn_start": true,
+            "produce_capital_ships": true,
+            "improved_factories_capacity": 8,
+            "production_and_repair_share_capacity": true,
+            "technology_benefit_transfers_on_capture": false,
+            "surface_ships_may_be_placed_in_port": true
+          },
+          "description": "Ship construction and capital-ship repair consume the same slot pool. Capital Ships require a Major Shipyard.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            }
+          ]
+        },
+        {
+          "id": "japanese_surprise_attack_port_aaa_suppression",
+          "parameters": {
+            "attacking_nation": "japan",
+            "combat_mode": "port_attack",
+            "requires_first_dow_on_allied_major_and_selected_surprise_attack_zone": true,
+            "requires_surprise_attack_active": true,
+            "port_attack_shots_per_attacking_aircraft": 0,
+            "grants_surprise_attack_eligibility": false
+          },
+          "description": "A port attack selected for Japan's eligible Surprise Attack suppresses the defending facility's inherent AA. Ordinary port attacks retain one shot per attacking aircraft, without a three-shot cap.",
+          "source_refs": [
+            {
+              "source_id": "japan_nrs",
+              "pdf_page": 4,
+              "section": "Special Abilities: Surprise Attack"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 96,
+          "section": "13.2.5"
+        }
+      ]
+    },
+    {
+      "id": "fortification",
+      "name": "Fortification",
+      "purchase_costs": [
+        5,
+        5
+      ],
+      "asset_value": 10,
+      "max_damage": null,
+      "repair_cost_per_damage": null,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": null,
+        "dice": 0,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "improved_construction_facility",
+        "fortification_combat",
+        "fortification_attack_mitigation",
+        "defensive_emplacement_capture",
+        "maginot_line_variant"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "maximum_per_border": 1,
+            "limit_includes_strategic_objective_awards": true,
+            "border_kind": "land_or_sea"
+          },
+          "description": "Place on one land or sea border of a possessed land zone; at most one Fortification protects each border, including awards from strategic objectives.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 97,
+              "section": "13.2.6"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "fortification_combat",
+          "parameters": {
+            "defense_threshold": 5,
+            "die_sides": 12,
+            "dice": 2,
+            "first_strike": true,
+            "combat_round": 1,
+            "defending_infantry_class_bonus": 2,
+            "protects_against": [
+              "land_attack",
+              "border_clash",
+              "amphibious_assault",
+              "airborne_assault"
+            ],
+            "hits_restricted_to_attackers_crossing_protected_border": true,
+            "airborne_doctrine_protects_airborne_transport_and_cargo": true,
+            "blocks_enemy_blitz_into_protected_border": true
+          },
+          "description": "The protected border determines the eligible attackers for fortification hits, including hits caused specifically by its infantry bonus. Airborne Doctrine protects the airborne transport and its cargo from the fortification first strike.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 66,
+              "section": "10.6.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 97,
+              "section": "13.2.6"
+            }
+          ]
+        },
+        {
+          "id": "fortification_attack_mitigation",
+          "parameters": {
+            "enemy_hit_threshold_modifier": -1,
+            "attack_modes": [
+              "shore_bombardment",
+              "attrition_attack",
+              "carpet_bombing_in_city"
+            ]
+          },
+          "description": "Fortifications reduce the effective hit threshold of the listed attacks by one, as shown by the printed Battleship example.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 97,
+              "section": "13.2.6"
+            }
+          ]
+        },
+        {
+          "id": "defensive_emplacement_capture",
+          "parameters": {
+            "removed_on_capture": true,
+            "can_be_strategically_bombed": false,
+            "can_be_selected_as_casualty": false
+          },
+          "description": "Fortifications are removed when their zone is captured and cannot be strategically bombed or taken as casualties.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 97,
+              "section": "13.2.6"
+            }
+          ]
+        },
+        {
+          "id": "maginot_line_variant",
+          "parameters": {
+            "requires_special_map_facility": "maginot_line",
+            "territory_name": "Alsace-Lorraine",
+            "protected_neighbor_name": "Bavaria",
+            "defense_threshold": 6,
+            "dice": 2,
+            "first_strike": true,
+            "combat_round": 1,
+            "defending_infantry_class_bonus": 3,
+            "attacking_land_unit_casualty_multiplier_all_rounds": 2
+          },
+          "description": "The printed Maginot Line is a named French map exception, not the profile of a newly purchased ordinary Fortification.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 97,
+              "section": "13.2.6"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 97,
+          "section": "13.2.6"
+        }
+      ]
+    },
+    {
+      "id": "coastal_artillery",
+      "name": "Coastal Artillery",
+      "purchase_costs": [
+        6
+      ],
+      "asset_value": 6,
+      "max_damage": null,
+      "repair_cost_per_damage": null,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": null,
+        "dice": 0,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "improved_construction_facility",
+        "coastal_artillery_fire",
+        "defensive_emplacement_capture"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": true,
+            "adjacent_sea_zone_count": {
+              "minimum": 1,
+              "maximum": null
+            },
+            "unlimited_per_border": true,
+            "may_border_one_or_more_sea_zones": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "coastal_artillery_fire",
+          "parameters": {
+            "threshold": 3,
+            "die_sides": 12,
+            "first_strike": true,
+            "shots_per_eligible_attacking_ship": 1,
+            "maximum_shots_per_player_turn": 3,
+            "amphibious_targets": [
+              "shore_bombarding_ship",
+              "ship_unloading_amphibious_units"
+            ],
+            "casualty_selector": "amphibious_attacker",
+            "narrow_crossing_targets": "enemy_surface_ship",
+            "narrow_crossing_includes": [
+              "normal_movement",
+              "scrambling",
+              "entering_port"
+            ],
+            "shot_limit_shared_across_all_triggers": true
+          },
+          "description": "Coastal Artillery fires against qualifying assault ships and enemy Surface Ships crossing its narrow crossing, sharing a total limit of three shots per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.7"
+            }
+          ]
+        },
+        {
+          "id": "defensive_emplacement_capture",
+          "parameters": {
+            "removed_on_capture": true,
+            "can_be_strategically_bombed": false,
+            "can_be_selected_as_casualty": false
+          },
+          "description": "Coastal Artillery is removed on capture and cannot be strategically bombed or selected as a casualty.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.7"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 97,
+          "section": "13.2.7"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 98,
+          "section": "13.2.7"
+        }
+      ]
+    },
+    {
+      "id": "railroad",
+      "name": "Railroad",
+      "purchase_costs": [
+        2
+      ],
+      "asset_value": 2,
+      "max_damage": 1,
+      "repair_cost_per_damage": 1,
+      "production_capacity": 0,
+      "repair_capacity": 0,
+      "aaa": {
+        "threshold": null,
+        "dice": 0,
+        "die_sides": 12
+      },
+      "abilities": [
+        "facility_placement",
+        "facility_construction",
+        "facility_repair_timing",
+        "facility_use",
+        "facility_damage_disables_use",
+        "improved_construction_facility",
+        "railroad_route_terrain",
+        "railroad_gauge",
+        "railroad_bombing"
+      ],
+      "rules": [
+        {
+          "id": "facility_placement",
+          "parameters": {
+            "possessed_land": true,
+            "possessed_since_turn_start": true,
+            "home_country": false,
+            "coastal_border": false,
+            "land_border": true,
+            "forbids_impassable_terrain": true,
+            "other_nation_requires_player_permission": true,
+            "forbids_uncontrolled_neutral_endpoint": true
+          },
+          "description": "Placement restrictions apply to the selected site; border facilities identify the sea or land border they serve.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_construction",
+          "parameters": {
+            "starts_on_map_at_selected_site": true,
+            "matching_build_queue_marker": true,
+            "completed_at_started_site": true,
+            "placement_requires_possession_since_turn_start": true,
+            "inherent_aaa_while_under_construction": false,
+            "repair_damage_before_advancing": true,
+            "damage_per_setback_stage": 3,
+            "remove_when_pushed_before_first_paid_stage": true,
+            "setback_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 5,
+              "result_queue_stage": 3,
+              "remaining_damage": 2
+            },
+            "destruction_example": {
+              "original_stages": 3,
+              "current_queue_stage": 2,
+              "damage": 6,
+              "removed": true
+            }
+          },
+          "description": "Multi-turn construction uses paid per-turn stages. Damage can reverse progress; the printed examples distinguish stage setbacks from ordinary completed-facility damage limits.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.3.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.1"
+            }
+          ]
+        },
+        {
+          "id": "facility_repair_timing",
+          "parameters": {
+            "start_phase": "production",
+            "complete_phase": "place_units",
+            "ipp_per_damage": 1
+          },
+          "description": "Facility repair is purchased in Production and completed in the same Player Turn's Place Units Phase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 51,
+              "section": "8.6"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 79,
+              "section": "12.2"
+            }
+          ]
+        },
+        {
+          "id": "facility_use",
+          "parameters": {
+            "own_use_requires_possession_since_turn_start": true,
+            "aligned_nation_use": true
+          },
+          "description": "Use requires possession since the start of the Player Turn; aligned use is limited to the capabilities expressly granted for this facility.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "facility_damage_disables_use",
+          "parameters": {
+            "minimum_disabling_damage": 1,
+            "inherent_aaa_separate": true
+          },
+          "description": "Any damage disables the facility's operational benefits; its inherent-AA rule controls whether AA remains.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 93,
+              "section": "13.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 94,
+              "section": "13.2.2-13.2.3"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_facility",
+          "parameters": {
+            "technology": "improved_construction",
+            "choose_one_cost_option": [
+              "reduce_each_stage_by_one_ipp",
+              "combine_first_two_stages_at_full_combined_cost"
+            ],
+            "stage_cost_reduction_ipp": 1,
+            "includes_facility_upgrades": true,
+            "strategic_bombing_damage_reduction_per_player_turn": 0
+          },
+          "description": "Improved Construction permits either the per-stage cost reduction or combining the first two construction stages. Factory bombing mitigation is per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "railroad_route_terrain",
+          "parameters": {
+            "normal": {
+              "purchase_costs": [
+                2
+              ],
+              "asset_value": 2,
+              "max_damage": 1
+            },
+            "difficult": {
+              "terrains": [
+                "desert",
+                "jungle",
+                "marsh",
+                "mountain",
+                "tundra"
+              ],
+              "purchase_costs": [
+                4
+              ],
+              "asset_value": 4,
+              "max_damage": 2
+            },
+            "terrain_source": "border_crossing_on_direct_roundel_to_roundel_line",
+            "do_not_infer_from_endpoint_terrain_alone": true,
+            "physical_asset": "one_undirected_land_border",
+            "covered_zone_if_any_border_has_rail": true
+          },
+          "description": "Rail construction cost and maximum damage come from the terrain where the direct route crosses the border. One newly built railroad connects the two land zones across one border.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 99,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "railroad_gauge",
+          "parameters": {
+            "broad_gauge_nations": [
+              "brazil",
+              "spain",
+              "finland",
+              "mongolia",
+              "tannu_tuva",
+              "ussr"
+            ],
+            "default_gauge": "narrow",
+            "gauge_determined_by_land_zone": true
+          },
+          "description": "The originating land zone determines the newly built railroad gauge; the listed nations use broad gauge.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        },
+        {
+          "id": "railroad_bombing",
+          "parameters": {
+            "can_be_strategically_bombed": true,
+            "inherent_aaa": false,
+            "attacker_chooses_border_after_damage_roll": true,
+            "affects_all_railroads_on_border": true,
+            "damage_recorded_on_attacked_land_zone_side": true,
+            "requires_war_with_attacked_zone_owner_only": true
+          },
+          "description": "Bombing targets a land zone; damage is then assigned to one chosen rail border on that zone's side, capped by the route terrain.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 67,
+              "section": "10.6.2"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 98,
+              "section": "13.2.8"
+            }
+          ]
+        }
+      ],
+      "upgrades": [],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 98,
+          "section": "13.2.8"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 99,
+          "section": "13.2.8"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "multiplayer_search_verification_v1",
+  "status": "passed",
+  "command": "./.venv/bin/python -m unittest tests.test_multiplayer_mcts -v",
+  "tests_passed": 16,
+  "player_order": [
+    "axis",
+    "allies",
+    "comintern"
+  ],
+  "implementation": [
+    "studies/shared/multiplayer_mcts.py",
+    "studies/shared/campaign_adapter.py"
+  ],
+  "test_source": "tests/test_multiplayer_mcts.py",
+  "scope": "Generic vector search and explicit interrupt scheduling. Real campaign binding and full-game verification are recorded separately.",
+  "oracle": {
+    "method": "Independent finite-tree enumeration of vector Max-N decisions, exact chance expectation, and an explicit fixed-opponent policy expectation.",
+    "claims": "Finite-budget correctness and approximation checks on these fixtures; no claim of a global optimum, Nash equilibrium, or full-game playing strength.",
+    "budget_fixture_games": [
+      "deterministic_three_owner_consecutive_turn_and_defender_reaction",
+      "two_outcome_stochastic_action"
+    ],
+    "seeds": [
+      11,
+      29,
+      101
+    ],
+    "action_orders": [
+      "forward",
+      "reversed"
+    ],
+    "action_order_result": "Identical per-action counts and value vectors for each paired budget, seed and fixture.",
+    "budget_checks": [
+      {
+        "simulations": 64,
+        "allowed_recommended_action_regret": 0.8,
+        "allowed_max_component_action_value_error": 1.6,
+        "allowed_max_component_root_value_error": 2.0,
+        "observed_max_recommended_action_regret": 0.0,
+        "observed_max_component_action_value_error": 1.4,
+        "observed_max_component_root_value_error": 1.875
+      },
+      {
+        "simulations": 256,
+        "allowed_recommended_action_regret": 0.4,
+        "allowed_max_component_action_value_error": 0.85,
+        "allowed_max_component_root_value_error": 1.2,
+        "observed_max_recommended_action_regret": 0.0,
+        "observed_max_component_action_value_error": 0.7307692307692307,
+        "observed_max_component_root_value_error": 1.08203125
+      },
+      {
+        "simulations": 1536,
+        "allowed_recommended_action_regret": 0.15,
+        "allowed_max_component_action_value_error": 0.4,
+        "allowed_max_component_root_value_error": 0.5,
+        "observed_max_recommended_action_regret": 0.0,
+        "observed_max_component_action_value_error": 0.3031578947368421,
+        "observed_max_component_root_value_error": 0.4609375
+      }
+    ],
+    "additional_fixtures": [
+      "Stochastic outcomes route to Allies and Comintern reaction owners; exact expected chosen-action vector [4, 3.5, 4], 4096 simulations, seed 73, component tolerance 0.4.",
+      "Fixed donation policy v1 is sampled in both search and actual opponent choices; exact target action value [8, 2, 0], 4096 simulations, seed 4, target value tolerance 0.3.",
+      "Depth-limited values are explicitly evaluator approximations; terminal roots return the exact three-component terminal vector.",
+      "Changing maximum depth invalidates shallow cached rollout values and bounds: a 512-simulation depth 1 search prefers the immediate 1 payoff; both reused-object and fresh 128-simulation depth 8 searches prefer the delayed 10 payoff under a deliberately pessimistic intermediate evaluator."
+    ]
+  },
+  "verified_contracts": [
+    "Each decision maximizes its entitled player's component without sign flips.",
+    "Chance has no policy owner; every simulation independently seeds a search clone and samples explicit chance events.",
+    "Actual execution state and its RNG are unchanged by search.",
+    "Action edges retain complete-state successors; explicit chance nodes retain multiple sampled outcome states.",
+    "Cache identities include complete planning state, rules, evaluator version, opponent mode, target, opponent-policy version and maximum rollout depth.",
+    "Observed root reuse requires exact complete-state identity.",
+    "Optimistic first-play urgency, PUCT components and optional selection traces remain inspectable; children are not forced to receive one visit each.",
+    "Root noise is local to the current root opportunity, including reused internal nodes and cycles.",
+    "Interrupt offers and passes are explicit entitled-player decisions; the engine retains mandatory declaration priority.",
+    "Interrupt pass state survives clone and checkpoint restore and participates in observation/planning identity.",
+    "Raw unhandled interrupt opportunities are rejected rather than silently skipped."
+  ],
+  "legacy_models_or_weights_changed": false
+}

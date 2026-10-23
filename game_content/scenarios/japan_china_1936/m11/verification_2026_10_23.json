@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "milestone": "M11",
+  "date": "2026-10-23",
+  "status": "correctness_exit_passed",
+  "scope": "Frozen closed Japan/China campaign. These checks validate implementation behavior and finite-budget search fixtures, not learned playing strength or world-game completeness.",
+  "definition_fingerprint": "7167b2570851dfe260f2a094a737d9ccd0da76ccdf16b10d7e70952bdec1472e",
+  "verification": {
+    "configuration": "Release; BUILD_TESTING=ON",
+    "cpp_build": "cmake --build build/m9-m11 -j 4",
+    "cpp_command": "ctest --test-dir build/m9-m11 --output-on-failure -j 3",
+    "cpp_suites_passed": 23,
+    "cpp_failures": 0,
+    "cpp_wall_seconds": 22.69,
+    "python_extension": "./.venv/bin/python setup.py build_ext --inplace --force -j 4",
+    "python_command": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py' -v",
+    "python_tests_passed": 156,
+    "python_failures": 0,
+    "python_wall_seconds": 26.906,
+    "campaign_env_cpp_fixture_groups": 6,
+    "campaign_env_python_tests": 6,
+    "campaign_integration_cpp_fixture_groups": 5,
+    "multiplayer_search_python_tests": 16,
+    "trace_validation": "./.venv/bin/python tools/verify_campaign_trace.py --current <both trace.json paths>",
+    "trace_html": "Embedded evidence equals trace.json; offline JavaScript syntax and Node minimal-DOM controls/final-board smoke checks passed. No rendered-screenshot claim.",
+    "profile_source_hashes": "all six profiles valid",
+    "whitespace": "git diff --check passed"
+  },
+  "contracts": [
+    "Actual entitled decision owners, explicit chance and declaration opportunities; no automatic opponent play.",
+    "Registry/entity graph observations preserve complete rule state while excluding execution RNG, future dice tapes and history.",
+    "Exact actual clones/checkpoints; independently seeded search clones do not consume execution randomness.",
+    "Ordered Axis/Allies/Comintern Max-N values and approved terminal wealth-gap objective.",
+    "City labels cost zero, paid construction is counted once, free repairs have zero deduction, and prepaid repairs require current ownership.",
+    "Exact-oracle tolerances, action-order robustness, stochastic successors, same-player reactions, fixed-opponent consistency, root-noise isolation, and version/depth-safe cache reuse."
+  ],
+  "search_evidence": "docs/m11/search_verification.json",
+  "naval_evidence": "docs/m9/source_exit_2026_10_23.json",
+  "coverage_ledger": "docs/m10/runtime_coverage_ledger.json",
+  "campaign_traces": [
+    {
+      "path": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/delayed_seed_1941/trace.json",
+      "sha256": "2b1af26bc01473582dffb9a187a7eb0484c928255339b939aefb3c84966c92b4",
+      "html": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/delayed_seed_1941/index.html",
+      "html_sha256": "72d5d2c7dc8359c253941bfbc608e805bce65fc65ea4b3bd0563efe418796625",
+      "transitions": 1289,
+      "national_turns": 44,
+      "exact_replay_verified": true,
+      "current_source_hashes_verified": true,
+      "initial_and_terminal_python_restore": "exact checkpoint serialization",
+      "terminal_wealth": {
+        "allies": {
+          "income_rate": 15,
+          "infrastructure": 84,
+          "paid_construction": 0,
+          "treasury": 15,
+          "units": 68,
+          "wealth": 31.7
+        },
+        "axis": {
+          "income_rate": 16,
+          "infrastructure": 170,
+          "paid_construction": 0,
+          "treasury": 16,
+          "units": 375,
+          "wealth": 72.10000000000001
+        },
+        "comintern": {
+          "income_rate": 0,
+          "infrastructure": 0,
+          "paid_construction": 0,
+          "treasury": 1,
+          "units": 17,
+          "wealth": 1.8
+        }
+      },
+      "terminal_returns": [
+        38.60000000000001,
+        -42.20000000000001,
+        -102.00000000000001
+      ]
+    },
+    {
+      "path": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/mixed_seed_1936/trace.json",
+      "sha256": "fbcfea101a3db1f0dcdd86c8ff9f3ac61590550c3133c2cad4e5616b5828fa13",
+      "html": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/mixed_seed_1936/index.html",
+      "html_sha256": "e55c87ae9ca56337ec8099f76a1aa43df0c59a4895036ec6a4c33aa43f5efe85",
+      "transitions": 1558,
+      "national_turns": 44,
+      "exact_replay_verified": true,
+      "current_source_hashes_verified": true,
+      "initial_and_terminal_python_restore": "exact checkpoint serialization",
+      "terminal_wealth": {
+        "allies": {
+          "income_rate": 12,
+          "infrastructure": 57,
+          "paid_construction": 0,
+          "treasury": 12,
+          "units": 74,
+          "wealth": 26.3
+        },
+        "axis": {
+          "income_rate": 20,
+          "infrastructure": 190,
+          "paid_construction": 0,
+          "treasury": 20,
+          "units": 333,
+          "wealth": 74.3
+        },
+        "comintern": {
+          "income_rate": 0,
+          "infrastructure": 0,
+          "paid_construction": 3,
+          "treasury": 0,
+          "units": 2,
+          "wealth": 0.5
+        }
+      },
+      "terminal_returns": [
+        47.5,
+        -48.49999999999999,
+        -100.1
+      ]
+    }
+  ],
+  "rule_interpretations": {
+    "RCL-014": "Provisionally adopted by user; evacuating fleet attacks; fleet already at sea defends.",
+    "RCL-015": "Provisionally adopted by user; eliminate required neutral relocations only when no Friendly land destination exists.",
+    "authority": "Pending developer clarification; not publisher errata."
+  },
+  "outstanding_M12": [
+    "Batched neural inference, model/action-generation profiling and further factorization of large action menus.",
+    "Learned policy/value heads, held-out evaluation, curriculum and interruptible/resumable training operations."
+  ],
+  "training_launched": false,
+  "preserved_historical_records": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    },
+    "M6": {
+      "path": "game_content/scenarios/japan_china_1936/m6/verification.json",
+      "sha256": "60e6f6b245aadb2a2c91d64fc2f3dfacd6b52f21d3514d0123137eabcdf19386"
+    },
+    "M7": {
+      "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+      "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+    }
+  },
+  "preserved_world_map": {
+    "path": "game_content/maps/gw36_manual_map.json",
+    "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed"
+  },
+  "rule_profile_sha256": {
+    "game_content/rules/gw36_air_v43.json": "3434d7c133c130d53ef38446a04cf47f84bb7a1b228289846aa2359f71bf475b",
+    "game_content/rules/gw36_economy_v43.json": "79b1c6f32ffc62a052a9a2389ea8137eb098e00b98d32a6750a58a427d796255",
+    "game_content/rules/gw36_land_combat_v43.json": "b17763dc1401c6611b2b440bfbc76bba1b77dc03274415a56db8f1ba266e66cf",
+    "game_content/rules/gw36_movement_v43.json": "9ab7303520d24f094878509bc4ad73ab091ac9564ca23b3675322d63e87b7a9a",
+    "game_content/rules/gw36_naval_v43.json": "ae4b1d28ec94d5558750ac568c7c6e3de5fe7c1cf8b3f1a8c5fc1e94f686019f",
+    "game_content/rules/gw36_politics_v43.json": "280722b67061b2d66431df903844f32b26bebd9e0fbd53e99d375b08f3992108"
+  },
+  "implementation_sha256": {
+    "CMakeLists.txt": "7aa7219d8b97be75b280cf5a5ac45bc2ca078159620839e4f71c764dd1e4b621",
+    "include/game/campaign.hpp": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "4c7afcab9619debba9c764ae389f5d68ea1e7fcfa15528dfff8981d0aac40e5d",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "setup.py": "ee8f8dcfd27ef47fe9c47f740c13d551e397e509ba54bb550d23baf9d797b3a0",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "2bc5f0118d4c8f03a1335639b20d59d55f9ff486d287d694ad82d79a3be47e68",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "f0f5384b723633561f573dbdff6c98992f084d597a28aae5437ec61c12467b97",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/python_bindings.cpp": "02bd55675fe466b8056ef79eb01682702f14b23c0da1dc0984e2ec12810fcd51",
+    "studies/shared/campaign_adapter.py": "ebc43b6c91f80c41ef48297a2cca8e494c800528323486f1d1271e50ee6afa7f",
+    "studies/shared/multiplayer_mcts.py": "28cedd9d57693c17b6e9133d980db62fd9ee4caeb2c09c99e69a1a275dd9b5a9",
+    "tests/campaign_env_tests.cpp": "83c5ed0b00b197821fc68fce03caa034b66803780c0d7e3e89fa94ee80b84b3d",
+    "tests/campaign_integration_tests.cpp": "db272d8017f37e54fc1fb7675ebffd984a2579a8e002df98bc63b70f6dd27f72",
+    "tests/test_campaign_env.py": "d900696b12171b945ea4688002e94d43db74a30a3f9e4f9bf0a6e379ec65650a",
+    "tests/test_multiplayer_mcts.py": "a42abec1c768f3a672c1de7d6d0503d8523b8678d2c3227b8db9b979b7205b65"
+  },
+  "campaign_integration_evidence": "game_content/scenarios/japan_china_1936/m10/integration_evidence_2026_10_23.json",
+  "evidence_sha256": {
+    "docs/m9/source_exit_2026_10_23.json": "4ef1c5d738fbb989f862bf439f43924461ca486f5e77ee217f9f08771f1c455a",
+    "docs/m10/runtime_coverage_ledger.json": "e7cf224f1e57ac18d4344ebda168271c4c811d5af4942b10ae76344a537f1778",
+    "docs/m10/integration_evidence_2026_10_23.md": "d76efe37d7df5fed435398cc57b7d44ccdeac7ad2940ce682e8de70ce0ed1f09",
+    "game_content/scenarios/japan_china_1936/m10/integration_evidence_2026_10_23.json": "5258c4139a936fc206c8e81b3d21188d176af173ef7fdfd644b5812b3b640ad5",
+    "docs/m11/search_verification.json": "383c84398f4e23a5bef32e00d1c6834ab37fdf081311a3bd0fe6a6ddb4b17ca9",
+    "tools/build_campaign_coverage.py": "6e49efaf7e5ce3663c7025b8062f72940e5e88db57b75e815447f2f0c3252a17",
+    "tools/verify_campaign_trace.py": "5ae8f6f1f49badfbf2d48bc8905e4eec3f655c2474fe652b65ea643ad1f7e07d",
+    "tools/verify_campaign_trace_viewer.mjs": "2c25a3406282d95510ade9c8beb1d292e1e71fe4fc6235ef94026a1be57ef832"
+  }
+}

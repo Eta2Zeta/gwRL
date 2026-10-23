@@ -76,11 +76,8 @@ def build_first_decision_after_declaration_snapshot(
     env: gwrl_cpp.JapanTrainingEnv,
 ) -> tuple[list[float], list[list[float]], list[gwrl_cpp.Action]]:
     env.reset()
-    legal_actions = env.legal_actions()
-    declare_war = next(
-        action for action in legal_actions if action.kind == gwrl_cpp.ActionKind.DeclareWarOnChina
-    )
-    env.step(declare_war)
+    # The shared engine starts in Production. War is declared by the actual
+    # legal political/movement action rather than a prototype opening shortcut.
     if env.is_terminal():
         raise RuntimeError("Game ended before Japan combat state")
     return env.encode_state(), env.encode_legal_actions(), env.legal_actions()
@@ -90,6 +87,10 @@ def verify_against_cpp_example(env: gwrl_cpp.JapanTrainingEnv, example_path: Pat
     with example_path.open("r", encoding="utf-8") as handle:
         exported = json.load(handle)
 
+    if exported.get("benchmark_schema") != "campaign_v1":
+        return {"ok": None, "skipped": True,
+                "messages": ["Historical prototype export preserved; its schema is incompatible with the shared campaign engine."],
+                "checked_file": str(example_path)}
     state_features, legal_action_features, legal_actions = build_first_decision_after_declaration_snapshot(env)
     state_labels = env.state_feature_labels()
     action_labels = env.action_feature_labels()
@@ -221,10 +222,6 @@ def snapshot_first_decision_policy(
     mcts_config: MctsConfig,
 ) -> list[dict[str, Any]]:
     env.reset()
-    declare_war = next(
-        action for action in env.legal_actions() if action.kind == gwrl_cpp.ActionKind.DeclareWarOnChina
-    )
-    env.step(declare_war)
     search = run_mcts(env, model, mcts_config, add_root_noise=False)
     return summarize_search_root(search)
 
@@ -731,10 +728,6 @@ def train(config: TrainingConfig, scenario_path: Path) -> dict[str, Any]:
 
     state_features, legal_action_features, _ = build_first_decision_after_declaration_snapshot(env)
     env.reset()
-    declare_war = next(
-        action for action in env.legal_actions() if action.kind == gwrl_cpp.ActionKind.DeclareWarOnChina
-    )
-    env.step(declare_war)
     first_decision_search = run_mcts(env, model, mcts_config, add_root_noise=False)
     first_decision_policy = [
         {
@@ -832,9 +825,8 @@ def write_outputs(result: dict[str, Any], output_dir: Path) -> None:
 
     verification = result.get("verification")
     if verification is not None:
-        lines.append(
-            f"encoder_match_with_cpp_export={'yes' if verification['ok'] else 'no'}"
-        )
+        status = "not_checked_historical_schema" if verification.get("skipped") else ("yes" if verification["ok"] else "no")
+        lines.append(f"encoder_match_with_cpp_export={status}")
         for message in verification["messages"]:
             lines.append(f"verification_note={message}")
 

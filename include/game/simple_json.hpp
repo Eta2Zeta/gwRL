@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -19,6 +20,9 @@ class Value {
     Value(std::nullptr_t) : storage_(nullptr) {}
     Value(bool value) : storage_(value) {}
     Value(double value) : storage_(value) {}
+    // Without this overload a string literal/conditional const char* silently
+    // chooses Value(bool), corrupting serialized rule continuation tags.
+    Value(const char* value) : Value(value ? std::string(value) : throw std::invalid_argument("Null JSON string")) {}
     Value(std::string value) : storage_(std::move(value)) {}
     Value(Array value) : storage_(std::move(value)) {}
     Value(Object value) : storage_(std::move(value)) {}

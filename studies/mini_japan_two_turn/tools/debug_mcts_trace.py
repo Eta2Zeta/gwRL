@@ -46,7 +46,7 @@ def advance_to_purchase_phase_if_requested(
 
     legal_actions = env.legal_actions()
     declare_war = next(
-        (action for action in legal_actions if action.kind == gwrl_cpp.ActionKind.DeclareWarOnChina),
+        (action for action in legal_actions if action.kind == "politics_declare_war"),
         None,
     )
     if declare_war is None:

@@ -1,0 +1,18 @@
+{
+  "scope": "M2 control-flow fixture, 99 real setup units; no gameplay handlers",
+  "clone_per_second": 56452.1,
+  "legal_actions_per_second": 7613250.0,
+  "planning_keys_per_second": 2484.87,
+  "transition_per_second": 1165.02,
+  "checksum": 215800,
+  "recorded_on": "2026-10-21",
+  "build": "CMake Release; C++20; AppleClang 21.0.0",
+  "architecture": "arm64",
+  "iterations": {
+    "clone": 2000,
+    "legal_actions": 5000,
+    "planning_key": 200,
+    "transition": 440
+  },
+  "interpretation": "Baseline for the M2 control-flow fixture only. Extend measurements with movement, casualty branching and full gameplay as those modules arrive. No training throughput claim."
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "truce_role_implementation_correction",
+  "finding": "Active CCP/KMT attacks in shared zones regardless of possession. Only automatic termination during a third nation turn retains the possessor-defends campaign fallback.",
+  "gameplay_changed": true,
+  "sources": [
+    "RB0.2 p5",
+    "RB6.6 p42",
+    "https://discord.com/channels/876158750870863964/1409991574292795392/1518702751113150535",
+    "https://discord.com/channels/876158750870863964/1409991574292795392/1476578711062057104"
+  ],
+  "scope_limits": [
+    "Shared-zone retreat destinations remain a separate campaign convention, including voluntary termination.",
+    "The announced v4.4 defender-capture amendment is recorded but is not adopted by this role correction.",
+    "Automatic battle ordering remains an implementation convention."
+  ],
+  "preserved_historical_records": [
+    {
+      "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+      "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+    },
+    {
+      "path": "game_content/scenarios/japan_china_1936/m7/source_correction_2026_10_22.json",
+      "sha256": "3bce1c49e82dc13b88efe3167fd59f4a1ec0f6c841c24e516852a18c77687099"
+    }
+  ],
+  "checks": {
+    "build": "passed: cmake --build build/m5-m8 --target land_truce_tests politics_warlords_tests land_combat_tests campaign_setup_tests",
+    "ctest": "passed: all 18 suites via ctest --test-dir build/m5-m8 --output-on-failure",
+    "shared_zone_fixture_groups": 9,
+    "git_diff_check": "passed"
+  },
+  "artifacts": [
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "9eab2f42c2cf6009080bc2e7f2050b9895b157d62613af44269b6829b272340d"
+    },
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "24d1009e9f1c8508cb9ba7b959a74aa8022505fc57dcecc0e9a497baa39c820a"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "0924a591996423a3fb7996b940d5352b66a3ba2e496108fcc501369942b5041d"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "5e82c166c20f4aff884722b56158a8df44e11392d6d72be9c827ee5a89a4889b"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "6825328ee9690af4e5292e263db25c6666be42e83d89c1debb8c51556bc9d7c5"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "6b04b810aeb7387caa08e7bb6417bf59d3aedcd4fb90735423e81bd1d395251c"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "84aedf0e6fb9adbd3dc060cf8fb7ff925708cbbac6687e612e5a34e1ef632461"
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "milestone": "M2",
+  "version": "M2-2026-10-21",
+  "scenario_id": "japan_china_1936_1941",
+  "status": "complete_shared_engine_foundation_not_playable_campaign",
+  "verified_on": "2026-10-21",
+  "scope": "Shared C++ definition/state, actual setup loading, validated action and chance execution, calendar/reactions, deterministic replay, isolated randomness and throughput baseline. Gameplay modules remain later milestones.",
+  "acceptance": {
+    "clone_isolation_shared_immutable_definition": "passed",
+    "complete_state_serialization_round_trip": "passed",
+    "legal_action_application_agreement": "passed",
+    "invalid_direct_action_rejection_rollback": "passed",
+    "deterministic_replay_checkpoint_restore": "passed",
+    "defender_and_national_decision_routing": "passed",
+    "initial_and_later_turn_hooks_exactly_once": "passed",
+    "eleven_complete_rounds_final_pending_work": "passed",
+    "actual_search_training_rng_isolation": "passed",
+    "planning_keys_exclude_rng_include_complete_decision_state": "passed",
+    "throughput_baseline": "docs/m2/benchmark.json"
+  },
+  "verification": {
+    "cpp_ctest_suites": 6,
+    "cpp_suites_passed": 6,
+    "runtime_fixture_groups": 14,
+    "python_tests": 119,
+    "python_extension_rebuilt": true,
+    "commands": [
+      "cmake -S . -B build/m2 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON",
+      "cmake --build build/m2 -j 4",
+      "ctest --test-dir build/m2 --output-on-failure",
+      "./.venv/bin/python setup.py build_ext --inplace",
+      "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+      "build/m2/campaign_benchmark",
+      "git diff --check"
+    ],
+    "independent_review": "loader_and_runtime_reviewed; initial_beginTurn_gap_fixed_and_regression_tested",
+    "source_world_map_unchanged": true
+  },
+  "loaded_setup": {
+    "map_nodes": 37,
+    "territories": 31,
+    "factions": 12,
+    "deployed_units": 99,
+    "facilities_including_three_setup_factories": 22,
+    "national_construction_queues": 2,
+    "paid_starting_construction_ipp": 10,
+    "starting_treasury_ipp": 23,
+    "first_nation": "ccp",
+    "first_player": "comintern"
+  },
+  "later_work": {
+    "M3": "Executable unit/facility catalog, exact movement values and availability.",
+    "M4": "Political/gameplay turn hooks and source-derived unlisted-nation home-country memberships.",
+    "M6": "National income evaluation and production/accounting rules.",
+    "M4_onward": "Gameplay rule modules, campaign integration, search and training."
+  },
+  "remaining_m2_user_decisions": [],
+  "historical_preservation": {
+    "M0": {
+      "historical_record": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "historical_record_sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2",
+      "approved_inputs_unchanged": true,
+      "unchanged_artifact_count": 19,
+      "progress_document_updates": [
+        {
+          "path": "docs/plans/japan_china_full_rules_plan.md",
+          "historical_sha256": "80e0a157cd20f16e7e9f01820c97afd8db125f7f1522e67f10de57d0008931be",
+          "current_sha256": "f9eff105fdc5574e1efc10b947ef8b538667a0a916d8a98f71ade4e80cf405ab",
+          "reason": "M2 implementation progress and current verification documented; approved scenario unchanged."
+        },
+        {
+          "path": "game_content/README.md",
+          "historical_sha256": "486a854ba69e7b6a838fb56b771309e2854db1e9cd8593e6b49705058b992b51",
+          "current_sha256": "0483251901fa29e661a53dea5850f250f2ecdb9720a13dc54a5972b348759782",
+          "reason": "M2 implementation progress and current verification documented; approved scenario unchanged."
+        },
+        {
+          "path": "game_content/scenarios/japan_china_1936/README.md",
+          "historical_sha256": "dc097c732280789a890112048c9b1df280521541507ae8c14da6205e08cb9879",
+          "current_sha256": "cf99b86e6d4df4d94f954611cdcec4754927aaa3ca21b3c8d52e12c84d5021b3",
+          "reason": "M2 implementation progress and current verification documented; approved scenario unchanged."
+        }
+      ]
+    },
+    "M1": {
+      "historical_record": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "historical_record_sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746",
+      "approved_inputs_unchanged": true,
+      "unchanged_artifact_count": 12,
+      "progress_document_updates": [
+        {
+          "path": "docs/plans/japan_china_full_rules_plan.md",
+          "historical_sha256": "3304b08dbf5c7d9f7441c832122a09740fefd9dedbd44a96baa618b67479a711",
+          "current_sha256": "f9eff105fdc5574e1efc10b947ef8b538667a0a916d8a98f71ade4e80cf405ab",
+          "reason": "M2 implementation progress and current verification documented; approved scenario unchanged."
+        }
+      ]
+    }
+  },
+  "source_input_sha256": {
+    "game_content/scenarios/japan_china_1936/manifest.json": "57d35100b04d00682f1cd31713492278dcc75372272a0062f667877bc081f4b0",
+    "game_content/scenarios/japan_china_1936/map.json": "27c9e9cd007dfa5e290ec816d6e1be962f50ab2a8a5b541cbc52d70bd1373670",
+    "game_content/scenarios/japan_china_1936/m0/scenario_contract.json": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+    "game_content/scenarios/japan_china_1936/m0/japan_setup.json": "e812bbaa0c19bc2049f2aa0fae95161316c38282b06561620ff22e9ec7be288c",
+    "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json": "6ee467595f6aad4ceab5292900eb97c0d8ab1a5d41f55719eebdc07ffb4d142d",
+    "game_content/scenarios/japan_china_1936/m1/faction_index.json": "1cb2e77200703bc0fbe73ec582a2d2bfb0693ae649119db15052074e593b245a"
+  },
+  "home_country_source_sha256": "916c9065407ba4486e889151a89e59bde8cf514c7ab004adbc6742b51f29ef90",
+  "file_sha256": {
+    "CMakeLists.txt": "90f0d74fce17c75ecb3cddc19eca2853c3bf4210548fa27e59080025e48a6414",
+    "README.md": "3a55cbf010c1c218d88e6bcde85b30a2d5e78604a5983ee88c698894cc87970d",
+    "include/game/campaign.hpp": "3201de01ee7ef199047c1d8404c67865ab3a7a18e4a9507ad119d6677b86ba7f",
+    "src/campaign_state.cpp": "dcbd394ff81bedb9fd3a3cf276a7f1b970e03ee3b53e3283a1a486de3105ee1e",
+    "src/campaign_runtime.cpp": "826abbd34e1357c5dee4db5b09ea7eb64db39277a36d82f2549a76a98dc6891c",
+    "src/campaign_setup.cpp": "e815732f3921c101d0a638e627a6ad95d339677ec692244f2d8343cf4e17691c",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "include/game/japan_training_env.hpp": "1664cb6a89013e2a96d4d05994d0bd5f4b0fe8282f9758fe0cf7b81e49bbe638",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "src/japan_training_env.cpp": "d8591b74a0c93cf1fb5f69465d26a576906002348d992fbd355e2a60aeefee35",
+    "tests/campaign_state_tests.cpp": "27e71e6863c78d262d10e806bf88f962c92ad2650334c5b96aed851d783f8cb1",
+    "tests/campaign_runtime_tests.cpp": "24a086d67ec4eb8ac83d729d56d68c596d81df590381d76e10339f17b71d5033",
+    "tests/campaign_setup_tests.cpp": "f0cd85439f37d84aff07341ab8e21b719e92ad85ff555f8f14a703de910d30c0",
+    "tests/json_integrity_tests.cpp": "0689edf1b4ceb31cc84d4aed36a2b816ad05bb07c59722e9472a7b830bc45ca4",
+    "tests/prototype_boundary_tests.cpp": "13771b0b4c7b1e275b60ed3fc3a51cfadfab64b92a1a82cc1164a616d92c4b58",
+    "tools/campaign_benchmark.cpp": "9d8a42a3a1e26318393d5fc142ba0b88fdb5d7cab81c3f1fc970ad1bb4319121",
+    "docs/m2/README.md": "3f2e016e254534452bf6d78b175d82aa66ce34b0dd5bc145ff67f4d52deaa831",
+    "docs/m2/benchmark.json": "11756f485b576545344e361cf0245dff59aee3e21ec37f06a06573eee5b1ab85",
+    "docs/plans/japan_china_full_rules_plan.md": "f9eff105fdc5574e1efc10b947ef8b538667a0a916d8a98f71ade4e80cf405ab",
+    "game_content/scenarios/japan_china_1936/README.md": "cf99b86e6d4df4d94f954611cdcec4754927aaa3ca21b3c8d52e12c84d5021b3",
+    "game_content/README.md": "0483251901fa29e661a53dea5850f250f2ecdb9720a13dc54a5972b348759782"
+  }
+}

@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "milestone": "M7",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "pdf_pages": [
+        5,
+        8,
+        9,
+        11,
+        12,
+        13,
+        42,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        73,
+        83,
+        84,
+        85,
+        86,
+        87,
+        92,
+        97,
+        107
+      ],
+      "review": "Complete listed pages inspected as rendered images; text used only as an index."
+    },
+    {
+      "id": "japan_nrs",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+      "pdf_pages": [
+        4
+      ],
+      "review": "Complete listed pages inspected as rendered images; text used only as an index."
+    },
+    {
+      "id": "kmt_nrs",
+      "path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+      "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6",
+      "pdf_pages": [
+        3
+      ],
+      "review": "Complete listed pages inspected as rendered images; text used only as an index."
+    },
+    {
+      "id": "user_truce_roles_2026_10_22",
+      "kind": "user_ruling",
+      "date": "2026-10-22",
+      "question": "When the Chinese Truce ends, how should combat work where CCP and KMT units already share a land zone? They have no normal attack-entry origin. I recommend that the land’s possessor defends, the other faction attacks, and the attacker may retreat to any adjacent friendly land. KMT’s explicit truce-breaking elimination roll would remain separate from ordinary combat Low Morale.",
+      "quote": "Yeah use the land possessor defends first. But add it to the list of problems need addressing",
+      "current_role_scope": "Earlier project role choice superseded by developer_truce_roles_reported_2026_10_22; no arbitrary retreat exception."
+    },
+    {
+      "id": "discord_truce_roles_2026_06_22",
+      "kind": "discord_discussion",
+      "author": "PsychedelicMojo",
+      "date": "2026-06-22",
+      "accessed": "2026-10-22",
+      "channel": "v4_3-general-discussion",
+      "url": "https://discord.com/channels/876158750870863964/1409991574292795392/1518702751113150535",
+      "finding": "For voluntary termination, the faction breaking the truce on its Combat phase is the attacker. This discussion supports the RB0.2 role definition; it does not settle third-party-turn roles or retreat origins."
+    },
+    {
+      "id": "discord_truce_aftermath_2026_02_26",
+      "kind": "discord_discussion",
+      "author": "Global War '36 Enthusiast",
+      "date": "2026-02-26",
+      "accessed": "2026-10-22",
+      "channel": "v4_3-general-discussion",
+      "url": "https://discord.com/channels/876158750870863964/1409991574292795392/1476578711062057104",
+      "finding": "The exchange treats CCP as attacker when it breaks the truce in CCP-possessed land. A separate survivor-capture amendment is announced for v4.4; that future-version aftermath amendment is not adopted by this v4.3 role correction."
+    },
+    {
+      "id": "developer_truce_roles_reported_2026_10_22",
+      "kind": "developer_clarification_reported_by_user",
+      "date": "2026-10-22",
+      "quote": "OK in any case it is resolved by a dev and when the third party triggers and evolution, the owner of the land will be the defender.",
+      "scope": "Third-party-triggered Chinese evolution: shared-land possessor defends; other Chinese faction attacks.",
+      "independently_verified": false
+    },
+    {
+      "id": "user_truce_low_morale_2026_10_22",
+      "kind": "user_clarification",
+      "date": "2026-10-22",
+      "quote": "I don't get why this is separate? Shouldn't it just follow the same rules when KMT is the one breaking the truce with sharing zones? Which is just auto elimination for those with low morale?",
+      "ruling": "Use the same attack-roll10+ elimination for eligible attacking minor KMT regular Infantry/Cavalry in shared truce-ending zones after voluntary or automatic termination.",
+      "scope": "Low Morale consequence; developer confirmation separately covers third-party combat roles."
+    },
+    {
+      "id": "developer_airborne_correction_2026_10_06",
+      "kind": "developer_correction_reported_by_user_and_inspected_in_discord",
+      "date": "2026-10-06",
+      "accessed": "2026-10-23",
+      "author": "Global War '36 Enthusiast",
+      "channel": "v4_3-general-discussion",
+      "url": "https://discord.com/channels/876158750870863964/1409991574292795392/1557027622016516186",
+      "posted_version": "v4.4",
+      "adoption": "Applied to this project at user request 2026-10-23; the local source rulebook remains v4.3.",
+      "finding": "Both sides Fighters and AAA resolve once in step 4; step 5 moves surviving transports to landing. Airborne infantry remains linked with its transporting aircraft for casualties in steps 3 and 4."
+    }
+  ],
+  "rules": [
+    {
+      "id": "LC001",
+      "rule": "Attacker chooses the order of declared battles. One active battle owns all rolls and decisions until its resolution.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 61,
+          "section": "10.1"
+        }
+      ]
+    },
+    {
+      "id": "LC002",
+      "rule": "D12 hit threshold includes the greatest positive and greatest negative modifier, with Japanese Dug In Defense and Surprise Attack stacking separately. Negative modifiers cannot reduce an available combat value below one; N/A remains N/A.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 9,
+          "section": "0.5"
+        }
+      ]
+    },
+    {
+      "id": "LC003",
+      "rule": "Approach origins belong to individual stable unit IDs; border terrain affects the first round while destination terrain persists.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 11,
+          "section": "1.7"
+        }
+      ]
+    },
+    {
+      "id": "LC004",
+      "rule": "Mountain/desert land attack penalties and jungle/marsh vehicle penalties retain their unit-specific exceptions.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 12,
+          "section": "1.7.1-1.7.4"
+        }
+      ]
+    },
+    {
+      "id": "LC005",
+      "rule": "Rivers penalize first-round land attacks except Marines, airborne assault infantry, and artillery. Direction comes from the reviewed M5 approach query.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 12,
+          "section": "1.7.6"
+        }
+      ]
+    },
+    {
+      "id": "LC006",
+      "rule": "City combat lasts at most three rounds; tundra/ice lasts one. Remaining attackers retreat or are eliminated if unable to retreat.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 13,
+          "section": "1.7.5-1.7.7"
+        }
+      ]
+    },
+    {
+      "id": "LC007",
+      "rule": "Unsurrounded city infantry gain defense and vehicle Target Selection; attacking vehicles lose attack. Surrounded cities remove these benefits and impose one defense penalty.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 13,
+          "section": "1.7.7"
+        }
+      ]
+    },
+    {
+      "id": "LC008",
+      "rule": "First-strike fire is simultaneous between first-strike participants and removes casualties before ordinary fire.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 61,
+          "section": "10.2"
+        }
+      ]
+    },
+    {
+      "id": "LC009",
+      "rule": "Fighters use first-round air-superiority priority; each AAA rolls up to three aircraft-only shots once in the first round and remains an eligible later casualty.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 61,
+          "section": "10.2"
+        }
+      ]
+    },
+    {
+      "id": "LC010",
+      "rule": "Normal casualty choices belong to the casualty side. Target Selection choices belong to the firing side, with a normal-hit fallback when its target class is absent.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 62,
+          "section": "10.2"
+        }
+      ]
+    },
+    {
+      "id": "LC011",
+      "rule": "Joint defenders consent to proposed normal casualties; a disagreement uses highest D12, rerolling ties, to choose the entitled decision maker.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 8,
+          "section": "0.3"
+        }
+      ]
+    },
+    {
+      "id": "LC012",
+      "rule": "Attacker ordinary fire precedes defender casualty selection and defender return fire. Selected defending casualties still roll before removal.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 63,
+          "section": "10.5"
+        }
+      ]
+    },
+    {
+      "id": "LC013",
+      "rule": "Artillery pairing is chosen explicitly, one companion per gun. Survivor changes recompute pairing and infantry support; unpaired artillery suffers one attack/defense penalty.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 86,
+          "section": "13.1.3"
+        }
+      ]
+    },
+    {
+      "id": "LC014",
+      "rule": "Land retreats use friendly adjacent approach origins represented by an attacking land unit; different units may use different eligible origins. Movement is exhausted, and airborne/amphibious attackers remain.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 62,
+          "section": "10.3"
+        }
+      ]
+    },
+    {
+      "id": "LC015",
+      "rule": "A battle won within two rounds permits surviving armor with movement to blitz, subject to terrain/city/fortification/amphibious restrictions. Explicit companion choices enforce one ordinary or two advanced mechanized units per armor.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 64,
+          "section": "10.5.1"
+        }
+      ]
+    },
+    {
+      "id": "LC016",
+      "rule": "Advanced-artillery attrition is one separate round at two (one against fortifications), ignores terrain, permits no return fire, leaves artillery in place, and cannot conquer territory.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 65,
+          "section": "10.5.3"
+        }
+      ]
+    },
+    {
+      "id": "LC017",
+      "rule": "Fortifications first-strike twice at five and add the greatest two-point infantry defense modifier on round one. Hits caused by that border restrict casualties to the protected approach.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 97,
+          "section": "13.2.6"
+        }
+      ]
+    },
+    {
+      "id": "LC018",
+      "rule": "Carpet bombing only attacks land in round one, is reduced by city fortification, cannot be hit by ordinary nonfighter defensive fire, and then exits to the M8 landing handler.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 61,
+          "section": "10.2"
+        }
+      ]
+    },
+    {
+      "id": "LC019",
+      "rule": "M8 owns scramble/grounding choices, surviving airborne transport landing after the combined Fighter/AAA stage and before ordinary attacks, and final aircraft landings. Developer-corrected RCL-001 links airborne cargo and transporting aircraft as one casualty in steps 3 and 4.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 66,
+          "section": "10.6.1"
+        },
+        {
+          "source_id": "developer_airborne_correction_2026_10_06",
+          "clarification": "RCL-001"
+        }
+      ]
+    },
+    {
+      "id": "LC020",
+      "rule": "KMT minor Infantry/Cavalry roll even against an empty target; raw 10-12 retreat to their individual attack origins and cannot be selected as casualties. Evolution removes Low Morale.",
+      "source_refs": [
+        {
+          "source_id": "kmt_nrs",
+          "pdf_page": 3,
+          "section": "Low Morale"
+        }
+      ]
+    },
+    {
+      "id": "LC021",
+      "rule": "Japanese Home Country infantry defense adds Dug In Defense separately. First Allies-major declaration may designate one surprise land target: Japanese aircraft gain first strike, defenders lose one in round one, no scrambling occurs, and the city round cap is removed.",
+      "source_refs": [
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 4,
+          "section": "Dug In Defense / Surprise Attack"
+        }
+      ]
+    },
+    {
+      "id": "shared_zone_truce_rcl012",
+      "rule": "Active CCP/KMT attacks on its own turn; when a third party triggers evolution, the shared-land possessor defends per developer clarification reported by the user. Eligible attacking minor KMT regular Infantry/Cavalry are eliminated on normal attack rolls of10+ in shared truce-ending battles, after voluntary or automatic termination per the user clarification. No extra test or arbitrary retreat destination is granted. Ordinary retreats elsewhere retain real land-entry origins.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 5,
+          "section": "0.2 Attacker/Defender"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 42,
+          "section": "6.6"
+        },
+        {
+          "source_id": "user_truce_roles_2026_10_22",
+          "clarification": "RCL-012"
+        },
+        {
+          "source_id": "discord_truce_roles_2026_06_22",
+          "scope": "Voluntary own-turn roles corroborate RB0.2."
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 62,
+          "section": "10.3 Retreating from Combat"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 107,
+          "section": "15.7 Low Morale"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 73,
+          "section": "10.10.1 Chinese land gift permits evolution during a conquering Major turn"
+        },
+        {
+          "source_id": "developer_truce_roles_reported_2026_10_22",
+          "clarification": "RCL-012 resolved third-party roles"
+        },
+        {
+          "source_id": "user_truce_low_morale_2026_10_22",
+          "clarification": "RCL-012 same Low Morale consequence after automatic termination"
+        }
+      ]
+    },
+    {
+      "id": "LC022",
+      "rule": "Strategic Rockets have no normal combat values and cannot be chosen as casualties. Surviving Enemy land units destroy unsupported Rockets; aircraft-only raids and remote attrition do not.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 92,
+          "section": "13.1.7 Strategic Rocket"
+        }
+      ],
+      "handlers": [
+        "src/land_combat.cpp"
+      ],
+      "tests": [
+        "tests/land_combat_tests.cpp"
+      ],
+      "implementation_audit": "M10 source correction, 2026-10-22"
+    }
+  ],
+  "inactive_rules": [
+    {
+      "rule": "Border clashes",
+      "reason": "The closed profile contains neither USSR nor the France-Germany border, the only listed nation pairs (RB65)."
+    }
+  ],
+  "integration_boundaries": [
+    "Naval/amphibious battle creation and shore bombardment are M9. M7 retains amphibious unit commitments for retreat and blitz restrictions.",
+    "Airborne assault follows developer-corrected RCL001; a destroyed linked transport and cargo do not land or attack.",
+    "Battle continuation JSON is serialized in BattleState.data; no module-owned mutable state or casualty policy exists."
+  ],
+  "status": "complete_land_battle_layer_not_playable_campaign",
+  "pending_decisions": [],
+  "implementation_conventions": [
+    "Automatic shared-zone battles resolve in stable queue order within the existing phase; actual faction controllers own battle choices."
+  ],
+  "implementation_notes": "Current behavior is documented in docs/m7/README.md; dated historical source audits and verification records are retained in game_content/scenarios/japan_china_1936/m7/."
+}

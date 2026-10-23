@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "truce_implementation_fix",
+  "gameplay_changed": true,
+  "scope": "Correct voluntary Chinese Truce combat and ordinary retreat rules; simplify clarification register.",
+  "acceptance": {
+    "no_preliminary_truce_die": "passed",
+    "eligible_minor_kmt_eliminated_on_same_attacking_die_each_round": "passed",
+    "defending_major_and_militia_morale_exemptions": "passed",
+    "no_arbitrary_adjacent_retreat": "passed",
+    "real_active_turn_land_origins_only": "passed",
+    "aircraft_approach_not_ground_retreat_origin": "passed",
+    "land_origin_survives_entrant_loss": "passed",
+    "ordinary_ground_cannot_escape_by_aircraft_presence": "passed",
+    "city_tundra_forced_no_exit_elimination": "passed",
+    "ordinary_kmt_morale_origin_return_and_casualty_exclusion": "passed",
+    "unresolved_no_origin_morale_rolls_back_state_and_rng": "passed",
+    "checkpoint_clone_and_exact_replay": "passed"
+  },
+  "fixture_groups": {
+    "land_combat": 23,
+    "land_truce": 13,
+    "politics_warlords": 6
+  },
+  "verification": {
+    "build": "cmake --build build/m5-m8 -j 4",
+    "cpp": "ctest --test-dir build/m5-m8 --output-on-failure -j 4",
+    "cpp_suites_passed": 18,
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 128,
+    "git_diff_check": "passed",
+    "independent_code_review": "no blocking findings"
+  },
+  "remaining_rule_question": {
+    "id": "RCL-012",
+    "scope": "Automatic termination during a third nation turn: official roles and minor KMT no-origin Low Morale.",
+    "current_role_fallback": "possessor_defends",
+    "unspecified_low_morale_outcome": "specific unresolved-rule error; no state/RNG mutation"
+  },
+  "preserved_historical_m7_verification": {
+    "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+    "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+  },
+  "previous_frozen_records": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    },
+    "M6": {
+      "path": "game_content/scenarios/japan_china_1936/m6/verification.json",
+      "sha256": "60e6f6b245aadb2a2c91d64fc2f3dfacd6b52f21d3514d0123137eabcdf19386"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "6708bba096c883b81fbc35f21d68a067e78c33db71c9c9b81bca34350f4a597c"
+    },
+    {
+      "path": "src/land_combat.cpp",
+      "sha256": "cd921e03494e08364c897e58c17597b90db8035111ca4b4e4b636311eb91bdf3"
+    },
+    {
+      "path": "tests/politics_warlords_tests.cpp",
+      "sha256": "b551c77f2e7b86267daa72f74f70bb4eb9059db8bb270b1dd171b5d3ec5c4a3c"
+    },
+    {
+      "path": "tests/land_combat_tests.cpp",
+      "sha256": "a107ee181364b672bf331f288e8cc4ab7b74a54a6224b36479264bad14d77525"
+    },
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "7de19c32e6d6775985a34cd1cc7b6eb353f35ca87e4d931b64468f2cdf3746f1"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "bcc6ade306f3154f28ed45ab07ae8dc322e437a1fbfe3b5c3f48266f33a92c7d"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "b584d847e7dea99c3db91a2c0e69fad216494c32219e6e6d1a191211313663d6"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "0187b9a472a7587b68ac4890c6056b26071246c4faa72ebc54e2e9d331887b4c"
+    },
+    {
+      "path": "docs/m4/README.md",
+      "sha256": "2f822ab84043ef573e6b1db745151e98ddb5fb06fe15ec05e47c387b035e5e1c"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "888aad94788526b661bedc5b41c06330a6293079cfb33551a0ed96d81a95de62"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "2209a87a5d1006523c886e2dacc0d0ff7050d1c5660bd0e63344120ca12a3585"
+    }
+  ]
+}

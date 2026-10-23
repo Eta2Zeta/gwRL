@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "kind": "developer_correction_implementation",
+  "clarification": "RCL-001",
+  "status": "closed",
+  "authority": {
+    "url": "https://discord.com/channels/876158750870863964/1409991574292795392/1557027622016516186",
+    "author": "Global War '36 Enthusiast",
+    "posted_date": "2026-10-06",
+    "inspected_date": "2026-10-23",
+    "evidence": "Corrected rule image directly inspected in native Discord; caption identifies v4.4. Developer authority reported by user.",
+    "adoption": "User requested correction applied to project; the local primary rulebook remains v4.3."
+  },
+  "changes": [
+    "Airborne step4 resolves both sides Fighters and AAA in one simultaneous batch, once; step5 lands surviving transports.",
+    "Transport and airborne cargo are one linked casualty through steps3/4 and cannot land/fire if destroyed.",
+    "Eligible not-yet-fired step4 casualties retain their one ordinary roll, cannot be selected twice, and are removed before later landing/occupation.",
+    "First-strike Fighter retains first-round aircraft priority and does not fire twice; opposing first-strike order is preserved.",
+    "Clarification entry shortened and closed; obsolete adopted split and unrelated provenance removed."
+  ],
+  "verification": {
+    "build": "cmake --build build/m8-m11 -j 4",
+    "cpp": "ctest --test-dir build/m8-m11 --output-on-failure -j 4",
+    "cpp_suites_passed": 21,
+    "cpp_failures": 0,
+    "python_extension": "./.venv/bin/python setup.py build_ext --inplace",
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 134,
+    "python_failures": 0,
+    "fixture_groups": {
+      "land_combat": 32,
+      "air_integration": 10,
+      "all_air": 40
+    },
+    "checkpoint_and_exact_replay": "passed",
+    "profile_source_hashes": "verified",
+    "git_diff_check": "passed"
+  },
+  "RCL015": {
+    "separate_wars": "Source-supported with KMT initiating the war and Dadao retaliating while CCP remains neutral.",
+    "no_Friendly_destination": "Still open; elimination has not been adopted.",
+    "audit": "game_content/scenarios/japan_china_1936/m10/rcl015_reachability_2026_10_23.json"
+  },
+  "milestone_status": {
+    "M8": "complete with this correction",
+    "M9": "partial; RCL-014 open",
+    "M10": "partial; RCL-015 outcome and integration gates open",
+    "M11": "not started"
+  },
+  "preserved_dated_records": {
+    "game_content/scenarios/japan_china_1936/m8/verification.json": "e335950d630e9dbdcd901d6d6ddc5520318d7b9eedde5fc5ade24ef4c6a126ed",
+    "game_content/scenarios/japan_china_1936/m9/checkpoint_2026_10_22.json": "c4ff99353c0d0cfe05aaa7b937e9fdbf4d494713e36941be6aef82044353b424",
+    "game_content/scenarios/japan_china_1936/m10/checkpoint_2026_10_22.json": "0c8636f2bb40bfc076d0f3711e7254105cf5fe31734ff69a72322de57cb3792e"
+  },
+  "preserved_historical_M0_through_M7": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    },
+    "M6": {
+      "path": "game_content/scenarios/japan_china_1936/m6/verification.json",
+      "sha256": "60e6f6b245aadb2a2c91d64fc2f3dfacd6b52f21d3514d0123137eabcdf19386"
+    },
+    "M7": {
+      "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+      "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "src/land_combat.cpp",
+      "sha256": "5580c04d01251829de896f6e824a921c1e79a6b4713325a20e4e7f154d00c111"
+    },
+    {
+      "path": "tests/land_combat_tests.cpp",
+      "sha256": "517f9ec7a82d720c0f8e5b9464a4db5ec1cba082915e70851a8792b62a80a6f7"
+    },
+    {
+      "path": "tests/air_integration_tests.cpp",
+      "sha256": "54be05113e2aeb481d8176982d4597c98d4a576f1830fe6d68393991592f809a"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "e9bacef1860d90114036bc458357430820e71108b72f4608a073c48dfb613e5d"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "b17763dc1401c6611b2b440bfbc76bba1b77dc03274415a56db8f1ba266e66cf"
+    },
+    {
+      "path": "game_content/rules/gw36_air_v43.json",
+      "sha256": "3434d7c133c130d53ef38446a04cf47f84bb7a1b228289846aa2359f71bf475b"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "892bd000cc9b2fe6c38b7c8eaa0c3a39d2aa5b27f5bf3913a558b78fd43ebfe2"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "e74120f6a3e61170def5aed5814af7a31b5cdc310bd5de43e02fdcbe1b3844c7"
+    },
+    {
+      "path": "docs/m8/README.md",
+      "sha256": "11f12cf33d0bca09c40d68c75fd99161f34e0d9087bab80fab367673bc16b2c4"
+    },
+    {
+      "path": "docs/m10/README.md",
+      "sha256": "803ae657dd54f2ff3d2fd26cfb3db7ae32c1e41c1811ce3e89c6d781a7a24547"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "8f2040d81b0004f36f2dda65f470f6c3507a152de856c1f05c7f318dd4497ea9"
+    },
+    {
+      "path": "game_content/scenarios/japan_china_1936/m10/rcl015_reachability_2026_10_23.json",
+      "sha256": "77c060441eecc6bcfa64caed6cbd551fcfe46ac05bd92ea960c71d7621359c7b"
+    }
+  ]
+}

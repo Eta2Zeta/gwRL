@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "version": "M9-2026-10-23",
+  "status": "implemented",
+  "scope": "Closed Japan/China campaign; convoy raiding, interdiction and Kido Butai remain disabled.",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "id": "japan",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa"
+    }
+  ],
+  "rules": [
+    {
+      "id": "naval_movement_supply",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        7,
+        57,
+        92
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "naval_transport_loading",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58,
+        76,
+        92
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "destroyer_transports",
+      "source_id": "japan",
+      "pdf_pages": [
+        4
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "peace_entry_declaration_windows",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        54
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "strategic_naval_movement",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        49,
+        76,
+        77
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "screening_and_continuation",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58,
+        69
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "submarine_and_map_reactions",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        55,
+        56,
+        57,
+        76
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp"
+      ],
+      "test_suites": [
+        "naval_movement"
+      ]
+    },
+    {
+      "id": "raider_slip_and_discovery",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58,
+        59,
+        69
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_movement.cpp",
+        "src/naval_combat.cpp"
+      ],
+      "test_suites": [
+        "naval_movement",
+        "naval_combat"
+      ]
+    },
+    {
+      "id": "naval_combat_and_typed_casualties",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        61,
+        62,
+        68,
+        69
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_combat.cpp"
+      ],
+      "test_suites": [
+        "naval_combat"
+      ]
+    },
+    {
+      "id": "submarine_first_strike_and_submerging",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        68,
+        69,
+        91
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_combat.cpp"
+      ],
+      "test_suites": [
+        "naval_combat"
+      ]
+    },
+    {
+      "id": "capital_damage_and_carrier_rescue",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        69,
+        90,
+        91
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_combat.cpp"
+      ],
+      "test_suites": [
+        "naval_combat"
+      ]
+    },
+    {
+      "id": "ship_scrambling_and_return",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        63,
+        78
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_combat.cpp",
+        "src/naval_operations.cpp"
+      ],
+      "test_suites": [
+        "naval_combat",
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "port_attacks",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        68,
+        78
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_combat.cpp",
+        "src/naval_operations.cpp"
+      ],
+      "test_suites": [
+        "naval_combat",
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "amphibious_clearance_and_shore_fire",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        70,
+        71
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_operations.cpp"
+      ],
+      "test_suites": [
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "amphibious_land_and_casualties",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        70,
+        71
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_operations.cpp",
+        "src/land_combat.cpp"
+      ],
+      "test_suites": [
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "in_port_and_skeleton_crews",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        77,
+        78,
+        81
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_operations.cpp",
+        "src/land_combat.cpp"
+      ],
+      "test_suites": [
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "damaged_port_evacuation",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        78
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_operations.cpp",
+        "src/air.cpp"
+      ],
+      "test_suites": [
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "blockade",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        60
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/movement.cpp"
+      ],
+      "test_suites": [
+        "movement"
+      ]
+    },
+    {
+      "id": "coastal_artillery_shared_shot_limit",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        70,
+        98
+      ],
+      "status": "implemented",
+      "handlers": [
+        "src/naval_operations.cpp"
+      ],
+      "test_suites": [
+        "naval_operations"
+      ]
+    },
+    {
+      "id": "narrow_crossing_passage_fire",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        98
+      ],
+      "status": "no_mandatory_passage_in_retained_geography",
+      "reason": "Both dotted crossings can be bypassed without another sea-zone move; ordinary sea-zone entry is not automatically a crossing. See geography_review."
+    }
+  ],
+  "mandatory_coastal_passages": [],
+  "geography_review": "docs/m9/naval_geography.md",
+  "pending_decisions": [],
+  "adopted_clarifications": [
+    {
+      "id": "RCL-014",
+      "status": "provisionally_adopted_by_user",
+      "date": "2026-10-23",
+      "ruling": "The fleet evacuating the damaged port attacks; the enemy fleet already at sea defends, including combat during a third party calendar turn.",
+      "authority": "User instruction; pending developer clarification, not publisher errata."
+    }
+  ]
+}

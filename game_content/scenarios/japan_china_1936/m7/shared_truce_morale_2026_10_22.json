@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "user_clarification_implementation",
+  "clarification": "RCL-012 shared-zone KMT Low Morale",
+  "status": "closed",
+  "rule": "Eligible attacking minor KMT regular Infantry and Cavalry in shared truce-ending zones are eliminated on their normal attack die of 10+, after voluntary or automatic termination. No additional die or retreat destination is required.",
+  "authority": {
+    "low_morale_after_automatic_termination": "User clarification in this conversation",
+    "third_party_combat_roles": "Separate developer clarification reported by the user; land possessor defends",
+    "scope": "Does not attribute the automatic Low Morale extension to the developer or change ordinary non-truce origin retreats."
+  },
+  "gameplay_changed": true,
+  "verification": {
+    "build": "cmake --build build/m5-m8 -j 4",
+    "cpp": "ctest --test-dir build/m5-m8 --output-on-failure -j 4",
+    "cpp_suites_passed": 18,
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 128,
+    "targeted_fixture_groups": {
+      "land_combat": 24,
+      "land_truce": 15,
+      "politics_warlords": 7
+    },
+    "independent_review": "No blocking findings",
+    "git_diff_check": "passed",
+    "source_register_hashes": "synchronized",
+    "frozen_m0_through_m7_verification_records": "preserved"
+  },
+  "coverage": [
+    "Automatic termination during Japan and Mongolia turns; Infantry and Cavalry",
+    "Elimination independent of safe neighbors or genuine entry origin",
+    "Normal single attack die; 9 survives and 10+ eliminates; successive rounds",
+    "Defending, Major-Power and militia exemptions",
+    "Exact replay; normal non-truce Low Morale origin retreat and invalid-origin rollback"
+  ],
+  "preserved_historical_m7_verification": {
+    "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+    "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+  },
+  "artifacts": [
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "324e4ac2c02f7dfc7ba81db099d9007e9a7cd05a9d6605bf462ae16019dd53e0"
+    },
+    {
+      "path": "src/land_combat.cpp",
+      "sha256": "85ea2ef47a764f2a2a192617e1956eb494d30a258f08a8bf0b51cae424353b47"
+    },
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "ef2affb6b04f3085200aaf2393c7dd6149e94c3c619b9e601a378d6c24a8e858"
+    },
+    {
+      "path": "tests/land_combat_tests.cpp",
+      "sha256": "b1dfe21a81173d51dd2189a96ed8fe6d5e1dc12de0869a96d1f44aa0c3887478"
+    },
+    {
+      "path": "tests/politics_warlords_tests.cpp",
+      "sha256": "73934d66a9de8f37e600f3e1b84178ddee42bb4abab7bbf1f1616d8ab368a2c2"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "7b5437bfb688f486412833a406ba43ebdd919c77660b436f9761d24b861b6276"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "f1c91abead5d3db5fa0bd975efb141d46c50822992704b9d4ef88b747d6ae3d6"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "f41011fa5d6f3ec1134ebaa2c755988ee55f9b9987c22f7f133d301bc415d54e"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "58c64324949ad81cdb37043913662970ba7f61be93a9ccfd9c836ac8b82a04df"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "ab36e6be8ac20f83c4911874cb4e8f9e312946862242d105271eaa8f54581e21"
+    }
+  ]
+}

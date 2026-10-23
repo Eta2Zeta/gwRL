@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "milestone": "M6",
+  "version": "M6-2026-10-22",
+  "scenario_id": "japan_china_1936_1941",
+  "verified_on": "2026-10-22",
+  "status": "complete_milestone_not_playable_full_campaign",
+  "scope": "Income, production, construction, repairs, research and local lend-lease; no full campaign claim.",
+  "acceptance": {
+    "current_territorial_income_six_japan_bonuses_and_no_offmap_accounts": "passed",
+    "opening_paid_ships_no_double_cash_charge": "passed",
+    "multiturn_ipp_and_project_conservation": "passed",
+    "national_build_dates_tech_caps_and_alternative_discounts": "passed",
+    "supplied_placement_decentralized_production_and_militia_limits": "passed",
+    "start_turn_capacity_shared_shipyard_repair_slots": "passed",
+    "captured_factory_original_tier_and_damage_preservation": "passed",
+    "repairs_delayed_completion_city_permanent_ipp_and_rail_side": "passed",
+    "research_factory_calendar_gate_immediate_technology_and_conversion": "passed",
+    "unit_and_facility_upgrade_placement_target_choices": "passed",
+    "three_point_construction_setbacks_explicit_examples_RCL011": "passed",
+    "foreign_rail_construction_owner_consent": "passed",
+    "RCL010_real_route_dadao_delivery_and_recipient_next_turn_credits": "passed",
+    "explicit_elite_airborne_lendlease_exception": "passed",
+    "exact_checkpoint_replay_and_all_44_turn_accounting": "passed"
+  },
+  "fixture_groups": {
+    "economy": 14
+  },
+  "sources": {
+    "profile": "game_content/rules/gw36_economy_v43.json",
+    "records": 6,
+    "rules": 22,
+    "runtime": "Source profiles are immutable definition inputs. Path-backed normative sources are hash checked; map artwork is generation evidence; user rulings remain separately identified."
+  },
+  "integration_verification": {
+    "build": "cmake --build build/m5-m8 -j 4",
+    "cpp": "ctest --test-dir build/m5-m8 --output-on-failure -j 4",
+    "cpp_suites_passed": 18,
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 128,
+    "cpp_standard": 20,
+    "compiler": "AppleClang 21.0.0",
+    "training_runs": 0
+  },
+  "preserved_source_world_map": {
+    "path": "game_content/maps/gw36_manual_map.json",
+    "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed"
+  },
+  "previous_frozen_records": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "2812a21748662a0822c2469869de0b6bf82ce490c1ae0889604db37061380835"
+    },
+    {
+      "path": "include/game/campaign.hpp",
+      "sha256": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369"
+    },
+    {
+      "path": "src/campaign_state.cpp",
+      "sha256": "709b043cd0bef1468300ee94d4133e12b5ef79c29192a5bfda32f33cf1215352"
+    },
+    {
+      "path": "src/campaign_runtime.cpp",
+      "sha256": "c984106a80ed99861a8e5e5c52e63576e87bfbceeac36a52e70529a31d0e70b3"
+    },
+    {
+      "path": "src/campaign_setup.cpp",
+      "sha256": "2d0c1fbf2fcc2d3509b942ec7a504f29ab1aadc907e436410a1d2590beff2260"
+    },
+    {
+      "path": "src/politics.cpp",
+      "sha256": "d1f9c779fa4d8391e819c2bf1e4a2d503a2d2963988e928df5fea6765175e968"
+    },
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "07542866ed858487a8ee4f24611b93b4c72f7c3f87476020a13f475b5d8575b9"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "0a876e783acd95e8a74089f1e54a5b999560910ead807d9cea5eac23cdee9a12"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "8793802dff77241fb8caa4a79695a5d5eef717f045927d5bc85e3b0e72f88cee"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "ed4270078fa99897a663f6d1940cd42341a23cd725999de9d259061f16c26539"
+    },
+    {
+      "path": "README.md",
+      "sha256": "6ec39b088fac7dfce0b85f843d28a5536c8021c4d11ad7a2a2a83df35c0e0ee0"
+    },
+    {
+      "path": "include/game/economy.hpp",
+      "sha256": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e"
+    },
+    {
+      "path": "src/economy.cpp",
+      "sha256": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108"
+    },
+    {
+      "path": "src/economy_lendlease.cpp",
+      "sha256": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502"
+    },
+    {
+      "path": "tests/economy_tests.cpp",
+      "sha256": "5d494c6a8eab0d946af92d46453d337255d107c39062a5e272f4e0da39b0adda"
+    },
+    {
+      "path": "game_content/rules/gw36_economy_v43.json",
+      "sha256": "79b1c6f32ffc62a052a9a2389ea8137eb098e00b98d32a6750a58a427d796255"
+    },
+    {
+      "path": "docs/m6/README.md",
+      "sha256": "ea35be5827f26a5bf41881fb96c38c40547832d69d9a383304006561e0a8956c"
+    },
+    {
+      "path": "docs/m6/source_coverage.md",
+      "sha256": "0a0ae40eca15784cf0f60ece8fd541cf86d0b6c2597174708948a658f7722943"
+    }
+  ],
+  "later_work": {
+    "M8": "in_progress_not_complete_pending_RCL013_and_remaining_air_exit_checks",
+    "M9": "naval_and_amphibious_not_started",
+    "M10_and_later": "campaign_adjudication_rewards_search_training_not_implemented_here"
+  }
+}

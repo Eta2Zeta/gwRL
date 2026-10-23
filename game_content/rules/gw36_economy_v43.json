@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "scope": "M6 closed Japan/China economy and production; sourced rules plus separately identified campaign ruling",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "version": "4.3"
+    },
+    {
+      "id": "japan_nrs",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+      "version": "4.3"
+    },
+    {
+      "id": "ccp_nrs",
+      "path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf",
+      "sha256": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c",
+      "version": "4.3"
+    },
+    {
+      "id": "kmt_nrs",
+      "path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+      "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6",
+      "version": "4.3"
+    },
+    {
+      "id": "scenario_contract",
+      "path": "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+      "sha256": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+      "version": "frozen M0"
+    },
+    {
+      "id": "user_dadao_delivery_2026_10_22",
+      "kind": "user_ruling",
+      "date": "2026-10-22",
+      "quote": "Yeah allow any dadao possessed chinese home country land and make a note on rules clarification on this issue, same for all future rules conflicts and I will report to devs"
+    }
+  ],
+  "rules": [
+    {
+      "id": "research",
+      "parameters": {
+        "die_sides": 12,
+        "rolls_per_undamaged_possessed_major_factory": 1,
+        "max_attempts_per_technology_per_calendar_turn": 1,
+        "stage_iii_from": "1939-07",
+        "completion_effects": "immediate",
+        "factory_used_for_roll_is_selected_by_policy": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2"
+        }
+      ]
+    },
+    {
+      "id": "technology_benefits",
+      "parameters": {
+        "improved_factories": "catalog capacities apply immediately",
+        "improved_construction": "discount each stage OR condense first two undiscounted stages; never both",
+        "automatic_conversions": "catalog driven"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 46,
+          "section": "8.2.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 47,
+          "section": "8.2.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 48,
+          "section": "8.2.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 49,
+          "section": "8.2.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 50,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "closed_income",
+      "parameters": {
+        "ordinary_accounts": [
+          "japan",
+          "kmt",
+          "ccp"
+        ],
+        "controlled_minors_collect_ipp": false,
+        "off_map_income": false,
+        "excluded_bonuses": [
+          "us_oil_trade",
+          "burma_road",
+          "soviet_home_country"
+        ]
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 82,
+          "section": "12.9"
+        }
+      ]
+    },
+    {
+      "id": "japanese_china_bonus",
+      "parameters": {
+        "zones": [
+          "land_china_beiping",
+          "land_china_hopeh",
+          "land_china_shantung",
+          "land_china_nanking",
+          "land_china_hunan",
+          "land_kwangtung"
+        ],
+        "ipp_each": 1,
+        "requires_major_power_war": false
+      },
+      "source_refs": [
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 2,
+          "section": "Wartime Bonus Income"
+        }
+      ]
+    },
+    {
+      "id": "national_purchases",
+      "parameters": {
+        "types_prices_caps_dates": "catalog national build rows",
+        "cash_must_cover_current_payment": true,
+        "factory_capacity_required": true,
+        "one_staged_payment_per_player_turn": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 50,
+          "section": "8.3"
+        }
+      ]
+    },
+    {
+      "id": "construction",
+      "parameters": {
+        "site_selected_when_new_facility_started": true,
+        "completed_at_started_site": true,
+        "no_inherent_aaa_under_construction": true,
+        "repair_damage_before_advancement": true,
+        "damage_per_setback": 3,
+        "remove_if_pushed_before_first_paid_stage": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.3.2"
+        }
+      ],
+      "note": "The explicit examples control the boundary: a three-stage factory at queue stage 2 with damage 5 goes back to stage 3 with 2 damage; damage 6 removes it. Each full 3 damage causes a setback. This reconciles the prose with its printed examples; it is not a new user or developer ruling."
+    },
+    {
+      "id": "upgrades",
+      "parameters": {
+        "replace_in_place_units": true,
+        "purchased_upgrade_selects_suitable_existing_target_at_placement": true,
+        "used_earlier_this_turn_allowed": true,
+        "new_unit_same_turn_forbidden": true,
+        "supply_required": true,
+        "militia_upgrades_per_turn": 2,
+        "motorization_upgrades_per_turn": 2
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.4;12.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 80,
+          "section": "8.4;12.3"
+        }
+      ]
+    },
+    {
+      "id": "paid_repairs",
+      "parameters": {
+        "cost_per_damage_ipp": 1,
+        "start": "production",
+        "finish": "place_units",
+        "types": [
+          "city",
+          "facility",
+          "construction",
+          "selected_rail_endpoint"
+        ],
+        "destroyed_city_cannot_repair": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.6;12.2;13.2.8"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 79,
+          "section": "8.6;12.2;13.2.8"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 98,
+          "section": "8.6;12.2;13.2.8"
+        }
+      ]
+    },
+    {
+      "id": "capital_ship_repairs",
+      "parameters": {
+        "cost_ipp": 0,
+        "repair_slots_per_hit": 1,
+        "multiple_hits_per_turn_allowed": true,
+        "adjacent_or_in_port_since_beginning": true,
+        "whole_turn_action_restriction": true,
+        "only_optional_move_into_repairing_port": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 51,
+          "section": "8.6;12.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 79,
+          "section": "8.6;12.2"
+        }
+      ]
+    },
+    {
+      "id": "unit_placement",
+      "parameters": {
+        "land_air": "supplied possessed factory with remaining capacity",
+        "naval": "supplied possessed shipyard with remaining capacity",
+        "capital_ships": "major shipyard",
+        "facilities": "site possessed since beginning",
+        "same_turn_upgrade_capacity": "starting facility type and damage cap; current technology applies"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 79,
+          "section": "12.1"
+        }
+      ]
+    },
+    {
+      "id": "militia_placement",
+      "parameters": {
+        "no_factory": true,
+        "per_zone_per_turn": "max(1,current territorial IPP)",
+        "non_original_zone_per_turn": 1,
+        "major_inventory_outside_home": "max(1,current territorial IPP)",
+        "major_inventory_inside_home": "unlimited",
+        "recruitment_is_distinct": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 79,
+          "section": "12.1"
+        }
+      ]
+    },
+    {
+      "id": "decentralized_production",
+      "parameters": {
+        "types": [
+          "infantry_class",
+          "cavalry"
+        ],
+        "placement": "possessed Chinese Home Country held since turn beginning",
+        "factory_required": false,
+        "evolution": "M4 same-own-turn grace only"
+      },
+      "source_refs": [
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 3,
+          "section": "Decentralized Production"
+        }
+      ]
+    },
+    {
+      "id": "factory_tiers",
+      "parameters": {
+        "capture_medium_major_as": "minor_factory",
+        "retain_original_maximum_damage": true,
+        "restore_original_level_on_original_owner_repossession": true,
+        "multiple_factories_per_zone": true,
+        "construction_and_capture_turn_capacity": 0
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2.1"
+        }
+      ]
+    },
+    {
+      "id": "naval_capacity",
+      "parameters": {
+        "shipyard_production_and_repair_share_slots": true,
+        "aligned_shipyard_may_repair_but_not_produce": true,
+        "capital_ships_require_major_shipyard": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 95,
+          "section": "13.2.4;13.2.5"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 96,
+          "section": "13.2.4;13.2.5"
+        }
+      ]
+    },
+    {
+      "id": "facility_sites",
+      "parameters": {
+        "airbase_per_zone": 1,
+        "naval_facilities_per_city": {
+          "minor": 1,
+          "major": 1
+        },
+        "coastal_facility_may_serve_sea_zones": [
+          1,
+          2
+        ],
+        "fortification_per_border": 1,
+        "coastal_artillery_multiple_per_border": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 92,
+          "section": "13.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 93,
+          "section": "13.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 94,
+          "section": "13.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 95,
+          "section": "13.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 96,
+          "section": "13.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 97,
+          "section": "13.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 98,
+          "section": "13.2"
+        }
+      ]
+    },
+    {
+      "id": "railroad_construction",
+      "parameters": {
+        "ordinary_cost": 2,
+        "harsh_cost": 4,
+        "terrain_basis": "direct roundel-to-roundel border route",
+        "harsh_terrain": [
+          "desert",
+          "jungle",
+          "marsh",
+          "mountain",
+          "tundra"
+        ],
+        "foreign_endpoint_requires_permission": true,
+        "noncontrolled_neutral_refuses": true,
+        "at_war_endpoint_forbidden": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 98,
+          "section": "13.2.8"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 99,
+          "section": "13.2.8"
+        }
+      ]
+    },
+    {
+      "id": "city_income_damage",
+      "parameters": {
+        "permanent_ipp_lost_per_damage": 20,
+        "repair_does_not_restore_ipp": true,
+        "destroyed_city_cannot_repair": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 66,
+          "section": "10.6.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 67,
+          "section": "10.6.2"
+        }
+      ]
+    },
+    {
+      "id": "lend_lease_permission",
+      "parameters": {
+        "sender_must_be_major": true,
+        "ordinary_recipient_must_be_at_war_with_major": true,
+        "japan_to_controlled_dadao_exception": true,
+        "recipient_at_war_with_senders_alliance_forbidden": true,
+        "one_item_per_recipient_per_sender_player_turn": true,
+        "technology_only_units_forbidden": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 52,
+          "section": "8.7;15.4"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 53,
+          "section": "8.7;15.4"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 105,
+          "section": "8.7;15.4"
+        }
+      ]
+    },
+    {
+      "id": "lend_lease_delivery",
+      "parameters": {
+        "origin": "sender Home Country",
+        "destination": "first recipient-possessed Home Country entry",
+        "destination_naval_facility_recipient_exception": true,
+        "other_naval_facilities": "sender possessed, controlled or aligned",
+        "all_naval_facilities_undamaged_held_since_beginning": true,
+        "blockaded_facilities_forbidden": true,
+        "naval_delivery_via_land_forbidden": true,
+        "failed_delivery": "wait on queue",
+        "bases_and_militia_credits": "recipient next Place Units, in eligible homeland"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 80,
+          "section": "12.4"
+        }
+      ]
+    },
+    {
+      "id": "dadao_lend_lease_destination",
+      "status": "adopted_campaign_ruling_pending_developer_clarification",
+      "parameters": {
+        "sender": "japan",
+        "recipient": "controlled dadao",
+        "eligible_destination": "any Dadao-possessed Chinese Home Country land zone",
+        "applies_to_recipient_lend_lease_base_and_militia_credit_placement": true,
+        "general_dadao_home_country_unchanged": true,
+        "other_supply_and_delivery_constraints_preserved": true
+      },
+      "source_refs": [
+        {
+          "source_id": "user_dadao_delivery_2026_10_22"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 80,
+          "section": "12.4"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 4,
+          "section": "Dadao Government"
+        }
+      ],
+      "clarification": "RCL-010"
+    },
+    {
+      "id": "construction_paid_value",
+      "parameters": {
+        "value": "cumulative already-paid IPP",
+        "setbacks_do_not_refund_or_erase_paid_ledger": true,
+        "completion": "replace project with full catalog asset; never both"
+      },
+      "source_refs": [
+        {
+          "source_id": "scenario_contract",
+          "section": "wealth.paid_construction_definition"
+        }
+      ]
+    },
+    {
+      "id": "elite_airborne_lend_lease_exception",
+      "parameters": {
+        "allowed_despite_generic_technology_only_unit_ban": true,
+        "receiver_without_airborne_doctrine": "airborne_infantry",
+        "receiver_with_airborne_doctrine": "elite_airborne_infantry",
+        "ordinary_airborne_delivered_to_receiver_with_doctrine": "elite_airborne_infantry"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 47,
+          "section": "8.2.1 Airborne Doctrine explicit lend-lease note"
+        }
+      ],
+      "note": "Explicit named exception takes precedence over generic RB8.7 technology-only lend-lease restriction. No new user or developer ruling."
+    }
+  ]
+}

@@ -1,55 +1,21 @@
 #pragma once
 
-#include "game/action_encoder.hpp"
-#include "game/mdp.hpp"
-#include "game/setup_loader.hpp"
-#include "game/state_encoder.hpp"
-
-#include <filesystem>
-#include <string>
-#include <vector>
+#include "game/campaign_benchmarks.hpp"
 
 namespace game {
 
-class JapanTrainingEnv {
+class JapanTrainingEnv : public CampaignBenchmarkEnv {
   public:
-    explicit JapanTrainingEnv(std::filesystem::path scenarioPath, std::string trackedNationId = "Japan");
-
-    JapanTrainingEnv clone() const;
-
-    void reset();
-
-    bool isTerminal() const { return gameState_.isTerminal(); }
-    std::string currentNation() const { return std::string(gameState_.currentNation()); }
-    std::string currentPhase() const { return std::string(toString(gameState_.currentPhase())); }
-
-    std::vector<Action> legalActions() const;
-    std::vector<double> encodeState() const;
-    std::vector<std::vector<double>> encodeLegalActions() const;
-    std::vector<std::string> stateFeatureLabels() const;
-    std::vector<std::string> actionFeatureLabels() const;
-
-    StepResult step(const Action& action);
+    explicit JapanTrainingEnv(std::filesystem::path scenarioPath,
+                              std::string trackedNationId = "Japan", std::uint64_t seed = 1);
+    JapanTrainingEnv clone() const { return *this; }
+    JapanTrainingEnv cloneForSearch(std::uint64_t seed) const {
+        auto result = clone(); result.useSearchSeed(seed); return result;
+    }
     double finalReward() const;
 
-    int completedTurnsFor(std::string_view nationId) const { return gameState_.completedTurnsFor(nationId); }
-    int nationIncome(std::string_view nationId) const { return gameState_.nation(nationId).income(); }
-    int nationTreasury(std::string_view nationId) const { return gameState_.nation(nationId).treasury(); }
-    int unitCountFor(std::string_view nationId) const { return gameState_.unitCountFor(nationId); }
-    int unitValueFor(std::string_view nationId) const { return gameState_.unitValueFor(nationId); }
-    int enemyUnitValueDestroyedByNation(std::string_view nationId) const {
-        return gameState_.enemyUnitValueDestroyedByNation(nationId);
-    }
-
   private:
-    void advanceUntilTrackedNationDecision();
-
-    std::filesystem::path scenarioPath_;
-    std::string trackedNationId_;
-    SimplifiedChinaMdp mdp_;
-    GameState gameState_;
-    StateEncoder stateEncoder_;
-    ActionEncoder actionEncoder_;
+    campaign::Id trackedNation_;
 };
 
-}  // namespace game
+} // namespace game

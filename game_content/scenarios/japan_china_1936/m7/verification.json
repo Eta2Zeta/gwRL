@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "milestone": "M7",
+  "version": "M7-2026-10-22",
+  "scenario_id": "japan_china_1936_1941",
+  "verified_on": "2026-10-22",
+  "status": "complete_milestone_not_playable_full_campaign",
+  "scope": "Authoritative land-battle state machine and nested Chinese Truce battles; no complete air/naval campaign claim.",
+  "acceptance": {
+    "D12_144_branch_exact_probability_check": "passed",
+    "first_strike_and_simultaneous_return_fire": "passed",
+    "owner_casualties_firing_player_target_selection_and_fallback": "passed",
+    "survivor_artillery_pairing_and_explicit_choices": "passed",
+    "per_contingent_border_river_and_node_terrain": "passed",
+    "city_surrounding_round_limits_fortification_provenance": "passed",
+    "national_modifiers_japan_dug_in_and_surprise_trigger": "passed",
+    "retreat_origin_choices_and_no_retreat_airborne_amphibious": "passed",
+    "KMT_low_morale_empty_targets_origin_specific_and_not_casualties": "passed",
+    "stationary_attrition_and_explicit_blitz_companions": "passed",
+    "air_superiority_AAA_once_city_airborne_and_RCL001_linked_losses": "passed",
+    "joint_defender_consent_disputed_D12_ties": "passed",
+    "Dadao_separate_owner_Japan_slot_and_no_mixed_attacks": "passed",
+    "multi_turn_ground_campaign_exact_replay": "passed",
+    "RCL012_possessor_defends_adjacent_friendly_retreat": "passed",
+    "separate_KMT_voluntary_truce_break_elimination": "passed",
+    "nested_Production_CM_and_real_PU_influence_evolution_no_clock_advance": "passed",
+    "mandatory_atomic_guard_phase_and_interrupt_blocking": "passed",
+    "stable_automatic_event_queue_order_documented_as_convention": "passed"
+  },
+  "fixture_groups": {
+    "land_combat": 22,
+    "land_truce": 8
+  },
+  "sources": {
+    "profile": "game_content/rules/gw36_land_combat_v43.json",
+    "records": 4,
+    "rules": 22,
+    "runtime": "Source profiles are immutable definition inputs. Path-backed normative sources are hash checked; map artwork is generation evidence; user rulings remain separately identified."
+  },
+  "integration_verification": {
+    "build": "cmake --build build/m5-m8 -j 4",
+    "cpp": "ctest --test-dir build/m5-m8 --output-on-failure -j 4",
+    "cpp_suites_passed": 18,
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 128,
+    "cpp_standard": 20,
+    "compiler": "AppleClang 21.0.0",
+    "training_runs": 0
+  },
+  "preserved_source_world_map": {
+    "path": "game_content/maps/gw36_manual_map.json",
+    "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed"
+  },
+  "previous_frozen_records": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    },
+    "M6": {
+      "path": "game_content/scenarios/japan_china_1936/m6/verification.json",
+      "sha256": "60e6f6b245aadb2a2c91d64fc2f3dfacd6b52f21d3514d0123137eabcdf19386"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "2812a21748662a0822c2469869de0b6bf82ce490c1ae0889604db37061380835"
+    },
+    {
+      "path": "include/game/campaign.hpp",
+      "sha256": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369"
+    },
+    {
+      "path": "src/campaign_state.cpp",
+      "sha256": "709b043cd0bef1468300ee94d4133e12b5ef79c29192a5bfda32f33cf1215352"
+    },
+    {
+      "path": "src/campaign_runtime.cpp",
+      "sha256": "c984106a80ed99861a8e5e5c52e63576e87bfbceeac36a52e70529a31d0e70b3"
+    },
+    {
+      "path": "src/campaign_setup.cpp",
+      "sha256": "2d0c1fbf2fcc2d3509b942ec7a504f29ab1aadc907e436410a1d2590beff2260"
+    },
+    {
+      "path": "src/politics.cpp",
+      "sha256": "d1f9c779fa4d8391e819c2bf1e4a2d503a2d2963988e928df5fea6765175e968"
+    },
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "07542866ed858487a8ee4f24611b93b4c72f7c3f87476020a13f475b5d8575b9"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "0a876e783acd95e8a74089f1e54a5b999560910ead807d9cea5eac23cdee9a12"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "8793802dff77241fb8caa4a79695a5d5eef717f045927d5bc85e3b0e72f88cee"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "ed4270078fa99897a663f6d1940cd42341a23cd725999de9d259061f16c26539"
+    },
+    {
+      "path": "README.md",
+      "sha256": "6ec39b088fac7dfce0b85f843d28a5536c8021c4d11ad7a2a2a83df35c0e0ee0"
+    },
+    {
+      "path": "include/game/land_combat.hpp",
+      "sha256": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1"
+    },
+    {
+      "path": "src/land_combat.cpp",
+      "sha256": "51a15ed300c35324b7c340587465bd2a2489f6d8a86c2b5de06699cf2c5586b0"
+    },
+    {
+      "path": "tests/land_combat_tests.cpp",
+      "sha256": "af4cfa3c0e3c5b1eb6dc593761edaedd9151a037aeb767c19c494b5ea28a83d6"
+    },
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "6cf47eb4dc5b7930af94220a3dda391f3b5a35725367726494368f6186bd4278"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "2f745dde771dcc5f102f8694c0824710d36253b251d87499b06f8aec1e05de70"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "e613ea81947b7950b3c0daee2923c1e2c1038b3ad8eaa9e2d4eb27a27295efbe"
+    }
+  ],
+  "later_work": {
+    "M8": "in_progress_not_complete_pending_RCL013_and_remaining_air_exit_checks",
+    "M9": "naval_and_amphibious_not_started",
+    "M10_and_later": "campaign_adjudication_rewards_search_training_not_implemented_here"
+  },
+  "implementation_conventions": [
+    "Mandatory automatic shared-zone battles resolve in stable queued order; this is not a publisher or user rule.",
+    "Forced retreat without an eligible destination follows the existing unable-to-retreat elimination rule."
+  ]
+}

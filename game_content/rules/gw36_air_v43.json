@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "version": "M8-2026-10-23",
+  "status": "implemented_air_layer",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "id": "japan",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa"
+    },
+    {
+      "id": "user_artillery_city_bombardment_2026_10_22",
+      "kind": "user_clarification",
+      "date": "2026-10-22",
+      "ruling": "Advanced Artillery city bombardment inherits attrition starting-adjacency and no-movement conditions, retaining its 1D6 city damage.",
+      "clarification": "RCL-013"
+    },
+    {
+      "id": "developer_airborne_correction_2026_10_06",
+      "kind": "developer_correction_reported_by_user_and_inspected_in_discord",
+      "date": "2026-10-06",
+      "accessed": "2026-10-23",
+      "author": "Global War '36 Enthusiast",
+      "channel": "v4_3-general-discussion",
+      "url": "https://discord.com/channels/876158750870863964/1409991574292795392/1557027622016516186",
+      "posted_version": "v4.4",
+      "adoption": "Applied to this project at user request 2026-10-23; the local source rulebook remains v4.3.",
+      "finding": "Both sides Fighters and AAA resolve once in step 4; step 5 moves surviving transports to landing. Airborne infantry remains linked with its transporting aircraft for casualties in steps 3 and 4."
+    }
+  ],
+  "rules": [
+    {
+      "id": "flight_permissions",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        55,
+        75
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "legal_landing_and_range",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        55,
+        62,
+        75
+      ],
+      "status": "implemented",
+      "parameters": {
+        "joint_capacity_assignment": true,
+        "medium_bomber_carrier_slots": 2,
+        "reserve_scramble_return_capacity": true
+      }
+    },
+    {
+      "id": "airbase_bonus_and_use",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        93,
+        94
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "carrier_aircraft_independent_flight",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        55,
+        75
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "scramble_and_return",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        63,
+        67
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "ground_or_fight",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        63,
+        65,
+        66
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "air_superiority_and_regular_aaa",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        61,
+        62,
+        63,
+        66
+      ],
+      "status": "land_combat_integration"
+    },
+    {
+      "id": "airborne_cargo_and_city_aa",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        65,
+        66,
+        88,
+        89
+      ],
+      "status": "land_combat_integration",
+      "correction_source": "developer_airborne_correction_2026_10_06",
+      "clarification": "RCL-001 closed; corrected step 4 both AAA sides, step 5 transport landing."
+    },
+    {
+      "id": "airlift_and_aligned_cargo",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        75,
+        88,
+        89
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "strategic_damage_then_facility_aa",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        66,
+        67
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "interception_and_escorts",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        67,
+        68,
+        87,
+        88
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "rail_all_tracks_target_side",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        67,
+        98
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "city_permanent_ipp_and_destruction",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        67
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "construction_damage",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        51
+      ],
+      "status": "economy_integration_RCL011"
+    },
+    {
+      "id": "improved_construction_mitigation",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        46,
+        47
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "radar_and_heavy_bomber_aa",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        46,
+        49
+      ],
+      "status": "implemented"
+    },
+    {
+      "id": "rockets",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        50,
+        67,
+        92
+      ],
+      "status": "regression_verified"
+    },
+    {
+      "id": "maritime_patrol_range_and_return",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        55,
+        56
+      ],
+      "status": "implemented_logistics_naval_engagement_M9"
+    },
+    {
+      "id": "carpet_bombing",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        61,
+        68,
+        88
+      ],
+      "status": "land_combat_integration"
+    },
+    {
+      "id": "port_attacks",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        68
+      ],
+      "status": "naval_combat_integration_M9"
+    },
+    {
+      "id": "advanced_artillery_city_bombing",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        66,
+        86
+      ],
+      "status": "implemented_adopted_RCL013",
+      "adopted_source": "user_artillery_city_bombardment_2026_10_22",
+      "conditions": [
+        "adjacent_since_player_turn_start",
+        "no_movement_that_turn"
+      ]
+    },
+    {
+      "id": "truce_shared_zone_battle",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        42,
+        62
+      ],
+      "status": "adopted_RCL012_land_combat_integration"
+    },
+    {
+      "id": "enemy_fighter_screening",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58
+      ],
+      "status": "implemented",
+      "parameters": {
+        "serialized_continuing_force": true,
+        "retains_remaining_flight": true,
+        "airborne_continuation_forbidden": true
+      }
+    },
+    {
+      "id": "surprise_attack_bombing",
+      "source_id": "japan",
+      "pdf_pages": [
+        4
+      ],
+      "status": "implemented",
+      "parameters": {
+        "first_strike_interception": true,
+        "scrambling_forbidden": true,
+        "facility_aa_exemption_only_for_port_attacks": true
+      }
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 
@@ -75,7 +76,10 @@ class Parser {
             std::string key = parseString();
             skipWhitespace();
             consume(':');
-            object.emplace(std::move(key), parseValue());
+            Value value = parseValue();
+            if (!object.emplace(key, std::move(value)).second) {
+                throw std::runtime_error("Duplicate JSON key: " + key);
+            }
             skipWhitespace();
             if (tryConsume('}')) {
                 return object;
@@ -138,12 +142,29 @@ class Parser {
                     case 't':
                         value.push_back('\t');
                         break;
-                    case 'u':
-                        throw std::runtime_error("Unicode escape sequences are not supported in this setup parser");
+                    case 'u': {
+                        unsigned codepoint = parseHexQuad();
+                        if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
+                            consume('\\');
+                            consume('u');
+                            const unsigned low = parseHexQuad();
+                            if (low < 0xDC00 || low > 0xDFFF) {
+                                throw std::runtime_error("Invalid JSON Unicode surrogate pair");
+                            }
+                            codepoint = 0x10000 + ((codepoint - 0xD800) << 10) + (low - 0xDC00);
+                        } else if (codepoint >= 0xDC00 && codepoint <= 0xDFFF) {
+                            throw std::runtime_error("Unpaired JSON Unicode surrogate");
+                        }
+                        appendUtf8(value, codepoint);
+                        break;
+                    }
                     default:
                         throw std::runtime_error("Unsupported escape sequence in JSON string");
                 }
                 continue;
+            }
+            if (static_cast<unsigned char>(current) < 0x20) {
+                throw std::runtime_error("Unescaped control character in JSON string");
             }
             value.push_back(current);
         }
@@ -158,7 +179,14 @@ class Parser {
             advance();
         }
 
-        consumeDigits();
+        if (!isAtEnd() && peek() == '0') {
+            advance();
+            if (!isAtEnd() && std::isdigit(static_cast<unsigned char>(peek()))) {
+                throw std::runtime_error("Leading zero in JSON number");
+            }
+        } else {
+            consumeDigits();
+        }
 
         if (!isAtEnd() && peek() == '.') {
             advance();
@@ -176,7 +204,7 @@ class Parser {
         const std::string token(input_.substr(start, index_ - start));
         char* end = nullptr;
         const double value = std::strtod(token.c_str(), &end);
-        if (end == token.c_str() || *end != '\0') {
+        if (end == token.c_str() || *end != '\0' || !std::isfinite(value)) {
             throw std::runtime_error("Invalid JSON number: " + token);
         }
         return value;
@@ -191,6 +219,36 @@ class Parser {
         }
     }
 
+    unsigned parseHexQuad() {
+        unsigned result = 0;
+        for (int index = 0; index < 4; ++index) {
+            const unsigned char value = static_cast<unsigned char>(advance());
+            result <<= 4;
+            if (value >= '0' && value <= '9') result += value - '0';
+            else if (value >= 'a' && value <= 'f') result += value - 'a' + 10;
+            else if (value >= 'A' && value <= 'F') result += value - 'A' + 10;
+            else throw std::runtime_error("Invalid JSON Unicode escape");
+        }
+        return result;
+    }
+
+    static void appendUtf8(std::string& text, unsigned codepoint) {
+        if (codepoint <= 0x7F) text.push_back(static_cast<char>(codepoint));
+        else if (codepoint <= 0x7FF) {
+            text.push_back(static_cast<char>(0xC0 | (codepoint >> 6)));
+            text.push_back(static_cast<char>(0x80 | (codepoint & 0x3F)));
+        } else if (codepoint <= 0xFFFF) {
+            text.push_back(static_cast<char>(0xE0 | (codepoint >> 12)));
+            text.push_back(static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F)));
+            text.push_back(static_cast<char>(0x80 | (codepoint & 0x3F)));
+        } else {
+            text.push_back(static_cast<char>(0xF0 | (codepoint >> 18)));
+            text.push_back(static_cast<char>(0x80 | ((codepoint >> 12) & 0x3F)));
+            text.push_back(static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F)));
+            text.push_back(static_cast<char>(0x80 | (codepoint & 0x3F)));
+        }
+    }
+
     void consumeLiteral(std::string_view literal) {
         for (char expected : literal) {
             consume(expected);
@@ -198,7 +256,7 @@ class Parser {
     }
 
     void skipWhitespace() {
-        while (!isAtEnd() && std::isspace(static_cast<unsigned char>(peek()))) {
+        while (!isAtEnd() && (peek() == ' ' || peek() == '\t' || peek() == '\n' || peek() == '\r')) {
             ++index_;
         }
     }
@@ -258,7 +316,8 @@ double Value::asNumber() const {
 
 int Value::asInt() const {
     const double value = asNumber();
-    if (std::floor(value) != value) {
+    if (!std::isfinite(value) || std::floor(value) != value
+            || value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max()) {
         throw std::runtime_error("JSON number is not an integer");
     }
     return static_cast<int>(value);

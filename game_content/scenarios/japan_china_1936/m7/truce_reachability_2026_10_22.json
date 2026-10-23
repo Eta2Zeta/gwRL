@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "truce_reachability_correction",
+  "gameplay_changed": false,
+  "rejected_example": "Japanese influence after an existing Chinese Truce; foreign-invasion alignment has already removed independent warlord targets.",
+  "verified_example": "Japanese medium armor captures CCP Hopeh from Japanese Beiping, gives the1IPP to12IPP KMT using RB10.10.1 and validated withdrawal, triggers KMT evolution and mixed Nanking battles in Japan Combat, then actually withdraws to Beiping in NCM. Exact replay passes.",
+  "source_pages": [
+    30,
+    42,
+    73,
+    105
+  ],
+  "checks": {
+    "politics_warlords_fixture_groups": 7,
+    "land_truce_fixture_groups": 13,
+    "targeted_cpp_suites_passed": 2,
+    "git_diff_check": "passed"
+  },
+  "artifacts": [
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "169b1fc51cfaecab77dab65bbaefe6f41db1fc2cb15f1d8eeabb869f7a07ab06"
+    },
+    {
+      "path": "tests/politics_warlords_tests.cpp",
+      "sha256": "aa3407e688496b78fd353193e5628d468ca1c722bd489faac4d8c959f4e5364c"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "80b05b435cafe2329b8eb4068d7f97b09bfcdd9d3f4ea77ce739bd54220b338d"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "54c085fe5b73aec561170bd997222f610cd9d62461ec14a93572775c74552ff1"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "39c878d721f53a35b5768300cdfff81af5d5ffcb28b223de2dcf0524c2b3ab9c"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "71885012111790307d6095dd44197d1eeaa4c5cf44f98cb45747ea4cbe3917c8"
+    }
+  ]
+}

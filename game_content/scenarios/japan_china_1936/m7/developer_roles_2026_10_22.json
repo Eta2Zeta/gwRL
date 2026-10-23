@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "developer_clarification_reported_by_user",
+  "clarification": "RCL-012 third-party combat roles",
+  "rule": "When a third party triggers evolution ending the Chinese Truce, the shared-land possessor defends and the other Chinese faction attacks.",
+  "quote": "OK in any case it is resolved by a dev and when the third party triggers and evolution, the owner of the land will be the defender.",
+  "gameplay_changed": false,
+  "reason": "Existing role assignment already matches the reported developer ruling.",
+  "verification": {
+    "land_truce_fixture_groups_passed": 14,
+    "third_party_role_combinations": 8,
+    "build": "passed",
+    "git_diff_check": "passed"
+  },
+  "scope_limit": "Does not supply a separate outcome for ordinary minor KMT Low Morale without a legal attack-origin retreat.",
+  "artifacts": [
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "84b41d89eed017bfc6b02dc9816793e216b16dbe376556d01079df8de8ab20fa"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "574b79c2b1c846ee7debf96ebf263657228d2eaa7858498aeb04c6e442b7bef9"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "f06e07e1ddebcb1517994017a6fd57990ab01bc94a7fa63c45a5c3e60efe7bba"
+    },
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "b24caf641de2f1f4f4ebee5db5c194665dda3cb1dd321471e3cc4deb965db367"
+    },
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "9c4a32beca83271bcbce349e80e0cdfe8a8bdb760f154a791522ae85b9eeb17e"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "445839ace4ba21bcf59e90752058fb024bcf1878fcba92c313642ead4127c699"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "92b8491124f6a4f87fe2e2cad5e15f177fc7a0b11812a846a7961ccba364beb9"
+    }
+  ]
+}

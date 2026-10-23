@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "milestone": "M10",
+  "date": "2026-10-22",
+  "kind": "partial_implementation_checkpoint",
+  "status": "partial",
+  "scope": "Integration source corrections and benchmark migration; full campaign certification and M11 remain outstanding.",
+  "verification": {
+    "build": "cmake --build build/m8-m11 -j 4",
+    "configuration": "Release; BUILD_TESTING=ON",
+    "cpp": "ctest --test-dir build/m8-m11 --output-on-failure -j 4",
+    "cpp_suites_passed": 21,
+    "cpp_failures": 0,
+    "python_extension": "./.venv/bin/python setup.py build_ext --inplace",
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 134,
+    "python_failures": 0,
+    "frozen_records_M0_through_M7": "sha256 preserved",
+    "frozen_world_map": "sha256 preserved",
+    "profile_source_hashes": "verified",
+    "saved_training_results_and_models": "preserved; independent manifest audit passed",
+    "whitespace": "git diff --check passed"
+  },
+  "fixture_groups": {
+    "movement": 18,
+    "land_combat": 28,
+    "land_truce": 15,
+    "politics_warlords": 11,
+    "prototype_boundary_canonical": 4,
+    "prototype_boundary_legacy": 5,
+    "new_python_benchmark": 6
+  },
+  "coverage": [
+    "Temporary warlord defense policy without permanent alignment/control; reciprocal war cleanup on incorporation.",
+    "Neutral nonparticipant relocation to nearest Friendly land with tied destinations; RCL-015 no-destination outcome explicitly unresolved with rollback.",
+    "Motorized Infantry 1:1 towing along real routes, with shared approach and commitment; post-unload movement restrictions.",
+    "Controlled-minor identities and entitled temporary-defense decisions; shared truce Low Morale retains adopted behavior.",
+    "Strategic Rockets never normal casualties or combat dice; surviving Enemy land destroys unsupported Rockets; aircraft-only/attrition immunity and replay.",
+    "Public tiny and composition APIs migrated to campaign::Engine, canonical actions and actual dice/casualty decisions; old archived results preserved.",
+    "Boundary suite has four canonical campaign benchmark groups plus five legacy prototype regression groups; six new Python canonical API groups."
+  ],
+  "remaining_exit_work": [
+    "User ruling for RCL-015 neutral relocation when no Friendly destination exists.",
+    "Close M9 including RCL-014.",
+    "Complete source-linked per-rule runtime coverage ledger and domain invariants.",
+    "Reviewable combined campaign traces through 44 national turns ending July 1941.",
+    "M11 multiplayer search/value-vector work has not started."
+  ],
+  "preserved_historical_records": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    },
+    "M6": {
+      "path": "game_content/scenarios/japan_china_1936/m6/verification.json",
+      "sha256": "60e6f6b245aadb2a2c91d64fc2f3dfacd6b52f21d3514d0123137eabcdf19386"
+    },
+    "M7": {
+      "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+      "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "6d5a4f2a45a06701f162058f2db6b2d8615b8cbdb0f3785633957b4c9bb08192"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "674eda77f3f077b73afb7e1297fd7786bfed34e11a022e32e345fbc9305ed4f9"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "499508717144dc443f71138fa29c659dc4a81522479ba2921205c4999b3764ea"
+    },
+    {
+      "path": "src/campaign_setup.cpp",
+      "sha256": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5"
+    },
+    {
+      "path": "src/campaign_runtime.cpp",
+      "sha256": "23ce012fad88cb70e3582c8f02205925041576b137517dcd136fd5f408bf5b31"
+    },
+    {
+      "path": "src/campaign_state.cpp",
+      "sha256": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c"
+    },
+    {
+      "path": "include/game/air.hpp",
+      "sha256": "75e8a874e1be4404f0d7b75fb3c78e1af2c520f7f2ba0620e16257f62a36572a"
+    },
+    {
+      "path": "src/air.cpp",
+      "sha256": "8f0295eadd210e7786f953125bcb95dc90dda29e6c9a3f97a4b06c5f38faf372"
+    },
+    {
+      "path": "tests/air_tests.cpp",
+      "sha256": "f2c6370100820b600c9bb3f68d68515d15463b9acb1d23742b4f83f99aec7951"
+    },
+    {
+      "path": "tests/air_logistics_tests.cpp",
+      "sha256": "c6906e35dd6b1bb87ac37cb8f12ccde2028d892b89909f042e060825b728ef4c"
+    },
+    {
+      "path": "tests/air_integration_tests.cpp",
+      "sha256": "280c5ca2b87e61498b2c5fe374e340338112c3924c7f92c5bb718c8beb082fea"
+    },
+    {
+      "path": "tests/air_mission_tests.cpp",
+      "sha256": "d13a5437a4e49d497ae2099f69738c61bc0e6d8b1604bb955b1c971b2e39cb5c"
+    },
+    {
+      "path": "game_content/rules/gw36_air_v43.json",
+      "sha256": "4e8ea04a55c313c6396d83bc7e6df0682c2fa4c81557a0dd86d76cf8d93d5b50"
+    },
+    {
+      "path": "docs/m8/README.md",
+      "sha256": "0a34eae1f92779d4071d5c9b80e7fd9b180b05fff845769f5bbce11fb570a424"
+    },
+    {
+      "path": "include/game/naval.hpp",
+      "sha256": "be117190eadfa50fb8884d512c89470d008532816b0d1f09965828c45d36e9ef"
+    },
+    {
+      "path": "src/naval.cpp",
+      "sha256": "4a03ba68894ef808201accccdb501c0d7634bf48d5e0a76a179d1b023a0aacc1"
+    },
+    {
+      "path": "src/naval_movement.cpp",
+      "sha256": "750dd7db50c9f62714165a56caa4aaefdc80bf29ed4db93f99414596c56384e9"
+    },
+    {
+      "path": "src/naval_combat.cpp",
+      "sha256": "3c547c2ae4d2c93fcebc1704268e7e44624abeaa9c1a976acd5b24cab15ff9bc"
+    },
+    {
+      "path": "src/naval_operations.cpp",
+      "sha256": "c566b21c41a9fb1f1f4491585bbd9297b3665e3a5ae26fddf80ddd04f2b81f89"
+    },
+    {
+      "path": "tests/naval_movement_tests.cpp",
+      "sha256": "d95b7c00094ad2e97344ccdd4724aa52a74e1506f9b83812d7348015c60e4d6a"
+    },
+    {
+      "path": "tests/naval_combat_tests.cpp",
+      "sha256": "9ca576e240b9b931a3dfae75b92176940c63a0883dbf2aea205f9973c3301b94"
+    },
+    {
+      "path": "tests/naval_operations_tests.cpp",
+      "sha256": "b0fafa386724d7d0527326bd4fbc6fe884e085b55b3a8ecfa6ab56ff2e76e372"
+    },
+    {
+      "path": "game_content/rules/gw36_naval_v43.json",
+      "sha256": "dfd12d511084d15f781a0db928e558e2f717b4903973120625bc00a8938a7603"
+    },
+    {
+      "path": "docs/m9/README.md",
+      "sha256": "241a8a8145a8d26219f0dbc6cec8c279ca2f303a1f32cf1c5bcf7432b5cac58f"
+    },
+    {
+      "path": "docs/m9/naval_geography.md",
+      "sha256": "e242971468098c3dbc9bec0f897f7f7c7197489c74304417c80f32e401348b51"
+    },
+    {
+      "path": "src/politics.cpp",
+      "sha256": "abec8a1d5d770a2ab8ca2b05b8228a166e50ca3323995fb4c5270f8c5b7a4df4"
+    },
+    {
+      "path": "src/politics_warlords.cpp",
+      "sha256": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81"
+    },
+    {
+      "path": "src/movement.cpp",
+      "sha256": "8e475d8a4e386bf677bc79b88575e76c6324405e776cae393cecdb2aec9d6caf"
+    },
+    {
+      "path": "src/land_combat.cpp",
+      "sha256": "1558cbffba1eb25b4bd78873e3241275c579c047d126f8525c330cd7deef3794"
+    },
+    {
+      "path": "include/game/movement.hpp",
+      "sha256": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718"
+    },
+    {
+      "path": "include/game/campaign_benchmarks.hpp",
+      "sha256": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543"
+    },
+    {
+      "path": "src/campaign_benchmarks.cpp",
+      "sha256": "f2d68e448bbacc923c62a2f9dd860850c6fae2ccf143ef09974fb3226f054522"
+    },
+    {
+      "path": "include/game/japan_training_env.hpp",
+      "sha256": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3"
+    },
+    {
+      "path": "src/japan_training_env.cpp",
+      "sha256": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb"
+    },
+    {
+      "path": "include/game/composition_battle_env.hpp",
+      "sha256": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480"
+    },
+    {
+      "path": "src/python_bindings.cpp",
+      "sha256": "2ecd0f6f986d720895e1724e467f0994c4bea7abdb4262e996c4ae50826752ef"
+    },
+    {
+      "path": "setup.py",
+      "sha256": "210514b8e694b9b9c3b370119d65b14efc0cb6b559e3e4b22c82b5fe1dd0f912"
+    },
+    {
+      "path": "studies/mini_japan_two_turn/train.py",
+      "sha256": "0b80ff873d460c655028d272019c4e452eaffe82cfd25d7d2dc5561e904b9ec9"
+    },
+    {
+      "path": "tests/movement_tests.cpp",
+      "sha256": "e0ef4a5d05e00fdbdc74a01b20af00380e89ef5baa167160a240e46e62195414"
+    },
+    {
+      "path": "tests/land_combat_tests.cpp",
+      "sha256": "db57727de56940eaf275016a6de72fc07611a8c9c05d1db777e5c11c94f873cc"
+    },
+    {
+      "path": "tests/land_truce_tests.cpp",
+      "sha256": "ef2affb6b04f3085200aaf2393c7dd6149e94c3c619b9e601a378d6c24a8e858"
+    },
+    {
+      "path": "tests/politics_warlords_tests.cpp",
+      "sha256": "5f39674cbf961c6f672a1721fcf6b0e3b47757fe3303ebd10386837352db971c"
+    },
+    {
+      "path": "tests/prototype_boundary_tests.cpp",
+      "sha256": "1bab5289666474e0551dacb3370b8043d9195d7ef3ed573b658965c77f972a69"
+    },
+    {
+      "path": "tests/test_campaign_benchmarks.py",
+      "sha256": "78dd76132cb376b946d19977b0d26f1b6b42d9a20f2dada25cb51363b726e495"
+    },
+    {
+      "path": "game_content/rules/gw36_movement_v43.json",
+      "sha256": "9ab7303520d24f094878509bc4ad73ab091ac9564ca23b3675322d63e87b7a9a"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "75c4d09d0c6fd2ef3d0c3cb8547f9b803c37e19b5d5b3edf4f7cdf3265ea4e32"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "8a344a13caee97106785a52a7b19810209a82796469382f4736d74f4565740d6"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "5b54baccdd263e0d88b3d9b164fe8ffbe6454780fffe04d46fb601e3cdd8dfa4"
+    },
+    {
+      "path": "docs/m10/README.md",
+      "sha256": "b7a0b2d3196d758087218a0cdc79fd7e866dd665b7c3225c4678e6361538d5e5"
+    }
+  ]
+}

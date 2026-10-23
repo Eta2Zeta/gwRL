@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "milestone": "M4",
+  "version": "M4-2026-10-21",
+  "scenario_id": "japan_china_1936_1941",
+  "verified_on": "2026-10-21",
+  "status": "complete_political_rule_layer_not_playable_campaign",
+  "scope": "Political transitions and explicit phase-boundary work: whole warlords, influence/recruitment, truce/evolution, capture/liberation notifications, surrender, timed declarations and replay. Movement, combat execution and full income/production evaluation remain later milestones.",
+  "acceptance": {
+    "whole_warlord_table_all_categories_and_boundaries": "passed",
+    "two_zone_factions_single_result_and_fixed_neighbor_snapshots": "passed",
+    "ordinary_and_exceptional_attack_alignment_ccp_revival": "passed",
+    "truce_consent_timing_break_low_morale_and_evolution_termination": "passed",
+    "immediate_thirteen_ipp_evolution_own_and_other_turns": "passed",
+    "capital_grade_optional_single_factory_same_turn_exception": "passed",
+    "dadao_creation_control_incorporation_and_later_influence": "passed",
+    "influence_prepaid_cap_qualifying_garrison_and_natural_twelve": "passed",
+    "distinct_ccp_and_controlled_minor_recruitment": "passed",
+    "offshore_exclusion_continuous_possession_and_split_militia": "passed",
+    "free_ship_advancement_paid_value_preserved_and_facility_repair": "passed",
+    "source_original_mainland_home_country_memberships": "passed",
+    "surrender_conditions_unpossessed_land_capital_cash_and_queue_dice": "passed",
+    "one_china_point_condition_and_surrender_time_award_entitlements": "passed",
+    "user_approved_direct_axis_dadao_after_japan_surrender": "passed",
+    "timed_major_declarations_active_alliance_priority_minor_land_attacks": "passed",
+    "political_pending_work_clone_checkpoint_replay_and_routing": "passed",
+    "unknown_national_income_fails_closed_no_controlled_minor_income": "passed"
+  },
+  "verification": {
+    "cpp_ctest_suites": 10,
+    "cpp_suites_passed": 10,
+    "political_fixture_groups": 34,
+    "politics_groups": 12,
+    "influence_recruitment_groups": 16,
+    "warlord_truce_groups": 6,
+    "python_tests": 128,
+    "python_extension_rebuilt": false,
+    "python_extension_note": "New campaign C++ modules are not exposed through the legacy Python prototype binding yet. Existing bindings remain unchanged and their full regression suite passed.",
+    "commands": [
+      "cmake -S . -B build/m4 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON",
+      "cmake --build build/m4 -j 4",
+      "ctest --test-dir build/m4 --output-on-failure",
+      "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+      "git diff --check"
+    ],
+    "source_profile_integrity": "All local source SHA256 values and references checked; artwork remains generation evidence rather than a runtime dependency.",
+    "independent_review": "Separate source audit and political module/core reviews; Dadao later-transfer, declaration opportunity, surrendered-KMT paragraph scope, temporary truce allies, continuous possession and controller-slot issues corrected and regression tested."
+  },
+  "political_source_inventory": {
+    "rule_records": 33,
+    "source_records": 14,
+    "known_home_country_records": 13
+  },
+  "user_rulings": [
+    {
+      "id": "user_ruling_dadao_after_japan_surrender",
+      "kind": "user_ruling",
+      "date": "2026-10-21",
+      "quote": "Keep Dadao separate, controlled directly by the Axis agent (recommended)"
+    }
+  ],
+  "source_combination_inferences": [
+    "Influence natural12 and foreign-invasion table outcomes honor their KMT recipient even after surrender; only the specifically stated CCP/Dadao attack exception leaves that warlord neutral. Reactivation transfers only the actual surviving warlord assets, with no restoration of lost assets/cash/capital/used awards.",
+    "Mongolia remains separate with the USSR excluded; common enemy does not create an invented non-incorporating Mongolia/CCP alignment."
+  ],
+  "remaining_m4_user_decisions": [],
+  "loaded_setup": {
+    "active_nations": 12,
+    "defined_identities_including_dormant_dadao": 13,
+    "map_nodes": 37,
+    "land_zones": 31,
+    "deployed_units": 99,
+    "facilities": 22,
+    "national_queues": 2,
+    "paid_starting_construction_ipp": 10,
+    "starting_cash_ipp": 23,
+    "national_turn_order": [
+      "ccp",
+      "mongolia",
+      "japan",
+      "kmt"
+    ]
+  },
+  "integration_boundaries": {
+    "M5": "Movement and path validation supplies legal land attacks and the explicit withdrawal eligibility for optional Chinese gifts.",
+    "M6": "Evaluates legal national income and performs production/placement, including completed free objective queue entitlements. M4 does not invent income or placement.",
+    "M7_onward": "Resolves queued mixed-stack battles and combat, then calls political capture/aftermath notifications.",
+    "training": "No training run launched. Modern search-guided learning and masked PPO remain competing candidates under equal compute evaluation."
+  },
+  "historical_preservation": {
+    "M0": {
+      "historical_record": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "historical_record_sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2",
+      "unchanged_artifact_count": 19,
+      "later_implementation_and_progress_updates": [
+        {
+          "path": "docs/plans/japan_china_full_rules_plan.md",
+          "historical_sha256": "80e0a157cd20f16e7e9f01820c97afd8db125f7f1522e67f10de57d0008931be",
+          "current_sha256": "80f913ee79aca2158abde695e9979e8b1febc0929fca177bdfefc2ce00dd99df",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "game_content/README.md",
+          "historical_sha256": "486a854ba69e7b6a838fb56b771309e2854db1e9cd8593e6b49705058b992b51",
+          "current_sha256": "f216716a531ae6e0224fb7e53322300e24702cb39f6933dc14d6c682899c709e",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "game_content/scenarios/japan_china_1936/README.md",
+          "historical_sha256": "dc097c732280789a890112048c9b1df280521541507ae8c14da6205e08cb9879",
+          "current_sha256": "8df71f3103b9ae2201fb92a5f1508c9cedf465ab00c0a04af4b6525f2a582fb5",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        }
+      ],
+      "approved_scenario_inputs_unchanged": true
+    },
+    "M1": {
+      "historical_record": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "historical_record_sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746",
+      "unchanged_artifact_count": 12,
+      "later_implementation_and_progress_updates": [
+        {
+          "path": "docs/plans/japan_china_full_rules_plan.md",
+          "historical_sha256": "3304b08dbf5c7d9f7441c832122a09740fefd9dedbd44a96baa618b67479a711",
+          "current_sha256": "80f913ee79aca2158abde695e9979e8b1febc0929fca177bdfefc2ce00dd99df",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        }
+      ],
+      "approved_scenario_inputs_unchanged": true
+    },
+    "M2": {
+      "historical_record": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "historical_record_sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210",
+      "unchanged_artifact_count": 11,
+      "later_implementation_and_progress_updates": [
+        {
+          "path": "CMakeLists.txt",
+          "historical_sha256": "90f0d74fce17c75ecb3cddc19eca2853c3bf4210548fa27e59080025e48a6414",
+          "current_sha256": "a838a29e57dfbf420d204d849c5110da7c78e883f489f97306929a7d05ead4ec",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "README.md",
+          "historical_sha256": "3a55cbf010c1c218d88e6bcde85b30a2d5e78604a5983ee88c698894cc87970d",
+          "current_sha256": "f95b4e256634a68eb7f4926fd6c59e318dc01ed01290fd00070320d08a0cffee",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "include/game/campaign.hpp",
+          "historical_sha256": "3201de01ee7ef199047c1d8404c67865ab3a7a18e4a9507ad119d6677b86ba7f",
+          "current_sha256": "cc721166db344385c9e795a6690b8593c668a7fd44058f630fb9ea2f52b8d346",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "src/campaign_state.cpp",
+          "historical_sha256": "dcbd394ff81bedb9fd3a3cf276a7f1b970e03ee3b53e3283a1a486de3105ee1e",
+          "current_sha256": "0b3365e876ce82ae79addab213753a944cfc15febb9dd71fec05f2c52dab027e",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "src/campaign_runtime.cpp",
+          "historical_sha256": "826abbd34e1357c5dee4db5b09ea7eb64db39277a36d82f2549a76a98dc6891c",
+          "current_sha256": "9cfd431afc0ff8c57949b268673aa903105d89b4b636750e507a11cfc693426a",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "src/campaign_setup.cpp",
+          "historical_sha256": "e815732f3921c101d0a638e627a6ad95d339677ec692244f2d8343cf4e17691c",
+          "current_sha256": "86c70b6ffae7cf3d287a6da5aed5cbecff29d7980fc3efc7d5015abcc22446b8",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "tests/campaign_setup_tests.cpp",
+          "historical_sha256": "f0cd85439f37d84aff07341ab8e21b719e92ad85ff555f8f14a703de910d30c0",
+          "current_sha256": "f9074b0bbaff4e4a5a2162865f09c6902569ac8ba9371c1c6b375687b89e3228",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "docs/plans/japan_china_full_rules_plan.md",
+          "historical_sha256": "f9eff105fdc5574e1efc10b947ef8b538667a0a916d8a98f71ade4e80cf405ab",
+          "current_sha256": "80f913ee79aca2158abde695e9979e8b1febc0929fca177bdfefc2ce00dd99df",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "game_content/scenarios/japan_china_1936/README.md",
+          "historical_sha256": "cf99b86e6d4df4d94f954611cdcec4754927aaa3ca21b3c8d52e12c84d5021b3",
+          "current_sha256": "8df71f3103b9ae2201fb92a5f1508c9cedf465ab00c0a04af4b6525f2a582fb5",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "game_content/README.md",
+          "historical_sha256": "0483251901fa29e661a53dea5850f250f2ecdb9720a13dc54a5972b348759782",
+          "current_sha256": "f216716a531ae6e0224fb7e53322300e24702cb39f6933dc14d6c682899c709e",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        }
+      ],
+      "approved_scenario_inputs_unchanged": true
+    },
+    "M3": {
+      "historical_record": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "historical_record_sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607",
+      "unchanged_artifact_count": 11,
+      "later_implementation_and_progress_updates": [
+        {
+          "path": "CMakeLists.txt",
+          "historical_sha256": "735dbe1690cd00bc2bff253cd730f25de4a9c0377fa03203624065c32635dee3",
+          "current_sha256": "a838a29e57dfbf420d204d849c5110da7c78e883f489f97306929a7d05ead4ec",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "include/game/campaign.hpp",
+          "historical_sha256": "efb9e159aa58bc4ef75da9e826c10fb31b61a463ed27591d38137722e31abf54",
+          "current_sha256": "cc721166db344385c9e795a6690b8593c668a7fd44058f630fb9ea2f52b8d346",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "src/campaign_state.cpp",
+          "historical_sha256": "c5a47cef4e67454086aa75677bdb31dbf4db21fdee14512b99be34f199c983f0",
+          "current_sha256": "0b3365e876ce82ae79addab213753a944cfc15febb9dd71fec05f2c52dab027e",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "src/campaign_runtime.cpp",
+          "historical_sha256": "5a7b436b69912c6a41154261920e06110c9c14d3719276979f0040820a7e5ef1",
+          "current_sha256": "9cfd431afc0ff8c57949b268673aa903105d89b4b636750e507a11cfc693426a",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "src/campaign_setup.cpp",
+          "historical_sha256": "83f0b85c0220f046a46afdc9f7c5450cd95ccbff702e98af48879b0fdfab9e5c",
+          "current_sha256": "86c70b6ffae7cf3d287a6da5aed5cbecff29d7980fc3efc7d5015abcc22446b8",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "tests/campaign_setup_tests.cpp",
+          "historical_sha256": "ed3cb62826613d8039da2d1fa19f40656aa999586d873bf399ad4e6cc3c47e7a",
+          "current_sha256": "f9074b0bbaff4e4a5a2162865f09c6902569ac8ba9371c1c6b375687b89e3228",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "docs/plans/japan_china_full_rules_plan.md",
+          "historical_sha256": "f70db98e3a207c66bbfa340fd1057974a16ac3ef0968d2946260f2eecbec157d",
+          "current_sha256": "80f913ee79aca2158abde695e9979e8b1febc0929fca177bdfefc2ce00dd99df",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "README.md",
+          "historical_sha256": "34f49bfba30dd1c0780bea299613e170020bad245ead0d26d558d6622d15eeef",
+          "current_sha256": "f95b4e256634a68eb7f4926fd6c59e318dc01ed01290fd00070320d08a0cffee",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "game_content/README.md",
+          "historical_sha256": "a871cdfc4f592548f0cb13a9997add3252df1775eb635f15cd672eb48435c7db",
+          "current_sha256": "f216716a531ae6e0224fb7e53322300e24702cb39f6933dc14d6c682899c709e",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        },
+        {
+          "path": "game_content/scenarios/japan_china_1936/README.md",
+          "historical_sha256": "c54ae99688ca1115fdeee23a6dad4a20312821b2deaba4722f007637aa748116",
+          "current_sha256": "8df71f3103b9ae2201fb92a5f1508c9cedf465ab00c0a04af4b6525f2a582fb5",
+          "reason": "Later M4 political integration or current progress/training-candidate documentation; approved historical scenario inputs unchanged."
+        }
+      ],
+      "approved_scenario_inputs_unchanged": true
+    }
+  },
+  "source_world_map": {
+    "path": "game_content/maps/gw36_manual_map.json",
+    "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+    "unchanged": true
+  },
+  "source_input_sha256": {
+    "game_content/scenarios/japan_china_1936/m0/scenario_contract.json": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+    "game_content/scenarios/japan_china_1936/m0/japan_setup.json": "e812bbaa0c19bc2049f2aa0fae95161316c38282b06561620ff22e9ec7be288c",
+    "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json": "6ee467595f6aad4ceab5292900eb97c0d8ab1a5d41f55719eebdc07ffb4d142d",
+    "game_content/scenarios/japan_china_1936/m1/faction_index.json": "1cb2e77200703bc0fbe73ec582a2d2bfb0693ae649119db15052074e593b245a",
+    "game_content/scenarios/japan_china_1936/map.json": "27c9e9cd007dfa5e290ec816d6e1be962f50ab2a8a5b541cbc52d70bd1373670",
+    "game_content/scenarios/japan_china_1936/manifest.json": "57d35100b04d00682f1cd31713492278dcc75372272a0062f667877bc081f4b0",
+    "game_content/maps/gw36_nation_home_country.json": "916c9065407ba4486e889151a89e59bde8cf514c7ab004adbc6742b51f29ef90",
+    "game_content/rules/clarifications.md": "06b0b3afaa0e23e9a12a487d90453ebbd151e4e941b52a04bc534ca3ecfdc7f4",
+    "game_content/catalog/gw36_v43/build_charts.json": "41e2af5319061380946568a6461720131d0a7fe4557b8de176d485f1e66b1a41",
+    "game_content/catalog/gw36_v43/facilities.json": "551cacfe939799b5952d60d19fa66b8b3700c1669fb850a22c54ea3925095765",
+    "game_content/catalog/gw36_v43/land_air.json": "61ff860334b798f1d2a4f8c7c1ad34571946e9b3bfa3df5c211d404ef911efbd",
+    "game_content/catalog/gw36_v43/naval.json": "61198c30ae80c1afdfaaa9ab963b007645f727c23f2277ea01e70b81d7cd68ec",
+    "game_content/catalog/gw36_v43/technologies.json": "e6b2007f3dc3156074a80160e590c8c24cc5f290282cd8d193e1c5f3f9c0c735"
+  },
+  "source_evidence_sha256": {
+    "game_content/rules/Global War 1936 v4.3 Rulebook.pdf": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+    "game_content/rules/GW36 - NRS - Japan v4.3.pdf": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+    "game_content/rules/GW36 - NRS - KMT v4.3.pdf": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6",
+    "game_content/rules/GW36 - NRS - CCP v4.3.pdf": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c",
+    "game_content/maps/gw36map.png": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba",
+    "game_content/maps/gw36_manual_map.json": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+    "game_content/maps/gw36_nation_home_country.json": "916c9065407ba4486e889151a89e59bde8cf514c7ab004adbc6742b51f29ef90",
+    "game_content/scenarios/japan_china_1936/m1/faction_index.json": "1cb2e77200703bc0fbe73ec582a2d2bfb0693ae649119db15052074e593b245a",
+    "game_content/scenarios/japan_china_1936/m0/scenario_contract.json": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+    "game_content/rules/clarifications.md": "06b0b3afaa0e23e9a12a487d90453ebbd151e4e941b52a04bc534ca3ecfdc7f4",
+    "docs/map_audits/full_world/evidence/ap_china_graph.png": "ea4469557f302c458b20d654740084644128d63c0dd17f14a577f536f9e345b1",
+    "docs/map_audits/full_world/evidence/ap_mongolia_north_edges.png": "d737f6648d4e93d3a6b57fa2d263e6d0a1dfc86158b14e930a266530e56f0692",
+    "docs/map_audits/full_world/evidence/ap_se_asia.png": "064f5e23097753855112d430e2f4d43667cdf3c6aa39382dc705ec9266bb9a6b"
+  },
+  "file_sha256": {
+    "CMakeLists.txt": "a838a29e57dfbf420d204d849c5110da7c78e883f489f97306929a7d05ead4ec",
+    "include/game/campaign.hpp": "cc721166db344385c9e795a6690b8593c668a7fd44058f630fb9ea2f52b8d346",
+    "include/game/politics.hpp": "57d725c1af809abac9b98b4f8f8b52d8623fab1aad0d6f1424a9c57ef22821c5",
+    "src/campaign_state.cpp": "0b3365e876ce82ae79addab213753a944cfc15febb9dd71fec05f2c52dab027e",
+    "src/campaign_runtime.cpp": "9cfd431afc0ff8c57949b268673aa903105d89b4b636750e507a11cfc693426a",
+    "src/campaign_setup.cpp": "86c70b6ffae7cf3d287a6da5aed5cbecff29d7980fc3efc7d5015abcc22446b8",
+    "src/politics.cpp": "2287df1340c7af346f11b50aedd43c0e138b21d9a53dbc68fccc15707d5c2e9a",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "b8beb02b767d29aad4ec2de8bd2d99c3ec5bf0bccc9cab894e25fca8b5d46bbd",
+    "tests/politics_tests.cpp": "910403d91b56747528ddc45db7e114b6e96f4814e8b551e40fedce8a67e33f64",
+    "tests/politics_influence_tests.cpp": "30e20976bfae61ec2caa412ef8cc3e4180a11c11d91d2c03cd67dff4cb380ec2",
+    "tests/politics_warlords_tests.cpp": "94cf5415d54c9d7076190acd97c43e65da6297a87b41da2a105663c207ae89e8",
+    "tests/campaign_setup_tests.cpp": "f9074b0bbaff4e4a5a2162865f09c6902569ac8ba9371c1c6b375687b89e3228",
+    "game_content/rules/gw36_politics_v43.json": "68da4f593e4d3753d8bc93b418f1d5909b4b32addc6c6c08ff692a4451b0d843",
+    "docs/m4/README.md": "11b6f05c1d5527bb824f8a9a4a8f9f9667be851d9d7aa3507ebb38ce1c356395",
+    "docs/m4/source_coverage.md": "09b669ea5bd4384a20459e5d8cab2399694b73d4bdf6cfbb65eec4518a957bed",
+    "docs/plans/japan_china_full_rules_plan.md": "80f913ee79aca2158abde695e9979e8b1febc0929fca177bdfefc2ce00dd99df",
+    "README.md": "f95b4e256634a68eb7f4926fd6c59e318dc01ed01290fd00070320d08a0cffee",
+    "game_content/README.md": "f216716a531ae6e0224fb7e53322300e24702cb39f6933dc14d6c682899c709e",
+    "game_content/scenarios/japan_china_1936/README.md": "8df71f3103b9ae2201fb92a5f1508c9cedf465ab00c0a04af4b6525f2a582fb5"
+  }
+}

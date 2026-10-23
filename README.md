@@ -1,12 +1,19 @@
 # gwRL
 
-`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The current playable models are simplified; the larger full-rules China campaign is still being specified.
+`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The 1936–1941 China campaign has completed its M0–M11 implementation gates, including two full campaign traces, a multi-agent API and stochastic vector search. Public tiny/composition study environments use the same campaign engine; their historical result archives predate that migration. Full-campaign neural training and evaluation remain M12 work.
 
 ## Start here
 
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.
 - [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md): neural MCTS trainer, search diagnostic and completed results.
-- [Full-campaign plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) and [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): the future 1936–1941 campaign, not a runnable training environment yet.
+- [Full-campaign plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) and [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): the approved 1936–1941 campaign and milestone gates.
+- [M2 engine foundation](/Users/home/Desktop/gwRL/docs/m2/README.md): actual campaign setup loading, shared state, validated actions, turn/reaction timing, dice, replay and verification.
+- [M3 catalog](/Users/home/Desktop/gwRL/docs/m3/README.md): unit/facility values, technologies, national build charts, availability and source verification.
+- [M4 politics](/Users/home/Desktop/gwRL/docs/m4/README.md): warlords, influence/recruitment, truce, evolution, timed declarations, capture notifications and surrender.
+- [M5 movement and logistics](/Users/home/Desktop/gwRL/docs/m5/README.md) and [M6 economy](/Users/home/Desktop/gwRL/docs/m6/README.md): routes, supply, production, income, construction, research and lend-lease.
+- [M7 land combat](/Users/home/Desktop/gwRL/docs/m7/README.md) and [M8 air operations](/Users/home/Desktop/gwRL/docs/m8/README.md): component gates complete, including adopted artillery city bombardment.
+- [M9 naval operations](/Users/home/Desktop/gwRL/docs/m9/README.md) and [M10 campaign integration](/Users/home/Desktop/gwRL/docs/m10/README.md): source review, complete campaign replays and the 143-row coverage ledger. RCL-014 and RCL-015 are provisionally adopted.
+- [M11 multi-agent API and search](/Users/home/Desktop/gwRL/docs/m11/README.md): explicit decision owners and chance, entity observations, wealth vectors and exact-oracle search checks.
 - [Game content](/Users/home/Desktop/gwRL/game_content/README.md): maps, rules and canonical scenarios.
 - [Rule clarifications](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md): unclear official rules and adopted project interpretations, separate from scenario choices.
 
@@ -14,6 +21,7 @@
 
 ```text
 game_content/
+  catalog/       Shared unit, facility, technology and national build definitions
   maps/          Global map data and source map images
   rules/         Official PDFs and the project rule-clarification register
   scenarios/     Simulator setups and manual battle fixtures
@@ -22,9 +30,9 @@ src/             C++ implementation and Python bindings
 studies/
   composition/   Trainer, search and preserved composition results
   mini_japan_two_turn/  Trainer, search, tools and results
-  shared/        Shared neural model and path helpers
-tests/           Data, search and organization checks; C++ combat regressions
-docs/            Map audits, implementation plan and M0 specification
+  shared/        Neural helpers, explicit campaign adapter and vector MCTS
+tests/           Data/search checks and C++ engine/combat regressions
+docs/            Map audits, implementation plan and milestone/checkpoint records
 tools/           Game-content generation utilities
 web/             Browser-based board visualization
 output/          Disposable C++ simulator/debug exports only
@@ -59,34 +67,23 @@ Training entry points (run from the repository root):
 ./.venv/bin/python -m studies.composition.train --help
 ```
 
-## Combat model and checks
+## Campaign model and checks
 
-The Japan map MDP and composition environment both use `BattleResolver` in
-`include/game/battle_resolver.hpp`. Combat remains deterministic: strength divided
-by 12 produces fractional casualties, with integer survivors assigned at the end
-for the map. Composition rewards use the fractional surviving force.
+`gwrl_cpp.CampaignEnv` uses the shared political, movement, economy, land, air and
+naval rules. Dice, defender casualties, retreat and other reactions remain explicit
+choices of their entitled player. The campaign adapter also exposes declaration
+offers and passes. See M11 for a small executable search example.
 
-Artillery fires first in the opening round. Pairing gives infantry-class units
-(Infantry and Marines) +1 attack only; infantry or vehicles can prevent the
-artillery's unpaired -1 attack/defense penalty. Pairing is recalculated from
-survivors, with infantry paired first. Mechanized Infantry is a vehicle with base
-attack 3, so it prevents the artillery penalty without receiving a support bonus.
-
-Tank Destroyer target-selection hits choose vehicles; any excess becomes ordinary
-hits after eligible vehicles run out. Targeted and ordinary casualties still fire
-in that round. Casualty choices remain automatic: ordinary hits remove units with
-the lowest adjusted base combat value first, while targeted hits remove eligible
-vehicles with the highest value first (unit reward value breaks ties).
-
-These are still simplified battles, not a complete rulebook implementation:
-terrain/city rules, retreat decisions, and scenario purchase/availability limits
-remain simplified. Saved training results from before combat-rule changes describe
-the earlier environment and need reevaluation under the current rules.
+The frozen regional profile excludes outside nations and named campaign-disabled
+mechanics; its coverage ledger records those exclusions. The old deterministic
+`BattleResolver` remains for historical prototype regressions. Current public study
+environments use the campaign engine, and archived models/results retain their
+original feature schemas and historical meaning.
 
 Run the focused C++ regressions and all Python data/search/organization checks:
 
 ```sh
-cmake -S . -B build -DBUILD_TESTING=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
 ./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'

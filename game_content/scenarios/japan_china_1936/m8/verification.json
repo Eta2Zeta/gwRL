@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "milestone": "M8",
+  "date": "2026-10-22",
+  "kind": "milestone_verification",
+  "status": "complete",
+  "scope": "Air-layer exit gate only; does not certify full campaign or close M9/M10.",
+  "verification": {
+    "build": "cmake --build build/m8-m11 -j 4",
+    "configuration": "Release; BUILD_TESTING=ON",
+    "cpp": "ctest --test-dir build/m8-m11 --output-on-failure -j 4",
+    "cpp_suites_passed": 21,
+    "cpp_failures": 0,
+    "python_extension": "./.venv/bin/python setup.py build_ext --inplace",
+    "python": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_tests_passed": 134,
+    "python_failures": 0,
+    "frozen_records_M0_through_M7": "sha256 preserved",
+    "frozen_world_map": "sha256 preserved",
+    "profile_source_hashes": "verified",
+    "saved_training_results_and_models": "preserved; independent manifest audit passed",
+    "whitespace": "git diff --check passed"
+  },
+  "fixture_groups": {
+    "air": 10,
+    "air_logistics": 9,
+    "air_integration": 9,
+    "air_mission": 11
+  },
+  "coverage": [
+    "RCL-013 adopted: city bombardment inherits attrition starting-adjacency and no-movement conditions, retaining 1D6 city damage.",
+    "Flight permissions/range, Airbase and carrier independence; joint weighted landing capacity and reserved scramble/defender seats.",
+    "Enemy Fighter screening success/failure and serialized continuation; airborne drop, cargo loss, retreat and landing.",
+    "Strategic bombing/interception/AAA, city/construction/rail damage, rocket overflight and Surprise Attack exceptions.",
+    "Damaged-port evacuation suspends bombing and resumes afterward; unresolved third-party fleet roles remain explicitly in M9."
+  ],
+  "remaining_exit_work": [],
+  "preserved_historical_records": {
+    "M0": {
+      "path": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+      "sha256": "734dd3ed5421f000a1de6eef4145d1aa9a78b5b1efbe4fe0a50a6e057feba8a2"
+    },
+    "M1": {
+      "path": "game_content/scenarios/japan_china_1936/m1/verification.json",
+      "sha256": "37208b33972bb986f8ccc9b6e182861369392d1b021deb28d2040a4eb3599746"
+    },
+    "M2": {
+      "path": "game_content/scenarios/japan_china_1936/m2/verification.json",
+      "sha256": "075412811366d55eb8ed5dc749069293b8552f09773361ee1b4bba8a64a35210"
+    },
+    "M3": {
+      "path": "game_content/scenarios/japan_china_1936/m3/verification.json",
+      "sha256": "a8b9c89797a4689509104f8efe59f47304c27236556430534c4d5d8f5ded7607"
+    },
+    "M4": {
+      "path": "game_content/scenarios/japan_china_1936/m4/verification.json",
+      "sha256": "bccdcfabd6ecded61911f6f03915d9e1bd1b630f7ff17fee393bf7ed871d6a18"
+    },
+    "M5": {
+      "path": "game_content/scenarios/japan_china_1936/m5/verification.json",
+      "sha256": "9be8c85be121547ce3e5ad1ef37703c3c1498e39c1ea1e06cff6f1b494af2d65"
+    },
+    "M6": {
+      "path": "game_content/scenarios/japan_china_1936/m6/verification.json",
+      "sha256": "60e6f6b245aadb2a2c91d64fc2f3dfacd6b52f21d3514d0123137eabcdf19386"
+    },
+    "M7": {
+      "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+      "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "6d5a4f2a45a06701f162058f2db6b2d8615b8cbdb0f3785633957b4c9bb08192"
+    },
+    {
+      "path": "docs/plans/japan_china_full_rules_plan.md",
+      "sha256": "674eda77f3f077b73afb7e1297fd7786bfed34e11a022e32e345fbc9305ed4f9"
+    },
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "499508717144dc443f71138fa29c659dc4a81522479ba2921205c4999b3764ea"
+    },
+    {
+      "path": "src/campaign_setup.cpp",
+      "sha256": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5"
+    },
+    {
+      "path": "src/campaign_runtime.cpp",
+      "sha256": "23ce012fad88cb70e3582c8f02205925041576b137517dcd136fd5f408bf5b31"
+    },
+    {
+      "path": "src/campaign_state.cpp",
+      "sha256": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c"
+    },
+    {
+      "path": "include/game/air.hpp",
+      "sha256": "75e8a874e1be4404f0d7b75fb3c78e1af2c520f7f2ba0620e16257f62a36572a"
+    },
+    {
+      "path": "src/air.cpp",
+      "sha256": "8f0295eadd210e7786f953125bcb95dc90dda29e6c9a3f97a4b06c5f38faf372"
+    },
+    {
+      "path": "tests/air_tests.cpp",
+      "sha256": "f2c6370100820b600c9bb3f68d68515d15463b9acb1d23742b4f83f99aec7951"
+    },
+    {
+      "path": "tests/air_logistics_tests.cpp",
+      "sha256": "c6906e35dd6b1bb87ac37cb8f12ccde2028d892b89909f042e060825b728ef4c"
+    },
+    {
+      "path": "tests/air_integration_tests.cpp",
+      "sha256": "280c5ca2b87e61498b2c5fe374e340338112c3924c7f92c5bb718c8beb082fea"
+    },
+    {
+      "path": "tests/air_mission_tests.cpp",
+      "sha256": "d13a5437a4e49d497ae2099f69738c61bc0e6d8b1604bb955b1c971b2e39cb5c"
+    },
+    {
+      "path": "game_content/rules/gw36_air_v43.json",
+      "sha256": "4e8ea04a55c313c6396d83bc7e6df0682c2fa4c81557a0dd86d76cf8d93d5b50"
+    },
+    {
+      "path": "docs/m8/README.md",
+      "sha256": "0a34eae1f92779d4071d5c9b80e7fd9b180b05fff845769f5bbce11fb570a424"
+    },
+    {
+      "path": "include/game/naval.hpp",
+      "sha256": "be117190eadfa50fb8884d512c89470d008532816b0d1f09965828c45d36e9ef"
+    },
+    {
+      "path": "src/naval.cpp",
+      "sha256": "4a03ba68894ef808201accccdb501c0d7634bf48d5e0a76a179d1b023a0aacc1"
+    },
+    {
+      "path": "src/naval_movement.cpp",
+      "sha256": "750dd7db50c9f62714165a56caa4aaefdc80bf29ed4db93f99414596c56384e9"
+    },
+    {
+      "path": "src/naval_combat.cpp",
+      "sha256": "3c547c2ae4d2c93fcebc1704268e7e44624abeaa9c1a976acd5b24cab15ff9bc"
+    },
+    {
+      "path": "src/naval_operations.cpp",
+      "sha256": "c566b21c41a9fb1f1f4491585bbd9297b3665e3a5ae26fddf80ddd04f2b81f89"
+    }
+  ]
+}

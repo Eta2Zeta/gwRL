@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "source_explanation_correction",
+  "finding": "RB0.2 p5 defines attacker and defender; original RCL012 statement overstated the role gap.",
+  "gameplay_changed": false,
+  "preserved_verification_record": {
+    "path": "game_content/scenarios/japan_china_1936/m7/verification.json",
+    "sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+  },
+  "artifacts": [
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "b49ba4465b14b5982a4ddbf6949963774d6c0de06e1106b682f3ef0ccb6802fd"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "732ea13b545a8c7e9ba497dd0246cc4d0ddb4537848c582d475fb52b9efc56ee"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "fd834e442980e630228d19cf87f8aeeb87e2b214ded0344567579ce371844fa9"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "4d537be4619c37162b40b6844264ba3219a0b730dc272db76e7fea199708bbce"
+    }
+  ]
+}

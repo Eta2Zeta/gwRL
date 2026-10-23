@@ -1,0 +1,744 @@
+{
+  "schema_version": 1,
+  "milestone": "M9",
+  "date": "2026-10-23",
+  "status": "source_exit_passed_for_closed_campaign",
+  "scope": "The retained Japan/China campaign under its adopted rule interpretations. Full 44-turn campaign traces and invariants belong to M10; no excluded world mechanics are enabled.",
+  "source_profile": {
+    "path": "game_content/rules/gw36_naval_v43.json",
+    "version": "M9-2026-10-23",
+    "status": "implemented"
+  },
+  "primary_sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "id": "japan",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa"
+    }
+  ],
+  "reviewed_primary_pages": {
+    "rulebook": [
+      7,
+      49,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      68,
+      69,
+      70,
+      71,
+      75,
+      76,
+      77,
+      78,
+      79,
+      81,
+      90,
+      91,
+      92,
+      98
+    ],
+    "japan": [
+      4
+    ]
+  },
+  "source_findings": [
+    {
+      "id": "evacuation_roles",
+      "authority": "RCL-014 provisionally adopted by the user, pending developer clarification",
+      "source": "RB11.5 p78 requires combat; the adopted campaign interpretation assigns the evacuating fleet as attacker.",
+      "verified": "Selection of up to three ships precedes resulting battles. Enemy participants are the actual fleet at sea; the calendar slot does not choose roles. Multiple destination battles finish before suspended bombing resumes. No adjacent retreat sea is invented for departure directly from a port."
+    },
+    {
+      "id": "screening_continuation",
+      "authority": "RB9.4.2 p58 and naval sequence p69",
+      "verified": "Victorious continuing ships may stop, continue their original route, pick up unmoved land units, and declare the subsequent assault in Combat. Unrelated ships do not receive another movement phase. Blockaded-port waiting ships stay in berth until the screening succeeds."
+    },
+    {
+      "id": "naval_retreat_origins",
+      "authority": "RB10.3 p62",
+      "verified": "Retreat uses an actual adjacent sea entry. The printed naval rule supplies no Friendly-possession or enemy-free filter; the contested-retreat trace includes an enemy ship in the actual origin and retains both that ship and linked cargo."
+    },
+    {
+      "id": "combined_land_amphibious_order",
+      "authority": "RB10.8 pp70-71",
+      "verified": "Same-attacker, same-target land combat waits for amphibious preparation. Shore and Coastal Artillery first strikes precede the merged land battle. Both origins survive registration; overland units may retreat while assaulting units remain. Other targets and other attackers are not blocked by the guard."
+    },
+    {
+      "id": "launching_sea_clearance",
+      "authority": "RB10.8.1 p70 with the continuing-force exception in RB9.4.2 p58",
+      "verified": "An assault declaration is offered after its launching sea is clear. This prevents an impossible declaration with no screening battle from trapping Combat. The contested-success trace still declares and lands via the printed continuing-force exception."
+    },
+    {
+      "id": "actual_naval_air_declarations",
+      "authority": "RB9.1 p54, RB10.6.4 p68 and RB10.7 pp68-69",
+      "verified": "The public naval_air_attack and naval_port_attack actions preserve a string context, commit the aircraft to air_combat, advance from Combat Movement into Combat, and do not permit an extra flight or early landing. Ships cannot scramble out into a port attack; the port attack is aircraft versus defending Fighters and ships in port. MAP attacks use their explicit Combat-phase declaration."
+    },
+    {
+      "id": "end_of_movement_berthing",
+      "authority": "RB11.5 pp77-78 and shared mandatory landing/withdrawal rules",
+      "verified": "Berthing cannot strand mandatory aircraft landing or Chinese-gift withdrawal, including a restored berthing marker. Ordinary movement remains closed after end-of-movement berthing."
+    },
+    {
+      "id": "destroyer_transport_source_correction",
+      "authority": "Japan reference sheet PDF p4",
+      "verified": "The transport permission is one Marine per Japanese Destroyer, -1 movement while loaded, and no further movement after unloading. The former profile citation to rulebook p105 was replaced by Japan NRS p4; no new gameplay ruling was introduced."
+    },
+    {
+      "id": "geographic_and_campaign_exclusions",
+      "authority": "RB13.2.7 p98 and frozen campaign contract",
+      "verified": "Neither retained narrow crossing requires a naval passage. Ordinary sea entry gets no invented passage fire. Convoy raiding, interdiction, Kido Butai and off-map states remain inactive."
+    }
+  ],
+  "rule_coverage": [
+    {
+      "rule_id": "naval_movement_supply",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        7,
+        57,
+        92
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "supplyDamageAndSubmarineRanges",
+        "regularMovementAndReplay"
+      ]
+    },
+    {
+      "rule_id": "naval_transport_loading",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58,
+        76,
+        92
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "transportComposition",
+        "loadVoyageAndFriendlyUnload",
+        "movedCargoAndSplitUnloadingRejected"
+      ]
+    },
+    {
+      "rule_id": "destroyer_transports",
+      "source_id": "japan",
+      "pdf_pages": [
+        4
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "destroyerTransportRangeAndStop",
+        "transportComposition"
+      ]
+    },
+    {
+      "rule_id": "peace_entry_declaration_windows",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        54
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "peacefulSeaEntryWindowsAreSequentialAndReplayable",
+        "defenderDeclarationQueuesCombatAndAllowsReinforcements"
+      ]
+    },
+    {
+      "rule_id": "strategic_naval_movement",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        49,
+        76,
+        77
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "strategicCapacityEndpointsAndUnloading",
+        "strategicPickupAlongRoute",
+        "strategicAndNoncombatBlockers"
+      ]
+    },
+    {
+      "rule_id": "screening_and_continuation",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58,
+        69
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "blockadedPortKeepsContinuingShipsInBerth",
+        "japanToChinaVoyageAndLanding"
+      ]
+    },
+    {
+      "rule_id": "submarine_and_map_reactions",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        55,
+        56,
+        57,
+        76
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "immediateSubmarineReactionResumesTheVoyage",
+        "defendingCarrierAircraftMayEngageMovingSubmarine",
+        "oneRoundMovementEncounterExcludesParkedFleet"
+      ]
+    },
+    {
+      "rule_id": "raider_slip_and_discovery",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        58,
+        59,
+        69
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "attackingRaiderSlipIsExplicitAndReplayable",
+        "raiderDiscoveryTiesAndSlipStayInSea"
+      ]
+    },
+    {
+      "rule_id": "naval_combat_and_typed_casualties",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        61,
+        62,
+        68,
+        69
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "reciprocalHitsAndReplay",
+        "jointDefenseDisputeUsesEntitledPlayers",
+        "transportsLastAndLinkedCargo"
+      ]
+    },
+    {
+      "rule_id": "submarine_first_strike_and_submerging",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        68,
+        69,
+        91
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "submarineFirstStrikeAndDestroyer",
+        "protectedSubmarinesAndSubmerge",
+        "mapPairingAndAdvancedSubmarineImmunity",
+        "seaplaneAswBonusTargetsSubmarines"
+      ]
+    },
+    {
+      "rule_id": "capital_damage_and_carrier_rescue",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        69,
+        90,
+        91
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "capitalHitsAndDamageValues",
+        "carrierLossRescuesDefendingAircraft",
+        "defendingAircraftReturnToTheirIntactCarrier"
+      ]
+    },
+    {
+      "rule_id": "ship_scrambling_and_return",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        63,
+        78
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "shipScrambleAndSkeletonCrewExclusion"
+      ]
+    },
+    {
+      "rule_id": "port_attacks",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        68,
+        78
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "portAttackStillGetsFacilityAaAfterShipLoss",
+        "actualNavalAirDeclarationsKeepContextAndCombatPhase"
+      ]
+    },
+    {
+      "rule_id": "amphibious_clearance_and_shore_fire",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        70,
+        71
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "seaMustBeClearedBeforeAssault",
+        "shoreBombardmentAndCoastalFirstStrike",
+        "japanToChinaVoyageAndLanding",
+        "adjacentLandAndAmphibiousAttacksResolveTogether"
+      ]
+    },
+    {
+      "rule_id": "amphibious_land_and_casualties",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        70,
+        71
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "waitingArmorRemainsAboardUntilFoothold",
+        "amphibiousDoubleCasualtiesAndExemptions",
+        "adjacentLandAndAmphibiousAttacksResolveTogether"
+      ]
+    },
+    {
+      "rule_id": "in_port_and_skeleton_crews",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        77,
+        78,
+        81
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "berthLocksMovementAndKeepsCargo",
+        "temporaryCrewAndSkeletonRestriction",
+        "capturedShipRollPreservesDamage",
+        "berthWaitsForMandatoryLandingAndWithdrawal"
+      ]
+    },
+    {
+      "rule_id": "damaged_port_evacuation",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        78
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "damagedPortEvacuationSuspendsAndResumesBombing",
+        "thirdPartyEvacuationUsesFleetRolesAndPreservesBombing",
+        "activeEnemyDefendsEvacuationAndSelectionMayStop",
+        "separateEvacuationSeasResolveBeforeCalendarResumes"
+      ]
+    },
+    {
+      "rule_id": "blockade",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        60
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "tests/movement_tests.cpp::blockadeSurfaceOnly"
+      ]
+    },
+    {
+      "rule_id": "coastal_artillery_shared_shot_limit",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        70,
+        98
+      ],
+      "review_status": "source_and_handler_reviewed",
+      "related_test_or_review_evidence": [
+        "shoreBombardmentAndCoastalFirstStrike",
+        "sharedShoreCasualtiesNeedBothPolicies"
+      ]
+    },
+    {
+      "rule_id": "narrow_crossing_passage_fire",
+      "source_id": "rulebook",
+      "pdf_pages": [
+        98
+      ],
+      "review_status": "inactive_geographic_precondition",
+      "related_test_or_review_evidence": [
+        "docs/m9/naval_geography.md; neither retained crossing is mandatory for an ordinary naval edge"
+      ]
+    }
+  ],
+  "verification": {
+    "build_directory": "build/rcl014",
+    "build_type": "Release",
+    "compiler": "AppleClang 21.0.0.21000334",
+    "targeted_command": "GWRL_NAVAL_EXIT_TRACE_DIR=/Users/home/Desktop/gwRL/docs/m9/evidence ctest --test-dir build/rcl014 -R '^(naval_movement|naval_combat|naval_operations|air_integration|land_combat)$' --output-on-failure",
+    "targeted_suites_passed": 5,
+    "targeted_elapsed_seconds": 9.43,
+    "fixture_groups": {
+      "naval_movement": 21,
+      "naval_combat": 17,
+      "naval_operations": 21
+    },
+    "final_evidence_export_command": "GWRL_NAVAL_EXIT_TRACE_DIR=/Users/home/Desktop/gwRL/docs/m9/evidence ./build/rcl014/naval_operations_tests",
+    "final_evidence_export_result": "All 21 operation groups passed after the source profile freeze; the four durable traces independently verified exact replay."
+  },
+  "combined_exit_traces": [
+    {
+      "path": "docs/m9/evidence/combined_clear_2026_10_23.json",
+      "sha256": "d1665bdf546194b693a5f3c2e7a0b391f5eab90bd0ec5684a88eccb65f946463",
+      "fixture": "japanToChinaVoyageAndLanding",
+      "variant": "clear",
+      "transitions": 17,
+      "event_counts": {
+        "action": 15,
+        "chance": 2
+      },
+      "action_counts": {
+        "end_phase": 1,
+        "land_begin_battle": 1,
+        "land_progress_battle": 1,
+        "naval_begin_assault": 1,
+        "naval_declare_assault": 2,
+        "naval_finish_shore_selection": 1,
+        "naval_force_add": 2,
+        "naval_load": 2,
+        "naval_route": 1,
+        "naval_select_bombardment": 1,
+        "naval_shore_casualty": 1,
+        "naval_start_move": 1
+      },
+      "exact_replay_identity_verified": true,
+      "final_clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "final_shantung_possessor": "japan",
+      "final_units": {
+        "bombard": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 1
+        },
+        "idle": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 3
+        },
+        "marine": {
+          "owner": "japan",
+          "zone": "land_china_shantung",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "reinforcement": {
+          "owner": "japan",
+          "zone": "land_china_shantung",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "screen": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 2
+        },
+        "transport": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        }
+      }
+    },
+    {
+      "path": "docs/m9/evidence/combined_contested_2026_10_23.json",
+      "sha256": "beeb5905140f193963a8380e4defd1eed761b36b787f4811a0b84cdbd8ae6ee7",
+      "fixture": "japanToChinaVoyageAndLanding",
+      "variant": "contested",
+      "transitions": 24,
+      "event_counts": {
+        "action": 20,
+        "chance": 4
+      },
+      "action_counts": {
+        "end_phase": 1,
+        "land_begin_battle": 1,
+        "land_progress_battle": 1,
+        "naval_begin_assault": 1,
+        "naval_begin_battle": 1,
+        "naval_declare_assault": 2,
+        "naval_finish_shore_selection": 1,
+        "naval_force_add": 2,
+        "naval_load": 2,
+        "naval_route": 1,
+        "naval_screen_add": 1,
+        "naval_screen_confirm": 1,
+        "naval_screen_continue_route": 1,
+        "naval_select_bombardment": 1,
+        "naval_shore_casualty": 1,
+        "naval_start_move": 1,
+        "naval_take_casualty": 1
+      },
+      "exact_replay_identity_verified": true,
+      "final_clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "final_shantung_possessor": "japan",
+      "final_units": {
+        "bombard": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 1
+        },
+        "idle": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 3
+        },
+        "marine": {
+          "owner": "japan",
+          "zone": "land_china_shantung",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "reinforcement": {
+          "owner": "japan",
+          "zone": "land_china_shantung",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "screen": {
+          "owner": "japan",
+          "zone": "sea_p15",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 3
+        },
+        "transport": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        }
+      }
+    },
+    {
+      "path": "docs/m9/evidence/combined_overland_amphibious_2026_10_23.json",
+      "sha256": "481a64340b572dd89d73fed27ecbe547facc7205eb713b8c8ce3c22ce9b472e4",
+      "fixture": "adjacentLandAndAmphibiousAttacksResolveTogether",
+      "variant": "overland_amphibious",
+      "transitions": 16,
+      "event_counts": {
+        "action": 11,
+        "chance": 5
+      },
+      "action_counts": {
+        "end_phase": 1,
+        "land_begin_battle": 1,
+        "land_progress_battle": 1,
+        "land_retreat_begin": 1,
+        "land_retreat_unit": 1,
+        "land_take_casualty": 1,
+        "movement_route": 1,
+        "naval_begin_assault": 1,
+        "naval_declare_assault": 1,
+        "naval_finish_shore_selection": 1,
+        "naval_select_bombardment": 1
+      },
+      "exact_replay_identity_verified": true,
+      "final_clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "final_shantung_possessor": "japan",
+      "final_units": {
+        "amphibious": {
+          "owner": "japan",
+          "zone": "land_china_shantung",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "bombard": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 2
+        },
+        "overland": {
+          "owner": "japan",
+          "zone": "land_china_hopeh",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "transport": {
+          "owner": "japan",
+          "zone": "sea_p14",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        }
+      }
+    },
+    {
+      "path": "docs/m9/evidence/combined_retreat_2026_10_23.json",
+      "sha256": "a0f4575301aa74b7654b4b5e551af3eaad9c5e7dc3cd738061a16c1efdbc374f",
+      "fixture": "japanToChinaVoyageAndLanding",
+      "variant": "retreat",
+      "transitions": 13,
+      "event_counts": {
+        "action": 11,
+        "chance": 2
+      },
+      "action_counts": {
+        "end_phase": 1,
+        "naval_begin_battle": 1,
+        "naval_force_add": 2,
+        "naval_load": 1,
+        "naval_retreat_begin": 1,
+        "naval_retreat_unit": 1,
+        "naval_route": 1,
+        "naval_screen_add": 1,
+        "naval_screen_confirm": 1,
+        "naval_start_move": 1
+      },
+      "exact_replay_identity_verified": true,
+      "final_clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "final_shantung_possessor": "kmt",
+      "final_units": {
+        "blocker": {
+          "owner": "kmt",
+          "zone": "sea_p15",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 3
+        },
+        "bombard": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "defender": {
+          "owner": "kmt",
+          "zone": "land_china_shantung",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 1
+        },
+        "idle": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 3
+        },
+        "marine": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": "transport",
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "origin_enemy": {
+          "owner": "kmt",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 3
+        },
+        "reinforcement": {
+          "owner": "japan",
+          "zone": "land_china_beiping",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 1
+        },
+        "screen": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [],
+          "movement_remaining": 0
+        },
+        "transport": {
+          "owner": "japan",
+          "zone": "sea_p16",
+          "carried_by": null,
+          "cargo": [
+            "marine"
+          ],
+          "movement_remaining": 0
+        }
+      }
+    }
+  ],
+  "sha256": {
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_combat.cpp": "b61afda70e355d4c0980a291c80f834d5fb94d010c8e25ed4666e3b21005e880",
+    "src/naval_operations.cpp": "134f53a440ab13c9c39b0689ddb0637d418c9efc27624d8f3e83fb10e65974a1",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "tests/naval_movement_tests.cpp": "cd40f9dff65f8415cc81ab040c017a454b7a9f811f609275906c21011c4f157f",
+    "tests/naval_combat_tests.cpp": "9ca576e240b9b931a3dfae75b92176940c63a0883dbf2aea205f9973c3301b94",
+    "tests/naval_operations_tests.cpp": "0fc34378bc43c1586fce57e4e2b07e8eb0371435bfefa870bf662abd54c9a7b4",
+    "game_content/rules/gw36_naval_v43.json": "ae4b1d28ec94d5558750ac568c7c6e3de5fe7c1cf8b3f1a8c5fc1e94f686019f"
+  },
+  "historical_checkpoint_preserved": "game_content/scenarios/japan_china_1936/m9/checkpoint_2026_10_22.json",
+  "limitations": [
+    "RCL-014 remains a user-adopted campaign interpretation pending developer clarification.",
+    "These source/sequence exits do not substitute for M10 full-campaign certification."
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "kind": "source_reachability_audit",
+  "clarification": "RCL-015",
+  "finding": "Dadao/KMT war with CCP neutral is source-supported during the Chinese Truce; use KMT initiating the war so no controller-created new war is needed.",
+  "source_files": [
+    {
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+      "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6"
+    },
+    {
+      "path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf",
+      "sha256": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c"
+    }
+  ],
+  "legal_sequence": [
+    {
+      "step": "Japan creates Dadao by influence before invading China.",
+      "sources": [
+        "RB15.4 p105",
+        "Japan NRS p4"
+      ]
+    },
+    {
+      "step": "Japan later declares war on China; CCP/KMT agree to the Chinese Truce. Japan stays at peace with all Major Powers, so Dadao remains separately controlled.",
+      "sources": [
+        "RB4.9 p30",
+        "RB6.6 p42",
+        "RB15.4 p105"
+      ]
+    },
+    {
+      "step": "KMT attacks Dadao, which possesses Chinese Home Country land. The minor-KMT declaration condition permits this, and the Dadao ability expressly anticipates KMT attacking without Dadao aligning with Japan.",
+      "sources": [
+        "RB5.1 p35",
+        "KMT NRS p1",
+        "RB15.4 p105"
+      ]
+    },
+    {
+      "step": "Dadao retaliates against KMT as a controlled minor already at war. CCP has not declared war and does not inherit KMT external wars merely by signing the Truce.",
+      "sources": [
+        "RB4.5 p27",
+        "RB6.6 p42"
+      ]
+    },
+    {
+      "step": "CCP co-occupants not at war with Dadao do not join defense and must relocate if Dadao conquers the land.",
+      "sources": [
+        "RB0.3 p8",
+        "RB6.6 p42"
+      ]
+    }
+  ],
+  "landless_CCP": "CCP never surrenders (CCP NRS p1); the civil war ends for absence of surviving units, not absence of territory (RB14.3 p101).",
+  "limits": "Political legality established from source; this is not a generated complete campaign trace. The no-Friendly-destination case additionally requires no CCP land or remaining Friendly KMT destination.",
+  "ruling_status": "No adoption or gameplay change. The no-destination consequence in RCL-015 remains open; no elimination rule has been adopted.",
+  "independent_source_review": "Complete relevant source pages visually inspected; no contrary automatic war coupling found."
+}

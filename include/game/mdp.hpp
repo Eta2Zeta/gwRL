@@ -51,6 +51,18 @@ class SimplifiedChinaMdp {
             throw std::runtime_error("Cannot step a terminal state");
         }
 
+        const auto actions = legalActions(gameState);
+        const auto legalAction = std::find_if(actions.begin(), actions.end(), [&](const Action& candidate) {
+            return candidate.kind == action.kind
+                && candidate.sourceZoneId == action.sourceZoneId
+                && candidate.targetZoneId == action.targetZoneId
+                && candidate.unitCount == action.unitCount
+                && candidate.unitKind == action.unitKind;
+        });
+        if (legalAction == actions.end()) {
+            throw std::runtime_error("Action is not legal in the current state");
+        }
+
         StepResult result{
             .actingNation = std::string(gameState.currentNation()),
             .phaseBefore = gameState.currentPhase(),

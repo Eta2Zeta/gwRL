@@ -15,6 +15,10 @@ from studies.shared.policy_value_model import LegalActionPolicyValueNet, PolicyV
 
 
 STUDY_NAMES = ("composition", "mini_japan_two_turn")
+IGNORED_IMAGE_SUFFIXES = {
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tif", ".tiff",
+    ".svg", ".heic", ".avif",
+}
 
 
 class StudyLayoutTests(unittest.TestCase):
@@ -89,15 +93,28 @@ class StudyLayoutTests(unittest.TestCase):
             for file_path in preserved_directory.rglob("*")
             if file_path.is_file()
         }
-        self.assertEqual(actual_files, set(manifest["files"]))
+        # Images are deliberately git-ignored at the user's request. Their
+        # manifest entries remain, but a clean clone need not contain them.
+        optional_images = {
+            filename for filename in manifest["files"]
+            if Path(filename).suffix.lower() in IGNORED_IMAGE_SUFFIXES
+        }
+        self.assertEqual(
+            actual_files - optional_images,
+            set(manifest["files"]) - optional_images,
+        )
         for filename, expected_digest in manifest["files"].items():
             with self.subTest(study=study_name, file=filename):
                 relative_path = Path(filename)
                 self.assertFalse(relative_path.is_absolute())
                 self.assertNotIn("..", relative_path.parts)
                 self.assertRegex(expected_digest, r"^[0-9a-f]{64}$")
+                preserved_path = preserved_directory / relative_path
+                if filename in optional_images and not preserved_path.exists():
+                    continue
+                self.assertTrue(preserved_path.is_file(), preserved_path)
                 actual_digest = hashlib.sha256(
-                    (preserved_directory / relative_path).read_bytes()
+                    preserved_path.read_bytes()
                 ).hexdigest()
                 self.assertEqual(actual_digest, expected_digest)
 

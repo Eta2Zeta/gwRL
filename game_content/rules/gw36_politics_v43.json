@@ -1,0 +1,1754 @@
+{
+  "schema_version": 1,
+  "game": "Global War 1936 v4.3",
+  "scope": "Source-backed M4 politics for retained Japan/China campaign; source rules distinguished from approved campaign overrides.",
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "kind": "local_file",
+      "version": "4.3"
+    },
+    {
+      "id": "japan_nrs",
+      "path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+      "kind": "local_file",
+      "version": "4.3"
+    },
+    {
+      "id": "kmt_nrs",
+      "path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+      "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6",
+      "kind": "local_file",
+      "version": "4.3"
+    },
+    {
+      "id": "ccp_nrs",
+      "path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf",
+      "sha256": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c",
+      "kind": "local_file",
+      "version": "4.3"
+    },
+    {
+      "id": "world_map_art",
+      "path": "game_content/maps/gw36map.png",
+      "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba",
+      "kind": "map_artwork"
+    },
+    {
+      "id": "world_map",
+      "path": "game_content/maps/gw36_manual_map.json",
+      "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+      "kind": "reviewed_source_transcription"
+    },
+    {
+      "id": "home_country_table",
+      "path": "game_content/maps/gw36_nation_home_country.json",
+      "sha256": "916c9065407ba4486e889151a89e59bde8cf514c7ab004adbc6742b51f29ef90",
+      "kind": "reviewed_source_transcription"
+    },
+    {
+      "id": "faction_index",
+      "path": "game_content/scenarios/japan_china_1936/m1/faction_index.json",
+      "sha256": "1cb2e77200703bc0fbe73ec582a2d2bfb0693ae649119db15052074e593b245a",
+      "kind": "frozen_identity_bridge"
+    },
+    {
+      "id": "scenario_contract",
+      "path": "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+      "sha256": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+      "kind": "approved_campaign_specification"
+    },
+    {
+      "id": "clarifications",
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "49fd855d02278c50a06a2651dce1b61b604111a5d5ba6e8c3cb1b6f618251023",
+      "kind": "project_rule_register"
+    },
+    {
+      "id": "china_map_crop",
+      "path": "docs/map_audits/full_world/evidence/ap_china_graph.png",
+      "sha256": "ea4469557f302c458b20d654740084644128d63c0dd17f14a577f536f9e345b1",
+      "kind": "map_artwork_crop"
+    },
+    {
+      "id": "mongolia_map_crop",
+      "path": "docs/map_audits/full_world/evidence/ap_mongolia_north_edges.png",
+      "sha256": "d737f6648d4e93d3a6b57fa2d263e6d0a1dfc86158b14e930a266530e56f0692",
+      "kind": "map_artwork_crop"
+    },
+    {
+      "id": "south_east_asia_map_crop",
+      "path": "docs/map_audits/full_world/evidence/ap_se_asia.png",
+      "sha256": "064f5e23097753855112d430e2f4d43667cdf3c6aa39382dc705ec9266bb9a6b",
+      "kind": "map_artwork_crop"
+    },
+    {
+      "id": "user_ruling_dadao_after_japan_surrender",
+      "kind": "user_ruling",
+      "date": "2026-10-21",
+      "quote": "Keep Dadao separate, controlled directly by the Axis agent (recommended)"
+    },
+    {
+      "id": "developer_truce_roles_reported_2026_10_22",
+      "kind": "developer_clarification_reported_by_user",
+      "date": "2026-10-22",
+      "quote": "OK in any case it is resolved by a dev and when the third party triggers and evolution, the owner of the land will be the defender.",
+      "scope": "Third-party-triggered Chinese evolution: shared-land possessor defends; other Chinese faction attacks.",
+      "independently_verified": false
+    },
+    {
+      "id": "user_truce_low_morale_2026_10_22",
+      "kind": "user_clarification",
+      "date": "2026-10-22",
+      "quote": "I don't get why this is separate? Shouldn't it just follow the same rules when KMT is the one breaking the truce with sharing zones? Which is just auto elimination for those with low morale?",
+      "ruling": "Use the same attack-roll10+ elimination for eligible attacking minor KMT regular Infantry/Cavalry in shared truce-ending zones after voluntary or automatic termination.",
+      "scope": "Low Morale consequence; developer confirmation separately covers third-party combat roles."
+    }
+  ],
+  "rules": [
+    {
+      "id": "political_identities",
+      "parameters": {
+        "distinct_fields": [
+          "national_identity",
+          "controlling_nation",
+          "controlling_player",
+          "alliance",
+          "possessor",
+          "original_nation",
+          "power_status"
+        ],
+        "alliance_membership_alone_implies_alignment": false,
+        "sea_zones_possessable": false,
+        "original_identity_changes_on_capture": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 5,
+          "section": "0.2 Control/Alignment"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally/Possession"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 26,
+          "section": "4.3-4.4"
+        }
+      ]
+    },
+    {
+      "id": "neutrality",
+      "parameters": {
+        "major_neutral_until_at_war_with_major": true,
+        "minor_relative_neutrality_until_alignment": true,
+        "major_war_with_minor_triggers_wartime_status": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 26,
+          "section": "4.4"
+        }
+      ]
+    },
+    {
+      "id": "controlled_minor_permissions",
+      "parameters": {
+        "allowed": [
+          "move_own_units",
+          "attack_existing_enemies",
+          "recruit",
+          "controller_aircraft_overflight",
+          "controller_supply_through_minor_land_and_naval_facilities"
+        ],
+        "forbidden": [
+          "declare_new_war",
+          "ordinary_income",
+          "send_lend_lease",
+          "research",
+          "ordinary_diplomacy"
+        ],
+        "special_nrs_exceptions": [
+          "ccp",
+          "kmt",
+          "free_france"
+        ],
+        "ordinary_control_assignment_timing": "end_of_attacker_combat",
+        "defensive_decisions_before_control": "future_controller",
+        "attacks_change_existing_controller": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 26,
+          "section": "4.5"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 27,
+          "section": "4.5"
+        }
+      ]
+    },
+    {
+      "id": "alignment",
+      "parameters": {
+        "same_alliance_majors_align_when_at_war_with_same_major": true,
+        "ordinary_controlled_minor_aligns_when_controller_and_minor_share_major_enemy": true,
+        "ordinary_minor_incorporation": true,
+        "non_incorporating_exceptions": [
+          "ccp",
+          "kmt",
+          "free_france"
+        ],
+        "transfers": [
+          "remaining_land",
+          "remaining_units"
+        ],
+        "phase_of_alignment_affects_same_turn_use": true,
+        "aligned_shared_defense_and_access": true,
+        "foreign_major_carrier_use": false,
+        "excess_existing_militia_removed_on_alignment": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 27,
+          "section": "4.5-4.6"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 28,
+          "section": "4.6"
+        }
+      ]
+    },
+    {
+      "id": "declaration_timing",
+      "parameters": {
+        "major_target": "any_time_including_other_player_turns",
+        "major_target_exception": "during_strategic_naval_movement",
+        "priority": [
+          "active_nation",
+          "other_members_of_active_alliance",
+          "requesting_other_nation"
+        ],
+        "minor_target": "land_unit_combat_movement_against_target",
+        "same_alliance_declaration_allowed": false,
+        "war_irreversible_except_explicit_treaty": true,
+        "major_dow_against_major_triggers_target_full_production": true,
+        "minor_dow_triggers_target_full_production": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 35,
+          "section": "5.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 36,
+          "section": "5.1"
+        }
+      ]
+    },
+    {
+      "id": "japan_declaration_permissions",
+      "parameters": {
+        "forbidden_alliance": "axis",
+        "forbidden_nation": "nationalist_spain",
+        "other_nations": "subject_to_general_target_timing"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 35,
+          "section": "5.1"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 3,
+          "section": "Declarations of War"
+        }
+      ]
+    },
+    {
+      "id": "chinese_declaration_permissions",
+      "parameters": {
+        "ccp": {
+          "forbidden_alliance": "comintern",
+          "warlords": "land_attack",
+          "other_nations": "major_power_or_target_has_unit_or_possession_in_chinese_home_country"
+        },
+        "kmt": {
+          "forbidden_alliance": "allies",
+          "warlords_and_mongolia": "land_attack_after_ccp_previously_eliminated",
+          "other_nations": "major_power_or_target_has_unit_or_possession_in_chinese_home_country"
+        }
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 35,
+          "section": "5.1"
+        },
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 2,
+          "section": "Declarations of War"
+        },
+        {
+          "source_id": "kmt_nrs",
+          "pdf_page": 2,
+          "section": "Declarations of War"
+        }
+      ]
+    },
+    {
+      "id": "warlord_identity",
+      "parameters": {
+        "faction_count": 8,
+        "multi_zone_factions": {
+          "warlord_beiping_hopeh": [
+            "land_china_beiping",
+            "land_china_hopeh"
+          ],
+          "warlord_kwangtung_hainan": [
+            "land_kwangtung",
+            "land_hainan"
+          ]
+        },
+        "foreign_relations": "semi_autonomous_chinese_provinces_considered_part_of_kmt",
+        "originally_kmt": false,
+        "ordinary_diplomacy_target": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 30,
+          "section": "4.8-4.9"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-008 closed source classification"
+        }
+      ]
+    },
+    {
+      "id": "warlord_chinese_attack_alignment",
+      "parameters": {
+        "kmt_attack_requires_ccp_previous_elimination": true,
+        "kmt_attack_recipient": "ccp",
+        "kmt_attack_revives_ccp": true,
+        "ccp_or_dadao_attack_recipient": "kmt",
+        "ccp_or_dadao_attack_alignment_timing": "end_of_attacker_combat",
+        "when_kmt_surrendered": "remain_unaligned",
+        "transfer_whole_warlord": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 30,
+          "section": "4.9"
+        }
+      ]
+    },
+    {
+      "id": "foreign_invasion_of_china",
+      "parameters": {
+        "trigger": "foreign_attack_on_original_warlord_ccp_or_kmt_land",
+        "dadao_exception": true,
+        "effect": "war_on_all_china",
+        "alignment_timing": "end_of_attacker_combat",
+        "scope": "each_whole_remaining_warlord",
+        "qualifying_neighbors_evaluated_across_all_warlord_territories": true,
+        "rolls_per_warlord": 1,
+        "die_sides": 12,
+        "neither_neighbor": {
+          "automatic": "kmt"
+        },
+        "only_ccp_neighbor": [
+          {
+            "faces": [
+              1,
+              6
+            ],
+            "recipient": "ccp"
+          },
+          {
+            "faces": [
+              7,
+              12
+            ],
+            "recipient": "kmt"
+          }
+        ],
+        "only_dadao_neighbor": [
+          {
+            "faces": [
+              1,
+              6
+            ],
+            "recipient": "dadao"
+          },
+          {
+            "faces": [
+              7,
+              12
+            ],
+            "recipient": "kmt"
+          }
+        ],
+        "both_neighbors": [
+          {
+            "faces": [
+              1,
+              5
+            ],
+            "recipient": "ccp"
+          },
+          {
+            "faces": [
+              6,
+              10
+            ],
+            "recipient": "kmt"
+          },
+          {
+            "faces": [
+              11,
+              12
+            ],
+            "recipient": "dadao"
+          }
+        ],
+        "kmt_result_after_kmt_surrender": "align_whole_warlord_with_kmt_and_reactivate_it",
+        "reactivation_restores_erased_units_or_cash": false,
+        "reactivation_resets_prior_evolution_or_objective_awards": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 30,
+          "section": "4.9"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 31,
+          "section": "4.9 alignment table"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-003 adopted whole-faction roll"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 38,
+          "section": "5.7 surrender consequences; liberation prohibition"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 39,
+          "section": "5.7 KMT no-land surrender condition"
+        }
+      ],
+      "notes": "The printed per-land-zone wording is superseded by the approved whole-warlord clarification; no per-zone split remains.",
+      "interpretation_notes": [
+        "The surrendered-KMT stay-neutral sentence belongs to the preceding CCP/Dadao-attack paragraph of RB4.9. The foreign-invasion paragraph and table supply automatic/die KMT outcomes without that exception, and adopted RCL-003 preserves the automatic KMT outcome. Apply that result to actual surviving warlord land and units even after KMT surrendered, ending its no-land condition; do not restore erased resources or reset one-time awards. This is a source-combination inference, not a new user ruling. Direct CCP/Dadao attacks still leave the warlord neutral when KMT has surrendered."
+      ]
+    },
+    {
+      "id": "influencing_zone",
+      "parameters": {
+        "requires_unit_since_turn_start": true,
+        "impassable_border_counts_as_adjacency": false,
+        "ccp_source_possession": "ccp_possesses",
+        "japan_source_possession": "japan_controls_or_possesses"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 Influencing Zone"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 104,
+          "section": "15.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 105,
+          "section": "15.4"
+        }
+      ]
+    },
+    {
+      "id": "warlord_influence",
+      "parameters": {
+        "phase": "place_units",
+        "ccp_attempts_per_player_turn": 1,
+        "japan_attempts_per_player_turn": 1,
+        "ccp_requires_minor_status": true,
+        "success_threshold": "number_of_qualifying_adjacent_land_zones",
+        "success_test": "raw_d12_minus_spend_lte_threshold",
+        "spend_before_roll": true,
+        "spend_minimum": 0,
+        "spend_maximum": "unmodified_success_threshold_and_available_treasury",
+        "natural_12_recipient": "kmt",
+        "natural_12_overrides_modified_success": true,
+        "transfers_whole_warlord": true,
+        "japan_success_creates_or_joins": "dadao",
+        "ccp_success_recipient": "ccp",
+        "natural_12_after_kmt_surrender": "align_whole_warlord_with_kmt_and_reactivate_it",
+        "reactivation_restores_erased_units_or_cash": false,
+        "reactivation_resets_prior_evolution_or_objective_awards": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 104,
+          "section": "15.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 105,
+          "section": "15.4"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-002 adopted spending bound"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 38,
+          "section": "5.7 surrender consequences; liberation prohibition"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 39,
+          "section": "5.7 KMT no-land surrender condition"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 30,
+          "section": "4.9 explicit exception limited to CCP/Dadao attacks"
+        }
+      ],
+      "interpretation_notes": [
+        "RB104/105 and the adopted RCL-002 natural-12 outcome have no surrender exception. RB5.7 forbids liberation to a surrendered nation, not alignment. RB4.9 expressly leaves a warlord neutral after a CCP/Dadao attack when KMT has surrendered; that attack-only exception is not applied to an influence backfire. Alignment supplies actual land/units, ending KMT’s no-land surrender condition. Reactivation is this source-combination inference, not an expressly printed KMT revival sentence or a new user ruling."
+      ]
+    },
+    {
+      "id": "dadao",
+      "parameters": {
+        "created_by": "successful_japanese_warlord_influence",
+        "alliance": "axis",
+        "controller_nation": "japan",
+        "incorporated_on_creation": false,
+        "recruitment_while_controlled": true,
+        "may_receive_japanese_lend_lease": true,
+        "may_attack_chinese_land_without_general_foreign_invasion_alignment": true,
+        "attacked_by_ccp_or_kmt_aligns_to_japan": false,
+        "attacked_by_non_chinese_nation_aligns_to_japan": "end_of_attacker_combat",
+        "japan_war_with_china_and_major_aligns_to_japan": "end_of_japanese_combat",
+        "own_original_land_zone_ids": []
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 29,
+          "section": "4.7 Dadao"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 105,
+          "section": "15.4 Dadao"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 4,
+          "section": "Dadao Government"
+        }
+      ]
+    },
+    {
+      "id": "mongolia_printed",
+      "parameters": {
+        "initial_controller_nation": "ussr",
+        "alliance": "comintern",
+        "recruitment_while_controlled": true,
+        "kmt_attack_causes_soviet_alignment": false,
+        "other_attack_soviet_alignment": "end_of_attacker_combat",
+        "ussr_at_war_with_major_alignment": "immediate"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 29,
+          "section": "4.7 Mongolia"
+        }
+      ]
+    },
+    {
+      "id": "mongolia_campaign_override",
+      "parameters": {
+        "controller_player": "comintern",
+        "controller_nation": null,
+        "retains_national_identity": true,
+        "soviet_alignment_enabled": false,
+        "soviet_possession_enabled": false,
+        "ordinary_income": false,
+        "turn_position": "normal_ussr_slot",
+        "turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "controlled_minor_movement_and_recruitment_retained": true,
+        "inherits_soviet_national_abilities": false,
+        "common_major_enemy_automatically_aligns_with_ccp": false
+      },
+      "source_refs": [
+        {
+          "source_id": "scenario_contract",
+          "section": "politics.mongolia; national_turn_order; boundary.logical_controllers"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 27,
+          "section": "4.6 common-enemy alignment"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 28,
+          "section": "4.6 incorporation and named exceptions"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 29,
+          "section": "4.7 Mongolia aligns with USSR"
+        }
+      ],
+      "interpretation_notes": [
+        "The general Minor-to-Major alignment rule incorporates the minor, except for named CCP/KMT/Free France exceptions. Mongolia’s specific printed alignment recipient is USSR, and the campaign disables that absent-nation alignment while retaining Mongolia’s identity. A common enemy with CCP therefore does not invent a separate non-incorporating Mongolia/CCP alignment or its shared access/defense permissions."
+      ]
+    },
+    {
+      "id": "chinese_truce_offer",
+      "parameters": {
+        "trigger": "foreign_major_declares_war_on_china",
+        "decision_timing": "immediately_at_end_of_attacker_combat",
+        "participants": [
+          "ccp",
+          "kmt"
+        ],
+        "requires_both_agree": true,
+        "eligible_after_either_evolves": false,
+        "may_resign_after_termination": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 40,
+          "section": "6.1-6.2"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 42,
+          "section": "6.6"
+        }
+      ]
+    },
+    {
+      "id": "chinese_truce_effects",
+      "parameters": {
+        "mutual_attack": false,
+        "shared_land_access": true,
+        "shared_defense_as_if_aligned": true,
+        "retaker_gains_possession_when_recapturing_chinese_home_country_from_foreign_nation": true,
+        "same_national_identity": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 42,
+          "section": "6.6"
+        }
+      ]
+    },
+    {
+      "id": "chinese_truce_termination",
+      "parameters": {
+        "voluntary_phase": "combat",
+        "prior_separation_phase": "combat_movement",
+        "requires_prior_commitment_to_break": false,
+        "retroactive_movement": false,
+        "automatic_on_either_evolution": true,
+        "resolve_remaining_mixed_stacks": true,
+        "third_party_evolution_defender": "land_possessor",
+        "kmt_shared_zone_low_morale": {
+          "eligible_types": [
+            "infantry",
+            "cavalry"
+          ],
+          "where": "shared_land_zones",
+          "die_sides": 12,
+          "eliminate_on_at_least": 10,
+          "roll": "normal_attacking_die_no_additional_roll",
+          "requires_minor_kmt": true,
+          "termination_modes": [
+            "voluntary",
+            "automatic"
+          ],
+          "requires_attacking_kmt": true
+        }
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 42,
+          "section": "6.6"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-007 closed source sequence"
+        },
+        {
+          "source_id": "developer_truce_roles_reported_2026_10_22",
+          "section": "RCL-012 third-party roles"
+        },
+        {
+          "source_id": "user_truce_low_morale_2026_10_22",
+          "section": "RCL-012 same attacking Low Morale consequence"
+        }
+      ],
+      "interpretation_notes": [
+        "Active CCP/KMT attacks under RB0.2 regardless of possession. When a third party triggers evolution, the land possessor defends, per developer clarification reported by the user on22October2026.",
+        "Eligible attacking minor KMT units in shared truce-ending combat are eliminated on their attacking roll of10+. RB6.6 supplies the voluntary case; the user clarified the same consequence after automatic termination. No extra preliminary roll."
+      ]
+    },
+    {
+      "id": "chinese_civil_war",
+      "parameters": {
+        "initial_participants": [
+          "ccp",
+          "kmt"
+        ],
+        "ends_when_either_faction_has_no_surviving_units": true,
+        "zero_units_implies_universal_surrender": false,
+        "other_nations_enter_original_chinese_land_requires_dow_even_if_friendly": true,
+        "entry_exception": "dadao"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 101,
+          "section": "14.3"
+        }
+      ]
+    },
+    {
+      "id": "chinese_evolution",
+      "parameters": {
+        "nations": [
+          "ccp",
+          "kmt"
+        ],
+        "threshold_possessed_land_ipp": 13,
+        "trigger_timing": "immediate_when_threshold_met",
+        "requires_income_collection": false,
+        "requires_major_enemy": false,
+        "select_capital": true,
+        "free_factory": {
+          "city": "major_factory",
+          "non_city": "medium_factory",
+          "cost_ipp": 0,
+          "maximum_awards_per_nation_per_game": 1,
+          "site": "chosen_capital",
+          "same_award_as_national_objective": true
+        },
+        "unlocks": [
+          "facility_building",
+          "outgoing_lend_lease",
+          "technology_research",
+          "movement_outside_chinese_home_country"
+        ],
+        "ccp_loses_immediately": [
+          "recruitment",
+          "influence",
+          "decentralized_production"
+        ],
+        "kmt_loses_immediately": [
+          "low_morale",
+          "decentralized_production"
+        ],
+        "own_player_turn_exception": [
+          "decentralized_production"
+        ],
+        "automatically_terminates_chinese_truce": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 101,
+          "section": "14.3.1"
+        },
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 1,
+          "section": "Evolution to Major Power"
+        },
+        {
+          "source_id": "kmt_nrs",
+          "pdf_page": 1,
+          "section": "Evolution to Major Power"
+        },
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 2,
+          "section": "Chinese Civil War objective"
+        },
+        {
+          "source_id": "kmt_nrs",
+          "pdf_page": 2,
+          "section": "Chinese Civil War objective"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-006 closed source timing"
+        }
+      ]
+    },
+    {
+      "id": "controlled_minor_recruitment",
+      "parameters": {
+        "phase": "place_units",
+        "die_sides": 12,
+        "success_test": "roll_lte_possessed_non_offshore_land_zone_count",
+        "offshore_exceptions": [
+          "vichy_corsica",
+          "ongoing_spanish_civil_war_factions"
+        ],
+        "choose_one_reward": [
+          {
+            "infantry": 1
+          },
+          {
+            "militia": 2
+          },
+          {
+            "advance_one_owned_ship_build_stage": 1
+          },
+          {
+            "fully_repair_one_owned_facility": 1
+          }
+        ],
+        "troop_placement": "land_possessed_by_minor_since_turn_start",
+        "ordinary_income": false,
+        "minor_units_attack_jointly_with_controller": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 43,
+          "section": "7.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 82,
+          "section": "12.7 and 12.9"
+        }
+      ]
+    },
+    {
+      "id": "ccp_recruitment",
+      "parameters": {
+        "phase": "place_units",
+        "maximum_attempts_per_player_turn": 1,
+        "requires_minor_status": true,
+        "die_sides": 12,
+        "success_test": "roll_lte_total_possessed_land_zone_count",
+        "offshore_exclusion": false,
+        "choose_one_reward": [
+          {
+            "infantry": 1
+          },
+          {
+            "militia": 2
+          }
+        ],
+        "placement": "chinese_home_country_possessed_since_turn_start"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 103,
+          "section": "15.2"
+        },
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 3,
+          "section": "Recruitment/Decentralized Production"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 101,
+          "section": "14.3.1"
+        }
+      ]
+    },
+    {
+      "id": "capture_land",
+      "parameters": {
+        "timing": "after_resolving_each_land_combat",
+        "requires_surviving_attacker_land_unit": true,
+        "default_recipient": "attacker",
+        "change_possession_immediately": true,
+        "adjust_land_ipp_chart_immediately": true,
+        "remove_facility_types": [
+          "fortification",
+          "coastal_artillery"
+        ],
+        "remove_facilities_under_construction": true,
+        "other_facility_capture_rules_retained": true,
+        "aircraft_may_land_in_just_captured_or_liberated_land_this_turn": false
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 73,
+          "section": "10.10"
+        }
+      ]
+    },
+    {
+      "id": "liberation",
+      "parameters": {
+        "original_major_same_alliance": "immediately_return_to_original_owner",
+        "surrendered_original_owner_eligible": false,
+        "major_conquers_nonoriginal_chinese_home_country": "immediate_keep_or_give_to_chinese_faction_choice",
+        "give_requires_any": [
+          "aligned_with_recipient",
+          "conquering_units_can_leave_to_friendly_land_or_transport_in_subsequent_noncombat"
+        ],
+        "minor_chinese_truce_recapture": "capturing_faction_keeps"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 73,
+          "section": "10.10.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 42,
+          "section": "6.6"
+        }
+      ]
+    },
+    {
+      "id": "capital_loss",
+      "parameters": {
+        "treasury_destination": "bank",
+        "treasury_amount": "all_current_national_ipp",
+        "france_first_axis_surrender_exception": true,
+        "automatic_relocation_nations": [
+          "great_britain",
+          "france",
+          "free_france",
+          "usa",
+          "ussr"
+        ],
+        "japan_kmt_ccp_automatic_relocation": false,
+        "minor_kmt_ccp_capital_required_for_income": false,
+        "evolved_kmt_ccp_capital_required_for_income": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 5,
+          "section": "0.2 Capital"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 73,
+          "section": "10.10.2-10.10.3"
+        },
+        {
+          "source_id": "kmt_nrs",
+          "pdf_page": 1,
+          "section": "Capital"
+        },
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 1,
+          "section": "Capital"
+        }
+      ]
+    },
+    {
+      "id": "surrender_triggers",
+      "parameters": {
+        "japan": {
+          "condition": "tokyo_enemy_possessed",
+          "timing": "end_of_japanese_player_turn"
+        },
+        "kmt": {
+          "condition": "no_possessed_land_zones",
+          "timing": "when_condition_met"
+        },
+        "ccp": {
+          "surrenders": false
+        },
+        "other_nations": {
+          "surrenders": false,
+          "eliminated_when": "no_land_and_no_units",
+          "may_be_absorbed_by_alignment": true
+        }
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 38,
+          "section": "5.7"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 39,
+          "section": "5.7"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 1,
+          "section": "Surrender"
+        },
+        {
+          "source_id": "kmt_nrs",
+          "pdf_page": 1,
+          "section": "Surrender"
+        },
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 1,
+          "section": "Surrender"
+        }
+      ]
+    },
+    {
+      "id": "surrender_effects",
+      "parameters": {
+        "remove_national_units": true,
+        "controlled_minors": "control_to_another_member_of_same_alliance",
+        "remaining_possessed_land": "unpossessed_capturable_by_land_combat_movement",
+        "subsequent_liberation_to_surrendered_nation": false,
+        "ships_under_construction": {
+          "die_sides": 12,
+          "roll_by": "attacking_player",
+          "scuttle_faces": [
+            1,
+            7
+          ],
+          "capture_faces": [
+            8,
+            12
+          ],
+          "captured_project_may_continue": true
+        }
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 38,
+          "section": "5.7"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 39,
+          "section": "5.7"
+        }
+      ],
+      "notes": "The source does not name a fallback controller where a closed scenario contains no remaining member of that Alliance. Do not create an off-map nation."
+    },
+    {
+      "id": "national_objective_timing",
+      "parameters": {
+        "bonus_effective_when_conditions_met": true,
+        "recurring_unit_facility_award_placement_phase": "place_units",
+        "one_time_awards_do_not_repeat": true,
+        "standard_victory_points_require_war_with_major": true,
+        "surrendered_nation_scores_standard_victory_points": false,
+        "campaign_wealth_objective_replaces_standard_victory_scoring": true
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 20,
+          "section": "3.1 and 3.3"
+        },
+        {
+          "source_id": "scenario_contract",
+          "section": "approved campaign reward specification"
+        }
+      ]
+    },
+    {
+      "id": "ccp_one_china",
+      "parameters": {
+        "point_condition": "kmt_possesses_no_chinese_home_country_except_formosa_or_hainan",
+        "bonus_trigger": "kmt_surrender",
+        "bonus_requires_ccp_possesses_land_at_trigger": true,
+        "bonus_once_per_game": true,
+        "bonus_units": {
+          "cavalry": 3,
+          "infantry": 2
+        },
+        "special_bonus_placement_location_specified": false,
+        "award_is_not_triggered_merely_by_kmt_retaining_only_formosa_or_hainan": true
+      },
+      "source_refs": [
+        {
+          "source_id": "ccp_nrs",
+          "pdf_page": 2,
+          "section": "Strategic Objectives: One China"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 20,
+          "section": "3.3"
+        }
+      ],
+      "notes": "Preserve award entitlement separately from location/ordinary placement processing; the objective row does not name a special destination."
+    },
+    {
+      "id": "japanese_objective_reachability",
+      "parameters": {
+        "pacific_buffer_zone": "inactive_required_off_map_territories_absent",
+        "access_to_resources": "inactive_required_off_map_territories_absent",
+        "asia_for_asians": "inactive_required_off_map_territories_absent",
+        "kido_butai": "explicitly_disabled"
+      },
+      "source_refs": [
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 3,
+          "section": "Strategic Objectives"
+        },
+        {
+          "source_id": "scenario_contract",
+          "section": "boundary and rule_reachability"
+        }
+      ]
+    },
+    {
+      "id": "ordinary_diplomacy",
+      "parameters": {
+        "phase": "production",
+        "requires_major_status": true,
+        "requires_war_with_another_major": true,
+        "target": "neutral_nation",
+        "requires_supply_to_target_own_home_country": true,
+        "die_sides": 12,
+        "success_at_most": 2,
+        "maximum_attempts_per_target_per_calendar_turn": 1,
+        "rolls_per_undamaged_possessed_major_factory": 1,
+        "rolls_per_damaged_factory": 0,
+        "maximum_relationships": "number_of_possessed_major_factories",
+        "starting_stage": 0,
+        "maximum_stage": 2,
+        "stage_1": [
+          "naval_facilities_in_port_if_no_enemy_units",
+          "supply_via_target_land_and_facilities"
+        ],
+        "stage_2_bonus_income_ipp": 1,
+        "benefits_require_supply": true,
+        "optional_recall_timing": "beginning_of_production",
+        "mandatory_recall_when_factory_loss_reduces_capacity": true,
+        "warlords_eligible": false,
+        "retained_campaign_ordinary_neutral_targets": []
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 53,
+          "section": "8.8"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 44,
+          "section": "7.3"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-008 closed source classification"
+        }
+      ]
+    },
+    {
+      "id": "phase_order",
+      "parameters": {
+        "phases": [
+          "production",
+          "combat_movement",
+          "combat",
+          "non_combat_movement",
+          "place_units"
+        ],
+        "within_phase_order": "player_choice_unless_explicit_rule",
+        "controlled_minors_share_controller_turn": true,
+        "controlled_minors_and_controller_attack_together": false,
+        "combat_order": "attacker_choice",
+        "income_collection_phase": "place_units",
+        "campaign_end": "after_complete_july_1941_round"
+      },
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 43,
+          "section": "7.1"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 44,
+          "section": "7.3"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 82,
+          "section": "12.9-12.11"
+        },
+        {
+          "source_id": "scenario_contract",
+          "section": "calendar; national_turn_order"
+        }
+      ]
+    },
+    {
+      "id": "dadao_after_japan_surrender",
+      "kind": "campaign_override",
+      "parameters": {
+        "condition": "Japan surrenders while Dadao remains separate and no other retained Axis Major Power can take control",
+        "national_identity": "dadao",
+        "power_status": "minor",
+        "alliance": "axis",
+        "controller_nation": null,
+        "controlling_player": "axis",
+        "retains": [
+          "land",
+          "units",
+          "existing_wars",
+          "controlled_minor_recruitment"
+        ],
+        "ordinary_income": false,
+        "create_external_controller": false,
+        "retained_calendar_slot": "japan"
+      },
+      "interpretation_notes": [
+        "The user explicitly chose separate Dadao identity and direct Axis player control. Retaining its existing Japanese calendar slot preserves the approved calendar; it does not create a new nation turn."
+      ],
+      "source_refs": [
+        {
+          "source_id": "user_ruling_dadao_after_japan_surrender",
+          "section": "Closed-campaign controller after Japan surrender"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 38,
+          "section": "5.5 general controlled-minor transfer baseline"
+        },
+        {
+          "source_id": "scenario_contract",
+          "section": "closed boundary and national_turn_order"
+        }
+      ]
+    }
+  ],
+  "home_country_memberships": {
+    "ccp": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_beiping",
+        "land_china_hopeh",
+        "land_china_hunan",
+        "land_china_kweichow",
+        "land_china_nanking",
+        "land_china_shantung",
+        "land_china_shensi",
+        "land_china_sikang",
+        "land_china_sinkiang",
+        "land_china_suiyuan",
+        "land_china_szechwan",
+        "land_china_tsinghai",
+        "land_china_yunnan",
+        "land_formosa",
+        "land_hainan",
+        "land_kwangtung",
+        "land_manchuria_eastern",
+        "land_manchuria_northern",
+        "land_manchuria_rehe",
+        "land_manchuria_western",
+        "land_mongolia_central_mongolia",
+        "land_mongolia_kerulen",
+        "land_mongolia_kobdo",
+        "land_mongolia_ulyassutai",
+        "land_tibet"
+      ],
+      "basis": "Explicit rulebook Home Country table, projected to retained land.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 Home Country table"
+        },
+        {
+          "source_id": "home_country_table",
+          "section": "CCP"
+        }
+      ]
+    },
+    "japan": {
+      "known": true,
+      "land_zone_ids": [
+        "land_jap_hokkaido",
+        "land_jap_honshu",
+        "land_jap_kyushu",
+        "land_jap_tokyo"
+      ],
+      "basis": "Explicit rulebook Home Country table, projected to retained land.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 Home Country table"
+        },
+        {
+          "source_id": "home_country_table",
+          "section": "Japan"
+        }
+      ]
+    },
+    "kmt": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_beiping",
+        "land_china_hopeh",
+        "land_china_hunan",
+        "land_china_kweichow",
+        "land_china_nanking",
+        "land_china_shantung",
+        "land_china_shensi",
+        "land_china_sikang",
+        "land_china_sinkiang",
+        "land_china_suiyuan",
+        "land_china_szechwan",
+        "land_china_tsinghai",
+        "land_china_yunnan",
+        "land_formosa",
+        "land_hainan",
+        "land_kwangtung",
+        "land_manchuria_eastern",
+        "land_manchuria_northern",
+        "land_manchuria_rehe",
+        "land_manchuria_western",
+        "land_mongolia_central_mongolia",
+        "land_mongolia_kerulen",
+        "land_mongolia_kobdo",
+        "land_mongolia_ulyassutai",
+        "land_tibet"
+      ],
+      "basis": "Explicit rulebook Home Country table, projected to retained land.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 Home Country table"
+        },
+        {
+          "source_id": "home_country_table",
+          "section": "KMT"
+        }
+      ]
+    },
+    "mongolia": {
+      "known": true,
+      "land_zone_ids": [
+        "land_mongolia_central_mongolia",
+        "land_mongolia_kerulen",
+        "land_mongolia_kobdo",
+        "land_mongolia_ulyassutai"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "mongolia"
+        },
+        {
+          "source_id": "mongolia_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_beiping_hopeh": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_beiping",
+        "land_china_hopeh"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_beiping_hopeh"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_kwangtung_hainan": {
+      "known": true,
+      "land_zone_ids": [
+        "land_kwangtung"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_kwangtung_hainan"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_sikang": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_sikang"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_sikang"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_sinkiang": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_sinkiang"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_sinkiang"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_suiyuan": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_suiyuan"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_suiyuan"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_tibet": {
+      "known": true,
+      "land_zone_ids": [
+        "land_tibet"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_tibet"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_tsinghai": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_tsinghai"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_tsinghai"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "warlord_yunnan": {
+      "known": true,
+      "land_zone_ids": [
+        "land_china_yunnan"
+      ],
+      "basis": "Unlisted original homeland predicate, mapped by original printed identity; offshore Hainan excluded from Guangxi own homeland.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "faction_index",
+          "section": "warlord_yunnan"
+        },
+        {
+          "source_id": "china_map_crop",
+          "section": "Printed mainland original identity and geography"
+        }
+      ]
+    },
+    "dadao": {
+      "known": true,
+      "land_zone_ids": [],
+      "basis": "Dadao is created during play and has no original printed possessions. Its Chinese operating permissions and controlled assets do not make it CCP/KMT or grant the broad Chinese Home Country table entry.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 6,
+          "section": "0.2 unlisted Home Country predicate"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 7,
+          "section": "0.2 Originally"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 105,
+          "section": "15.4 creation of Dadao"
+        }
+      ]
+    }
+  },
+  "offshore_land_zone_ids": [
+    "land_hainan",
+    "land_formosa",
+    "land_jap_okinawa",
+    "land_jap_hokkaido",
+    "land_jap_honshu",
+    "land_jap_kyushu",
+    "land_jap_tokyo"
+  ],
+  "offshore_geography_scope": "Retained island geography for mainland-origin controlled-minor recruitment. This list is not used to subtract islands from Japan or CCP/KMT explicit Home Country lists.",
+  "offshore_source_refs": [
+    {
+      "source_id": "rulebook",
+      "pdf_page": 6,
+      "section": "0.2 offshore exception"
+    },
+    {
+      "source_id": "rulebook",
+      "pdf_page": 82,
+      "section": "12.7 offshore recruitment exclusion"
+    },
+    {
+      "source_id": "world_map_art",
+      "section": "Retained Japanese islands and islands off China"
+    },
+    {
+      "source_id": "south_east_asia_map_crop",
+      "section": "Hainan, Formosa and Okinawa shown surrounded by sea"
+    }
+  ],
+  "source_limits": [
+    {
+      "id": "one_china_bonus_destination",
+      "status": "placement_entitlement_preserved",
+      "details": "CCP One China row states amount and surrender-time eligibility but no special destination; do not invent an arbitrary immediate destination."
+    },
+    {
+      "id": "surrender_controller_without_surviving_alliance_member",
+      "status": "resolved_by_user_ruling_2026_10_21",
+      "details": "Dadao remains separate and directly controlled by the Axis player after Japan surrenders, preserving its land, units, existing wars and controlled-minor recruitment without ordinary income or an external controller."
+    }
+  ],
+  "visual_review": {
+    "rulebook_pages": [
+      6,
+      20,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      35,
+      36,
+      38,
+      39,
+      42,
+      43,
+      44,
+      53,
+      73,
+      82,
+      101,
+      103,
+      104,
+      105
+    ],
+    "japan_nrs_pages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "kmt_nrs_pages": [
+      1,
+      2,
+      3
+    ],
+    "ccp_nrs_pages": [
+      1,
+      2,
+      3
+    ],
+    "map_crops": [
+      "china_map_crop",
+      "mongolia_map_crop",
+      "south_east_asia_map_crop"
+    ]
+  },
+  "implementation_updates_2026_10_22": {
+    "temporary_independent_warlord_defence": "pending policy assignment without permanent controller/wealth ownership",
+    "incorporation_relationships": "retire original reciprocal wars; do not inherit war against recipient/controller/alliance",
+    "neutral_nonparticipant_relocation": "nearest Friendly land, entitled tied-destination choices",
+    "pending_decisions": [],
+    "adopted_clarifications": [
+      {
+        "id": "RCL-015",
+        "status": "provisionally_adopted_by_user",
+        "date": "2026-10-23",
+        "ruling": "Eliminate nonparticipating units required to relocate only when no Friendly relocation destination exists. Otherwise retain nearest-Friendly-land relocation and the owner decision for ties.",
+        "authority": "User instruction; pending developer clarification, not publisher errata."
+      }
+    ]
+  }
+}

@@ -2,12 +2,55 @@
 
 This directory keeps source material and authored game data separate from engine and training code.
 
+Current implementation status (23 October 2026): M0–M11 gates are complete,
+including naval source review, two full 44-turn campaign traces and the explicit
+multi-agent API/vector search. Reviewed rule profiles supplement the frozen M0
+map. Full-campaign neural training and evaluation remain M12 work. RCL-012 is
+closed; RCL-013 is adopted. RCL-014 and RCL-015 are provisionally adopted. Consult the shared
+clarification register for the developer-report list; user interpretations are
+not publisher-confirmed errata.
+
+## Rule sources and discussion review
+
+The [annotated HTML rules reader](rules/html/index.html) combines the main
+rulebook and all 13 national sheets with separately labeled clarifications,
+fixes, unresolved questions and campaign choices. The
+[pilot audit](rules/discord_audits/2025-08-26_2025-09-26/README.md) covers all
+1,129 visible discussion messages from 26 August through 26 September 2025.
+It found no new genuine rule gaps. The active
+[clarification register](rules/clarifications.md) excludes questions already
+answered by the sources; their earlier records remain in
+[archived source checks](rules/source_answered_questions.md).
+
+## Shared catalog
+
+`catalog/gw36_v43/` contains the source-linked M3 unit, facility, technology and
+national build definitions used by the campaign engine. It covers every printed
+Japanese/Chinese build-chart row and preserves conditional abilities, surviving
+damage states and source-only unbuildable types. See the
+[M3 record](/Users/home/Desktop/gwRL/docs/m3/README.md) for queries and verification.
+
+## Political rules
+
+`rules/gw36_politics_v43.json` records the source-backed M4 political rules,
+explicit retained Home Country memberships, adopted clarifications and the
+closed-campaign Dadao controller ruling. The
+[M4 implementation record](/Users/home/Desktop/gwRL/docs/m4/README.md) describes
+the executable transitions and their boundaries with later rule modules.
+
 ## Maps
 
 - `gw36_manual_map.json` is the detailed world graph used for ongoing environment development.
 - `gw36_nation_home_country.json` maps nations to their home-country land zones.
 - `gw36map.png` is the primary full-map image.
 - `gw36map_double.png` places two copies side by side for inspecting map-edge connections.
+
+The world map now uses schema 2 with **539 nodes**, a canonical physical-facility
+registry, 15 resolved convoy lines, passages, exceptional routes, crossing records
+and coast restrictions. Reviewed edits live in `maps/authoring/`; the generated
+`gw36_manual_map_review.json` preserves sources and deferred decisions. See
+[implementation status](../docs/map_audits/full_world/implementation.md). Board
+images and evidence crops are local, Git-ignored inputs.
 
 Regenerate the JSON map files from the repository root with:
 
@@ -46,11 +89,10 @@ convention. Ottawa has normal ground and `is_city: true`.
 
 The user-approved opposite-edge links are **District of Mackenzie ↔ District of
 Keewatin** and **Alberta-Saskatchewan ↔ Manitoba**. The latter's pre-existing
-railway is retained but **not visually verified**. Alberta–Upper Midwest and
-Manitoba–Upper Midwest remain unresolved and are not added. Ordinary Ottawa sea
-adjacency also remains unresolved. The missing Alaska, Southeast Alaska,
-New England, and P1 nodes are included as Canadian-border endpoints; their
-remaining non-Canadian connections still need an audit.
+railway is retained but **not visually verified**. The whole-world pass confirms
+Alberta–Upper Midwest; Manitoba–Upper Midwest remains unresolved and is not added.
+Ordinary Ottawa sea adjacency remains unresolved. Alaska, Southeast Alaska,
+New England and P1 now have their reviewed world connections.
 
 The strip below Ottawa belongs to Quebec: the railway runs **Ottawa ↔ Quebec ↔
 Nova Scotia**, with another branch **Quebec ↔ New England**. There is no direct
@@ -71,11 +113,13 @@ of strategic movement, canal control, or enemy-bank restrictions in the engine.
 
 ### Rail connections
 
-`railway_connection` is a **boolean** on each neighbor entry. Both directions
+`railway_connection` is a **boolean or explicit unknown (`null`)** on each neighbor entry. Both directions
 agree; two printed tracks across the same border still mean `true`, not two
 separately named connections. There are no `railroads` arrays or `rail_id` fields.
-`gauge_change` remains separate from rail presence. Existing gauge annotations
-outside the audited theatre have not been re-audited by this migration.
+`gauge_change` is derived only from independently verified gauges on both sides
+of a printed railway; it is unknown where that source review is missing.
+Original ownership cannot determine track gauge. Legacy coast rail flags remain
+unchanged pending AM-229 and do not authorize rail movement into the sea.
 
 The v4.3 rulebook, §10.6.2 (p. 67), explicitly applies strategic-bombing damage to
 all railroads on the chosen border of the targeted land zone. Under §13.2.8
@@ -157,11 +201,19 @@ fully audited sea zones. Existing outside-region warnings still apply.
 
 ## Scenarios
 
-- `japan_china_1936/` contains a closed 38-node map projection (Tannu Tuva excluded)
+- `japan_china_1936/` contains a closed 37-node map projection (31 land, 6 sea;
+  Tannu Tuva and Hong Kong excluded)
   and campaign specification. See its [README](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/README.md)
   for extraction commands, scope and limitations; it is not yet a playable setup.
   Its `m0/` data adds source-audited official setup, theatre-adjusted accounts
-  and explicit pending choices. The [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md)
-  links the rules checklist, price tables and missing-value questions.
+  and approved decisions, with 99 deployed pieces, 3 setup factories and 19 static
+  facilities. FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
+  The [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) links the rules
+  checklist, price tables, source reconciliation and the verified M0 specification
+  frozen on 21 October 2026 (106 repository tests passed). The
+  [M2 engine foundation](/Users/home/Desktop/gwRL/docs/m2/README.md) now loads the
+  setup into shared C++ state and supplies action validation, turn/reaction
+  timing, separate RNG streams and replay. Gameplay modules remain later work;
+  current verification passes six CTest suites and 119 Python tests.
 - `china_simplified_setup.json` defines the six-zone China training environment.
 - `manual_battles/` contains deterministic battle fixtures used by the debug runner.

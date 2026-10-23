@@ -103,8 +103,13 @@ class JapanMapTests(unittest.TestCase):
                 with self.subTest(source=source, destination=destination):
                     edge = self.edge(source, destination)
                     self.assertEqual(edge["naval_facilities"], facilities)
+                    # AM-229 leaves legacy shore railway booleans in place;
+                    # these are not permission to rail-move into a sea zone.
                     self.assertEqual(edge["railway_connection"], rail)
-                    self.assertFalse(edge["gauge_change"])
+                    if rail:
+                        self.assertIsNone(edge["gauge_change"])
+                    else:
+                        self.assertIs(edge["gauge_change"], False)
                     self.assertEqual(edge["port_or_dock_connection"], bool(facilities))
                     self.assertTrue(edge["passable"])
                     self.assertEqual(
@@ -141,7 +146,9 @@ class JapanMapTests(unittest.TestCase):
                     edge = self.edge(*pair)
                     self.assertTrue(edge["passable"])
                     self.assertTrue(edge["railway_connection"])
-                    self.assertFalse(edge["gauge_change"])
+                    # Existing Japanese crossing reviews did not separately
+                    # author both printed gauges. Same owner proves neither.
+                    self.assertIsNone(edge["gauge_change"])
                     self.assertEqual(edge["border_terrain"], "mountain")
                     self.assertFalse(edge["narrow_crossing"])
                     self.assertEqual(edge["narrow_crossings"], 0)

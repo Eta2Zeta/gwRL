@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "scope": "M10 verification of the approved 37-node Japan/China July1936\u2013July1941 campaign; not a global-map certification or learning result",
+  "definition_fingerprint": "7167b2570851dfe260f2a094a737d9ccd0da76ccdf16b10d7e70952bdec1472e",
+  "full_campaign_traces": [
+    {
+      "path": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/mixed_seed_1936/trace.json",
+      "transitions": 1558,
+      "national_turns": 44,
+      "action_counts": {
+        "economy_purchase": 74,
+        "end_phase": 221,
+        "movement_route": 223,
+        "land_begin_battle": 80,
+        "land_take_casualty": 71,
+        "land_continue_fighting": 29,
+        "land_progress_battle": 101,
+        "economy_place": 75,
+        "recruitment_roll": 16,
+        "influence_roll": 1,
+        "economy_research": 22,
+        "economy_finish_research": 22,
+        "economy_advance": 4,
+        "naval_load": 13,
+        "air_ground_attack": 35,
+        "air_land": 46,
+        "politics_choose_capital": 1,
+        "air_land_noncombat": 44,
+        "air_ground": 5,
+        "politics_keep_capture": 11,
+        "land_retreat_begin": 12,
+        "land_retreat_unit": 23,
+        "recruitment_place_infantry": 5,
+        "air_support": 20,
+        "naval_declare_assault": 11,
+        "naval_start_move": 26,
+        "naval_route": 26,
+        "naval_begin_assault": 10,
+        "naval_finish_shore_selection": 10,
+        "air_defend": 8,
+        "naval_air_attack": 9,
+        "naval_begin_battle": 9,
+        "naval_take_casualty": 10,
+        "naval_finish_battle": 9,
+        "naval_strategic_continue": 1,
+        "naval_continue_fighting": 5,
+        "naval_progress_battle": 4,
+        "naval_sub_unprotected": 2,
+        "naval_sub_protected": 1,
+        "land_pair_artillery": 3,
+        "naval_retreat_begin": 2
+      },
+      "chance_transitions": 258,
+      "definition_fingerprint": "7167b2570851dfe260f2a094a737d9ccd0da76ccdf16b10d7e70952bdec1472e",
+      "trace_sha256": "fbcfea101a3db1f0dcdd86c8ff9f3ac61590550c3133c2cad4e5616b5828fa13",
+      "policy": "early Japanese invasion, Chinese evolution and combined land/air/naval play",
+      "seed": "1936",
+      "viewer": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/mixed_seed_1936/index.html",
+      "viewer_sha256": "e55c87ae9ca56337ec8099f76a1aa43df0c59a4895036ec6a4c33aa43f5efe85",
+      "invariant_checks": 1559,
+      "final_wealth": {
+        "allies": {
+          "income_rate": 12,
+          "infrastructure": 57,
+          "paid_construction": 0,
+          "treasury": 12,
+          "units": 74,
+          "wealth": 26.3
+        },
+        "axis": {
+          "income_rate": 20,
+          "infrastructure": 190,
+          "paid_construction": 0,
+          "treasury": 20,
+          "units": 333,
+          "wealth": 74.3
+        },
+        "comintern": {
+          "income_rate": 0,
+          "infrastructure": 0,
+          "paid_construction": 3,
+          "treasury": 0,
+          "units": 2,
+          "wealth": 0.5
+        }
+      }
+    },
+    {
+      "path": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/delayed_seed_1941/trace.json",
+      "transitions": 1289,
+      "national_turns": 44,
+      "action_counts": {
+        "economy_purchase": 77,
+        "end_phase": 221,
+        "movement_route": 248,
+        "land_begin_battle": 45,
+        "land_take_casualty": 69,
+        "land_progress_battle": 52,
+        "economy_place": 80,
+        "influence_roll": 1,
+        "recruitment_roll": 19,
+        "recruitment_place_infantry": 4,
+        "economy_research": 12,
+        "economy_finish_research": 12,
+        "economy_advance": 10,
+        "naval_load": 9,
+        "naval_start_move": 41,
+        "naval_route": 41,
+        "air_land_noncombat": 77,
+        "land_continue_fighting": 21,
+        "land_retreat_begin": 8,
+        "land_retreat_unit": 15,
+        "air_fly": 5,
+        "politics_choose_capital": 1,
+        "politics_declare_war": 1,
+        "land_select_surprise_zone": 1,
+        "air_ground_attack": 16,
+        "air_support": 12,
+        "air_land": 18,
+        "economy_request_rail": 1,
+        "economy_approve_rail": 1,
+        "air_ground": 2,
+        "air_defend": 6,
+        "politics_keep_capture": 2
+      },
+      "chance_transitions": 161,
+      "definition_fingerprint": "7167b2570851dfe260f2a094a737d9ccd0da76ccdf16b10d7e70952bdec1472e",
+      "trace_sha256": "2b1af26bc01473582dffb9a187a7eb0484c928255339b939aefb3c84966c92b4",
+      "policy": "delayed Japanese war until KMT evolution",
+      "seed": "1941",
+      "viewer": "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/delayed_seed_1941/index.html",
+      "viewer_sha256": "72d5d2c7dc8359c253941bfbc608e805bce65fc65ea4b3bd0563efe418796625",
+      "invariant_checks": 1290,
+      "final_wealth": {
+        "allies": {
+          "income_rate": 15,
+          "infrastructure": 84,
+          "paid_construction": 0,
+          "treasury": 15,
+          "units": 68,
+          "wealth": 31.7
+        },
+        "axis": {
+          "income_rate": 16,
+          "infrastructure": 170,
+          "paid_construction": 0,
+          "treasury": 16,
+          "units": 375,
+          "wealth": 72.10000000000001
+        },
+        "comintern": {
+          "income_rate": 0,
+          "infrastructure": 0,
+          "paid_construction": 0,
+          "treasury": 1,
+          "units": 17,
+          "wealth": 1.8
+        }
+      }
+    }
+  ],
+  "total_national_turns": 88,
+  "total_transitions": 2847,
+  "total_invariant_checks": 2849,
+  "ledger": {
+    "path": "docs/m10/runtime_coverage_ledger.json",
+    "sha256": "e7cf224f1e57ac18d4344ebda168271c4c811d5af4942b10ae76344a537f1778",
+    "row_counts": {
+      "inactive_in_frozen_profile": 21,
+      "replaced_by_approved_campaign_policy": 2,
+      "runtime_and_executable_evidence_indexed": 120
+    }
+  },
+  "invariants": [
+    "State structural validation after every transition",
+    "symmetric wars",
+    "one unresolved land attack per attacking unit",
+    "transport type/cargo eligibility and capacity; weighted carrier slots",
+    "land units at sea must be carried; ships on land require a matching berth",
+    "facility usage cannot exceed beginning-of-turn capacity, including technology",
+    "no unlanded active aircraft past Noncombat or at terminal",
+    "new IDs never reused and every created unit has completed placement, recruitment, or ship-crew source",
+    "construction payments conserve treasury against paid work",
+    "financial and roll-declaration actions cannot remove deployed units"
+  ],
+  "focused_conditional_evidence": [
+    "tests/land_truce_tests.cpp::japaneseCaptureGiftCanEndAnExistingTruce",
+    "tests/land_truce_tests.cpp::thirdPartyAutomaticSharedRolesFollowTheLandPossessor",
+    "tests/land_truce_tests.cpp::automaticTruceLowMoraleEliminatesWithoutAnEscape",
+    "tests/politics_warlords_tests.cpp::neutralRelocationWithoutFriendlyLandUsesAdoptedElimination",
+    "tests/naval_operations_tests.cpp::thirdPartyEvacuationUsesFleetRolesAndPreservesBombing",
+    "tests/campaign_integration_tests.cpp::carpetBombingParticipatesOnceAndCannotBeHitByInfantry"
+  ],
+  "tests": {
+    "campaign_integration_fixture_groups": 5,
+    "bounded_random_legal_transitions": 240,
+    "latest_focused_ctest_suites_passed": 6,
+    "public_benchmark_boundary_groups_passed": 9,
+    "viewer_smoke": "Node vm with a minimal DOM verified previous/next/range controls and final unit-board rows; no rendered-screenshot claim"
+  },
+  "limits": [
+    "Two seeded non-optimal policies sample legal play; they do not prove every possible action sequence",
+    "Conditional Truce, neutral-relocation, third-party port evacuation and carpet bombing are covered by focused runtime fixtures, not falsely attributed to the full-game exports",
+    "The ledger maps behavior assertions and runtime entry points; catalog source presence alone is not runtime evidence",
+    "Twenty-one rows are inactive in the frozen profile, including ordinary diplomacy with no eligible neutral Minor target; two rows are replaced by approved campaign policy",
+    "Historical accounting-only traces and old trained models/results are not labeled full-rule game or new-engine learning results"
+  ]
+}

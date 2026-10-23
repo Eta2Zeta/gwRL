@@ -1,0 +1,2430 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "rulebook",
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "version": "4.3"
+    }
+  ],
+  "research_chart_note": "The embedded chart on v4.3 rulebook page 45 is labeled v4.1; all 16 rows and four destination-stage thresholds were visually checked at native resolution.",
+  "technologies": [
+    {
+      "id": "advanced_mechanized_infantry",
+      "name": "Advanced Mechanized Infantry",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "advanced_mechanized_infantry",
+        "panzergrenadier"
+      ],
+      "conversions": [],
+      "abilities": [
+        "advanced_mechanized_blitz_pairing"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "advanced_mechanized_blitz_pairing",
+          "parameters": {
+            "unit_to_armor_ratio": [
+              2,
+              1
+            ],
+            "national_exclusive_unlocks": {
+              "germany": [
+                "panzergrenadier"
+              ]
+            },
+            "automatic_conversion": false
+          },
+          "description": "Advanced Mechanized Infantry have the catalog improved values and may accompany blitzing armor at a 2:1 ratio. Germany alone gains Panzergrenadiers.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "advanced_artillery",
+      "name": "Advanced Artillery",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "advanced_artillery",
+        "advanced_self_propelled_artillery",
+        "katyusha_rocket_artillery"
+      ],
+      "conversions": [],
+      "abilities": [
+        "advanced_artillery_capabilities"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "advanced_artillery_capabilities",
+          "parameters": {
+            "attrition_threshold": 2,
+            "national_exclusive_unlocks": {
+              "ussr": [
+                "katyusha_rocket_artillery"
+              ]
+            },
+            "automatic_conversion": false
+          },
+          "description": "Advanced Artillery types use improved catalog combat values and may make adjacent-zone attrition attacks at 2; the USSR alone gains Katyusha Rocket Artillery.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 46,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "radar",
+      "name": "Radar",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [],
+      "conversions": [],
+      "abilities": [
+        "radar_raid_modifiers",
+        "radar_unlimited_scrambling",
+        "radar_interception",
+        "radar_rocket_defense",
+        "radar_heavy_carrier_fighters"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "radar_raid_modifiers",
+          "parameters": {
+            "battlecruiser_roll_modifier": 1,
+            "convoy_roll_modifier": 1
+          },
+          "description": "Adds +1 to battlecruiser and convoy rolls.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "radar_unlimited_scrambling",
+          "parameters": {
+            "capacity_limit": null,
+            "facility_categories": [
+              "base",
+              "major_naval_facility"
+            ]
+          },
+          "description": "Bases and major Naval Facilities may scramble an unlimited number of eligible units; ordinary eligibility still applies.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "radar_interception",
+          "parameters": {
+            "interception_bonus": 1
+          },
+          "description": "Aircraft gain +1 to their interception values.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "radar_rocket_defense",
+          "parameters": {
+            "inherent_facility_aaa_targets_add": [
+              "strategic_rocket"
+            ]
+          },
+          "description": "Facilities' inherent anti-aircraft may fire at Strategic Rockets.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "radar_heavy_carrier_fighters",
+          "parameters": {
+            "carrier_type": "heavy_fleet_carrier",
+            "eligible_classes": [
+              "fighter"
+            ],
+            "interception": true,
+            "scrambling": true
+          },
+          "description": "Fighters on Heavy Fleet Carriers may intercept and scramble.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 46,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "anti_submarine_warfare",
+      "name": "Anti-submarine Warfare",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [
+        {
+          "unit_types": [
+            "seaplane"
+          ],
+          "classes": [],
+          "stat": "attack",
+          "add": 2,
+          "requires_flags": [
+            "on_maritime_air_patrol",
+            "target_is_submarine"
+          ]
+        }
+      ],
+      "unlocks": [],
+      "conversions": [],
+      "abilities": [
+        "asw_convoy_defense",
+        "asw_naval_transport_defense"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "asw_convoy_defense",
+          "parameters": {
+            "convoy_roll_modifier": 1,
+            "per_raiding_submarine_defense_threshold": 2,
+            "die_sides": 12
+          },
+          "description": "Defending convoys gain +1 to convoy rolls and one separate defensive roll at 2 against each raiding submarine.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "asw_naval_transport_defense",
+          "parameters": {
+            "unit_types": [
+              "naval_transport",
+              "attack_naval_transport"
+            ],
+            "defense_threshold": 1,
+            "target_classes": [
+              "submarine"
+            ],
+            "requires_flags": [
+              "defending_against_attacking_submarines"
+            ]
+          },
+          "description": "In regular combat all Naval Transports defend at 1 against attacking submarines; this is a conditional threshold, not an unconditional defense increase.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 46,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "improved_factories",
+      "name": "Improved Factories",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "t_34"
+      ],
+      "conversions": [],
+      "abilities": [
+        "improved_factories_capacity",
+        "improved_factories_t34"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_factories_capacity",
+          "parameters": {
+            "production_capacity_by_type": {
+              "minor_factory": 2,
+              "medium_factory": 5,
+              "major_factory": 8,
+              "minor_shipyard": 2,
+              "major_shipyard": 8
+            },
+            "captor_inherits_technology": false,
+            "repair_capacity_by_type": {
+              "minor_dockyard": 2,
+              "major_dockyard": 8,
+              "minor_shipyard": 2,
+              "major_shipyard": 8
+            }
+          },
+          "description": "Increases the owner's factory/shipyard production capacity and dockyard/shipyard repair capacity. Shipyard production and repair share slots. Capturing an improved facility does not confer the former owner's technology.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 95,
+              "section": "13.2.4 Dockyards: Repair Slots with Improved Factories"
+            },
+            {
+              "source_id": "rulebook",
+              "pdf_page": 96,
+              "section": "13.2.5 Shipyards: Production / Repair Slots, Improved Factories"
+            }
+          ]
+        },
+        {
+          "id": "improved_factories_t34",
+          "parameters": {
+            "national_exclusive_unlocks": {
+              "ussr": [
+                "t_34"
+              ]
+            },
+            "purchase_price_modifier": 0
+          },
+          "description": "The USSR alone may build T-34 units after developing this technology.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 46,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "improved_construction",
+      "name": "Improved Construction",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [],
+      "conversions": [],
+      "abilities": [
+        "improved_construction_choice",
+        "improved_construction_bombing_reduction"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_choice",
+          "parameters": {
+            "discount_per_stage": 1,
+            "combine_first_stages": 2,
+            "applies_to_classes": [
+              "naval",
+              "facility"
+            ],
+            "applies_to_upgrades": true,
+            "eligible_categories": [
+              "facility",
+              "facility_upgrade",
+              "naval_unit"
+            ],
+            "choices": [
+              {
+                "id": "discount_each_stage",
+                "stage_cost_delta": -1
+              },
+              {
+                "id": "combine_first_two_stages",
+                "combined_stage_indices": [
+                  0,
+                  1
+                ],
+                "combined_cost": "sum_of_undiscounted_first_two_stage_costs",
+                "requires_at_least_stages": 2
+              }
+            ],
+            "mutually_exclusive": true,
+            "asset_value_unchanged": true
+          },
+          "description": "Choose either a 1 IPP discount on each construction stage, or combine the first two stages at their summed full cost. These are alternatives: 6/6/6 can become 12/6. This does not change the undiscounted catalog asset value.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_construction_bombing_reduction",
+          "parameters": {
+            "damage_reduction_per_player_turn": {
+              "minor_factory": 1,
+              "medium_factory": 3,
+              "major_factory": 5,
+              "city": 5
+            }
+          },
+          "description": "Reduces strategic bombing damage to Minor Factories by 1, Medium Factories by 3, Major Factories by 5 and cities by 5, per Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 46,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 46,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "airborne_doctrine",
+      "name": "Airborne Doctrine",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "elite_airborne_infantry",
+        "heavy_air_transport"
+      ],
+      "conversions": [
+        {
+          "from": "airborne_infantry",
+          "to": "elite_airborne_infantry",
+          "cost_ipp": 0,
+          "automatic": true
+        }
+      ],
+      "abilities": [
+        "airborne_doctrine_conversion_and_lend_lease",
+        "airborne_doctrine_city_aaa",
+        "airborne_doctrine_fortification_first_strike",
+        "heavy_air_transport_mission_capacity"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "airborne_doctrine_conversion_and_lend_lease",
+          "parameters": {
+            "automatic_existing_conversion": true,
+            "recipient_technology_determines_airborne_variant": true
+          },
+          "description": "All existing Airborne Infantry become Elite Airborne Infantry immediately. Lend-leased Elite Airborne becomes ordinary Airborne for a recipient without this technology; delivery to a recipient with it converts ordinary Airborne to Elite.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 47,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "airborne_doctrine_city_aaa",
+          "parameters": {
+            "city_inherent_aaa_against_airborne_assault": false
+          },
+          "description": "Enemy cities lose inherent anti-aircraft against this nation's airborne assaults.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 47,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "airborne_doctrine_fortification_first_strike",
+          "parameters": {
+            "protected_targets": [
+              "airborne_assaulting_infantry",
+              "transporting_aircraft"
+            ],
+            "against": "fortification_first_strike"
+          },
+          "description": "Enemy fortification first-strike rolls cannot target airborne-assaulting infantry or their transporting aircraft.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 47,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "heavy_air_transport_mission_capacity",
+          "parameters": {
+            "combat_cargo_capacity": 2,
+            "combat_cargo_types": [
+              "airborne_infantry",
+              "elite_airborne_infantry"
+            ],
+            "noncombat_cargo_capacity": 1,
+            "noncombat_cargo_classes": [
+              "infantry_class"
+            ],
+            "noncombat_cargo_types": [
+              "artillery",
+              "anti_aircraft_artillery"
+            ]
+          },
+          "description": "Heavy Air Transports carry two airborne infantry into one assault, or one Artillery, Anti-aircraft Artillery, or infantry-class unit during noncombat movement.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 47,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 47,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "amphibious_doctrine",
+      "name": "Amphibious Doctrine",
+      "thresholds": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "attack_naval_transport"
+      ],
+      "conversions": [],
+      "abilities": [
+        "amphibious_doctrine_casualties",
+        "attack_transport_assault"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "amphibious_doctrine_casualties",
+          "parameters": {
+            "classes": [
+              "infantry_class"
+            ],
+            "first_round_double_casualties": false
+          },
+          "description": "Infantry-class units avoid double casualties in the first combat round of an amphibious assault.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 47,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "attack_transport_assault",
+          "parameters": {
+            "transport_type": "attack_naval_transport",
+            "transport_defense": 1,
+            "marine_attack_bonus": 1,
+            "land_participates_from_round": 1
+          },
+          "description": "Attack Naval Transports defend at 1; Marines gain +1 attack while assaulting from them and all land cargo can participate from the first combat round.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 48,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 47,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "heavy_armor",
+      "name": "Heavy Armor",
+      "thresholds": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "heavy_armor",
+        "tiger_i"
+      ],
+      "conversions": [],
+      "abilities": [
+        "heavy_armor_capabilities"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "heavy_armor_capabilities",
+          "parameters": {
+            "target_selection_threshold": 1,
+            "target_classes": [
+              "vehicle_class"
+            ],
+            "national_exclusive_unlocks": {
+              "germany": [
+                "tiger_i"
+              ]
+            },
+            "automatic_conversion": false
+          },
+          "description": "Allows Heavy Armor with improved catalog values and target selection at 1 versus vehicles. Germany alone gains Tiger I, whose target-selection threshold is separately specified in the unit catalog.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 48,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 48,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "jet_fighters",
+      "name": "Jet Fighters",
+      "thresholds": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "jet_fighter"
+      ],
+      "conversions": [],
+      "abilities": [
+        "jet_fighter_capabilities"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "jet_fighter_capabilities",
+          "parameters": {
+            "interception_threshold": 5,
+            "automatic_conversion": false
+          },
+          "description": "Allows Jet Fighters with improved catalog attack/defense and interception value 5; existing Fighters are not stated to convert automatically.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 48,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 48,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "long_range_aircraft",
+      "name": "Long-range Aircraft",
+      "thresholds": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [
+        {
+          "unit_types": [],
+          "classes": [
+            "aircraft"
+          ],
+          "stat": "movement",
+          "add": 1,
+          "requires_flags": []
+        }
+      ],
+      "unlocks": [],
+      "conversions": [],
+      "abilities": [
+        "long_range_aircraft_map",
+        "long_range_aircraft_convoy_defense"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "long_range_aircraft_map",
+          "parameters": {
+            "medium_bomber_map_range_bonus": 1,
+            "seaplane_map_range_bonus": 1,
+            "seaplane_requires_flags": [
+              "starts_at_seaplane_base"
+            ],
+            "existing_aircraft_automatically_receive_bonus": true
+          },
+          "description": "Medium Bombers gain +1 MAP range. Seaplanes gain +1 MAP range only when starting from a Seaplane Base. All existing aircraft receive the movement increase automatically.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 48,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "long_range_aircraft_convoy_defense",
+          "parameters": {
+            "convoy_roll_modifier": 1
+          },
+          "description": "Defending convoys gain +1 to their convoy roll.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 48,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 48,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "advanced_submarines",
+      "name": "Advanced Submarines",
+      "thresholds": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "advanced_submarine"
+      ],
+      "conversions": [],
+      "abilities": [
+        "advanced_submarine_wolfpacks",
+        "advanced_submarine_capabilities"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "advanced_submarine_wolfpacks",
+          "parameters": {
+            "submarine_count_minimum": 2,
+            "convoy_roll_modifier": 1,
+            "interdiction_multiplier": 2
+          },
+          "description": "All submarine types gain +1 convoy-raiding roll when more than one raids in the sea zone; submarine interdiction values double.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 48,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "advanced_submarine_capabilities",
+          "parameters": {
+            "unit_type": "advanced_submarine",
+            "convoy_roll_modifier": 4,
+            "attacking_eligibility": "aircraft_on_maritime_air_patrol",
+            "paired_destroyer_allowed": false,
+            "normal_defense_against_advanced_submarine": true,
+            "automatic_conversion": false
+          },
+          "description": "Advanced Submarines have +4 to convoy rolls and can be attacked only by aircraft on MAP, without a paired Destroyer. Units defend against them normally.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 49,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 49,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "large_ship_construction",
+      "name": "Large Ship Construction",
+      "thresholds": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "heavy_battleship",
+        "heavy_fleet_carrier"
+      ],
+      "conversions": [],
+      "abilities": [
+        "heavy_capital_ship_capabilities"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "heavy_capital_ship_capabilities",
+          "parameters": {
+            "heavy_battleship_max_hits": 3,
+            "heavy_carrier_loadouts": [
+              {
+                "maximum": 3,
+                "unit_types": [
+                  "fighter",
+                  "tactical_bomber"
+                ]
+              },
+              {
+                "unit_types": [
+                  "medium_bomber"
+                ],
+                "count": 1,
+                "plus": {
+                  "unit_types": [
+                    "fighter",
+                    "tactical_bomber"
+                  ],
+                  "count": 1
+                }
+              }
+            ],
+            "heavy_carrier_fighter_intercept_scramble_requires": "radar",
+            "automatic_conversion": false
+          },
+          "description": "Heavy Battleships have improved catalog values and require three hits to sink. Heavy Fleet Carriers carry three Fighters/Tactical Bombers, or one Medium Bomber plus one Fighter or Tactical Bomber. Radar is still required for their fighters to intercept/scramble.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 49,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 49,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "improved_logistics",
+      "name": "Improved Logistics",
+      "thresholds": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [],
+      "conversions": [],
+      "abilities": [
+        "improved_logistics_movement_capacity",
+        "improved_logistics_factory_relocation",
+        "improved_logistics_anti_diplomacy"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_logistics_movement_capacity",
+          "parameters": {
+            "strategic_rail_capacity_bonus_each_region": 1,
+            "allow_rail_gauge_change": true,
+            "supply_path_range_bonus": 1,
+            "strategic_naval_capacity_bonus": 2,
+            "strategic_naval_range_bonus": 1
+          },
+          "description": "Adds one Strategic Rail capacity in every region, allows gauge changes, extends Supply Path range by one, adds two Strategic Naval Movement capacity and one Strategic Naval range.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 49,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_logistics_factory_relocation",
+          "parameters": {
+            "factory_rail_capacity_cost": {
+              "minor_factory": 1,
+              "medium_factory": 1,
+              "major_factory": 2
+            },
+            "requires_flags": [
+              "start_in_home_country",
+              "end_in_home_country"
+            ],
+            "preserve_damage": true,
+            "forbidden_same_turn": [
+              "unit_production",
+              "technology_production",
+              "upgrade",
+              "repair"
+            ]
+          },
+          "description": "Factories may move within Home Country using Strategic Rail capacity: one for Minor/Medium, two for Major. They keep their damage state and cannot produce units/technology, upgrade or repair in that Player Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 49,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "improved_logistics_anti_diplomacy",
+          "parameters": {
+            "maximum_per_player_turn": 1,
+            "die_sides": 12,
+            "success_threshold": 2,
+            "result_diplomacy_stage": 0
+          },
+          "description": "One anti-diplomacy roll per Player Turn; a result of 2 or less resets another Major Power's diplomacy status for a nation to stage zero.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 49,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 49,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "heavy_strategic_bombers",
+      "name": "Heavy Strategic Bombers",
+      "thresholds": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "heavy_strategic_bomber",
+        "b_29"
+      ],
+      "conversions": [],
+      "abilities": [
+        "heavy_bomber_facility_aaa",
+        "heavy_bomber_carpet_bombing"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "heavy_bomber_facility_aaa",
+          "parameters": {
+            "inherent_facility_aaa_threshold": 2
+          },
+          "description": "Enemy facilities' inherent anti-aircraft defends at 2 instead of 3 against this nation's attacks.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 49,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "heavy_bomber_carpet_bombing",
+          "parameters": {
+            "carpet_bombing": {
+              "strategic_bomber": {
+                "dice": 3,
+                "threshold": 2,
+                "die_sides": 12
+              },
+              "heavy_strategic_bomber": {
+                "dice": 5,
+                "threshold": 2,
+                "die_sides": 12
+              },
+              "b_29": {
+                "dice": 5,
+                "threshold": 2,
+                "die_sides": 12
+              }
+            },
+            "heavy_strategic_bombing": {
+              "dice": 3,
+              "die_sides": 6
+            },
+            "heavy_interception_threshold": 2,
+            "national_exclusive_unlocks": {
+              "usa": [
+                "b_29"
+              ]
+            },
+            "automatic_conversion": false
+          },
+          "description": "Strategic Bombers may conduct carpet bombing after this technology: ordinary Strategic Bombers roll three D12 at 2; Heavy Strategic Bombers and B-29 roll five D12 at 2. The heavy variants do 3D6 strategic damage and intercept at 2.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 49,
+          "section": "8.2.1"
+        }
+      ]
+    },
+    {
+      "id": "strategic_rockets",
+      "name": "Strategic Rockets",
+      "thresholds": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "stage_iii_from": "1939-07",
+      "modifiers": [],
+      "unlocks": [
+        "strategic_rocket"
+      ],
+      "conversions": [],
+      "abilities": [
+        "strategic_rocket_capabilities"
+      ],
+      "rules": [
+        {
+          "id": "research_roll_capacity",
+          "parameters": {
+            "rolls_per_undamaged_possessed_major_factory": 1,
+            "rolls_per_damaged_factory": 0,
+            "maximum_attempts_per_technology_per_calendar_turn": 1,
+            "die_sides": 12,
+            "success_comparison": "roll_greater_than_or_equal_to_threshold",
+            "destination_stages": [
+              "stage_i",
+              "stage_ii",
+              "stage_iii",
+              "complete"
+            ]
+          },
+          "description": "Each undamaged possessed Major Factory provides one technology roll. Damaged factories provide none. Each technology may be attempted only once per Calendar Turn.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_stage_timing",
+          "parameters": {
+            "stage_iii_from": "1939-07",
+            "available_immediately_on_completion": true
+          },
+          "description": "Stage III cannot be developed before July 1939. A technology is immediately usable upon completion.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "research_national_prerequisites",
+          "parameters": {
+            "usa_minimum_income": 10,
+            "ussr_regular_research_minimum_income": 15,
+            "ussr_below_threshold_exceptions": [
+              "rapid_industrialization",
+              "molotov_ribbentrop_pact"
+            ]
+          },
+          "description": "USA needs at least 10 IPP income for technology. Before 15 IPP income USSR can develop technology only via Rapid Industrialization or the Molotov-Ribbentrop Pact.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "technology_lend_lease_restriction",
+          "parameters": {
+            "technology_unlocked_units_lend_lease": false,
+            "exception_rule": "airborne_doctrine_conversion_and_lend_lease"
+          },
+          "description": "Technology-unlocked units cannot be lend-leased, except the explicit Airborne Doctrine recipient conversion described on page 47.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 45,
+              "section": "8.2.1"
+            }
+          ]
+        },
+        {
+          "id": "strategic_rocket_capabilities",
+          "parameters": {
+            "maximum_purchases_per_player_turn": 2,
+            "range": 3,
+            "damage_dice": 1,
+            "damage_die_sides": 6,
+            "single_use": true,
+            "overflight_requires_any": [
+              "at_war",
+              "aligned"
+            ],
+            "ordinary_combat": false,
+            "normal_combat_casualty": false,
+            "eliminated_alone_with_enemy_land": true
+          },
+          "description": "Allows up to two Strategic Rockets per Player Turn. Each fires once at any strategically bombable target, range 3, doing 1D6; it cannot overfly a nation neither at war nor aligned. It has no ordinary attack/defense and cannot be chosen as a casualty, but is eliminated alone with enemy land units.",
+          "source_refs": [
+            {
+              "source_id": "rulebook",
+              "pdf_page": 50,
+              "section": "8.2.1"
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 45,
+          "section": "8.2 and embedded technology chart"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 50,
+          "section": "8.2.1"
+        }
+      ]
+    }
+  ]
+}

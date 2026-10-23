@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "kind": "retreat_and_low_morale_source_audit",
+  "gameplay_changed": false,
+  "findings": [
+    "Ordinary optional retreat requires a valid adjacent Friendly attack-entry origin; no such origin means no ordinary retreat option.",
+    "Voluntary KMT truce breaking explicitly eliminates eligible shared-zone units on10+.",
+    "No universal unable-to-retreat elimination fallback was found for ordinary Low Morale. City/tundra round-limit elimination is explicit.",
+    "An extra preliminary truce-break test is not instructed; current extra-roll interpretation remains implemented pending reconciliation."
+  ],
+  "discord_searches": {
+    "channel": "v4_3-general-discussion",
+    "truce": 20,
+    "retreat": 42,
+    "morale": 5,
+    "nowhere": 6,
+    "unable": 10
+  },
+  "discord_links": [
+    "https://discord.com/channels/876158750870863964/1409991574292795392/1518700548088660010",
+    "https://discord.com/channels/876158750870863964/1409991574292795392/1518702751113150535"
+  ],
+  "checks": {
+    "campaign_setup_tests": "passed",
+    "git_diff_check": "passed"
+  },
+  "artifacts": [
+    {
+      "path": "game_content/rules/clarifications.md",
+      "sha256": "ecefbe60a933e8ed0c0c20617197bff7d9c46afcad2190ab385fa9872ab31872"
+    },
+    {
+      "path": "docs/m7/README.md",
+      "sha256": "80c480bbe43322e91e990f547d6b21f84049ff9c3bd175c7bf53f5aa0aa61494"
+    },
+    {
+      "path": "game_content/rules/gw36_land_combat_v43.json",
+      "sha256": "515e10ff4514c802250a00932c6816b74848af7a2515714bdfacec0aa5941ce4"
+    },
+    {
+      "path": "game_content/rules/gw36_politics_v43.json",
+      "sha256": "dad5a4a575291424caa7d018eaa9f0f665c6b8853e0e185df0a202889896184a"
+    }
+  ],
+  "preserved_m7_verification_sha256": "53b0ad2e5521c9b1beac55a30c5193775abe4c4a84f146bdd7d81db5b189ec14"
+}
