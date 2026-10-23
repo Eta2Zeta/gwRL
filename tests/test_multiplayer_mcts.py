@@ -339,6 +339,89 @@ class MultiplayerMctsTests(unittest.TestCase):
         long_edge = next(edge for edge in deeper.root.edges if edge.action == "long")
         self.assertGreater(long_edge.values[0], 8)
 
+    def test_cycle_cutoff_preserves_one_root_visit_per_simulation(self):
+        graph = {"root": {"player": "axis", "actions": {"loop": "root", "finish": "done"}},
+                 "done": terminal(0, 0, 0)}
+        policies = []
+        for depth in (2, 8, 32):
+            result = VectorMCTS(config=MctsConfig(simulations=16, max_depth=depth, seed=13,
+                                                  record_trace=True)).search(TreeEnv(graph))
+            self.assertEqual(result.root.visits, 16)
+            self.assertEqual(sum(result.visit_counts), 16)
+            self.assertTrue(any(trace.leaf_source == "cycle_cutoff" for trace in result.simulations))
+            self.assertTrue(all(len({choice.state_key for choice in trace.selections}) == len(trace.selections)
+                                for trace in result.simulations))
+            policies.append(dict(zip(result.actions, result.visit_counts)))
+        self.assertTrue(all(policy == policies[0] for policy in policies))
+
+    def test_cycle_cutoff_bootstraps_vector_without_a_terminal_or_reward(self):
+        class ConstantEvaluator:
+            version = "cycle-vector-v1"
+
+            def evaluate(self, env, actions):
+                return Evaluation([1] * len(actions), (7, -3, 2))
+
+        graph = {"root": {"player": "axis", "actions": {"loop": "root"}}}
+        for depth in (1, 2, 32):
+            env = TreeEnv(graph)
+            before = env.serialize()
+            result = VectorMCTS(ConstantEvaluator(), MctsConfig(simulations=16, max_depth=depth,
+                                                                record_trace=True)).search(env)
+            self.assertFalse(env.is_terminal())
+            self.assertEqual(env.serialize(), before)
+            self.assertEqual(result.root.visits, 16)
+            self.assertEqual(result.visit_counts, [16])
+            self.assertEqual(result.values, (7, -3, 2))
+            self.assertEqual(result.action_values, [(7, -3, 2)])
+            self.assertTrue(all(trace.leaf_source == "cycle_cutoff" for trace in result.simulations))
+
+    def test_cycle_cutoff_through_other_players_and_chance_backs_up_unique_path(self):
+        class ConstantEvaluator:
+            version = "cycle-vector-v1"
+
+            def evaluate(self, env, actions):
+                return Evaluation([1] * len(actions), (2, 3, 4))
+
+        graph = {"root": {"player": "axis", "actions": {"enter": "allies"}},
+                 "allies": {"player": "allies", "kind": "defender_reaction", "actions": {"roll": "chance"}},
+                 "chance": {"outcomes": [(1.0, "comintern")]},
+                 "comintern": {"player": "comintern", "actions": {"return": "root"}}}
+        env = TreeEnv(graph)
+        before = env.serialize()
+        search = VectorMCTS(ConstantEvaluator(), MctsConfig(simulations=16, max_depth=32,
+                                                            record_trace=True))
+        result = search.search(env)
+        self.assertEqual(result.root.visits, 16)
+        self.assertEqual(result.visit_counts, [16])
+        self.assertEqual(result.values, (2, 3, 4))
+        self.assertEqual(env.serialize(), before)
+        self.assertEqual({choice.player for trace in result.simulations for choice in trace.selections}, set(PLAYERS))
+        self.assertTrue(any(trace.leaf_source == "cycle_cutoff" for trace in result.simulations))
+        for node in search.nodes.values():
+            self.assertLessEqual(node.visits, 16)
+            self.assertTrue(all(edge.visits <= node.visits for edge in node.edges))
+        self.assertTrue(all(len(trace.chance_outcomes) <= 1 for trace in result.simulations))
+
+    def test_chance_self_cycle_uses_evaluator_and_keeps_actual_rng_untouched(self):
+        class ChanceEvaluator:
+            version = "chance-cycle-vector-v1"
+
+            def evaluate(self, env, actions):
+                self.assertion = (env.decision_kind(), list(actions))
+                return Evaluation([], (6, 7, 8))
+
+        env = TreeEnv({"root": {"outcomes": [(1.0, "root")]}})
+        before = env.serialize()
+        evaluator = ChanceEvaluator()
+        result = VectorMCTS(evaluator, MctsConfig(simulations=16, max_depth=32,
+                                                  record_trace=True)).search(env)
+        self.assertEqual(env.serialize(), before)
+        self.assertEqual(result.root.visits, 16)
+        self.assertEqual(result.values, (6, 7, 8))
+        self.assertEqual(evaluator.assertion, ("chance", []))
+        self.assertTrue(all(trace.leaf_source == "cycle_cutoff" and len(trace.chance_outcomes) == 1
+                            for trace in result.simulations))
+
     def test_root_noise_is_order_stable_and_does_not_replace_base_priors(self):
         results = []
         for reverse in (False, True):
@@ -353,13 +436,18 @@ class MultiplayerMctsTests(unittest.TestCase):
         search = VectorMCTS(config=MctsConfig(simulations=96, seed=71, record_trace=True))
         noised = search.search(TreeEnv(graph, "axis_again"), add_root_noise=True)
         self.assertTrue(any(edge.selection_prior != edge.prior for edge in noised.root.edges))
-        search.search(TreeEnv(graph), add_root_noise=False)
+        continued = search.search(TreeEnv(graph), add_root_noise=False)
         self.assertTrue(all(edge.selection_prior == edge.prior for node in search.nodes.values() for edge in node.edges))
+        internal = [selection for trace in continued.simulations for selection in trace.selections[1:]
+                    if selection.state_key == noised.root.state_key]
+        self.assertTrue(internal)
+        self.assertTrue(all(score.selection_prior == score.prior for selection in internal for score in selection.scores))
         graph = {"root": {"player": "axis", "actions": {"loop": "root", "finish": "done"}}, "done": terminal(1, 0, 0)}
         cycled = VectorMCTS(config=MctsConfig(simulations=96, max_depth=8, seed=13, record_trace=True)).search(TreeEnv(graph), add_root_noise=True)
         internal = [selection for trace in cycled.simulations for selection in trace.selections[1:] if selection.state_key == cycled.root.state_key]
-        self.assertTrue(internal)
-        self.assertTrue(all(score.selection_prior == score.prior for selection in internal for score in selection.scores))
+        self.assertFalse(internal, "A repeated planning state must cut off before another selection")
+        self.assertTrue(any(trace.leaf_source == "cycle_cutoff" for trace in cycled.simulations))
+        self.assertEqual(sum(cycled.visit_counts), 96)
 
     def test_invalid_versions_values_and_opponent_modes_are_rejected(self):
         for kwargs in ({"simulations": 0}, {"max_depth": 0}, {"c_puct": float("nan")}, {"rules_version": ""},

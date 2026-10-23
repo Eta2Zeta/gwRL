@@ -64,6 +64,22 @@ a changed implementation needs an explicit migration or a new run. Only load
 trusted local Torch checkpoints produced by this runner. CPU thread count and
 software versions are part of exact continuation compatibility.
 
+## Completed-episode Stage A pilot
+
+Add `--complete-episodes` to freeze a batch until each independent short game
+reaches its true endpoint. Each new batch creates fresh games. Every row in this
+mode receives an observed terminal target; a transition guard saves frozen pending
+work without bootstrapping or updating and exits with code 2. Increase only that
+execution guard explicitly when resuming with `--extend-episode-budget N`.
+The starting model is archived in `initial.pt` before any action or update.
+
+`--cpu-budget N` conservatively checks tensor threads plus parallel search workers
+plus one coordinator against the available core budget. Set BLAS environment
+limits as shown in the [Stage A pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
+That page records the authorized core limit, exact foreground command and results.
+Progress now also includes action kinds/parameters, terminal flags and real final
+return vectors for each completed root.
+
 ## Evaluation and profiling
 
 Held-out evaluation keeps the target weights fixed, turns root noise off, and

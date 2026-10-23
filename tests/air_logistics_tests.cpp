@@ -1,4 +1,5 @@
 #include "game/air.hpp"
+#include "game/campaign_audit.hpp"
 #include "game/catalog.hpp"
 #include "game/economy.hpp"
 #include "game/land_combat.hpp"
@@ -197,6 +198,119 @@ void attackDeclarationsRequireACombinedReturnPlan() {
         "Third attacking fighter double-counted the two returning carrier slots");
     check(airLandingPlanAvailable(s)&&AirRules{}.phaseComplete(s),"A valid two-aircraft return plan prevented Combat Movement completion");
 }
+void groundedLandingCannotRepeatWithoutChangingState() {
+    auto s = fixture(Phase::NonCombatMovement);
+    add(s, "grounded", "fighter", honshu);
+    const auto options = AirRules{}.actions(s);
+    const auto redundant = std::find_if(options.begin(), options.end(), [](const auto &a) {
+        return a.kind == "air_land_noncombat" &&
+               a.parameters.require("unit").asString() == "grounded" &&
+               a.parameters.require("destination").asString() == honshu;
+    });
+    if (redundant != options.end()) {
+        auto proof = s.clone();
+        const auto before = proof.planningKey();
+        AirRules{}.apply(proof, *redundant);
+        check(proof.planningKey() == before, "Grounded landing unexpectedly changed its rule state");
+        std::cout << "PROOF grounded landing preserved exact planning identity\n";
+    }
+    check(redundant == options.end(), "Grounded aircraft can repeat a same-zone landing with no effect");
+    Action forged;
+    forged.kind = "air_land_noncombat";
+    forged.nation = "japan";
+    forged.parameters = game::json::Value(game::json::Value::Object{
+        {"unit", game::json::Value(std::string("grounded"))}, {"destination", game::json::Value(honshu)}});
+    const auto before = s.planningKey();
+    bool rejected = false;
+    try { AirRules{}.apply(s, forged); } catch (const std::runtime_error &) { rejected = true; }
+    check(rejected && s.planningKey() == before, "Forged no-effect landing changed state or escaped the guard");
+    const auto moved = std::find_if(options.begin(), options.end(), [](const auto &a) {
+        return a.kind == "air_land_noncombat" &&
+               a.parameters.require("unit").asString() == "grounded" &&
+               a.parameters.require("destination").asString() == "land_jap_tokyo";
+    });
+    check(moved != options.end(), "No-op filtering removed a real noncombat flight and landing");
+    AirRules{}.apply(s, *moved);
+    check(s.units.at("grounded").zone == "land_jap_tokyo" && !s.units.at("grounded").route.empty() &&
+          !s.units.at("grounded").turnFlags.contains("air_in_flight"), "Real noncombat relocation failed");
+}
+void sameZoneLandingsRetainActualReturnEffects() {
+    for (const bool screening : {false, true}) {
+        auto s = fixture(Phase::NonCombatMovement);
+        add(s, "returning", "fighter", honshu);
+        auto &u = s.units.at("returning");
+        u.movementRemaining = 0;
+        u.turnFlags[screening ? "air_screening_ready" : "air_in_flight"] = 1;
+        const auto options = AirRules{}.actions(s);
+        const auto landing = std::find_if(options.begin(), options.end(), [](const auto &a) {
+            return a.kind == "air_land_noncombat" &&
+                   a.parameters.require("unit").asString() == "returning" &&
+                   a.parameters.require("destination").asString() == honshu;
+        });
+        check(landing != options.end(), "Actual same-zone return or screening consumption was removed");
+        const auto before = s.planningKey();
+        AirRules{}.apply(s, *landing);
+        check(s.planningKey() != before && !u.turnFlags.contains("air_in_flight") &&
+              !u.turnFlags.contains("air_screening_ready"), "Same-zone return did not consume its state effect");
+        if (screening)
+            check(u.turnFlags.at("air_battle_turn") == static_cast<int>(s.clock.playerTurnSerial + 1),
+                  "Landing failed to consume the screened aircraft's combat commitment");
+    }
+    auto s = fixture(Phase::NonCombatMovement);
+    add(s, "first", "fleet_carrier", "sea_p16");
+    add(s, "second", "fleet_carrier", "sea_p16");
+    add(s, "deck", "fighter", "sea_p16");
+    attachCargo(s, "first", "deck");
+    const auto options = AirRules{}.actions(s);
+    check(std::none_of(options.begin(), options.end(), [](const auto &a) {
+        return a.kind == "air_land_noncombat" && a.parameters.require("unit").asString() == "deck" &&
+               a.parameters.require("destination").asString() == "first";
+    }), "Aircraft already aboard a carrier can repeatedly reattach to that carrier");
+    const auto transfer = std::find_if(options.begin(), options.end(), [](const auto &a) {
+        return a.kind == "air_land_noncombat" && a.parameters.require("unit").asString() == "deck" &&
+               a.parameters.require("destination").asString() == "second";
+    });
+    check(transfer != options.end(), "No-op filtering removed a genuine same-sea carrier transfer");
+    AirRules{}.apply(s, *transfer);
+    check(s.units.at("deck").carriedBy == "second" && s.units.at("first").cargo.empty(),
+          "Same-sea carrier transfer failed");
+    add(s, "incoming", "fighter", "sea_p16");
+    s.units.at("incoming").movementRemaining = 0;
+    s.units.at("incoming").turnFlags["air_in_flight"] = 1;
+    const auto incomingOptions = AirRules{}.actions(s);
+    const auto actualReturn = std::find_if(incomingOptions.begin(), incomingOptions.end(), [](const auto &a) {
+        return a.kind == "air_land_noncombat" && a.parameters.require("unit").asString() == "incoming" &&
+               a.parameters.require("destination").asString() == "first";
+    });
+    check(actualReturn != incomingOptions.end(), "Redundant reattachment filtering removed an actual carrier return");
+    AirRules{}.apply(s, *actualReturn);
+    check(s.units.at("incoming").carriedBy == "first" &&
+          !s.units.at("incoming").turnFlags.contains("air_in_flight"), "Actual carrier return failed");
+}
+void startingCarrierAircraftDoNotOfferRedundantReattachment() {
+    auto engine = Engine::start(
+        loadScenario(std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/scenarios/japan_china_1936"),
+        campaignRules(), 713);
+    for (int step = 0; step < 40 && !(engine.state().currentNation() == "japan" &&
+                                    engine.state().clock.phase == Phase::NonCombatMovement); ++step) {
+        const auto options = engine.legalActions();
+        auto next = std::find_if(options.begin(), options.end(), [](const auto &a) { return a.kind == "end_phase"; });
+        if (next == options.end())
+            next = std::find_if(options.begin(), options.end(), [](const auto &a) { return a.kind == "economy_finish_research"; });
+        check(next != options.end(), "Approved setup did not offer the legal phase/research completion path");
+        engine.step(*next);
+    }
+    const auto &state = engine.state();
+    check(state.currentNation() == "japan" && state.clock.phase == Phase::NonCombatMovement,
+          "Approved setup did not reach Japan Noncombat Movement");
+    const auto &plane = state.units.at("japan_fighter_p15_fleet_carrier_1");
+    check(plane.carriedBy == "japan_fleet_carrier_p15_setup_1", "Source setup aircraft lost its carrier");
+    const auto options = engine.legalActions();
+    check(std::none_of(options.begin(), options.end(), [&](const auto &a) {
+        return a.kind == "air_land_noncombat" && a.parameters.require("unit").asString() == plane.id &&
+               a.parameters.require("destination").asString() == plane.carriedBy;
+    }), "Approved starting aircraft can repeatedly land on its existing carrier");
+}
 } // namespace
 int main() {
     try {
@@ -207,10 +321,13 @@ int main() {
             {"weighted joint assignment",jointLandingUsesWeightedCarrierAssignments},
             {"scramble reservations",scrambledAircraftReserveTheirOriginalCarrierSeats},
             {"landing choices",landingChoicesPreserveOtherAircraftsOnlyCarrierSlot},
-            {"attack return planning",attackDeclarationsRequireACombinedReturnPlan}}){
+            {"attack return planning",attackDeclarationsRequireACombinedReturnPlan},
+            {"grounded landing no-op",groundedLandingCannotRepeatWithoutChangingState},
+            {"actual same-zone returns",sameZoneLandingsRetainActualReturnEffects},
+            {"starting carrier reattachment",startingCarrierAircraftDoNotOfferRedundantReattachment}}){
             test();std::cout<<"PASS "<<name<<'\n';
         }
-        std::cout << "9 air logistics fixture groups passed\n";
+        std::cout << "12 air logistics fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

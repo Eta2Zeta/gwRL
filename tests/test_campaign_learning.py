@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import io
 import json
 import random
 import tempfile
@@ -133,6 +134,16 @@ class SchedulingToyRaw(LearningToyEnv):
         value = json.loads(serialized)
         super().restore(value["raw"])
         self.declared = value["declared"]
+
+
+class MutableContextToyEnv(LearningToyEnv):
+    def __init__(self):
+        super().__init__()
+        self.caller_context = super().context()
+        self.caller_context["opaque_registry"] = {"entries": [{"name": "retained", "extra": [1, 2, 3]}]}
+
+    def context(self):
+        return self.caller_context
 
 
 class CampaignLearningTests(unittest.TestCase):
@@ -388,6 +399,113 @@ class CampaignLearningTests(unittest.TestCase):
                 learner.restore(broken, env_template=LearningToyEnv())
             self.assert_tree_equal(checkpoint, learner.checkpoint())
 
+    def test_context_snapshots_are_complete_interned_read_only_and_detached(self):
+        env = MutableContextToyEnv()
+        original = json.loads(json.dumps(env.context()))
+        learner = self.learner()
+        learner.begin_batch(env)
+        learner.collect(2)
+        first, second = [sample["input"]["context"] for sample in learner.pending]
+        self.assertIs(first, second)
+        self.assertIsNot(first, env.context())
+        self.assertEqual(first, original)
+        self.assertEqual(json.loads(json.dumps(first)), original)
+        with self.assertRaisesRegex(TypeError, "read-only"):
+            first["schema"] = "changed"
+        with self.assertRaisesRegex(TypeError, "read-only"):
+            first["opaque_registry"]["entries"].append({"name": "injected"})
+        with self.assertRaisesRegex(TypeError, "read-only"):
+            first["opaque_registry"]["entries"][0]["name"] = "changed"
+        env.context()["opaque_registry"]["entries"][0]["name"] = "caller changed"
+        env.context()["geography"]["zones"].append({"id": "later"})
+        self.assertEqual(first, original)
+
+    def test_checkpoint_and_restore_deduplicate_context_across_replay_and_pending(self):
+        learner = self.learner()
+        learner.run_batch(LearningToyEnv, 5)
+        learner.begin_batch()
+        learner.collect(2, LearningToyEnv)
+        original = learner.replay[0]["input"]["context"]
+        self.assertIs(original, learner.pending[0]["input"]["context"])
+        payload = learner.checkpoint()
+        saved_context = payload["replay"][0]["input"]["context"]
+        self.assertIsNot(saved_context, original)
+        self.assertTrue(all(sample["input"]["context"] is saved_context
+                            for sample in payload["replay"] + payload["pending"]))
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "shared-context.pt"
+            torch.save(payload, path)
+            loaded = torch.load(path, weights_only=False)
+        loaded_context = loaded["replay"][0]["input"]["context"]
+        self.assertTrue(all(sample["input"]["context"] is loaded_context
+                            for sample in loaded["replay"] + loaded["pending"]))
+        resumed = self.learner()
+        resumed.restore(loaded, env_template=LearningToyEnv())
+        restored_context = resumed.replay[0]["input"]["context"]
+        self.assertIsNot(restored_context, loaded_context)
+        self.assertTrue(all(sample["input"]["context"] is restored_context
+                            for sample in resumed.replay + resumed.pending))
+        self.assert_tree_equal(payload, resumed.checkpoint())
+
+    def test_large_context_is_serialized_once_instead_of_once_per_sample(self):
+        env = MutableContextToyEnv()
+        blob = "complete-static-source:" + "x" * 128_000
+        env.context()["full_registry_payload"] = blob
+        learner = self.learner()
+        learner.begin_batch(env)
+        learner.collect(2)
+        shared = learner.checkpoint()
+        legacy = copy.deepcopy(shared)
+        contexts = []
+        for sample in legacy["pending"]:
+            sample["input"]["context"] = json.loads(json.dumps(sample["input"]["context"]))
+            contexts.append(sample["input"]["context"])
+        self.assertIsNot(contexts[0]["full_registry_payload"], contexts[1]["full_registry_payload"])
+        compact_file, repeated_file = io.BytesIO(), io.BytesIO()
+        torch.save(shared, compact_file)
+        torch.save(legacy, repeated_file)
+        self.assertGreater(repeated_file.tell() - compact_file.tell(), len(blob) * 0.9)
+        restored = self.learner()
+        template = MutableContextToyEnv()
+        template.context()["full_registry_payload"] = blob
+        restored.restore(legacy, env_template=template)
+        self.assertIs(restored.pending[0]["input"]["context"], restored.pending[1]["input"]["context"])
+
+    def test_restore_interns_legacy_distinct_context_objects_without_mutating_caller(self):
+        learner = self.learner()
+        learner.begin_batch_many([LearningToyEnv(), LearningToyEnv(seed=47)])
+        learner.collect_many(1)
+        payload = learner.checkpoint()
+        copies = []
+        for group in payload["parallel_pending"]:
+            for sample in group:
+                sample["input"]["context"] = json.loads(json.dumps(sample["input"]["context"]))
+                copies.append(sample["input"]["context"])
+        self.assertIsNot(copies[0], copies[1])
+        resumed = self.learner()
+        resumed.restore(payload, env_template=LearningToyEnv())
+        first, second = [group[0]["input"]["context"] for group in resumed.parallel_pending]
+        self.assertIs(first, second)
+        self.assertIsNot(first, copies[0])
+        copies[0]["geography"]["zones"].append({"id": "caller mutation"})
+        self.assertEqual(len(first["geography"]["zones"]), 1)
+        self.assertEqual(len(copies[0]["geography"]["zones"]), 2)
+
+    def test_selected_action_diagnostics_preserve_raw_kind_parameters_and_sampling(self):
+        for env in (LearningToyEnv(), CampaignAdapter(SchedulingToyRaw())):
+            learner = self.learner()
+            learner.begin_batch(env)
+            learner.collect(1)
+            event = learner.action_history[-1]
+            features = learner.pending[0]["input"]["actions"]
+            chosen = next(feature for feature in features if feature["id"] == event["action"])
+            raw = chosen.get("action") or chosen
+            self.assertEqual(event["action_kind"], raw["kind"])
+            self.assertEqual(event["action_parameters"], raw.get("parameters", {}))
+            before = copy.deepcopy(event["action_parameters"])
+            raw.setdefault("parameters", {})["caller_only"] = True
+            self.assertEqual(event["action_parameters"], before)
+
     def test_incompatible_checkpoint_rejection_is_transactional_including_global_rng(self):
         learner = self.learner()
         learner.run_batch(LearningToyEnv, 5)
@@ -415,7 +533,9 @@ class CampaignLearningTests(unittest.TestCase):
             payload["replay"][0]["input"]["schema"] = "older-input-schema"
 
         def wrong_context(payload):
-            payload["replay"][0]["input"]["context"]["schema"] = "other-scenario"
+            features = payload["replay"][0]["input"]
+            features["context"] = json.loads(json.dumps(features["context"]))
+            features["context"]["schema"] = "other-scenario"
 
         def wrong_optimizer_hyperparameters(payload):
             payload["optimizers"]["axis"]["param_groups"][0]["betas"] = (0.1, 0.2)

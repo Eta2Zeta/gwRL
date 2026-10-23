@@ -309,6 +309,17 @@ class VectorMCTS:
         node.expanded = True
         return node.evaluation
 
+    def _bootstrap_value(self, node: Node, env: SearchEnv) -> Vector:
+        """Approximate a nonterminal cutoff with the frozen evaluator value.
+
+        Chance nodes have no policy expansion and their stored evaluation is
+        only a placeholder. They need an explicit value-only evaluation rather
+        than a zero return or an extra sampled outcome.
+        """
+        if node.kind == "chance":
+            return vector(self.evaluator.evaluate(env, []).values)
+        return node.evaluation if node.expanded else self._expand(node, env)
+
     def search(self, env: SearchEnv, *, add_root_noise: bool = False, reuse_root: bool = True) -> SearchResult:
         if not reuse_root:
             self.nodes.clear()
@@ -338,6 +349,7 @@ class VectorMCTS:
             policy_random = random.Random(seed ^ 0xD1B54A32D192ED03)
             node = root
             nodes_path = [root]
+            path_keys = {root.state_key}
             edges_path = []
             selections = []
             outcomes = []
@@ -352,8 +364,12 @@ class VectorMCTS:
                     successor, _ = self._node(simulation)
                     node.chance_successors[successor.state_key] = successor
                     outcomes.append((before, successor.state_key))
+                    if successor.state_key in path_keys:
+                        values, source = self._bootstrap_value(successor, simulation), "cycle_cutoff"
+                        break
                     node = successor
                     nodes_path.append(node)
+                    path_keys.add(node.state_key)
                     continue
                 if not node.expanded:
                     values, source = self._expand(node, simulation), "evaluator"
@@ -378,17 +394,23 @@ class VectorMCTS:
                 edges_path.append(edge)
                 successor, _ = self._node(simulation)
                 edge.successors[successor.state_key] = successor
+                # A reversible planning sequence can return to an exact state.
+                # Stop at its first repetition and bootstrap; revisiting it
+                # inside this rollout would count one simulation repeatedly in
+                # the same node/action and inflate the cycle's policy target.
+                if successor.state_key in path_keys:
+                    values, source = self._bootstrap_value(successor, simulation), "cycle_cutoff"
+                    break
                 node = successor
                 nodes_path.append(node)
+                path_keys.add(node.state_key)
             else:
                 if simulation.is_terminal():
                     values, source = vector(simulation.returns()), "terminal"
-                elif simulation.decision_kind() != "chance":
-                    values = node.evaluation if node.expanded else self._expand(node, simulation)
                 else:
-                    # A depth cutoff is an explicit approximation, never a fake
+                    # A cutoff is an explicit approximation, never a fake
                     # terminal return or a policy-selected die outcome.
-                    values = vector(self.evaluator.evaluate(simulation, []).values)
+                    values = self._bootstrap_value(node, simulation)
 
             for visited in nodes_path:
                 visited.visits += 1

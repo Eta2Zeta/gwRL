@@ -103,6 +103,13 @@ bool used(const State &s, const UnitState &u) {
 void stamp(State &s, UnitState &u) {
     u.turnFlags["air_battle_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
 }
+bool landingChangesState(const State &s, const UnitState &u, const Id &destination) {
+    if (marked(u.turnFlags, "air_in_flight") || marked(u.turnFlags, "air_screening_ready"))
+        return true;
+    if (u.carriedBy == destination)
+        return false;
+    return destination != u.zone || !land(s, u.zone) || u.carriedBy.has_value();
+}
 O object(const BattleState &b, const Id &key) {
     auto p = b.data.find(key);
     return p ? p->asObject() : O{};
@@ -1020,7 +1027,8 @@ std::vector<Action> AirRules::actions(const State &s) const {
                     out.push_back(
                         action(s, s.currentNation(), "air_fly", {{"unit", V(id)}, {"path", V(ids(path))}}));
                 if (!combat || marked(u.turnFlags, "air_in_flight")) {
-                    if (airLandingAvailable(s, id, zone) && preservesLandingPlan(s, id, zone))
+                    if (landingChangesState(s, u, zone) && airLandingAvailable(s, id, zone) &&
+                        preservesLandingPlan(s, id, zone))
                         out.push_back(action(s, s.currentNation(), "air_land_noncombat",
                                              {{"unit", V(id)}, {"destination", V(zone)}}));
                     if (!combat)
@@ -1126,7 +1134,8 @@ std::vector<Action> AirRules::actions(const State &s) const {
                     }
             if (!combat || marked(u.turnFlags, "air_in_flight"))
                 for (const auto &destination : airLandingSpots(s, id))
-                    if (s.units.contains(destination) && preservesLandingPlan(s, id, destination))
+                    if (s.units.contains(destination) && landingChangesState(s, u, destination) &&
+                        preservesLandingPlan(s, id, destination))
                         out.push_back(action(s, s.currentNation(), "air_land_noncombat",
                                              {{"unit", V(id)}, {"destination", V(destination)}}));
             if (!combat && !u.cargo.empty() && land(s, u.zone) &&
@@ -1251,6 +1260,7 @@ void AirRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "air_land_noncombat") {
         auto id = p.require("unit").asString(), z = p.require("destination").asString();
+        require(landingChangesState(s, s.units.at(id), z), "Aircraft is already grounded at this landing destination");
         auto paths = flightPaths(s, id, false);
         auto dest = s.units.contains(z) ? s.units.at(z).zone : z;
         require(paths.contains(dest) && airLandingAvailable(s, id, z), "Invalid landing");

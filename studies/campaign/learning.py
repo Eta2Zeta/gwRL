@@ -31,12 +31,62 @@ CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
 TARGET_SCHEMA = "campaign-raw-vector-target-v1"
 
 
+def _read_only(*_args, **_kwargs):
+    raise TypeError("Replay context snapshots are read-only")
+
+
+class _ReadOnlyDict(dict):
+    """JSON-compatible immutable containers; pickle retains shared references."""
+    __setitem__ = __delitem__ = clear = pop = popitem = setdefault = update = __ior__ = _read_only
+
+    def __reduce_ex__(self, _protocol):
+        return type(self), (dict(self),)
+
+
+class _ReadOnlyList(list):
+    __setitem__ = __delitem__ = append = clear = extend = insert = pop = remove = reverse = sort = _read_only
+    __iadd__ = __imul__ = _read_only
+
+    def __reduce_ex__(self, _protocol):
+        return type(self), (list(self),)
+
+
+def _read_only_snapshot(value: Any) -> Any:
+    if isinstance(value, dict):
+        return _ReadOnlyDict({key: _read_only_snapshot(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return _ReadOnlyList(_read_only_snapshot(item) for item in value)
+    return value
+
+
 def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
 
 def _fingerprint(value: Any) -> str:
     return hashlib.sha256(_canonical(value).encode()).hexdigest()
+
+
+def _intern_context(context: dict[str, Any], pool: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    key = _fingerprint(context)  # Validates every static field before retaining it.
+    if key not in pool:
+        pool[key] = _read_only_snapshot(context)
+    return pool[key]
+
+
+def _checkpoint_contexts(payload: dict[str, Any]):
+    """Visit sample contexts without requiring a valid checkpoint up front."""
+    groups = [payload.get(name, []) for name in ("replay", "pending", "batch_records")]
+    parallel = payload.get("parallel_pending", [])
+    if isinstance(parallel, list):
+        groups.extend(parallel)
+    for group in groups:
+        if isinstance(group, list):
+            for sample in group:
+                if isinstance(sample, dict) and isinstance(sample.get("input"), dict):
+                    context = sample["input"].get("context")
+                    if isinstance(context, dict):
+                        yield context
 
 
 def _model_digest(model: nn.Module) -> str:
@@ -115,6 +165,8 @@ class CampaignLearner:
         self.parallel_envs: list[Any] = []
         self.parallel_pending: list[list[dict[str, Any]]] = []
         self.replay: list[dict[str, Any]] = []
+        # Only immutable source JSON is shared; learned tensors are never cached.
+        self._context_pool: dict[str, dict[str, Any]] = {}
         self.pending: list[dict[str, Any]] = []
         self.batch_records: list[dict[str, Any]] = []
         self.frozen_models: dict[str, nn.Module] | None = None
@@ -207,10 +259,17 @@ class CampaignLearner:
         maximum = max(logs)
         policy = probabilities([math.exp(value - maximum) for value in logs], len(logs))
         index = self._sample(result.actions, policy)
-        pending.append({"input": json.loads(_canonical(make_input(env, result.actions))),
+        features = make_input(env, result.actions)  # Already detached and JSON-validated.
+        features["context"] = _intern_context(features["context"], self._context_pool)
+        pending.append({"input": features,
                         "owner": owner, "policy": policy, "rollout_version": self.batch_version})
         action = result.actions[index]
-        event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action)}
+        selected = features["actions"][index]
+        raw = selected.get("action")
+        raw = raw if isinstance(raw, dict) else selected
+        event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action),
+                 "action_kind": raw.get("kind", "unknown"),
+                 "action_parameters": copy.deepcopy(raw.get("parameters", {}))}
         env.apply_action(action)
         self.counters["decisions"] += 1
         return event
@@ -479,7 +538,12 @@ class CampaignLearner:
             raise ValueError("Unsupported replay input schema")
         if features["observation"].get("current_decision_player") != sample["owner"]:
             raise ValueError("Replay owner differs from actual observation owner")
-        _canonical(features)
+        # Interned context was validated in full once and cannot be mutated.
+        # Validate each changing observation/menu without serializing that same
+        # large registry once per trajectory row during checkpoint restoration.
+        _canonical({key: item for key, item in features.items() if key != "context"})
+        if not isinstance(features["context"], _ReadOnlyDict):
+            _canonical(features["context"])
         if not isinstance(features.get("actions"), list) or not features["actions"]:
             raise ValueError("Replay sample must contain legal action features")
         normalized = probabilities(sample["policy"], len(features["actions"]))
@@ -492,7 +556,13 @@ class CampaignLearner:
 
     def restore(self, payload: Mapping[str, Any], *, env_template: Any = None) -> None:
         """Validate staged replacements before changing models, environment or RNG."""
-        value = copy.deepcopy(dict(payload))
+        incoming = dict(payload)
+        context_pool: dict[str, dict[str, Any]] = {}
+        memo = {}
+        for context in _checkpoint_contexts(incoming):
+            if id(context) not in memo:
+                memo[id(context)] = _intern_context(context, context_pool)
+        value = copy.deepcopy(incoming, memo)
         expected = {"schema", "metadata", "models", "model_versions", "optimizers", "frozen_models",
                     "frozen_versions", "batch_version", "replay", "pending", "batch_records", "generation",
                     "counters", "action_history", "env", "env_context", "rng", "parallel_envs", "parallel_pending"}
@@ -596,7 +666,8 @@ class CampaignLearner:
         samples.extend(sample for rows in value["parallel_pending"] for sample in rows)
         if samples and env is None:
             raise ValueError("Replay requires an environment with a verified static context")
-        if any(_fingerprint(sample["input"]["context"]) != value["env_context"] for sample in samples):
+        context_keys = {id(context): key for key, context in context_pool.items()}
+        if any(context_keys[id(sample["input"]["context"])] != value["env_context"] for sample in samples):
             raise ValueError("Replay sample context differs from campaign compatibility context")
         rng = value["rng"]
         if set(rng) != {"python", "numpy", "torch", "cuda", "mps", "policy", "search", "replay", "environment"}:
@@ -621,6 +692,7 @@ class CampaignLearner:
                 raise ValueError("Invalid MPS random-generator state")
         # All parsing, compatibility and object loading succeeded. Commit once.
         self.models, self.optimizers, self.env = models, optimizers, env
+        self._context_pool = context_pool
         self.parallel_envs, self.parallel_pending = parallel, value["parallel_pending"]
         self.frozen_models, self.frozen_versions, self.batch_version = frozen, value["frozen_versions"], value["batch_version"]
         self.replay, self.pending, self.batch_records = value["replay"], value["pending"], value["batch_records"]
