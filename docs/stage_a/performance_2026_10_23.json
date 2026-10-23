@@ -1,0 +1,158 @@
+{
+  "baseline_repository_commit": "67693beb417f45455960f679145dbd713641bc85",
+  "changes": [
+    "Share immutable static context and its canonical text across search clones and replay",
+    "Reuse complete parsed observations/actions and constant tensors",
+    "Assemble batched tensors without repeating source traversal; linear external-reference offsets",
+    "Skip other alliances’ unused action graphs during learning while retaining every state/context field",
+    "Cache C++ planning keys with successful-mutation invalidation",
+    "Report collection, learning, save and reporting times separately outside deterministic checkpoint state"
+  ],
+  "date": "2026-10-23",
+  "fixed_workload": {
+    "actual_transitions": 32,
+    "learning_three_steps_per_agent_batch_size_32": {
+      "baseline_seconds": 8.367679666960612,
+      "optimized_seconds": 2.576501458999701,
+      "speedup": 3.247690637912262
+    },
+    "max_depth": 8,
+    "measurement": "One fixed-workload run per runtime in separate Python processes; no competing heavy jobs",
+    "neural_requests": 160,
+    "roots": 4,
+    "same_states_actions_and_policy_targets": true,
+    "search_collection": {
+      "baseline_seconds": 12.677448458969593,
+      "optimized_seconds": 2.431798500008881,
+      "speedup": 5.213198568435375
+    },
+    "search_simulations": 4,
+    "search_waves": 8
+  },
+  "full_pilot": {
+    "actual_action_history_identical": true,
+    "all_eight_episode_summaries_identical": true,
+    "all_policy_targets_identical": true,
+    "all_terminal_targets_identical": true,
+    "config": {
+      "batch_size": 32,
+      "batches": 2,
+      "calendar_rounds": 1,
+      "checkpoint_every_waves": 32,
+      "complete_episodes": true,
+      "cpu_budget": 11,
+      "epochs": 16,
+      "hidden_dim": 16,
+      "learning_rate": 0.001,
+      "max_depth": 8,
+      "message_layers": 1,
+      "parallel_envs": 4,
+      "replay_capacity": 16384,
+      "seed": 1951,
+      "simulations": 4,
+      "threads": 4,
+      "token_buckets": 2048,
+      "transitions_per_batch": 1500,
+      "value_scale": 100.0
+    },
+    "counters": {
+      "batches": 2,
+      "chance_events": 52,
+      "decisions": 386,
+      "episodes": 8,
+      "transitions": 438,
+      "updates": 2
+    },
+    "final_environment_serializations_identical": true,
+    "optimized_seconds": 118.68008133396506,
+    "optimized_timings_seconds": {
+      "checkpoint_save": 6.897574207861908,
+      "collection": 82.09070978919044,
+      "learning_updates": 26.882336082984693,
+      "progress_reporting": 2.806632213992998
+    },
+    "original_seconds": 346.6227513330523,
+    "post_training_output_comparison": {
+      "max_absolute_action_probability_difference": 1.1920928955078125e-07,
+      "max_absolute_raw_value_difference": 3.5762786865234375e-05,
+      "positions": 386
+    },
+    "post_training_parameter_max_absolute_difference": 0.0023588985204696655,
+    "same_configuration": true,
+    "speedup": 2.9206480770573275,
+    "time_reduction_percent": 65.76102379963761
+  },
+  "limits": [
+    "One machine and one fixed-seed pilot repeat; not a throughput guarantee for full campaigns, deeper search or bigger models",
+    "Floating-point reduction order changes learned weights; old and optimized training are not bitwise identical",
+    "Exact interruption/resume is required within the optimized runtime and tested separately",
+    "Only source data is cached; all learned embeddings and network outputs recompute every forward",
+    "Tensor cache payload capped at 32 MiB; source graphs separately entry bounded, not a total-process memory cap",
+    "Original checkpoints and historical held-out evaluation remain preserved; no new strategic-strength claim"
+  ],
+  "reproduction": {
+    "arguments": [
+      "--seed",
+      "1951",
+      "--complete-episodes",
+      "--calendar-rounds",
+      "1",
+      "--batches",
+      "2",
+      "--transitions-per-batch",
+      "1500",
+      "--parallel-envs",
+      "4",
+      "--simulations",
+      "4",
+      "--max-depth",
+      "8",
+      "--hidden-dim",
+      "16",
+      "--message-layers",
+      "1",
+      "--token-buckets",
+      "2048",
+      "--batch-size",
+      "32",
+      "--epochs",
+      "16",
+      "--replay-capacity",
+      "16384",
+      "--threads",
+      "4",
+      "--cpu-budget",
+      "11",
+      "--checkpoint-every-waves",
+      "32"
+    ],
+    "baseline_run": "studies/campaign/runs/stage-a-one-round-2026-10-23",
+    "confirmation_run": "studies/campaign/runs/stage-a-speedcheck-2026-10-23",
+    "entry_point": "python -m studies.campaign.run train",
+    "environment": {
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0",
+      "VECLIB_MAXIMUM_THREADS": "4"
+    },
+    "output_requirement": "Pass --run-dir with a fresh empty ignored runs directory; preserve original checkpoints"
+  },
+  "runtime_sources_sha256": "4c39f75c862979f2ef7ce7ebad6fbc53f6fff70bdfe48365167d19fb7dde6a9b",
+  "schema": "stage-a-performance-followup-v1",
+  "scope": "Performance fix and repeat of the same eight-game pilot; no larger training experiment",
+  "verification": {
+    "checks": [
+      "Release extension rebuild",
+      "Release C++ targets rebuilt before CTest",
+      "Full Python discovery, including real CLI interrupt/resume",
+      "Exact full-pilot actions, policy targets, outcomes and final environments",
+      "All 386 post-training positions compared for score and action-probability drift",
+      "git diff --check"
+    ],
+    "cpp_seconds": 74.44,
+    "cpp_suites": 24,
+    "python_seconds": 89.041,
+    "python_tests": 241,
+    "status": "passed"
+  }
+}

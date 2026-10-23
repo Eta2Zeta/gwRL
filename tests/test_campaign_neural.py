@@ -6,11 +6,13 @@ from dataclasses import asdict
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
 
 import torch
 from torch import nn
 
-from studies.campaign.features import ADJACENT, IDENTITY_REFERENCE, compile_graph
+from studies.campaign.features import (ADJACENT, IDENTITY_REFERENCE, cached_action,
+                                      cached_context, cached_observation, compile_graph)
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator, make_input
 from studies.shared.multiplayer_mcts import PLAYERS
 
@@ -225,6 +227,46 @@ class CampaignNeuralTests(unittest.TestCase):
             model.value_head[-1].bias.copy_(torch.tensor([3., -4., 9.]))
         _, unbounded = model.forward_batch([item])
         torch.testing.assert_close(unbounded[0], torch.tensor([3., -4., 9.]))
+
+    def test_source_graph_reuse_detects_mutations_in_every_input_section(self):
+        cached_context.cache_clear()
+        cached_observation.cache_clear()
+        cached_action.cache_clear()
+        item = make_input(PublicEnv(), [action("a", unit="unit_16"), action("b", unit="unit_1")])
+        model = self.model()
+        with mock.patch("studies.campaign.features.compile_graph", wraps=compile_graph) as compile_source:
+            before_logits, before_values = model.forward_batch([item])
+            cold_calls = compile_source.call_count
+            logits, values = model.forward_batch([item])
+            self.assertEqual(compile_source.call_count, cold_calls)
+            torch.testing.assert_close(logits[0], before_logits[0])
+            torch.testing.assert_close(values, before_values)
+            for section in ("context", "observation", "actions"):
+                changed = copy.deepcopy(item)
+                target = changed[section][0] if section == "actions" else changed[section]
+                target["previously_unknown_rule"] = {"enabled": True, "amount": 731}
+                logits, values = model.forward_batch([changed])
+                self.assertGreater(compile_source.call_count, cold_calls)
+                cold_calls = compile_source.call_count
+                difference = ((logits[0] - before_logits[0]).abs().max() if section == "actions"
+                              else (values - before_values).abs().max())
+                self.assertGreater(difference.item(), 1e-7)
+
+    def test_inference_preparation_remains_trainable_and_respects_tensor_dtype(self):
+        item = make_input(PublicEnv(), [action("a", "move"), action("b", "purchase")])
+        model = self.model()
+        with torch.inference_mode():
+            _, inference_values = model.forward_batch([item])
+        logits, values = model.forward_batch([item])
+        torch.testing.assert_close(values, inference_values)
+        (values.square().sum() - logits[0].log_softmax(0)[0]).backward()
+        self.assertGreater(model.encoder.tokens.weight.grad.abs().sum().item(), 0)
+        model.zero_grad(set_to_none=True)
+        model.double()
+        logits, values = model.forward_batch([item])
+        self.assertEqual(values.dtype, torch.float64)
+        (values.square().sum() - logits[0].log_softmax(0)[0]).backward()
+        self.assertEqual(model.encoder.tokens.weight.grad.dtype, torch.float64)
 
     def test_actor_routing_batch_order_raw_scaling_and_chance_mean(self):
         raw_values = {"axis": [120, -400, 80], "allies": [-50, 240, 25], "comintern": [30, 45, 330]}

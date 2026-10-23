@@ -11,6 +11,7 @@ import json
 from dataclasses import dataclass
 from typing import Any
 
+from .immutable_json import FrozenDict, freeze_json
 from .multiplayer_mcts import PLAYERS, action_key
 
 SCHEMA = "campaign-interrupt-scheduler-v1"
@@ -47,6 +48,7 @@ class CampaignAdapter:
         self.interrupt_order = tuple(interrupt_order)
         self._anchor = raw.planning_key()
         self._passed: set[str] = set()
+        self._neural_context: FrozenDict | None = None
 
     def _sync(self) -> None:
         key = self.raw.planning_key()
@@ -122,20 +124,41 @@ class CampaignAdapter:
         return observation
 
     def context(self) -> dict[str, Any]:
-        context = dict(self.raw.context())
-        context["interrupt_scheduler"] = {"schema": SCHEMA, "order": list(self.interrupt_order)}
-        return context
+        # Public callers retain the detached, mutable JSON contract. Inference
+        # uses the immutable snapshot instead of retranslating the registry on
+        # every searched position.
+        return json.loads(self.neural_context_key())
+
+    def neural_context(self) -> FrozenDict:
+        """Return the immutable definition shared by this environment's clones.
+
+        Campaign context contains the scenario/rules definition, never changing
+        game state or execution RNG. Restore replaces this cache transactionally.
+        """
+        if self._neural_context is None:
+            context = dict(self.raw.context())
+            context["interrupt_scheduler"] = {"schema": SCHEMA, "order": list(self.interrupt_order)}
+            snapshot = freeze_json(context)
+            # Validate the entire plain JSON definition before publishing it.
+            snapshot.canonical_json
+            self._neural_context = snapshot
+        return self._neural_context
+
+    def neural_context_key(self) -> str:
+        return self.neural_context().canonical_json
 
     def clone(self) -> CampaignAdapter:
         self._sync()
         result = CampaignAdapter(self.raw.clone(), interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
+        result._neural_context = self._neural_context
         return result
 
     def clone_for_search(self, seed: int) -> CampaignAdapter:
         self._sync()
         result = CampaignAdapter(self.raw.clone_for_search(seed), interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
+        result._neural_context = self._neural_context
         return result
 
     def planning_key(self) -> str:

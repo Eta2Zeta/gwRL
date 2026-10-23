@@ -719,6 +719,12 @@ finds better Axis completion and much smaller value error, with unchanged Allies
 Comintern scores on two dice seeds. This is an early Stage A result, not a
 completed strength/generalization gate. See [the pilot report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
 
+The performance follow-up repeats the same eight games in 118.68 seconds,
+compared with 346.62 seconds originally, with identical actions, policy targets
+and final game states. All 241 Python tests and 24 C++ suites pass. Larger
+training remains on hold while representative deeper-search and longer-horizon
+throughput is measured; this pilot repeat alone does not establish scalability.
+
 Before campaign learning, check the shared search against exact tiny deterministic
 and stochastic three-side fixtures. Then start with this synchronized loop:
 
@@ -997,8 +1003,9 @@ exists to make completeness testable before implementation.
 self-play games with terminal-only labels and a paired initial-versus-trained
 comparison. Broader strategic strength is unestablished.
 
-**Next work:** expand one-round learning/evaluation across several training and
-dice seeds, then extend starting positions, horizon and opponent pairs.
+**Next work:** measure representative deeper-search and longer-horizon throughput
+before larger training. Then expand one-round learning/evaluation across several
+training and dice seeds, followed by starting positions, horizon and opponent pairs.
 M12 closes the final planned implementation gate with reproducible training,
 exact interrupt/resume, evaluation and profiling. Its six learned-policy smoke
 games are explicitly truncated; two scripted controls reach a real one-round

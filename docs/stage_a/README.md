@@ -9,6 +9,42 @@ are bootstrapped or dropped. Policy samples: Axis 90, Allies 96, Comintern 200
 (the latter controls both CCP and Mongolia turns). Two frozen-policy generations
 performed 32 sampled Adam steps per agent.
 
+One calendar round finishes the CCP, Mongolia, Japan and KMT national turns.
+These practice games deliberately end there; the full July 1941 campaign has
+eleven rounds. A policy sample is one saved position with the search's preferred
+probabilities over all its legal choices. For example, one actual Japan research
+position has 17 choices: finish research 50%, airborne doctrine 25%, heavy armor
+25%, and the other choices 0%. That entire position/distribution is one sample.
+The percentages are action preferences from the small search, not measured win
+rates. The 90 Axis samples are 90 recorded decisions across eight games.
+
+The original 346.62-second run is the pre-optimization baseline. Its progress log
+attributes 117.56 seconds to the two learning/update intervals, including their
+checkpoint writes; the remaining 229.06 seconds includes search/play, reporting,
+other saves and setup. It is not a measurement of rules execution alone.
+
+The performance follow-up repeats the identical eight-game configuration in
+**118.68 seconds, down from 346.62 seconds (2.92 times faster)**. All 386 policy
+targets, terminal targets, actual actions and eight final game states match the
+original run. The search budget remains four simulations at depth eight, and
+each alliance still receives 32 learning steps. No larger training run was
+launched. The optimized repeat spends 82.09 seconds in collection/search, 26.88
+in learning, 6.90 saving checkpoints and 2.81 reporting. These new buckets are
+separate invocation measurements, outside deterministic checkpoint state.
+
+The fix shares immutable static context, reuses complete parsed feature graphs
+and constant tensors, caches planning keys until state changes, and skips the
+unused action graphs of other alliances during learning. It retains every state
+field and legal choice; learned embeddings and predictions still recompute.
+The tensor-data cache has a 32 MiB payload limit; source-graph caches are bounded
+separately by entry count. Floating-point accumulation order changes weights,
+so old and optimized training are not bitwise identical. Across all 386 saved
+positions, the final models' largest action-probability difference is 1.20e-7
+and raw score-prediction difference is 3.58e-5. Exact interrupt/resume under the
+optimized runtime passes. All 241 Python tests and 24 C++ suites pass.
+See [the performance measurements](performance_2026_10_23.json). This single
+repeat measures the pilot, not full-campaign or deeper-search throughput.
+
 Held-out comparison uses the same scripted opponents, two unseen dice seeds
 (40009/40013), 4 simulations, depth 8, no root noise and identical initial states:
 
@@ -29,8 +65,9 @@ counts; it does not prevent an actual policy from repeating legal actions.
 The observed improvement is completion behavior and outcome prediction. Allies/
 Comintern scores did not improve on these two dice seeds. Eight training games
 and one training seed do not establish robust strategic strength. The next
-experiment should expand one-round training and evaluation across several seeds
-before extending the horizon or claiming superiority over other algorithms.
+step is to measure representative deeper-search and longer-horizon throughput
+before larger training. Then expand one-round learning and evaluation across
+several seeds before claiming strategic strength.
 
 The completed run includes 19 purchases, 35 land moves and 12 land-battle starts,
 but demonstrates no naval movement/combat learning. All 230 Python tests and 24 C++
@@ -100,6 +137,7 @@ checkpoint copies without changing any learner, optimizer, replay, game or RNG
 state.
 
 - [Training and per-episode results](training_2026_10_23.json)
+- [Performance follow-up and identical-workload repeat](performance_2026_10_23.json)
 - [Paired comparison and limits](comparison_2026_10_23.json)
 - [Initial-model evaluation](evaluation_initial_2026_10_23.json)
 - [Trained-model evaluation](evaluation_final_2026_10_23.json)

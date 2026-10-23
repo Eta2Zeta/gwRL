@@ -77,6 +77,75 @@ void reactionAndChanceEntitlements() {
     require(chance.observation().require("state").require("chance").require("dice").asArray().size() == 1, "Visible chance distribution missing");
 }
 
+void cachedPlanningKeysTrackEveryMutation() {
+    const auto checkKey = [](const CampaignEnv& env, const std::string& message) {
+        const auto actual = env.engine().planningKey();
+        require(env.planningKey() == actual && env.planningKey() == actual, message);
+    };
+    const auto rejects = [](const std::function<void()>& operation) {
+        try { operation(); } catch (const std::exception&) { return; }
+        throw std::runtime_error("Expected rejected operation");
+    };
+    const auto choose = [](const std::vector<Action>& actions, const Id& kind) {
+        const auto found = std::find_if(actions.begin(), actions.end(), [&](const Action& action) { return action.kind == kind; });
+        require(found != actions.end(), "Missing planning-key test action: " + kind);
+        return *found;
+    };
+
+    CampaignEnv env(scenario, 123);
+    const auto checkpoint = env.serialize();
+    const auto original = env.planningKey();
+    checkKey(env, "Initial cached key differs from the engine");
+    auto exact = env.clone();
+    auto searched = env.cloneForSearch(987);
+    require(exact.planningKey() == original && searched.planningKey() == original,
+            "Clone or search reseeding changed decision identity");
+    require(searched.serialize() != checkpoint, "Search clone did not isolate execution RNG");
+    exact.applyAction(choose(exact.legalActions(), "end_phase"));
+    checkKey(exact, "Action retained a stale planning key");
+    require(exact.planningKey() != original && env.planningKey() == original && searched.planningKey() == original,
+            "Clone key invalidation leaked into another environment");
+
+    auto forged = choose(env.legalActions(), "end_phase");
+    forged.id = "illegal_planning_key_test";
+    rejects([&] { env.applyAction(forged); });
+    rejects([&] { env.resolveChance(); });
+    require(env.serialize() == checkpoint && env.planningKey() == original,
+            "Rejected action/chance changed the cached planning state");
+
+    const auto declarations = env.legalInterrupts();
+    const auto declaration = std::find_if(declarations.begin(), declarations.end(), [](const Action& action) {
+        return action.kind == "politics_declare_war" && action.nation == "kmt"
+            && action.parameters.require("target").asString() == "japan";
+    });
+    require(declaration != declarations.end(), "No declaration available for planning-key invalidation");
+    auto forgedInterrupt = *declaration;
+    forgedInterrupt.player = "axis";
+    rejects([&] { env.applyInterrupt(forgedInterrupt); });
+    require(env.planningKey() == original && env.serialize() == checkpoint,
+            "Rejected interrupt changed cached decision identity");
+    env.applyInterrupt(*declaration);
+    checkKey(env, "Interrupt retained a stale planning key");
+    require(env.planningKey() != original, "Declaration did not change the planning state");
+    const auto pending = env.serialize();
+    const auto pendingKey = env.planningKey();
+    rejects([&] { env.restore("invalid JSON checkpoint"); });
+    require(env.serialize() == pending && env.planningKey() == pendingKey,
+            "Rejected restore changed the cached planning state");
+    env.restore(checkpoint);
+    checkKey(env, "Restore retained a stale planning key");
+    require(env.planningKey() == original, "Successful restore did not recover original decision identity");
+
+    for (int phase = 0; phase < 4; ++phase) env.applyAction(choose(env.legalActions(), "end_phase"));
+    env.applyAction(choose(env.legalActions(), "recruitment_roll"));
+    require(env.decisionKind() == "chance", "Recruitment did not create a real chance request");
+    const auto chanceKey = env.planningKey();
+    checkKey(env, "Chance request retained a stale action key");
+    env.resolveChance();
+    checkKey(env, "Chance resolution retained a stale planning key");
+    require(env.planningKey() != chanceKey, "Resolved chance retained its pending decision identity");
+}
+
 void setupValuesAndNoDoubleCounting() {
     auto s = loadScenario(scenario);
     const auto initial = allianceWealth(s);
@@ -164,6 +233,7 @@ int main() {
         {"explicit decisions and opponents", publicDecisionsAndNoAutomaticOpponents},
         {"registry observations and RNG separation", entityObservationsAndRandomIsolation},
         {"reaction and chance owner", reactionAndChanceEntitlements},
+        {"planning key cache invalidation", cachedPlanningKeysTrackEveryMutation},
         {"setup and temporary asset values", setupValuesAndNoDoubleCounting},
         {"repair/rail/neutral accounting", repairsRailAndNeutralAttribution},
         {"ordered general-sum returns", terminalThreeVector},

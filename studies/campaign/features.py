@@ -19,6 +19,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
 
+from studies.shared.immutable_json import FrozenDict
+
 SCHEMA = "campaign-neural-input-v1"
 NODE_TYPES = ("null", "bool", "number", "string", "array", "object")
 NUMERIC_DIM = 8
@@ -32,6 +34,8 @@ LEXEMES = re.compile(r"[^\W_]+|_|[^\w\s]", re.UNICODE)
 
 
 def canonical(value: Any) -> str:
+    if isinstance(value, FrozenDict):
+        return value.canonical_json
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
 
 
@@ -163,9 +167,27 @@ def cached_context(serialized: str, buckets: int) -> Graph:
     return compile_graph(json.loads(serialized), buckets)
 
 
+@lru_cache(maxsize=256)
+def cached_observation(serialized: str, buckets: int) -> Graph:
+    """Reuse complete source graphs across replay samples and actor models.
+
+    Content keys detect edits to caller-owned JSON. No learned embeddings or
+    autograd tensors are retained, and the cache has a bounded entry count.
+    """
+    return compile_graph(json.loads(serialized), buckets)
+
+
+@lru_cache(maxsize=4096)
+def cached_action(serialized: str, buckets: int) -> Graph:
+    """Keep small legal-action graphs separate from larger observation graphs."""
+    return compile_graph(json.loads(serialized), buckets)
+
+
 def make_input(env: Any, actions: Any) -> dict[str, Any]:
     """Snapshot public features only; never call serialize/RNG/planning APIs."""
-    observation, context = env.observation(), env.context()
+    observation = env.observation()
+    shared_context = getattr(env, "neural_context", None)
+    context = shared_context() if shared_context is not None else env.context()
     if not isinstance(observation, dict) or not isinstance(context, dict):
         raise TypeError("Campaign neural inputs require observation/context objects")
     forbidden = {"history", "random", "rng", "rng_state", "random_state", "dice_tape",
@@ -186,8 +208,14 @@ def make_input(env: Any, actions: Any) -> dict[str, Any]:
         features.append(feature)
     # The JSON round trip both validates the plain replay format and detaches
     # it from caller-owned mutable observations/action dictionaries.
-    return json.loads(canonical({"schema": SCHEMA, "observation": observation,
-                                 "context": context, "actions": features}))
+    item = {"schema": SCHEMA, "observation": observation, "actions": features}
+    if isinstance(context, FrozenDict):
+        # Only immutable source data bypasses the validating/detaching copy.
+        context.canonical_json
+        result = json.loads(canonical(item))
+        result["context"] = context
+        return result
+    return json.loads(canonical({**item, "context": context}))
 
 
 def action_factors(action: dict[str, Any]) -> tuple[str, str, str, str]:

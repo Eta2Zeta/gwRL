@@ -14,6 +14,7 @@ import signal
 import tempfile
 import time
 from collections import Counter
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, fields
 from datetime import datetime
 from pathlib import Path
@@ -74,6 +75,7 @@ class RunConfig:
 def source_hashes() -> dict[str, str]:
     paths = [*sorted((ROOT / "studies/campaign").glob("*.py")),
              ROOT / "studies/shared/campaign_adapter.py", ROOT / "studies/shared/multiplayer_mcts.py",
+             ROOT / "studies/shared/immutable_json.py",
              *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp"))]
     return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
@@ -180,54 +182,81 @@ def train(args) -> int:
     manifest_path, checkpoint_path = output / "manifest.json", output / "checkpoint.pt"
     started = time.perf_counter()
     initial_waves = runner["total_waves"]
+    initial_transitions = learner.counters["transitions"]
+    timings = {name: 0.0 for name in ("collection", "learning_updates", "checkpoint_save", "progress_reporting")}
+
+    @contextmanager
+    def measure(name):
+        before = time.perf_counter()
+        try:
+            yield
+        finally:
+            timings[name] += time.perf_counter() - before
+
+    def save_checkpoint(path):
+        with measure("checkpoint_save"):
+            _save(path, learner, runner)
 
     def factory(seed):
         runner["training_environment_seeds"].append(seed)
         return make_env(seed, calendar_rounds=config.calendar_rounds)
 
     def persist(status):
-        _save(checkpoint_path, learner, runner)
-        _json(manifest_path, {"schema": RUN_SCHEMA, "status": status,
-            "checkpoint": checkpoint_path.name, "runner": runner, "counters": learner.counters,
-            "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads},
-            "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
-                          "conservative_thread_budget": config.threads + config.parallel_envs + 1,
-                          "interop_threads": torch.get_num_interop_threads()},
-            "elapsed_seconds_this_invocation": time.perf_counter() - started,
-            "full_target_game": runner["task"]["full_target_game"],
-            "limits": "Bounded training and bootstrapped cutoffs are not evidence of strategic strength."})
+        save_checkpoint(checkpoint_path)
+        with measure("progress_reporting"):
+            _json(manifest_path, {"schema": RUN_SCHEMA, "status": status,
+                "checkpoint": checkpoint_path.name, "runner": runner, "counters": learner.counters,
+                "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads},
+                "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
+                              "conservative_thread_budget": config.threads + config.parallel_envs + 1,
+                              "interop_threads": torch.get_num_interop_threads()},
+                "elapsed_seconds_this_invocation": time.perf_counter() - started,
+                "timings_seconds_this_invocation": dict(timings),
+                "collection_transitions_per_second_this_invocation":
+                    (learner.counters["transitions"] - initial_transitions) / timings["collection"]
+                    if timings["collection"] else None,
+                # Timing is an invocation report, never deterministic runner
+                # state. This snapshot excludes its own JSON write and later
+                # progress output; subsequent reports include earlier writes.
+                "timing_scope": "After initialization, non-overlapping buckets through this snapshot; "
+                                "current report write and later output excluded; learning includes finish_batch.",
+                "full_target_game": runner["task"]["full_target_game"],
+                "limits": "Bounded training and bootstrapped cutoffs are not evidence of strategic strength."})
 
     def progress(event, collection=None):
-        value = {"event": event, "batch": runner["batch_index"], "wave": runner["wave_index"],
-                 "counters": learner.counters.copy(), "elapsed_seconds": time.perf_counter() - started,
-                 "clocks": [env.observation()["state"]["clock"] for env in learner.parallel_envs],
-                 "terminal": [env.is_terminal() for env in learner.parallel_envs],
-                 "last_actions": collection["events"] if collection else [],
-                 "terminal_returns": [list(env.returns()) if env.is_terminal() else None
-                                      for env in learner.parallel_envs]}
-        print(json.dumps(value, sort_keys=True), flush=True)
-        with (output / "progress.jsonl").open("a") as handle:
-            handle.write(json.dumps(value, sort_keys=True) + "\n")
-            handle.flush()
+        with measure("progress_reporting"):
+            value = {"event": event, "batch": runner["batch_index"], "wave": runner["wave_index"],
+                     "counters": learner.counters.copy(), "elapsed_seconds": time.perf_counter() - started,
+                     "clocks": [env.observation()["state"]["clock"] for env in learner.parallel_envs],
+                     "terminal": [env.is_terminal() for env in learner.parallel_envs],
+                     "last_actions": collection["events"] if collection else [],
+                     "terminal_returns": [list(env.returns()) if env.is_terminal() else None
+                                          for env in learner.parallel_envs]}
+            print(json.dumps(value, sort_keys=True), flush=True)
+            with (output / "progress.jsonl").open("a") as handle:
+                handle.write(json.dumps(value, sort_keys=True) + "\n")
+                handle.flush()
 
     try:
         if loaded is None:
-            _save(output / "initial.pt", learner, runner)
+            save_checkpoint(output / "initial.pt")
             persist("initialized")
         while runner["batch_index"] < config.batches and not stopped:
             if learner.frozen_models is None:
-                runner["batch_start_history"] = len(learner.action_history)
-                if config.complete_episodes or not learner.parallel_envs:
-                    roots = [learner._new_env(factory) for _ in range(config.parallel_envs)]
-                    runner["active_episode_seeds"] = runner["training_environment_seeds"][-config.parallel_envs:]
-                else:
-                    roots = learner.parallel_envs
-                learner.begin_batch_many(roots)
+                with measure("collection"):
+                    runner["batch_start_history"] = len(learner.action_history)
+                    if config.complete_episodes or not learner.parallel_envs:
+                        roots = [learner._new_env(factory) for _ in range(config.parallel_envs)]
+                        runner["active_episode_seeds"] = runner["training_environment_seeds"][-config.parallel_envs:]
+                    else:
+                        roots = learner.parallel_envs
+                    learner.begin_batch_many(roots)
             limit = runner["episode_wave_limit"] if config.complete_episodes else config.transitions_per_batch
             while runner["wave_index"] < limit and not stopped:
                 if config.complete_episodes and all(env.is_terminal() for env in learner.parallel_envs):
                     break
-                result = learner.collect_many(1, None if config.complete_episodes else factory)
+                with measure("collection"):
+                    result = learner.collect_many(1, None if config.complete_episodes else factory)
                 runner["batch_sizes"].extend(result.get("inference_batch_sizes", []))
                 runner["wave_index"] += 1
                 progress("episode_completed" if any(event["terminal"] for event in result["events"]) else "rollout", result)
@@ -241,20 +270,22 @@ def train(args) -> int:
                 if config.complete_episodes and not all(env.is_terminal() for env in learner.parallel_envs):
                     exhausted = True
                     break
-                history = learner.action_history[runner["batch_start_history"]:]
-                episodes = []
-                for index, env in enumerate(learner.parallel_envs):
-                    events = [event for event in history if event["root"] == index]
-                    episodes.append({"root": index, "seed": runner["active_episode_seeds"][index],
-                        "terminal": env.is_terminal(), "transitions_this_batch": len(events),
-                        "decisions_by_actor": dict(Counter(e["owner"] for e in events if e["owner"] is not None)),
-                        "action_counts": dict(Counter(e.get("action_kind", e["kind"]) for e in events)),
-                        "clock": env.observation()["state"]["clock"], "wealth": env.wealth(),
-                        "observed_terminal_returns": list(env.returns()) if env.is_terminal() else None})
-                rollout = learner.finish_batch()
-                if config.complete_episodes and rollout["bootstrap_samples"]:
-                    raise RuntimeError("Complete-episode training must never create bootstrap labels")
-                update = learner.update()
+                with measure("progress_reporting"):
+                    history = learner.action_history[runner["batch_start_history"]:]
+                    episodes = []
+                    for index, env in enumerate(learner.parallel_envs):
+                        events = [event for event in history if event["root"] == index]
+                        episodes.append({"root": index, "seed": runner["active_episode_seeds"][index],
+                            "terminal": env.is_terminal(), "transitions_this_batch": len(events),
+                            "decisions_by_actor": dict(Counter(e["owner"] for e in events if e["owner"] is not None)),
+                            "action_counts": dict(Counter(e.get("action_kind", e["kind"]) for e in events)),
+                            "clock": env.observation()["state"]["clock"], "wealth": env.wealth(),
+                            "observed_terminal_returns": list(env.returns()) if env.is_terminal() else None})
+                with measure("learning_updates"):
+                    rollout = learner.finish_batch()
+                    if config.complete_episodes and rollout["bootstrap_samples"]:
+                        raise RuntimeError("Complete-episode training must never create bootstrap labels")
+                    update = learner.update()
                 runner["updates"].append({"rollout": rollout, "update": update, "episodes": episodes})
                 runner["batch_index"] += 1
                 runner["wave_index"] = 0

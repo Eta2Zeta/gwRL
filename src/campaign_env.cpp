@@ -82,7 +82,12 @@ CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const {
     copy.engine_ = engine_.cloneForSearch(seed);
     return copy;
 }
+std::string CampaignEnv::planningKey() const {
+    if (!planningKey_) planningKey_ = engine_.planningKey();
+    return *planningKey_;
+}
 void CampaignEnv::restore(const std::string& serialized) {
     engine_ = Engine::restore(engine_.state().definition, campaignRules(), serialized);
+    planningKey_.reset();
 }
 }  // namespace game::campaign

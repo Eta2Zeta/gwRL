@@ -26,6 +26,7 @@ from torch import nn
 from studies.shared.multiplayer_mcts import (
     PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
 )
+from studies.shared.immutable_json import freeze_json
 
 CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
 TARGET_SCHEMA = "campaign-raw-vector-target-v1"
@@ -52,11 +53,9 @@ class _ReadOnlyList(list):
 
 
 def _read_only_snapshot(value: Any) -> Any:
-    if isinstance(value, dict):
-        return _ReadOnlyDict({key: _read_only_snapshot(item) for key, item in value.items()})
-    if isinstance(value, list):
-        return _ReadOnlyList(_read_only_snapshot(item) for item in value)
-    return value
+    # Retain the legacy container classes above for existing local checkpoints.
+    # New snapshots also retain their canonical source text for graph reuse.
+    return freeze_json(value)
 
 
 def _canonical(value: Any) -> str:
@@ -434,11 +433,16 @@ class CampaignLearner:
         losses: dict[str, list[dict[str, float]]] = {player: [] for player in PLAYERS}
         for _ in range(self.config.epochs):
             samples = self.replay_random.sample(self.replay, min(self.config.batch_size, len(self.replay)))
-            inputs = [sample["input"] for sample in samples]
             for player in PLAYERS:
                 model, optimizer = self.models[player], self.optimizers[player]
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
+                # Every position trains the value head, while only its owner
+                # has a policy target. State values do not read action graphs,
+                # so avoid encoding other actors' unused policy menus. Keep
+                # replay and the complete observation/context unchanged.
+                inputs = [sample["input"] if sample["owner"] == player
+                          else {**sample["input"], "actions": []} for sample in samples]
                 logits, predicted = model.forward_batch(inputs)
                 target = torch.as_tensor([sample["values"] for sample in samples], dtype=predicted.dtype,
                                          device=predicted.device) / self.config.value_scale

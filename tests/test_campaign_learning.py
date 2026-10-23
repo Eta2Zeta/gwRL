@@ -6,8 +6,10 @@ import json
 import random
 import tempfile
 import unittest
+from contextlib import ExitStack
 from dataclasses import replace
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import torch
@@ -226,6 +228,67 @@ class CampaignLearningTests(unittest.TestCase):
             self.assertEqual(result["losses"][player][0]["policy_samples"], 0)
             self.assert_tree_equal(before[player], learner.models[player].state_dict())
 
+    def test_unused_policy_menus_are_skipped_without_changing_learning(self):
+        learner = self.learner(real=True, config=replace(self.config, epochs=1))
+        for index, node in enumerate((0, 1, 3, 4)):
+            env = LearningToyEnv()
+            env.node, env.score = node, index * 3
+            learner.replay.append({
+                "input": make_input(env, env.legal_actions()),
+                "owner": env.current_decision_player(), "policy": [.8, .2],
+                "values": [350. + index, -70. - index / 4, -280. - index * 3 / 4],
+                "rollout_version": "unfiltered-reference", "target_source": "terminal",
+                "target_schema": "campaign-raw-vector-target-v1",
+            })
+        original_replay = copy.deepcopy(learner.replay)
+        baseline = copy.deepcopy(learner)
+        samples = baseline.replay_random.sample(baseline.replay, len(baseline.replay))
+        inputs = [sample["input"] for sample in samples]
+        expected = {}
+        # Reference the original computation: all actors encode every action
+        # menu, although only the actual owner's policy contributes to loss.
+        for player in PLAYERS:
+            model, optimizer = baseline.models[player], baseline.optimizers[player]
+            model.train()
+            optimizer.zero_grad(set_to_none=True)
+            logits, predicted = model.forward_batch(inputs)
+            targets = predicted.new_tensor([sample["values"] for sample in samples]) / baseline.config.value_scale
+            value_loss = (predicted - targets).square().mean()
+            terms = [-(logits[index].new_tensor(sample["policy"]) * logits[index].log_softmax(0)).sum()
+                     for index, sample in enumerate(samples) if sample["owner"] == player]
+            policy_loss = torch.stack(terms).mean()
+            loss = value_loss + policy_loss
+            loss.backward()
+            expected[player] = {"value": float(value_loss.detach()), "policy": float(policy_loss.detach()),
+                                "total": float(loss.detach()), "policy_samples": len(terms)}
+        for player in PLAYERS:
+            baseline.optimizers[player].step()
+            baseline.models[player].eval()
+
+        with ExitStack() as stack:
+            calls = {player: stack.enter_context(mock.patch.object(
+                model, "forward_batch", wraps=model.forward_batch)) for player, model in learner.models.items()}
+            result = learner.update()
+        self.assertEqual(learner.replay, original_replay)
+        for player in PLAYERS:
+            forwarded = calls[player].call_args.args[0]
+            for item, sample in zip(forwarded, samples, strict=True):
+                self.assertEqual(item["observation"], sample["input"]["observation"])
+                self.assertEqual(item["context"], sample["input"]["context"])
+                self.assertEqual(item["actions"], sample["input"]["actions"] if sample["owner"] == player else [])
+            actual = result["losses"][player][0]
+            self.assertEqual(actual["policy_samples"], expected[player]["policy_samples"])
+            for name in ("policy", "value", "total"):
+                self.assertAlmostEqual(actual[name], expected[player][name], places=6)
+            torch.testing.assert_close(learner.models[player].state_dict(), baseline.models[player].state_dict(),
+                                       atol=2e-6, rtol=2e-5)
+            torch.testing.assert_close(learner.optimizers[player].state_dict(), baseline.optimizers[player].state_dict(),
+                                       atol=2e-6, rtol=2e-5)
+            for parameter, reference in zip(learner.models[player].parameters(), baseline.models[player].parameters(), strict=True):
+                self.assertEqual(parameter.grad is None, reference.grad is None)
+                if parameter.grad is not None:
+                    torch.testing.assert_close(parameter.grad, reference.grad, atol=2e-6, rtol=2e-5)
+
     def test_bounded_nonterminal_segment_bootstraps_instead_of_fake_terminal(self):
         learner = self.learner()
         learner.begin_batch(LearningToyEnv())
@@ -429,7 +492,10 @@ class CampaignLearningTests(unittest.TestCase):
         self.assertIs(original, learner.pending[0]["input"]["context"])
         payload = learner.checkpoint()
         saved_context = payload["replay"][0]["input"]["context"]
-        self.assertIsNot(saved_context, original)
+        self.assertEqual(saved_context, original)
+        # An immutable source context may safely survive deepcopy by identity.
+        with self.assertRaisesRegex(TypeError, "read-only"):
+            saved_context["schema"] = "checkpoint mutation"
         self.assertTrue(all(sample["input"]["context"] is saved_context
                             for sample in payload["replay"] + payload["pending"]))
         with tempfile.TemporaryDirectory() as directory:
@@ -442,7 +508,9 @@ class CampaignLearningTests(unittest.TestCase):
         resumed = self.learner()
         resumed.restore(loaded, env_template=LearningToyEnv())
         restored_context = resumed.replay[0]["input"]["context"]
-        self.assertIsNot(restored_context, loaded_context)
+        self.assertEqual(restored_context, loaded_context)
+        with self.assertRaisesRegex(TypeError, "read-only"):
+            restored_context["geography"]["zones"].append({"id": "restored mutation"})
         self.assertTrue(all(sample["input"]["context"] is restored_context
                             for sample in resumed.replay + resumed.pending))
         self.assert_tree_equal(payload, resumed.checkpoint())

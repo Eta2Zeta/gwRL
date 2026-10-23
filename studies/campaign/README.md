@@ -83,6 +83,16 @@ the short six-transition default smoke is not a full-game runtime estimate.
 Progress now also includes action kinds/parameters, terminal flags and real final
 return vectors for each completed root.
 
+The performance follow-up repeats that same pilot in 118.68 seconds (2.92 times
+faster) with identical actions, policy targets and final game states. It reuses
+immutable source features and skips unused policy work without reducing search.
+Manifests now separate invocation time into collection/search, learning updates,
+checkpoint saves and reporting, and report collection transitions per second.
+Timing stays outside deterministic checkpoint state. Full results and numerical
+limits are in the [Stage A report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
+Measure representative deeper-search and longer-horizon throughput before
+expanding learning; the pilot timing alone does not establish scalability.
+
 ## Evaluation and profiling
 
 Held-out evaluation keeps the target weights fixed, turns root noise off, and

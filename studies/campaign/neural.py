@@ -7,6 +7,7 @@ before handing predictions to MCTS. The default scale is 100 IPP wealth units.
 from __future__ import annotations
 
 import math
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -15,7 +16,7 @@ from torch import Tensor, nn
 
 from studies.shared.multiplayer_mcts import Evaluation, PLAYERS, vector
 from .features import (EXTERNAL_REFERENCE, NODE_TYPES, NUMERIC_DIM, RELATIONS, SCHEMA,
-                       Graph, action_factors, cached_context, canonical, compile_graph, make_input)
+                       Graph, action_factors, cached_action, cached_context, cached_observation, canonical, make_input)
 
 
 @dataclass(frozen=True)
@@ -46,6 +47,52 @@ class _EncodedGraph:
     pooled: Tensor
 
 
+@dataclass
+class _GraphTensors:
+    graph: Graph
+    tokens: Tensor
+    offsets: Tensor
+    types: Tensor
+    numbers: Tensor
+    sources: Tensor
+    targets: Tensor
+    relations: Tensor
+
+
+# These tensors contain only source data, never model outputs or gradients.
+# Sharing them across actor models is safe; the byte limit also bounds large
+# observation/menu entries independently of the source-graph entry limits.
+_GRAPH_TENSORS: OrderedDict[tuple, _GraphTensors] = OrderedDict()
+_GRAPH_TENSOR_BYTES = 0
+_GRAPH_TENSOR_LIMIT = 32 * 1024 * 1024
+
+
+def _graph_tensors(graph: Graph, device: torch.device, dtype: torch.dtype) -> _GraphTensors:
+    global _GRAPH_TENSOR_BYTES
+    key = (id(graph), device, dtype)
+    if key in _GRAPH_TENSORS:
+        _GRAPH_TENSORS.move_to_end(key)
+        return _GRAPH_TENSORS[key]
+    long = lambda values: torch.tensor(values, dtype=torch.long, device=device)
+    sources, targets, relations = zip(*graph.edges) if graph.edges else ((), (), ())
+    # An inference-mode tensor cannot subsequently be saved for backward.
+    # Construct ordinary constant tensors even when called during inference.
+    with torch.inference_mode(False):
+        result = _GraphTensors(graph, long(graph.token_ids), long(graph.token_offsets), long(graph.types),
+                               torch.tensor(graph.numeric, dtype=dtype, device=device),
+                               long(sources), long(targets), long(relations))
+    size = sum(value.numel() * value.element_size() for value in vars(result).values()
+               if isinstance(value, Tensor))
+    if size <= _GRAPH_TENSOR_LIMIT:
+        while _GRAPH_TENSORS and _GRAPH_TENSOR_BYTES + size > _GRAPH_TENSOR_LIMIT:
+            _, old = _GRAPH_TENSORS.popitem(last=False)
+            _GRAPH_TENSOR_BYTES -= sum(value.numel() * value.element_size() for value in vars(old).values()
+                                       if isinstance(value, Tensor))
+        _GRAPH_TENSORS[key] = result
+        _GRAPH_TENSOR_BYTES += size
+    return result
+
+
 class _GraphEncoder(nn.Module):
     def __init__(self, config: CampaignModelConfig) -> None:
         super().__init__()
@@ -64,28 +111,29 @@ class _GraphEncoder(nn.Module):
         if not graphs:
             return []
         device, dtype = self.tokens.weight.device, self.tokens.weight.dtype
-        ids, offsets, types, numbers, graph_ids = [], [0], [], [], []
-        sources, targets, relations = [], [], []
-        starts = [0]
-        for row, graph in enumerate(graphs):
-            start = starts[-1]
-            ids.extend(graph.token_ids)
-            offsets.extend(len(ids) - len(graph.token_ids) + offset for offset in graph.token_offsets[1:])
-            types.extend(graph.types)
-            numbers.extend(graph.numeric)
-            graph_ids.extend([row] * graph.node_count)
-            for source, target, relation in graph.edges:
-                sources.append(start + source)
-                targets.append(start + target)
-                relations.append(relation)
-            starts.append(start + graph.node_count)
+        packs = [_graph_tensors(graph, device, dtype) for graph in graphs]
+        starts, token_starts = [0], [0]
+        for graph in graphs:
+            starts.append(starts[-1] + graph.node_count)
+            token_starts.append(token_starts[-1] + len(graph.token_ids))
         long = lambda values: torch.tensor(values, dtype=torch.long, device=device)
         node_count = starts[-1]
-        encoded = self.tokens(long(ids), long(offsets)) + self.types(long(types))
-        encoded = self.input_norm(encoded + self.numbers(torch.tensor(numbers, dtype=dtype, device=device)))
+        cat = lambda values: values[0] if len(values) == 1 else torch.cat(values)
+        ids = cat([pack.tokens for pack in packs])
+        offsets = (packs[0].offsets if len(packs) == 1 else
+                   torch.cat([*(pack.offsets[:-1] + start for pack, start in zip(packs, token_starts)),
+                              long([token_starts[-1]])]))
+        types = cat([pack.types for pack in packs])
+        numbers = cat([pack.numbers for pack in packs])
+        sources = [pack.sources + start for pack, start in zip(packs, starts)]
+        targets = [pack.targets + start for pack, start in zip(packs, starts)]
+        relations = [pack.relations for pack in packs]
+        encoded = self.tokens(ids, offsets) + self.types(types)
+        encoded = self.input_norm(encoded + self.numbers(numbers))
         # Context and observation encodings are read-only inputs for later
         # stages. Requests cannot send messages into another request's state.
         external_chunks = []
+        external_count = 0
         if external is not None:
             for row, (graph, contexts) in enumerate(zip(graphs, external, strict=True)):
                 for context in contexts:
@@ -96,11 +144,12 @@ class _GraphEncoder(nn.Module):
                             destinations.append(starts[row] + destination)
                     if indices:
                         external_chunks.append(context.nodes.index_select(0, long(indices)))
-                        offset = node_count + sum(chunk.shape[0] for chunk in external_chunks[:-1])
-                        sources.extend(range(offset, offset + len(indices)))
-                        targets.extend(destinations)
-                        relations.extend([EXTERNAL_REFERENCE] * len(indices))
-        source_ids, target_ids, relation_ids = long(sources), long(targets), long(relations)
+                        offset = node_count + external_count
+                        sources.append(torch.arange(offset, offset + len(indices), device=device))
+                        targets.append(long(destinations))
+                        relations.append(torch.full((len(indices),), EXTERNAL_REFERENCE, dtype=torch.long, device=device))
+                        external_count += len(indices)
+        source_ids, target_ids, relation_ids = cat(sources), cat(targets), cat(relations)
         degree = torch.bincount(target_ids, minlength=node_count).clamp_min(1).to(dtype).unsqueeze(1)
         external_nodes = torch.cat(external_chunks) if external_chunks else None
         for message, update in zip(self.messages, self.updates, strict=True):
@@ -109,7 +158,8 @@ class _GraphEncoder(nn.Module):
             aggregate = torch.zeros_like(encoded)
             aggregate.index_add_(0, target_ids, message(gathered))
             encoded = encoded + update(torch.cat((encoded, aggregate / degree), dim=1))
-        owners = long(graph_ids)
+        owners = torch.repeat_interleave(torch.arange(len(graphs), device=device),
+                                         long([graph.node_count for graph in graphs]))
         summed = encoded.new_zeros((len(graphs), encoded.shape[1]))
         summed.index_add_(0, owners, encoded)
         counts = encoded.new_tensor([graph.node_count for graph in graphs]).unsqueeze(1)
@@ -187,12 +237,12 @@ class CampaignPolicyValueNet(nn.Module):
                 context_lookup[context_key] = len(contexts)
                 contexts.append(cached_context(context_key, self.config.token_buckets))
             context_rows.append(context_lookup[context_key])
-            observations.append(compile_graph(item["observation"], self.config.token_buckets))
+            observations.append(cached_observation(canonical(item["observation"]), self.config.token_buckets))
             lengths.append(len(item["actions"]))
             for action in item["actions"]:
                 if not isinstance(action, dict):
                     raise ValueError("Each legal action needs a complete feature object")
-                action_graphs.append(compile_graph(action, self.config.token_buckets))
+                action_graphs.append(cached_action(canonical(action), self.config.token_buckets))
                 action_rows.append(row)
         static = self.encoder(contexts)
         dynamic = self.encoder(observations, [[static[index]] for index in context_rows])

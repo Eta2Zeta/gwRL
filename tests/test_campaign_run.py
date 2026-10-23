@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 import os
 import random
 import selectors
@@ -94,7 +95,29 @@ class CampaignRunTests(unittest.TestCase):
         # optimizer moments and active CampaignAdapters, must match exactly.
         self.assert_tree_equal(self.reference["learner"], actual["learner"])
         self.assert_tree_equal(self.reference["runner"], actual["runner"], "runner")
-        self.assertEqual(json.loads((directory / "manifest.json").read_text())["status"], "completed")
+        manifest = json.loads((directory / "manifest.json").read_text())
+        self.assertEqual(manifest["status"], "completed")
+        self.assert_invocation_timings(manifest)
+
+    def assert_invocation_timings(self, manifest):
+        timings = manifest["timings_seconds_this_invocation"]
+        self.assertEqual(set(timings), {"collection", "learning_updates", "checkpoint_save", "progress_reporting"})
+        self.assertTrue(all(math.isfinite(value) and value >= 0 for value in timings.values()))
+        for name in ("collection", "learning_updates", "checkpoint_save"):
+            self.assertGreater(timings[name], 0)
+        self.assertLessEqual(sum(timings.values()), manifest["elapsed_seconds_this_invocation"])
+        self.assertGreater(manifest["collection_transitions_per_second_this_invocation"], 0)
+        self.assertNotIn("timings_seconds_this_invocation", manifest["runner"])
+
+    def test_completed_manifest_reports_wall_time_outside_deterministic_checkpoint(self):
+        manifest = json.loads((self.reference_dir / "manifest.json").read_text())
+        self.assert_invocation_timings(manifest)
+        self.assertIn("studies/shared/immutable_json.py", self.reference["runner"]["runtime_source_sha256"])
+        self.assertAlmostEqual(manifest["collection_transitions_per_second_this_invocation"],
+                               self.reference["learner"]["counters"]["transitions"] /
+                               manifest["timings_seconds_this_invocation"]["collection"])
+        self.assertNotIn("timings_seconds_this_invocation", self.reference["runner"])
+        self.assertNotIn("timings_seconds_this_invocation", self.reference["learner"])
 
     def test_real_two_root_cli_updates_all_actors_and_resume_matches_uninterrupted(self):
         directory = self.directory / "bounded-resume"
