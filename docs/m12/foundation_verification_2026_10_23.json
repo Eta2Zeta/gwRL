@@ -1,0 +1,38 @@
+{
+  "checks": [
+    {
+      "command": "PYTHONPATH=tests ./.venv/bin/python -m unittest test_campaign_neural test_campaign_batching test_campaign_curriculum -v",
+      "elapsed_seconds": 12.773,
+      "result": "24 passed"
+    },
+    {
+      "command": "ctest --test-dir build/m9-m11 -R '^(campaign_env|campaign_runtime|campaign_setup)$' --output-on-failure -j3",
+      "elapsed_seconds": 14.26,
+      "result": "3 passed"
+    },
+    {
+      "command": "./.venv/bin/python setup.py build_ext --inplace --force -j4",
+      "result": "passed"
+    }
+  ],
+  "date": "2026-10-23",
+  "limitations": [
+    "No learning-strength claim or large training run",
+    "Further M12 learning, resume and evaluation checks recorded separately"
+  ],
+  "schema": "m12-foundation-verification-v1",
+  "scope": "Entity graph neural model, independent-root batched search, explicit real-horizon curriculum",
+  "source_sha256": {
+    "include/game/campaign_env.hpp": "dd50697fd9f73a1d8c55aafd35a5a9cd550b60c54c3711b75a90706384e567d8",
+    "src/campaign_env.cpp": "3c36d4e272e0c5d779eba714ce5b6aa667a2979c802479361acc5885b5141c4d",
+    "src/python_bindings.cpp": "34b920a92deed84cfd6605d0f59c69e44d00dadc65d783266c727bdafd20fa0a",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/features.py": "d5a643627c635dd6d00848ca9de5856038f1e2f3438fc443d05293a71cc8e83e",
+    "studies/campaign/neural.py": "baa9518a61b7996f4c9f2b9d19d93184a73cb677c218b2042be0e6147873c0ce",
+    "tests/test_campaign_batching.py": "41bcf94bcb2c9e7afb916266de13ef1732cbb323fe6fdba22e3f42955d0f063e",
+    "tests/test_campaign_curriculum.py": "c8fac5b784769725b78992a1bca54c40ef0c1ff25e9026e2103447c66e1b6cfa",
+    "tests/test_campaign_neural.py": "fea393802e6afa18ad6c4aad90c97667b10bc41e0d3fc0fb00d09930f46b93ef"
+  }
+}

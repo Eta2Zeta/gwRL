@@ -625,8 +625,11 @@ globally optimal full-campaign strategy.
 
 ### M12. Add rewards, evaluation, curriculum and training operations
 
-Status: next. The approved terminal wealth evaluator is already implemented in
-M11; model training, evaluation and operational tooling remain outstanding.
+Status: implementation in progress, 23 October 2026. The user authorized continuing
+through the remaining plan. M12 is delivered in three chunks: entity-graph models
+and batched inference; resumable parallel training; held-out evaluation and a
+bounded foreground smoke run. See docs/m12/README.md. The approved terminal wealth
+evaluator is already implemented in M11.
 
 Depends on: finalized wealth valuation/local setup in M0; M10-M11 for training.
 

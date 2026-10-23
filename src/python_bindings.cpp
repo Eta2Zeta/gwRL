@@ -95,6 +95,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def(py::init([](const std::string& scenario, std::uint64_t seed) {
             return game::campaign::CampaignEnv(std::filesystem::path(scenario), seed);
         }), py::arg("scenario_path"), py::arg("seed") = 1)
+        .def_static("curriculum", [](const std::string& scenario, int rounds, std::uint64_t seed) {
+            return game::campaign::CampaignEnv::curriculum(std::filesystem::path(scenario), rounds, seed);
+        }, py::arg("scenario_path"), py::arg("calendar_rounds"), py::arg("seed") = 1)
         .def("is_terminal", &game::campaign::CampaignEnv::isTerminal)
         .def("current_decision_player", &game::campaign::CampaignEnv::currentDecisionPlayer)
         .def("current_nation", &game::campaign::CampaignEnv::currentNation)

@@ -1,0 +1,210 @@
+"""Lossless JSON traversal and variable entity graphs for campaign observations.
+
+Every JSON container and scalar becomes a node; nothing is selected by a fixed
+unit list, field allowlist, or sequence limit. Directed edges retain the JSON
+hierarchy, matching registry identities, and physical geography adjacency.
+Strings use a documented hashed lexical vocabulary: both the complete UTF-8
+string and *every* word/punctuation token contribute. Hash collisions are an
+ordinary finite embedding approximation, not an unknown-field/drop policy.
+Parsed graphs contain integers/numbers only and may be cached; learned vectors
+must be recomputed on every forward pass.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import re
+from dataclasses import dataclass
+from functools import lru_cache
+from typing import Any
+
+SCHEMA = "campaign-neural-input-v1"
+NODE_TYPES = ("null", "bool", "number", "string", "array", "object")
+NUMERIC_DIM = 8
+RELATIONS = 6
+PARENT_TO_CHILD, CHILD_TO_PARENT, IDENTITY_REFERENCE, REFERENCE_BACK, ADJACENT, EXTERNAL_REFERENCE = range(RELATIONS)
+ENTITY_COLLECTIONS = frozenset({
+    "nodes", "factions", "nations", "units", "territories", "facilities",
+    "construction", "repairs", "rails", "battles",
+})
+LEXEMES = re.compile(r"[^\W_]+|_|[^\w\s]", re.UNICODE)
+
+
+def canonical(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
+
+
+@lru_cache(maxsize=131072)
+def lexical_ids(text: str, role: str, buckets: int) -> tuple[int, ...]:
+    def token_id(value: str) -> int:
+        return int.from_bytes(hashlib.blake2b(value.encode("utf-8"), digest_size=8).digest(), "little") % buckets
+
+    return (token_id(role + ":full:" + text),
+            *(token_id(role + ":part:" + token.group()) for token in LEXEMES.finditer(text)))
+
+
+@dataclass(frozen=True)
+class Graph:
+    """A complete document graph; IDs below are local node indices."""
+    token_ids: tuple[int, ...]
+    token_offsets: tuple[int, ...]  # Includes the final offset for EmbeddingBag.
+    types: tuple[int, ...]
+    numeric: tuple[tuple[float, ...], ...]
+    edges: tuple[tuple[int, int, int], ...]
+    identities: dict[str, tuple[int, ...]]
+    references: tuple[tuple[int, str], ...]
+    leaf_count: int
+
+    @property
+    def node_count(self) -> int:
+        return len(self.types)
+
+
+def compile_graph(value: Any, buckets: int) -> Graph:
+    """Visit every field, preserving null/empty containers and list positions."""
+    if buckets < 2:
+        raise ValueError("The lexical vocabulary needs at least two buckets")
+    tokens: list[int] = []
+    offsets = [0]
+    types: list[int] = []
+    numeric: list[tuple[float, ...]] = []
+    edges: list[tuple[int, int, int]] = []
+    identities: dict[str, set[int]] = {}
+    references: list[tuple[int, str]] = []
+    paths: dict[tuple[Any, ...], int] = {}
+    leaves = 0
+
+    def bind(identity: str, index: int) -> None:
+        identities.setdefault(identity, set()).add(index)
+
+    def visit(item: Any, path: tuple[Any, ...], key: str, position: int) -> int:
+        nonlocal leaves
+        index = len(types)
+        paths[path] = index
+        words = list(lexical_ids(key, "field", buckets))
+        number, length, size = 0.0, 0, 0
+        if item is None:
+            kind = "null"
+        elif isinstance(item, bool):
+            kind, number = "bool", float(item)
+        elif isinstance(item, (int, float)):
+            kind, number = "number", float(item)
+            if not math.isfinite(number):
+                raise ValueError("Neural features require finite JSON numbers")
+        elif isinstance(item, str):
+            kind, length = "string", len(item.encode("utf-8"))
+            words.extend(lexical_ids(item, "value", buckets))
+            references.append((index, item))
+            # Turn serials are JSON strings to preserve exact integer storage.
+            # Retain the string tokens while also exposing their magnitude.
+            if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", item):
+                candidate = float(item)
+                if math.isfinite(candidate):
+                    number = candidate
+        elif isinstance(item, list):
+            kind, size = "array", len(item)
+        elif isinstance(item, dict):
+            if any(not isinstance(k, str) for k in item):
+                raise ValueError("JSON object keys must be strings")
+            kind, size = "object", len(item)
+        else:
+            raise TypeError(f"Unsupported neural JSON value: {type(item).__name__}")
+        tokens.extend(words)
+        offsets.append(len(tokens))
+        types.append(NODE_TYPES.index(kind))
+        magnitude = math.log1p(abs(number))
+        # No numerical clipping: signed log compression remains unbounded.
+        numeric.append((math.copysign(magnitude, number), float(number != 0),
+                        float(number < 0), math.log1p(length), math.log1p(size),
+                        math.log1p(position), math.sin(position), math.cos(position)))
+        if kind == "object":
+            if isinstance(item.get("id"), str):
+                bind(item["id"], index)
+            for field, child in sorted(item.items()):
+                target = visit(child, path + (field,), field, 0)
+                edges.extend(((index, target, PARENT_TO_CHILD), (target, index, CHILD_TO_PARENT)))
+                if key in ENTITY_COLLECTIONS and isinstance(child, dict):
+                    bind(field, target)
+        elif kind == "array":
+            for position, child in enumerate(item):
+                target = visit(child, path + (position,), "[]", position)
+                edges.extend(((index, target, PARENT_TO_CHILD), (target, index, CHILD_TO_PARENT)))
+        else:
+            leaves += 1
+        return index
+
+    visit(value, (), "$", 0)
+    for source, identity in references:
+        for target in sorted(identities.get(identity, ())):
+            if source != target:
+                edges.extend(((target, source, IDENTITY_REFERENCE), (source, target, REFERENCE_BACK)))
+    # Map links get direct message-passing edges as well as their complete
+    # JSON representation (which retains river/rail/directional attributes).
+    if isinstance(value, dict):
+        geography = value.get("geography", {})
+        nodes = geography.get("nodes", {}) if isinstance(geography, dict) else {}
+        for identity, node in nodes.items():
+            if not isinstance(node, dict):
+                continue
+            source = paths.get(("geography", "nodes", identity))
+            for neighbor in node.get("neighbors", []):
+                target = paths.get(("geography", "nodes", neighbor.get("neighbor_id")))
+                if source is not None and target is not None:
+                    edges.append((source, target, ADJACENT))
+    return Graph(tuple(tokens), tuple(offsets), tuple(types), tuple(numeric), tuple(edges),
+                 {name: tuple(sorted(indices)) for name, indices in identities.items()},
+                 tuple(references), leaves)
+
+
+@lru_cache(maxsize=8)
+def cached_context(serialized: str, buckets: int) -> Graph:
+    """Cache source tokens/topology only, never tensors from model parameters."""
+    return compile_graph(json.loads(serialized), buckets)
+
+
+def make_input(env: Any, actions: Any) -> dict[str, Any]:
+    """Snapshot public features only; never call serialize/RNG/planning APIs."""
+    observation, context = env.observation(), env.context()
+    if not isinstance(observation, dict) or not isinstance(context, dict):
+        raise TypeError("Campaign neural inputs require observation/context objects")
+    forbidden = {"history", "random", "rng", "rng_state", "random_state", "dice_tape",
+                 "future_tape", "future_rolls", "planning_key", "definition_fingerprint"}
+    state = observation.get("state", {})
+    if forbidden.intersection(observation) or (isinstance(state, dict) and forbidden.intersection(state)):
+        raise ValueError("Execution RNG, future dice, history and planning hashes are not neural features")
+    features = []
+    for action in actions:
+        if hasattr(action, "features"):
+            feature = action.features()
+        elif isinstance(action, dict):
+            feature = action
+        else:
+            raise TypeError("Campaign actions must expose features() or be plain JSON objects")
+        if not isinstance(feature, dict):
+            raise TypeError("Campaign action features must be a JSON object")
+        features.append(feature)
+    # The JSON round trip both validates the plain replay format and detaches
+    # it from caller-owned mutable observations/action dictionaries.
+    return json.loads(canonical({"schema": SCHEMA, "observation": observation,
+                                 "context": context, "actions": features}))
+
+
+def action_factors(action: dict[str, Any]) -> tuple[str, str, str, str]:
+    """Readout groups, never additional engine actions or interchangeability.
+
+    Preserve the full authoritative action below these conditional categories.
+    Unrecognized parameters still enter the action graph and final leaf score.
+    Empty categories simply have one branch and change no probabilities.
+    """
+    raw = action.get("action")
+    raw = raw if isinstance(raw, dict) else action
+    parameters = raw.get("parameters", {})
+    parameters = parameters if isinstance(parameters, dict) else {}
+    groups = (
+        ("source", "from", "origin", "source_zone", "unit", "units", "group", "force", "transport", "carrier", "facility", "battle"),
+        ("path", "route", "sea_route", "land_route"),
+        ("target", "destination", "to", "zone", "recipient", "endpoint"),
+    )
+    return (canonical(raw.get("kind", action.get("kind", "unspecified"))),
+            *(canonical({key: parameters[key] for key in keys if key in parameters}) for keys in groups))

@@ -9,6 +9,8 @@ class CampaignEnv {
   public:
     explicit CampaignEnv(const std::filesystem::path& scenario, std::uint64_t seed = 1);
     explicit CampaignEnv(Engine engine);
+    static CampaignEnv curriculum(const std::filesystem::path& scenario, int calendarRounds,
+                                  std::uint64_t seed = 1);
     bool isTerminal() const { return engine_.state().terminal; }
     std::optional<Id> currentDecisionPlayer() const { return engine_.state().decisionPlayer(); }
     Id currentNation() const { return engine_.state().currentNation(); }

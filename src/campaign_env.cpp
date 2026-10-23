@@ -33,6 +33,27 @@ CampaignEnv::CampaignEnv(const std::filesystem::path& path, std::uint64_t seed)
 CampaignEnv::CampaignEnv(Engine engine)
     : engine_(std::move(engine)), context_(std::make_shared<const V>(staticContext(engine_.state()))) {}
 
+CampaignEnv CampaignEnv::curriculum(const std::filesystem::path& path, int calendarRounds,
+                                    std::uint64_t seed) {
+    auto initial = loadScenario(path);
+    auto definition = *initial.definition;
+    if (calendarRounds < 1 || calendarRounds > definition.calendarRounds)
+        throw std::invalid_argument("Curriculum rounds must be between one and the full campaign horizon");
+    const auto baseFingerprint = definition.fingerprint;
+    const int targetRounds = definition.calendarRounds;
+    definition.scenarioId += "_curriculum_" + std::to_string(calendarRounds);
+    definition.calendarRounds = calendarRounds;
+    auto rules = definition.rules.asObject();
+    rules["curriculum"] = V(O{{"base_definition_fingerprint", V(baseFingerprint)},
+        {"calendar_rounds", V(static_cast<double>(calendarRounds))},
+        {"full_target_calendar_rounds", V(static_cast<double>(targetRounds))},
+        {"full_target_game", V(false)}, {"setup", V(std::string("unchanged_approved_initial_setup"))}});
+    definition.rules = V(std::move(rules));
+    initial.definition = freezeDefinition(std::move(definition));
+    initial.validate();
+    return CampaignEnv(Engine::start(std::move(initial), campaignRules(), seed));
+}
+
 std::string CampaignEnv::decisionKind() const {
     const auto& s = engine_.state();
     if (s.terminal) return "terminal";
