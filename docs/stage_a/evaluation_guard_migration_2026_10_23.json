@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-23",
+  "limits": "Only evaluation.py source hash was rebased after review; original initial and trained checkpoints are retained byte-for-byte.",
+  "migrations": [
+    {
+      "changed_runtime_paths": [
+        "studies/campaign/evaluation.py"
+      ],
+      "entire_learner_state_unchanged": true,
+      "migrated_checkpoint": "initial-evaluation.pt",
+      "migrated_checkpoint_sha256": "46503c9116a66a1e7035e1b268b2dcd84f250e373993ef77689709b467366cf6",
+      "new_source_sha256": {
+        "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4"
+      },
+      "old_source_sha256": {
+        "studies/campaign/evaluation.py": "294358f0a185ddefee55513d59a1bf8a95cd7a1da405c5d24384caf1f148e5f6"
+      },
+      "original_checkpoint_preserved": true,
+      "reason": "Nonterminal repeated-state evaluation guard; no training, model, game rule or RNG changes",
+      "schema": "reviewed-evaluation-only-checkpoint-migration-v1",
+      "source_checkpoint": "initial.pt",
+      "source_checkpoint_sha256": "9b6107c3cd0e128e64b9ec48501680e4b4062976e4a3830eeb89f0e446568c72"
+    },
+    {
+      "changed_runtime_paths": [
+        "studies/campaign/evaluation.py"
+      ],
+      "entire_learner_state_unchanged": true,
+      "migrated_checkpoint": "checkpoint-evaluation.pt",
+      "migrated_checkpoint_sha256": "1abedf8b8cac42bda98fa39f8af59219f3f67b3ba1beb28ca94d596b134cb267",
+      "new_source_sha256": {
+        "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4"
+      },
+      "old_source_sha256": {
+        "studies/campaign/evaluation.py": "294358f0a185ddefee55513d59a1bf8a95cd7a1da405c5d24384caf1f148e5f6"
+      },
+      "original_checkpoint_preserved": true,
+      "reason": "Nonterminal repeated-state evaluation guard; no training, model, game rule or RNG changes",
+      "schema": "reviewed-evaluation-only-checkpoint-migration-v1",
+      "source_checkpoint": "checkpoint.pt",
+      "source_checkpoint_sha256": "4ef0a0f9da1fd1614566a8c3236da0a06b6db4e899940b7b3f922458c2daea35"
+    }
+  ],
+  "schema": "stage-a-evaluation-guard-migration-record-v1"
+}

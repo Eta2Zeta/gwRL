@@ -1,0 +1,316 @@
+{
+  "checks": {
+    "cpp_suites": {
+      "elapsed_seconds": 22.35,
+      "passed": 24
+    },
+    "evaluation_guard_tests": 13,
+    "full_python": {
+      "elapsed_seconds": 98.379,
+      "passed": 230
+    }
+  },
+  "conclusions": [
+    "All eight training episodes reached genuine one-round terminals; all386 labels use observed terminal returns",
+    "All three policies received action-loss samples in every optimizer step",
+    "Trained Axis completes both held-out games that the initial policy repeatedly cycles in",
+    "Allies and Comintern have identical completed-game scores before/after training on these seeds",
+    "Own outcome-prediction error is much smaller on the completed Allies/Comintern held-out games",
+    "No overall playing-strength or algorithm-superiority claim is supported"
+  ],
+  "date": "2026-10-23",
+  "files": {
+    "evaluation_final_2026_10_23.json": "f6ad59374b04b997df77798e8bfce535797b57d48e14b6749c1fb76bbbbd329f",
+    "evaluation_guard_migration_2026_10_23.json": "c95c1182a5a0a1a7fd93f43e7c2109010a9487ebb0e55664ecc00f41a0580f1c",
+    "evaluation_initial_2026_10_23.json": "0ee51cc6e8d67307190b02b1824bde88aff3d5db552b97a81e1c14bbc3ad56aa",
+    "training_2026_10_23.json": "8d812996c3833bdad3e261961c976141099c98bc9271e16706318657178af7d8"
+  },
+  "final_terminal_states_and_scores_unchanged_by_diagnostic_guard": true,
+  "limits": [
+    "One training seed, eight short episodes and only two held-out seeds per alliance",
+    "The two initial Axis games are truncated by a repeated-state collection guard; no terminal score or loss is assigned",
+    "A repeated planning state does not prove an infinite loop because fresh search seeds/future execution RNG may permit escape",
+    "Paired terminal score changes exclude truncated games and do not measure their utility; completion rates are reported separately",
+    "Approximate normal intervals with two games are not reliable evidence of generalization",
+    "No learned full eleven-round campaign, archived-opponent league or PPO comparison has been run",
+    "CPU samples are partial observations, not an operating-system affinity guarantee; all jobs were configured below the authorized11-core compute ceiling"
+  ],
+  "protocol": {
+    "baseline_policy": "campaign-active-baseline-v2:balanced",
+    "calendar_rounds": 1,
+    "comparison": "One learning alliance at a time against the same two fixed scripted alliance policies; matching seeds/search budgets/initial states",
+    "evaluation_only_checkpoint_migration": "evaluation_guard_migration_2026_10_23.json",
+    "full_target_game": false,
+    "heldout_seeds": [
+      40009,
+      40013
+    ],
+    "max_depth": 8,
+    "max_state_visits": 20,
+    "max_transitions": 1500,
+    "root_noise": false,
+    "simulations": 4,
+    "training_seed_separation": {
+      "cross_target_seed_reuse_allowed": true,
+      "disjoint_from_training": true,
+      "distinct_training_seeds": 9,
+      "heldout_by_target": {
+        "allies": [
+          40009,
+          40013
+        ],
+        "axis": [
+          40009,
+          40013
+        ],
+        "comintern": [
+          40009,
+          40013
+        ]
+      }
+    }
+  },
+  "results": [
+    {
+      "final_completions": 2,
+      "final_first_search_own_value_mse": 7.596057808898625,
+      "final_own_terminal_gap": {
+        "approximate_95_percent_interval": [
+          44.46,
+          45.440000000000005
+        ],
+        "mean": 44.95,
+        "n": 2,
+        "standard_error": 0.25
+      },
+      "games": 2,
+      "initial_completions": 0,
+      "initial_first_search_own_value_mse": null,
+      "initial_own_terminal_gap": {
+        "approximate_95_percent_interval": null,
+        "mean": null,
+        "n": 0,
+        "standard_error": null
+      },
+      "paired_own_terminal_gap_change": {
+        "approximate_95_percent_interval": null,
+        "mean": null,
+        "n": 0,
+        "standard_error": null
+      },
+      "pairs": [
+        {
+          "final_own_terminal_gap": 44.7,
+          "final_stop_reason": "terminal",
+          "final_terminal": true,
+          "initial_own_terminal_gap": null,
+          "initial_stop_reason": "repeated_state_guard",
+          "initial_terminal": false,
+          "paired_terminal_gap_change": null,
+          "seed": 40009
+        },
+        {
+          "final_own_terminal_gap": 45.2,
+          "final_stop_reason": "terminal",
+          "final_terminal": true,
+          "initial_own_terminal_gap": null,
+          "initial_stop_reason": "repeated_state_guard",
+          "initial_terminal": false,
+          "paired_terminal_gap_change": null,
+          "seed": 40013
+        }
+      ],
+      "player": "axis"
+    },
+    {
+      "final_completions": 2,
+      "final_first_search_own_value_mse": 22.061279747842537,
+      "final_own_terminal_gap": {
+        "approximate_95_percent_interval": [
+          -58.88800000000001,
+          -52.812000000000005
+        ],
+        "mean": -55.85000000000001,
+        "n": 2,
+        "standard_error": 1.5500000000000007
+      },
+      "games": 2,
+      "initial_completions": 2,
+      "initial_first_search_own_value_mse": 3948.427488239058,
+      "initial_own_terminal_gap": {
+        "approximate_95_percent_interval": [
+          -58.88800000000001,
+          -52.812000000000005
+        ],
+        "mean": -55.85000000000001,
+        "n": 2,
+        "standard_error": 1.5500000000000007
+      },
+      "paired_own_terminal_gap_change": {
+        "approximate_95_percent_interval": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n": 2,
+        "standard_error": 0.0
+      },
+      "pairs": [
+        {
+          "final_own_terminal_gap": -57.400000000000006,
+          "final_stop_reason": "terminal",
+          "final_terminal": true,
+          "initial_own_terminal_gap": -57.400000000000006,
+          "initial_stop_reason": "terminal",
+          "initial_terminal": true,
+          "paired_terminal_gap_change": 0.0,
+          "seed": 40009
+        },
+        {
+          "final_own_terminal_gap": -54.300000000000004,
+          "final_stop_reason": "terminal",
+          "final_terminal": true,
+          "initial_own_terminal_gap": -54.300000000000004,
+          "initial_stop_reason": "terminal",
+          "initial_terminal": true,
+          "paired_terminal_gap_change": 0.0,
+          "seed": 40013
+        }
+      ],
+      "player": "allies"
+    },
+    {
+      "final_completions": 2,
+      "final_first_search_own_value_mse": 50.48238538298755,
+      "final_own_terminal_gap": {
+        "approximate_95_percent_interval": [
+          -87.18800000000002,
+          -81.112
+        ],
+        "mean": -84.15,
+        "n": 2,
+        "standard_error": 1.550000000000004
+      },
+      "games": 2,
+      "initial_completions": 2,
+      "initial_first_search_own_value_mse": 10548.177621270032,
+      "initial_own_terminal_gap": {
+        "approximate_95_percent_interval": [
+          -87.18800000000002,
+          -81.112
+        ],
+        "mean": -84.15,
+        "n": 2,
+        "standard_error": 1.550000000000004
+      },
+      "paired_own_terminal_gap_change": {
+        "approximate_95_percent_interval": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n": 2,
+        "standard_error": 0.0
+      },
+      "pairs": [
+        {
+          "final_own_terminal_gap": -85.7,
+          "final_stop_reason": "terminal",
+          "final_terminal": true,
+          "initial_own_terminal_gap": -85.7,
+          "initial_stop_reason": "terminal",
+          "initial_terminal": true,
+          "paired_terminal_gap_change": 0.0,
+          "seed": 40009
+        },
+        {
+          "final_own_terminal_gap": -82.6,
+          "final_stop_reason": "terminal",
+          "final_terminal": true,
+          "initial_own_terminal_gap": -82.6,
+          "initial_stop_reason": "terminal",
+          "initial_terminal": true,
+          "paired_terminal_gap_change": 0.0,
+          "seed": 40013
+        }
+      ],
+      "player": "comintern"
+    }
+  ],
+  "runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "dd50697fd9f73a1d8c55aafd35a5a9cd550b60c54c3711b75a90706384e567d8",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "62bb0a1d920c50e98972e57aeb5a024d13d02af989db4ba21ff80a099bfdd1c9",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "3919edbb4c0e732fb00c41b4558081a0026cdb57b678b8b939d2af0b91029a1b",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "3c36d4e272e0c5d779eba714ce5b6aa667a2979c802479361acc5885b5141c4d",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "f0f5384b723633561f573dbdff6c98992f084d597a28aae5437ec61c12467b97",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "b61afda70e355d4c0980a291c80f834d5fb94d010c8e25ed4666e3b21005e880",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_operations.cpp": "134f53a440ab13c9c39b0689ddb0637d418c9efc27624d8f3e83fb10e65974a1",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "34b920a92deed84cfd6605d0f59c69e44d00dadc65d783266c727bdafd20fa0a",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4",
+    "studies/campaign/features.py": "d5a643627c635dd6d00848ca9de5856038f1e2f3438fc443d05293a71cc8e83e",
+    "studies/campaign/learning.py": "f17724474cee336b99da567e2134c96f4b6877c3d97cc0ffde0cc704c5eb93a4",
+    "studies/campaign/neural.py": "baa9518a61b7996f4c9f2b9d19d93184a73cb677c218b2042be0e6147873c0ce",
+    "studies/campaign/run.py": "4e753e6dcba4c5f73e176866cb43a852d633d34140a7e05a8822645c11b18b91",
+    "studies/shared/campaign_adapter.py": "ebc43b6c91f80c41ef48297a2cca8e494c800528323486f1d1271e50ee6afa7f",
+    "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+  },
+  "schema": "stage-a-initial-final-comparison-v1",
+  "training_implementation_commit": "47eb3d6",
+  "training_record": "training_2026_10_23.json"
+}

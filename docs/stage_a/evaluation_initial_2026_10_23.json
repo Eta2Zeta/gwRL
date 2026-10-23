@@ -1,0 +1,2414 @@
+{
+  "model_versions": {
+    "allies": "allies:generation-0:77c88df9a8a06189561d604be4b7f87b8909e95e8fa5f0f4033c4faf314c7a64",
+    "axis": "axis:generation-0:afaa8eecdbc3f74cbf119b07688ccbe1e123da61d9af6107fef1591702425b1f",
+    "comintern": "comintern:generation-0:5637477f3c902dbe82f198242cd003dbe5922eef8cdea3224a881df9c9de8277"
+  },
+  "results": [
+    {
+      "decision_throughput": {
+        "decisions": 134,
+        "decisions_per_second": 1.3084899535624224,
+        "wall_seconds": 102.40812291693874
+      },
+      "games": [
+        {
+          "casualties_by_nation": {
+            "warlord_beiping_hopeh": 1
+          },
+          "casualties_by_nation_and_type": {
+            "warlord_beiping_hopeh": {
+              "militia": 1
+            }
+          },
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "completed_turns_at_stop": {
+            "ccp": 1,
+            "japan": 0,
+            "kmt": 0,
+            "mongolia": 1
+          },
+          "counts": {
+            "chance_events": 7,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 1,
+            "land_take_casualty": 1,
+            "movement_route": 3,
+            "naval_designate_raider": 19,
+            "naval_remove_raider": 19,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2,
+            "transitions": 73
+          },
+          "decisions_by_actor": {
+            "allies": 2,
+            "axis": 40,
+            "comintern": 24
+          },
+          "final_planning_key": "6fbf7e8cc43da7f342c43b0ecd7168afbd7d5b90fa9824103e829d8d3f93e709",
+          "first_search_prediction_point": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "production",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "planning_key": "b5334c0b73da2d90c1f728c7ea08b095896438717569844fe6bee3dc3a61a7df",
+            "transitions": 33
+          },
+          "first_search_value_prediction": [
+            -8.530643701553345,
+            -8.001556634902954,
+            -1.1736947298049927
+          ],
+          "illegal_actions": 0,
+          "initial": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "context_sha256": "b4e6cba79737246903ff300cb4857b62f4d75e39978718e1fb11a00ecbc466ae",
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "wealth": {
+              "allies": {
+                "income_rate": 6,
+                "infrastructure": 25,
+                "paid_construction": 0,
+                "treasury": 6,
+                "units": 33,
+                "wealth": 12.4
+              },
+              "axis": {
+                "income_rate": 15,
+                "infrastructure": 156,
+                "paid_construction": 10,
+                "treasury": 15,
+                "units": 329,
+                "wealth": 66
+              },
+              "comintern": {
+                "income_rate": 2,
+                "infrastructure": 2,
+                "paid_construction": 0,
+                "treasury": 2,
+                "units": 20,
+                "wealth": 4.4
+              }
+            }
+          },
+          "observed_terminal_returns": null,
+          "repeated_state_guard": {
+            "includes_initial_state": true,
+            "max_seen": 20,
+            "repeated_key": "6fbf7e8cc43da7f342c43b0ecd7168afbd7d5b90fa9824103e829d8d3f93e709",
+            "threshold": 20,
+            "triggered": true
+          },
+          "seed": 40009,
+          "stop_reason": "repeated_state_guard",
+          "terminal": false,
+          "terminal_squared_value_error": null,
+          "terminal_value_error": null,
+          "territorial_control": {
+            "ccp": 2,
+            "japan": 11,
+            "kmt": 6,
+            "mongolia": 4,
+            "warlord_kwangtung_hainan": 2,
+            "warlord_sikang": 1,
+            "warlord_sinkiang": 1,
+            "warlord_suiyuan": 1,
+            "warlord_tibet": 1,
+            "warlord_tsinghai": 1,
+            "warlord_yunnan": 1
+          },
+          "transition_budget": 1500,
+          "truncated": true,
+          "wealth_components_at_stop": {
+            "allies": {
+              "income_rate": 8,
+              "infrastructure": 32,
+              "paid_construction": 0,
+              "treasury": 6,
+              "units": 42,
+              "wealth": 16
+            },
+            "axis": {
+              "income_rate": 15,
+              "infrastructure": 156,
+              "paid_construction": 10,
+              "treasury": 15,
+              "units": 329,
+              "wealth": 66
+            },
+            "comintern": {
+              "income_rate": 3,
+              "infrastructure": 6,
+              "paid_construction": 0,
+              "treasury": 3,
+              "units": 24,
+              "wealth": 6.3
+            }
+          }
+        },
+        {
+          "casualties_by_nation": {
+            "ccp": 1,
+            "warlord_beiping_hopeh": 1
+          },
+          "casualties_by_nation_and_type": {
+            "ccp": {
+              "cavalry": 1
+            },
+            "warlord_beiping_hopeh": {
+              "militia": 1
+            }
+          },
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "completed_turns_at_stop": {
+            "ccp": 1,
+            "japan": 0,
+            "kmt": 0,
+            "mongolia": 1
+          },
+          "counts": {
+            "chance_events": 9,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 1,
+            "land_take_casualty": 2,
+            "movement_route": 3,
+            "naval_designate_raider": 19,
+            "naval_remove_raider": 19,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2,
+            "transitions": 77
+          },
+          "decisions_by_actor": {
+            "allies": 2,
+            "axis": 40,
+            "comintern": 26
+          },
+          "final_planning_key": "cf87d8d9021f72297cc17aef0d33acb8e5e8dd4326c9c78749e22c8b4c8e1867",
+          "first_search_prediction_point": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "production",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "planning_key": "d4d3b7f347b2c37febaf81306ba4730f9f3d71ef26c3d67bb0da3244c3d1adf9",
+            "transitions": 37
+          },
+          "first_search_value_prediction": [
+            -8.528596043586731,
+            -8.00727367401123,
+            -1.178223967552185
+          ],
+          "illegal_actions": 0,
+          "initial": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "context_sha256": "b4e6cba79737246903ff300cb4857b62f4d75e39978718e1fb11a00ecbc466ae",
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "wealth": {
+              "allies": {
+                "income_rate": 6,
+                "infrastructure": 25,
+                "paid_construction": 0,
+                "treasury": 6,
+                "units": 33,
+                "wealth": 12.4
+              },
+              "axis": {
+                "income_rate": 15,
+                "infrastructure": 156,
+                "paid_construction": 10,
+                "treasury": 15,
+                "units": 329,
+                "wealth": 66
+              },
+              "comintern": {
+                "income_rate": 2,
+                "infrastructure": 2,
+                "paid_construction": 0,
+                "treasury": 2,
+                "units": 20,
+                "wealth": 4.4
+              }
+            }
+          },
+          "observed_terminal_returns": null,
+          "repeated_state_guard": {
+            "includes_initial_state": true,
+            "max_seen": 20,
+            "repeated_key": "cf87d8d9021f72297cc17aef0d33acb8e5e8dd4326c9c78749e22c8b4c8e1867",
+            "threshold": 20,
+            "triggered": true
+          },
+          "seed": 40013,
+          "stop_reason": "repeated_state_guard",
+          "terminal": false,
+          "terminal_squared_value_error": null,
+          "terminal_value_error": null,
+          "territorial_control": {
+            "ccp": 2,
+            "japan": 11,
+            "kmt": 6,
+            "mongolia": 4,
+            "warlord_kwangtung_hainan": 2,
+            "warlord_sikang": 1,
+            "warlord_sinkiang": 1,
+            "warlord_suiyuan": 1,
+            "warlord_tibet": 1,
+            "warlord_tsinghai": 1,
+            "warlord_yunnan": 1
+          },
+          "transition_budget": 1500,
+          "truncated": true,
+          "wealth_components_at_stop": {
+            "allies": {
+              "income_rate": 8,
+              "infrastructure": 32,
+              "paid_construction": 0,
+              "treasury": 6,
+              "units": 42,
+              "wealth": 16
+            },
+            "axis": {
+              "income_rate": 15,
+              "infrastructure": 156,
+              "paid_construction": 10,
+              "treasury": 15,
+              "units": 329,
+              "wealth": 66
+            },
+            "comintern": {
+              "income_rate": 3,
+              "infrastructure": 6,
+              "paid_construction": 0,
+              "treasury": 3,
+              "units": 21,
+              "wealth": 6
+            }
+          }
+        }
+      ],
+      "inference_batches": {
+        "batch_sizes": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "batches": 220,
+        "elapsed_seconds": 88.94110983109567,
+        "inference_seconds": 54.95654042204842,
+        "requests": 400,
+        "roots": 80,
+        "search_calls": 44
+      },
+      "limits": [
+        "Short horizon variants are curriculum tasks, not full July1941 target results.",
+        "Truncated snapshots contribute no observed terminal return, terminal wealth interval, or calibration.",
+        "The repeated-state guard is a nonterminal collection limit, not proof of an infinite loop; changing search seeds or execution RNG may allow escape.",
+        "Casualties count removed unit identities, including combat, surrender and forced removal; ownership transfers are not casualties.",
+        "Intervals use a normal approximation; very small or dependent samples do not establish strategic strength.",
+        "Illegal rule actions raise an error rather than being silently replaced."
+      ],
+      "max_depth": 8,
+      "max_state_visits": 20,
+      "max_transitions": 1500,
+      "observed_return_statistics": {
+        "allies": {
+          "approximate_95_percent_interval": null,
+          "mean": null,
+          "n": 0,
+          "standard_error": null
+        },
+        "axis": {
+          "approximate_95_percent_interval": null,
+          "mean": null,
+          "n": 0,
+          "standard_error": null
+        },
+        "comintern": {
+          "approximate_95_percent_interval": null,
+          "mean": null,
+          "n": 0,
+          "standard_error": null
+        }
+      },
+      "observed_terminal_wealth_statistics": {
+        "allies": {
+          "income_rate": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "treasury": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "units": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "wealth": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          }
+        },
+        "axis": {
+          "income_rate": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "treasury": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "units": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "wealth": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          }
+        },
+        "comintern": {
+          "income_rate": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "treasury": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "units": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "wealth": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          }
+        }
+      },
+      "opponent_policy": "campaign-active-baseline-v2:balanced",
+      "root_noise": false,
+      "schema": "campaign-heldout-evaluation-v1",
+      "search_mode": "fixed_opponents",
+      "seeds": [
+        40009,
+        40013
+      ],
+      "simulations": 4,
+      "target_player": "axis",
+      "target_policy": "537dfe1a0f6969f678361516d23d2729e2581c4deb5ae9837803ba6d1ac6c8ea",
+      "terminal_games": 0,
+      "truncated_games": 2,
+      "value_calibration": {
+        "complete_games": 0,
+        "error": {
+          "allies": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "axis": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "comintern": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          }
+        },
+        "prediction_source": "first target MCTS root mean, in raw three-vector units",
+        "squared_error": {
+          "allies": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "axis": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          },
+          "comintern": {
+            "approximate_95_percent_interval": null,
+            "mean": null,
+            "n": 0,
+            "standard_error": null
+          }
+        }
+      }
+    },
+    {
+      "decision_throughput": {
+        "decisions": 339,
+        "decisions_per_second": 9.267719631205583,
+        "wall_seconds": 36.57857741601765
+      },
+      "games": [
+        {
+          "casualties_by_nation": {
+            "japan": 10,
+            "kmt": 7,
+            "warlord_beiping_hopeh": 1
+          },
+          "casualties_by_nation_and_type": {
+            "japan": {
+              "cavalry": 1,
+              "fighter": 3,
+              "infantry": 4,
+              "militia": 2
+            },
+            "kmt": {
+              "infantry": 7
+            },
+            "warlord_beiping_hopeh": {
+              "militia": 1
+            }
+          },
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "completed_turns_at_stop": {
+            "ccp": 1,
+            "japan": 1,
+            "kmt": 1,
+            "mongolia": 1
+          },
+          "counts": {
+            "air_ground_attack": 4,
+            "air_land": 4,
+            "air_support": 3,
+            "chance_events": 40,
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 6,
+            "economy_purchase": 5,
+            "economy_research": 1,
+            "end_phase": 21,
+            "influence_roll": 1,
+            "land_begin_battle": 7,
+            "land_continue_fighting": 9,
+            "land_progress_battle": 7,
+            "land_take_casualty": 18,
+            "movement_route": 9,
+            "naval_begin_assault": 3,
+            "naval_declare_assault": 7,
+            "naval_finish_shore_selection": 3,
+            "naval_load": 7,
+            "naval_route": 23,
+            "naval_start_move": 23,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2,
+            "transitions": 210
+          },
+          "decisions_by_actor": {
+            "allies": 18,
+            "axis": 128,
+            "comintern": 24
+          },
+          "final_planning_key": "4dd13f86dbf5f39b02238f33c50e4252ac57d42eb0472f0362b946a2d828a5f0",
+          "first_search_prediction_point": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "transitions": 0
+          },
+          "first_search_value_prediction": [
+            -30.0018630027771,
+            6.96739399433136,
+            14.839513897895813
+          ],
+          "illegal_actions": 0,
+          "initial": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "context_sha256": "b4e6cba79737246903ff300cb4857b62f4d75e39978718e1fb11a00ecbc466ae",
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "wealth": {
+              "allies": {
+                "income_rate": 6,
+                "infrastructure": 25,
+                "paid_construction": 0,
+                "treasury": 6,
+                "units": 33,
+                "wealth": 12.4
+              },
+              "axis": {
+                "income_rate": 15,
+                "infrastructure": 156,
+                "paid_construction": 10,
+                "treasury": 15,
+                "units": 329,
+                "wealth": 66
+              },
+              "comintern": {
+                "income_rate": 2,
+                "infrastructure": 2,
+                "paid_construction": 0,
+                "treasury": 2,
+                "units": 20,
+                "wealth": 4.4
+              }
+            }
+          },
+          "observed_terminal_returns": [
+            42.80000000000001,
+            -57.400000000000006,
+            -84.80000000000001
+          ],
+          "repeated_state_guard": {
+            "includes_initial_state": true,
+            "max_seen": 1,
+            "repeated_key": null,
+            "threshold": 20,
+            "triggered": false
+          },
+          "seed": 40009,
+          "stop_reason": "terminal",
+          "terminal": true,
+          "terminal_squared_value_error": [
+            5300.111256675127,
+            4143.161409621485,
+            9928.032729808976
+          ],
+          "terminal_value_error": [
+            -72.80186300277711,
+            64.36739399433137,
+            99.63951389789582
+          ],
+          "territorial_control": {
+            "ccp": 3,
+            "japan": 13,
+            "kmt": 11,
+            "mongolia": 4
+          },
+          "transition_budget": 1500,
+          "truncated": false,
+          "wealth_components_at_stop": {
+            "allies": {
+              "income_rate": 9,
+              "infrastructure": 22,
+              "paid_construction": 0,
+              "treasury": 9,
+              "units": 89,
+              "wealth": 21
+            },
+            "axis": {
+              "income_rate": 21,
+              "infrastructure": 176,
+              "paid_construction": 10,
+              "treasury": 21,
+              "units": 294,
+              "wealth": 71.10000000000001
+            },
+            "comintern": {
+              "income_rate": 3,
+              "infrastructure": 6,
+              "paid_construction": 0,
+              "treasury": 3,
+              "units": 34,
+              "wealth": 7.3
+            }
+          }
+        },
+        {
+          "casualties_by_nation": {
+            "ccp": 1,
+            "japan": 10,
+            "kmt": 7,
+            "mongolia": 1,
+            "warlord_beiping_hopeh": 1
+          },
+          "casualties_by_nation_and_type": {
+            "ccp": {
+              "cavalry": 1
+            },
+            "japan": {
+              "fighter": 3,
+              "infantry": 4,
+              "militia": 2,
+              "tactical_bomber": 1
+            },
+            "kmt": {
+              "infantry": 7
+            },
+            "mongolia": {
+              "militia": 1
+            },
+            "warlord_beiping_hopeh": {
+              "militia": 1
+            }
+          },
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "completed_turns_at_stop": {
+            "ccp": 1,
+            "japan": 1,
+            "kmt": 1,
+            "mongolia": 1
+          },
+          "counts": {
+            "air_ground_attack": 4,
+            "air_land": 3,
+            "air_support": 3,
+            "chance_events": 36,
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 6,
+            "economy_purchase": 5,
+            "economy_research": 1,
+            "end_phase": 21,
+            "influence_roll": 1,
+            "land_begin_battle": 7,
+            "land_continue_fighting": 7,
+            "land_progress_battle": 7,
+            "land_take_casualty": 20,
+            "movement_route": 9,
+            "naval_begin_assault": 3,
+            "naval_declare_assault": 7,
+            "naval_finish_shore_selection": 3,
+            "naval_load": 7,
+            "naval_route": 23,
+            "naval_start_move": 23,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2,
+            "transitions": 205
+          },
+          "decisions_by_actor": {
+            "allies": 16,
+            "axis": 126,
+            "comintern": 27
+          },
+          "final_planning_key": "cd7b772ab04d443bb59eccbc83a68090f14a43c22d587026d08fbd0744611bf4",
+          "first_search_prediction_point": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "transitions": 0
+          },
+          "first_search_value_prediction": [
+            -30.0018630027771,
+            6.96739399433136,
+            14.839513897895813
+          ],
+          "illegal_actions": 0,
+          "initial": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "context_sha256": "b4e6cba79737246903ff300cb4857b62f4d75e39978718e1fb11a00ecbc466ae",
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "wealth": {
+              "allies": {
+                "income_rate": 6,
+                "infrastructure": 25,
+                "paid_construction": 0,
+                "treasury": 6,
+                "units": 33,
+                "wealth": 12.4
+              },
+              "axis": {
+                "income_rate": 15,
+                "infrastructure": 156,
+                "paid_construction": 10,
+                "treasury": 15,
+                "units": 329,
+                "wealth": 66
+              },
+              "comintern": {
+                "income_rate": 2,
+                "infrastructure": 2,
+                "paid_construction": 0,
+                "treasury": 2,
+                "units": 20,
+                "wealth": 4.4
+              }
+            }
+          },
+          "observed_terminal_returns": [
+            35.7,
+            -54.300000000000004,
+            -79.5
+          ],
+          "repeated_state_guard": {
+            "includes_initial_state": true,
+            "max_seen": 1,
+            "repeated_key": null,
+            "threshold": 20,
+            "triggered": false
+          },
+          "seed": 40013,
+          "stop_reason": "terminal",
+          "terminal": true,
+          "terminal_squared_value_error": [
+            4316.73480203569,
+            3753.6935668566307,
+            8899.943882491278
+          ],
+          "terminal_value_error": [
+            -65.7018630027771,
+            61.267393994331364,
+            94.33951389789581
+          ],
+          "territorial_control": {
+            "ccp": 4,
+            "japan": 13,
+            "kmt": 11,
+            "mongolia": 3
+          },
+          "transition_budget": 1500,
+          "truncated": false,
+          "wealth_components_at_stop": {
+            "allies": {
+              "income_rate": 10,
+              "infrastructure": 33,
+              "paid_construction": 0,
+              "treasury": 10,
+              "units": 76,
+              "wealth": 21.900000000000002
+            },
+            "axis": {
+              "income_rate": 19,
+              "infrastructure": 163,
+              "paid_construction": 10,
+              "treasury": 19,
+              "units": 287,
+              "wealth": 66.9
+            },
+            "comintern": {
+              "income_rate": 4,
+              "infrastructure": 8,
+              "paid_construction": 0,
+              "treasury": 3,
+              "units": 42,
+              "wealth": 9.3
+            }
+          }
+        }
+      ],
+      "inference_batches": {
+        "batch_sizes": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "batches": 136,
+        "elapsed_seconds": 15.228054710198194,
+        "inference_seconds": 11.799561174120754,
+        "requests": 162,
+        "roots": 34,
+        "search_calls": 28
+      },
+      "limits": [
+        "Short horizon variants are curriculum tasks, not full July1941 target results.",
+        "Truncated snapshots contribute no observed terminal return, terminal wealth interval, or calibration.",
+        "The repeated-state guard is a nonterminal collection limit, not proof of an infinite loop; changing search seeds or execution RNG may allow escape.",
+        "Casualties count removed unit identities, including combat, surrender and forced removal; ownership transfers are not casualties.",
+        "Intervals use a normal approximation; very small or dependent samples do not establish strategic strength.",
+        "Illegal rule actions raise an error rather than being silently replaced."
+      ],
+      "max_depth": 8,
+      "max_state_visits": 20,
+      "max_transitions": 1500,
+      "observed_return_statistics": {
+        "allies": {
+          "approximate_95_percent_interval": [
+            -58.88800000000001,
+            -52.812000000000005
+          ],
+          "mean": -55.85000000000001,
+          "n": 2,
+          "standard_error": 1.5500000000000007
+        },
+        "axis": {
+          "approximate_95_percent_interval": [
+            32.292,
+            46.20800000000001
+          ],
+          "mean": 39.25000000000001,
+          "n": 2,
+          "standard_error": 3.5500000000000043
+        },
+        "comintern": {
+          "approximate_95_percent_interval": [
+            -87.34400000000002,
+            -76.95599999999999
+          ],
+          "mean": -82.15,
+          "n": 2,
+          "standard_error": 2.6500000000000057
+        }
+      },
+      "observed_terminal_wealth_statistics": {
+        "allies": {
+          "income_rate": {
+            "approximate_95_percent_interval": [
+              8.52,
+              10.48
+            ],
+            "mean": 9.5,
+            "n": 2,
+            "standard_error": 0.5
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": [
+              16.720000000000002,
+              38.28
+            ],
+            "mean": 27.5,
+            "n": 2,
+            "standard_error": 5.499999999999999
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "treasury": {
+            "approximate_95_percent_interval": [
+              8.52,
+              10.48
+            ],
+            "mean": 9.5,
+            "n": 2,
+            "standard_error": 0.5
+          },
+          "units": {
+            "approximate_95_percent_interval": [
+              69.76,
+              95.24
+            ],
+            "mean": 82.5,
+            "n": 2,
+            "standard_error": 6.499999999999999
+          },
+          "wealth": {
+            "approximate_95_percent_interval": [
+              20.568,
+              22.332000000000004
+            ],
+            "mean": 21.450000000000003,
+            "n": 2,
+            "standard_error": 0.45000000000000107
+          }
+        },
+        "axis": {
+          "income_rate": {
+            "approximate_95_percent_interval": [
+              18.04,
+              21.96
+            ],
+            "mean": 20.0,
+            "n": 2,
+            "standard_error": 1.0
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": [
+              156.76,
+              182.24
+            ],
+            "mean": 169.5,
+            "n": 2,
+            "standard_error": 6.499999999999999
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": [
+              10.0,
+              10.0
+            ],
+            "mean": 10.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "treasury": {
+            "approximate_95_percent_interval": [
+              18.04,
+              21.96
+            ],
+            "mean": 20.0,
+            "n": 2,
+            "standard_error": 1.0
+          },
+          "units": {
+            "approximate_95_percent_interval": [
+              283.64,
+              297.36
+            ],
+            "mean": 290.5,
+            "n": 2,
+            "standard_error": 3.4999999999999996
+          },
+          "wealth": {
+            "approximate_95_percent_interval": [
+              64.884,
+              73.116
+            ],
+            "mean": 69.0,
+            "n": 2,
+            "standard_error": 2.1000000000000014
+          }
+        },
+        "comintern": {
+          "income_rate": {
+            "approximate_95_percent_interval": [
+              2.52,
+              4.48
+            ],
+            "mean": 3.5,
+            "n": 2,
+            "standard_error": 0.5
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": [
+              5.04,
+              8.96
+            ],
+            "mean": 7.0,
+            "n": 2,
+            "standard_error": 1.0
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "treasury": {
+            "approximate_95_percent_interval": [
+              3.0,
+              3.0
+            ],
+            "mean": 3.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "units": {
+            "approximate_95_percent_interval": [
+              30.16,
+              45.84
+            ],
+            "mean": 38.0,
+            "n": 2,
+            "standard_error": 4.0
+          },
+          "wealth": {
+            "approximate_95_percent_interval": [
+              6.34,
+              10.260000000000002
+            ],
+            "mean": 8.3,
+            "n": 2,
+            "standard_error": 1.0000000000000002
+          }
+        }
+      },
+      "opponent_policy": "campaign-active-baseline-v2:balanced",
+      "root_noise": false,
+      "schema": "campaign-heldout-evaluation-v1",
+      "search_mode": "fixed_opponents",
+      "seeds": [
+        40009,
+        40013
+      ],
+      "simulations": 4,
+      "target_player": "allies",
+      "target_policy": "537dfe1a0f6969f678361516d23d2729e2581c4deb5ae9837803ba6d1ac6c8ea",
+      "terminal_games": 2,
+      "truncated_games": 0,
+      "value_calibration": {
+        "complete_games": 2,
+        "error": {
+          "allies": {
+            "approximate_95_percent_interval": [
+              59.779393994331365,
+              65.85539399433137
+            ],
+            "mean": 62.81739399433137,
+            "n": 2,
+            "standard_error": 1.5500000000000007
+          },
+          "axis": {
+            "approximate_95_percent_interval": [
+              -76.20986300277711,
+              -62.293863002777094
+            ],
+            "mean": -69.2518630027771,
+            "n": 2,
+            "standard_error": 3.5500000000000043
+          },
+          "comintern": {
+            "approximate_95_percent_interval": [
+              91.7955138978958,
+              102.18351389789584
+            ],
+            "mean": 96.98951389789582,
+            "n": 2,
+            "standard_error": 2.6500000000000057
+          }
+        },
+        "prediction_source": "first target MCTS root mean, in raw three-vector units",
+        "squared_error": {
+          "allies": {
+            "approximate_95_percent_interval": [
+              3566.749002329501,
+              4330.105974148616
+            ],
+            "mean": 3948.427488239058,
+            "n": 2,
+            "standard_error": 194.7339213824273
+          },
+          "axis": {
+            "approximate_95_percent_interval": [
+              3844.7141038087602,
+              5772.131954902056
+            ],
+            "mean": 4808.423029355408,
+            "n": 2,
+            "standard_error": 491.68822731971835
+          },
+          "comintern": {
+            "approximate_95_percent_interval": [
+              8406.461235778783,
+              10421.515376521473
+            ],
+            "mean": 9413.988306150128,
+            "n": 2,
+            "standard_error": 514.0444236588492
+          }
+        }
+      }
+    },
+    {
+      "decision_throughput": {
+        "decisions": 377,
+        "decisions_per_second": 10.751019565416772,
+        "wall_seconds": 35.06644162500743
+      },
+      "games": [
+        {
+          "casualties_by_nation": {
+            "japan": 9,
+            "kmt": 10,
+            "mongolia": 1,
+            "warlord_beiping_hopeh": 3,
+            "warlord_suiyuan": 1
+          },
+          "casualties_by_nation_and_type": {
+            "japan": {
+              "fighter": 3,
+              "infantry": 4,
+              "militia": 2
+            },
+            "kmt": {
+              "cavalry": 2,
+              "infantry": 8
+            },
+            "mongolia": {
+              "militia": 1
+            },
+            "warlord_beiping_hopeh": {
+              "infantry": 3
+            },
+            "warlord_suiyuan": {
+              "militia": 1
+            }
+          },
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "completed_turns_at_stop": {
+            "ccp": 1,
+            "japan": 1,
+            "kmt": 1,
+            "mongolia": 1
+          },
+          "counts": {
+            "air_ground_attack": 4,
+            "air_land": 4,
+            "air_support": 3,
+            "chance_events": 52,
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 5,
+            "economy_purchase": 4,
+            "economy_research": 1,
+            "end_phase": 21,
+            "land_begin_battle": 10,
+            "land_continue_fighting": 12,
+            "land_progress_battle": 10,
+            "land_take_casualty": 24,
+            "movement_route": 24,
+            "naval_begin_assault": 3,
+            "naval_declare_assault": 7,
+            "naval_finish_shore_selection": 3,
+            "naval_load": 7,
+            "naval_route": 23,
+            "naval_start_move": 23,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 2,
+            "transitions": 248
+          },
+          "decisions_by_actor": {
+            "allies": 49,
+            "axis": 132,
+            "comintern": 15
+          },
+          "final_planning_key": "b9e66f5d35ca5119d50d7ef42cb9e59ffe6604acbd8d7afd65be2aaeab594b9d",
+          "first_search_prediction_point": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "planning_key": "5dcce772bd1a56d25184bd2d2156299dc2d90313faf7d81adff2838d769c48bf",
+            "transitions": 1
+          },
+          "first_search_value_prediction": [
+            -48.623552322387695,
+            8.180134057998657,
+            18.542624473571777
+          ],
+          "illegal_actions": 0,
+          "initial": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "context_sha256": "b4e6cba79737246903ff300cb4857b62f4d75e39978718e1fb11a00ecbc466ae",
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "wealth": {
+              "allies": {
+                "income_rate": 6,
+                "infrastructure": 25,
+                "paid_construction": 0,
+                "treasury": 6,
+                "units": 33,
+                "wealth": 12.4
+              },
+              "axis": {
+                "income_rate": 15,
+                "infrastructure": 156,
+                "paid_construction": 10,
+                "treasury": 15,
+                "units": 329,
+                "wealth": 66
+              },
+              "comintern": {
+                "income_rate": 2,
+                "infrastructure": 2,
+                "paid_construction": 0,
+                "treasury": 2,
+                "units": 20,
+                "wealth": 4.4
+              }
+            }
+          },
+          "observed_terminal_returns": [
+            38.7,
+            -50.7,
+            -85.7
+          ],
+          "repeated_state_guard": {
+            "includes_initial_state": true,
+            "max_seen": 1,
+            "repeated_key": null,
+            "threshold": 20,
+            "triggered": false
+          },
+          "seed": 40009,
+          "stop_reason": "terminal",
+          "terminal": true,
+          "terminal_squared_value_error": [
+            7625.402790200782,
+            3466.8701866878937,
+            10866.524757138106
+          ],
+          "terminal_value_error": [
+            -87.3235523223877,
+            58.88013405799866,
+            104.24262447357178
+          ],
+          "territorial_control": {
+            "ccp": 2,
+            "japan": 13,
+            "kmt": 13,
+            "mongolia": 3
+          },
+          "transition_budget": 1500,
+          "truncated": false,
+          "wealth_components_at_stop": {
+            "allies": {
+              "income_rate": 11,
+              "infrastructure": 35,
+              "paid_construction": 0,
+              "treasury": 11,
+              "units": 79,
+              "wealth": 23.5
+            },
+            "axis": {
+              "income_rate": 19,
+              "infrastructure": 163,
+              "paid_construction": 10,
+              "treasury": 22,
+              "units": 297,
+              "wealth": 68.2
+            },
+            "comintern": {
+              "income_rate": 3,
+              "infrastructure": 6,
+              "paid_construction": 0,
+              "treasury": 4,
+              "units": 20,
+              "wealth": 6
+            }
+          }
+        },
+        {
+          "casualties_by_nation": {
+            "ccp": 1,
+            "japan": 9,
+            "kmt": 2,
+            "mongolia": 1,
+            "warlord_beiping_hopeh": 3,
+            "warlord_suiyuan": 2
+          },
+          "casualties_by_nation_and_type": {
+            "ccp": {
+              "cavalry": 1
+            },
+            "japan": {
+              "fighter": 3,
+              "infantry": 3,
+              "militia": 2,
+              "tactical_bomber": 1
+            },
+            "kmt": {
+              "infantry": 2
+            },
+            "mongolia": {
+              "militia": 1
+            },
+            "warlord_beiping_hopeh": {
+              "infantry": 3
+            },
+            "warlord_suiyuan": {
+              "militia": 2
+            }
+          },
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "completed_turns_at_stop": {
+            "ccp": 1,
+            "japan": 1,
+            "kmt": 1,
+            "mongolia": 1
+          },
+          "counts": {
+            "air_ground_attack": 4,
+            "air_land": 3,
+            "air_support": 3,
+            "chance_events": 38,
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 5,
+            "economy_purchase": 4,
+            "economy_research": 1,
+            "end_phase": 21,
+            "land_begin_battle": 8,
+            "land_continue_fighting": 8,
+            "land_progress_battle": 8,
+            "land_take_casualty": 18,
+            "movement_route": 23,
+            "naval_begin_assault": 3,
+            "naval_declare_assault": 7,
+            "naval_finish_shore_selection": 3,
+            "naval_load": 7,
+            "naval_route": 23,
+            "naval_start_move": 23,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2,
+            "transitions": 219
+          },
+          "decisions_by_actor": {
+            "allies": 39,
+            "axis": 125,
+            "comintern": 17
+          },
+          "final_planning_key": "d3200546fdda7046c821f40027f8f1a81da761a562ea0df6562304edd0087b33",
+          "first_search_prediction_point": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "planning_key": "5dcce772bd1a56d25184bd2d2156299dc2d90313faf7d81adff2838d769c48bf",
+            "transitions": 1
+          },
+          "first_search_value_prediction": [
+            -48.623552322387695,
+            8.180134057998657,
+            18.542624473571777
+          ],
+          "illegal_actions": 0,
+          "initial": {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "context_sha256": "b4e6cba79737246903ff300cb4857b62f4d75e39978718e1fb11a00ecbc466ae",
+            "planning_key": "b1a76f91304915c9ffed978c886e15acabc05b2df3f8719d0d78a12dbfb8bc02",
+            "wealth": {
+              "allies": {
+                "income_rate": 6,
+                "infrastructure": 25,
+                "paid_construction": 0,
+                "treasury": 6,
+                "units": 33,
+                "wealth": 12.4
+              },
+              "axis": {
+                "income_rate": 15,
+                "infrastructure": 156,
+                "paid_construction": 10,
+                "treasury": 15,
+                "units": 329,
+                "wealth": 66
+              },
+              "comintern": {
+                "income_rate": 2,
+                "infrastructure": 2,
+                "paid_construction": 0,
+                "treasury": 2,
+                "units": 20,
+                "wealth": 4.4
+              }
+            }
+          },
+          "observed_terminal_returns": [
+            35.60000000000001,
+            -51.8,
+            -82.6
+          ],
+          "repeated_state_guard": {
+            "includes_initial_state": true,
+            "max_seen": 1,
+            "repeated_key": null,
+            "threshold": 20,
+            "triggered": false
+          },
+          "seed": 40013,
+          "stop_reason": "terminal",
+          "terminal": true,
+          "terminal_squared_value_error": [
+            7093.606765801979,
+            3597.61648161549,
+            10229.830485401959
+          ],
+          "terminal_value_error": [
+            -84.2235523223877,
+            59.980134057998654,
+            101.14262447357177
+          ],
+          "territorial_control": {
+            "ccp": 3,
+            "japan": 13,
+            "kmt": 12,
+            "mongolia": 3
+          },
+          "transition_budget": 1500,
+          "truncated": false,
+          "wealth_components_at_stop": {
+            "allies": {
+              "income_rate": 10,
+              "infrastructure": 33,
+              "paid_construction": 0,
+              "treasury": 10,
+              "units": 92,
+              "wealth": 23.5
+            },
+            "axis": {
+              "income_rate": 19,
+              "infrastructure": 163,
+              "paid_construction": 10,
+              "treasury": 19,
+              "units": 290,
+              "wealth": 67.2
+            },
+            "comintern": {
+              "income_rate": 4,
+              "infrastructure": 8,
+              "paid_construction": 0,
+              "treasury": 4,
+              "units": 29,
+              "wealth": 8.1
+            }
+          }
+        }
+      ],
+      "inference_batches": {
+        "batch_sizes": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "batches": 90,
+        "elapsed_seconds": 12.582553876680322,
+        "inference_seconds": 9.426768252975307,
+        "requests": 160,
+        "roots": 32,
+        "search_calls": 18
+      },
+      "limits": [
+        "Short horizon variants are curriculum tasks, not full July1941 target results.",
+        "Truncated snapshots contribute no observed terminal return, terminal wealth interval, or calibration.",
+        "The repeated-state guard is a nonterminal collection limit, not proof of an infinite loop; changing search seeds or execution RNG may allow escape.",
+        "Casualties count removed unit identities, including combat, surrender and forced removal; ownership transfers are not casualties.",
+        "Intervals use a normal approximation; very small or dependent samples do not establish strategic strength.",
+        "Illegal rule actions raise an error rather than being silently replaced."
+      ],
+      "max_depth": 8,
+      "max_state_visits": 20,
+      "max_transitions": 1500,
+      "observed_return_statistics": {
+        "allies": {
+          "approximate_95_percent_interval": [
+            -52.327999999999996,
+            -50.172000000000004
+          ],
+          "mean": -51.25,
+          "n": 2,
+          "standard_error": 0.5499999999999972
+        },
+        "axis": {
+          "approximate_95_percent_interval": [
+            34.11200000000001,
+            40.188
+          ],
+          "mean": 37.150000000000006,
+          "n": 2,
+          "standard_error": 1.5499999999999972
+        },
+        "comintern": {
+          "approximate_95_percent_interval": [
+            -87.18800000000002,
+            -81.112
+          ],
+          "mean": -84.15,
+          "n": 2,
+          "standard_error": 1.550000000000004
+        }
+      },
+      "observed_terminal_wealth_statistics": {
+        "allies": {
+          "income_rate": {
+            "approximate_95_percent_interval": [
+              9.52,
+              11.48
+            ],
+            "mean": 10.5,
+            "n": 2,
+            "standard_error": 0.5
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": [
+              32.04,
+              35.96
+            ],
+            "mean": 34.0,
+            "n": 2,
+            "standard_error": 1.0
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "treasury": {
+            "approximate_95_percent_interval": [
+              9.52,
+              11.48
+            ],
+            "mean": 10.5,
+            "n": 2,
+            "standard_error": 0.5
+          },
+          "units": {
+            "approximate_95_percent_interval": [
+              72.76,
+              98.24
+            ],
+            "mean": 85.5,
+            "n": 2,
+            "standard_error": 6.499999999999999
+          },
+          "wealth": {
+            "approximate_95_percent_interval": [
+              23.5,
+              23.5
+            ],
+            "mean": 23.5,
+            "n": 2,
+            "standard_error": 0.0
+          }
+        },
+        "axis": {
+          "income_rate": {
+            "approximate_95_percent_interval": [
+              19.0,
+              19.0
+            ],
+            "mean": 19.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": [
+              163.0,
+              163.0
+            ],
+            "mean": 163.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": [
+              10.0,
+              10.0
+            ],
+            "mean": 10.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "treasury": {
+            "approximate_95_percent_interval": [
+              17.560000000000002,
+              23.439999999999998
+            ],
+            "mean": 20.5,
+            "n": 2,
+            "standard_error": 1.4999999999999998
+          },
+          "units": {
+            "approximate_95_percent_interval": [
+              286.64,
+              300.36
+            ],
+            "mean": 293.5,
+            "n": 2,
+            "standard_error": 3.4999999999999996
+          },
+          "wealth": {
+            "approximate_95_percent_interval": [
+              66.72,
+              68.68
+            ],
+            "mean": 67.7,
+            "n": 2,
+            "standard_error": 0.5
+          }
+        },
+        "comintern": {
+          "income_rate": {
+            "approximate_95_percent_interval": [
+              2.52,
+              4.48
+            ],
+            "mean": 3.5,
+            "n": 2,
+            "standard_error": 0.5
+          },
+          "infrastructure": {
+            "approximate_95_percent_interval": [
+              5.04,
+              8.96
+            ],
+            "mean": 7.0,
+            "n": 2,
+            "standard_error": 1.0
+          },
+          "paid_construction": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "treasury": {
+            "approximate_95_percent_interval": [
+              4.0,
+              4.0
+            ],
+            "mean": 4.0,
+            "n": 2,
+            "standard_error": 0.0
+          },
+          "units": {
+            "approximate_95_percent_interval": [
+              15.68,
+              33.32
+            ],
+            "mean": 24.5,
+            "n": 2,
+            "standard_error": 4.5
+          },
+          "wealth": {
+            "approximate_95_percent_interval": [
+              4.992,
+              9.108
+            ],
+            "mean": 7.05,
+            "n": 2,
+            "standard_error": 1.0499999999999998
+          }
+        }
+      },
+      "opponent_policy": "campaign-active-baseline-v2:balanced",
+      "root_noise": false,
+      "schema": "campaign-heldout-evaluation-v1",
+      "search_mode": "fixed_opponents",
+      "seeds": [
+        40009,
+        40013
+      ],
+      "simulations": 4,
+      "target_player": "comintern",
+      "target_policy": "537dfe1a0f6969f678361516d23d2729e2581c4deb5ae9837803ba6d1ac6c8ea",
+      "terminal_games": 2,
+      "truncated_games": 0,
+      "value_calibration": {
+        "complete_games": 2,
+        "error": {
+          "allies": {
+            "approximate_95_percent_interval": [
+              58.35213405799866,
+              60.50813405799865
+            ],
+            "mean": 59.43013405799866,
+            "n": 2,
+            "standard_error": 0.5499999999999972
+          },
+          "axis": {
+            "approximate_95_percent_interval": [
+              -88.8115523223877,
+              -82.7355523223877
+            ],
+            "mean": -85.7735523223877,
+            "n": 2,
+            "standard_error": 1.5499999999999972
+          },
+          "comintern": {
+            "approximate_95_percent_interval": [
+              99.65462447357177,
+              105.7306244735718
+            ],
+            "mean": 102.69262447357178,
+            "n": 2,
+            "standard_error": 1.550000000000004
+          }
+        },
+        "prediction_source": "first target MCTS root mean, in raw three-vector units",
+        "squared_error": {
+          "allies": {
+            "approximate_95_percent_interval": [
+              3404.1119651226472,
+              3660.374703180736
+            ],
+            "mean": 3532.2433341516917,
+            "n": 2,
+            "standard_error": 65.3731474637982
+          },
+          "axis": {
+            "approximate_95_percent_interval": [
+              6838.344674090555,
+              7880.664881912207
+            ],
+            "mean": 7359.504778001381,
+            "n": 2,
+            "standard_error": 265.89801219940136
+          },
+          "comintern": {
+            "approximate_95_percent_interval": [
+              9924.217234968608,
+              11172.138007571455
+            ],
+            "mean": 10548.177621270032,
+            "n": 2,
+            "standard_error": 318.34713586807356
+          }
+        }
+      }
+    }
+  ],
+  "schema": "campaign-evaluation-bundle-v1",
+  "seed_separation": {
+    "cross_target_seed_reuse_allowed": true,
+    "disjoint_from_training": true,
+    "distinct_training_seeds": 1,
+    "heldout_by_target": {
+      "allies": [
+        40009,
+        40013
+      ],
+      "axis": [
+        40009,
+        40013
+      ],
+      "comintern": [
+        40009,
+        40013
+      ]
+    }
+  },
+  "task": {
+    "calendar_rounds": 1,
+    "compatibility": {
+      "curriculum": "regional-horizon-curriculum-v1",
+      "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+      "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+      "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+    },
+    "full_target_game": false,
+    "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+    "setup": "unchanged approved 99-piece,37-node July1936 setup",
+    "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+    "version": "regional-horizon-curriculum-v1"
+  },
+  "training_seed": 1951
+}

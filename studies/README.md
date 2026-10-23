@@ -4,7 +4,7 @@ Start with the study you want to read or run:
 
 | Study | Main entry point | Preserved completed results |
 | --- | --- | --- |
-| [Regional campaign](/Users/home/Desktop/gwRL/studies/campaign/README.md) | `python -m studies.campaign.run` | [M12 operational checks](/Users/home/Desktop/gwRL/docs/m12/README.md), no trained-strength result |
+| [Regional campaign](/Users/home/Desktop/gwRL/studies/campaign/README.md) | `python -m studies.campaign.run` | [M12 checks](/Users/home/Desktop/gwRL/docs/m12/README.md) and [first Stage A learning pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md) |
 | [Composition](/Users/home/Desktop/gwRL/studies/composition/README.md) | `python -m studies.composition.train` | [Results guide](/Users/home/Desktop/gwRL/studies/composition/results/README.md) |
 | [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md) | `python -m studies.mini_japan_two_turn.train` | [Results guide](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/results/README.md) |
 

@@ -77,6 +77,9 @@ The starting model is archived in `initial.pt` before any action or update.
 plus one coordinator against the available core budget. Set BLAS environment
 limits as shown in the [Stage A pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
 That page records the authorized core limit, exact foreground command and results.
+The first eight-game pilot completed in 346.62 seconds with 386 genuine terminal
+training rows. Complete-episode timing includes full games and optimizer steps;
+the short six-transition default smoke is not a full-game runtime estimate.
 Progress now also includes action kinds/parameters, terminal flags and real final
 return vectors for each completed root.
 
@@ -97,6 +100,11 @@ Seeds must differ from the base run seed and every logged training episode seed.
   --checkpoint studies/campaign/runs/YOUR_RUN/checkpoint.pt \
   --output studies/campaign/runs/YOUR_RUN/profile.json --repeats 3
 ```
+
+The default evaluation also stops collection after 20 visits to one full planning
+state. This is reported as `repeated_state_guard`, an unfinished game with no
+terminal score; changing search seeds or future dice might still allow escape.
+The Python evaluation API can disable it with `max_state_visits=None`.
 
 The evaluation budget is per game. Increase it explicitly to reach real terminal
 states. Truncated games report their snapshot wealth and calendar, but contribute

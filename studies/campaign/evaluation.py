@@ -87,12 +87,15 @@ def _merge_stats(total: BatchStats, wave: BatchStats) -> None:
 def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player: str,
              seeds: Sequence[int], baseline_style: str = "balanced", simulations: int = 2,
              max_depth: int = 4, max_transitions: int = 500,
-             target_script: str | None = None) -> dict[str, Any]:
+             target_script: str | None = None, max_state_visits: int | None = 20) -> dict[str, Any]:
     """Search the target; sample the same fixed opponents in search and play.
 
     A transition cap stops collection only. Cutoff snapshots contribute neither
     observed returns nor calibration/terminal wealth confidence intervals.
     target_script supplies an explicit baseline-versus-baseline control.
+    A repeated-state guard counts the initial state and each real transition;
+    it is a nonterminal collection cutoff, not proof of an inescapable loop.
+    Set max_state_visits=None to use the transition budget alone.
     Call validate_heldout_seeds with the training seed log before a study run.
     """
     seeds = _seeds(seeds, unique=True, label="Evaluation seeds")
@@ -100,6 +103,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
         raise ValueError("Evaluation requires an actor and held-out seeds")
     if type(max_transitions) is not int or max_transitions <= 0:
         raise ValueError("Evaluation transition budget must be a positive integer")
+    if max_state_visits is not None and (type(max_state_visits) is not int or max_state_visits <= 0):
+        raise ValueError("Repeated-state visit threshold must be a positive integer or None")
     if type(simulations) is not int or type(max_depth) is not int:
         raise ValueError("Search budgets must be positive integers")
     MctsConfig(simulations=simulations, max_depth=max_depth)
@@ -121,9 +126,14 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
     initial = [{"planning_key": env.planning_key(), "context_sha256": _context_key(env),
                 "clock": _plain(env.observation()["state"]["clock"]), "wealth": _plain(env.wealth())}
                for env in envs]
+    state_visits = [Counter({start["planning_key"]: 1}) for start in initial]
     decisions, search_calls = 0, 0
     batch_stats = BatchStats()
     started = time.perf_counter()
+
+    def repeated_state_limit(index: int) -> bool:
+        return (max_state_visits is not None and
+                state_visits[index][envs[index].planning_key()] >= max_state_visits)
 
     def record(index: int, kind: str, owner: str | None) -> None:
         nonlocal decisions
@@ -138,10 +148,12 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
             casualties[index][unit["owner"]] += 1
             casualty_types[index][(unit["owner"], unit["type"])] += 1
         previous_units[index] = units
+        state_visits[index][envs[index].planning_key()] += 1
 
     while True:
         active = [i for i, env in enumerate(envs)
-                  if not env.is_terminal() and counts[i]["transitions"] < max_transitions]
+                  if not env.is_terminal() and counts[i]["transitions"] < max_transitions and
+                  not repeated_state_limit(i)]
         if not active:
             break
         searches, configs, indices = [], [], []
@@ -191,6 +203,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
     for index, (seed, env) in enumerate(zip(seeds, envs, strict=True)):
         state = env.observation()["state"]
         terminal = bool(env.is_terminal())
+        guarded = not terminal and repeated_state_limit(index)
+        repeated_key, max_seen = state_visits[index].most_common(1)[0]
         returns = list(vector(env.returns())) if terminal else None
         prediction = predictions[index]
         errors = [p - value for p, value in zip(prediction, returns, strict=True)] if prediction is not None and returns is not None else None
@@ -198,7 +212,11 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
         for (nation, kind), amount in casualty_types[index].items():
             type_losses.setdefault(nation, {})[kind] = amount
         games.append({"seed": seed, "terminal": terminal, "truncated": not terminal,
-            "stop_reason": "terminal" if terminal else "transition_budget", "transition_budget": max_transitions,
+            "stop_reason": "terminal" if terminal else "repeated_state_guard" if guarded else "transition_budget",
+            "transition_budget": max_transitions,
+            "repeated_state_guard": {"threshold": max_state_visits, "max_seen": max_seen,
+                "repeated_key": repeated_key if max_seen > 1 else None,
+                "includes_initial_state": True, "triggered": guarded},
             "initial": initial[index], "clock": state["clock"], "counts": dict(counts[index]),
             "completed_turns_at_stop": state.get("completed_turns", {}),
             "decisions_by_actor": dict(owners[index]), "casualties_by_nation": dict(casualties[index]),
@@ -217,7 +235,7 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
         "target_policy": target_policy.version if target_policy else evaluator_version,
         "opponent_policy": opponent.version, "search_mode": "fixed_opponents" if target_policy is None else "scripted_control",
         "root_noise": False, "simulations": simulations, "max_depth": max_depth,
-        "max_transitions": max_transitions, "seeds": seeds, "games": games,
+        "max_transitions": max_transitions, "max_state_visits": max_state_visits, "seeds": seeds, "games": games,
         "terminal_games": len(terminal_games), "truncated_games": len(games) - len(terminal_games),
         "observed_return_statistics": {player: uncertainty([game["observed_terminal_returns"][i] for game in terminal_games])
             for i, player in enumerate(PLAYERS)},
@@ -234,6 +252,7 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
         "inference_batches": {**asdict(batch_stats), "search_calls": search_calls},
         "limits": ["Short horizon variants are curriculum tasks, not full July1941 target results.",
                    "Truncated snapshots contribute no observed terminal return, terminal wealth interval, or calibration.",
+                   "The repeated-state guard is a nonterminal collection limit, not proof of an infinite loop; changing search seeds or execution RNG may allow escape.",
                    "Casualties count removed unit identities, including combat, surrender and forced removal; ownership transfers are not casualties.",
                    "Intervals use a normal approximation; very small or dependent samples do not establish strategic strength.",
                    "Illegal rule actions raise an error rather than being silently replaced."]})

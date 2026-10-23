@@ -1,9 +1,10 @@
 # gwRL
 
-`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The 1936–1941 China campaign has completed its M0–M12 implementation gates, including two full campaign traces, vector search, neural self-play, exact checkpoint resume and held-out evaluation. Bounded learning checks establish the training pipeline; playing strength remains untested. Public tiny/composition study environments use the same campaign engine; their historical result archives predate that migration.
+`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The 1936–1941 China campaign has completed its M0–M12 implementation gates, including two full campaign traces, vector search, neural self-play, exact checkpoint resume and held-out evaluation. The first Stage A pilot completed eight one-round self-play games and initial-versus-trained evaluation; robust playing strength remains unestablished. Public tiny/composition study environments use the same campaign engine; their historical result archives predate that migration.
 
 ## Start here
 
+- [Stage A learning pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md): eight completed games, terminal-only training and paired held-out results.
 - [Campaign learning](/Users/home/Desktop/gwRL/studies/campaign/README.md): foreground training, interrupt/resume, evaluation and profiling; [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md).
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.
 - [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md): neural MCTS trainer, search diagnostic and completed results.

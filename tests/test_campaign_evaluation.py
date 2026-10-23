@@ -121,7 +121,73 @@ class CountingEvaluator:
         return [self.evaluate(env, actions) for env, actions in requests]
 
 
+class ToggleEnv(EvaluationEnv):
+    """A legal two-state decision cycle; applied history is not decision state."""
+    def is_terminal(self):
+        return False
+
+    def decision_kind(self):
+        return "choose"
+
+    def apply_action(self, action):
+        if action not in self.legal_actions():
+            raise ValueError("Illegal toggle action")
+        self.applied.append((self.current_decision_player(), action["id"]))
+        self.node = 1 - self.node
+
+
 class CampaignEvaluationTests(unittest.TestCase):
+    def test_repeated_state_guard_is_a_nonterminal_four_step_cutoff(self):
+        actual = []
+
+        def factory(seed):
+            env = ToggleEnv(seed)
+            actual.append(env)
+            return env
+
+        report = evaluate(factory, CountingEvaluator(), target_player="axis", seeds=[7],
+                          simulations=1, max_depth=1, max_transitions=1500, max_state_visits=3)
+        game = report["games"][0]
+        self.assertEqual(game["counts"]["transitions"], 4)
+        self.assertEqual(len(actual[0].applied), 4)
+        self.assertFalse(actual[0].is_terminal())
+        self.assertFalse(game["terminal"])
+        self.assertTrue(game["truncated"])
+        self.assertEqual(game["stop_reason"], "repeated_state_guard")
+        self.assertEqual(game["repeated_state_guard"], {
+            "threshold": 3, "max_seen": 3, "repeated_key": game["initial"]["planning_key"],
+            "includes_initial_state": True, "triggered": True})
+        self.assertIsNotNone(game["first_search_value_prediction"])
+        self.assertIsNone(game["observed_terminal_returns"])
+        self.assertIsNone(game["terminal_squared_value_error"])
+        self.assertEqual(report["value_calibration"]["complete_games"], 0)
+        self.assertEqual(report["observed_return_statistics"]["axis"]["n"], 0)
+        self.assertEqual(report["max_transitions"], 1500)
+        json.dumps(report, allow_nan=False)
+
+    def test_repeated_state_guard_can_be_disabled_and_roots_stop_independently(self):
+        disabled = evaluate(ToggleEnv, CountingEvaluator(), target_player="axis", seeds=[7],
+                            simulations=1, max_depth=1, max_transitions=7, max_state_visits=None)
+        game = disabled["games"][0]
+        self.assertEqual(game["counts"]["transitions"], 7)
+        self.assertEqual(game["stop_reason"], "transition_budget")
+        self.assertIsNone(game["repeated_state_guard"]["threshold"])
+        self.assertEqual(game["repeated_state_guard"]["max_seen"], 4)
+        self.assertFalse(game["repeated_state_guard"]["triggered"])
+        mixed = evaluate(lambda seed: ToggleEnv(seed) if seed == 7 else EvaluationEnv(seed),
+                         CountingEvaluator(), target_player="axis", seeds=[7, 11],
+                         simulations=1, max_depth=1, max_transitions=10, max_state_visits=3)
+        self.assertEqual([g["stop_reason"] for g in mixed["games"]], ["repeated_state_guard", "terminal"])
+        self.assertEqual(mixed["terminal_games"], 1)
+        self.assertEqual(mixed["truncated_games"], 1)
+        self.assertEqual(mixed["observed_return_statistics"]["axis"]["n"], 1)
+        self.assertEqual(mixed["value_calibration"]["complete_games"], 1)
+
+    def test_repeated_state_guard_threshold_requires_a_positive_integer(self):
+        for threshold in (0, -1, True, 3.0, "3"):
+            with self.subTest(threshold=threshold), self.assertRaises(ValueError):
+                evaluate(ToggleEnv, CountingEvaluator(), target_player="axis", seeds=[7],
+                         max_state_visits=threshold)
     def test_complete_games_report_raw_vectors_wealth_casualties_and_calibration(self):
         report = evaluate(EvaluationEnv, CountingEvaluator(), target_player="axis", seeds=[1009, 1013],
                           simulations=4, max_depth=4, max_transitions=5)
@@ -291,12 +357,15 @@ class CampaignEvaluationTests(unittest.TestCase):
             return env
 
         evaluator = CountingEvaluator()
-        report = evaluate(factory, evaluator, target_player="axis", seeds=[1009], max_transitions=1)
+        report = evaluate(factory, evaluator, target_player="axis", seeds=[1009], max_transitions=1,
+                          max_state_visits=1)
         game = report["games"][0]
         self.assertEqual(report["terminal_games"], 1)
         self.assertEqual(game["wealth_components_at_stop"], actual[0].wealth())
         self.assertEqual(game["observed_terminal_returns"], actual[0].returns())
         self.assertEqual(game["clock"]["completed_rounds"], 11)
+        self.assertEqual(game["stop_reason"], "terminal")
+        self.assertFalse(game["repeated_state_guard"]["triggered"])
         self.assertEqual(game["counts"].get("transitions", 0), 0)
         self.assertEqual(report["value_calibration"]["complete_games"], 0)
         self.assertEqual(evaluator.batches, [])

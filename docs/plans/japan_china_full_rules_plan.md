@@ -1,6 +1,6 @@
 # Japan-China full-rules theatre: implementation and RL plan
 
-Status: **M0 frozen; M1–M12 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 and RCL-015 are provisionally adopted by the user; developer clarification remains pending. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and interruptible operations pass their bounded operational gate; playing strength remains untested.**
+Status: **M0 frozen; M1–M12 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 and RCL-015 are provisionally adopted by the user; developer clarification remains pending. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and interruptible operations pass their bounded operational gate; the first eight-game Stage A pilot is complete, with robust playing strength still unestablished.**
 
 Prepared 11 September; synchronized 23 October 2026 against the current repository,
 the local Global War 1936 v4.3 rulebook/national sheets, and the user's decisions.
@@ -712,6 +712,13 @@ unrelated exploration defaults: retain our tested FPU/PUCT behavior.
 
 ### Stage A: validate multiplayer search and latest-policy self-play
 
+Status, 23 October 2026: search and training checks pass; the first pilot finished
+eight genuine one-round self-play episodes and 32 sampled optimizer steps for
+each alliance. All 386 labels use terminal outcomes. Paired held-out evaluation
+finds better Axis completion and much smaller value error, with unchanged Allies/
+Comintern scores on two dice seeds. This is an early Stage A result, not a
+completed strength/generalization gate. See [the pilot report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
+
 Before campaign learning, check the shared search against exact tiny deterministic
 and stochastic three-side fixtures. Then start with this synchronized loop:
 
@@ -986,8 +993,12 @@ Rule sources in `game_content/rules/`:
 This planning review is not a completed line-by-line rules certification; M0
 exists to make completeness testable before implementation.
 
-**Next work:** manual foreground learning experiments, expanded starting-position
-curricula and held-out comparisons against stronger/historical opponent pairs.
+**Current learning work:** the first Stage A pilot has completed eight one-round
+self-play games with terminal-only labels and a paired initial-versus-trained
+comparison. Broader strategic strength is unestablished.
+
+**Next work:** expand one-round learning/evaluation across several training and
+dice seeds, then extend starting positions, horizon and opponent pairs.
 M12 closes the final planned implementation gate with reproducible training,
 exact interrupt/resume, evaluation and profiling. Its six learned-policy smoke
 games are explicitly truncated; two scripted controls reach a real one-round

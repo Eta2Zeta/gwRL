@@ -1,6 +1,42 @@
 # Stage A: completed-episode campaign learning
 
-Status: pilot preparation, 23 October 2026. The user authorized actual Stage A
+Status: first completed-episode pilot complete, 23 October 2026. Stage A remains
+an early learning experiment; it is not a completed playing-strength gate.
+
+Eight real one-round self-play games finished in 346.62 seconds, with 386 decisions
+and 52 chance events. All 386 training rows have observed terminal targets; none
+are bootstrapped or dropped. Policy samples: Axis 90, Allies 96, Comintern 200
+(the latter controls both CCP and Mongolia turns). Two frozen-policy generations
+performed 32 sampled Adam steps per agent.
+
+Held-out comparison uses the same scripted opponents, two unseen dice seeds
+(40009/40013), 4 simulations, depth 8, no root noise and identical initial states:
+
+| Alliance | Completed games: initial → trained | Mean own terminal gap: initial → trained | Own value MSE: initial → trained |
+| --- | --- | --- | --- |
+| Axis | 0/2 → 2/2 | unavailable → 44.95 | unavailable → 7.60 |
+| Allies | 2/2 → 2/2 | -55.85 → -55.85 | 3948.43 → 22.06 |
+| Comintern | 2/2 → 2/2 | -84.15 → -84.15 | 10548.18 → 50.48 |
+
+The initial Axis policy toggles one battlecruiser's raider status repeatedly.
+A diagnostic evaluation guard stops collection after 20 occurrences of a full
+planning state. Those two games remain unfinished: they receive no terminal
+score, loss or calibration error. The trained model completes all six games
+without triggering the guard, with the same terminal states and scores as evaluation
+before the guard was added. Per-simulation search cycle handling corrects visit
+counts; it does not prevent an actual policy from repeating legal actions.
+
+The observed improvement is completion behavior and outcome prediction. Allies/
+Comintern scores did not improve on these two dice seeds. Eight training games
+and one training seed do not establish robust strategic strength. The next
+experiment should expand one-round training and evaluation across several seeds
+before extending the horizon or claiming superiority over other algorithms.
+
+The completed run includes 19 purchases, 35 land moves and 12 land-battle starts,
+but demonstrates no naval movement/combat learning. All 230 Python tests and 24 C++
+suites pass after the preparation/diagnostic fixes.
+
+The user authorized actual Stage A
 learning and up to 80% of available compute cores. This Apple M4 Max exposes 14
 CPU cores; the configured CPU budget is 11, rounded down from 80%. Four search
 workers, four tensor threads and one coordinator fit a conservative 9-thread
@@ -58,4 +94,14 @@ Preparation fixes, with regressions:
   sharing and caller mutation cannot change a stored sample.
 
 Large checkpoints and raw progress remain in ignored local `runs/`. Curated
-verification and pilot results are saved here after the foreground run.
+verification and pilot results are saved here; the original checkpoints are
+preserved. A reviewed evaluation-only source-hash migration created separate
+checkpoint copies without changing any learner, optimizer, replay, game or RNG
+state.
+
+- [Training and per-episode results](training_2026_10_23.json)
+- [Paired comparison and limits](comparison_2026_10_23.json)
+- [Initial-model evaluation](evaluation_initial_2026_10_23.json)
+- [Trained-model evaluation](evaluation_final_2026_10_23.json)
+- [Evaluation-only checkpoint migration](evaluation_guard_migration_2026_10_23.json)
+- [Preflight validation and resource plan](preflight_2026_10_23.json)
