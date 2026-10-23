@@ -1,0 +1,27 @@
+{
+  "checks": [
+    {
+      "command": "PYTHONPATH=tests ./.venv/bin/python -m unittest test_campaign_learning -v",
+      "elapsed_seconds": 0.861,
+      "result": "15 passed"
+    },
+    {
+      "command": "ctest --test-dir build/m9-m11 -R '^campaign_reward$' --output-on-failure",
+      "elapsed_seconds": 4.17,
+      "result": "1 C++ suite with 6 action-driven accounting groups passed"
+    }
+  ],
+  "date": "2026-10-23",
+  "limitations": [
+    "Actual CLI signal interruption and held-out evaluation are recorded in the final operations gate",
+    "Bootstrap targets for truncated episodes are explicitly distinct from observed terminal outcomes"
+  ],
+  "schema": "m12-learning-verification-v1",
+  "scope": "Frozen three-policy parallel self-play, raw target provenance, optimizer/replay/engine/RNG resume and wealth accounting",
+  "source_sha256": {
+    "CMakeLists.txt": "f34d1fd118d6d789b9c1d75723c05e0a04ba596b079133d5e9c8dc444b474f5a",
+    "studies/campaign/learning.py": "dc85442ecf74f572a3f7c086eb6349f9bd8c5de728ea60ac68ea81c8f146377a",
+    "tests/campaign_reward_tests.cpp": "c0ed0febcce0929c7c687d14d244b54a40f6394012cfd6c4b946e41237ebba66",
+    "tests/test_campaign_learning.py": "8e17d4b7af3efba56aa4d012b2af2fe34415808f45a4aa58a13b35e86b585dda"
+  }
+}

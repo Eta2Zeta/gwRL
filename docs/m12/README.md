@@ -33,5 +33,9 @@ with bootstrap provenance rather than an invented terminal outcome.
 
 The initial correctness checks cover 11 neural tests, 11 batched-search tests,
 two actual-engine curriculum tests and three existing C++ foundation suites.
-Learning/resume and evaluation records will be added after their real foreground
-smoke checks finish.
+The learner adds 15 tests for raw terminal/bootstrap targets, actor routing,
+real graph gradients and exact multi-root continuation with populated optimizer
+state, replay and random generators. Six action-driven C++ accounting groups
+cover paid queues, opening ships, bombing/repair, capture, recruitment/alignment
+and phase passing. See `learning_verification_2026_10_23.json`. Actual CLI signal
+interruption and held-out evaluation are recorded in the final operations gate.
