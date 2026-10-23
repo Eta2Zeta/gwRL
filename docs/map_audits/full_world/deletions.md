@@ -1,8 +1,10 @@
 # Deletions — complete finding register
 
+**Implementation, 7 October:** approved work has been applied; uncertainties remain deferred. See [implementation status](implementation.md). The before/after proposals below retain the checkpoint baseline.
+
 94 finding records. Group findings may contain multiple fields or nodes; these are not edit counts.
 
-Proposals only. Apply neither uncertain values nor incomplete new-node records automatically. Each confidence rating applies only to the described fields. Regional reports explain dependencies and unresolved source coverage.
+Historical proposals. Apply neither uncertain values nor incomplete new-node records automatically. Each confidence rating applies only to the described fields. Regional reports explain dependencies and unresolved source coverage.
 
 See [overview](README.md), [mechanism proposals](mechanisms_and_schema.md), and [machine-readable register](data/all_findings.json).
 

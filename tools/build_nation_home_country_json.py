@@ -1,5 +1,5 @@
 import json
-from collections import deque
+import hashlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -8,6 +8,19 @@ OUTPUT_RELATIVE_PATH = Path("game_content/maps/gw36_nation_home_country.json")
 RULEBOOK_RELATIVE_PATH = Path("game_content/rules/Global War 1936 v4.3 Rulebook.pdf")
 MAP_PATH = ROOT / MAP_RELATIVE_PATH
 OUTPUT_PATH = ROOT / OUTPUT_RELATIVE_PATH
+
+# Rulebook p6 defines the contiguous USA. Geography is reviewed independently
+# of route availability: a missing/blocked border must not revoke Home Country.
+USA_MAINLAND_IDS = (
+    "land_usa_appalachia", "land_usa_chicago", "land_usa_great_lakes",
+    "land_usa_great_plains", "land_usa_heartlands", "land_usa_midwest",
+    "land_usa_new_england", "land_usa_new_orleans", "land_usa_new_york",
+    "land_usa_pacific_northwest", "land_usa_san_francisco",
+    "land_usa_southeastern_united_states", "land_usa_southwest_united_states",
+    "land_usa_texas", "land_usa_the_carolinas", "land_usa_the_northeast",
+    "land_usa_upper_midwest", "land_usa_washington_dc",
+    "land_usa_western_united_states",
+)
 
 
 def load_nodes(path):
@@ -48,31 +61,15 @@ def resolve_named_zones(names, name_to_id):
     return zone_ids, missing
 
 
-def contiguous_us_home(nodes, name_to_id):
-    start = name_to_id.get("Washington, D.C.")
-    if start is None:
-        return []
-
-    allowed = {
-        node_id
-        for node_id, node in nodes.items()
-        if node.get("type") == "land" and node.get("original_owner") == "United States"
-    }
-    if start not in allowed:
-        return []
-
-    visited = {start}
-    queue = deque([start])
-
-    while queue:
-        node_id = queue.popleft()
-        for edge in nodes[node_id].get("neighbors", []):
-            neighbor_id = edge["neighbor_id"]
-            if neighbor_id in allowed and neighbor_id not in visited:
-                visited.add(neighbor_id)
-                queue.append(neighbor_id)
-
-    return sort_zone_ids(visited, nodes)
+def contiguous_us_home(nodes, name_to_id=None):
+    """Return reviewed mainland membership, independent of movement topology."""
+    missing = sorted(set(USA_MAINLAND_IDS) - nodes.keys())
+    if missing:
+        raise ValueError("USA Home Country requires missing world nodes: " + ", ".join(missing))
+    for node_id in USA_MAINLAND_IDS:
+        if nodes[node_id].get("type") != "land":
+            raise ValueError(f"USA Home Country member is not land: {node_id}")
+    return sort_zone_ids(USA_MAINLAND_IDS, nodes)
 
 
 def make_entry(zone_ids, nodes, rulebook_definition, missing_named_zones=None):
@@ -138,7 +135,7 @@ def build():
     nations["USA"] = make_entry(
         usa_ids,
         nodes,
-        "Contiguous USA zones adjoining Washington, D.C.",
+        "Reviewed contiguous mainland USA roster; membership is independent of movement edges.",
     )
 
     chinese_roundel_owners = {
@@ -191,12 +188,15 @@ def build():
 
     doc = {
         "_meta": {
+            "schema_version": 2,
             "game": "Global War 1936 v4.3",
             "source_rulebook_section": (
                 f"Home Country ({RULEBOOK_RELATIVE_PATH.as_posix()}, p. 6)"
             ),
             "description": "Nation-level Home Country data extracted from the rulebook definition and mapped to land node ids.",
             "inputs": [MAP_RELATIVE_PATH.as_posix(), RULEBOOK_RELATIVE_PATH.as_posix()],
+            "source_map_sha256": hashlib.sha256(MAP_PATH.read_bytes()).hexdigest(),
+            "membership_basis": "Rules geography and printed original identity, never current control or graph reachability.",
         },
         "non_listed_nation_rule": (
             "Non-listed nations: all originally possessed land zones except offshore territories."

@@ -9,6 +9,7 @@ import hashlib
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
+from audit_baseline import read_baseline_map
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -29,7 +30,7 @@ def write_csv(name, rows):
 
 def main():
     DATA.mkdir(exist_ok=True)
-    doc = json.loads(MAP.read_text())
+    doc = read_baseline_map()
     nodes = doc["nodes"]
     edges = {(src, e["neighbor_id"]): e for src, n in nodes.items() for e in n["neighbors"]}
     findings = []
@@ -180,14 +181,8 @@ def main():
                         "Directional terrain and river_crossing are intentionally not required to be symmetric.",
                         "A rail/coast flag may mean access to a facility; it does not itself authorize a land unit to enter the sea."]
     }
-    inputs = [MAP, ROOT / "game_content/maps/gw36_nation_home_country.json", ROOT / "game_content/maps/gw36map.png",
-              ROOT / "tools/build_manual_map_json.py", ROOT / "tools/build_nation_home_country_json.py",
-              ROOT / "game_content/scenarios/japan_china_1936/m0/convoy_audit.json",
-              ROOT / "docs/map_audits/japan_and_nearby_seas.md",
-              *sorted((ROOT / "game_content/rules").glob("*.pdf"))]
-    manifest = {"audit_date": "2026-10-05", "files": [{"path": str(p.relative_to(ROOT)), "bytes": p.stat().st_size,
-                  "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in inputs]}
-    save_json("input_manifest.json", manifest)
+    # input_manifest.json records the original review sources. Regeneration
+    # must not replace its hashes with post-implementation working-tree files.
     save_json("structural_summary.json", summary)
     save_json("structural_findings.json", findings)
     save_json("facility_inventory.json", facilities)

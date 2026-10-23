@@ -2,6 +2,11 @@
 
 **5 October 2026 — proposals for the entire world map.**
 
+**Implemented, 7 October:** approved findings have been applied to the production
+map; uncertain items remain deferred. See [implementation status](implementation.md)
+for the current counts, files, validation and precise remaining limits. Everything
+below describes the original audit baseline unless stated otherwise.
+
 **Naval-facility revision, 6 October:** [the corrected port and naval-facility
 roster](naval_facility_reaudit.md) compares the current map with the proposed
 printed facilities territory by territory. The original conditional port-ID
@@ -13,8 +18,8 @@ The current map needs substantial geographic correction. Missing territories and
 sea cells, incorrect ocean shortcuts, phantom railways/ports, and wrong terrain
 and IPP values occur well beyond the campaign theatre. The reports below describe
 proposed additions, changes, deletions and unresolved items with before/after
-values and local source evidence. **Production map, generator and scenario content
-remain unchanged.**
+values and local source evidence. The before-values are preserved from checkpoint
+`eeb5e90`; the [implementation report](implementation.md) describes the updated map.
 
 Every stored node and directed edge has been inventoried: **407 nodes (303 land,
 104 sea), 1,612 directed edges, 806 reciprocal pairs**. All 407 nodes have regional

@@ -1,0 +1,282 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "description": "Rule definitions referencing static map geography; these records do not implement gameplay or initial pieces.",
+    "source": {
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    "review_date": "2026-10-07"
+  },
+  "nation_ids": {
+    "britain": "Great Britain",
+    "fec": "FEC",
+    "anzac": "ANZAC",
+    "usa": "USA",
+    "germany": "Germany",
+    "italy": "Italy",
+    "ussr": "USSR",
+    "japan": "Japan"
+  },
+  "rules": {
+    "convoy_raiding": {
+      "section": "10.9",
+      "pages": [
+        71,
+        72
+      ],
+      "loss_cap_scope": "physical_line_per_player_turn",
+      "loss_cap_is_income": false,
+      "runtime_fields": [
+        "ipp_lost_this_player_turn",
+        "closure",
+        "raiding_eligibility",
+        "escorts"
+      ],
+      "absent_printed_cap": "unspecified_do_not_substitute_income_bonus"
+    },
+    "northern_sea_route": {
+      "section": "1.13",
+      "pages": [
+        17
+      ],
+      "units_per_player_turn": 1,
+      "unit_class": "naval",
+      "base_nation_id": "ussr",
+      "permission_granted_by": "ussr",
+      "must_start_at_endpoint": true,
+      "movement_cost": "all_including_bonuses"
+    },
+    "canal_baltic_white_sea": {
+      "section": "1.8",
+      "pages": [
+        15
+      ],
+      "units_per_player_turn": 1,
+      "unit_class": "submarine",
+      "movement_phase": "non_combat",
+      "must_start_at_endpoint": true,
+      "movement_cost": "all_including_bonuses",
+      "permission": "All possessing players of Leningrad and Karelia must permit passage.",
+      "lend_lease_destination_id": "land_usr_leningrad"
+    },
+    "burma_road": {
+      "section": "1.12",
+      "pages": [
+        17
+      ],
+      "scope": "lend_lease_supply_exception",
+      "conditions": [
+        {
+          "date_on_or_after": "1938-07"
+        },
+        {
+          "at_war": [
+            "japan",
+            "kmt"
+          ]
+        },
+        {
+          "possessor": "kmt",
+          "land_id": "land_china_yunnan"
+        },
+        {
+          "possessing_alliance": "allies",
+          "land_id": "land_burma"
+        }
+      ],
+      "permits_yunnan_purchases": [
+        "artillery",
+        "anti_aircraft_artillery"
+      ],
+      "can_be_strategically_bombed": false
+    },
+    "ledo_road": {
+      "section": "1.12",
+      "pages": [
+        17
+      ],
+      "inherits": "burma_road",
+      "additional_conditions": [
+        {
+          "possessing_alliance": "allies",
+          "land_id": "land_india_bengal"
+        }
+      ]
+    },
+    "narrow_crossing": {
+      "section": "1.9",
+      "pages": [
+        16
+      ],
+      "combat_move": "marine_amphibious_assault",
+      "non_combat_move": "infantry_class",
+      "strategic_rail_allowed": false,
+      "blocking_seas": "Every sea touched by the printed crossing line.",
+      "coastal_artillery_rule": {
+        "section": "13.2.7",
+        "pages": [
+          98
+        ],
+        "applies_to": "Naval paths crossing the printed line, including facility scramble paths; geometric intersections require source review."
+      }
+    },
+    "great_barrier_reef": {
+      "section": "1.14",
+      "pages": [
+        17
+      ],
+      "prohibited_mode": "amphibious_assault",
+      "other_coast_modes": "unchanged"
+    },
+    "strategic_rail": {
+      "section": "11.2",
+      "pages": [
+        74,
+        75
+      ],
+      "capacity_per_player_turn": {
+        "north_america": 4,
+        "south_america": 1,
+        "europe": 4,
+        "soviet_union": 2,
+        "africa": 1,
+        "middle_east": 1,
+        "asia": 1
+      },
+      "cross_region_usage": "Consumes capacity in both regions.",
+      "gauge_change_required_technology": "improved_logistics",
+      "printed_gauge_key": {
+        "white_checkered": "narrow",
+        "yellow_checkered": "broad"
+      },
+      "construction_gauge_defaults": {
+        "source_section": "13.2.8",
+        "source_pages": [
+          98
+        ],
+        "broad_nations": [
+          "Brazil",
+          "Spain",
+          "Finland",
+          "Mongolia",
+          "Tannu Tuva",
+          "Soviet Union"
+        ],
+        "all_other_nations": "narrow",
+        "use_for_existing_printed_rail": false
+      },
+      "zone_coverage": "A border-crossing railroad covers the whole land zone; do not require a separately printed facility spur.",
+      "runtime_fields": [
+        "capacity_used",
+        "damage",
+        "constructed_rail",
+        "permission"
+      ]
+    },
+    "special_fortification_coverage": {
+      "section": "1.10",
+      "pages": [
+        16
+      ],
+      "all_city_land_zones": true,
+      "additional_land_ids": [
+        "land_panama",
+        "land_british_malaya",
+        "land_usr_crimea"
+      ],
+      "starts_with_fortification": false
+    },
+    "japan_kamikaze": {
+      "section": "15.4",
+      "pages": [
+        105
+      ],
+      "storage": "japan_nation_rules",
+      "activation": "USA reaches Wartime Income.",
+      "range": {
+        "origin": "japanese_home_country",
+        "sea_zones": 4,
+        "graph_distance_interpretation": "not_implemented_requires_review"
+      },
+      "maximum_per_calendar_turn": 2,
+      "maximum_per_game": 6,
+      "attack": 7,
+      "first_strike": true,
+      "target_selection": [
+        1,
+        3
+      ],
+      "target_class": "surface_ship",
+      "aircraft_expended": false,
+      "port_attacks_allowed": false,
+      "defensive_exceptions": [
+        "Japan defending in a sea zone adjacent to Japanese Home Country.",
+        "Shore bombardment phase of an amphibious assault on Japanese Home Country."
+      ],
+      "runtime_fields": [
+        "attacks_this_calendar_turn",
+        "attacks_this_game"
+      ],
+      "core_sea_flags": false
+    },
+    "strait_gibraltar": {
+      "section": "1.8",
+      "pages": [
+        14
+      ],
+      "permission_and_forcing": "Use the complete strait control, submarine and forcing rules; static adjacency does not grant unconditional transit."
+    },
+    "strait_danish": {
+      "section": "1.8",
+      "pages": [
+        14
+      ],
+      "permission_and_forcing": "Use the complete strait control, submarine and forcing rules; static adjacency does not grant unconditional transit."
+    },
+    "canal_panama": {
+      "section": "1.8",
+      "pages": [
+        15
+      ],
+      "closes_to_enemies": true,
+      "neutral_permission_controlled": false
+    },
+    "canal_suez": {
+      "section": "1.8",
+      "pages": [
+        15
+      ],
+      "closes_to_enemies": true,
+      "neutral_permission_controlled": false
+    },
+    "canal_kaiser_wilhelm": {
+      "section": "1.8",
+      "pages": [
+        15
+      ],
+      "closes_to_enemies": true,
+      "neutral_permission_controlled": true
+    },
+    "canal_turkish_straits": {
+      "section": "1.8",
+      "pages": [
+        15
+      ],
+      "closes_to_enemies": true,
+      "neutral_permission_controlled": true,
+      "neutral_turkey_restrictions": [
+        "No carriers or battleships.",
+        "No nation at war with a Major Power; the USSR International Red Aid supply exception remains a nation rule."
+      ]
+    },
+    "canal_st_lawrence": {
+      "section": "1.8",
+      "pages": [
+        15
+      ],
+      "closes_to_enemies": true,
+      "neutral_permission_controlled": true
+    }
+  }
+}

@@ -4,6 +4,7 @@ import csv
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
+from audit_baseline import read_baseline_map
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -28,7 +29,7 @@ def pretty(value):
 
 
 def main():
-    nodes = json.loads((ROOT / "game_content/maps/gw36_manual_map.json").read_text())["nodes"]
+    nodes = read_baseline_map()["nodes"]
     findings = []
     ids = set()
     by_node = defaultdict(list)
@@ -74,8 +75,10 @@ def main():
     for category, filename in [("add", "additions.md"), ("change", "changes.md"), ("delete", "deletions.md"), ("uncertain", "uncertain.md")]:
         group = [row for row in findings if row["category"] == category]
         lines = [f"# {filename[:-3].capitalize()} — complete finding register", "",
+                 "**Implementation, 7 October:** approved work has been applied; uncertainties remain deferred. "
+                 "See [implementation status](implementation.md). The before/after proposals below retain the checkpoint baseline.", "",
                  f"{len(group)} finding records. Group findings may contain multiple fields or nodes; these are not edit counts.", "",
-                 "Proposals only. Apply neither uncertain values nor incomplete new-node records automatically. "
+                 "Historical proposals. Apply neither uncertain values nor incomplete new-node records automatically. "
                  "Each confidence rating applies only to the described fields. Regional reports explain dependencies and unresolved source coverage.", "",
                  "See [overview](README.md), [mechanism proposals](mechanisms_and_schema.md), and [machine-readable register](data/all_findings.json).", "",
                  "**Naval facilities were rechecked on 6 October 2026.** Start with the "

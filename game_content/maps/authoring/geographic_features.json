@@ -1,0 +1,1004 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "description": "Reviewed static geographic features authored for world map schema 2; executable build does not read audit reports.",
+    "review_date": "2026-10-07",
+    "sources": [
+      {
+        "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+        "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+      },
+      {
+        "path": "game_content/maps/gw36map.png",
+        "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba"
+      },
+      {
+        "path": "docs/map_audits/full_world/data/global_findings.json",
+        "sha256": "3a843416b1d3a8c04f2a6769ed776f6e2550189144fdd11d0816b6e367144ead"
+      },
+      {
+        "path": "docs/map_audits/full_world/data/convoy_register.json",
+        "sha256": "ba7f341a1dca3b5549a8f1d5595ae628108f129e7884b6bd1ce73c44e443f9f7"
+      }
+    ],
+    "excluded_findings": [
+      "WG-031",
+      "AP-086",
+      "AP-095"
+    ],
+    "uncertainties": "Unreviewed rail-region membership and artillery-intersected access paths are not populated."
+  },
+  "convoy_lines": [
+    {
+      "id": "convoy_europe_america_line",
+      "printed_name": "Europe-America Line",
+      "beneficiary_nation_id": "britain",
+      "maximum_ipp_loss": 5,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a18",
+        "sea_a19",
+        "sea_a20",
+        "sea_a21"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_can_nova_scotia"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_gbr_southern_england"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-019"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_canada_start.jpg",
+        "docs/map_audits/full_world/evidence/root_atlantic_north.jpg"
+      ]
+    },
+    {
+      "id": "convoy_atlantic_line",
+      "printed_name": "Atlantic Line",
+      "beneficiary_nation_id": "britain",
+      "maximum_ipp_loss": 6,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a21",
+        "sea_a28",
+        "sea_a27",
+        "sea_a35",
+        "sea_a44"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_gbr_southern_england"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_a44"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-020"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_atlantic_north.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_atlantic_27_28.jpg",
+        "docs/map_audits/full_world/evidence/root_atlantic_middle.jpg"
+      ]
+    },
+    {
+      "id": "convoy_mediterranean_line",
+      "printed_name": "Mediterranean Line",
+      "beneficiary_nation_id": "britain",
+      "maximum_ipp_loss": 6,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a44",
+        "sea_m2",
+        "sea_m4",
+        "sea_m8"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a44"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_m8"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-021"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_atlantic_middle.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_med.jpg"
+      ]
+    },
+    {
+      "id": "convoy_west_african_line",
+      "printed_name": "West African Line",
+      "beneficiary_nation_id": "britain",
+      "maximum_ipp_loss": 3,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a44",
+        "sea_a46",
+        "sea_a48",
+        "sea_a50",
+        "sea_a51",
+        "sea_a53",
+        "sea_a54"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a44"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_a54"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-022"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_atlantic_middle.jpg",
+        "docs/map_audits/full_world/evidence/root_atlantic_south.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_south_africa.jpg"
+      ]
+    },
+    {
+      "id": "convoy_east_african_line",
+      "printed_name": "East African Line",
+      "beneficiary_nation_id": "britain",
+      "maximum_ipp_loss": 1,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a54",
+        "sea_i1",
+        "sea_i3",
+        "sea_i4"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a54"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_i4"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-023"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_south_africa.jpg",
+        "docs/map_audits/full_world/evidence/root_indian_ocean.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_aden_detail.jpg"
+      ]
+    },
+    {
+      "id": "convoy_indian_ocean_line",
+      "printed_name": "Indian Ocean Line",
+      "beneficiary_nation_id": "fec",
+      "maximum_ipp_loss": 1,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_i5",
+        "sea_i4",
+        "sea_i7",
+        "sea_i12",
+        "sea_p50"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_i5"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_p50"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-024"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_suez_full.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_aden_detail.jpg",
+        "docs/map_audits/full_world/evidence/root_indian_ocean.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_singapore.jpg"
+      ]
+    },
+    {
+      "id": "convoy_east_asian_line",
+      "printed_name": "East Asian Line",
+      "beneficiary_nation_id": "anzac",
+      "maximum_ipp_loss": 2,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_p50",
+        "sea_p59",
+        "sea_p60",
+        "sea_p62",
+        "sea_p63",
+        "sea_p64",
+        "sea_p71",
+        "sea_p72"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_p50"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_aus_new_south_wales"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-025"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_singapore.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_east_asian_java.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_far_east.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_australia_end.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_sydney_end.jpg"
+      ]
+    },
+    {
+      "id": "convoy_lend_lease_to_britain_line",
+      "printed_name": "Lend Lease to Britain Line",
+      "beneficiary_nation_id": "usa",
+      "maximum_ipp_loss": 3,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a25",
+        "sea_a30",
+        "sea_a37",
+        "sea_a41",
+        "sea_a42",
+        "sea_a45",
+        "sea_a47"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_usa_new_york"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_brazil_rio_de_janeiro"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-026"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_north_atlantic_start.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_caribbean.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_brazil.jpg"
+      ]
+    },
+    {
+      "id": "convoy_north_sea_line",
+      "printed_name": "North Sea Line",
+      "beneficiary_nation_id": "germany",
+      "maximum_ipp_loss": 2,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a11",
+        "sea_a10",
+        "sea_a7",
+        "sea_a5",
+        "sea_a8"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_ger_western_germany"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_nor_northern_norway"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-027"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_north_sea_full.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_arctic.jpg",
+        "docs/map_audits/full_world/evidence/ea_naval_germany_denmark_20261006.png"
+      ]
+    },
+    {
+      "id": "convoy_baltic_line",
+      "printed_name": "Baltic Line",
+      "beneficiary_nation_id": "germany",
+      "maximum_ipp_loss": 3,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a12",
+        "sea_a13"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_ger_eastern_germany"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_swe_norrland"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-028"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_baltic_full.jpg"
+      ]
+    },
+    {
+      "id": "convoy_liguria_tripoli_line",
+      "printed_name": "Liguria-Tripoli Line",
+      "beneficiary_nation_id": "italy",
+      "maximum_ipp_loss": 1,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_m3",
+        "sea_m2",
+        "sea_m4"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_ita_lazio"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_tripoli"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-029"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_italy_detail.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_med.jpg"
+      ]
+    },
+    {
+      "id": "convoy_soviet_arctic_line",
+      "printed_name": "Soviet Arctic Line",
+      "beneficiary_nation_id": "ussr",
+      "maximum_ipp_loss": null,
+      "loss_cap_status": "no_numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a20",
+        "sea_a17",
+        "sea_a4",
+        "sea_a6",
+        "sea_a5",
+        "sea_a8"
+      ],
+      "endpoints": [
+        {
+          "kind": "sea",
+          "node_id": "sea_a20"
+        },
+        {
+          "kind": "land",
+          "node_id": "land_usr_kola"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-030"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_soviet_start.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_arctic.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_north_sea_full.jpg",
+        "docs/map_audits/full_world/evidence/root_convoy_kola_end.jpg"
+      ]
+    },
+    {
+      "id": "convoy_caribbean_line",
+      "printed_name": "Caribbean Line",
+      "beneficiary_nation_id": "usa",
+      "maximum_ipp_loss": 2,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_a36",
+        "sea_a37"
+      ],
+      "endpoints": [
+        {
+          "kind": "land",
+          "node_id": "land_usa_texas"
+        },
+        {
+          "kind": "sea",
+          "node_id": "sea_a37"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-035"
+      ],
+      "evidence": [
+        "docs/map_audits/full_world/evidence/root_convoy_caribbean.jpg"
+      ]
+    },
+    {
+      "id": "convoy_nagasaki_line",
+      "printed_name": "Nagasaki Line",
+      "beneficiary_nation_id": "japan",
+      "maximum_ipp_loss": 5,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_p14",
+        "sea_p15"
+      ],
+      "endpoints": [
+        {
+          "node_id": "land_manchuria_rehe",
+          "kind": "land"
+        },
+        {
+          "node_id": "land_jap_kyushu",
+          "kind": "land"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-036"
+      ],
+      "evidence": [
+        "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+      ]
+    },
+    {
+      "id": "convoy_tokyo_line",
+      "printed_name": "Tokyo Line",
+      "beneficiary_nation_id": "japan",
+      "maximum_ipp_loss": 5,
+      "loss_cap_status": "numeric_cap_printed",
+      "sea_zone_ids": [
+        "sea_p16",
+        "sea_p34",
+        "sea_p33",
+        "sea_p32",
+        "sea_p41",
+        "sea_p50"
+      ],
+      "endpoints": [
+        {
+          "node_id": "land_jap_tokyo",
+          "kind": "land"
+        },
+        {
+          "node_id": "sea_p50",
+          "marker": "terminal_arc_near_singapore",
+          "kind": "sea"
+        }
+      ],
+      "rule_id": "convoy_raiding",
+      "review_status": "source_verified",
+      "finding_ids": [
+        "WG-037"
+      ],
+      "evidence": [
+        "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+      ]
+    }
+  ],
+  "passages": [
+    {
+      "id": "strait_gibraltar",
+      "name": "Strait of Gibraltar",
+      "kind": "strait",
+      "controlling_land_ids": [
+        "land_gibraltar"
+      ],
+      "sea_endpoints": [
+        "sea_a44",
+        "sea_m2"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [
+        [
+          "sea_a44",
+          "sea_m2"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "strait_gibraltar",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "strait_danish",
+      "name": "Danish Straits",
+      "kind": "strait",
+      "controlling_land_ids": [
+        "land_denmark"
+      ],
+      "sea_endpoints": [
+        "sea_a10",
+        "sea_a12"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [
+        [
+          "sea_a10",
+          "sea_a12"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "strait_danish",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "canal_panama",
+      "name": "Panama Canal",
+      "kind": "canal",
+      "controlling_land_ids": [
+        "land_panama"
+      ],
+      "sea_endpoints": [
+        "sea_a40",
+        "sea_p76"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [
+        [
+          "sea_a40",
+          "sea_p76"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "canal_panama",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "canal_suez",
+      "name": "Suez Canal",
+      "kind": "canal",
+      "controlling_land_ids": [
+        "land_lower_egypt"
+      ],
+      "sea_endpoints": [
+        "sea_m8",
+        "sea_i5"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [
+        [
+          "sea_m8",
+          "sea_i5"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "canal_suez",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "canal_kaiser_wilhelm",
+      "name": "Kaiser-Wilhelm Kanal",
+      "kind": "canal",
+      "controlling_land_ids": [
+        "land_ger_western_germany"
+      ],
+      "sea_endpoints": [
+        "sea_a11",
+        "sea_a12"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [
+        [
+          "sea_a11",
+          "sea_a12"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "canal_kaiser_wilhelm",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "canal_baltic_white_sea",
+      "name": "Baltic–White Sea Canal",
+      "kind": "canal",
+      "controlling_land_ids": [
+        "land_usr_leningrad",
+        "land_usr_karelia"
+      ],
+      "sea_endpoints": [
+        "sea_a14",
+        "sea_a9"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [],
+      "special_transit": true,
+      "rule_id": "canal_baltic_white_sea",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "canal_turkish_straits",
+      "name": "Turkish Straits",
+      "kind": "canal",
+      "controlling_land_ids": [
+        "land_tur_istanbul"
+      ],
+      "sea_endpoints": [
+        "sea_m7",
+        "sea_m10"
+      ],
+      "access_land_ids": [],
+      "ordinary_edge_pairs": [
+        [
+          "sea_m7",
+          "sea_m10"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "canal_turkish_straits",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "id": "canal_st_lawrence",
+      "name": "St. Lawrence Seaway",
+      "kind": "canal",
+      "controlling_land_ids": [
+        "land_can_ottawa"
+      ],
+      "sea_endpoints": [
+        "sea_a24",
+        "sea_a18"
+      ],
+      "access_land_ids": [
+        "land_can_ontario",
+        "land_can_ottawa",
+        "land_can_quebec"
+      ],
+      "ordinary_edge_pairs": [
+        [
+          "sea_a24",
+          "sea_a18"
+        ],
+        [
+          "land_can_ontario",
+          "land_can_ottawa"
+        ],
+        [
+          "land_can_ottawa",
+          "land_can_quebec"
+        ]
+      ],
+      "special_transit": false,
+      "rule_id": "canal_st_lawrence",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          14,
+          15
+        ]
+      }
+    }
+  ],
+  "exceptional_routes": [
+    {
+      "id": "route_northern_sea",
+      "name": "Northern Sea Route",
+      "kind": "naval_special_transit",
+      "endpoint_ids": [
+        "sea_a9",
+        "sea_p1"
+      ],
+      "ordinary_adjacency": false,
+      "rule_id": "northern_sea_route",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.13",
+        "pages": [
+          17
+        ]
+      }
+    },
+    {
+      "id": "route_baltic_white_sea",
+      "name": "Baltic–White Sea Canal transit",
+      "kind": "naval_special_transit",
+      "endpoint_ids": [
+        "sea_a14",
+        "sea_a9"
+      ],
+      "controlling_land_ids": [
+        "land_usr_leningrad",
+        "land_usr_karelia"
+      ],
+      "passage_id": "canal_baltic_white_sea",
+      "ordinary_adjacency": false,
+      "rule_id": "canal_baltic_white_sea",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.8",
+        "pages": [
+          15
+        ]
+      }
+    },
+    {
+      "id": "route_burma_road",
+      "name": "Burma Road",
+      "kind": "lend_lease_supply_exception",
+      "endpoint_ids": [
+        "land_burma",
+        "land_china_yunnan"
+      ],
+      "ordinary_adjacency": false,
+      "rule_id": "burma_road",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.12",
+        "pages": [
+          17
+        ]
+      }
+    },
+    {
+      "id": "route_ledo_road",
+      "name": "Ledo Road",
+      "kind": "lend_lease_supply_exception",
+      "endpoint_ids": [
+        "land_india_bengal",
+        "land_china_yunnan"
+      ],
+      "via_land_ids": [
+        "land_burma"
+      ],
+      "ordinary_adjacency": false,
+      "rule_id": "ledo_road",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.12",
+        "pages": [
+          17
+        ]
+      }
+    }
+  ],
+  "narrow_crossing_blocker_updates": [
+    {
+      "land_ids": [
+        "land_can_baffin_island",
+        "land_can_district_of_keewatin"
+      ],
+      "blocking_sea_ids": [
+        "sea_a1"
+      ],
+      "finding_ids": [
+        "WG-016"
+      ]
+    },
+    {
+      "land_ids": [
+        "land_can_labrador",
+        "land_can_newfoundland"
+      ],
+      "blocking_sea_ids": [
+        "sea_a15",
+        "sea_a18"
+      ],
+      "finding_ids": [
+        "WG-017"
+      ]
+    },
+    {
+      "land_ids": [
+        "land_can_newfoundland",
+        "land_can_st_pierre_island"
+      ],
+      "blocking_sea_ids": [
+        "sea_a18"
+      ],
+      "finding_ids": [
+        "WG-018"
+      ]
+    }
+  ],
+  "coast_restrictions": [
+    {
+      "id": "reef_queensland_p64",
+      "source_sea_id": "sea_p64",
+      "target_land_id": "land_aus_queensland",
+      "amphibious_assault_allowed": false,
+      "rule_id": "great_barrier_reef",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.14",
+        "pages": [
+          17
+        ]
+      }
+    },
+    {
+      "id": "reef_queensland_p71",
+      "source_sea_id": "sea_p71",
+      "target_land_id": "land_aus_queensland",
+      "amphibious_assault_allowed": false,
+      "rule_id": "great_barrier_reef",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.14",
+        "pages": [
+          17
+        ]
+      }
+    },
+    {
+      "id": "reef_queensland_p72",
+      "source_sea_id": "sea_p72",
+      "target_land_id": "land_aus_queensland",
+      "amphibious_assault_allowed": false,
+      "rule_id": "great_barrier_reef",
+      "source": {
+        "source": "rulebook_v4_3",
+        "section": "1.14",
+        "pages": [
+          17
+        ]
+      }
+    }
+  ],
+  "rail_region_ids": [
+    "north_america",
+    "south_america",
+    "europe",
+    "soviet_union",
+    "africa",
+    "middle_east",
+    "asia"
+  ],
+  "victory_city_updates": [
+    {
+      "node_id": "land_denmark",
+      "is_victory_city": false,
+      "finding_ids": [
+        "WG-006"
+      ]
+    },
+    {
+      "node_id": "land_fin_southern_finland",
+      "is_victory_city": false,
+      "finding_ids": [
+        "WG-007"
+      ]
+    },
+    {
+      "node_id": "land_pol_warsaw",
+      "is_victory_city": false,
+      "finding_ids": [
+        "WG-008"
+      ]
+    },
+    {
+      "node_id": "land_tur_istanbul",
+      "is_victory_city": false,
+      "finding_ids": [
+        "WG-009"
+      ]
+    },
+    {
+      "node_id": "land_usr_kiev",
+      "is_victory_city": false,
+      "finding_ids": [
+        "WG-010"
+      ]
+    },
+    {
+      "node_id": "land_usr_leningrad",
+      "is_victory_city": false,
+      "finding_ids": [
+        "WG-011"
+      ]
+    },
+    {
+      "node_id": "land_india_calcutta",
+      "is_victory_city": true,
+      "finding_ids": [
+        "WG-012"
+      ]
+    }
+  ],
+  "deferred_schema_fields": {
+    "rail_region_membership": "The rulebook capacity table names seven regions but audited territory memberships are not complete. Do not infer from current control.",
+    "narrow_crossing_naval_paths": "Blocking seas are known where recorded; exact naval transit and facility access intersections are not yet fully traced.",
+    "river_routes": "Deferred with AP-086. A combat river crossing is not a navigable river network."
+  }
+}

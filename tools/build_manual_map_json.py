@@ -188,11 +188,8 @@ def find_edge(nodes, src, dst):
 
 
 def zone_name_part(node_id):
-    if node_id.startswith("land_"):
-        parts = node_id.split("_", 2)
-        if len(parts) == 3:
-            return parts[2]
-    return node_id
+    # Keep every geographic component: Somaliland and Egypt are not identities.
+    return node_id.removeprefix("land_")
 
 
 def set_edge(nodes, src, dst, **attrs):
@@ -250,11 +247,11 @@ def link(nodes, a, b, **attrs):
     set_edge(nodes, a, b, **attrs)
 
     reverse_edge_attrs = dict(attrs)
-    # Directional edge semantics: reverse edge gets default values unless explicitly set.
+    # An unreviewed reverse approach is unknown, never automatically normal/dry.
     if "border_terrain" in reverse_edge_attrs:
-        reverse_edge_attrs["border_terrain"] = DEFAULT_EDGE["border_terrain"]
+        reverse_edge_attrs["border_terrain"] = None
     if "river_crossing" in reverse_edge_attrs:
-        reverse_edge_attrs["river_crossing"] = False
+        reverse_edge_attrs["river_crossing"] = None
     set_edge(nodes, b, a, **reverse_edge_attrs)
 
 
@@ -278,6 +275,7 @@ def link_rail(
         river_crossing=river_crossing,
         railway_connection=True,
         gauge_change=False,
+        authoring_confidence=confidence,
     )
 
 
@@ -311,6 +309,7 @@ def link_land(
         canal_or_strait=None,
         narrow_crossing=narrow_crossing,
         narrow_crossings=narrow_crossings,
+        authoring_confidence=confidence,
     )
 
 
@@ -357,6 +356,7 @@ def link_land_sea(
         canal_or_strait=canal,
         narrow_crossing=narrow,
         narrow_crossings=narrow_crossings,
+        authoring_confidence=confidence,
     )
 
 
@@ -2026,7 +2026,7 @@ def build():
             edge["naval_facility_ids"] = facility_ids
             edge["port_or_dock_connection"] = bool(facilities)
 
-    # Ensure symmetric closure (best-effort defaults for missing reverse)
+    # Preserve reciprocal infrastructure, with independently unknown approaches.
     for src, node in list(nodes.items()):
         for e in list(node.get("neighbors", [])):
             dst = e["neighbor_id"]
@@ -2036,32 +2036,31 @@ def build():
             if not revs:
                 reverse_defaults = {k: deepcopy(v) for k, v in e.items() if k != "neighbor_id"}
                 if "border_terrain" in reverse_defaults:
-                    reverse_defaults["border_terrain"] = DEFAULT_EDGE["border_terrain"]
+                    reverse_defaults["border_terrain"] = None
                 if "river_crossing" in reverse_defaults:
-                    reverse_defaults["river_crossing"] = False
+                    reverse_defaults["river_crossing"] = None
                 set_edge(nodes, dst, src, **reverse_defaults)
 
-    # Gauge-change rule: only rail links crossing USSR <-> non-USSR are marked as a gauge change.
-    for src, node in nodes.items():
-        src_owner = node.get("original_owner")
-        for edge in node.get("neighbors", []):
-            if not edge.get("railway_connection"):
-                edge["gauge_change"] = False
-                continue
-
-            dst = edge["neighbor_id"]
-            dst_owner = nodes[dst].get("original_owner") if dst in nodes else None
-            is_ussr_cross_border = (
-                (src_owner == "Soviet Union" and dst_owner != "Soviet Union")
-                or (dst_owner == "Soviet Union" and src_owner != "Soviet Union")
-            )
-            edge["gauge_change"] = bool(is_ussr_cross_border)
+    # Apply reviewed facts, then derive gauge transitions from printed gauges.
+    try:
+        from tools.world_map_authoring import apply_authoring, validate_world
+        from tools.world_map_features import apply_features
+    except ModuleNotFoundError:  # Direct execution from the tools directory.
+        from world_map_authoring import apply_authoring, validate_world
+        from world_map_features import apply_features
+    doc["nodes"] = nodes
+    review = apply_authoring(doc)
+    apply_features(doc)
+    validate_world(doc)
 
     # Deterministic node ordering
-    doc["nodes"] = {k: nodes[k] for k in sorted(nodes.keys())}
+    doc["nodes"] = {k: doc["nodes"][k] for k in sorted(doc["nodes"])}
 
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=True, indent=2)
+
+    review_output = OUTPUT.with_name(OUTPUT.stem + "_review.json")
+    review_output.write_text(json.dumps(review, ensure_ascii=False, indent=2) + "\n")
 
     print(f"Wrote {OUTPUT} with {len(doc['nodes'])} nodes")
 

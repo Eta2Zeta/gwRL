@@ -163,18 +163,33 @@ class ManualMapTests(unittest.TestCase):
         for (source, destination), edge in self.edges.items():
             with self.subTest(source=source, destination=destination):
                 # Rule 10.6.2 damages all railroads on the same border together.
-                # Existence is a boolean; no named/per-track authoring remains.
-                self.assertIsInstance(edge["railway_connection"], bool)
-                self.assertIsInstance(edge["gauge_change"], bool)
+                # Reviewed existence is boolean; null preserves an unreviewed
+                # new border. Gauge changes require two verified gauge values.
+                self.assertIn(type(edge["railway_connection"]), (bool, type(None)))
+                self.assertIn(type(edge["gauge_change"]), (bool, type(None)))
                 self.assertNotIn("railroads", edge)
                 self.assertNotIn("rail_id", edge)
-                if not edge["railway_connection"]:
-                    self.assertFalse(edge["gauge_change"])
+                if edge["railway_connection"] is False:
+                    self.assertIs(edge["gauge_change"], False)
+                elif edge["railway_connection"] is None:
+                    self.assertIsNone(edge["gauge_change"])
+                elif source.startswith("land_") and destination.startswith("land_"):
+                    gauges = (edge.get("source_rail_gauge"), edge.get("target_rail_gauge"))
+                    if all(gauges):
+                        self.assertEqual(edge["gauge_change"], gauges[0] != gauges[1])
+                    else:
+                        self.assertIsNone(edge["gauge_change"])
                 facilities = edge["naval_facilities"]
                 ids = edge["naval_facility_ids"]
                 self.assertEqual(len(facilities), len(ids))
                 self.assertEqual(len(ids), len(set(ids)))
                 self.assertTrue(all(isinstance(value, str) and value for value in ids))
+                for facility_type, facility_id in zip(facilities, ids):
+                    facility = self.document["facilities"][facility_id]
+                    self.assertEqual(facility["type"], facility_type)
+                    land, sea = (source, destination) if source.startswith("land_") else (destination, source)
+                    self.assertEqual(facility["land_id"], land)
+                    self.assertIn(sea, facility["sea_accesses"])
                 self.assertIsInstance(edge["narrow_crossings"], int)
                 self.assertGreaterEqual(edge["narrow_crossings"], 0)
                 self.assertEqual(edge["narrow_crossing"], edge["narrow_crossings"] > 0)
@@ -217,7 +232,7 @@ class ManualMapTests(unittest.TestCase):
                 self.assertFalse(outbound["river_crossing"])
                 self.assertTrue(inbound["river_crossing"])
 
-    def test_accepted_seams_and_excluded_corner_contacts(self):
+    def test_accepted_seams_restored_borders_and_excluded_corner_contacts(self):
         for source, destination in (
             ("land_can_district_of_mackenzie", "land_can_district_of_keewatin"),
             ("land_can_alberta_saskatchewan", "land_can_manitoba"),
@@ -225,10 +240,18 @@ class ManualMapTests(unittest.TestCase):
             with self.subTest(accepted=(source, destination)):
                 self.assertTrue(self.edge(source, destination)["passable"])
                 self.assertTrue(self.edge(destination, source)["passable"])
+        # AM-241 resolved these finite borders from the enlarged board and
+        # explicit glossary approaches; they are no longer corner exclusions.
         for source, destination in (
             ("land_can_alberta_saskatchewan", "land_usa_pacific_northwest"),
-            ("land_can_british_columbia", "land_usa_alaska"),
             ("land_can_yukon_territory", "land_usa_southeast_alaska"),
+            ("land_can_alberta_saskatchewan", "land_usa_upper_midwest"),
+        ):
+            with self.subTest(restored=(source, destination)):
+                self.assertIs(self.edge(source, destination)["railway_connection"], False)
+                self.assertIs(self.edge(destination, source)["railway_connection"], False)
+        for source, destination in (
+            ("land_can_british_columbia", "land_usa_alaska"),
             ("land_can_ottawa", "land_usa_new_england"),
             ("land_can_ottawa", "land_usa_the_northeast"),
             ("land_can_ottawa", "land_can_nova_scotia"),
@@ -266,7 +289,7 @@ class ManualMapTests(unittest.TestCase):
             edge = self.edge(*direction)
             self.assertTrue(edge["railway_connection"])
             self.assertNotIn("railroads", edge)
-            self.assertFalse(edge["gauge_change"])
+            self.assertIsNone(edge["gauge_change"])
         rail_pairs = (
             ("land_can_british_columbia", "land_can_alberta_saskatchewan"),
             ("land_can_british_columbia", "land_usa_pacific_northwest"),
@@ -293,7 +316,12 @@ class ManualMapTests(unittest.TestCase):
                     with self.subTest(direction=direction):
                         edge = self.edge(*direction)
                         self.assertEqual(edge["railway_connection"], expected)
-                        self.assertFalse(edge["gauge_change"])
+                        if expected:
+                            # The Canadian rail review confirmed the crossing;
+                            # it did not independently record both gauges.
+                            self.assertIsNone(edge["gauge_change"])
+                        else:
+                            self.assertIs(edge["gauge_change"], False)
 
     def test_china_territory_inventory_terrain_and_income(self):
         expected = {
@@ -301,7 +329,7 @@ class ManualMapTests(unittest.TestCase):
             "suiyuan": ("mountain", 1), "beiping": ("normal", 2),
             "hopeh": ("normal", 1), "tibet": ("mountain", 0),
             "sikang": ("mountain", 0), "yunnan": ("mountain", 1),
-            "kwangtung": ("mountain", 2), "hainan": ("mountain", 1),
+            "kwangtung": ("mountain", 2), "hainan": (["mountain", "jungle"], 1),
             "shensi": ("mountain", 2), "szechwan": ("mountain", 0),
             "shantung": ("normal", 2), "kweichow": ("mountain", 0),
             "hunan": ("normal", 2), "nanking": ("normal", 2),
@@ -482,9 +510,16 @@ class ManualMapTests(unittest.TestCase):
             ("rehe", "p14"), ("korea", "p14"), ("beiping", "p14"),
         )
         for source, destination in regular_rail_pairs:
-            self.assert_theatre_pair(source, destination, railway_connection=True, gauge_change=False)
-        for source, destination in (("chita", "northern"), ("eastern", "primorsky_krai")):
-            self.assert_theatre_pair(source, destination, railway_connection=True, gauge_change=True)
+            self.assert_theatre_pair(source, destination, railway_connection=True)
+        # Explicitly checked track colors, rather than owner differences,
+        # establish these two gauge outcomes (rulebook 1.6 / WG-015).
+        self.assert_theatre_pair("northern", "western", gauge_change=False)
+        self.assert_theatre_pair("chita", "northern", railway_connection=True, gauge_change=True)
+        # The old Soviet-only heuristic asserted a change here without a
+        # separately recorded source/target gauge review.
+        self.assert_theatre_pair("eastern", "primorsky_krai", railway_connection=True, gauge_change=None)
+        for source, destination in (("hopeh", "beiping"), ("kwangtung", "p41")):
+            self.assert_theatre_pair(source, destination, gauge_change=None)
         for source, destination in (
             ("northern", "amur"), ("tibet", "kashmir"), ("tibet", "nepal"),
             ("suiyuan", "tsinghai"), ("korea", "p15"),
@@ -550,8 +585,18 @@ class ManualMapTests(unittest.TestCase):
                 self.assertEqual(actual, {THEATRE_IDS[neighbor] for neighbor in neighbors})
                 for neighbor in neighbors:
                     self.assert_theatre_pair(sea, neighbor, border_terrain="sea")
-        self.assertEqual(self.nodes[THEATRE_IDS["p15"]]["name"], "Sea of Japan")
-        self.assertEqual(self.nodes[THEATRE_IDS["p32"]]["name"], "East China Sea")
+        self.assertEqual(self.nodes[THEATRE_IDS["p15"]]["name"], "P15")
+        self.assertEqual(self.nodes[THEATRE_IDS["p32"]]["name"], "P32")
+
+    def test_printed_gauge_changes_are_independent_of_original_owner(self):
+        for source, destination, change in (
+            ("land_swe_norrland", "land_fin_lapland", True),
+            ("land_fin_viipuri_province", "land_usr_leningrad", False),
+        ):
+            with self.subTest(pair=(source, destination)):
+                self.assertIs(self.edge(source, destination)["railway_connection"], True)
+                self.assertIs(self.edge(source, destination)["gauge_change"], change)
+                self.assertIs(self.edge(destination, source)["gauge_change"], change)
 
 
 if __name__ == "__main__":

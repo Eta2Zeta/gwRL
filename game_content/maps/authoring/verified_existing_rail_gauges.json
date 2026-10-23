@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "description": "Individually reviewed printed railway gauge crossings. Values follow check colors at the border, never original ownership or the construction gauge-country list. Reciprocal application swaps source_rail_gauge and target_rail_gauge. Missing pairs stay unreviewed.",
+  "source_hashes": [
+    {
+      "path": "game_content/maps/gw36map.png",
+      "sha256": "f0e4c34846470eec355db4ccaf6e98d5c0876e9e67abc3eac2cd85a64562f3ba"
+    },
+    {
+      "path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d"
+    },
+    {
+      "path": "docs/map_audits/full_world/data/europe_africa_middle_east_edge_review.json",
+      "sha256": "d903f82daf9b06d726d74308dc76bbac1f975a2d9842af2dfd2501dae4c069f5"
+    },
+    {
+      "path": "docs/map_audits/full_world/data/asia_pacific_edge_review.json",
+      "sha256": "d3383ad025775a925d55c66e75c34138145d21ace33e6a77953e35788d8a5fb9"
+    }
+  ],
+  "operations": [
+    {
+      "op": "set_edge",
+      "source_id": "land_swe_norrland",
+      "target_id": "land_fin_lapland",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "narrow",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            3550,
+            0,
+            4380,
+            1550
+          ],
+          "crop": "docs/map_audits/full_world/evidence/ea_round2_finland_baltic.png"
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "White checks west of the Sweden/Finland boundary turn yellow on the Lapland side. Existing physical and rail crossing confirmed by the regional pair ledger."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_fin_lapland",
+      "target_id": "land_fin_southern_finland",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "broad",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            3550,
+            0,
+            4380,
+            1550
+          ],
+          "crop": "docs/map_audits/full_world/evidence/ea_round2_finland_baltic.png"
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "Yellow checked railway crosses the Lapland/Southern Finland border near the northern Gulf of Bothnia."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_fin_southern_finland",
+      "target_id": "land_fin_viipuri_province",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "broad",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            3550,
+            0,
+            4380,
+            1550
+          ],
+          "crop": "docs/map_audits/full_world/evidence/ea_round2_finland_baltic.png"
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "Yellow checked north-south Finnish railway crosses from Southern Finland into Viipuri Province."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_fin_viipuri_province",
+      "target_id": "land_usr_leningrad",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "broad",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015",
+        "EA-482"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            3550,
+            0,
+            4380,
+            1550
+          ],
+          "crop": "docs/map_audits/full_world/evidence/ea_round2_finland_baltic.png"
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "Actual Finnish/Soviet crossing south of Viipuri has yellow checks on both sides. Topology is the approved EA-482 addition. Viipuri\u2013Karelia is a different border with no railway (EA-458)."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_manchuria_northern",
+      "target_id": "land_usr_chita",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "narrow",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6500,
+            1200,
+            7550,
+            1900
+          ]
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "White checked railway in Northern Manchuria becomes yellow after crossing the western border into Chita. This is the adopted China-audit crossing, not the non-rail Northern Manchuria\u2013Amur border."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_manchuria_northern",
+      "target_id": "land_manchuria_western",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "narrow",
+        "target_rail_gauge": "narrow"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6500,
+            1200,
+            7550,
+            1900
+          ]
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "The north-south track crosses the Northern/Western Manchuria boundary in white checks on both sides."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_usr_buryatia",
+      "target_id": "land_usr_chita",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "broad",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6500,
+            1200,
+            7550,
+            1900
+          ]
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "The Trans-Siberian track crosses the Buryatia/Chita boundary in yellow checks on both sides."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_usr_chita",
+      "target_id": "land_usr_amur",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "broad",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6500,
+            1200,
+            7550,
+            1900
+          ]
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "The eastward track crosses the Chita/Amur border above Northern Manchuria in yellow checks on both sides."
+    },
+    {
+      "op": "set_edge",
+      "source_id": "land_usr_amur",
+      "target_id": "land_usr_primorsky_krai",
+      "reciprocal": true,
+      "phase": 55,
+      "values": {
+        "railway_connection": true,
+        "source_rail_gauge": "broad",
+        "target_rail_gauge": "broad"
+      },
+      "finding_ids": [
+        "WG-015"
+      ],
+      "evidence": [
+        {
+          "source": "game_content/maps/gw36map.png",
+          "rectangle": [
+            6500,
+            1200,
+            7550,
+            1900
+          ]
+        },
+        {
+          "source": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+          "printed_page": 10,
+          "section": "1.6 Railroads",
+          "interpretation": "White checked artwork is narrow (normal); yellow checked artwork is broad. Colors are read at each crossing, independently of ownership."
+        }
+      ],
+      "notes": "The southbound coastal track crosses Amur/Primorsky Krai with yellow checks on both sides."
+    }
+  ],
+  "findings": {}
+}

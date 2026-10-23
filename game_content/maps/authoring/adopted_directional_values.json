@@ -1,0 +1,1024 @@
+{
+  "schema_version": 1,
+  "description": "Previously adopted directional values that must survive replacing implicit reverse defaults with unknown. Only the listed independently checked checkpoint expectations are retained; no general defaults or reciprocal propagation. Later source corrections may override them.",
+  "baseline_checkpoint": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+  "source_hashes": [
+    {
+      "path": "game_content/maps/gw36_manual_map.json",
+      "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+      "sha256": "97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24"
+    },
+    {
+      "path": "tests/test_manual_map.py",
+      "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+      "sha256": "bde96152168c23dc458b9c5133efe2b11edd3df408ec64e9d000d5cfe6a695e0"
+    },
+    {
+      "path": "game_content/README.md",
+      "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+      "sha256": "01777e1c69cd2de1b8676bec497bc4654c6005cb87d78e16dd956e6c4c91b24a"
+    }
+  ],
+  "operations": [
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_annam_tonkin",
+      "target_id": "land_china_yunnan",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_annam_tonkin/neighbors/[neighbor_id=land_china_yunnan]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_can_british_columbia",
+      "target_id": "land_can_yukon_territory",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_can_british_columbia/neighbors/[neighbor_id=land_can_yukon_territory]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_can_ottawa",
+      "target_id": "land_can_ontario",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_can_ottawa/neighbors/[neighbor_id=land_can_ontario]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_can_quebec",
+      "target_id": "land_can_ottawa",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_can_quebec/neighbors/[neighbor_id=land_can_ottawa]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_can_yukon_territory",
+      "target_id": "land_usa_alaska",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_can_yukon_territory/neighbors/[neighbor_id=land_usa_alaska]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_canadian_river_routes_and_directional_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_hunan",
+      "target_id": "land_china_nanking",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_hunan/neighbors/[neighbor_id=land_china_nanking]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_hunan",
+      "target_id": "land_china_shantung",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_hunan/neighbors/[neighbor_id=land_china_shantung]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_nanking",
+      "target_id": "land_china_shantung",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_nanking/neighbors/[neighbor_id=land_china_shantung]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_sikang",
+      "target_id": "land_china_kweichow",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_sikang/neighbors/[neighbor_id=land_china_kweichow]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_sikang",
+      "target_id": "land_china_tsinghai",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_sikang/neighbors/[neighbor_id=land_china_tsinghai]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_suiyuan",
+      "target_id": "land_china_shensi",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_suiyuan/neighbors/[neighbor_id=land_china_shensi]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_suiyuan",
+      "target_id": "land_china_tsinghai",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_suiyuan/neighbors/[neighbor_id=land_china_tsinghai]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_tsinghai",
+      "target_id": "land_china_shensi",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_tsinghai/neighbors/[neighbor_id=land_china_shensi]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_china_yunnan",
+      "target_id": "land_china_kweichow",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_china_yunnan/neighbors/[neighbor_id=land_china_kweichow]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_kwangtung",
+      "target_id": "land_annam_tonkin",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_kwangtung/neighbors/[neighbor_id=land_annam_tonkin]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_manchuria_western",
+      "target_id": "land_manchuria_northern",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_manchurian_directional_border_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_manchuria_western/neighbors/[neighbor_id=land_manchuria_northern]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_manchurian_directional_border_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_manchuria_western",
+      "target_id": "land_mongolia_kerulen",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_manchurian_directional_border_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_manchuria_western/neighbors/[neighbor_id=land_mongolia_kerulen]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_manchurian_directional_border_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_usr_angara",
+      "target_id": "land_mongolia_central_mongolia",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_usr_angara/neighbors/[neighbor_id=land_mongolia_central_mongolia]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_usr_angara",
+      "target_id": "land_mongolia_tannu_tuva",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_usr_angara/neighbors/[neighbor_id=land_mongolia_tannu_tuva]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "land_usr_eastern_kazakhstan",
+      "target_id": "land_mongolia_kobdo",
+      "reciprocal": false,
+      "values": {
+        "river_crossing": false
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/land_usr_eastern_kazakhstan/neighbors/[neighbor_id=land_mongolia_kobdo]/river_crossing"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_river_routes_are_distinct_from_combat_crossings",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p14",
+      "target_id": "land_china_beiping",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p14/neighbors/[neighbor_id=land_china_beiping]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p14",
+      "target_id": "land_china_hopeh",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p14/neighbors/[neighbor_id=land_china_hopeh]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p14",
+      "target_id": "land_china_nanking",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p14/neighbors/[neighbor_id=land_china_nanking]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p14",
+      "target_id": "land_china_shantung",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p14/neighbors/[neighbor_id=land_china_shantung]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p14",
+      "target_id": "land_manchuria_rehe",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p14/neighbors/[neighbor_id=land_manchuria_rehe]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p32",
+      "target_id": "land_china_hunan",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p32/neighbors/[neighbor_id=land_china_hunan]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    },
+    {
+      "op": "set_edge",
+      "phase": 45,
+      "source_id": "sea_p32",
+      "target_id": "land_china_nanking",
+      "reciprocal": false,
+      "values": {
+        "border_terrain": "normal"
+      },
+      "finding_ids": [],
+      "review_status": "adopted_project_value",
+      "source_refs": [
+        {
+          "path": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain"
+        },
+        {
+          "path": "game_content/README.md",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958"
+        },
+        {
+          "path": "game_content/maps/gw36_manual_map.json",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "json_pointer": "/nodes/sea_p32/neighbors/[neighbor_id=land_china_nanking]/border_terrain"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "tests/test_manual_map.py",
+          "git_commit": "eeb5e9028d0f9efde087b3009d7f9613ce92f958",
+          "test": "test_china_coasts_facilities_and_amphibious_terrain",
+          "kind": "adopted_project_constraint"
+        }
+      ],
+      "notes": "Retains an explicit independently directional expectation in the checkpoint regression suite. This records the adopted project value, not a new physical-source certification or an automatic reverse-edge default."
+    }
+  ],
+  "findings": {}
+}

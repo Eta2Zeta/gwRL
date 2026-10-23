@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Validate source-authored naval reviews and render their proposed final roster.
 
-This reads the production map for comparison. It never writes production data.
+This reads the checkpoint map for historical comparison. It never writes production data.
 Run consolidate.py first so finding references reflect the latest authored review.
 """
 import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+from audit_baseline import read_baseline_map
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -109,7 +110,7 @@ def facility_text(facilities):
 
 
 def main():
-    nodes = json.loads((ROOT / "game_content/maps/gw36_manual_map.json").read_text())["nodes"]
+    nodes = read_baseline_map()["nodes"]
     current = stored_facilities(nodes)
     findings = json.loads((DATA / "all_findings.json").read_text())
     finding_ids = {f["id"] for f in findings}
