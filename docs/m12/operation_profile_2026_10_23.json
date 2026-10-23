@@ -1,0 +1,138 @@
+{
+  "actual_state_unchanged": true,
+  "decision_kinds": [
+    "combat",
+    "land_casualty"
+  ],
+  "environments": 2,
+  "evaluator_version": "2a291e0020b25db527b2b39ec1fd38e6056b8de81f93a53a902f9f75646b1d65",
+  "inference_batch_sizes": [
+    2,
+    2,
+    2
+  ],
+  "legal_menu_sizes": [
+    2,
+    2
+  ],
+  "limits": [
+    "Timings include first-use token parsing and later warm calls.",
+    "A rule transition is one legal action or chance on a clone, not an entire turn."
+  ],
+  "model_versions": {
+    "allies": "allies:generation-2:0e9f5cf9b23aa1e5a37a29f5d8ccc65866d6a6030de77c3a149840f75e4599ec",
+    "axis": "axis:generation-2:f549088245a244fed06e8ae01546abf292ff5d15968b3c05c793025391d5709d",
+    "comintern": "comintern:generation-2:5c554762a79a75ead5537433a912a63bf8fc9f4dd26b834b2554e30033daa8c4"
+  },
+  "repeats": 3,
+  "schema": "campaign-operation-profile-v1",
+  "software": {
+    "device": "cpu",
+    "threads": 1,
+    "torch": "2.11.0"
+  },
+  "task": {
+    "calendar_rounds": 1,
+    "compatibility": {
+      "curriculum": "regional-horizon-curriculum-v1",
+      "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+      "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+      "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+    },
+    "full_target_game": false,
+    "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+    "setup": "unchanged approved 99-piece,37-node July1936 setup",
+    "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+    "version": "regional-horizon-curriculum-v1"
+  },
+  "timings_seconds": {
+    "clone": {
+      "mean": 0.0014785204936439793,
+      "median": 0.0014826245023868978,
+      "samples": [
+        0.0015619579935446382,
+        0.0015046249609440565,
+        0.0014732079580426216,
+        0.001435540965758264,
+        0.001403750036843121,
+        0.001492041046731174
+      ],
+      "total": 0.008871122961863875
+    },
+    "context": {
+      "mean": 0.008160485983050117,
+      "median": 0.008116416458506137,
+      "samples": [
+        0.008057374972850084,
+        0.008745624916628003,
+        0.00835500005632639,
+        0.0076318749925121665,
+        0.007997583015821874,
+        0.00817545794416219
+      ],
+      "total": 0.04896291589830071
+    },
+    "inference_batch": {
+      "mean": 0.19849297229666263,
+      "median": 0.16798179096076638,
+      "samples": [
+        0.2626650419551879,
+        0.16798179096076638,
+        0.1648320839740336
+      ],
+      "total": 0.5954789168899879
+    },
+    "inference_scalar": {
+      "mean": 0.09238956267169367,
+      "median": 0.08097558398731053,
+      "samples": [
+        0.15284362505190074,
+        0.07710237498395145,
+        0.08088758401572704,
+        0.08177699998486787,
+        0.08106358395889401,
+        0.08066320803482085
+      ],
+      "total": 0.554337376030162
+    },
+    "legal_actions": {
+      "mean": 0.0015059583432351549,
+      "median": 0.001450458017643541,
+      "samples": [
+        0.0023730420507490635,
+        0.0006289170123636723,
+        0.0022356660338118672,
+        0.0005918749375268817,
+        0.00254100002348423,
+        0.000665250001475215
+      ],
+      "total": 0.00903575005941093
+    },
+    "observation": {
+      "mean": 0.005422999849542975,
+      "median": 0.005486666515935212,
+      "samples": [
+        0.007680249982513487,
+        0.0034208750585094094,
+        0.0071855830028653145,
+        0.0037877500290051103,
+        0.0072171250358223915,
+        0.0032464159885421395
+      ],
+      "total": 0.03253799909725785
+    },
+    "rule_transition": {
+      "mean": 0.00462573617308711,
+      "median": 0.0044131039758212864,
+      "samples": [
+        0.006760042044334114,
+        0.0027699170168489218,
+        0.006053999997675419,
+        0.002772207953967154,
+        0.006644167006015778,
+        0.002754083019681275
+      ],
+      "total": 0.02775441703852266
+    }
+  }
+}

@@ -50,7 +50,7 @@ bombardment. M9 naval operations and M10 integration completed their gates on
 the campaign API and tested stochastic vector search. RCL-014 and RCL-015 are
 provisionally adopted pending developer clarification. These source profiles are
 fingerprinted with the scenario definition; earlier verification files remain
-historical snapshots. Full-campaign neural training and evaluation remain M12 work.
+historical snapshots. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds entity-graph models, batched self-play, exact resume and held-out evaluation. Its explicit short-horizon tasks preserve this approved setup; the full constructor retains eleven rounds. Bounded smoke runs do not establish playing strength.
 
 ## Files and rebuilding
 

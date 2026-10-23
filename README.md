@@ -1,9 +1,10 @@
 # gwRL
 
-`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The 1936–1941 China campaign has completed its M0–M11 implementation gates, including two full campaign traces, a multi-agent API and stochastic vector search. Public tiny/composition study environments use the same campaign engine; their historical result archives predate that migration. Full-campaign neural training and evaluation remain M12 work.
+`gwRL` is a C++20 Global War 1936 simulation core with Python bindings and reinforcement-learning studies. The 1936–1941 China campaign has completed its M0–M12 implementation gates, including two full campaign traces, vector search, neural self-play, exact checkpoint resume and held-out evaluation. Bounded learning checks establish the training pipeline; playing strength remains untested. Public tiny/composition study environments use the same campaign engine; their historical result archives predate that migration.
 
 ## Start here
 
+- [Campaign learning](/Users/home/Desktop/gwRL/studies/campaign/README.md): foreground training, interrupt/resume, evaluation and profiling; [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md).
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.
 - [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md): neural MCTS trainer, search diagnostic and completed results.
 - [Full-campaign plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) and [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): the approved 1936–1941 campaign and milestone gates.
@@ -28,6 +29,7 @@ game_content/
 include/game/    C++ public headers and game rules
 src/             C++ implementation and Python bindings
 studies/
+  campaign/      Entity-graph models, batched search, self-play and evaluation
   composition/   Trainer, search and preserved composition results
   mini_japan_two_turn/  Trainer, search, tools and results
   shared/        Neural helpers, explicit campaign adapter and vector MCTS
@@ -38,8 +40,9 @@ web/             Browser-based board visualization
 output/          Disposable C++ simulator/debug exports only
 ```
 
-Each study has a `README.md`, preserved `results/`, and a fresh `runs/` destination
-for new output. See the [study index](/Users/home/Desktop/gwRL/studies/README.md)
+Each study has a `README.md` and a fresh ignored `runs/` destination. Historical
+composition/mini-Japan results remain in their preserved `results/` directories;
+current campaign verification records live in `docs/m12/`. See the [study index](/Users/home/Desktop/gwRL/studies/README.md)
 for the cleanup record and result-retention conventions. Old results preserve
 their original bytes and historical engine behavior; organizing them does not
 revalidate those results against today's rules.
@@ -63,6 +66,7 @@ Build the Python extension in the project virtual environment:
 Training entry points (run from the repository root):
 
 ```sh
+./.venv/bin/python -m studies.campaign.run --help
 ./.venv/bin/python -m studies.mini_japan_two_turn.train --help
 ./.venv/bin/python -m studies.composition.train --help
 ```

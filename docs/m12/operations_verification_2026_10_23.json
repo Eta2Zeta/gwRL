@@ -1,0 +1,210 @@
+{
+  "checks": [
+    {
+      "command": "./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+      "elapsed_seconds": 94.488,
+      "result": "212 tests passed"
+    },
+    {
+      "command": "ctest --test-dir build/m9-m11 --output-on-failure -j4",
+      "elapsed_seconds": 16.55,
+      "result": "24 suites passed"
+    },
+    {
+      "command": "PYTHONPATH=tests ./.venv/bin/python -m unittest test_campaign_run -v",
+      "elapsed_seconds": 40.92,
+      "result": "3 independent real CLI tests passed, including delivered SIGINT, exact full learner/runner continuation and existing-file preservation"
+    }
+  ],
+  "date": "2026-10-23",
+  "evidence": {
+    "completed_scripted_controls": "scripted_control_2026_10_23.json",
+    "default_model_same_actor_batch_profile": "default_model_profile_2026_10_23.json",
+    "heldout_evaluation": "evaluation_smoke_2026_10_23.json",
+    "retained_actual_state_profile": "operation_profile_2026_10_23.json"
+  },
+  "implementation_commits_before_final_operations": [
+    "cab5597",
+    "3013ae9"
+  ],
+  "limitations": [
+    "Operational gate only; no claim of strong or converged learned policies",
+    "All six learned-policy held-out games hit their explicit40-transition cap; observed terminal returns/calibration remain absent",
+    "Two fixed-script one-round control games reached genuine terminals; they are not full July1941 results",
+    "Smoke targets are bootstrapped; no completed learned self-play episode or full-horizon neural campaign is claimed",
+    "Profiling sampled small menus and specific actors; full-game and larger-search runtime must be measured separately",
+    "Source/configuration changes need explicit checkpoint migration or a fresh run",
+    "No large or background training experiment was launched"
+  ],
+  "runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "dd50697fd9f73a1d8c55aafd35a5a9cd550b60c54c3711b75a90706384e567d8",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "62bb0a1d920c50e98972e57aeb5a024d13d02af989db4ba21ff80a099bfdd1c9",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "8cefdc3fccbc745724fbf76976aaab246897fe8b92fda71f5bfebe86a193cf73",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "3c36d4e272e0c5d779eba714ce5b6aa667a2979c802479361acc5885b5141c4d",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "f0f5384b723633561f573dbdff6c98992f084d597a28aae5437ec61c12467b97",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "b61afda70e355d4c0980a291c80f834d5fb94d010c8e25ed4666e3b21005e880",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_operations.cpp": "134f53a440ab13c9c39b0689ddb0637d418c9efc27624d8f3e83fb10e65974a1",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "34b920a92deed84cfd6605d0f59c69e44d00dadc65d783266c727bdafd20fa0a",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/evaluation.py": "294358f0a185ddefee55513d59a1bf8a95cd7a1da405c5d24384caf1f148e5f6",
+    "studies/campaign/features.py": "d5a643627c635dd6d00848ca9de5856038f1e2f3438fc443d05293a71cc8e83e",
+    "studies/campaign/learning.py": "dc85442ecf74f572a3f7c086eb6349f9bd8c5de728ea60ac68ea81c8f146377a",
+    "studies/campaign/neural.py": "baa9518a61b7996f4c9f2b9d19d93184a73cb677c218b2042be0e6147873c0ce",
+    "studies/campaign/run.py": "734799dc5f4cfd19af31f9b57e0642f994eba94dcb60d88761dad55f18c9e237",
+    "studies/shared/campaign_adapter.py": "ebc43b6c91f80c41ef48297a2cca8e494c800528323486f1d1271e50ee6afa7f",
+    "studies/shared/multiplayer_mcts.py": "28cedd9d57693c17b6e9133d980db62fd9ee4caeb2c09c99e69a1a275dd9b5a9"
+  },
+  "schema": "m12-operations-verification-v1",
+  "smoke": {
+    "all_models_changed_from_seeded_initial": {
+      "allies": true,
+      "axis": true,
+      "comintern": true
+    },
+    "checkpoint_and_raw_runs": "Local ignored scratch only; weights and bulky replay are not committed",
+    "checkpoint_sha256": "bd530c26641d17bd5e67d4ee1498c5f45ca45025e41317a7889dca32a523d7c6",
+    "commands": [
+      "./.venv/bin/python -m studies.campaign.run train --run-dir studies/campaign/runs/m12-final-smoke-2026-10-23 --batches 2 --transitions-per-batch 6 --stop-after-waves 8",
+      "./.venv/bin/python -m studies.campaign.run train --resume studies/campaign/runs/m12-final-smoke-2026-10-23/checkpoint.pt"
+    ],
+    "config": {
+      "batch_size": 8,
+      "batches": 2,
+      "calendar_rounds": 1,
+      "checkpoint_every_waves": 4,
+      "epochs": 1,
+      "hidden_dim": 16,
+      "learning_rate": 0.001,
+      "max_depth": 4,
+      "message_layers": 1,
+      "parallel_envs": 2,
+      "replay_capacity": 512,
+      "seed": 1936,
+      "simulations": 2,
+      "threads": 1,
+      "token_buckets": 2048,
+      "transitions_per_batch": 6,
+      "value_scale": 100.0
+    },
+    "counters": {
+      "batches": 2,
+      "chance_events": 3,
+      "decisions": 21,
+      "episodes": 0,
+      "transitions": 24,
+      "updates": 2
+    },
+    "inference_batch_size_histogram": {
+      "1": 9,
+      "2": 27
+    },
+    "interrupted_after": {
+      "batch": 1,
+      "counters": {
+        "batches": 1,
+        "chance_events": 0,
+        "decisions": 16,
+        "episodes": 0,
+        "transitions": 16,
+        "updates": 1
+      },
+      "elapsed_seconds": 10.089917250094004,
+      "wave": 2
+    },
+    "model_versions": {
+      "allies": "allies:generation-2:0e9f5cf9b23aa1e5a37a29f5d8ccc65866d6a6030de77c3a149840f75e4599ec",
+      "axis": "axis:generation-2:f549088245a244fed06e8ae01546abf292ff5d15968b3c05c793025391d5709d",
+      "comintern": "comintern:generation-2:5c554762a79a75ead5537433a912a63bf8fc9f4dd26b834b2554e30033daa8c4"
+    },
+    "policy_samples_by_actual_owner": {
+      "allies": 5,
+      "comintern": 16
+    },
+    "resume_elapsed_seconds": 4.209807417006232,
+    "status": "completed",
+    "target_sources": {
+      "bootstrap": 21
+    },
+    "task": {
+      "calendar_rounds": 1,
+      "compatibility": {
+        "curriculum": "regional-horizon-curriculum-v1",
+        "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+        "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+        "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+      },
+      "full_target_game": false,
+      "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+      "setup": "unchanged approved 99-piece,37-node July1936 setup",
+      "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+      "version": "regional-horizon-curriculum-v1"
+    },
+    "training_environment_seeds": [
+      2389006844805470477,
+      5419864310660499333
+    ]
+  },
+  "software": {
+    "device": "cpu",
+    "machine": "arm64",
+    "python": "3.13.5",
+    "threads": 1,
+    "torch": "2.11.0"
+  },
+  "status": "operational_exit_gate_complete"
+}

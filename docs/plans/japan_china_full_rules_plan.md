@@ -1,18 +1,18 @@
 # Japan-China full-rules theatre: implementation and RL plan
 
-Status: **M0 frozen; M1–M11 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 and RCL-015 are provisionally adopted by the user; developer clarification remains pending. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and training operations remain next.**
+Status: **M0 frozen; M1–M12 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 and RCL-015 are provisionally adopted by the user; developer clarification remains pending. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and interruptible operations pass their bounded operational gate; playing strength remains untested.**
 
 Prepared 11 September; synchronized 23 October 2026 against the current repository,
 the local Global War 1936 v4.3 rulebook/national sheets, and the user's decisions.
-The user has authorized continuing M0 through M11, including the map/closed-scenario extractor,
+The user has authorized continuing M0 through M12, including the map/closed-scenario extractor,
 faction identity bridge, shared C++ foundation, catalog, politics, movement, economy,
 land combat, air and naval operations, campaign integration and the following multi-agent/search milestone.
 The [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) and source-linked setup
 files record the audit results and approved decisions. The [M3 catalog](/Users/home/Desktop/gwRL/docs/m3/README.md) records definitions,
 source coverage and availability checks. M5–M10 supply the integrated gameplay
 layers; M11 supplies the explicit API, approved terminal wealth calculation and
-vector search. Full-campaign neural learning and evaluation remain M12 work;
-no training run has been launched.
+vector search. M12 supplies the neural learning/evaluation pipeline and bounded
+foreground smoke checks. No large or background training experiment was launched.
 
 On 22 October the user authorized completing M5-M8 autonomously until a real
 decision or blocker is encountered. Source audits and public module interfaces
@@ -584,7 +584,7 @@ map's existing structural tests are useful but are not proof of gameplay fidelit
 
 ### M11. Expose the multi-agent environment and upgrade MCTS
 
-Status: correctness exit complete, 23 October 2026; actual campaign API and wealth checks pass, with 16 exact-oracle/search tests and six Python binding tests. See docs/m11/README.md. Batched neural inference and performance profiling remain follow-ups with M12's model and training work.
+Status: correctness exit complete, 23 October 2026; actual campaign API and wealth checks pass, with 16 exact-oracle/search tests and six Python binding tests. See docs/m11/README.md. Batched neural inference and performance profiling are completed under M12; the M11 verification record remains a historical snapshot.
 
 Depends on: M2; tactical integration can begin at M7; campaign use requires M10.
 
@@ -625,11 +625,13 @@ globally optimal full-campaign strategy.
 
 ### M12. Add rewards, evaluation, curriculum and training operations
 
-Status: implementation in progress, 23 October 2026. The user authorized continuing
-through the remaining plan. M12 is delivered in three chunks: entity-graph models
-and batched inference; resumable parallel training; held-out evaluation and a
-bounded foreground smoke run. See docs/m12/README.md. The approved terminal wealth
-evaluator is already implemented in M11.
+Status: operational exit gate complete, 23 October 2026. Delivered in three chunks:
+entity-graph models and batched inference; resumable parallel training; held-out
+evaluation, profiling and bounded foreground smoke. All 212 Python tests and 24
+C++ suites pass. See docs/m12/README.md. The approved terminal wealth evaluator
+remains unchanged. No large training run or playing-strength result is claimed.
+The initial executable curriculum varies the real calendar horizon; broader
+starting-position curricula and opponent leagues remain subsequent experiments.
 
 Depends on: finalized wealth valuation/local setup in M0; M10-M11 for training.
 
@@ -984,10 +986,13 @@ Rule sources in `game_content/rules/`:
 This planning review is not a completed line-by-line rules certification; M0
 exists to make completeness testable before implementation.
 
-**Next implementation work:** M12 model training, held-out evaluation, curriculum
-and interruptible training operations. The approved terminal wealth evaluator is
-already available through M11. M9–M11 verification records link the full campaign
-traces and exact-oracle search checks; these checks do not establish playing strength.
+**Next work:** manual foreground learning experiments, expanded starting-position
+curricula and held-out comparisons against stronger/historical opponent pairs.
+M12 closes the final planned implementation gate with reproducible training,
+exact interrupt/resume, evaluation and profiling. Its six learned-policy smoke
+games are explicitly truncated; two scripted controls reach a real one-round
+terminal. These checks do not establish playing strength. M9–M11 records retain
+the full campaign traces and exact-oracle search checks.
 M0 is verified and frozen; source
 reconciliation records numeric queue payments and research thresholds. Ship values, queue
 scope and scoring, Mongolia timing, starting-cash adjustment, controlled-minor

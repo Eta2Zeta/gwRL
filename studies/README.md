@@ -4,6 +4,7 @@ Start with the study you want to read or run:
 
 | Study | Main entry point | Preserved completed results |
 | --- | --- | --- |
+| [Regional campaign](/Users/home/Desktop/gwRL/studies/campaign/README.md) | `python -m studies.campaign.run` | [M12 operational checks](/Users/home/Desktop/gwRL/docs/m12/README.md), no trained-strength result |
 | [Composition](/Users/home/Desktop/gwRL/studies/composition/README.md) | `python -m studies.composition.train` | [Results guide](/Users/home/Desktop/gwRL/studies/composition/results/README.md) |
 | [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md) | `python -m studies.mini_japan_two_turn.train` | [Results guide](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/results/README.md) |
 
@@ -12,6 +13,11 @@ longer a flat `python/` script collection or a `PYTHONPATH=python` requirement.
 
 ```text
 studies/
+  campaign/
+    run.py                   Foreground train, resume, evaluate and profile
+    neural.py                Complete entity-graph policy and vector value heads
+    learning.py              Frozen three-policy parallel batches and exact resume
+    runs/                    Ignored local checkpoints, progress and reports
   composition/
     train.py                 Attacker/defender self-play trainer
     mcts.py                  Alternating-player search
