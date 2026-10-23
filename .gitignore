@@ -38,3 +38,9 @@ output/manual_battle_trace.txt
 
 # New training/diagnostic runs are local scratch output. Curated results stay tracked.
 studies/*/runs/
+
+# Public repository: keep raw discussion exports and unfinished personal notes local.
+/game_content/rules/discord_audits/*/*
+!/game_content/rules/discord_audits/*/README.md
+!/game_content/rules/discord_audits/*/summary.json
+/game_content/V5 Recs.md
