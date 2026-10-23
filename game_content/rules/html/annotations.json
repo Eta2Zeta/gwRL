@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "pilot": {
+    "title": "Discord rules audit pilot",
+    "date_label": "26 August–26 September 2025",
+    "start_date": "2025-08-26",
+    "end_date": "2025-09-26",
+    "timezone": "America/Chicago",
+    "channel": "v4_3-general-discussion",
+    "reviewed_messages": 1129,
+    "new_findings": 0,
+    "coverage_note": "All 1,129 messages in the inclusive pilot window were reviewed, with source checks and attachment evidence. No additional genuine missing rule, contradiction or verified fix qualified. The colored reference notes below come from the existing register outside the pilot dates; their dates and authority are shown. Older source editions and later local v4.3.1 sheets are distinguished.",
+    "audit_url": "../discord_audits/2025-08-26_2025-09-26/README.md"
+  },
+  "annotations": [
+    {
+      "id": "RCL-001",
+      "category": "fix",
+      "title": "Airborne sequence: one combined Fighter/AAA step",
+      "body": "In the developer’s posted v4.4 correction, both sides’ Fighters and AAA resolve in step 4, once. Step 5 moves surviving transports to a suitable landing spot. Airborne infantry and its transporting aircraft remain linked as one casualty through steps 3 and 4; destroyed cargo does not land or attack. This correction is applied to this project at the user’s request.",
+      "section_ids": [
+        "rb-10-6-1"
+      ],
+      "date": "2026-10-06",
+      "authority": "Developer correction posted for v4.4",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-001-aaa-in-the-airborne-assault-sequence",
+      "reference_label": "Rule register",
+      "author": "Global War ’36 Enthusiast",
+      "discord_url": "https://discord.com/channels/876158750870863964/1409991574292795392/1557027622016516186",
+      "authority_detail": "Rule image inspected directly in Discord. It is explicitly a v4.4 correction, applied here; the baseline PDF remains v4.3."
+    },
+    {
+      "id": "RCL-002",
+      "category": "project",
+      "title": "Influence spending cap before rolling",
+      "body": "Project ruling: use the unmodified success threshold as the pre-roll spending cap. Spend an integer no greater than that threshold and available treasury; subtract the spending from the die result. A natural 12 still backfires. The phrase “original influence roll” is not treated as a die that has already been rolled.",
+      "section_ids": [
+        "rb-15-2",
+        "rb-15-4",
+        "gw36_nrs_ccp_v4_3-p003",
+        "gw36_nrs_japan_v4_3-p004"
+      ],
+      "date": "2026-10-05",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-002-influence-spending-before-the-die-roll",
+      "reference_label": "Rule register",
+      "authority_detail": "Not independently publisher-confirmed; this is a settled project choice for ambiguous spending wording."
+    },
+    {
+      "id": "RCL-003",
+      "category": "project",
+      "title": "Foreign-invasion alignment is one roll per whole warlord",
+      "body": "Project ruling: use one alignment roll per whole warlord, applying its outcome to all remaining territories and forces of that warlord. Determine neighboring factions across the whole warlord. Beiping/Hopeh and Kwangtung/Hainan each remain one warlord. This resolves the table’s per-land-zone wording against the whole-warlord description.",
+      "section_ids": [
+        "rb-4-9"
+      ],
+      "date": "2026-10-05",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-003-whole-warlord-alignment-after-foreign-invasion",
+      "reference_label": "Rule register",
+      "authority_detail": "Retains the source table’s automatic outcomes; does not turn individual provinces into separate warlords."
+    },
+    {
+      "id": "RCL-004",
+      "category": "fix",
+      "title": "CCP purchases: railroad wording, not a generic supply path",
+      "body": "Use the undamaged railroad connection from CCP-possessed land to Soviet-possessed land required by Comintern Brothers, including its placement restriction. A sea-only or river-only supply path does not unlock these Artillery/AAA purchases. The user reports that the developers fixed the inconsistent purchase-note wording for the next version.",
+      "section_ids": [
+        "rb-15-2",
+        "gw36_nrs_ccp_v4_3-p003",
+        "gw36_nrs_ccp_v4_3-p004"
+      ],
+      "date": "2026-10-17",
+      "authority": "Developer fix reported by user",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-004-ccp-comintern-brothers-rail-versus-supply",
+      "reference_label": "Rule register",
+      "authority_detail": "Reported developer resolution; a subsequently published replacement sheet has not been verified here."
+    },
+    {
+      "id": "RCL-005",
+      "category": "clarification",
+      "title": "Enemy presence preventing a blockade",
+      "body": "Only enemy Surface Warships prevent a blockade under the enemy-presence condition. Enemy submarines alone do not prevent an otherwise qualifying surface fleet from blockading. Retain all fleet-size, alliance and sea-access requirements.",
+      "section_ids": [
+        "rb-9-4-6",
+        "rb-13-1-6"
+      ],
+      "date": "2026-10-18",
+      "authority": "Developer clarification reported by user",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-005-what-prevents-a-blockade",
+      "reference_label": "Rule register",
+      "authority_detail": "Resolves the broader naval-summary wording against the detailed blockade rule; direct message link was not supplied with the report."
+    },
+    {
+      "id": "RCL-009",
+      "category": "project",
+      "title": "Japanese border-clash targets",
+      "body": "Project ruling: treat Japan’s reference-sheet target list as exhaustive. Japan may target Soviet units in Chita, Amur and Primorsky Krai; Soviet possession elsewhere does not expand that list. Keep the ordinary border-clash eligibility, one-round and no-conquest restrictions.",
+      "section_ids": [
+        "rb-10-5-2",
+        "gw36_nrs_japan_v4_3-p001"
+      ],
+      "date": "2026-10-21",
+      "authority": "User-adopted source choice",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-009-japan-soviet-border-clash-geography",
+      "reference_label": "Rule register",
+      "authority_detail": "This choice reconciles the general geography with Japan’s national list; it does not add USSR attack origins."
+    },
+    {
+      "id": "RCL-010",
+      "category": "project",
+      "title": "Dadao lend-lease destination",
+      "body": "Project ruling pending developer clarification: Japanese lend-lease may be delivered to any Dadao-possessed land within Chinese Home Country, subject to all ordinary supply-route, timing, blockade and item limits. This supplies a destination for the explicit aid permission when Dadao has no original Home Country; it does not redefine Dadao’s Home Country for other rules.",
+      "section_ids": [
+        "rb-12-4",
+        "rb-15-4",
+        "gw36_nrs_japan_v4_3-p004"
+      ],
+      "date": "2026-10-22",
+      "authority": "User-adopted campaign interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-010-dadao-home-country-destination-for-japanese-lend-lease",
+      "reference_label": "Rule register",
+      "authority_detail": "Genuine missing delivery destination; no developer ruling has been reported."
+    },
+    {
+      "id": "RCL-012",
+      "category": "clarification",
+      "title": "Chinese Truce: attacker and defender",
+      "body": "When CCP or KMT breaks the Truce on its own turn, that active faction attacks. When a third party triggers evolution and automatic termination, the possessor of each shared land zone defends and the other Chinese faction attacks.",
+      "section_ids": [
+        "rb-6-6"
+      ],
+      "date": "2026-10-22",
+      "authority": "Developer clarification reported by user",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-012-chinese-truce-combat-and-retreat",
+      "reference_label": "Rule register",
+      "authority_detail": "Third-party roles are a developer ruling reported by the user. Ordinary own-turn roles also follow the rulebook and the separately linked June discussion in the register."
+    },
+    {
+      "id": "RCL-012-morale",
+      "category": "project",
+      "title": "Chinese Truce: Low Morale after automatic termination",
+      "body": "Project ruling: use the same normal-attack-roll 10+ elimination for eligible attacking minor-KMT regular Infantry/Cavalry in shared zones after voluntary or automatic termination. There is no additional preliminary roll. Defending KMT and Major-Power KMT remain exempt.",
+      "section_ids": [
+        "rb-6-6"
+      ],
+      "date": "2026-10-22",
+      "authority": "User clarification",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-012-chinese-truce-combat-and-retreat",
+      "reference_label": "Rule register",
+      "authority_detail": "The automatic-termination Low Morale extension is the user’s choice, separately identified from the developer’s attacker/defender clarification."
+    },
+    {
+      "id": "RCL-013",
+      "category": "project",
+      "title": "Advanced Artillery city bombardment conditions",
+      "body": "Project ruling: city bombardment uses attrition’s starting-adjacency and no-movement conditions. The gun remains in its original zone and fires at a city adjacent since the Player Turn began. City bombardment still deals 1D6 strategic damage; it does not use attrition’s hit-at-2 attack against units.",
+      "section_ids": [
+        "rb-10-6-2",
+        "rb-13-1-3"
+      ],
+      "date": "2026-10-22",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-013-applying-attrition-restrictions-to-artillery-city-bombing",
+      "reference_label": "Rule register",
+      "authority_detail": "Ordinary attrition’s own restrictions are already explicit. This note concerns their extension to city bombardment only."
+    },
+    {
+      "id": "RCL-014",
+      "category": "project",
+      "title": "Port evacuation into a third party’s enemy fleet",
+      "body": "Provisional project ruling: when a damaged-port evacuation forces combat with an enemy fleet, the evacuating fleet attacks and the fleet already at sea defends. This applies even when another nation owns the current calendar turn.",
+      "section_ids": [
+        "rb-11-5"
+      ],
+      "date": "2026-10-23",
+      "authority": "User-adopted provisional interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-014-third-party-combat-after-damaged-port-evacuation",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted the proposed ruling for now on 23 October 2026. The source does not assign these third-party combat roles; developer clarification is still pending."
+    },
+    {
+      "id": "RCL-015",
+      "category": "project",
+      "title": "Required neutral relocation without a Friendly destination",
+      "body": "Provisional project ruling: eliminate nonparticipating neutral units required to relocate after conquest only when no Friendly relocation destination exists. Where a destination exists, retain the printed nearest-Friendly-land rule regardless of distance.",
+      "section_ids": [
+        "rb-0-3"
+      ],
+      "date": "2026-10-23",
+      "authority": "User-adopted provisional interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-015-neutral-relocation-with-no-friendly-destination",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted the proposed no-destination consequence for now on 23 October 2026. The source permits neutral co-occupants but does not specify this elimination consequence; developer clarification is still pending."
+    }
+  ]
+}

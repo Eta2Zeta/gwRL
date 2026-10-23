@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Global War 1936 — Annotated rules</title>
+<style>{{CSS}}</style>
+</head>
+<body>
+<a class="skip-link" href="#rules">Skip to rules</a>
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true">GW</span><span>Global War 1936<small>ANNOTATED RULES</small></span></a>
+  <div class="sidebar-caption">THE RULES LIBRARY</div>
+  <div class="toc">{{TOC}}</div>
+  <footer class="sidebar-footer"><span class="offline-dot"></span>Offline reader<span>Source documents linked throughout</span></footer>
+</aside>
+<div class="mobile-scrim" id="scrim"></div>
+<div class="workspace">
+<header class="topbar">
+  <button class="mobile-nav icon-button" id="nav-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Open contents">☰</button>
+  <div class="breadcrumb">RULES LIBRARY <span>/</span> Discord pilot</div>
+  <div class="topbar-actions"><a href="#source-register">Sources</a><button id="print-button" class="quiet-button">Print / PDF</button></div>
+</header>
+<main>
+<section class="overview" id="overview">
+  <div class="eyebrow"><span class="edition-label">V4.3 SOURCE EDITION</span><span class="pilot-label">PILOT REVIEW</span></div>
+  <h1>The rules, with context.</h1>
+  <p class="intro">Read the original rule text and the relevant Discord discussion together. Clarifications, corrections, and open questions stay distinct.</p>
+  <div class="coverage-banner"><span class="coverage-icon" aria-hidden="true">◷</span><div><strong>Discussion review: {{WINDOW}}</strong><p>{{COVERAGE}}</p>{{PILOT_METRICS}}</div></div>
+  <div class="reader-stats"><div><strong>{{SOURCE_COUNT}}</strong><span>source documents</span></div><div><strong>{{SECTION_COUNT}}</strong><span>rule sections</span></div><div><strong>{{NOTE_COUNT}}</strong><span>reference annotations</span></div></div>
+  <div class="legend" aria-label="Annotation categories"><span class="legend-item clarification"><b>i</b>Clarification <small>Explains an existing rule</small></span><span class="legend-item fix"><b>✓</b>Correction / fix <small>Changes or repairs the text</small></span><span class="legend-item unresolved"><b>?</b>Unresolved <small>Needs a ruling or more evidence</small></span>{{PROJECT_LEGEND}}</div>
+</section>
+<section class="reader-controls" aria-label="Search and filter rules">
+  <div class="search-row"><label class="search-box"><span class="search-icon" aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search rules and annotations…" aria-label="Search all rules and annotations" autocomplete="off"><kbd>⌘ K</kbd></label><label class="source-select"><span class="sr-only">Source document</span><select id="source"><option value="">All source documents</option>{{OPTIONS}}</select></label></div>
+  <div class="filter-row"><span class="filter-label">SHOW NOTES</span><button class="category-filter clarification" data-category="clarification" aria-pressed="true">Clarifications <span>{{CLARIFICATIONS}}</span></button><button class="category-filter fix" data-category="fix" aria-pressed="true">Corrections <span>{{FIXES}}</span></button><button class="category-filter unresolved" data-category="unresolved" aria-pressed="true">Unresolved <span>{{UNRESOLVED}}</span></button>{{PROJECT_FILTER}}<label class="annotated-only"><input type="checkbox" id="annotated-only"> Annotated rules only</label></div>
+  <div class="search-status"><span id="result-status" role="status" aria-live="polite">{{SECTION_COUNT}} rule sections · {{NOTE_COUNT}} unique reference annotations</span><button id="reset-filters" class="text-button" hidden>Reset filters</button></div>
+</section>
+<div class="rules-column" id="rules">{{ARTICLES}}</div>
+<div class="empty-state" id="empty-state" hidden><span aria-hidden="true">⌕</span><h2>No matching rules</h2><p>Try fewer words, another source document, or show all annotation categories.</p><button id="empty-reset" class="quiet-button">Reset search and filters</button></div>
+<section class="source-register" id="source-register"><div class="eyebrow">SOURCE REGISTER</div><h2>Keep the original within reach.</h2><p>The text is a reading aid. Use the linked PDF pages for figures, merged table cells, and exact original layout. Image-only source pages may remain images rather than searchable text. A discussion author’s authority is recorded with each annotation; inclusion alone does not make a community comment an official ruling.</p><ul>{{SOURCES}}</ul><p class="build-note">Pilot discussion window: {{WINDOW}} · Reader generated {{BUILD_DATE}} · {{UNPLACED}} annotations awaiting section anchors.</p></section>
+</main>
+<footer class="page-footer"><span>Global War 1936 · Annotated rules</span><a href="#overview">Back to top ↑</a></footer>
+</div>
+<script>{{JS}}</script>
+</body>
+</html>

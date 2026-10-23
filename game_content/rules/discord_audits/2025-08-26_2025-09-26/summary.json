@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "kind": "public_rules_discussion_audit_summary",
+  "reviewed_on": "2026-10-23",
+  "channel": "v4_3-general-discussion",
+  "start_date": "2025-08-26",
+  "end_date": "2025-09-26",
+  "timezone": "America/Chicago",
+  "coverage": {
+    "ui_search_results": 1129,
+    "search_pages": 46,
+    "unique_messages_reviewed": 1129,
+    "duplicates": 0,
+    "missing_timestamps": 0,
+    "timestamps_checked_against_snowflake_ids": 1129,
+    "first_message": "https://discord.com/channels/876158750870863964/1409991574292795392/1409992036060233859",
+    "last_message": "https://discord.com/channels/876158750870863964/1409991574292795392/1421295848146337933",
+    "messages_by_local_date": {
+      "2025-08-26": 77,
+      "2025-09-11": 175,
+      "2025-09-12": 417,
+      "2025-09-13": 44,
+      "2025-09-14": 5,
+      "2025-09-15": 7,
+      "2025-09-16": 15,
+      "2025-09-17": 19,
+      "2025-09-18": 96,
+      "2025-09-19": 56,
+      "2025-09-20": 90,
+      "2025-09-21": 59,
+      "2025-09-22": 34,
+      "2025-09-23": 8,
+      "2025-09-24": 7,
+      "2025-09-25": 12,
+      "2025-09-26": 8
+    },
+    "static_attachment_files_reviewed": 42,
+    "unrelated_calculator_spreadsheets_excluded": 2
+  },
+  "result": {
+    "new_genuine_clarifications": 0,
+    "new_verified_rule_fixes": 0,
+    "new_confirmed_unresolved_rule_conflicts": 0,
+    "new_RCL_ids": []
+  },
+  "publication_scope": "Aggregate findings and official source provenance only. Raw discussion correspondence, attachment witnesses, signed sharing links and local preview images are not published.",
+  "local_witness_sha256": {
+    "review.json": "1403e7dd0bd4aa5eb7a58f5c6e301c98c9d09a2f4d5e8f2a53737180bc9917c6",
+    "messages.json": "51a8671e55d78d668cbb7b97f7ac0f8a6558e19783654944b0b67e9e1b7e0e69",
+    "review_pages_01_15.json": "bc2624f4a59b243d75c2bcfe17d23d58d2c18e6c0a0061efa3ef009b8ce2c0a9",
+    "review_pages_16_30.json": "436e730110edd89926aa9d07456736c10d3edf03513c8c268f83bc6905ef1db3",
+    "review_pages_31_46.json": "4cd098e196150c3a377398972ccc6f2c6a5d54b0c79bd2ec0a9772d95f984ebe",
+    "attachments.json": "dc1d977d19b8113430a79b180dd2303d0c09a15a7c69dc4582efb0a0cadc77eb",
+    "source_inventory.json": "ac0b4824627ec7a254946968cb3f6bb6516ab175dc53f26110c4e9ebfe92ee07",
+    "verification.json": "1f2fb04c0d42d878fe688f95c4ef8eea6a215fce709d13d4eb10acc95ca3436f"
+  },
+  "official_sources": [
+    {
+      "id": "gw1936_terrain_glossary_v1",
+      "title": "GW1936_Terrain_Glossary_v1",
+      "file_path": "game_content/rules/GW1936_Terrain_Glossary_v1.pdf",
+      "sha256": "3f9e222630be3f9168969b9c8184ad2cf72571ece4ee93c7f54672ee6bb3801b",
+      "kind": "terrain_glossary",
+      "version": "v1",
+      "pages": 12,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_anzac",
+      "title": "GW36 - NRS - ANZAC v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - ANZAC v4.3.pdf",
+      "sha256": "6b3b6a12e1fc76b4b6f8fb9de68174afa3b57744a0e20032b29b0f2449e4fe3d",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 5,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_ccp",
+      "title": "GW36 - NRS - CCP v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - CCP v4.3.pdf",
+      "sha256": "fb5840a2c838b2532964c73c2878909181226af87cd58d67ba196663ae1c932c",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 7,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_fec",
+      "title": "GW36 - NRS - FEC v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - FEC v4.3.pdf",
+      "sha256": "ce4a7fbe4712a0b389de0f87a4144db8c33ef3ee9f0081c608d8af738c790b37",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 6,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_france",
+      "title": "GW36 - NRS - France v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - France v4.3.pdf",
+      "sha256": "ea0f9874326bcadad4e016eaf87466ae9064288a1035cecb9c7a67c874bb13c9",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 7,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_free_france",
+      "title": "GW36 - NRS - Free France v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - Free France v4.3.pdf",
+      "sha256": "0019b7504fefe1a2d1098adf155af787eade2096f365a5aef834b3f5e6d50343",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 5,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_germany_iron_cross_version",
+      "title": "GW36 - NRS - Germany v4.3 Iron Cross Version",
+      "file_path": "game_content/rules/GW36 - NRS - Germany v4.3 Iron Cross Version.pdf",
+      "sha256": "58c2b2731d138267f27483f435ef28bf91d3c715fa237d61e04629717927c3e9",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 8,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_great_britain",
+      "title": "GW36 - NRS - Great Britain v4.3.1",
+      "file_path": "game_content/rules/GW36 - NRS - Great Britain v4.3.1.pdf",
+      "sha256": "5d8f9e424498ef550b2aade377c7642f09d91e892d93d13ed11f01977cd93a54",
+      "kind": "national_sheet",
+      "version": "4.3.1",
+      "pages": 8,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": true
+    },
+    {
+      "id": "nrs_italy",
+      "title": "GW36 - NRS - Italy v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - Italy v4.3.pdf",
+      "sha256": "5d5e22edbeb3853c51def0a574730a893cac98db2bbc35ab153f50c2171530f0",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 6,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_japan",
+      "title": "GW36 - NRS - Japan v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - Japan v4.3.pdf",
+      "sha256": "832ca2e38968fd469bdf33dd2b415cd36b236d0f314ce7615137e489949935fa",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 9,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_kmt",
+      "title": "GW36 - NRS - KMT v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - KMT v4.3.pdf",
+      "sha256": "0124074a7ba0fa80a8fa418f31e0b48f896d4e6c6de66fe3befd0ceeb9a278a6",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 7,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_usa",
+      "title": "GW36 - NRS - USA v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - USA v4.3.pdf",
+      "sha256": "614a467fd7fce1d78451e508cacf7d555fd738bb874dcf24290f15733259ffe5",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 9,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "nrs_ussr",
+      "title": "GW36 - NRS - USSR v4.3.1",
+      "file_path": "game_content/rules/GW36 - NRS - USSR v4.3.1.pdf",
+      "sha256": "ec9eb64c3e0589386e36d704f6a4de12387171c3d6461a7f2bb1e520092c655b",
+      "kind": "national_sheet",
+      "version": "4.3.1",
+      "pages": 10,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": true
+    },
+    {
+      "id": "nrs_vichy",
+      "title": "GW36 - NRS - Vichy v4.3",
+      "file_path": "game_content/rules/GW36 - NRS - Vichy v4.3.pdf",
+      "sha256": "deb92ebe67c1098951bc9d89bd52a299d75ed5c00a02f4de9e268843868df4da",
+      "kind": "national_sheet",
+      "version": "4.3",
+      "pages": 5,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "global_war_1936_neutrals_setup_chart",
+      "title": "Global War 1936 v4.3 Neutrals setup chart",
+      "file_path": "game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf",
+      "sha256": "9d8b6382dfcd68e5d91ab48f2d81fef0bb61090dc951300bc19bea93f1a12512",
+      "kind": "neutral_setup",
+      "version": "4.3",
+      "pages": 2,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    },
+    {
+      "id": "rulebook",
+      "title": "Global War 1936 v4.3 Rulebook",
+      "file_path": "game_content/rules/Global War 1936 v4.3 Rulebook.pdf",
+      "sha256": "240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d",
+      "kind": "rulebook",
+      "version": "4.3",
+      "pages": 108,
+      "review_window_scope": "Current local source; verify whether relevant change predates this edition. No historical version inferred from filename.",
+      "post_review_cutoff_edition": false
+    }
+  ],
+  "limits": [
+    "Visible history at review time; deleted messages cannot be reconstructed.",
+    "National sheets that postdate this pilot are not attributed to historical discussion.",
+    "The 12 existing HTML reader notes originate outside this pilot and do not count as new findings.",
+    "Original raw witnesses and their attachment files remain local; their hashes do not imply those files are bundled in a checkout."
+  ]
+}
