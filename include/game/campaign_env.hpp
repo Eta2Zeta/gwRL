@@ -17,12 +17,14 @@ class CampaignEnv {
     std::string decisionKind() const;
     std::vector<Action> legalActions() const { return engine_.legalActions(); }
     std::vector<Action> legalInterrupts() const { return engine_.legalInterrupts(); }
-    void applyAction(const Action& action) { engine_.step(action); planningKey_.reset(); }
-    void applyInterrupt(const Action& action) { engine_.interrupt(action); planningKey_.reset(); }
-    void resolveChance() { engine_.resolveChance(); planningKey_.reset(); }
+    void applyAction(const Action& action);
+    void applyInterrupt(const Action& action);
+    void resolveChance();
     std::array<double, 3> returns() const { return terminalReturns(engine_.state()); }
     json::Value wealth() const { return wealthJson(engine_.state()); }
-    json::Value observation() const;
+    // Valid until this environment's next successful mutation. Callers that
+    // need an independently mutable snapshot can copy the returned value.
+    const json::Value& observation() const;
     json::Value context() const { return *context_; }
     CampaignEnv clone() const;
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
@@ -32,11 +34,12 @@ class CampaignEnv {
     const Engine& engine() const { return engine_; }
 
   private:
+    struct DecisionCache;
     Engine engine_;
     std::shared_ptr<const json::Value> context_;
     // Engine state is exposed as const; successful wrapper mutations are the
     // only invalidation points. Search reseeding leaves decision identity alone.
-    mutable std::optional<std::string> planningKey_;
+    std::shared_ptr<DecisionCache> decisionCache_;
 };
 
 }  // namespace game::campaign

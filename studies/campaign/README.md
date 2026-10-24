@@ -94,8 +94,13 @@ The [scaling follow-up](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23
 now records 13 bounded cases: later positions, stronger search, a larger model,
 parallelism comparisons and actual one/two/eleven-round collection. A small-budget
 full campaign completes, but the 16-simulation two-round batch reaches its wall
-limit before completing. Repeated legal-menu and observation work needs a
-performance pass before expanding learning at that search budget.
+limit before completing. The
+[24 October decision-reuse pass](/Users/home/Desktop/gwRL/docs/stage_a/decision_reuse_2026_10_24.md)
+removes repeated legal-menu and observation work. A matched full-game invocation
+improves from 198.42 to 112.72 seconds with identical search results, choices,
+dice and scores. These are frozen-policy collection timings, excluding learning
+updates. Stronger collection still reaches its 240-second guard: 370 choices
+completed versus 234 before the fix, with no completed two-round games.
 
 `python -m studies.campaign.scaling_benchmark --help` describes the supervised
 CPU-only benchmark. Its current resource envelope is 12 cores and 30 GB, with
@@ -105,6 +110,13 @@ actual episodes, and explicit inference-only model-weight transfer from a
 trusted local checkpoint. It never resumes old game/replay state or updates
 weights. Fixed-root queries are not executed moves or training rows. See the
 scaling report for measured results and reproduction commands.
+
+RSS means **resident set size**: the physical memory currently occupied by a
+process. The benchmark samples and sums the supervisor and worker RSS, reporting
+the highest sampled total in bytes. For example, 2.58 GB means roughly that much
+RAM was resident while the benchmark ran. Shared pages can be counted more than
+once, and sampling can miss a brief peak; this is a memory estimate, not an
+instantaneous allocation limit.
 
 ## Evaluation and profiling
 
@@ -144,9 +156,11 @@ It includes first-use parsing and warm calls; menu size and game phase matter.
 
 ## Starting a larger experiment
 
-The current next step is to optimize repeated legal-menu/observation generation,
-then repeat the matched benchmarks and a bounded stronger-search episode batch.
-The 13-case follow-up is a collection/search measurement, not a new training run.
+The current next step is to reduce first-use observation-graph construction and
+profile remaining costs, then complete a bounded stronger-search episode batch
+before expanding learning. Decision reuse is implemented and verified; the stronger
+batch still reaches its guard. Both performance follow-ups measure collection
+and search, not new learning updates.
 
 The original small two-batch smoke took 14.30
 seconds across stop/resume; 100 similar batches would take roughly 12 minutes

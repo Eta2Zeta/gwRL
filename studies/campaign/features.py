@@ -184,8 +184,14 @@ def cached_action(serialized: str, buckets: int) -> Graph:
 
 
 def make_input(env: Any, actions: Any) -> dict[str, Any]:
-    """Snapshot public features only; never call serialize/RNG/planning APIs."""
-    observation = env.observation()
+    """Snapshot public features; reuse validated immutable decision data.
+
+    Environments may expose immutable source snapshots for inference. Ordinary
+    mutable JSON still gets validated and detached; neither path reads execution
+    randomness or includes planning identities in the neural input.
+    """
+    shared_observation = getattr(env, "neural_observation", None)
+    observation = shared_observation() if shared_observation is not None else env.observation()
     shared_context = getattr(env, "neural_context", None)
     context = shared_context() if shared_context is not None else env.context()
     if not isinstance(observation, dict) or not isinstance(context, dict):
@@ -197,7 +203,9 @@ def make_input(env: Any, actions: Any) -> dict[str, Any]:
         raise ValueError("Execution RNG, future dice, history and planning hashes are not neural features")
     features = []
     for action in actions:
-        if hasattr(action, "features"):
+        if hasattr(action, "neural_features"):
+            feature = action.neural_features()
+        elif hasattr(action, "features"):
             feature = action.features()
         elif isinstance(action, dict):
             feature = action
@@ -206,16 +214,17 @@ def make_input(env: Any, actions: Any) -> dict[str, Any]:
         if not isinstance(feature, dict):
             raise TypeError("Campaign action features must be a JSON object")
         features.append(feature)
-    # The JSON round trip both validates the plain replay format and detaches
-    # it from caller-owned mutable observations/action dictionaries.
-    item = {"schema": SCHEMA, "observation": observation, "actions": features}
-    if isinstance(context, FrozenDict):
-        # Only immutable source data bypasses the validating/detaching copy.
-        context.canonical_json
-        result = json.loads(canonical(item))
-        result["context"] = context
-        return result
-    return json.loads(canonical({**item, "context": context}))
+
+    def snapshot(value: dict[str, Any]) -> dict[str, Any]:
+        if isinstance(value, FrozenDict):
+            # Canonical text validates the complete source once. The same frozen
+            # observation/actions are then safe for search, replay and clones.
+            value.canonical_json
+            return value
+        return json.loads(canonical(value))
+
+    return {"schema": SCHEMA, "observation": snapshot(observation),
+            "context": snapshot(context), "actions": [snapshot(feature) for feature in features]}
 
 
 def action_factors(action: dict[str, Any]) -> tuple[str, str, str, str]:

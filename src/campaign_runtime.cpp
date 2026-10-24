@@ -6,6 +6,7 @@
 #include <charconv>
 #include <cmath>
 #include <limits>
+#include <mutex>
 #include <stdexcept>
 
 namespace game::campaign {
@@ -110,6 +111,21 @@ void prepareTurnStart(State& state) {
 
 }  // namespace
 
+struct Engine::ActionMenu {
+    std::vector<Action> actions;
+    std::map<Id, std::string> canonicalById;
+};
+
+struct Engine::DecisionCache {
+    std::mutex mutex;
+    std::shared_ptr<const ActionMenu> actions;
+    std::shared_ptr<const ActionMenu> interrupts;
+};
+
+void Engine::invalidateDecisionCache() {
+    decisionCache_ = std::make_shared<DecisionCache>();
+}
+
 RandomStreams RandomStreams::seeded(std::uint64_t seed) {
     RandomStreams result;
     result.actual = nextRandom(seed);
@@ -202,7 +218,8 @@ double outcomeProbability(const ChanceRequest& request, const ChanceOutcome& out
 }
 
 Engine::Engine(State initial, std::shared_ptr<const Rules> rules, std::uint64_t seed)
-    : state_(std::move(initial)), rules_(std::move(rules)), random_(RandomStreams::seeded(seed)) {
+    : state_(std::move(initial)), rules_(std::move(rules)), random_(RandomStreams::seeded(seed)),
+      decisionCache_(std::make_shared<DecisionCache>()) {
     require(rules_ && !rules_->id().empty(), "Campaign execution requires an explicit rules module");
     state_.validate();
 }
@@ -228,12 +245,20 @@ Engine Engine::start(State initial, std::shared_ptr<const Rules> rules, std::uin
     return result;
 }
 
-std::vector<Action> Engine::legalActions() const {
-    if (state_.terminal || state_.chance) return {};
+std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
+    std::lock_guard lock(decisionCache_->mutex);
+    if (decisionCache_->actions) return decisionCache_->actions;
+    auto menu = std::make_shared<ActionMenu>();
+    const auto finish = [&]() -> std::shared_ptr<const ActionMenu> {
+        decisionCache_->actions = menu;
+        return menu;
+    };
+    if (state_.terminal || state_.chance) return finish();
     const auto player = state_.decisionPlayer();
-    if (!player) return {};
+    if (!player) return finish();
     const bool decisionPending = !state_.decisions.empty();
-    std::vector<Action> actions = decisionPending ? state_.decisions.back().options : rules_->actions(state_);
+    auto& actions = menu->actions;
+    actions = decisionPending ? state_.decisions.back().options : rules_->actions(state_);
     const auto immediate = state_.flags.find("immediate_land_battles");
     if (!decisionPending && immediate != state_.flags.end() && immediate->second)
         actions.erase(std::remove_if(actions.begin(), actions.end(), [](const Action& action) {
@@ -259,20 +284,27 @@ std::vector<Action> Engine::legalActions() const {
                      controlledBy(state_,action.nation,state_.currentNation()) || directAxis) && !action.decision,
                     "Rules action does not match active nation");
         }
-        (void)canonicalJson(actionJson(action));
+        menu->canonicalById.emplace(action.id, canonicalJson(actionJson(action)));
     }
-    if (!decisionPending && phaseWorkClear(state_) && rules_->phaseComplete(state_))
+    if (!decisionPending && phaseWorkClear(state_) && rules_->phaseComplete(state_)) {
         actions.push_back(endPhaseAction(state_, *player));
-    return actions;
+        const auto& action = actions.back();
+        menu->canonicalById.emplace(action.id, canonicalJson(actionJson(action)));
+    }
+    return finish();
+}
+
+std::vector<Action> Engine::legalActions() const {
+    return actionMenu()->actions;
 }
 
 void Engine::step(const Action& action) {
     const auto proposed = canonicalJson(actionJson(action));
-    const auto legal = legalActions();
-    require(std::any_of(legal.begin(), legal.end(), [&](const Action& candidate) {
-        return canonicalJson(actionJson(candidate)) == proposed;
-    }), "Illegal campaign action");
+    const auto menu = actionMenu();
+    const auto found = menu->canonicalById.find(action.id);
+    require(found != menu->canonicalById.end() && found->second == proposed, "Illegal campaign action");
     Engine next = clone();
+    next.invalidateDecisionCache();
     if (reserved(action)) next.endPhase();
     else {
         const auto before = next.state_.clock;
@@ -285,13 +317,21 @@ void Engine::step(const Action& action) {
     *this = std::move(next);
 }
 
-std::vector<Action> Engine::legalInterrupts() const {
-    if(state_.terminal||state_.chance)return {};
+std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
+    std::lock_guard lock(decisionCache_->mutex);
+    if (decisionCache_->interrupts) return decisionCache_->interrupts;
+    auto menu = std::make_shared<ActionMenu>();
+    const auto finish = [&]() -> std::shared_ptr<const ActionMenu> {
+        decisionCache_->interrupts = menu;
+        return menu;
+    };
+    if(state_.terminal||state_.chance)return finish();
     const auto immediate = state_.flags.find("immediate_land_battles");
-    if (immediate != state_.flags.end() && immediate->second) return {};
+    if (immediate != state_.flags.end() && immediate->second) return finish();
     const auto naval = state_.flags.find("immediate_naval_battles");
-    if (naval != state_.flags.end() && naval->second) return {};
-    auto actions=rules_->interrupts(state_);
+    if (naval != state_.flags.end() && naval->second) return finish();
+    auto& actions=menu->actions;
+    actions=rules_->interrupts(state_);
     std::set<Id> ids;
     for(const auto& action:actions) {
         require(!reserved(action)&&!action.id.empty()&&ids.insert(action.id).second,
@@ -299,16 +339,22 @@ std::vector<Action> Engine::legalInterrupts() const {
         require(state_.nations.contains(action.nation)&&state_.nations.at(action.nation).player==action.player,
                 "Interrupt entitlement mismatch");
         require(!action.decision&&action.parameters.isObject(),"Invalid interrupt payload");
+        menu->canonicalById.emplace(action.id, canonicalJson(actionJson(action)));
     }
-    return actions;
+    return finish();
+}
+
+std::vector<Action> Engine::legalInterrupts() const {
+    return interruptMenu()->actions;
 }
 
 void Engine::interrupt(const Action& action) {
     const auto proposed=canonicalJson(actionJson(action));
-    const auto legal=legalInterrupts();
-    require(std::any_of(legal.begin(),legal.end(),[&](const Action& a){return canonicalJson(actionJson(a))==proposed;}),
-            "Illegal campaign interrupt");
+    const auto menu=interruptMenu();
+    const auto found=menu->canonicalById.find(action.id);
+    require(found!=menu->canonicalById.end()&&found->second==proposed, "Illegal campaign interrupt");
     auto next=clone();
+    next.invalidateDecisionCache();
     const auto before=next.state_.clock;
     const bool beforeTerminal=next.state_.terminal;
     next.rules_->apply(next.state_,action);
@@ -321,6 +367,7 @@ void Engine::interrupt(const Action& action) {
 void Engine::resolveChance() {
     require(!state_.terminal && state_.chance.has_value(), "No pending campaign chance request");
     Engine next = clone();
+    next.invalidateDecisionCache();
     const ChanceRequest request = *next.state_.chance;
     ChanceOutcome outcome;
     for (const auto& die : request.dice) {

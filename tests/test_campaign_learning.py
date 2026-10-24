@@ -571,6 +571,17 @@ class CampaignLearningTests(unittest.TestCase):
             self.assertEqual(event["action_kind"], raw["kind"])
             self.assertEqual(event["action_parameters"], raw.get("parameters", {}))
             before = copy.deepcopy(event["action_parameters"])
+            # Campaign source actions are now immutable and shared safely by
+            # inference/replay. A caller can replace a replay entry with its own
+            # mutable copy; neither operation may change the recorded event.
+            from studies.shared.immutable_json import FrozenDict
+            if isinstance(chosen, FrozenDict):
+                with self.assertRaises(TypeError):
+                    raw.setdefault("parameters", {})["caller_only"] = True
+                index = features.index(chosen)
+                chosen = json.loads(json.dumps(chosen))
+                features[index] = chosen
+                raw = chosen.get("action") or chosen
             raw.setdefault("parameters", {})["caller_only"] = True
             self.assertEqual(event["action_parameters"], before)
 

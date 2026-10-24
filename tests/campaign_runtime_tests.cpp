@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -151,6 +152,35 @@ class FixtureRules : public Rules {
             state.territories.at("land_a").possessor = "mongolia";
             state.units.at("mongolian_unit").zone = "land_b";
         }
+    }
+};
+
+class CountingRules : public FixtureRules {
+  public:
+    mutable int actionCalls {0};
+    mutable int interruptCalls {0};
+    std::vector<Action> actions(const State& state) const override {
+        ++actionCalls;
+        auto actions = FixtureRules::actions(state);
+        const auto mark = state.flags.find("marks");
+        for (auto& action : actions)
+            if (action.kind == "mark")
+                action.parameters = V(O{{"value", V(mark == state.flags.end() ? 0.0 : double(mark->second))}});
+        return actions;
+    }
+    std::vector<Action> interrupts(const State& state) const override {
+        ++interruptCalls;
+        if (state.flags.contains("interrupt_mark")) return {};
+        Action action;
+        action.id = action.kind = "interrupt_mark";
+        action.nation = "kmt";
+        action.player = "allies";
+        action.parameters = V(O{{"value", V(1.0)}});
+        return {action};
+    }
+    void apply(State& state, const Action& action) const override {
+        if (action.kind == "interrupt_mark") ++state.flags["interrupt_mark"];
+        else FixtureRules::apply(state, action);
     }
 };
 
@@ -474,6 +504,73 @@ void cloneAndSearchRandomnessAreIsolated() {
     require(state.planningKey() == key && state.serialize() != engine.state().serialize(), "Planning key did not distinguish history from decision state");
 }
 
+void decisionMenusAreReusedAndTransactional() {
+    auto rules = std::make_shared<CountingRules>();
+    Engine engine(initialState(), rules, 555);
+    const auto checkpoint = engine.serialize();
+    const auto mark = findAction(engine, "mark");
+    auto exposed = engine.legalActions();
+    auto branch = engine.cloneForSearch(654);
+    branch.legalActions();
+    engine.setDiceTapeForTesting({6, 12});
+    engine.legalActions();
+    require(rules->actionCalls == 1, "Unchanged states, clones or RNG reseeding regenerated actions");
+    exposed.front().parameters = V(O{{"poison", V(true)}});
+    require(canonicalJson(actionJson(findAction(engine, "mark"))) == canonicalJson(actionJson(mark)),
+            "A caller changed the authoritative cached action payload");
+    auto forged = mark;
+    forged.parameters = V(O{{"value", V(1.0)}});
+    const auto before = engine.serialize();
+    rejects([&] { engine.step(forged); }, "Cached ID bypassed full payload validation");
+    rejects([&] { engine.step(findAction(engine, "throw_after_mutation")); }, "Throwing handler accepted");
+    require(engine.serialize() == before && rules->actionCalls == 1,
+            "Rejected input discarded or poisoned an unchanged decision cache");
+    branch.step(mark);
+    require(rules->actionCalls == 1, "Applying a previously generated action rebuilt its menu");
+    const auto changed = findAction(branch, "mark");
+    require(rules->actionCalls == 2 && changed.parameters.require("value").asInt() == 1,
+            "Successful action retained a stale menu");
+    engine.legalActions();
+    require(rules->actionCalls == 2 && !engine.state().flags.contains("marks"),
+            "Clone mutation invalidated or changed its parent cache");
+    rejects([&] { branch.step(mark); }, "An old action payload remained legal after state changed");
+    require(rules->actionCalls == 2, "Stale payload validation regenerated an available menu");
+
+    const auto interrupts = engine.legalInterrupts();
+    engine.legalInterrupts();
+    require(rules->interruptCalls == 1 && interrupts.size() == 1, "Interrupts were generated repeatedly");
+    auto forgedInterrupt = interrupts.front();
+    forgedInterrupt.parameters = V(O{{"value", V(2.0)}});
+    rejects([&] { engine.interrupt(forgedInterrupt); }, "Cached interrupt ID bypassed payload validation");
+    engine.interrupt(interrupts.front());
+    require(rules->interruptCalls == 1, "Interrupt validation rebuilt its menu");
+    require(engine.legalInterrupts().empty() && rules->interruptCalls == 2,
+            "Successful interrupt retained a stale menu");
+
+    auto restored = Engine::restore(engine.state().definition, rules, checkpoint);
+    restored.legalActions();
+    require(rules->actionCalls == 3, "Restore inherited another state's action cache");
+    restored.step(findAction(restored, "request_chance"));
+    require(restored.legalActions().empty(), "Chance retained an ordinary action menu");
+    restored.setDiceTapeForTesting({6, 12});
+    restored.resolveChance();
+    restored.legalActions();
+    require(rules->actionCalls == 4, "Resolved chance did not invalidate its empty menu");
+    endPhase(restored);
+    restored.legalActions();
+    require(rules->actionCalls == 5 && restored.state().clock.phase == Phase::CombatMovement,
+            "Phase transition retained the preceding phase menu");
+
+    auto sharedRules = std::make_shared<CountingRules>();
+    Engine cold(initialState(), sharedRules);
+    auto left = cold.clone();
+    auto right = cold.cloneForSearch(42);
+    auto leftActions = std::async(std::launch::async, [&] { return left.legalActions(); });
+    auto rightActions = std::async(std::launch::async, [&] { return right.legalActions(); });
+    require(leftActions.get().size() == rightActions.get().size() && sharedRules->actionCalls == 1,
+            "Concurrent clones regenerated their shared unchanged menu");
+}
+
 }  // namespace
 
 int main() {
@@ -491,6 +588,7 @@ int main() {
         {"final pending work", finalPendingWorkPreventsDeadline},
         {"exact replay and restore", replayAndRestoreAreExact},
         {"clone and search isolation", cloneAndSearchRandomnessAreIsolated},
+        {"decision menu reuse and invalidation", decisionMenusAreReusedAndTransactional},
     };
     for (const auto& [name, test] : tests) {
         try { test(); std::cout << "PASS " << name << '\n'; }

@@ -740,9 +740,14 @@ pass. The subsequent scaling follow-up completes 13 bounded cases covering
 deeper search, later positions, larger models and longer horizons. One
 small-budget full campaign completes, while the 16-simulation two-round batch
 reaches its time guard without a completed game. Larger training remains on hold
-for the measured legal-menu/observation and input-construction performance work,
-followed by matched benchmarks and a completed stronger-search collection batch.
-See [the scaling report](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md);
+for the remaining performance work and a completed stronger-search collection
+batch. The 24 October decision-reuse fix removes repeated legal-menu generation
+and observation conversion: a matched full game improves from 198.42 to 112.72
+seconds, with identical actions, dice, search results and scores. The stronger
+batch still hits its 240-second guard, progressing through 370 choices instead
+of 234. All 258 Python tests and 24 C++ suites pass. Details are in
+[the decision-reuse report](/Users/home/Desktop/gwRL/docs/stage_a/decision_reuse_2026_10_24.md)
+and [the scaling report](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md);
 the pilot repeat alone does not establish scalability.
 
 Before campaign learning, check the shared search against exact tiny deterministic
@@ -1029,8 +1034,16 @@ One small-budget eleven-round game completes in 187.56 seconds; the stronger
 16-simulation two-round batch reaches its 240-second guard without a completed
 game. See [the scaling report](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md).
 
-**Next work:** reduce repeated legal-menu/observation generation and graph
-construction, then verify stronger-search collection before larger training.
+**Decision reuse:** the 24 October pass removes repeated legal-menu/observation
+work and reduces a matched full-game invocation from 198.42 to 112.72 seconds.
+Exact full-campaign replay and all 258 Python/24 C++ checks pass. The stronger
+two-round batch still hits its 240-second guard with 370 choices completed,
+versus 234 before the fix. See
+[the decision-reuse report](/Users/home/Desktop/gwRL/docs/stage_a/decision_reuse_2026_10_24.md).
+
+**Next work:** reduce first-use observation-graph construction and profile the
+remaining simulation/neural-input costs, then verify stronger-search collection
+before larger training.
 Expand one-round learning/evaluation across several training and dice seeds,
 followed by starting positions, horizon and opponent pairs.
 M12 closes the final planned implementation gate with reproducible training,

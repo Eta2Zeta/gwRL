@@ -14,6 +14,7 @@ from torch import nn
 from studies.campaign.features import (ADJACENT, IDENTITY_REFERENCE, cached_action,
                                       cached_context, cached_observation, compile_graph)
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator, make_input
+from studies.shared.immutable_json import freeze_json
 from studies.shared.multiplayer_mcts import PLAYERS
 
 
@@ -145,6 +146,68 @@ class CampaignNeuralTests(unittest.TestCase):
             bad.public["state"][name] = [1]
             with self.assertRaises(ValueError):
                 make_input(bad, [])
+
+    def test_immutable_decision_sources_are_reused_with_identical_model_inputs(self):
+        env = PublicEnv()
+        menu = [action("one", unit="unit_1"), action("two", unit="unit_16")]
+        expected = make_input(env, menu)
+        observation, context = freeze_json(env.public), freeze_json(env.static)
+        frozen_actions = [freeze_json(value) for value in menu]
+        env.neural_observation = lambda: observation
+        env.neural_context = lambda: context
+        env.observation = mock.Mock(side_effect=AssertionError("Use the shared decision snapshot"))
+        choices = []
+        for feature in frozen_actions:
+            choice = mock.Mock()
+            choice.neural_features.return_value = feature
+            choice.features.side_effect = AssertionError("Use the shared action snapshot")
+            choices.append(choice)
+        first, second = make_input(env, choices), make_input(env, choices)
+        self.assertEqual(first, expected)
+        self.assertIs(first["observation"], observation)
+        self.assertIs(second["observation"], observation)
+        self.assertIs(first["context"], context)
+        self.assertIs(first["actions"][0], frozen_actions[0])
+        self.assertIs(second["actions"][0], frozen_actions[0])
+        self.assertEqual(json.loads(json.dumps(first)), expected)
+        with self.assertRaises(TypeError):
+            first["observation"]["state"]["units"]["unit_1"]["movement_remaining"] = 42
+        model = self.model()
+        plain_logits, plain_values = model.forward_batch([expected])
+        shared_logits, shared_values = model.forward_batch([first])
+        torch.testing.assert_close(shared_logits[0], plain_logits[0], rtol=0, atol=0)
+        torch.testing.assert_close(shared_values, plain_values, rtol=0, atol=0)
+        # Reusing source data must still recompute learned values after updates.
+        with torch.no_grad():
+            model.value_head[-1].bias.add_(1)
+        _, updated = model.forward_batch([second])
+        torch.testing.assert_close(updated, shared_values + 1, rtol=1e-6, atol=1e-6)
+
+    def test_shared_snapshot_hooks_still_validate_and_detach_mutable_sources(self):
+        env = PublicEnv()
+        env.neural_observation = lambda: env.public
+        env.neural_context = lambda: env.static
+        feature = action("one", unit="unit_1")
+        choice = mock.Mock()
+        choice.neural_features.return_value = feature
+        item = make_input(env, [choice])
+        env.public["state"]["units"].clear()
+        feature["action"]["parameters"]["unit"] = "changed"
+        self.assertEqual(len(item["observation"]["state"]["units"]), 17)
+        self.assertEqual(item["actions"][0]["action"]["parameters"]["unit"], "unit_1")
+        for source in ("observation", "context", "action"):
+            bad = PublicEnv()
+            bad.neural_observation = lambda: freeze_json(bad.public)
+            bad.neural_context = lambda: freeze_json(bad.static)
+            invalid_action = action("invalid")
+            if source == "action":
+                invalid_action["action"]["parameters"]["new_number"] = float("nan")
+            else:
+                (bad.public if source == "observation" else bad.static)["new_number"] = float("nan")
+            invalid_choice = mock.Mock()
+            invalid_choice.neural_features.return_value = freeze_json(invalid_action)
+            with self.subTest(source=source), self.assertRaises(ValueError):
+                make_input(bad, [invalid_choice])
 
     def test_variable_menus_are_padding_free_and_batch_independent(self):
         env = PublicEnv()

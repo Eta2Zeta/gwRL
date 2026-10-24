@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <stdexcept>
 
@@ -81,6 +82,17 @@ void cachedPlanningKeysTrackEveryMutation() {
     const auto checkKey = [](const CampaignEnv& env, const std::string& message) {
         const auto actual = env.engine().planningKey();
         require(env.planningKey() == actual && env.planningKey() == actual, message);
+        const auto& observed = env.observation();
+        require(canonicalJson(observed.require("state")) == canonicalJson(env.engine().state().observation()),
+                message + ": observation retained a different state");
+        V::Array actions, interrupts;
+        for (const auto& action : env.engine().legalActions()) actions.push_back(actionJson(action));
+        for (const auto& action : env.engine().legalInterrupts()) interrupts.push_back(actionJson(action));
+        require(canonicalJson(observed.require("legal_actions")) == canonicalJson(V(actions))
+                && canonicalJson(observed.require("legal_interrupts")) == canonicalJson(V(interrupts)),
+                message + ": observation retained a different legal menu");
+        require(observed.require("decision_kind").asString() == env.decisionKind(),
+                message + ": observation retained a different pending decision");
     };
     const auto rejects = [](const std::function<void()>& operation) {
         try { operation(); } catch (const std::exception&) { return; }
@@ -144,6 +156,42 @@ void cachedPlanningKeysTrackEveryMutation() {
     env.resolveChance();
     checkKey(env, "Chance resolution retained a stale planning key");
     require(env.planningKey() != chanceKey, "Resolved chance retained its pending decision identity");
+}
+
+void observationsAreSharedOnlyForTheSameDecisionState() {
+    CampaignEnv env(scenario, 123);
+    const auto checkpoint = env.serialize();
+    const auto* snapshot = &env.observation();
+    const auto observed = canonicalJson(*snapshot);
+    auto exact = env.clone();
+    auto searched = env.cloneForSearch(987);
+    require(&env.observation() == snapshot && &exact.observation() == snapshot
+            && &searched.observation() == snapshot, "Unchanged clones rebuilt their observation");
+    auto detached = env.observation();
+    detached = V(O{{"poison", V(true)}});
+    require(canonicalJson(env.observation()) == observed, "Caller altered the shared observation snapshot");
+    auto forged = env.legalActions().back();
+    forged.parameters = V(O{{"poison", V(true)}});
+    try { env.applyAction(forged); throw std::logic_error("Expected forged action rejection"); }
+    catch (const std::runtime_error&) {}
+    require(&env.observation() == snapshot && env.serialize() == checkpoint,
+            "Rejected action discarded an unchanged observation");
+    env.applyAction(env.legalActions().back());
+    require(&env.observation() != snapshot && canonicalJson(env.observation()) != observed,
+            "Successful action retained its old observation snapshot");
+    require(&exact.observation() == snapshot && &searched.observation() == snapshot
+            && canonicalJson(*snapshot) == observed, "Mutation changed another clone's observation");
+    env.restore(checkpoint);
+    require(&env.observation() != snapshot && canonicalJson(env.observation()) == observed,
+            "Restore retained the changed state observation");
+
+    CampaignEnv cold(scenario, 777);
+    auto left = cold.clone();
+    auto right = cold.cloneForSearch(888);
+    auto leftObservation = std::async(std::launch::async, [&] { return &left.observation(); });
+    auto rightObservation = std::async(std::launch::async, [&] { return &right.observation(); });
+    require(leftObservation.get() == rightObservation.get(),
+            "Concurrent clones rebuilt their unchanged observation snapshot");
 }
 
 void setupValuesAndNoDoubleCounting() {
@@ -234,6 +282,7 @@ int main() {
         {"registry observations and RNG separation", entityObservationsAndRandomIsolation},
         {"reaction and chance owner", reactionAndChanceEntitlements},
         {"planning key cache invalidation", cachedPlanningKeysTrackEveryMutation},
+        {"observation snapshot reuse", observationsAreSharedOnlyForTheSameDecisionState},
         {"setup and temporary asset values", setupValuesAndNoDoubleCounting},
         {"repair/rail/neutral accounting", repairsRailAndNeutralAttribution},
         {"ordered general-sum returns", terminalThreeVector},

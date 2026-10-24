@@ -6,7 +6,7 @@ import json
 import pickle
 import unittest
 
-from studies.shared.campaign_adapter import CampaignAdapter
+from studies.shared.campaign_adapter import CampaignAdapter, ScheduledAction
 from studies.shared.immutable_json import FrozenDict, FrozenList, freeze_json
 
 
@@ -53,6 +53,82 @@ class ContextRaw:
     def restore(self, serialized):
         value = json.loads(serialized)
         self.state, self.definition = value["state"], value["definition"]
+
+
+class DecisionRaw(ContextRaw):
+    """Small counted rule API with choices, offers and a chance transition."""
+    def __init__(self, *, offers=(), phase="choose", state=0):
+        super().__init__(state=state)
+        self.offers = list(offers)
+        self.phase = phase
+        self.rule_version = "rules-v1"
+        self.calls = {"legal_actions": 0, "legal_interrupts": 0, "observation": 0}
+        self.applied = None
+        self.draws = 0
+
+    def current_decision_player(self):
+        return None if self.phase == "chance" else "axis"
+
+    def decision_kind(self):
+        return self.phase
+
+    def _action(self):
+        return {"id": f"choose-{self.state}", "player": "axis", "kind": "choose",
+                "parameters": {"step": self.state, "retained": ["蒙古", {"opaque": True}]}}
+
+    def legal_actions(self):
+        self.calls["legal_actions"] += 1
+        return [] if self.phase == "chance" else [self._action()]
+
+    def legal_interrupts(self):
+        self.calls["legal_interrupts"] += 1
+        return [{"id": f"declare-{player}", "player": player, "kind": "declare",
+                 "parameters": {"retained": [self.state]}} for player in self.offers]
+
+    def observation(self):
+        self.calls["observation"] += 1
+        return {"current_decision_player": self.current_decision_player(), "decision_kind": self.phase,
+                "state": {"step": self.state, "pending": {"opaque": [1, 2, 3]}},
+                "unknown_future_field": {"retained": [False, None, "蒙古"]},
+                "legal_actions": [] if self.phase == "chance" else [self._action()]}
+
+    def apply_action(self, action):
+        self.applied = copy.deepcopy(dict(action))
+        if action != self._action():
+            raise ValueError("Illegal raw choice")
+        self.state += 1
+
+    def apply_interrupt(self, action):
+        self.applied = copy.deepcopy(dict(action))
+        if action["player"] not in self.offers:
+            raise ValueError("Illegal raw declaration")
+        self.offers.remove(action["player"])
+        self.phase = "priority"
+        self.state += 1
+
+    def resolve_chance(self):
+        if self.phase != "chance":
+            raise ValueError("No chance pending")
+        self.draws += 1
+        self.state += 1
+        self.phase = "choose"
+
+    def planning_key(self):
+        return json.dumps([self.state, self.phase, self.offers, self.rule_version])
+
+    def clone(self):
+        result = copy.deepcopy(self)
+        result.calls = dict.fromkeys(self.calls, 0)
+        return result
+
+    def serialize(self):
+        return json.dumps({"state": self.state, "phase": self.phase, "offers": self.offers,
+                           "rules": self.rule_version, "draws": self.draws})
+
+    def restore(self, serialized):
+        value = json.loads(serialized)
+        self.state, self.phase, self.offers = value["state"], value["phase"], value["offers"]
+        self.rule_version, self.draws = value["rules"], value["draws"]
 
 
 class CampaignContextTransportTests(unittest.TestCase):
@@ -195,6 +271,136 @@ class CampaignContextTransportTests(unittest.TestCase):
         for mutation in mutations:
             with self.subTest(mutation=mutation), self.assertRaises(TypeError):
                 mutation()
+
+
+class CampaignDecisionReuseTests(unittest.TestCase):
+    def test_unchanged_selection_observation_and_apply_build_each_raw_source_once(self):
+        env = CampaignAdapter(DecisionRaw())
+        first = env.legal_actions()
+        expected = first[0].features()
+        snapshot = env.neural_observation()
+        for _ in range(4):
+            self.assertEqual(env.current_decision_player(), "axis")
+            self.assertEqual(env.decision_kind(), "choose")
+            self.assertEqual(env.legal_actions()[0].features(), expected)
+            self.assertIs(env.neural_observation(), snapshot)
+            self.assertEqual(env.observation(), snapshot)
+        self.assertEqual(env.raw.calls, {"legal_actions": 1, "legal_interrupts": 0, "observation": 1})
+        self.assertEqual(snapshot["unknown_future_field"], {"retained": [False, None, "蒙古"]})
+        env.apply_action(first[0])
+        self.assertEqual(env.raw.calls, {"legal_actions": 1, "legal_interrupts": 0, "observation": 1})
+        self.assertEqual(env.raw.applied, expected["action"])
+        self.assertEqual(env.neural_observation()["state"]["step"], 1)
+        self.assertEqual(env.raw.calls, {"legal_actions": 2, "legal_interrupts": 0, "observation": 2})
+
+    def test_public_payloads_cannot_poison_canonical_actions_or_neural_observation(self):
+        env = CampaignAdapter(DecisionRaw())
+        action = env.legal_actions()[0]
+        snapshot = env.neural_observation()
+        public = env.observation()
+        public["state"]["pending"]["opaque"].append("poison")
+        public["legal_actions"][0]["action"]["parameters"]["step"] = -1
+        feature = action.features()
+        feature["action"]["parameters"]["retained"].clear()
+        env.legal_actions().clear()
+        with self.assertRaises(TypeError):
+            action.raw["parameters"]["step"] = -1
+        with self.assertRaises(TypeError):
+            action.neural_features()["action"]["parameters"]["retained"].append("poison")
+        self.assertIs(snapshot, env.neural_observation())
+        self.assertEqual(env.observation()["state"]["pending"]["opaque"], [1, 2, 3])
+        self.assertEqual(action.features()["action"]["parameters"]["retained"], ["蒙古", {"opaque": True}])
+        forged = ScheduledAction(action.id, action.kind, action.player,
+                                 {"id": "forged", "parameters": {"step": -1}})
+        env.apply_action(forged)
+        self.assertEqual(env.raw.applied["id"], "choose-0")
+        self.assertEqual(env.raw.applied["parameters"]["step"], 0)
+
+    def test_passing_offers_changes_scheduled_cache_without_rebuilding_raw_sources(self):
+        env = CampaignAdapter(DecisionRaw(offers=("allies", "comintern"), phase="production"))
+        raw_key = env.raw.planning_key()
+        first_key = env.planning_key()
+        first = env.neural_observation()
+        self.assertEqual(first["current_decision_player"], "allies")
+        for player in ("allies", "comintern"):
+            self.assertEqual(env.current_decision_player(), player)
+            env.apply_action(next(action for action in env.legal_actions() if action.kind == "pass_interrupt"))
+            current = env.neural_observation()
+            self.assertIsNot(current, first)
+            self.assertEqual(env.raw.planning_key(), raw_key)
+            self.assertNotEqual(env.planning_key(), first_key)
+        self.assertEqual(current["current_decision_player"], "axis")
+        self.assertEqual(current["decision_kind"], "production")
+        self.assertEqual(current["interrupt_scheduler"]["passed"], ["allies", "comintern"])
+        self.assertEqual(env.raw.calls, {"legal_actions": 1, "legal_interrupts": 1, "observation": 1})
+        # Reordering offers changes the scheduled identity, even when the raw
+        # board and already-passed actors are unchanged.
+        env.interrupt_order = tuple(reversed(env.interrupt_order))
+        reordered = env.neural_observation()
+        self.assertIsNot(reordered, current)
+        self.assertEqual(reordered["interrupt_scheduler"]["order"], list(env.interrupt_order))
+        self.assertEqual(env.raw.calls["observation"], 1)
+
+    def test_clones_share_snapshots_but_invalidate_independently_on_actions_and_offers(self):
+        env = CampaignAdapter(DecisionRaw(offers=("allies", "comintern"), phase="production"))
+        original = env.neural_observation()
+        original_actions = env.legal_actions()
+        for clone in (env.clone(), env.clone_for_search(71)):
+            self.assertIs(clone.neural_observation(), original)
+            self.assertIs(clone.legal_actions()[0], original_actions[0])
+            self.assertEqual(clone.raw.calls, dict.fromkeys(clone.raw.calls, 0))
+            clone.apply_action(next(action for action in clone.legal_actions() if action.kind == "pass_interrupt"))
+            self.assertEqual(clone.current_decision_player(), "comintern")
+            self.assertEqual(env.current_decision_player(), "allies")
+            self.assertIsNot(clone.neural_observation(), original)
+            clone.apply_action(next(action for action in clone.legal_actions() if action.kind == "interrupt"))
+            self.assertEqual(clone.neural_observation()["state"]["step"], 1)
+            self.assertEqual(env.neural_observation()["state"]["step"], 0)
+            self.assertEqual(clone.raw.calls["observation"], 1)
+        self.assertIs(env.neural_observation(), original)
+        self.assertEqual(env.raw.calls["observation"], 1)
+
+    def test_chance_and_external_raw_changes_invalidate_complete_decision(self):
+        env = CampaignAdapter(DecisionRaw(phase="chance"))
+        chance = env.neural_observation()
+        self.assertEqual(chance["legal_actions"], [])
+        self.assertEqual(env.raw.draws, 0)
+        clone = env.clone_for_search(99)
+        self.assertIs(clone.neural_observation(), chance)
+        clone.resolve_chance()
+        self.assertEqual(clone.raw.draws, 1)
+        self.assertEqual(env.raw.draws, 0)
+        self.assertEqual(clone.neural_observation()["state"]["step"], 1)
+        env.resolve_chance()
+        selected = env.legal_actions()[0]
+        normal = env.neural_observation()
+        env.raw.state += 1
+        with self.assertRaises(ValueError):
+            env.apply_action(selected)
+        self.assertIsNot(env.neural_observation(), normal)
+        self.assertEqual(env.neural_observation()["state"]["step"], 2)
+        # A rules change is also part of the raw API's complete planning key.
+        current = env.neural_observation()
+        env.raw.rule_version = "rules-v2"
+        self.assertIsNot(env.neural_observation(), current)
+
+    def test_successful_restore_replaces_cache_and_rejected_restore_preserves_it(self):
+        env = CampaignAdapter(DecisionRaw(offers=("allies", "comintern"), phase="production"))
+        checkpoint = env.serialize()
+        first = env.neural_observation()
+        env.apply_action(next(action for action in env.legal_actions() if action.kind == "pass_interrupt"))
+        changed = env.neural_observation()
+        invalid = json.loads(checkpoint)
+        invalid["passed"] = ["allies", "allies"]
+        with self.assertRaises(ValueError):
+            env.restore(json.dumps(invalid))
+        self.assertIs(env.neural_observation(), changed)
+        env.restore(checkpoint)
+        restored = env.neural_observation()
+        self.assertEqual(restored, first)
+        self.assertIsNot(restored, changed)
+        self.assertEqual(env.current_decision_player(), "allies")
+        self.assertEqual(env.serialize(), checkpoint)
 
 
 if __name__ == "__main__":

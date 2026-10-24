@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from .immutable_json import FrozenDict, freeze_json
@@ -34,10 +34,40 @@ class ScheduledAction:
     kind: str
     player: str
     raw: Any = None
+    _features: FrozenDict = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        # The wrapper exposes source features, never the authoritative native
+        # object used by apply_action. Even nested caller edits cannot poison a
+        # cached legal payload or the neural input of another search clone.
+        raw = freeze_json(_raw_features(self.raw)) if self.raw is not None else None
+        object.__setattr__(self, "raw", raw)
+        object.__setattr__(self, "_features", freeze_json({
+            "id": self.id, "kind": self.kind, "player": self.player, "action": raw,
+        }))
+
+    def neural_features(self) -> FrozenDict:
+        return self._features
 
     def features(self) -> dict[str, Any]:
-        return {"id": self.id, "kind": self.kind, "player": self.player,
-                "action": _raw_features(self.raw) if self.raw is not None else None}
+        return json.loads(self._features.canonical_json)
+
+
+@dataclass(slots=True)
+class _DecisionCache:
+    key: tuple[str, tuple[str, ...], tuple[str, ...]]
+    offered: str | None
+    owner: str | None
+    kind: str
+    actions: tuple[ScheduledAction, ...] | None = None
+    raw_actions: tuple[Any, ...] | None = None
+    observation: FrozenDict | None = None
+
+
+def _canonical_raw(action: Any) -> Any:
+    # Native actions have value fields and stay private. JSON fake environments
+    # also retain a detached canonical payload instead of a caller-owned dict.
+    return freeze_json(action) if isinstance(action, dict) else action
 
 
 class CampaignAdapter:
@@ -49,59 +79,100 @@ class CampaignAdapter:
         self._anchor = raw.planning_key()
         self._passed: set[str] = set()
         self._neural_context: FrozenDict | None = None
+        self._context_order = self.interrupt_order
+        self._raw_interrupts: tuple[Any, ...] | None = None
+        self._raw_actions: tuple[Any, ...] | None = None
+        self._raw_observation: FrozenDict | None = None
+        self._decision: _DecisionCache | None = None
+
+    def _invalidate_raw(self) -> None:
+        self._raw_interrupts = self._raw_actions = None
+        self._raw_observation = None
+        self._decision = None
 
     def _sync(self) -> None:
         key = self.raw.planning_key()
         if key != self._anchor:
             self._anchor, self._passed = key, set()
+            self._invalidate_raw()
+
+    def _decision_cache(self) -> _DecisionCache:
+        self._sync()
+        key = (self._anchor, self.interrupt_order, tuple(sorted(self._passed)))
+        if self._decision is not None and self._decision.key == key:
+            return self._decision
+        kind = self.raw.decision_kind()
+        offered = None
+        if not self.raw.is_terminal() and kind in PHASES:
+            if self._raw_interrupts is None:
+                self._raw_interrupts = tuple(_canonical_raw(action) for action in self.raw.legal_interrupts())
+            owners = {_field(action, "player") for action in self._raw_interrupts}
+            if not owners.issubset(PLAYERS):
+                raise ValueError("Interrupt names an unknown decision owner")
+            offered = next((player for player in self.interrupt_order
+                            if player in owners and player not in self._passed), None)
+        self._decision = _DecisionCache(key, offered, offered or self.raw.current_decision_player(),
+                                        "declaration_offer" if offered is not None else kind)
+        return self._decision
 
     def _offered_player(self) -> str | None:
-        self._sync()
-        if self.raw.is_terminal() or self.raw.decision_kind() not in PHASES:
-            return None
-        owners = {_field(action, "player") for action in self.raw.legal_interrupts()}
-        if not owners.issubset(PLAYERS):
-            raise ValueError("Interrupt names an unknown decision owner")
-        return next((player for player in self.interrupt_order if player in owners and player not in self._passed), None)
+        return self._decision_cache().offered
 
     def current_decision_player(self) -> str | None:
-        return self._offered_player() or self.raw.current_decision_player()
+        return self._decision_cache().owner
 
     def decision_kind(self) -> str:
-        return "declaration_offer" if self._offered_player() is not None else self.raw.decision_kind()
+        return self._decision_cache().kind
+
+    def _legal_actions(self, decision: _DecisionCache) -> tuple[ScheduledAction, ...]:
+        if decision.actions is None:
+            if decision.offered is not None:
+                raw_actions = tuple(action for action in self._raw_interrupts or ()
+                                    if _field(action, "player") == decision.offered)
+                actions = [ScheduledAction(f"{SCHEMA}:interrupt:{action_key(action)}", "interrupt",
+                                           decision.offered, action) for action in raw_actions]
+                actions.append(ScheduledAction(f"{SCHEMA}:pass:{decision.offered}", "pass_interrupt", decision.offered))
+                decision.raw_actions = (*raw_actions, None)
+            else:
+                if self._raw_actions is None:
+                    self._raw_actions = tuple(_canonical_raw(action) for action in self.raw.legal_actions())
+                decision.raw_actions = self._raw_actions
+                actions = [ScheduledAction(f"{SCHEMA}:play:{action_key(action)}", "play", str(decision.owner), action)
+                           for action in self._raw_actions]
+            decision.actions = tuple(actions)
+        return decision.actions
 
     def legal_actions(self) -> list[ScheduledAction]:
-        offered = self._offered_player()
-        if offered is not None:
-            actions = [ScheduledAction(f"{SCHEMA}:interrupt:{action_key(action)}", "interrupt", offered, action)
-                       for action in self.raw.legal_interrupts() if _field(action, "player") == offered]
-            actions.append(ScheduledAction(f"{SCHEMA}:pass:{offered}", "pass_interrupt", offered))
-            return actions
-        owner = self.raw.current_decision_player()
-        return [ScheduledAction(f"{SCHEMA}:play:{action_key(action)}", "play", str(owner), action)
-                for action in self.raw.legal_actions()]
+        return list(self._legal_actions(self._decision_cache()))
 
     def apply_action(self, action: ScheduledAction) -> None:
-        # Use the current legal object, never a caller-supplied raw payload with
-        # a copied ID. Validation occurs before changing wrapper or engine state.
-        candidates = [candidate for candidate in self.legal_actions()
-                      if candidate.id == action.id and candidate.kind == action.kind and candidate.player == action.player]
-        if len(candidates) != 1:
+        # Validate against the unchanged decision's canonical legal objects. A
+        # forged or mutated public raw payload is never sent to the engine.
+        decision = self._decision_cache()
+        actions = self._legal_actions(decision)
+        matches = [index for index, candidate in enumerate(actions)
+                   if candidate.id == action.id and candidate.kind == action.kind and candidate.player == action.player]
+        if len(matches) != 1:
             raise ValueError("Illegal scheduled campaign action")
-        chosen = candidates[0]
+        index = matches[0]
+        chosen = actions[index]
         if chosen.kind == "pass_interrupt":
             self._passed.add(chosen.player)
-        elif chosen.kind == "interrupt":
-            self.raw.apply_interrupt(chosen.raw)
-            self._sync()
+            self._decision = None
         else:
-            self.raw.apply_action(chosen.raw)
+            assert decision.raw_actions is not None
+            if chosen.kind == "interrupt":
+                self.raw.apply_interrupt(decision.raw_actions[index])
+            else:
+                self.raw.apply_action(decision.raw_actions[index])
+            self._invalidate_raw()
             self._sync()
 
     def resolve_chance(self) -> None:
         if self.decision_kind() != "chance":
             raise ValueError("No scheduled chance event is pending")
         self.raw.resolve_chance()
+        self._invalidate_raw()
         self._sync()
 
     def is_terminal(self) -> bool:
@@ -113,15 +184,25 @@ class CampaignAdapter:
     def wealth(self) -> Any:
         return self.raw.wealth()
 
+    def neural_observation(self) -> FrozenDict:
+        """Complete immutable observation reused for one scheduled decision."""
+        decision = self._decision_cache()
+        if decision.observation is None:
+            if self._raw_observation is None:
+                self._raw_observation = freeze_json(dict(self.raw.observation()))
+            observation = dict(self._raw_observation)
+            observation.update({"current_decision_player": decision.owner,
+                                "decision_kind": decision.kind,
+                                "legal_actions": [action.neural_features() for action in self._legal_actions(decision)],
+                                "interrupt_scheduler": {"schema": SCHEMA, "order": list(self.interrupt_order),
+                                                        "passed": sorted(self._passed)}})
+            decision.observation = freeze_json(observation)
+        return decision.observation
+
     def observation(self) -> dict[str, Any]:
-        self._sync()
-        observation = dict(self.raw.observation())
-        observation.update({"current_decision_player": self.current_decision_player(),
-                            "decision_kind": self.decision_kind(),
-                            "legal_actions": [action.features() for action in self.legal_actions()],
-                            "interrupt_scheduler": {"schema": SCHEMA, "order": list(self.interrupt_order),
-                                                    "passed": sorted(self._passed)}})
-        return observation
+        # Public callers may edit a detached mutable observation; inference
+        # retains the immutable source directly and avoids repeated conversion.
+        return json.loads(self.neural_observation().canonical_json)
 
     def context(self) -> dict[str, Any]:
         # Public callers retain the detached, mutable JSON contract. Inference
@@ -135,6 +216,9 @@ class CampaignAdapter:
         Campaign context contains the scenario/rules definition, never changing
         game state or execution RNG. Restore replaces this cache transactionally.
         """
+        if self._context_order != self.interrupt_order:
+            self._neural_context = None
+            self._context_order = self.interrupt_order
         if self._neural_context is None:
             context = dict(self.raw.context())
             context["interrupt_scheduler"] = {"schema": SCHEMA, "order": list(self.interrupt_order)}
@@ -152,6 +236,14 @@ class CampaignAdapter:
         result = CampaignAdapter(self.raw.clone(), interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
         result._neural_context = self._neural_context
+        result._context_order = self._context_order
+        # Copy lazy cache containers while sharing their immutable source data.
+        # Neither real-play nor search RNG is stored in these snapshots.
+        if result._anchor == self._anchor:
+            result._raw_interrupts = self._raw_interrupts
+            result._raw_actions = self._raw_actions
+            result._raw_observation = self._raw_observation
+            result._decision = replace(self._decision) if self._decision is not None else None
         return result
 
     def clone_for_search(self, seed: int) -> CampaignAdapter:
@@ -159,6 +251,14 @@ class CampaignAdapter:
         result = CampaignAdapter(self.raw.clone_for_search(seed), interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
         result._neural_context = self._neural_context
+        result._context_order = self._context_order
+        # Copy lazy cache containers while sharing their immutable source data.
+        # Neither real-play nor search RNG is stored in these snapshots.
+        if result._anchor == self._anchor:
+            result._raw_interrupts = self._raw_interrupts
+            result._raw_actions = self._raw_actions
+            result._raw_observation = self._raw_observation
+            result._decision = replace(self._decision) if self._decision is not None else None
         return result
 
     def planning_key(self) -> str:

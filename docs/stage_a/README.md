@@ -1,10 +1,18 @@
 # Stage A: completed-episode campaign learning
 
-Status: first completed-episode pilot and scaling measurements complete, 23
+Status: first completed-episode pilot, scaling measurements and decision-reuse
+performance pass complete, 24
 October 2026. Stage A remains an early learning experiment; it is not a completed
 playing-strength gate. [The scaling follow-up](scaling_2026_10_23.md) completes
 one small-budget eleven-round game, but stronger-search collection still needs
 performance work before larger learning.
+
+The [24 October decision-reuse fix](decision_reuse_2026_10_24.md) removes repeated
+legal-menu generation and observation conversion. A matched full-game invocation
+falls from 198.42 to 112.72 seconds, preserving all search results, 560 choices,
+71 chance events and terminal scores. The stronger two-round batch still hits
+its 240-second guard, with 370 choices completed versus 234 before the fix.
+All 258 Python tests and 24 C++ suites pass; larger learning remains on hold.
 
 Eight real one-round self-play games finished in 346.62 seconds, with 386 decisions
 and 52 chance events. All 386 training rows have observed terminal targets; none
@@ -69,9 +77,9 @@ The observed improvement is completion behavior and outcome prediction. Allies/
 Comintern scores did not improve on these two dice seeds. Eight training games
 and one training seed do not establish robust strategic strength. The scaling
 follow-up now measures stronger search, later positions and longer horizons.
-Next reduce repeated legal-menu/observation work and verify completion at the
-stronger budget, then expand one-round learning and evaluation across several
-seeds before claiming strategic strength.
+Decision reuse is now implemented. Next reduce remaining simulation/neural-input
+costs and verify completion at the stronger budget, then expand one-round learning
+and evaluation across several seeds before claiming strategic strength.
 
 The completed run includes 19 purchases, 35 land moves and 12 land-battle starts,
 but demonstrates no naval movement/combat learning. All 230 Python tests and 24 C++
@@ -144,6 +152,7 @@ state.
 - [Training and per-episode results](training_2026_10_23.json)
 - [Performance follow-up and identical-workload repeat](performance_2026_10_23.json)
 - [Search/campaign scaling report](scaling_2026_10_23.md)
+- [Decision reuse and matched performance results](decision_reuse_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)
 - [Matched-position operation profile](position_profile_2026_10_23.json)
 - [Paired comparison and limits](comparison_2026_10_23.json)

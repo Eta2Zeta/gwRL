@@ -3,6 +3,7 @@
 #include "game/catalog.hpp"
 
 #include <stdexcept>
+#include <mutex>
 
 namespace game::campaign {
 namespace {
@@ -27,11 +28,18 @@ V staticContext(const State& s) {
 }
 }  // namespace
 
+struct CampaignEnv::DecisionCache {
+    std::mutex mutex;
+    std::optional<std::string> planningKey;
+    std::optional<V> observation;
+};
+
 CampaignEnv::CampaignEnv(const std::filesystem::path& path, std::uint64_t seed)
     : CampaignEnv(Engine::start(loadScenario(path), campaignRules(), seed)) {}
 
 CampaignEnv::CampaignEnv(Engine engine)
-    : engine_(std::move(engine)), context_(std::make_shared<const V>(staticContext(engine_.state()))) {}
+    : engine_(std::move(engine)), context_(std::make_shared<const V>(staticContext(engine_.state()))),
+      decisionCache_(std::make_shared<DecisionCache>()) {}
 
 CampaignEnv CampaignEnv::curriculum(const std::filesystem::path& path, int calendarRounds,
                                     std::uint64_t seed) {
@@ -62,7 +70,9 @@ std::string CampaignEnv::decisionKind() const {
     return toString(s.clock.phase);
 }
 
-V CampaignEnv::observation() const {
+const V& CampaignEnv::observation() const {
+    std::lock_guard lock(decisionCache_->mutex);
+    if (decisionCache_->observation) return *decisionCache_->observation;
     const auto owner = currentDecisionPlayer();
     A actions, interrupts;
     for (const auto& action : legalActions()) actions.push_back(actionJson(action));
@@ -70,10 +80,11 @@ V CampaignEnv::observation() const {
     // Entity maps retain every rule status, route/origin, relationship, pending
     // choice and chance request. Geography/catalog registries are shared context.
     // Execution RNG, dice tapes, history and planning hashes are never features.
-    return V(O{{"schema", V(std::string("campaign_entities_v1"))}, {"state", engine_.state().observation()},
+    decisionCache_->observation = V(O{{"schema", V(std::string("campaign_entities_v1"))}, {"state", engine_.state().observation()},
         {"current_decision_player", owner ? V(*owner) : V(nullptr)},
         {"decision_kind", V(decisionKind())}, {"legal_actions", V(std::move(actions))},
         {"legal_interrupts", V(std::move(interrupts))}});
+    return *decisionCache_->observation;
 }
 
 CampaignEnv CampaignEnv::clone() const { return *this; }
@@ -83,11 +94,28 @@ CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const {
     return copy;
 }
 std::string CampaignEnv::planningKey() const {
-    if (!planningKey_) planningKey_ = engine_.planningKey();
-    return *planningKey_;
+    std::lock_guard lock(decisionCache_->mutex);
+    if (!decisionCache_->planningKey) decisionCache_->planningKey = engine_.planningKey();
+    return *decisionCache_->planningKey;
+}
+void CampaignEnv::applyAction(const Action& action) {
+    auto fresh = std::make_shared<DecisionCache>();
+    engine_.step(action);
+    decisionCache_ = std::move(fresh);
+}
+void CampaignEnv::applyInterrupt(const Action& action) {
+    auto fresh = std::make_shared<DecisionCache>();
+    engine_.interrupt(action);
+    decisionCache_ = std::move(fresh);
+}
+void CampaignEnv::resolveChance() {
+    auto fresh = std::make_shared<DecisionCache>();
+    engine_.resolveChance();
+    decisionCache_ = std::move(fresh);
 }
 void CampaignEnv::restore(const std::string& serialized) {
+    auto fresh = std::make_shared<DecisionCache>();
     engine_ = Engine::restore(engine_.state().definition, campaignRules(), serialized);
-    planningKey_.reset();
+    decisionCache_ = std::move(fresh);
 }
 }  // namespace game::campaign
