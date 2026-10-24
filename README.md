@@ -6,6 +6,7 @@
 
 - [Stage A learning pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md): eight completed games, terminal-only training and paired held-out results.
 - [Campaign learning](/Users/home/Desktop/gwRL/studies/campaign/README.md): foreground training, interrupt/resume, evaluation and profiling; [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md).
+- [Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md): local map viewer, self-play replay, optional live following and recorded MCTS decisions.
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.
 - [Mini Japan, two turns](/Users/home/Desktop/gwRL/studies/mini_japan_two_turn/README.md): neural MCTS trainer, search diagnostic and completed results.
 - [Full-campaign plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) and [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): the approved 1936–1941 campaign and milestone gates.

@@ -109,6 +109,31 @@ class CampaignRunTests(unittest.TestCase):
         self.assertGreater(manifest["collection_transitions_per_second_this_invocation"], 0)
         self.assertNotIn("timings_seconds_this_invocation", manifest["runner"])
 
+    def test_record_replay_is_opt_in_and_preserves_training_and_resume_files(self):
+        self.assertFalse((self.reference_dir / "replay.jsonl").exists())
+        directory = self.directory / "recorded"
+        result = self.command(["--run-dir", str(directory), *self.flags, "--record-replay"])
+        self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+        actual = self.read(directory / "checkpoint.pt")
+        self.assert_tree_equal(self.reference["learner"], actual["learner"])
+        records = [json.loads(line) for line in (directory / "replay.jsonl").read_text().splitlines()]
+        self.assertEqual(records[0]["type"], "run_start")
+        self.assertEqual(records[-1]["type"], "run_end")
+        self.assertEqual(records[-1]["status"], "completed")
+        self.assertEqual(records[0]["verification"], "initial_serialized_sha256_then_planning_keys_and_seed")
+        transitions = [record for record in records if record["type"] == "transition"]
+        self.assertEqual([record["event"] for record in transitions], actual["learner"]["action_history"])
+        self.assertEqual(len(transitions), actual["learner"]["counters"]["transitions"])
+        starts = [record for record in records if record["type"] == "episode_start"]
+        self.assertEqual([record["seed"] for record in starts], actual["runner"]["training_environment_seeds"])
+        manifest = json.loads((directory / "manifest.json").read_text())
+        self.assertEqual(manifest["replay_trace"], "replay.jsonl")
+        before = self.files(directory)
+        rejected = self.command(["--resume", str(directory / "checkpoint.pt"), "--record-replay"])
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertIn("requires a fresh run", rejected.stderr)
+        self.assertEqual(before, self.files(directory))
+
     def test_completed_manifest_reports_wall_time_outside_deterministic_checkpoint(self):
         manifest = json.loads((self.reference_dir / "manifest.json").read_text())
         self.assert_invocation_timings(manifest)

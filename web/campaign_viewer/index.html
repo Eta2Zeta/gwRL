@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Campaign Observatory · GW36</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="./" aria-label="Campaign Observatory home"><span class="brand-mark" aria-hidden="true">◈</span><span>CAMPAIGN <b>OBSERVATORY</b><small>GLOBAL WAR 1936 · CHINA THEATRE</small></span></a>
+    <div class="toolbar-actions">
+      <label class="sr-only" for="recordings">Choose a recording</label><select id="recordings"><option value="">Loading recordings…</option></select>
+      <label class="button file-button" for="file-input">Open recording<input id="file-input" type="file" accept=".json,application/json"></label>
+      <button id="refresh" class="button subtle" disabled>Refresh</button><label class="follow-label" for="follow-latest"><input id="follow-latest" type="checkbox" disabled> Follow latest</label>
+      <button id="download" class="button subtle" disabled>Export JSON</button>
+    </div>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">SELF-PLAY REVIEW</p><h1 id="replay-title">See every decision.</h1><p id="replay-subtitle">Open a recorded game to inspect the board, dice events and the choices made by each agent.</p></div>
+      <div class="record-badges" id="record-badges"><span class="badge">REPLAY ONLY</span></div>
+    </section>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <section class="position-strip" aria-label="Current position">
+      <div><span class="stat-label">CAMPAIGN CLOCK</span><strong id="clock">—</strong></div>
+      <div><span class="stat-label">PHASE</span><strong id="phase">—</strong></div>
+      <div><span class="stat-label">DECISION BELONGS TO</span><strong id="decision-owner">—</strong><small id="decision-kind" class="decision-kind"></small></div>
+      <div class="position-count"><span class="stat-label">RECORDED POSITION</span><strong id="position-count">0 / 0</strong></div>
+    </section>
+    <div class="workspace">
+      <section class="map-panel panel" aria-label="Campaign map">
+        <div class="panel-heading"><div><h2>Theatre map</h2><span class="caption">Geographic schematic · zoom in and drag to inspect</span></div><div class="map-controls"><label><input type="checkbox" id="show-connections"> Connections</label><div class="zoom-controls"><button id="zoom-out" class="icon-button" title="Zoom out" aria-label="Zoom map out" disabled>−</button><span id="zoom-level" aria-live="polite">100%</span><button id="zoom-in" class="icon-button" title="Zoom in" aria-label="Zoom map in">+</button><button id="reset-view" class="icon-button" title="Show full map" aria-label="Reset map to full view">↺</button></div></div></div>
+        <div class="map-container" id="map-container"><svg id="map" viewBox="0 0 1400 1000" role="group" aria-label="Schematic campaign map. Choose a location to inspect it."></svg><div id="map-empty" class="map-empty"><span aria-hidden="true">◈</span><strong>Your campaign, decision by decision.</strong><p>Load a recording above. This viewer reads saved events; it does not run the engine or train a network.</p></div></div>
+        <div class="map-legend"><span><i style="--faction:#b54d43"></i>Japan</span><span><i style="--faction:#34658a"></i>KMT</span><span><i style="--faction:#ad812b"></i>CCP</span><span><i style="--faction:#4f7c63"></i>Mongolia</span><span><i style="--faction:#858073"></i>Other nations</span><span class="legend-highlight"><i></i>Changed this event</span></div><div class="politics-status" id="politics-status"></div>
+      </section>
+      <aside class="inspector panel" aria-label="Location inspector"><div class="panel-heading"><h2>Location inspector</h2><span class="small-tag" id="location-type">MAP</span></div><div id="location-details" class="inspector-body"><div class="empty-detail"><span aria-hidden="true">⌖</span><h3>Select a location</h3><p>Inspect its possessor, units, facilities and work in progress.</p></div></div></aside>
+    </div>
+    <section class="playback panel" aria-label="Replay controls">
+      <div class="playback-row"><div class="transport"><button id="first" class="icon-button" disabled title="Initial position" aria-label="Initial position">|◀</button><button id="prev" class="icon-button" disabled title="Previous event (Left arrow)" aria-label="Previous event">◀</button><button id="play" class="play-button" disabled title="Play or pause (Space)" aria-label="Play replay">▶</button><button id="next" class="icon-button" disabled title="Next event (Right arrow)" aria-label="Next event">▶</button><button id="last" class="icon-button" disabled title="Final position" aria-label="Final position">▶|</button></div><div class="event-now"><span class="stat-label" id="event-kind">INITIAL POSITION</span><strong id="event-summary">No recording loaded</strong></div><label class="speed-label" for="speed">Speed<select id="speed"><option value="1800">0.5×</option><option value="900" selected>1×</option><option value="450">2×</option><option value="180">5×</option></select></label></div>
+      <label class="sr-only" for="timeline">Recorded position</label><input id="timeline" type="range" min="0" max="0" value="0" disabled><div class="timeline-labels"><span>Initial position</span><span id="timeline-help">Space to play · ← → to step · Home / End to jump</span><span>Final position</span></div><details class="event-record" id="event-record" hidden><summary>Inspect this recorded event</summary><pre id="event-record-json"></pre></details>
+    </section>
+    <div class="analysis-grid">
+      <section class="panel wealth-panel"><div class="panel-heading"><h2>Alliance ledger</h2><span class="caption">At the selected position</span></div><div id="wealth-cards" class="wealth-cards"></div><p class="panel-note">Wealth follows the engine’s campaign scoring. Cash is shown separately; queued purchases are not counted twice.</p></section>
+      <section class="panel search-panel"><div class="panel-heading"><div><h2>Inside the decision</h2><span class="caption" id="search-caption">Recorded MCTS statistics</span></div><span class="small-tag">IMAGINED SEARCH</span></div><div id="search-details" class="search-body"><p class="empty-copy">Select a recording to see its available search information.</p></div></section>
+      <section class="panel event-panel"><div class="panel-heading"><div><h2>Event journal</h2><span class="caption">Actual recorded actions and dice events</span></div><label class="sr-only" for="event-filter">Filter event journal</label><select id="event-filter"><option value="all">All events</option><option value="action">Actions</option><option value="chance">Dice events</option><option value="combat">Combat</option><option value="ownership">Possession changes</option></select></div><div id="event-list" class="event-list"><p class="empty-copy">The recording’s events will appear here.</p></div></section>
+    </div>
+    <footer><span>ACTUAL REPLAY ≠ IMAGINED SEARCH</span><p>Replay positions show what happened. Search alternatives show what the agent considered. Policy probabilities and value estimates are not measured win rates.</p></footer>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -30,6 +30,30 @@ from studies.shared.immutable_json import freeze_json
 
 CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
 TARGET_SCHEMA = "campaign-raw-vector-target-v1"
+REPLAY_TRACE_SCHEMA = "campaign-self-play-trace-v1"
+
+
+class ReplayTraceWriter:
+    """Append-only inspection data, deliberately separate from learner checkpoints.
+
+    One writer describes one fresh invocation. It never changes the learner RNG
+    or serializes a full position for every transition. A killed run can leave a
+    valid prefix; absence of ``run_end`` explicitly means it is incomplete.
+    """
+
+    def __init__(self, path: str | Path, metadata: Mapping[str, Any]):
+        self.path = Path(path)
+        self._handle = self.path.open("x")
+        self({"type": "run_start", **dict(metadata),
+              "verification": "initial_serialized_sha256_then_planning_keys_and_seed",
+              "resume_supported": False})
+
+    def __call__(self, record: Mapping[str, Any]) -> None:
+        self._handle.write(_canonical({"schema": REPLAY_TRACE_SCHEMA, **record}) + "\n")
+        self._handle.flush()
+
+    def close(self) -> None:
+        self._handle.close()
 
 
 def _read_only(*_args, **_kwargs):
@@ -130,6 +154,55 @@ class LearningConfig:
             raise ValueError("Learning updates all three policies in multiplayer mode")
 
 
+class ReplayTraceCapture:
+    """Record only actual transitions; full state is hashed once per episode."""
+
+    def __init__(self, observer: Callable[[dict[str, Any]], None]):
+        self.replay_observer = observer
+        self._replay_roots: dict[int, dict[str, Any]] = {}
+        self._replay_seeds: dict[int, int] = {}
+        self._replay_contexts: set[str] = set()
+
+    def remember_seed(self, env: Any, seed: int) -> None:
+        self._replay_seeds[id(env)] = seed
+
+    def before(self, env: Any, root: int) -> dict[str, Any] | None:
+        """Start an inspection episode and remember only its past-event cursor."""
+        if self.replay_observer is None:
+            return None
+        current = self._replay_roots.get(root)
+        if current is None or current["env"] is not env:
+            number = current["number"] + 1 if current else 0
+            context = env.context()
+            context_key = _fingerprint(context)
+            if context_key not in self._replay_contexts:
+                self.replay_observer({"type": "context", "context_sha256": context_key, "context": context})
+                self._replay_contexts.add(context_key)
+            serialized = env.serialize()  # Once per episode, never once per action.
+            current = {"env": env, "number": number, "episode_id": f"{root}:{number}", "sequence": 0}
+            self._replay_roots[root] = current
+            self.replay_observer({"type": "episode_start", "root": root, "episode_id": current["episode_id"],
+                "seed": self._replay_seeds.pop(id(env), None), "context_sha256": context_key,
+                "initial_state_sha256": hashlib.sha256(serialized.encode()).hexdigest(),
+                "initial_planning_key": env.planning_key(), "initial_observation": env.observation()})
+        raw = getattr(env, "raw", env)
+        cursor = raw.history_size() if hasattr(raw, "history_size") else None
+        return {"root": root, "episode_id": current["episode_id"], "sequence": current["sequence"],
+                "history_cursor": cursor}
+
+    def after(self, env: Any, replay: dict[str, Any] | None, event: dict[str, Any]) -> None:
+        if replay is None:
+            return
+        cursor = replay.pop("history_cursor")
+        raw = getattr(env, "raw", env)
+        observed = raw.history_since(cursor) if cursor is not None else None
+        self.replay_observer({"type": "transition", **replay, "event": event,
+            "observed_events": observed,
+            "dice_verification": "recorded_past_events" if observed is not None else "seed_and_planning_key",
+            "terminal_returns": list(env.returns()) if env.is_terminal() else None})
+        self._replay_roots[replay["root"]]["sequence"] += 1
+
+
 class CampaignLearner:
     """Owns live models, replay, RNG, and an optional active CampaignAdapter.
 
@@ -139,7 +212,8 @@ class CampaignLearner:
     """
 
     def __init__(self, models: Mapping[str, nn.Module], model_config: Any,
-                 config: LearningConfig | None = None, *, compatibility: Mapping[str, Any]):
+                 config: LearningConfig | None = None, *, compatibility: Mapping[str, Any],
+                 replay_observer: Callable[[dict[str, Any]], None] | None = None):
         self.config = config or LearningConfig()
         self.model_config = copy.deepcopy(asdict(model_config))
         self.compatibility = json.loads(_canonical(dict(compatibility)))
@@ -175,6 +249,9 @@ class CampaignLearner:
         self.counters = dict(transitions=0, decisions=0, chance_events=0,
                              episodes=0, batches=0, updates=0)
         self.action_history: list[dict[str, Any]] = []
+        # Inspection-only callbacks are never checkpointed or restored. Their
+        # absence leaves collection unchanged and performs no replay conversion.
+        self.set_replay_observer(replay_observer)
 
     def _optimizer(self, model: nn.Module) -> torch.optim.Optimizer:
         return torch.optim.Adam(model.parameters(), lr=self.config.learning_rate)
@@ -190,8 +267,24 @@ class CampaignLearner:
             signature = inspect.signature(factory)
             signature.bind(seed)
         except (TypeError, ValueError):
-            return factory()
-        return factory(seed)
+            env = factory()
+            seed = None
+        else:
+            env = factory(seed)
+        if self.replay_capture is not None and seed is not None:
+            self.replay_capture.remember_seed(env, seed)
+        return env
+
+    def set_replay_observer(self, observer: Callable[[dict[str, Any]], None] | None) -> None:
+        """Attach a new inspection segment without altering checkpoint state."""
+        self.replay_capture = ReplayTraceCapture(observer) if observer is not None else None
+
+    def _replay_before(self, env: Any, root: int) -> dict[str, Any] | None:
+        return self.replay_capture.before(env, root) if self.replay_capture is not None else None
+
+    def _replay_after(self, env: Any, replay: dict[str, Any] | None, event: dict[str, Any]) -> None:
+        if self.replay_capture is not None:
+            self.replay_capture.after(env, replay, event)
 
     def model_versions(self) -> dict[str, str]:
         return {player: f"{player}:generation-{self.generation}:{_model_digest(self.models[player])}"
@@ -249,7 +342,8 @@ class CampaignLearner:
             root_dirichlet_alpha=self.config.root_dirichlet_alpha,
             root_dirichlet_epsilon=self.config.root_dirichlet_epsilon)
 
-    def _apply_search_result(self, env: Any, result: Any, pending: list[dict[str, Any]]) -> dict[str, Any]:
+    def _apply_search_result(self, env: Any, result: Any, pending: list[dict[str, Any]],
+                             replay: dict[str, Any] | None = None) -> dict[str, Any]:
         from .neural import make_input
         owner = env.current_decision_player()
         if owner not in PLAYERS:
@@ -266,6 +360,12 @@ class CampaignLearner:
         selected = features["actions"][index]
         raw = selected.get("action")
         raw = raw if isinstance(raw, dict) else selected
+        if replay is not None:
+            replay.update(selected_index=index, selected_action=selected, decision_menu=features["actions"],
+                search={"visit_counts": result.visit_counts, "priors": result.priors,
+                        "policy": result.policy, "sampling_policy": policy, "values": list(result.values),
+                        "action_values": result.action_values, "simulations": self.config.simulations,
+                        "max_depth": self.config.max_depth, "rollout_version": self.batch_version})
         event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action),
                  "action_kind": raw.get("kind", "unknown"),
                  "action_parameters": copy.deepcopy(raw.get("parameters", {}))}
@@ -297,6 +397,7 @@ class CampaignLearner:
                 if self.env.is_terminal():
                     raise ValueError("Environment factory returned a terminal starting position")
             before = self.env.planning_key()
+            replay = self._replay_before(self.env, 0)
             if self.env.decision_kind() == "chance":
                 self.env.resolve_chance()
                 self.counters["chance_events"] += 1
@@ -307,11 +408,12 @@ class CampaignLearner:
                     raise ValueError("A policy choice must belong to one of the three actors")
                 result = VectorMCTS(evaluator, self._search_config()).search(
                     self.env, add_root_noise=self.config.root_noise, reuse_root=False)
-                event = self._apply_search_result(self.env, result, self.pending)
+                event = self._apply_search_result(self.env, result, self.pending, replay)
             self.counters["transitions"] += 1
             event.update(before=before, after=self.env.planning_key(), terminal=self.env.is_terminal())
             events.append(event)
             self.action_history.append(event)
+            self._replay_after(self.env, replay, event)
             if self.env.is_terminal():
                 self._label_pending(self.env.returns(), "terminal")
                 self.counters["episodes"] += 1
@@ -336,13 +438,14 @@ class CampaignLearner:
         counts = [0] * len(self.parallel_envs)
         events, metrics = [], []
 
-        def record(index, before, event):
+        def record(index, before, event, replay):
             env = self.parallel_envs[index]
             self.counters["transitions"] += 1
             counts[index] += 1
             event.update(root=index, before=before, after=env.planning_key(), terminal=env.is_terminal())
             events.append(event)
             self.action_history.append(event)
+            self._replay_after(env, replay, event)
             if env.is_terminal():
                 self._label_samples(self.parallel_pending[index], env.returns(), "terminal")
                 self.parallel_pending[index] = []
@@ -350,6 +453,7 @@ class CampaignLearner:
 
         for _ in range(transitions_per_env):
             decision_indices = []
+            decision_replays = {}
             for index, env in enumerate(self.parallel_envs):
                 if env.is_terminal():
                     if env_factory is None:
@@ -360,15 +464,17 @@ class CampaignLearner:
                     env = self.parallel_envs[index] = replacement
                     if index == 0:
                         self.env = env
+                replay = self._replay_before(env, index)
                 if env.decision_kind() == "chance":
                     before = env.planning_key()
                     env.resolve_chance()
                     self.counters["chance_events"] += 1
-                    record(index, before, {"kind": "chance", "owner": None, "action": None})
+                    record(index, before, {"kind": "chance", "owner": None, "action": None}, replay)
                 else:
                     if env.current_decision_player() not in PLAYERS:
                         raise ValueError("Parallel choice lacks an entitled actor")
                     decision_indices.append(index)
+                    decision_replays[index] = replay
             if decision_indices:
                 stats = BatchStats()
                 results = search_many([self.parallel_envs[index] for index in decision_indices], evaluator,
@@ -378,8 +484,9 @@ class CampaignLearner:
                 for index, result in zip(decision_indices, results, strict=True):
                     env = self.parallel_envs[index]
                     before = env.planning_key()
-                    event = self._apply_search_result(env, result, self.parallel_pending[index])
-                    record(index, before, event)
+                    replay = decision_replays[index]
+                    event = self._apply_search_result(env, result, self.parallel_pending[index], replay)
+                    record(index, before, event, replay)
         return {"transitions": sum(counts), "transitions_per_env": counts, "events": events,
                 "terminal": [env.is_terminal() for env in self.parallel_envs],
                 "pending_samples": [len(rows) for rows in self.parallel_pending],

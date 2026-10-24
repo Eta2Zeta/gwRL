@@ -15,7 +15,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from studies.campaign.learning import CampaignLearner, LearningConfig
+from studies.campaign.learning import CampaignLearner, LearningConfig, ReplayTraceCapture, ReplayTraceWriter
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, make_input
 from studies.shared.campaign_adapter import CampaignAdapter
 from studies.shared.multiplayer_mcts import PLAYERS
@@ -189,6 +189,108 @@ class CampaignLearningTests(unittest.TestCase):
                 self.assert_tree_equal(first, second)
         else:
             self.assertEqual(left, right)
+
+    def test_opt_in_replay_preserves_learning_rng_and_checkpoint_and_captures_real_choices(self):
+        baseline = self.learner()
+        baseline.run_batch_many(LearningToyEnv, 5, parallel_envs=2)
+        expected = baseline.checkpoint()
+        recorded = []
+        learner = self.learner()
+        learner.set_replay_observer(recorded.append)
+        learner.run_batch_many(LearningToyEnv, 5, parallel_envs=2)
+        self.assert_tree_equal(expected, learner.checkpoint())
+        starts = [record for record in recorded if record["type"] == "episode_start"]
+        self.assertEqual([record["root"] for record in starts], [0, 1])
+        self.assertTrue(all(isinstance(record["seed"], int) for record in starts))
+        self.assertEqual(len([record for record in recorded if record["type"] == "context"]), 1)
+        transitions = [record for record in recorded if record["type"] == "transition"]
+        self.assertEqual([record["event"] for record in transitions], learner.action_history)
+        for root in range(2):
+            self.assertEqual([record["sequence"] for record in transitions if record["root"] == root], list(range(5)))
+        decisions = [record for record in transitions if record["event"]["kind"] != "chance"]
+        self.assertEqual(len(decisions), 8)
+        for record in decisions:
+            self.assertEqual(record["selected_action"], record["decision_menu"][record["selected_index"]])
+            self.assertEqual(len(record["decision_menu"]), len(record["search"]["visit_counts"]))
+            self.assertAlmostEqual(sum(record["search"]["sampling_policy"]), 1)
+            self.assertEqual(record["search"]["max_depth"], self.config.max_depth)
+        self.assertEqual(len([record for record in transitions if record["event"]["kind"] == "chance"]), 2)
+        self.assertTrue(all(record["terminal_returns"] is not None for record in transitions if record["event"]["terminal"]))
+        self.assertNotIn("replay_capture", learner.checkpoint())
+
+    def test_replay_disabled_never_serializes_positions_or_reads_inspection_history(self):
+        learner = self.learner()
+        env = LearningToyEnv()
+        learner.begin_batch(env)
+        with mock.patch.object(env, "serialize", side_effect=AssertionError("No per-step checkpoint")), \
+                mock.patch.object(env, "history_size", create=True, side_effect=AssertionError("Inspection disabled")):
+            learner.collect(5)
+        self.assertEqual(learner.counters["transitions"], 5)
+
+    def test_capture_serializes_only_episode_start_and_reads_actual_past_events(self):
+        env = LearningToyEnv()
+        records = []
+        capture = ReplayTraceCapture(records.append)
+        capture.remember_seed(env, 31)
+        history = []
+        with mock.patch.object(env, "serialize", wraps=env.serialize) as serialize, \
+                mock.patch.object(env, "history_size", create=True, side_effect=lambda: len(history)), \
+                mock.patch.object(env, "history_since", create=True, side_effect=lambda cursor: history[cursor:]):
+            for index in range(2):
+                replay = capture.before(env, 0)
+                before = env.planning_key()
+                env.apply_action(env.legal_actions()[0])
+                history.append({"kind": "action", "payload": {"observed": index}})
+                capture.after(env, replay, {"before": before, "after": env.planning_key(), "terminal": False})
+            self.assertEqual(serialize.call_count, 1)
+        transitions = [record for record in records if record["type"] == "transition"]
+        self.assertEqual([record["observed_events"] for record in transitions], [[history[0]], [history[1]]])
+        self.assertTrue(all(record["dice_verification"] == "recorded_past_events" for record in transitions))
+        self.assertEqual(records[1]["seed"], 31)
+        self.assertNotIn("random", records[1]["initial_observation"])
+
+    def test_recorded_real_chance_uses_native_past_events_and_preserves_execution_rng(self):
+        from studies.campaign.curriculum import compatibility, make_env
+        env = make_env(11)
+        # Legally reach CCP recruitment, then attach inspection to its pending
+        # dice event. No future outcome is read before the real resolution.
+        for _ in range(4):
+            env.raw.apply_action(next(action for action in env.raw.legal_actions() if action.kind == "end_phase"))
+        env.raw.apply_action(next(action for action in env.raw.legal_actions() if action.kind == "recruitment_roll"))
+        self.assertEqual(env.decision_kind(), "chance")
+        reference = env.clone()
+        cursor = env.raw.history_size()
+        records = []
+        learner = self.learner(compatibility=compatibility(env))
+        learner.set_replay_observer(records.append)
+        learner.begin_batch(env)
+        with mock.patch.object(env, "serialize", wraps=env.serialize) as serialize:
+            learner.collect(1)
+            self.assertEqual(serialize.call_count, 1, "Only the initial episode hash needs a checkpoint")
+        reference.resolve_chance()
+        self.assertEqual(env.serialize(), reference.serialize())
+        transition = next(record for record in records if record["type"] == "transition")
+        expected_events = json.loads(env.raw.serialize())["state"]["history"][cursor:]
+        self.assertEqual(transition["observed_events"], expected_events)
+        self.assertTrue(any(event["kind"] == "chance" and "outcome" in event["payload"] for event in expected_events))
+        self.assertEqual(transition["dice_verification"], "recorded_past_events")
+        self.assertNotIn("search", transition)
+        self.assertNotIn("history", records[1]["initial_observation"]["state"])
+        self.assertEqual(learner.counters["chance_events"], 1)
+
+    def test_stream_writer_flushes_valid_prefix_and_preserves_existing_files(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "replay.jsonl"
+            writer = ReplayTraceWriter(path, {"kind": "test"})
+            writer({"type": "transition", "root": 0, "sequence": 0})
+            records = [json.loads(line) for line in path.read_text().splitlines()]
+            self.assertEqual([record["type"] for record in records], ["run_start", "transition"])
+            self.assertTrue(all(record["schema"] == "campaign-self-play-trace-v1" for record in records))
+            writer.close()
+            before = path.read_bytes()
+            with self.assertRaises(FileExistsError):
+                ReplayTraceWriter(path, {})
+            self.assertEqual(path.read_bytes(), before)
 
     def test_terminal_targets_are_raw_three_component_gaps_without_clipping(self):
         learner = self.learner()

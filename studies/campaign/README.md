@@ -118,6 +118,17 @@ RAM was resident while the benchmark ran. Shared pages can be counted more than
 once, and sampling can miss a brief peak; this is a memory estimate, not an
 instantaneous allocation limit.
 
+## Watch self-play
+
+The [Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md)
+shows the actual game on a geographic schematic, with playback, location
+inspection, dice, wealth and the search alternatives behind each choice.
+Add `--record-replay` to a fresh training command, then run
+`python -m studies.campaign.viewer --live-trace PATH_TO_RUN/replay.jsonl` and
+enable **Follow latest**. Recording is optional and ordinary checkpoint resume
+is unchanged; recording during resume is currently unsupported. Exported JSON
+and standalone HTML can be reopened without running search or learning.
+
 ## Evaluation and profiling
 
 Held-out evaluation keeps the target weights fixed, turns root noise off, and

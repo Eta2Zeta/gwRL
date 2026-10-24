@@ -121,6 +121,10 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("clone_for_search", &game::campaign::CampaignEnv::cloneForSearch)
         .def("planning_key", &game::campaign::CampaignEnv::planningKey)
         .def("serialize", &game::campaign::CampaignEnv::serialize)
+        .def("history_size", &game::campaign::CampaignEnv::historySize)
+        .def("history_since", [](const game::campaign::CampaignEnv& env, std::size_t index) {
+            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(env.historySince(index)));
+        }, py::arg("index"))
         .def("restore", &game::campaign::CampaignEnv::restore);
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
 

@@ -35,6 +35,7 @@ output/snapshots/
 output/session_actions.txt
 output/japan_training_example.json
 output/manual_battle_trace.txt
+output/campaign_viewer/
 
 # New training/diagnostic runs are local scratch output. Curated results stay tracked.
 studies/*/runs/

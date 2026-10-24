@@ -126,17 +126,21 @@ def _sample(env, actions):
             "planning_key": env.planning_key()}
 
 
-def run_case(config: BenchmarkConfig, progress_path: Path | None = None) -> dict:
+def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
+             replay_output: Path | None = None) -> dict:
     """Run inside an already supervised worker; also useful for tiny smoke tests."""
+    if replay_output is not None and config.mode != "episode":
+        raise ValueError("Replay recording requires episode mode with real executed choices")
     import random
     import numpy as np
     import torch
-    from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig
+    from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, action_key
     from .baselines import BASELINE_VERSION, baseline_distribution
     from .batching import BatchStats, search_many
     from .curriculum import SCENARIO, make_env, task_manifest
     from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
     from .run import source_hashes
+    from .learning import ReplayTraceCapture, ReplayTraceWriter
 
     started = time.perf_counter()
     torch.set_num_threads(config.threads)
@@ -259,97 +263,138 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None) -> dict
 
     actual_snapshots = [env.serialize() for env in envs]
     report["prepared_state_sha256"] = [hashlib.sha256(value.encode()).hexdigest() for value in actual_snapshots]
-    counts = [Counter(transitions=0, decisions=0, chance_events=0) for _ in envs]
-    visits = [Counter({env.planning_key(): 1}) for env in envs]
-    search_rngs = [random.Random(config.seed + i ^ 0x9E3779B97F4A7C15) for i in range(len(envs))]
-    policy_rngs = [random.Random(config.seed + i ^ 0xD1B54A32D192ED03) for i in range(len(envs))]
-    waves = 0
+    replay_writer = None
+    replay_capture = None
+    if replay_output is not None:
+        replay_writer = ReplayTraceWriter(replay_output, {
+            "kind": "frozen_policy_benchmark", "config": asdict(config), "task": report["task"],
+            "runtime_source_sha256": report["runtime_source_sha256"], "model": report["model"]})
+        replay_capture = ReplayTraceCapture(replay_writer)
+        for index, env in enumerate(envs):
+            replay_capture.remember_seed(env, config.seed + index)
+        report["replay_trace"] = str(replay_output.resolve())
+    try:
+        counts = [Counter(transitions=0, decisions=0, chance_events=0) for _ in envs]
+        visits = [Counter({env.planning_key(): 1}) for env in envs]
+        search_rngs = [random.Random(config.seed + i ^ 0x9E3779B97F4A7C15) for i in range(len(envs))]
+        policy_rngs = [random.Random(config.seed + i ^ 0xD1B54A32D192ED03) for i in range(len(envs))]
+        waves = 0
 
-    def record(index, chance):
-        counts[index]["transitions"] += 1
-        counts[index]["chance_events" if chance else "decisions"] += 1
-        report["chance_events" if chance else "executed_decisions"] += 1
-        visits[index][envs[index].planning_key()] += 1
+        def record(index, chance):
+            counts[index]["transitions"] += 1
+            counts[index]["chance_events" if chance else "decisions"] += 1
+            report["chance_events" if chance else "executed_decisions"] += 1
+            visits[index][envs[index].planning_key()] += 1
 
-    def reason(index):
-        env = envs[index]
-        if env.is_terminal():
-            return "terminal"
-        if config.mode == "search":
-            return None
-        if counts[index]["transitions"] >= config.max_transitions:
-            return "transition_limit"
-        if visits[index][env.planning_key()] >= config.max_state_visits:
-            return "repetition_limit"
-        return None
-
-    while True:
-        if time.perf_counter() - started >= config.seconds:
-            report["status"] = "wall_limit"
-            break
-        if config.mode == "search" and waves >= config.waves:
-            report["status"] = "completed"
-            break
-        active = [index for index in range(len(envs)) if reason(index) is None]
-        if not active:
-            report["status"] = "completed" if all(env.is_terminal() for env in envs) else "collection_limit"
-            break
-        searching, indices = [], []
-        for index in active:
+        def reason(index):
             env = envs[index]
-            if env.decision_kind() == "chance":
+            if env.is_terminal():
+                return "terminal"
+            if config.mode == "search":
+                return None
+            if counts[index]["transitions"] >= config.max_transitions:
+                return "transition_limit"
+            if visits[index][env.planning_key()] >= config.max_state_visits:
+                return "repetition_limit"
+            return None
+
+        while True:
+            if time.perf_counter() - started >= config.seconds:
+                report["status"] = "wall_limit"
+                break
+            if config.mode == "search" and waves >= config.waves:
+                report["status"] = "completed"
+                break
+            active = [index for index in range(len(envs)) if reason(index) is None]
+            if not active:
+                report["status"] = "completed" if all(env.is_terminal() for env in envs) else "collection_limit"
+                break
+            searching, indices = [], []
+            for index in active:
+                env = envs[index]
+                if env.decision_kind() == "chance":
+                    before = time.perf_counter()
+                    replay = replay_capture.before(env, index) if replay_capture is not None else None
+                    planning_before = env.planning_key() if replay is not None else None
+                    env.resolve_chance()
+                    if replay is not None:
+                        replay_capture.after(env, replay, {"kind": "chance", "owner": None, "action": None,
+                            "before": planning_before, "after": env.planning_key(), "terminal": env.is_terminal()})
+                    report["timings_seconds"]["execution"] += time.perf_counter() - before
+                    record(index, True)
+                else:
+                    actions = env.legal_actions()
+                    report["samples"].append({"root": index, "wave": waves, **_sample(env, actions)})
+                    searching.append(env)
+                    indices.append(index)
+            if searching:
+                stats = BatchStats()
+                configs = [MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
+                                     seed=search_rngs[index].getrandbits(64)) for index in indices]
+                report["pending_wave"] = {"index": waves, "root_indices": indices,
+                                          "search_configs": [asdict(value) for value in configs]}
+                persist()
+                results = search_many(searching, evaluator, configs=configs, add_root_noise=True, stats=stats)
+                report["pending_wave"] = None
+                report["timings_seconds"]["search"] += stats.elapsed_seconds
+                report["timings_seconds"]["inference"] += stats.inference_seconds
+                report["timings_seconds"]["search_outside_inference"] += max(0.0, stats.elapsed_seconds - stats.inference_seconds)
+                report["waves"].append({"index": waves, "root_indices": indices,
+                    "cache_temperature": "cold_first_search" if waves == 0 else "warm_feature_caches",
+                    "search_configs": [asdict(value) for value in configs], "add_root_noise": True, **asdict(stats)})
+                report["decisions"] += len(results)
                 before = time.perf_counter()
-                env.resolve_chance()
+                if config.mode == "episode":
+                    for index, result in zip(indices, results, strict=True):
+                        chosen = policy_rngs[index].choices(result.actions, weights=result.policy, k=1)[0]
+                        env = envs[index]
+                        replay = replay_capture.before(env, index) if replay_capture is not None else None
+                        if replay is not None:
+                            menu = [action.features() if hasattr(action, "features") else dict(action)
+                                    for action in result.actions]
+                            selected_index = next(i for i, action in enumerate(result.actions) if action is chosen)
+                            replay.update(selected_index=selected_index, selected_action=menu[selected_index], decision_menu=menu,
+                                search={"visit_counts": result.visit_counts, "priors": result.priors,
+                                        "policy": result.policy, "sampling_policy": result.policy,
+                                        "values": list(result.values), "action_values": result.action_values,
+                                        "simulations": config.simulations, "max_depth": config.max_depth,
+                                        "rollout_version": evaluator.version})
+                            event = {"kind": env.decision_kind(), "owner": env.current_decision_player(),
+                                     "action": action_key(chosen), "before": env.planning_key()}
+                        env.apply_action(chosen)
+                        if replay is not None:
+                            event.update(after=env.planning_key(), terminal=env.is_terminal())
+                            replay_capture.after(env, replay, event)
+                        record(index, False)
+                else:
+                    report["actual_state_and_rng_unchanged"] = all(env.serialize() == snapshot
+                        for env, snapshot in zip(envs, actual_snapshots, strict=True))
+                    if not report["actual_state_and_rng_unchanged"]:
+                        raise RuntimeError("A fixed-root search changed an actual state or execution RNG")
                 report["timings_seconds"]["execution"] += time.perf_counter() - before
-                record(index, True)
-            else:
-                actions = env.legal_actions()
-                report["samples"].append({"root": index, "wave": waves, **_sample(env, actions)})
-                searching.append(env)
-                indices.append(index)
-        if searching:
-            stats = BatchStats()
-            configs = [MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
-                                 seed=search_rngs[index].getrandbits(64)) for index in indices]
-            report["pending_wave"] = {"index": waves, "root_indices": indices,
-                                      "search_configs": [asdict(value) for value in configs]}
+                waves += 1
             persist()
-            results = search_many(searching, evaluator, configs=configs, add_root_noise=True, stats=stats)
-            report["pending_wave"] = None
-            report["timings_seconds"]["search"] += stats.elapsed_seconds
-            report["timings_seconds"]["inference"] += stats.inference_seconds
-            report["timings_seconds"]["search_outside_inference"] += max(0.0, stats.elapsed_seconds - stats.inference_seconds)
-            report["waves"].append({"index": waves, "root_indices": indices,
-                "cache_temperature": "cold_first_search" if waves == 0 else "warm_feature_caches",
-                "search_configs": [asdict(value) for value in configs], "add_root_noise": True, **asdict(stats)})
-            report["decisions"] += len(results)
-            before = time.perf_counter()
-            if config.mode == "episode":
-                for index, result in zip(indices, results, strict=True):
-                    chosen = policy_rngs[index].choices(result.actions, weights=result.policy, k=1)[0]
-                    envs[index].apply_action(chosen)
-                    record(index, False)
-            else:
-                report["actual_state_and_rng_unchanged"] = all(env.serialize() == snapshot
-                    for env, snapshot in zip(envs, actual_snapshots, strict=True))
-                if not report["actual_state_and_rng_unchanged"]:
-                    raise RuntimeError("A fixed-root search changed an actual state or execution RNG")
-            report["timings_seconds"]["execution"] += time.perf_counter() - before
-            waves += 1
+
+        report["roots"] = [{"index": index, "clock": _clock(env), "terminal": env.is_terminal(),
+                            "stop_reason": reason(index) or report["status"], **dict(counts[index]),
+                            "observed_terminal_returns": list(env.returns()) if env.is_terminal() else None}
+                           for index, env in enumerate(envs)]
+        report["search_decisions_per_second"] = report["decisions"] / report["timings_seconds"]["search"] if report["timings_seconds"]["search"] else None
         persist()
-
-    report["roots"] = [{"index": index, "clock": _clock(env), "terminal": env.is_terminal(),
-                        "stop_reason": reason(index) or report["status"], **dict(counts[index]),
-                        "observed_terminal_returns": list(env.returns()) if env.is_terminal() else None}
-                       for index, env in enumerate(envs)]
-    report["search_decisions_per_second"] = report["decisions"] / report["timings_seconds"]["search"] if report["timings_seconds"]["search"] else None
-    persist()
-    return report
+        if replay_writer is not None:
+            replay_writer({"type": "run_end", "status": report["status"], "roots": report["roots"]})
+        return report
+    finally:
+        if replay_writer is not None:
+            replay_writer.close()
 
 
-def supervise(config: BenchmarkConfig, output: Path) -> dict:
+def supervise(config: BenchmarkConfig, output: Path, *, record_replay: bool = False) -> dict:
     """Enforce a wall deadline even if native code or an inference call stalls."""
-    if output.exists():
+    replay_output = output.with_suffix(".replay.jsonl") if record_replay else None
+    if record_replay and config.mode != "episode":
+        raise ValueError("Replay recording requires episode mode with real executed choices")
+    if output.exists() or (replay_output is not None and replay_output.exists()):
         raise ValueError("Choose a new output file; existing benchmark results are preserved")
     output.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -364,7 +409,8 @@ def supervise(config: BenchmarkConfig, output: Path) -> dict:
                        "VECLIB_MAXIMUM_THREADS": str(config.threads), "NUMEXPR_NUM_THREADS": "1"}
         with (directory / "stdout").open("w") as stdout, (directory / "stderr").open("w") as stderr:
             process = subprocess.Popen([sys.executable, "-m", "studies.campaign.scaling_benchmark",
-                "--_worker", str(settings), "--output", str(progress)], env=environment,
+                "--_worker", str(settings), "--output", str(progress),
+                *(["--replay-output", str(replay_output)] if replay_output is not None else [])], env=environment,
                 stdout=stdout, stderr=stderr)
             try:
                 while process.poll() is None:
@@ -408,6 +454,8 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--record-replay", action="store_true", help="Write an adjacent .replay.jsonl for real episode choices")
+    parser.add_argument("--replay-output", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--mode", choices=("search", "episode"), default="search")
     parser.add_argument("--full-campaign", action="store_true")
     for name, default in asdict(BenchmarkConfig()).items():
@@ -419,13 +467,13 @@ def main(argv=None) -> int:
     parser.add_argument("--seconds", type=float, default=60.0)
     args = parser.parse_args(argv)
     if args._worker:
-        run_case(BenchmarkConfig(**json.loads(args._worker.read_text())), args.output)
+        run_case(BenchmarkConfig(**json.loads(args._worker.read_text())), args.output, replay_output=args.replay_output)
         return 0
     values = {name: getattr(args, name) for name in asdict(BenchmarkConfig())}
     if args.full_campaign:
         values["calendar_rounds"] = None
     try:
-        report = supervise(BenchmarkConfig(**values), args.output.resolve())
+        report = supervise(BenchmarkConfig(**values), args.output.resolve(), record_replay=args.record_replay)
     except ValueError as error:
         parser.error(str(error))
     print(json.dumps({"output": str(args.output.resolve()), "status": report["status"],

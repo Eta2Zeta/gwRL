@@ -118,4 +118,17 @@ void CampaignEnv::restore(const std::string& serialized) {
     engine_ = Engine::restore(engine_.state().definition, campaignRules(), serialized);
     decisionCache_ = std::move(fresh);
 }
+
+V CampaignEnv::historySince(std::size_t index) const {
+    const auto& history = engine_.state().history;
+    if (index > history.size()) throw std::out_of_range("Past-event index exceeds recorded history");
+    A events;
+    events.reserve(history.size() - index);
+    for (; index < history.size(); ++index) {
+        const auto& event = history[index];
+        events.emplace_back(O{{"kind", V(event.kind)}, {"payload", event.payload},
+                              {"after_state_key", V(event.afterStateKey)}});
+    }
+    return V(std::move(events));
+}
 }  // namespace game::campaign

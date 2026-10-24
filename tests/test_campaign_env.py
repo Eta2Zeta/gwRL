@@ -17,6 +17,33 @@ def end_phase(env):
 
 
 class CampaignEnvironmentTests(unittest.TestCase):
+    def test_past_event_inspection_is_detached_and_does_not_reveal_future_dice(self):
+        env = gwrl_cpp.CampaignEnv(str(SCENARIO), 11)
+        initial = env.serialize()
+        self.assertEqual(env.history_size(), 0)
+        self.assertEqual(env.history_since(0), [])
+        self.assertEqual(env.serialize(), initial)
+        for _ in range(4):
+            end_phase(env)
+        env.apply_action(next(a for a in env.legal_actions() if a.kind == "recruitment_roll"))
+        cursor = env.history_size()
+        pending = env.serialize()
+        self.assertEqual(env.decision_kind(), "chance")
+        self.assertEqual(env.history_since(cursor), [])
+        self.assertEqual(env.serialize(), pending)
+        env.resolve_chance()
+        checkpoint = env.serialize()
+        events = env.history_since(cursor)
+        self.assertEqual(events, json.loads(checkpoint)["state"]["history"][cursor:])
+        self.assertTrue(any(event["kind"] == "chance" and "outcome" in event["payload"] for event in events))
+        self.assertTrue(all(set(event) == {"kind", "payload", "after_state_key"} for event in events))
+        events[0]["payload"]["caller_only"] = True
+        self.assertNotEqual(events, env.history_since(cursor))
+        self.assertEqual(env.serialize(), checkpoint)
+        with self.assertRaises((IndexError, RuntimeError)):
+            env.history_since(env.history_size() + 1)
+        self.assertEqual(env.serialize(), checkpoint)
+
     def test_graph_registry_and_complete_dynamic_entities(self):
         env = gwrl_cpp.CampaignEnv(str(SCENARIO), 91)
         observation, context = env.observation(), env.context()

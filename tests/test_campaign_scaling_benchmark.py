@@ -16,6 +16,41 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ScalingBenchmarkTests(unittest.TestCase):
+    def test_record_replay_rejects_fixed_searches_and_preserves_existing_prefix(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "result.json"
+            with self.assertRaisesRegex(ValueError, "episode mode"):
+                supervise(BenchmarkConfig(roots=1, threads=1), output, record_replay=True)
+            replay = output.with_suffix(".replay.jsonl")
+            replay.write_text('{"type":"run_start"}\n')
+            before = replay.read_bytes()
+            with self.assertRaisesRegex(ValueError, "preserved"):
+                supervise(BenchmarkConfig(mode="episode", roots=1, threads=1), output, record_replay=True)
+            self.assertEqual(replay.read_bytes(), before)
+            self.assertFalse(output.exists())
+
+    def test_episode_replay_records_only_executed_choices_and_current_search_results(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "result.json"
+            command = [sys.executable, "-m", "studies.campaign.scaling_benchmark", "--output", str(output),
+                       "--mode", "episode", "--roots", "1", "--threads", "1", "--simulations", "1",
+                       "--max-depth", "2", "--max-transitions", "2", "--seconds", "30",
+                       "--hidden-dim", "8", "--message-layers", "1", "--token-buckets", "128", "--record-replay"]
+            result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=40)
+            self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+            report = json.loads(output.read_text())
+            records = [json.loads(line) for line in output.with_suffix(".replay.jsonl").read_text().splitlines()]
+            transitions = [record for record in records if record["type"] == "transition"]
+            self.assertEqual(len(transitions), 2)
+            self.assertEqual(report["executed_decisions"] + report["chance_events"], 2)
+            self.assertEqual(records[-1]["type"], "run_end")
+            self.assertEqual(records[-1]["status"], "collection_limit")
+            self.assertTrue(all(record["terminal_returns"] is None for record in transitions))
+            for record in transitions:
+                if record["event"]["kind"] != "chance":
+                    self.assertEqual(record["selected_action"], record["decision_menu"][record["selected_index"]])
+                    self.assertEqual(record["search"]["simulations"], 1)
+
     def test_authorized_resource_envelope_includes_both_coordinators(self):
         config = BenchmarkConfig(roots=6, threads=4)
         self.assertEqual(config.roots + config.threads + 2, 12)

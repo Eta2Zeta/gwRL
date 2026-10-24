@@ -25,7 +25,7 @@ import torch
 
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
-from .learning import CampaignLearner, LearningConfig
+from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 
 RUN_SCHEMA = "campaign-foreground-run-v1"
@@ -144,6 +144,8 @@ def _config(args, saved=None):
 
 
 def train(args) -> int:
+    if getattr(args, "record_replay", False) and args.resume:
+        raise ValueError("--record-replay currently requires a fresh run; existing replay prefixes are preserved")
     loaded = _read(args.resume) if args.resume else None
     config = _config(args, loaded["runner"]["config"] if loaded else None)
     output = (args.run_dir or (args.resume.parent if args.resume else ROOT / "studies/campaign/runs" /
@@ -183,6 +185,7 @@ def train(args) -> int:
     started = time.perf_counter()
     initial_waves = runner["total_waves"]
     initial_transitions = learner.counters["transitions"]
+    replay_writer = None
     timings = {name: 0.0 for name in ("collection", "learning_updates", "checkpoint_save", "progress_reporting")}
 
     @contextmanager
@@ -206,6 +209,7 @@ def train(args) -> int:
         with measure("progress_reporting"):
             _json(manifest_path, {"schema": RUN_SCHEMA, "status": status,
                 "checkpoint": checkpoint_path.name, "runner": runner, "counters": learner.counters,
+                "replay_trace": replay_writer.path.name if replay_writer else None,
                 "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads},
                 "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
                               "conservative_thread_budget": config.threads + config.parallel_envs + 1,
@@ -238,6 +242,12 @@ def train(args) -> int:
                 handle.flush()
 
     try:
+        if getattr(args, "record_replay", False):
+            replay_writer = ReplayTraceWriter(output / "replay.jsonl", {
+                "kind": "training", "config": asdict(config), "task": runner["task"],
+                "runtime_source_sha256": runner["runtime_source_sha256"],
+                "model_config": learner.model_config, "initial_model_versions": learner.model_versions()})
+            learner.set_replay_observer(replay_writer)
         if loaded is None:
             save_checkpoint(output / "initial.pt")
             persist("initialized")
@@ -294,10 +304,15 @@ def train(args) -> int:
         status = "interrupted" if stopped else "episode_budget_exhausted" if exhausted else "completed"
         persist(status)
         progress(status)
+        if replay_writer is not None:
+            replay_writer({"type": "run_end", "status": status, "stop_reason": signal_name,
+                           "counters": learner.counters.copy()})
         print(json.dumps({"run_dir": str(output), "status": status,
                           "stop_reason": signal_name, "checkpoint": str(checkpoint_path)}, sort_keys=True), flush=True)
         return 130 if stopped else 2 if exhausted else 0
     finally:
+        if replay_writer is not None:
+            replay_writer.close()
         for number, handler in old_handlers.items():
             signal.signal(number, handler)
 
@@ -357,6 +372,8 @@ def main(argv=None) -> int:
     training = commands.add_parser("train", help="Bounded foreground vector-MCTS self-play")
     training.add_argument("--run-dir", type=Path)
     training.add_argument("--resume", type=Path, help="Only a trusted local checkpoint produced by this runner")
+    training.add_argument("--record-replay", action="store_true",
+                          help="Write real choices, search preferences and observed events to replay.jsonl (fresh runs only)")
     training.add_argument("--stop-after-waves", type=int, help="Safe bounded interruption for resume verification")
     training.add_argument("--extend-episode-budget", type=int,
                           help="Explicitly increase the resumable complete-episode transition guard")
