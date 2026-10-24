@@ -3,6 +3,7 @@
 #include "game/japan_training_env.hpp"
 #include "game/mdp.hpp"
 #include "game/campaign_env.hpp"
+#include "game/neural_graph.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -46,6 +47,11 @@ std::string describeAction(const game::Action& action) {
 
 PYBIND11_MODULE(gwrl_cpp, module) {
     module.doc() = "C++ training environment bindings for gwRL";
+
+    module.def("compile_campaign_graph", &game::neural::compileCampaignGraph,
+               py::arg("value"), py::arg("buckets"), py::arg("lexical_ids"),
+               py::arg("string_descriptor"), py::arg("numeric_features"),
+               "Compile complete public JSON features without engine state or learned tensors.");
 
     py::enum_<game::UnitKind>(module, "UnitKind")
         .value("Infantry", game::UnitKind::Infantry)

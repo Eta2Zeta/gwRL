@@ -1,0 +1,1287 @@
+{
+  "actual_replay": {
+    "all_631_observations_actions_planning_keys_state_and_execution_rng_equal": true,
+    "checks_sha256": "8408b48f0e7588e3d22d41ee3ed8f41a05ee4d65786ff600733ef3a088fa6ec1",
+    "final_state_and_rng_sha256": [
+      "bbee2703a3170c75523add962be25a30d0ca9355c61d75be13898d408fc232cc"
+    ],
+    "returns": [
+      [
+        51.599999999999994,
+        -70.6,
+        -99.4
+      ]
+    ],
+    "terminal": [
+      true
+    ]
+  },
+  "additional_policy_diagnostic": {
+    "actual_action_counts": {
+      "air_fly": 5,
+      "air_land_noncombat": 4,
+      "air_start_patrol": 4,
+      "economy_advance": 1,
+      "economy_decline_rail": 1,
+      "economy_finish_research": 2,
+      "economy_place": 4,
+      "economy_purchase": 7,
+      "economy_request_rail": 1,
+      "economy_research": 2,
+      "end_phase": 31,
+      "influence_roll": 2,
+      "land_begin_battle": 3,
+      "land_continue_fighting": 1,
+      "land_progress_battle": 3,
+      "land_retreat_begin": 1,
+      "land_retreat_unit": 1,
+      "land_take_casualty": 3,
+      "movement_route": 22,
+      "naval_cancel_move": 114,
+      "naval_declare_assault": 1,
+      "naval_designate_raider": 34,
+      "naval_force_add": 265,
+      "naval_force_remove": 202,
+      "naval_load": 5,
+      "naval_remove_raider": 34,
+      "naval_route": 7,
+      "naval_start_move": 122,
+      "politics_declare_war": 1,
+      "politics_priority_declare": 1,
+      "politics_priority_decline": 1,
+      "recruitment_roll": 3
+    },
+    "chance_events": 15,
+    "distinct_plans_with_actual_actions": 122,
+    "executed_decisions": 888,
+    "explanation": "These are actual selected actions, not hypothetical MCTS branches. Many force add/remove/cancel sequences use fresh plan IDs and decision serials. Full decision identities must retain them; the current full-state repetition guard therefore does not merge such separately created plans. No rule, action, search budget or score was changed to shorten this workload.",
+    "last_three_plans": {
+      "naval_plan_127": [
+        {
+          "decision": "naval_plan_127_decision_581",
+          "kind": "naval_force_add",
+          "parameters": {
+            "plan": "naval_plan_127",
+            "unit": "setup_japan_sea_p15_battleship_2"
+          }
+        },
+        {
+          "decision": "naval_plan_127_decision_582",
+          "kind": "naval_cancel_move",
+          "parameters": {
+            "plan": "naval_plan_127"
+          }
+        }
+      ],
+      "naval_plan_128": [
+        {
+          "decision": "naval_plan_128_decision_583",
+          "kind": "naval_force_add",
+          "parameters": {
+            "plan": "naval_plan_128",
+            "unit": "setup_japan_sea_p15_light_cruiser_1"
+          }
+        },
+        {
+          "decision": "naval_plan_128_decision_584",
+          "kind": "naval_force_add",
+          "parameters": {
+            "plan": "naval_plan_128",
+            "unit": "japan_fleet_carrier_p15_setup_1"
+          }
+        },
+        {
+          "decision": "naval_plan_128_decision_585",
+          "kind": "naval_cancel_move",
+          "parameters": {
+            "plan": "naval_plan_128"
+          }
+        }
+      ],
+      "naval_plan_129": [
+        {
+          "decision": "naval_plan_129_decision_586",
+          "kind": "naval_force_add",
+          "parameters": {
+            "plan": "naval_plan_129",
+            "unit": "setup_japan_sea_p15_submarine_1"
+          }
+        },
+        {
+          "decision": "naval_plan_129_decision_587",
+          "kind": "naval_force_add",
+          "parameters": {
+            "plan": "naval_plan_129",
+            "unit": "setup_japan_sea_p15_torpedo_boat_destroyer_1"
+          }
+        },
+        {
+          "decision": "naval_plan_129_decision_588",
+          "kind": "naval_force_remove",
+          "parameters": {
+            "plan": "naval_plan_129",
+            "unit": "setup_japan_sea_p15_battlecruiser_1"
+          }
+        }
+      ]
+    },
+    "naval_cancels": 114,
+    "naval_force_add_remove": 467,
+    "naval_move_starts": 122,
+    "paired_after_run": false,
+    "reason_after_not_run": "The 600-second case already exposes unproductive legal move-planning choices; it was not repeated as a performance claim.",
+    "root_progress": [
+      {
+        "chance_events": 15,
+        "clock": {
+          "completed_rounds": 1,
+          "income_collected": false,
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "player_turn_serial": "6",
+          "round_index": 1
+        },
+        "decisions": 888,
+        "index": 0,
+        "observed_terminal_returns": null,
+        "terminal": false,
+        "transitions": 903
+      }
+    ],
+    "schema": "campaign-actual-move-planning-pattern-v1",
+    "source_report": "tmp/encoder-pass-2026-10-24/baseline-results/single-two-round-s16.json",
+    "status": "wall_limit"
+  },
+  "after_runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "3e639cee58a2e0d89e81bc63c7311901d433f3dce6650db12808e96e07827b29",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "94951d8d58b63768c2247e968cd25f0d15b67b781282a7c716c1318ff182f57c",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "62bb0a1d920c50e98972e57aeb5a024d13d02af989db4ba21ff80a099bfdd1c9",
+    "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "3919edbb4c0e732fb00c41b4558081a0026cdb57b678b8b939d2af0b91029a1b",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "c8a58d0f2c1d6a3ce2c681e9c72291ba66b450ebc5e406758ad913c471d4e30d",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "3cf51ef2821adf34c8eb5b133d9480dac1a83eff054fdb7f514e57f48985b251",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_operations.cpp": "0bf7f336c18f003342ef53b4da7781454a784ead48498439a0a9e0633cad5e66",
+    "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "0db795001e274a92117b754d1d5a48a87bf0e9e964d441c29989e47ccd58e073",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4",
+    "studies/campaign/features.py": "15cf244d5312536b78e4f4adcdd858ce50b3531acba58c52b48c6f20a0238752",
+    "studies/campaign/learning.py": "dd70ca35bc69059d63a058dd5892045adfb7eb3392194508c46659b5047cc707",
+    "studies/campaign/neural.py": "c8530ef33e1861c62f9f5de7e06834a1e015efead156979605545878048ed598",
+    "studies/campaign/replay.py": "964dc5ff796801b454f58aefd25ad913a869708157c549ad5003d3c4594900ee",
+    "studies/campaign/run.py": "61c5ea3a348ed08c2539269b92da59a1887b7642d67805a618a777b2daf78ae1",
+    "studies/campaign/scaling_benchmark.py": "303831c3317ee21ef95a7521c492d68dc1fc57a0e48ff90b7b303fa8539bddd3",
+    "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+    "studies/shared/campaign_adapter.py": "cef35f5730550ec9ef418fd328a75b32dc362bd43b9301ea3c7552e869e64a16",
+    "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+    "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+  },
+  "after_working_tree_based_on_commit": "a03437fe8a9be3311515bdf6ec563593ea96c0f7",
+  "authorized_resources": {
+    "cpu_cores": 12,
+    "memory_bytes": 30000000000
+  },
+  "before_commit": "a03437fe8a9be3311515bdf6ec563593ea96c0f7",
+  "before_runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "3e639cee58a2e0d89e81bc63c7311901d433f3dce6650db12808e96e07827b29",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "94951d8d58b63768c2247e968cd25f0d15b67b781282a7c716c1318ff182f57c",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "62bb0a1d920c50e98972e57aeb5a024d13d02af989db4ba21ff80a099bfdd1c9",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "3919edbb4c0e732fb00c41b4558081a0026cdb57b678b8b939d2af0b91029a1b",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "c8a58d0f2c1d6a3ce2c681e9c72291ba66b450ebc5e406758ad913c471d4e30d",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "3cf51ef2821adf34c8eb5b133d9480dac1a83eff054fdb7f514e57f48985b251",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_operations.cpp": "0bf7f336c18f003342ef53b4da7781454a784ead48498439a0a9e0633cad5e66",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "01f0b51963ab7c38233df3ec495958fb5d0612f113bed01f9fd5245bc979bdab",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4",
+    "studies/campaign/features.py": "bdf69547568d5d6a2516b70a095616e20185a2a59ed68d34fcee7d04dc2080af",
+    "studies/campaign/learning.py": "dd70ca35bc69059d63a058dd5892045adfb7eb3392194508c46659b5047cc707",
+    "studies/campaign/neural.py": "c8530ef33e1861c62f9f5de7e06834a1e015efead156979605545878048ed598",
+    "studies/campaign/replay.py": "964dc5ff796801b454f58aefd25ad913a869708157c549ad5003d3c4594900ee",
+    "studies/campaign/run.py": "df036905bbbb42f6ccce06b145c3230d27863d2ed962a009da176e529c1f5431",
+    "studies/campaign/scaling_benchmark.py": "da2f018a3e397bee5df302e8f58dc5a200f3d644eee59c07069ac5c1d1c023ef",
+    "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+    "studies/shared/campaign_adapter.py": "cef35f5730550ec9ef418fd328a75b32dc362bd43b9301ea3c7552e869e64a16",
+    "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+    "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+  },
+  "cases": [
+    {
+      "after": {
+        "chance_events": 71,
+        "executed_decisions": 560,
+        "peak_rss_bytes": 1559412736,
+        "status": "completed",
+        "trace": {
+          "bytes": 5479513,
+          "events": 1191,
+          "incomplete_trailing_line": false,
+          "report_saved_events": 1191,
+          "sha256": "519eb159d3496b37b6e3b1def0d205c5e55149fc0c64233cc6ff4db39e60d022"
+        },
+        "wall_seconds": 104.5802980419976,
+        "warm_wave_seconds": null
+      },
+      "before": {
+        "chance_events": 71,
+        "executed_decisions": 560,
+        "peak_rss_bytes": 2015510528,
+        "status": "completed",
+        "trace": {
+          "bytes": 5479513,
+          "events": 1191,
+          "incomplete_trailing_line": false,
+          "report_saved_events": 1191,
+          "sha256": "519eb159d3496b37b6e3b1def0d205c5e55149fc0c64233cc6ff4db39e60d022"
+        },
+        "wall_seconds": 113.27363825000066,
+        "warm_wave_seconds": null
+      },
+      "canonical_shared_semantic_prefix_bytes_equal": true,
+      "case": "full11-s4",
+      "checked_events": 1191,
+      "completed_games": {
+        "after": 1,
+        "before": 1
+      },
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 8,
+        "max_state_visits": 12,
+        "max_transitions": 2000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 1,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 4,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 4
+      },
+      "exact_neural_numbers": true,
+      "failures": [],
+      "matched_completed_search_prefix": {
+        "after_seconds": 80.9256648419614,
+        "before_seconds": 89.51171966098991,
+        "limitation": "Completed search-wave time only, excluding preparation/execution and any pending wave; equal completed prefixes, not a ratio of differently completed game batches.",
+        "queries": 560,
+        "speedup": 1.1060980448637165,
+        "waves": 560
+      },
+      "max_absolute_neural_difference": {},
+      "model_versions": {
+        "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+        "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+        "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+      },
+      "numeric_difference_count": 0,
+      "semantic_prefix_matches": true,
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "wall_speedup": 1.0831259842509913,
+      "warm_search_speedup": null
+    },
+    {
+      "after": {
+        "chance_events": 0,
+        "executed_decisions": 0,
+        "peak_rss_bytes": 1458896896,
+        "status": "completed",
+        "trace": {
+          "bytes": 641862,
+          "events": 170,
+          "incomplete_trailing_line": false,
+          "report_saved_events": 170,
+          "sha256": "972d0420529e403ea2f86f54bc73a83cb822271856cd68fe20e5e658178ea1a8"
+        },
+        "wall_seconds": 21.20080987500114,
+        "warm_wave_seconds": 3.746958916501171
+      },
+      "before": {
+        "chance_events": 0,
+        "executed_decisions": 0,
+        "peak_rss_bytes": 1761968128,
+        "status": "completed",
+        "trace": {
+          "bytes": 641862,
+          "events": 170,
+          "incomplete_trailing_line": false,
+          "report_saved_events": 170,
+          "sha256": "972d0420529e403ea2f86f54bc73a83cb822271856cd68fe20e5e658178ea1a8"
+        },
+        "wall_seconds": 23.583283666997886,
+        "warm_wave_seconds": 4.085764104000191
+      },
+      "canonical_shared_semantic_prefix_bytes_equal": true,
+      "case": "opening-s16",
+      "checked_events": 170,
+      "completed_games": {
+        "after": 0,
+        "before": 0
+      },
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1024,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 150.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "exact_neural_numbers": true,
+      "failures": [],
+      "matched_completed_search_prefix": {
+        "after_seconds": 11.227429666003445,
+        "before_seconds": 12.777229416999035,
+        "limitation": "Completed search-wave time only, excluding preparation/execution and any pending wave; equal completed prefixes, not a ratio of differently completed game batches.",
+        "queries": 12,
+        "speedup": 1.1380369146901332,
+        "waves": 3
+      },
+      "max_absolute_neural_difference": {},
+      "model_versions": {
+        "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+        "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+        "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+      },
+      "numeric_difference_count": 0,
+      "semantic_prefix_matches": true,
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "wall_speedup": 1.1123765462755284,
+      "warm_search_speedup": 1.090421377722334
+    },
+    {
+      "after": {
+        "chance_events": 50,
+        "executed_decisions": 398,
+        "peak_rss_bytes": 1899855872,
+        "status": "wall_limit",
+        "trace": {
+          "bytes": 4347303,
+          "events": 560,
+          "incomplete_trailing_line": false,
+          "report_saved_events": 560,
+          "sha256": "d128191fd33c5b09741a1bd090b664323b12745ca4fd3c233e3ae64688797c6c"
+        },
+        "wall_seconds": 240.07798237500538,
+        "warm_wave_seconds": null
+      },
+      "before": {
+        "chance_events": 50,
+        "executed_decisions": 370,
+        "peak_rss_bytes": 2597928960,
+        "status": "wall_limit",
+        "trace": {
+          "bytes": 4181677,
+          "events": 525,
+          "incomplete_trailing_line": false,
+          "report_saved_events": 525,
+          "sha256": "7162f69bd9d9f12a1b73d3884070270960355393e97b16aa27689282cd5253ae"
+        },
+        "wall_seconds": 240.1697940419981,
+        "warm_wave_seconds": null
+      },
+      "canonical_shared_semantic_prefix_bytes_equal": true,
+      "case": "two-round-s16",
+      "checked_events": 525,
+      "completed_games": {
+        "after": 0,
+        "before": 0
+      },
+      "config": {
+        "calendar_rounds": 2,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 4
+      },
+      "exact_neural_numbers": true,
+      "failures": [],
+      "matched_completed_search_prefix": {
+        "after_seconds": 206.03788087602152,
+        "before_seconds": 223.8848119560207,
+        "limitation": "Completed search-wave time only, excluding preparation/execution and any pending wave; equal completed prefixes, not a ratio of differently completed game batches.",
+        "queries": 370,
+        "speedup": 1.0866196594729014,
+        "waves": 105
+      },
+      "max_absolute_neural_difference": {},
+      "model_versions": {
+        "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+        "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+        "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+      },
+      "numeric_difference_count": 0,
+      "semantic_prefix_matches": true,
+      "task": {
+        "calendar_rounds": 2,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "10622810b2dfade66d521aa886e4528e05787be9c31986cdedd8a32ba50ce9c5",
+          "scenario": "4226a302f57c73e709e6c1874572243209a95ab33573a2fe1215169cf38de66c",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "wall_speedup": null,
+      "warm_search_speedup": null
+    }
+  ],
+  "checkpoint_weights": {
+    "bytes": 40547084,
+    "path": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+    "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00"
+  },
+  "compiler_oracle": {
+    "binary_sha256": "9e8e667be7e4339503c49484658c5e41a014f55c6f8596c12479ef2eacd4e561",
+    "callback_mutation_safety_cases": 3,
+    "compiler_speedup": 4.216032073309825,
+    "exact_cases": 230,
+    "invalid_cases": 6,
+    "recursion_guard": true,
+    "seconds": {
+      "native": 0.0005696235998281433,
+      "python": 0.002401551366589653
+    },
+    "timing_scope": "Isolated warm opening-observation compilation; not whole search, game or training speed."
+  },
+  "date": "2026-10-24",
+  "feature_oracle": {
+    "backend": "native",
+    "contexts": [
+      {
+        "edges": 144832,
+        "graph_sha256": "e7cfc585d242f554e56317e4b940bd8abf63174a11dd889a8c53a3c622038645",
+        "leaves": 23661,
+        "nodes": 33393,
+        "numeric_bits_sha256": "f8294d2992241b7bd063ad75ba3aa25abe1b64686ce41a17a23ebe182a6adb81",
+        "references": 13719
+      }
+    ],
+    "cpu_seconds": 19.331853,
+    "decision_kinds": {
+      "chance": 71,
+      "combat": 72,
+      "combat_movement": 112,
+      "declaration_offer": 1,
+      "economy_rail_permission": 2,
+      "land_casualty": 17,
+      "land_retreat_destination": 2,
+      "land_retreat_or_continue": 7,
+      "non_combat_movement": 66,
+      "place_units": 134,
+      "politics_declaration_priority": 2,
+      "production": 141,
+      "recruitment_choice": 4
+    },
+    "event_counts": {
+      "action": 560,
+      "chance": 71
+    },
+    "events_verified": 631,
+    "final_states": [
+      "bbee2703a3170c75523add962be25a30d0ca9355c61d75be13898d408fc232cc"
+    ],
+    "graph_checks": 1193,
+    "graph_types": {
+      "context": 1,
+      "observation": 631,
+      "played_action": 560,
+      "terminal_observation": 1
+    },
+    "helper_sha256": "83e854ba3da07fd83d7a67ef445bb298ff80853391e293b3213321230ec72055",
+    "limits": "No neural models, search, optimizer, future RNG access or source changes",
+    "memory_note": "macOS ru_maxrss bytes, this verification process only",
+    "native_sha256": "9e8e667be7e4339503c49484658c5e41a014f55c6f8596c12479ef2eacd4e561",
+    "phases": {
+      "combat": 136,
+      "combat_movement": 112,
+      "non_combat_movement": 66,
+      "place_units": 166,
+      "production": 151
+    },
+    "process_peak_rss_bytes": 329662464,
+    "returns": [
+      [
+        51.599999999999994,
+        -70.6,
+        -99.4
+      ]
+    ],
+    "rounds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "rows": "tmp/encoder-pass-2026-10-24/full631-feature-oracle.rows.jsonl",
+    "rows_sha256": "a866dbbff9de28fb64d23c59fb2ec7a679a7cabd91e7e3562ff6a7b8e8da1567",
+    "schema": "campaign-trajectory-feature-oracle-v1",
+    "source_report": "tmp/encoder-pass-2026-10-24/baseline-results/full11-s4.json",
+    "source_report_sha256": "e7b73e9084346f63973796f568fe6a82743c580c5d8a39c91821401e5e47eec7",
+    "source_trace_sha256": "519eb159d3496b37b6e3b1def0d205c5e55149fc0c64233cc6ff4db39e60d022",
+    "state_rng_checks": 1262,
+    "task": {
+      "calendar_rounds": 11,
+      "compatibility": {
+        "curriculum": "regional-horizon-curriculum-v1",
+        "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+        "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+        "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+      },
+      "full_target_game": true,
+      "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+      "setup": "unchanged approved 99-piece,37-node July1936 setup",
+      "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+      "version": "regional-horizon-curriculum-v1"
+    },
+    "terminal": [
+      true
+    ],
+    "terminal_graphs": [
+      {
+        "edges": 8242,
+        "graph_sha256": "942a9c0bc00369fdb8dce632079345dd9a0ebe6dddda7bb0550099aea38ed220",
+        "leaves": 2151,
+        "nodes": 3278,
+        "numeric_bits_sha256": "887269896223a430b39cba5ae658219b8a1afb32986497e5aa094f30c6599117",
+        "references": 1129
+      }
+    ],
+    "total_edges_compared": 6145544,
+    "total_nodes_compared": 2376595,
+    "wall_seconds": 19.354177083005197
+  },
+  "local_helpers": [
+    {
+      "bytes": 3591,
+      "path": "tmp/encoder-pass-2026-10-24/run_matched.py",
+      "sha256": "08b446be66d9be3bab9cced287e073b55ff24a21f5b03434f6b23312235187fa"
+    },
+    {
+      "bytes": 5311,
+      "path": "tmp/encoder-pass-2026-10-24/trace_benchmark.py",
+      "sha256": "da5263b0554b2be4b83cd8bb4aa929fbcd276ad57ef44483759b4c6c8cd66d23"
+    },
+    {
+      "bytes": 7486,
+      "path": "tmp/encoder-pass-2026-10-24/compare_matched.py",
+      "sha256": "57a61b3cd675ec1a54719fbdd8ac87fd6d1171460c269f8c09bcdfa8f32fc340"
+    },
+    {
+      "bytes": 3021,
+      "path": "tmp/encoder-pass-2026-10-24/replay_trace.py",
+      "sha256": "edfc7cd83dfe08d8bd7399ca0939920c8b7b7de212e4cc2f1f68568798342c2f"
+    },
+    {
+      "bytes": 4769,
+      "path": "tmp/encoder-pass-2026-10-24/run_training.py",
+      "sha256": "63dd5a47e9a0dfbe8f33a75d882b1f490e370ed1ab8cf7d93f422fdd745150aa"
+    },
+    {
+      "bytes": 3711,
+      "path": "tmp/encoder-pass-2026-10-24/compare_training.py",
+      "sha256": "2284b9ca96d1261fcbb52b4d6e54a7a4478b31072a499ea056d0882707b84673"
+    },
+    {
+      "bytes": 2260,
+      "path": "tmp/encoder-pass-2026-10-24/summarize_loop.py",
+      "sha256": "0def0825888d41f815c2ba159e216c949f78c79665fbb1ca5fdacd305c3b2221"
+    },
+    {
+      "bytes": 9292,
+      "path": "tmp/encoder-pass-2026-10-24/summarize.py",
+      "sha256": "1ba66d2986b641f25cfde7b0b5eca0904f1d6277386c3b3f414d6371817e1243"
+    },
+    {
+      "bytes": 2321,
+      "path": "tmp/encoder-pass-2026-10-24/profile_serial.py",
+      "sha256": "7a7d315532510723a5cb42ef2b988ae3ab7dc97bdf3ee450317678f82b5682cb"
+    },
+    {
+      "bytes": 7486,
+      "path": "tmp/encoder-pass-2026-10-24/feature_trajectory_oracle.py",
+      "sha256": "83e854ba3da07fd83d7a67ef445bb298ff80853391e293b3213321230ec72055"
+    },
+    {
+      "bytes": 3819,
+      "path": "tmp/encoder-pass-2026-10-24/native_oracle_smoke.py",
+      "sha256": "26569fe6502377fe6e3fd0fc4b3fb295257f95129ed7b1a4a85d3d84e691ed7c"
+    }
+  ],
+  "native_modules": {
+    "after": {
+      "bytes": 3048048,
+      "path": "gwrl_cpp.cpython-313-darwin.so",
+      "sha256": "9e8e667be7e4339503c49484658c5e41a014f55c6f8596c12479ef2eacd4e561"
+    },
+    "before": {
+      "bytes": 2998000,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-a03437f/gwrl_cpp.cpython-313-darwin.so",
+      "sha256": "c9739ea1029275ef65b480688002b6ddf3e62974965320ee497d837a1d8c4b32"
+    }
+  },
+  "provenance_note": "Candidate working tree based on before_commit; after_runtime_source_sha256 and native_modules.after identify the measured implementation before its commit.",
+  "raw_files": [
+    {
+      "bytes": 756555,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/full11-s4.json",
+      "sha256": "e7b73e9084346f63973796f568fe6a82743c580c5d8a39c91821401e5e47eec7"
+    },
+    {
+      "bytes": 5479513,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/full11-s4.trace.jsonl",
+      "sha256": "519eb159d3496b37b6e3b1def0d205c5e55149fc0c64233cc6ff4db39e60d022"
+    },
+    {
+      "bytes": 33528,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/opening-s16.json",
+      "sha256": "8011b24cefe0b29a81288b08bb9c339833b8e7742076ee17fead351f07863853"
+    },
+    {
+      "bytes": 641862,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/opening-s16.trace.jsonl",
+      "sha256": "972d0420529e403ea2f86f54bc73a83cb822271856cd68fe20e5e658178ea1a8"
+    },
+    {
+      "bytes": 1323963,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/single-two-round-s16.json",
+      "sha256": "f77a56e6bf102af9aa8bcf578c8223c99fa7671ef12ebb5993fd6fb2fa55c9ea"
+    },
+    {
+      "bytes": 4106940,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/single-two-round-s16.trace.jsonl",
+      "sha256": "1cb60249e622975c48d47ccc19327a265766ae43ec62610049f5645e74097140"
+    },
+    {
+      "bytes": 425577,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/two-round-s16.json",
+      "sha256": "ee7ffd6a37fe82f910fa6159cb34b12e8a75e7db2672c3884e9d3948be972909"
+    },
+    {
+      "bytes": 4181677,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-results/two-round-s16.trace.jsonl",
+      "sha256": "7162f69bd9d9f12a1b73d3884070270960355393e97b16aa27689282cd5253ae"
+    },
+    {
+      "bytes": 756887,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-results/full11-s4.json",
+      "sha256": "f9c5fc8f7f295dbcdf4106a74d2c5ead0371d9b790747d68f2217b9481e30c06"
+    },
+    {
+      "bytes": 5479513,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-results/full11-s4.trace.jsonl",
+      "sha256": "519eb159d3496b37b6e3b1def0d205c5e55149fc0c64233cc6ff4db39e60d022"
+    },
+    {
+      "bytes": 33762,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-results/opening-s16.json",
+      "sha256": "552bb68b9195dd50dc0d439085a18c8e57d3e0b3e6cbd1a4d20c47eaf03e690a"
+    },
+    {
+      "bytes": 641862,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-results/opening-s16.trace.jsonl",
+      "sha256": "972d0420529e403ea2f86f54bc73a83cb822271856cd68fe20e5e658178ea1a8"
+    },
+    {
+      "bytes": 456214,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-results/two-round-s16.json",
+      "sha256": "056eacc1ececf84d912655b102368d8a25abe4198a6f3bff5f5558cceca1a586"
+    },
+    {
+      "bytes": 4347303,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-results/two-round-s16.trace.jsonl",
+      "sha256": "d128191fd33c5b09741a1bd090b664323b12745ca4fd3c233e3ae64688797c6c"
+    },
+    {
+      "bytes": 19,
+      "path": "tmp/encoder-pass-2026-10-24/profile-before/log.txt",
+      "sha256": "5b34a5be0e6602140da1ae8fdf1474a9b9eb97776c2f1e7c9ea820f378daab7e"
+    },
+    {
+      "bytes": 20412,
+      "path": "tmp/encoder-pass-2026-10-24/profile-before/report.json",
+      "sha256": "332de11fd13b75a45cfad1ab00177e1d5b656d917348bbde50ea3f7000845ca4"
+    },
+    {
+      "bytes": 29103,
+      "path": "tmp/encoder-pass-2026-10-24/profile-before/search.prof",
+      "sha256": "2b593b5bc305d167ff7244166b080e8d20b2a87b529e8db2bd82fa79154586ae"
+    },
+    {
+      "bytes": 4277,
+      "path": "tmp/encoder-pass-2026-10-24/profile-before/top.txt",
+      "sha256": "c9bcb8bfaeac81951eccf31be69d83969e4b7e35e5fe205716230663d1b06606"
+    },
+    {
+      "bytes": 19708,
+      "path": "tmp/encoder-pass-2026-10-24/profile-after/report.json",
+      "sha256": "b996b0248e90de11ed96c8fa0f1637029ecdbff121a61ba865ce50c23eba6d7d"
+    },
+    {
+      "bytes": 28426,
+      "path": "tmp/encoder-pass-2026-10-24/profile-after/search.prof",
+      "sha256": "fefde4c9c014441a55b7fd0d4e9f6e7831eb3e4551f188ba2f8b8c73e0bd5e38"
+    },
+    {
+      "bytes": 3706,
+      "path": "tmp/encoder-pass-2026-10-24/profile-after/top.txt",
+      "sha256": "f620dd680fd7df824a8660e7e59599ff62e3e06b3c108f81326f7fb3b90a80f6"
+    },
+    {
+      "bytes": 2731,
+      "path": "tmp/encoder-pass-2026-10-24/baseline_manifest.json",
+      "sha256": "590c32b348158fddc3284d8a0fc37388096438fcf968fb9f74b28e62b85a7de6"
+    },
+    {
+      "bytes": 5484,
+      "path": "tmp/encoder-pass-2026-10-24/comparison.json",
+      "sha256": "23e9e1e7a304536d0348d86d7965e2d65d3590cd7632f6c7a3bdcfd163bcbc00"
+    },
+    {
+      "bytes": 10125,
+      "path": "tmp/encoder-pass-2026-10-24/training-before.measurement.json",
+      "sha256": "d4fdbc45e8878d1264a5a00dac3bef9c0aab1affe0548d0849e9a1175c832699"
+    },
+    {
+      "bytes": 10280,
+      "path": "tmp/encoder-pass-2026-10-24/training-after.measurement.json",
+      "sha256": "660c1b96133e106e3eb1d3202f54268e9f89c2670dee24913d1fe976d2ef0fbc"
+    },
+    {
+      "bytes": 1308,
+      "path": "tmp/encoder-pass-2026-10-24/training-comparison.json",
+      "sha256": "013ddbc1bcc048563edec6d213b6aa59b04c58e54bef7bf52494956f0dfe5572"
+    },
+    {
+      "bytes": 302589,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-observation-replay.json",
+      "sha256": "86a43c2425b71ed7651ebced51982a9f7e48af938397ebefeab3888efbd0cdf6"
+    },
+    {
+      "bytes": 302589,
+      "path": "tmp/encoder-pass-2026-10-24/optimized-observation-replay.json",
+      "sha256": "a43b4599fe6d393fe439e6db434c71e5483419a0c6d166c0a8283a13813c9933"
+    },
+    {
+      "bytes": 3942,
+      "path": "tmp/encoder-pass-2026-10-24/baseline-single-loop.json",
+      "sha256": "9411d022d9227ebf3c2337590636e72142a4f8c8f10744448d36a1368d2cb0ce"
+    },
+    {
+      "bytes": 3435,
+      "path": "tmp/encoder-pass-2026-10-24/full631-feature-oracle.json",
+      "sha256": "7622ef8909a7722288e2a7ec9ff6fc9f785d47667715d2ea913b5b0f1d683750"
+    },
+    {
+      "bytes": 571949,
+      "path": "tmp/encoder-pass-2026-10-24/full631-feature-oracle.rows.jsonl",
+      "sha256": "a866dbbff9de28fb64d23c59fb2ec7a679a7cabd91e7e3562ff6a7b8e8da1567"
+    },
+    {
+      "bytes": 333,
+      "path": "tmp/encoder-pass-2026-10-24/native-oracle-result.json",
+      "sha256": "2b7d1944cb4d2b915e89ce0cb50066e850e1604a6b586213bcbd23b0f6319e76"
+    },
+    {
+      "bytes": 835,
+      "path": "tmp/encoder-pass-2026-10-24/python-tests.log",
+      "sha256": "3e30b9db27cfdf8782183d94237e53bd2c74d4604b2c19a07f93590651998427"
+    },
+    {
+      "bytes": 2579,
+      "path": "tmp/encoder-pass-2026-10-24/cpp-tests.log",
+      "sha256": "cacb20be39d0d013349080d03029df285d1bf638592ce8f5a0f7e803be77dca8"
+    },
+    {
+      "bytes": 122,
+      "path": "tmp/encoder-pass-2026-10-24/focused-tests-final.log",
+      "sha256": "080b981249f94791896f7d78ad602fab95a7a5f1e866900f378fbf55dc49f112"
+    },
+    {
+      "bytes": 2573,
+      "path": "tmp/encoder-pass-2026-10-24/native-index-rebuild.log",
+      "sha256": "8cd9064d2dc4f8ab5b924423117db6d1c7d1713f0a89d822c040dc8849f2c886"
+    },
+    {
+      "bytes": 3647,
+      "path": "tmp/encoder-pass-2026-10-24/native-index-rebuild.json",
+      "sha256": "136633bc6f5d8148c3077d6bd5e3c29f7f3da27c50c1260c6cc974994f2d7ce2"
+    }
+  ],
+  "reproduction": {
+    "after_matrix": ".venv/bin/python tmp/encoder-pass-2026-10-24/run_matched.py --tree . --out NEW-AFTER --cases opening-s16 full11-s4 two-round-s16 --trace",
+    "before_matrix": ".venv/bin/python tmp/encoder-pass-2026-10-24/run_matched.py --tree REFERENCE --out NEW-BEFORE --cases opening-s16 full11-s4 two-round-s16 --trace",
+    "extension_build": "./.venv/bin/python setup.py build_ext --inplace --force",
+    "notes": "Use new outputs and preserve historical artifacts. All raw files and helpers remain ignored and are identified by SHA. Source/code changes are expected only between before and after; verify frozen module and checkpoint hashes.",
+    "reference_snapshot": "/Users/home/Desktop/gwRL/tmp/encoder-pass-2026-10-24/baseline-a03437f",
+    "tracked_benchmark_commands": {
+      "full11-s4": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 VECLIB_MAXIMUM_THREADS=4 NUMEXPR_NUM_THREADS=1 ./.venv/bin/python -m studies.campaign.scaling_benchmark --output NEW-RUN/full11-s4.json --checkpoint-weights studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt --seed 1951 --threads 4 --cpu-budget 12 --memory-bytes 30000000000 --full-campaign --mode episode --roots 1 --simulations 4 --max-depth 8 --max-transitions 2000 --seconds 240.0 --waves 4 --start-round 1 --start-nation-index 0 --start-phase production",
+      "opening-s16": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 VECLIB_MAXIMUM_THREADS=4 NUMEXPR_NUM_THREADS=1 ./.venv/bin/python -m studies.campaign.scaling_benchmark --output NEW-RUN/opening-s16.json --checkpoint-weights studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt --seed 1951 --threads 4 --cpu-budget 12 --memory-bytes 30000000000 --full-campaign --mode search --roots 4 --simulations 16 --max-depth 16 --max-transitions 1024 --seconds 150.0 --waves 3 --start-round 1 --start-nation-index 2 --start-phase combat_movement --start-decision-kind combat_movement",
+      "two-round-s16": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 VECLIB_MAXIMUM_THREADS=4 NUMEXPR_NUM_THREADS=1 ./.venv/bin/python -m studies.campaign.scaling_benchmark --output NEW-RUN/two-round-s16.json --checkpoint-weights studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt --seed 1951 --threads 4 --cpu-budget 12 --memory-bytes 30000000000 --calendar-rounds 2 --mode episode --roots 4 --simulations 16 --max-depth 16 --max-transitions 1500 --seconds 240.0 --waves 4 --start-round 1 --start-nation-index 0 --start-phase production"
+    },
+    "tracked_training_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 VECLIB_MAXIMUM_THREADS=4 NUMEXPR_NUM_THREADS=1 PYTHONHASHSEED=0 ./.venv/bin/python -m studies.campaign.run train --run-dir NEW-PILOT --seed 1951 --complete-episodes --calendar-rounds 1 --batches 2 --transitions-per-batch 1500 --parallel-envs 4 --simulations 4 --max-depth 8 --hidden-dim 16 --message-layers 1 --token-buckets 2048 --batch-size 32 --epochs 16 --replay-capacity 16384 --threads 4 --cpu-budget 11 --checkpoint-every-waves 32",
+    "training": ".venv/bin/python tmp/encoder-pass-2026-10-24/run_training.py --tree SOURCE --out NEW-PILOT",
+    "working_directory": "/Users/home/Desktop/gwRL"
+  },
+  "resource_accounting": {
+    "limitations": [
+      "Sampled aggregate RSS can double-count shared pages and miss brief peaks; monitor threshold is 128 MiB below 30 GB, not a kernel allocation cap.",
+      "A single paired repetition per configuration on one machine; not confidence intervals."
+    ],
+    "maximum_configured_benchmark_or_pilot_core_budget": 10,
+    "maximum_sampled_benchmark_or_pilot_rss_bytes": 2597928960,
+    "overlap": "Representative cases were serialized. Some baseline cases overlapped at most 2 cores of profiling/build work; the seven-core 600-second diagnostic overlapped the full Python suite (at most 4 cores) and CTest on 1 core. Pilot and optimized cases overlapped at most 2 cores of light work."
+  },
+  "schema": "campaign-native-graph-optimization-v1",
+  "semantic_verification": {
+    "entire_learner_and_non_source_runner_checkpoint_equal": true,
+    "neural_numbers_exact": true,
+    "new_strategic_strength_claim": false,
+    "primary_semantic_prefix_canonical_bytes_equal": true,
+    "rules_actions_rng_search_budget_model_horizon_unchanged": true
+  },
+  "serial_profile": {
+    "after": {
+      "prepared_sha256": "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+      "profile_self_seconds": 0.9551754670000002,
+      "wall_seconds": 1.3840082079987042
+    },
+    "before": {
+      "prepared_sha256": "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+      "profile_self_seconds": 1.496906135000001,
+      "wall_seconds": 1.9230412090000755
+    },
+    "exact_priors_values_visits_prepared_state": true,
+    "limitation": "Profiler accounting differs from elapsed time and includes profiler overhead. These numbers are diagnostic, not unprofiled speed or percentage-of-total claims. See hashed raw .prof/top.txt files.",
+    "scope": "Single-core 16-simulation diagnostic with cProfile overhead. Partial accounting and nested cumulative times cannot establish search cost percentages. Whole-search/game claims use independent wall measurements."
+  },
+  "training_pilot": {
+    "after": {
+      "command": [
+        "/Users/home/Desktop/gwRL/.venv/bin/python",
+        "-m",
+        "studies.campaign.run",
+        "train",
+        "--run-dir",
+        "/Users/home/Desktop/gwRL/tmp/encoder-pass-2026-10-24/training-after",
+        "--seed",
+        "1951",
+        "--complete-episodes",
+        "--calendar-rounds",
+        "1",
+        "--batches",
+        "2",
+        "--transitions-per-batch",
+        "1500",
+        "--parallel-envs",
+        "4",
+        "--simulations",
+        "4",
+        "--max-depth",
+        "8",
+        "--hidden-dim",
+        "16",
+        "--message-layers",
+        "1",
+        "--token-buckets",
+        "2048",
+        "--batch-size",
+        "32",
+        "--epochs",
+        "16",
+        "--replay-capacity",
+        "16384",
+        "--threads",
+        "4",
+        "--cpu-budget",
+        "11",
+        "--checkpoint-every-waves",
+        "32"
+      ],
+      "counters": {
+        "batches": 2,
+        "chance_events": 52,
+        "decisions": 386,
+        "episodes": 8,
+        "transitions": 438,
+        "updates": 2
+      },
+      "environment_limits": {
+        "MKL_NUM_THREADS": "4",
+        "NUMEXPR_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "VECLIB_MAXIMUM_THREADS": "4"
+      },
+      "invocation_seconds_after_initialization": 83.98361020900484,
+      "manifest": "/Users/home/Desktop/gwRL/tmp/encoder-pass-2026-10-24/training-after/manifest.json",
+      "manifest_sha256": "2a480b1c3925ead391851b4166dc5f21c98f592e4483439060bfd6a18918f52b",
+      "memory_limit_bytes": 30000000000,
+      "memory_scope": "Summed sampled RSS of training process and monitor; shared pages can be counted twice and sub-sample peaks missed; no kernel allocation cap.",
+      "memory_stop_threshold_bytes": 29865782272,
+      "native_module_sha256": "9e8e667be7e4339503c49484658c5e41a014f55c6f8596c12479ef2eacd4e561",
+      "poll_interval_seconds": 0.1,
+      "resource_scope": "Training process plus external monitor. Four search workers, four tensor threads and two coordinators:10 conservative cores.",
+      "rss_samples": 802,
+      "runtime_source_hashes_reference": "after_runtime_source_sha256",
+      "sampled_aggregate_peak_rss_bytes": 2195947520,
+      "schema": "campaign-eight-game-pilot-measurement-v1",
+      "scope": "Repeat the existing eight one-round games for implementation cost/correctness; no larger learning experiment or strength claim.",
+      "status": "completed",
+      "timings_seconds": {
+        "checkpoint_save": 6.732394832986756,
+        "collection": 52.031159702040895,
+        "learning_updates": 22.82063699900027,
+        "progress_reporting": 2.3967112120153615
+      },
+      "wall_seconds": 87.10730624999997,
+      "worker_returncode": 0,
+      "working_directory": "/Users/home/Desktop/gwRL"
+    },
+    "before": {
+      "command": [
+        "/Users/home/Desktop/gwRL/.venv/bin/python",
+        "-m",
+        "studies.campaign.run",
+        "train",
+        "--run-dir",
+        "/Users/home/Desktop/gwRL/tmp/encoder-pass-2026-10-24/training-before",
+        "--seed",
+        "1951",
+        "--complete-episodes",
+        "--calendar-rounds",
+        "1",
+        "--batches",
+        "2",
+        "--transitions-per-batch",
+        "1500",
+        "--parallel-envs",
+        "4",
+        "--simulations",
+        "4",
+        "--max-depth",
+        "8",
+        "--hidden-dim",
+        "16",
+        "--message-layers",
+        "1",
+        "--token-buckets",
+        "2048",
+        "--batch-size",
+        "32",
+        "--epochs",
+        "16",
+        "--replay-capacity",
+        "16384",
+        "--threads",
+        "4",
+        "--cpu-budget",
+        "11",
+        "--checkpoint-every-waves",
+        "32"
+      ],
+      "counters": {
+        "batches": 2,
+        "chance_events": 52,
+        "decisions": 386,
+        "episodes": 8,
+        "transitions": 438,
+        "updates": 2
+      },
+      "environment_limits": {
+        "MKL_NUM_THREADS": "4",
+        "NUMEXPR_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "VECLIB_MAXIMUM_THREADS": "4"
+      },
+      "invocation_seconds_after_initialization": 90.23743924999872,
+      "manifest": "/Users/home/Desktop/gwRL/tmp/encoder-pass-2026-10-24/training-before/manifest.json",
+      "manifest_sha256": "740ce9242b40ffe0aed43ca00474a7590430f85a6930520539300695871ccf19",
+      "memory_limit_bytes": 30000000000,
+      "memory_scope": "Summed sampled RSS of training process and monitor; shared pages can be counted twice and sub-sample peaks missed; no kernel allocation cap.",
+      "memory_stop_threshold_bytes": 29865782272,
+      "native_module_sha256": "c9739ea1029275ef65b480688002b6ddf3e62974965320ee497d837a1d8c4b32",
+      "poll_interval_seconds": 0.1,
+      "resource_scope": "Training process plus external monitor. Four search workers, four tensor threads and two coordinators:10 conservative cores.",
+      "rss_samples": 859,
+      "runtime_source_hashes_reference": "before_runtime_source_sha256",
+      "sampled_aggregate_peak_rss_bytes": 2584133632,
+      "schema": "campaign-eight-game-pilot-measurement-v1",
+      "scope": "Repeat the existing eight one-round games for implementation cost/correctness; no larger learning experiment or strength claim.",
+      "status": "completed",
+      "timings_seconds": {
+        "checkpoint_save": 7.105613373998494,
+        "collection": 56.48401045198989,
+        "learning_updates": 24.11199958400539,
+        "progress_reporting": 2.5332228720362764
+      },
+      "wall_seconds": 93.20210566699825,
+      "worker_returncode": 0,
+      "working_directory": "/Users/home/Desktop/gwRL/tmp/encoder-pass-2026-10-24/baseline-a03437f"
+    },
+    "comparison": {
+      "after_checkpoint_sha256": "ee68a2ee1907f9b2bfb3e670e5c470eb52212c942b947322c3e4eb57ff3b1f0b",
+      "all_learner_fields_bitwise_identical": true,
+      "before_checkpoint_sha256": "981983e53a80df2a47f55cb90cc644459c7623949257d4931576ed58609a5b38",
+      "compared_counts": {
+        "arrays": 1,
+        "containers": 4242096,
+        "scalars": 10151639,
+        "tensor_bytes": 1379068,
+        "tensors": 541
+      },
+      "counters": {
+        "batches": 2,
+        "chance_events": 52,
+        "decisions": 386,
+        "episodes": 8,
+        "transitions": 438,
+        "updates": 2
+      },
+      "excluded_fields": [
+        "runner.runtime_source_sha256"
+      ],
+      "failures": [],
+      "learner_keys": [
+        "schema",
+        "metadata",
+        "models",
+        "model_versions",
+        "optimizers",
+        "frozen_models",
+        "frozen_versions",
+        "batch_version",
+        "replay",
+        "pending",
+        "batch_records",
+        "generation",
+        "counters",
+        "action_history",
+        "env",
+        "env_context",
+        "parallel_envs",
+        "parallel_pending",
+        "rng"
+      ],
+      "passed": true,
+      "runtime_sources_differ": true,
+      "schema": "campaign-exact-pilot-checkpoint-comparison-v1",
+      "scope": "Every learner field, replay observation/action/policy/targets, all model/optimizer tensor bits, history, actual game+execution RNG, and all RNG states; runner metadata except runtime source hashes."
+    },
+    "new_larger_learning_experiment": false,
+    "same_eight_one_round_games": true,
+    "whole_process_speedup": 1.069968865751698
+  },
+  "verification_tests": {
+    "cpp": {
+      "command": "ctest --test-dir build/rcl014 --output-on-failure -j 1",
+      "failed": 0,
+      "passed": 24,
+      "seconds": 67.21
+    },
+    "focused": {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 ./.venv/bin/python -m unittest tests.test_campaign_graph_compiler tests.test_campaign_neural",
+      "failed": 0,
+      "passed": 23
+    },
+    "model_outputs_and_all_parameter_gradients_zero_tolerance": true,
+    "python": {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 ./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+      "failed": 0,
+      "passed": 294,
+      "seconds": 181.539
+    },
+    "review": "Two reviews found no remaining material semantic or lifetime blocker; callback ownership regressions were fixed before final measurements."
+  }
+}

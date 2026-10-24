@@ -1,8 +1,8 @@
 # Stage A: completed-episode campaign learning
 
-Status: first completed-episode pilot, scaling measurements and decision-reuse
-performance pass complete, 24
-October 2026. Stage A remains an early learning experiment; it is not a completed
+Status: first completed-episode pilot, scaling measurements, decision reuse and
+native input compilation verified, 24 October 2026. Stage A remains an early
+learning experiment; it is not a completed
 playing-strength gate. [The scaling follow-up](scaling_2026_10_23.md) completes
 one small-budget eleven-round game, but stronger-search collection still needs
 performance work before larger learning.
@@ -14,7 +14,16 @@ falls from 198.42 to 112.72 seconds, preserving all search results, 560 choices,
 its 240-second guard, with 370 choices completed versus 234 before the fix.
 All 258 Python tests and 24 C++ suites pass; larger learning remains on hold.
 
-Eight real one-round self-play games finished in 346.62 seconds, with 386 decisions
+The [native input compiler](neural_input_2026_10_24.md) moves complete graph
+construction into C++ without changing features, model architecture or search.
+In matched runs, the complete eleven-round game falls from 113.27 to 104.58
+seconds; repeating the eight-game training pilot, including updates and saving,
+falls from 93.20 to 87.11 seconds. All 294 Python tests and 24 C++ suites pass,
+including exact graph/numeric-bit comparisons and identical model outputs and
+training gradients. Stronger-search games still reach their wall guard; larger
+training remains on hold.
+
+The original eight-game one-round pilot finished in 346.62 seconds, with 386 decisions
 and 52 chance events. All 386 training rows have observed terminal targets; none
 are bootstrapped or dropped. Policy samples: Axis 90, Allies 96, Comintern 200
 (the latter controls both CCP and Mongolia turns). Two frozen-policy generations
@@ -77,8 +86,9 @@ The observed improvement is completion behavior and outcome prediction. Allies/
 Comintern scores did not improve on these two dice seeds. Eight training games
 and one training seed do not establish robust strategic strength. The scaling
 follow-up now measures stronger search, later positions and longer horizons.
-Decision reuse is now implemented. Next reduce remaining simulation/neural-input
-costs and verify completion at the stronger budget, then expand one-round learning
+Decision reuse and native graph construction are now implemented. Next measure
+remaining rule/tensor costs and address repeated naval planning at the stronger
+search budget, then expand one-round learning
 and evaluation across several seeds before claiming strategic strength.
 
 The completed run includes 19 purchases, 35 land moves and 12 land-battle starts,
@@ -153,6 +163,7 @@ state.
 - [Performance follow-up and identical-workload repeat](performance_2026_10_23.json)
 - [Search/campaign scaling report](scaling_2026_10_23.md)
 - [Decision reuse and matched performance results](decision_reuse_2026_10_24.md)
+- [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)
 - [Matched-position operation profile](position_profile_2026_10_23.json)
 - [Paired comparison and limits](comparison_2026_10_23.json)

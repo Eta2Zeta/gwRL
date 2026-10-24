@@ -21,6 +21,11 @@ from typing import Any
 
 from studies.shared.immutable_json import FrozenDict
 
+try:
+    from gwrl_cpp import compile_campaign_graph as _native_compile_graph
+except ImportError:
+    _native_compile_graph = None
+
 SCHEMA = "campaign-neural-input-v1"
 NODE_TYPES = ("null", "bool", "number", "string", "array", "object")
 NUMERIC_DIM = 8
@@ -65,8 +70,8 @@ class Graph:
         return len(self.types)
 
 
-def compile_graph(value: Any, buckets: int) -> Graph:
-    """Visit every field, preserving null/empty containers and list positions."""
+def compile_graph_python(value: Any, buckets: int) -> Graph:
+    """Reference traversal, retained as the exact oracle and portable fallback."""
     if buckets < 2:
         raise ValueError("The lexical vocabulary needs at least two buckets")
     tokens: list[int] = []
@@ -159,6 +164,50 @@ def compile_graph(value: Any, buckets: int) -> Graph:
     return Graph(tuple(tokens), tuple(offsets), tuple(types), tuple(numeric), tuple(edges),
                  {name: tuple(sorted(indices)) for name, indices in identities.items()},
                  tuple(references), leaves)
+
+
+@lru_cache(maxsize=131072)
+def _string_descriptor(text: str) -> tuple[int, float]:
+    """Keep Python's UTF-8 and Unicode decimal semantics in the native path."""
+    number = 0.0
+    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", text):
+        candidate = float(text)
+        if math.isfinite(candidate):
+            number = candidate
+    return len(text.encode("utf-8")), number
+
+
+@lru_cache(maxsize=32768)
+def _cached_numeric_features(number: float, negative: bool, length: int, size: int,
+                             position: int) -> tuple[float, ...]:
+    # Include the sign separately in the cache key: -0.0 == 0.0 in Python,
+    # but their signed-log feature must retain its exact floating-point sign.
+    magnitude = math.log1p(abs(number))
+    return (math.copysign(magnitude, -1.0 if negative else 1.0), float(number != 0),
+            float(number < 0), math.log1p(length), math.log1p(size),
+            math.log1p(position), math.sin(position), math.cos(position))
+
+
+def _numeric_features(number: float, length: int, size: int, position: int) -> tuple[float, ...]:
+    return _cached_numeric_features(number, math.copysign(1.0, number) < 0, length, size, position)
+
+
+def graph_compiler_backend() -> str:
+    return "native" if _native_compile_graph is not None else "python_reference"
+
+
+def compile_graph(value: Any, buckets: int) -> Graph:
+    """Visit every JSON field with the same ordered graph as the reference.
+
+    Only source tokens, numeric constants and topology are compiled/cached.
+    Model embeddings, policy/value predictions and gradients are never cached.
+    Rebuild the extension to use native traversal; the reference remains usable
+    on a machine without that binding and is reported by graph_compiler_backend.
+    """
+    if _native_compile_graph is None or not isinstance(buckets, int):
+        return compile_graph_python(value, buckets)
+    return Graph(**_native_compile_graph(value, buckets, lexical_ids,
+                                        _string_descriptor, _numeric_features))
 
 
 @lru_cache(maxsize=8)

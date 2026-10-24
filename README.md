@@ -5,6 +5,7 @@
 ## Start here
 
 - [Stage A learning pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md): eight completed games, terminal-only training and paired held-out results.
+- [Native neural-input compiler](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md): complete feature graphs in C++, exact numerical parity and matched performance checks.
 - [Campaign learning](/Users/home/Desktop/gwRL/studies/campaign/README.md): foreground training, interrupt/resume, evaluation and profiling; [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md).
 - [Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md): local map viewer, self-play replay, optional live following and recorded MCTS decisions.
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.

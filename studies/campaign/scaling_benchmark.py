@@ -138,6 +138,7 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
     from .baselines import BASELINE_VERSION, baseline_distribution
     from .batching import BatchStats, search_many
     from .curriculum import SCENARIO, make_env, task_manifest
+    from .features import graph_compiler_backend
     from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
     from .run import source_hashes
     from .learning import ReplayTraceCapture, ReplayTraceWriter
@@ -183,7 +184,7 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
               "initialization": "checkpoint weights transfer" if transfer else "fresh seeded weights",
               "weights_transfer": transfer, "frozen": True, "training_updates": 0},
               "runtime_source_sha256": source_hashes(), "software": {"python": sys.version.split()[0],
-              "torch": torch.__version__, "device": "cpu"},
+              "torch": torch.__version__, "device": "cpu", "graph_compiler": graph_compiler_backend()},
               "resources": {"cpu_budget": config.cpu_budget, "tensor_threads": torch.get_num_threads(),
               "interop_threads": torch.get_num_interop_threads(), "search_workers": config.roots,
               "coordinators": 2, "conservative_thread_budget": config.threads + config.roots + 2,

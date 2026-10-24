@@ -72,6 +72,7 @@ def worker(args) -> dict:
     from studies.campaign.baselines import BASELINE_VERSION, baseline_distribution, raw_action
     from studies.campaign.curriculum import make_env, task_manifest
     from studies.campaign.evaluation import profile
+    from studies.campaign.features import graph_compiler_backend
     from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
     from studies.campaign.run import source_hashes
     from studies.shared.multiplayer_mcts import MctsConfig, PLAYERS, VectorMCTS
@@ -81,7 +82,8 @@ def worker(args) -> dict:
     random.seed(args.seed)
     np.random.seed(args.seed % 2**32)
     torch.manual_seed(args.seed)
-    report["software"] = {"python": sys.version.split()[0], "torch": torch.__version__, "device": "cpu"}
+    report["software"] = {"python": sys.version.split()[0], "torch": torch.__version__, "device": "cpu",
+                          "graph_compiler": graph_compiler_backend()}
     report["resources"]["interop_threads"] = torch.get_num_interop_threads()
     report["runtime_source_sha256"] = source_hashes()
     report["diagnostic_source_sha256"] = digest(Path(__file__).resolve())

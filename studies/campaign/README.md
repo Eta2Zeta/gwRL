@@ -111,6 +111,12 @@ trusted local checkpoint. It never resumes old game/replay state or updates
 weights. Fixed-root queries are not executed moves or training rows. See the
 scaling report for measured results and reproduction commands.
 
+The [native input compiler](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md)
+now constructs the same complete source graph in C++, retaining Python's exact
+Unicode tokenization and numerical features. Reports identify the backend in
+`software.graph_compiler`. Rebuild the extension after pulling this change;
+the model architecture, input schema and learned-gradient behavior are unchanged.
+
 RSS means **resident set size**: the physical memory currently occupied by a
 process. The benchmark samples and sums the supervisor and worker RSS, reporting
 the highest sampled total in bytes. For example, 2.58 GB means roughly that much

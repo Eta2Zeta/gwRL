@@ -25,6 +25,7 @@ import torch
 
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
+from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 
@@ -210,7 +211,8 @@ def train(args) -> int:
             _json(manifest_path, {"schema": RUN_SCHEMA, "status": status,
                 "checkpoint": checkpoint_path.name, "runner": runner, "counters": learner.counters,
                 "replay_trace": replay_writer.path.name if replay_writer else None,
-                "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads},
+                "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads,
+                             "graph_compiler": graph_compiler_backend()},
                 "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
                               "conservative_thread_budget": config.threads + config.parallel_envs + 1,
                               "interop_threads": torch.get_num_interop_threads()},
