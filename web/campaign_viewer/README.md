@@ -12,6 +12,13 @@ Click a location to inspect it; use +/− to zoom and drag the zoomed map to pan
 The reset button restores the whole map. Use the timeline, arrows, play button
 and speed selector to browse events. Home/End jump to the first/last position.
 
+Map labels show current possession and retain the original nation when it
+differs. The location inspector lists possession changes with links to their
+events, and the event journal names transfers that happen while finishing a
+phase. For example, Tsinghai starts under Ma Clique; in the seed-1951 replay,
+CCP attacks it and the surviving Ma Clique joins KMT at event 12 (RB §4.9).
+Later KMT possession does not change Tsinghai's original nationality.
+
 ## Watch a recorded run
 
 Add `--record-replay` to a **fresh** foreground training command:

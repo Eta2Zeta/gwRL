@@ -1,5 +1,6 @@
 import { createReplayModel, displayName, eventSummary, factionColor, locationOf,
-  ownerOf, recordEntries, changedLocations } from './model.js';
+  ownerOf, recordEntries, changedLocations, territoryIdentity, possessionChanges,
+  possessionChangeText } from './model.js';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
@@ -175,16 +176,16 @@ function renderMap(changed = new Set(), before = null) {
   }
   for (const [index, [id,node]] of nodes.entries()) {
     const [x,y] = positionFor(id,index);
-    const territory = UI.state.territories?.[id];
-    const owner = ownerOf(territory) ?? node.current_owner;
+    const identity = territoryIdentity(id, UI.state, UI.replay);
+    const owner = identity.owner;
     const sea = node.type === 'sea' || id.startsWith('sea_');
-    const group = svgElement('g', { transform:`translate(${x},${y})`, class:`map-node${sea ? ' sea-node' : ''}${id === UI.selected ? ' selected' : ''}${changed.has(id) ? ' changed' : ''}`, tabindex:0, role:'button', 'aria-label':`${node.name || id}, ${sea ? 'sea zone' : human(owner)}, ${unitsAt(id).length} units`, 'data-location':id, 'aria-pressed':id === UI.selected });
+    const group = svgElement('g', { transform:`translate(${x},${y})`, class:`map-node${sea ? ' sea-node' : ''}${id === UI.selected ? ' selected' : ''}${changed.has(id) ? ' changed' : ''}`, tabindex:0, role:'button', 'aria-label':`${node.name || id}, ${sea ? 'sea zone' : identity.subtitle}, ${unitsAt(id).length} units`, 'data-location':id, 'aria-pressed':id === UI.selected });
     const width = Math.max(130,Math.min(170,(node.name || id).length*7.5+26));
     if (changed.has(id)) group.append(svgElement('rect',{x:-width/2-5,y:-32,width:width+10,height:69,rx:9,class:'change-ring'}));
     group.append(svgElement('rect',{x:-width/2,y:-27,width,height:59,rx:6,class:'node-card'}));
     group.append(svgElement('rect',{x:-width/2,y:-27,width:5,height:59,rx:2,fill:sea ? '#8eafb7' : factionColor(owner)}));
     group.append(svgElement('text',{x:0,y:-9,'text-anchor':'middle',class:'node-label'},node.name || id));
-    const secondary = sea ? 'Sea zone' : `${human(owner)}${node.ipp_value != null ? ` · ${node.ipp_value} IPP` : ''}`;
+    const secondary = sea ? 'Sea zone' : identity.subtitle;
     group.append(svgElement('text',{x:0,y:5,'text-anchor':'middle',class:'node-subtitle'},secondary.length > 26 ? secondary.slice(0,25)+'…' : secondary));
     if (node.is_city) group.append(svgElement('rect',{x:width/2-12,y:-20,width:5,height:5,class:'city-dot'}));
     const units = unitsAt(id);
@@ -228,19 +229,32 @@ function renderInspector() {
   if (!UI.selected || !UI.replay.map.nodes[UI.selected]) return;
   const id = UI.selected; const node = UI.replay.map.nodes[id];
   const territory = UI.state.territories?.[id] || {};
-  const owner = ownerOf(territory) ?? node.current_owner;
+  const identity = territoryIdentity(id, UI.state, UI.replay);
+  const owner = identity.owner;
   box.replaceChildren();
   $('location-type').textContent = node.type === 'sea' ? 'SEA ZONE' : node.is_city ? 'CITY' : 'LAND ZONE';
   box.append(element('h3','location-title',node.name || id));
   const label = element('div','owner-label');
   const dot = element('i'); dot.style.background=factionColor(owner);
-  label.append(dot,document.createTextNode(node.type === 'sea' ? 'Sea zone · no land possessor' : `Possessed by ${human(owner)}`));box.append(label);
+  label.append(dot,document.createTextNode(node.type === 'sea' ? 'Sea zone · no land possessor'
+    : owner == null ? 'Unpossessed' : `Current possessor: ${identity.ownerName}`));box.append(label);
   const facts=element('dl','facts');
   factsRow(facts,'Land value',node.type === 'sea' ? '—' : `${node.ipp_value ?? 0} IPP`);
   factsRow(facts,'Terrain',node.type === 'sea' ? 'Sea' : human(node.terrain || 'normal'));
-  factsRow(facts,'Original nation',human(territory.original_owner ?? node.original_owner));
+  factsRow(facts,'Original nation',identity.originalName);
   factsRow(facts,'Units present',unitsAt(id).length);
   box.append(facts);
+  if(node.type!=='sea'){
+    const history=element('section','detail-section');history.append(element('h4','','Possession history'));
+    const initial=territoryIdentity(id,UI.replay.initial,UI.replay);
+    history.append(element('p','empty-copy',`Starting possessor: ${initial.ownerName}`));
+    const changes=possessionChanges(UI.replay).flat().filter(change=>change.zone===id&&change.eventNumber<=UI.position);
+    for(const change of changes){
+      const button=element('button','ownership-event',`Event ${change.eventNumber} · ${possessionChangeText(change,UI.replay)}`);
+      button.type='button';button.addEventListener('click',()=>{stop();seek(change.eventNumber);});history.append(button);
+    }
+    box.append(history);
+  }
   const section=element('section','detail-section');section.append(element('h4','','Units by nation'));
   const grouped=new Map();
   for (const unit of unitsAt(id)) { const nation=ownerOf(unit); if (!grouped.has(nation)) grouped.set(nation,[]);grouped.get(nation).push(unit); }
@@ -364,16 +378,16 @@ function renderSearch() {
   }
   table.append(body);box.append(table);
 }
-function eventMatches(step,filter) {
+function eventMatches(step,filter,index) {
   if (filter==='all') return true;
   if (filter==='chance') return step.kind==='chance';
   if (filter==='action') return step.kind!=='chance';
-  if (filter==='ownership') return Object.keys(step.changes?.territories?.upsert || {}).length>0;
+  if (filter==='ownership') return (possessionChanges(UI.replay)[index]?.length??0)>0;
   return /combat|battle|casualt|attack|retreat|attrition|bombard/i.test(JSON.stringify([step.action?.kind,step.summary,step.chance]));
 }
 function renderEvents() {
   const box=$('event-list');box.replaceChildren();
-  const entries=UI.replay.steps.map((step,index)=>({step,index})).filter(({step})=>eventMatches(step,$('event-filter').value));
+  const entries=UI.replay.steps.map((step,index)=>({step,index})).filter(({step,index})=>eventMatches(step,$('event-filter').value,index));
   // Bound DOM work on very long recordings while keeping the current event in view.
   let center=entries.findIndex(({index})=>index>=UI.position-1);if(center<0)center=entries.length-1;
   const start=Math.max(0,Math.min(entries.length-160,center-60));const visible=entries.slice(start,start+160);

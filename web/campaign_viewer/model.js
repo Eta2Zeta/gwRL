@@ -128,6 +128,83 @@ export function ownerOf(record) {
   return record?.nation ?? record?.owner ?? record?.possessor ?? record?.current_owner ?? record?.faction ?? null;
 }
 
+const identityKey = (value) => String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function factionIdentity(value, replay) {
+  if (value === null || value === undefined || value === '') return null;
+  if (own(replay?.factions || {}, value)) return value;
+  const matches = recordEntries(replay?.factions).filter(([id, faction]) =>
+    identityKey(id) === identityKey(value) || identityKey(faction.name) === identityKey(value));
+  return matches.length === 1 ? matches[0][0] : value;
+}
+const possessionName = (value, replay) => value === null || value === undefined
+  ? 'Unpossessed' : displayName(value, replay);
+
+/** Current possession and original nationality are separate recorded facts. */
+export function territoryIdentity(id, state, replay) {
+  const territory = state?.territories?.[id];
+  const node = replay?.map?.nodes?.[id] || {};
+  // An explicit null records lost possession; it must not revive the map's starting owner.
+  const owner = factionIdentity(territory && own(territory, 'possessor')
+    ? territory.possessor : ownerOf(territory) ?? node.current_owner ?? node.original_owner, replay);
+  const originalOwner = factionIdentity(territory && own(territory, 'original_owner')
+    ? territory.original_owner : node.original_owner, replay);
+  const ownerName = possessionName(owner, replay);
+  const originalName = possessionName(originalOwner, replay);
+  const changed = originalOwner !== null && identityKey(owner) !== identityKey(originalOwner);
+  return { owner, originalOwner, ownerName, originalName, changed,
+    subtitle: changed ? `${ownerName} · originally ${originalName}`
+      : `${ownerName} · ${node.ipp_value ?? territory?.ipp_value ?? 0} IPP` };
+}
+
+const possessionCache = new WeakMap();
+function possessionHistory(replay) {
+  if (possessionCache.has(replay)) return possessionCache.get(replay);
+  const owners = new Map(recordEntries(replay.initial.territories)
+    .map(([id, territory]) => [id, territory.possessor]));
+  const nations = new Map(recordEntries(replay.initial.nations));
+  const indices = new Map();
+  let politics = replay.initial.politics || {};
+  const steps = replay.steps.map((step, index) => {
+    indices.set(step, index);
+    const changes = step.changes || {};
+    for (const id of changes.nations?.remove || []) nations.delete(id);
+    for (const [id, nation] of recordEntries(changes.nations?.upsert)) nations.set(id, nation);
+    const result = [];
+    const update = (zone, to) => {
+      const from = owners.get(zone) ?? null;
+      owners.set(zone, to);
+      if (from === to) return;
+      const nation = nations.get(from);
+      const alignment = Boolean(nation?.game_flags?.incorporated && nation.controller_nation === to);
+      const attackers = alignment ? [...(politics.attacked_warlords?.[from] || [])] : [];
+      result.push({ zone, from, to, reason: alignment ? 'alignment' : 'possession',
+        attackers, eventNumber: index + 1 });
+    };
+    for (const zone of changes.territories?.remove || []) update(zone, null);
+    for (const [zone, territory] of recordEntries(changes.territories?.upsert)) {
+      if (own(territory, 'possessor')) update(zone, territory.possessor);
+    }
+    if (own(changes, 'politics')) politics = changes.politics || {};
+    return result;
+  });
+  const result = { steps, indices };
+  possessionCache.set(replay, result);
+  return result;
+}
+
+/** Index zero contains ownership changes caused by event one; no search branches. */
+export function possessionChanges(replay) { return possessionHistory(replay).steps; }
+
+export function possessionChangeText(change, replay) {
+  let reason = '';
+  if (change.reason === 'alignment') {
+    const attackers = change.attackers.map((id) => displayName(id, replay)).join(' and ');
+    reason = attackers ? ` (alignment after ${attackers} attack${change.attackers.length > 1 ? 's' : ''})`
+      : ' (alignment)';
+  }
+  return `${displayName(change.zone, replay)}: ${possessionName(change.from, replay)} → ${possessionName(change.to, replay)}${reason}`;
+}
+
 export function factionColor(id) {
   const key = String(id || '').toLowerCase();
   if (key.includes('japan') || key === 'axis') return '#b54d43';
@@ -141,10 +218,14 @@ export function factionColor(id) {
 
 export function eventSummary(step, replay) {
   if (!step) return 'Initial campaign position';
-  if (step.summary) return String(step.summary);
-  if (step.kind === 'chance') return 'Dice event resolved';
   const action = step.action || {};
-  return `${displayName(step.actor ?? step.nation, replay)} · ${displayName(action.kind ?? step.kind, replay)}`;
+  const summary = step.summary ? String(step.summary) : step.kind === 'chance' ? 'Dice event resolved'
+    : `${displayName(step.actor ?? step.nation, replay)} · ${displayName(action.kind ?? step.kind, replay)}`;
+  const history = replay ? possessionHistory(replay) : null;
+  const changes = history?.steps[history.indices.get(step)] || [];
+  const details = changes.slice(0, 2).map((change) => possessionChangeText(change, replay));
+  if (changes.length > 2) details.push(`${changes.length - 2} more possession changes`);
+  return [summary, ...details].join(' · ');
 }
 
 export function changedLocations(before, after) {

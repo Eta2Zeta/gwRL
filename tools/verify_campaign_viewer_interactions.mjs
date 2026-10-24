@@ -187,4 +187,42 @@ assert.match(inspectorText, /Repair Facility/);
 assert.match(inspectorText, /Repair Unit/);
 assert.match(inspectorText, /Repair Rail/);
 assert.doesNotMatch(inspectorText, /Repair Elsewhere/);
-console.log('Campaign viewer interaction checks passed: live refresh, replay/search scope, bounded zoom/pan, active battles and repair targets');
+// Possession changes must remain visible as actual game history, rather than
+// making an initially independent warlord look like starting KMT territory.
+const tsinghai = 'land_china_tsinghai';
+const ownershipFixture = {
+  schema:'campaign-replay-v1', metadata:{},
+  map:{nodes:{[tsinghai]:{name:'Tsinghai',type:'land',original_owner:'Ma Clique',current_owner:'Ma Clique',ipp_value:0}}},
+  factions:{warlord_tsinghai:{name:'Ma Clique'},kmt:{name:'KMT'},ccp:{name:'CCP'}},
+  initial:{clock:{round_index:0},territories:{[tsinghai]:{possessor:'warlord_tsinghai'}},
+    nations:{warlord_tsinghai:{game_flags:{}}},politics:{attacked_warlords:{}}},
+  steps:[
+    {kind:'action',summary:'CCP attacks Tsinghai',changes:{politics:{attacked_warlords:{warlord_tsinghai:['ccp']}}}},
+    {kind:'action',summary:'Flags only',changes:{territories:{upsert:{[tsinghai]:{possessor:'warlord_tsinghai',flags:{test:true}}},remove:[]}}},
+    {kind:'action',summary:'Finish combat',changes:{
+      territories:{upsert:{[tsinghai]:{possessor:'kmt'}},remove:[]},
+      nations:{upsert:{warlord_tsinghai:{game_flags:{incorporated:1},controller_nation:'kmt'}},remove:[]},
+      politics:{attacked_warlords:{}}}},
+    {kind:'action',summary:'Surrender',changes:{territories:{upsert:{[tsinghai]:{possessor:null}},remove:[]}}},
+  ],
+};
+loadReplay(ownershipFixture);
+UI.selected=tsinghai;
+seek(0);
+assert.match(textOf(getElement('map')),/Ma Clique · 0 IPP/);
+assert.match(textOf(getElement('location-details')),/Current possessor: Ma Clique/);
+seek(3);
+assert.match(textOf(getElement('map')),/KMT · originally Ma Clique/);
+assert.match(textOf(getElement('location-details')),/Starting possessor: Ma Clique/);
+assert.match(textOf(getElement('location-details')),/alignment after CCP attack/);
+assert.match(getElement('event-summary').textContent,/Tsinghai: Ma Clique → KMT/);
+getElement('event-filter').value='ownership';seek(3);
+assert.match(textOf(getElement('event-list')),/Ma Clique → KMT/);
+assert.doesNotMatch(textOf(getElement('event-list')),/Flags only/);
+seek(4);
+assert.match(textOf(getElement('map')),/Unpossessed/);
+assert.match(textOf(getElement('location-details')),/Unpossessed/);
+seek(0);
+assert.match(textOf(getElement('map')),/Ma Clique · 0 IPP/);
+assert.doesNotMatch(textOf(getElement('location-details')),/KMT/,'Initial inspector cannot show later possession');
+console.log('Campaign viewer interaction checks passed, including original nationality, alignment history and unpossessed land');
