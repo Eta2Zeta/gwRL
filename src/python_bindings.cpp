@@ -3,6 +3,7 @@
 #include "game/japan_training_env.hpp"
 #include "game/mdp.hpp"
 #include "game/campaign_env.hpp"
+#include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 
 #include <pybind11/pybind11.h>
@@ -98,12 +99,12 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         });
 
     py::class_<game::campaign::CampaignEnv>(module, "CampaignEnv")
-        .def(py::init([](const std::string& scenario, std::uint64_t seed) {
-            return game::campaign::CampaignEnv(std::filesystem::path(scenario), seed);
-        }), py::arg("scenario_path"), py::arg("seed") = 1)
-        .def_static("curriculum", [](const std::string& scenario, int rounds, std::uint64_t seed) {
-            return game::campaign::CampaignEnv::curriculum(std::filesystem::path(scenario), rounds, seed);
-        }, py::arg("scenario_path"), py::arg("calendar_rounds"), py::arg("seed") = 1)
+        .def(py::init([](const std::string& scenario, std::uint64_t seed, bool trainingActions) {
+            return game::campaign::CampaignEnv(std::filesystem::path(scenario), seed, trainingActions);
+        }), py::arg("scenario_path"), py::arg("seed") = 1, py::arg("training_actions") = false)
+        .def_static("curriculum", [](const std::string& scenario, int rounds, std::uint64_t seed, bool trainingActions) {
+            return game::campaign::CampaignEnv::curriculum(std::filesystem::path(scenario), rounds, seed, trainingActions);
+        }, py::arg("scenario_path"), py::arg("calendar_rounds"), py::arg("seed") = 1, py::arg("training_actions") = false)
         .def("is_terminal", &game::campaign::CampaignEnv::isTerminal)
         .def("current_decision_player", &game::campaign::CampaignEnv::currentDecisionPlayer)
         .def("current_nation", &game::campaign::CampaignEnv::currentNation)
@@ -133,6 +134,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         }, py::arg("index"))
         .def("restore", &game::campaign::CampaignEnv::restore);
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
+    module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)

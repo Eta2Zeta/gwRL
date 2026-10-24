@@ -20,6 +20,11 @@ int navalCompletedTurns(const State &, const Id &nation);
 bool navalCargoFits(const State &, const Id &transport, const std::vector<Id> &cargo);
 bool navalLoadAllowed(const State &, const Id &transport, const Id &cargo);
 std::vector<Action> navalMovementActions(const State &);
+// Training order construction is forward-only. The ordinary rules retain the
+// editable human picker; these helpers preserve each executable fleet/route
+// while removing drafts that have no legal completion.
+std::vector<Action> forwardNavalOrderActions(const State &, std::vector<Action>);
+void forwardNavalOrderDecision(State &);
 bool applyNavalMovementAction(State &, const Action &);
 bool applyNavalMovementChance(State &, const ChanceRequest &, const ChanceOutcome &);
 bool navalMovementPhaseComplete(const State &);

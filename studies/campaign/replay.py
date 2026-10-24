@@ -16,6 +16,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+import gwrl_cpp
+
 from .curriculum import ROOT, make_env, task_manifest
 
 SCHEMA = "campaign-replay-v1"
@@ -30,6 +32,14 @@ def digest(value: Any) -> str:
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
+
+
+def _recorded_env(seed: int, rounds: int | None, task: dict):
+    # Old recordings retain the original game-action interface. Selecting the
+    # recorded profile is explicit compatibility, not replay/checkpoint migration.
+    actions = task.get("compatibility", {}).get("actions")
+    _require(actions in (None, gwrl_cpp.CAMPAIGN_ACTION_SCHEMA), "Unsupported recorded action interface")
+    return make_env(seed, calendar_rounds=rounds, training_actions=actions is not None)
 
 
 def _sources(expected: dict[str, str], allow_source_drift: bool) -> dict:
@@ -273,7 +283,7 @@ def export_report(report_path: Path, *, root: int = 0, allow_source_drift: bool 
         _require(hashlib.sha256(authenticated).hexdigest() == declared["events_sha256"], "Report/trace SHA256 differs")
     events = [json.loads(line) for line in lines[:count]]
     source = _sources(report.get("runtime_source_sha256", {}), allow_source_drift)
-    env = make_env(config["seed"] + root, calendar_rounds=config["calendar_rounds"])
+    env = _recorded_env(config["seed"] + root, config["calendar_rounds"], report["task"])
     _require(task_manifest(env)["compatibility"] == report["task"]["compatibility"], "Recorded task/rules are incompatible with current engine")
     _require(report["preparation"]["roots"][root]["transitions"] == 0, "Episode trace must begin at the approved initial position")
     _require(digest(env.serialize()) == report["prepared_state_sha256"][root], "Initial state/execution RNG hash differs")
@@ -325,7 +335,7 @@ def _stream_initial(trace_path: Path, run: dict, start: dict, context: dict,
                     *, root: int, episode: int, allow_source_drift: bool):
     _require(type(start.get("seed")) is int, "Recorded episode has no initial seed; exact replay is unavailable")
     _require(digest(context) == start["context_sha256"], "Recorded context SHA256 differs")
-    env = make_env(start["seed"], calendar_rounds=run["config"]["calendar_rounds"])
+    env = _recorded_env(start["seed"], run["config"]["calendar_rounds"], run["task"])
     source = _sources(run.get("runtime_source_sha256", {}), allow_source_drift)
     _require(task_manifest(env)["compatibility"] == run["task"]["compatibility"], "Recorded task/rules are incompatible with current engine")
     _require(env.context() == context, "Recorded context differs from current engine")

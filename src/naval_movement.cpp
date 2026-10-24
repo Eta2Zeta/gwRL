@@ -476,6 +476,7 @@ void encounter(State &s, const Id &id) {
     });
     if (!opposing.empty()) {
       b.stage = "naval_screen_selection";
+      put(b, "screening", V(A{}));
       screenChoice(s, b);
       return;
     }
@@ -535,6 +536,7 @@ void encounter(State &s, const Id &id) {
     const auto cursor = b.data.require("cursor").asInt();
     if (cursor + 1 < static_cast<int>(r.path.size())) {
       b.stage = "naval_screen_selection";
+      put(b, "screening", V(A{}));
       screenChoice(s, b);
       return;
     }
@@ -731,8 +733,157 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
       return false;
   return true;
 }
+// The visitor returns true to stop after finding a completion witness. It does
+// not execute the route, draw dice, or enter any opponent decision window.
+bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
+                      const std::function<bool(const NavalRouteRequest &)> &emit,
+                      bool *landingBlocked = nullptr) {
+  if (selected.empty())
+    return false;
+  const auto &nation = s.units.at(selected.front()).owner;
+  const bool strategicEligible =
+      s.clock.phase == Phase::NonCombatMovement &&
+      std::all_of(selected.begin(), selected.end(), [&](const Id &id) {
+        const auto &unit = s.units.at(id);
+        return has(s, unit, "naval_transport") && unit.route.empty() &&
+               !unit.commitments.contains("combat_move");
+      });
+  for (const auto &start : seasAt(s, selected.front())) {
+      std::function<bool(std::vector<Id>)> visit = [&](std::vector<Id> path) {
+        NavalRouteRequest r{
+            selected, path,         s.clock.phase != Phase::NonCombatMovement,
+            false,    std::nullopt, std::nullopt};
+        if (path.size() > 1 || !port(s.units.at(selected.front())).empty()) {
+          const auto valid = validateNavalRoute(s, r);
+          if (valid.allowed) {
+            if (emit(r))
+              return true;
+          } else if (valid.reason ==
+                     "Carrier movement leaves aircraft without a joint landing plan") {
+            // A later destination may restore aircraft landing capacity. This
+            // final-position constraint cannot prune the route's extensions.
+            if (landingBlocked)
+              *landingBlocked = true;
+          } else {
+            return false;
+          }
+        }
+        if (path.size() > 8)
+          return false;
+        for (const auto &edge :
+             node(s, path.back()).require("neighbors").asArray()) {
+          const auto next = edge.require("neighbor_id").asString();
+          if (!sea(s, next) ||
+              std::find(path.begin(), path.end(), next) != path.end())
+            continue;
+          auto p = path;
+          p.push_back(next);
+          if (visit(std::move(p)))
+            return true;
+        }
+        return false;
+      };
+      if (visit({start}))
+        return true;
+      if (strategicEligible)
+        for (const auto &[origin, f] : s.facilities)
+          if (f.type.rfind("major_", 0) == 0) {
+            const auto access = navalFacilitySeaZones(s, origin);
+            if (std::find(access.begin(), access.end(), start) == access.end())
+              continue;
+            std::function<bool(std::vector<Id>)> strategic =
+                [&](std::vector<Id> path) {
+                  for (const auto &[dest, end] : s.facilities) {
+                    NavalRouteRequest r{selected, path,   false,
+                                        true,     origin, dest};
+                    const auto valid = validateNavalRoute(s, r);
+                    if (valid.allowed && emit(r))
+                      return true;
+                    if (!valid.allowed && landingBlocked && valid.reason ==
+                        "Carrier movement leaves aircraft without a joint landing plan")
+                      *landingBlocked = true;
+                  }
+                  if (path.size() >
+                      static_cast<std::size_t>(
+                          4 +
+                          (tech(s, nation, "improved_logistics") ? 1 : 0)))
+                    return false;
+                  for (const auto &e :
+                       node(s, path.back()).require("neighbors").asArray()) {
+                    const auto next = e.require("neighbor_id").asString();
+                    if (!sea(s, next) ||
+                        std::find(path.begin(), path.end(), next) != path.end())
+                      continue;
+                    auto p = path;
+                    p.push_back(next);
+                    if (strategic(std::move(p)))
+                      return true;
+                  }
+                  return false;
+                };
+            if (strategic({start}))
+              return true;
+          }
+  }
+  return false;
+}
+
+class NavalOrderCompletion {
+public:
+  explicit NavalOrderCompletion(const State &state) : state_(state) {}
+
+  void rememberComplete(const std::vector<Id> &selected) {
+    complete_[selected] = true;
+  }
+
+  bool possible(const std::vector<Id> &selected) {
+    if (selected.empty())
+      return false;
+    if (const auto known = complete_.find(selected); known != complete_.end())
+      return known->second;
+    const auto &first = state_.units.at(selected.front());
+    if (state_.clock.phase != Phase::NonCombatMovement &&
+        sea(state_, first.zone) && anyEnemy(state_, first.owner, first.zone))
+      return complete_[selected] = true;
+    bool landingBlocked = false;
+    if (visitNavalRoutes(state_, selected,
+                         [](const NavalRouteRequest &) { return true; },
+                         &landingBlocked))
+      return complete_[selected] = true;
+    // An added ship cannot repair a range, origin, passage, ownership,
+    // transport-capacity or raider-combination failure. Only moving additional
+    // aircraft capacity (or aircraft cargo in an externally supplied state)
+    // can repair the global joint-landing constraint. Search those helpers
+    // lazily, retaining all combinations rather than capping a fleet menu.
+    if (landingBlocked) {
+      for (const auto &[id, unit] : state_.units) {
+        if (id <= selected.back() || unit.zone != first.zone ||
+            unit.owner != first.owner ||
+            !available(state_, unit,
+                       state_.clock.phase != Phase::NonCombatMovement))
+          continue;
+        const bool aircraftCargo =
+            std::any_of(unit.cargo.begin(), unit.cargo.end(), [&](const Id &cargo) {
+              return isAircraft(state_, state_.units.at(cargo));
+            });
+        if (!has(state_, unit, "carrier") && !aircraftCargo)
+          continue;
+        auto withHelper = selected;
+        withHelper.push_back(id);
+        if (possible(withHelper))
+          return complete_[selected] = true;
+      }
+    }
+    return complete_[selected] = false;
+  }
+
+private:
+  const State &state_;
+  std::map<std::vector<Id>, bool> complete_;
+};
+
 void routeChoices(State &s, BattleState &b) {
-  auto selected = readIds(b.data.require("selected"));
+  const auto selected = readIds(b.data.require("selected"));
   std::vector<Action> options;
   for (const auto &[id, u] : s.units)
     if (u.zone == b.zone && u.owner == b.attacker &&
@@ -745,77 +896,75 @@ void routeChoices(State &s, BattleState &b) {
           {{"plan", V(b.id)}, {"unit", V(id)}}));
   options.push_back(
       action(s, b.attacker, "naval_cancel_move", {{"plan", V(b.id)}}));
-  if (!selected.empty()) {
-    if (s.clock.phase != Phase::NonCombatMovement && sea(s, b.zone) &&
-        anyEnemy(s, b.attacker, b.zone))
-      options.push_back(
-          action(s, b.attacker, "naval_engage_force", {{"plan", V(b.id)}}));
-    for (const auto &start : seasAt(s, selected.front())) {
-      std::function<void(std::vector<Id>)> visit = [&](std::vector<Id> path) {
-        NavalRouteRequest r{
-            selected, path,         s.clock.phase != Phase::NonCombatMovement,
-            false,    std::nullopt, std::nullopt};
-        if (path.size() > 1 || !port(s.units.at(selected.front())).empty()) {
-          const auto valid = validateNavalRoute(s, r);
-          if (!valid.allowed)
-            return;
-          options.push_back(
-              action(s, b.attacker, "naval_route",
-                     {{"plan", V(b.id)}, {"request", requestJson(r)}}));
-        }
-        if (path.size() > 8)
-          return;
-        for (const auto &edge :
-             node(s, path.back()).require("neighbors").asArray()) {
-          const auto next = edge.require("neighbor_id").asString();
-          if (!sea(s, next) ||
-              std::find(path.begin(), path.end(), next) != path.end())
-            continue;
-          auto p = path;
-          p.push_back(next);
-          visit(std::move(p));
-        }
-      };
-      visit({start});
-      if (s.clock.phase == Phase::NonCombatMovement)
-        for (const auto &[origin, f] : s.facilities)
-          if (f.type.rfind("major_", 0) == 0) {
-            const auto access = navalFacilitySeaZones(s, origin);
-            if (std::find(access.begin(), access.end(), start) == access.end())
-              continue;
-            std::function<void(std::vector<Id>)> strategic =
-                [&](std::vector<Id> path) {
-                  for (const auto &[dest, end] : s.facilities) {
-                    NavalRouteRequest r{selected, path,   false,
-                                        true,     origin, dest};
-                    if (validateNavalRoute(s, r).allowed)
-                      options.push_back(action(
-                          s, b.attacker, "naval_route",
-                          {{"plan", V(b.id)}, {"request", requestJson(r)}}));
-                  }
-                  if (path.size() >
-                      static_cast<std::size_t>(
-                          4 +
-                          (tech(s, b.attacker, "improved_logistics") ? 1 : 0)))
-                    return;
-                  for (const auto &e :
-                       node(s, path.back()).require("neighbors").asArray()) {
-                    const auto next = e.require("neighbor_id").asString();
-                    if (!sea(s, next) ||
-                        std::find(path.begin(), path.end(), next) != path.end())
-                      continue;
-                    auto p = path;
-                    p.push_back(next);
-                    strategic(std::move(p));
-                  }
-                };
-            strategic({start});
-          }
-    }
-  }
+  if (!selected.empty() && s.clock.phase != Phase::NonCombatMovement &&
+      sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone))
+    options.push_back(
+        action(s, b.attacker, "naval_engage_force", {{"plan", V(b.id)}}));
+  visitNavalRoutes(s, selected, [&](const NavalRouteRequest &request) {
+    options.push_back(action(s, b.attacker, "naval_route",
+                             {{"plan", V(b.id)},
+                              {"request", requestJson(request)}}));
+    return false;
+  });
   decision(s, b, b.attacker, "naval_force_selection", std::move(options));
 }
 } // namespace
+
+std::vector<Action> forwardNavalOrderActions(const State &s,
+                                            std::vector<Action> actions) {
+  NavalOrderCompletion completion(s);
+  std::erase_if(actions, [&](const Action &candidate) {
+    return candidate.kind == "naval_start_move" &&
+           !completion.possible({candidate.parameters.require("unit").asString()});
+  });
+  return actions;
+}
+
+void forwardNavalOrderDecision(State &s) {
+  if (s.decisions.empty())
+    return;
+  auto &pending = s.decisions.back();
+  if (pending.kind == "naval_screening_force") {
+    const auto &plan = s.battles.at(pending.continuation);
+    const auto selected = plan.data.find("screening")
+                              ? readIds(plan.data.require("screening"))
+                              : std::vector<Id>{};
+    std::erase_if(pending.options, [&](const Action &candidate) {
+      return candidate.kind == "naval_screen_remove" ||
+             (candidate.kind == "naval_screen_add" && !selected.empty() &&
+              candidate.parameters.require("unit").asString() <= selected.back());
+    });
+    require(!pending.options.empty(), "Forward naval screen has no completion");
+    return;
+  }
+  if (pending.kind != "naval_force_selection")
+    return;
+  const auto &plan = s.battles.at(pending.continuation);
+  const auto selected = readIds(plan.data.require("selected"));
+  require(!selected.empty() && std::is_sorted(selected.begin(), selected.end()),
+          "Forward naval order requires an ascending nonempty fleet");
+  NavalOrderCompletion completion(s);
+  if (std::any_of(pending.options.begin(), pending.options.end(),
+                  [](const Action &candidate) {
+                    return candidate.kind == "naval_route" ||
+                           candidate.kind == "naval_engage_force";
+                  }))
+    completion.rememberComplete(selected);
+  std::erase_if(pending.options, [&](const Action &candidate) {
+    if (candidate.kind == "naval_cancel_move" ||
+        candidate.kind == "naval_force_remove")
+      return true;
+    if (candidate.kind != "naval_force_add")
+      return false;
+    const auto &unit = candidate.parameters.require("unit").asString();
+    if (unit <= selected.back())
+      return true;
+    auto next = selected;
+    next.push_back(unit);
+    return !completion.possible(next);
+  });
+  require(!pending.options.empty(), "Forward naval order has no completion");
+}
 
 int strategicNavalCapacity(const State &s, const Id &n) {
   int base = n == "japan"                                            ? 3

@@ -702,7 +702,9 @@ std::vector<Action> navalOperationActions(const State &s) {
             out.push_back(action(
                 s, s.currentNation(), "naval_enter_port",
                 {{"unit", V(id)}, {"facility", V(fid)}, {"unload", V(false)}}));
-            if (!u.cargo.empty())
+            if (std::any_of(u.cargo.begin(), u.cargo.end(), [&](const Id& cargo) {
+                  return s.units.at(cargo).owner == u.owner;
+                }))
               out.push_back(action(s, s.currentNation(), "naval_enter_port",
                                    {{"unit", V(id)},
                                     {"facility", V(fid)},

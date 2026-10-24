@@ -7,10 +7,11 @@ namespace game::campaign {
 
 class CampaignEnv {
   public:
-    explicit CampaignEnv(const std::filesystem::path& scenario, std::uint64_t seed = 1);
+    explicit CampaignEnv(const std::filesystem::path& scenario, std::uint64_t seed = 1,
+                         bool trainingActions = false);
     explicit CampaignEnv(Engine engine);
     static CampaignEnv curriculum(const std::filesystem::path& scenario, int calendarRounds,
-                                  std::uint64_t seed = 1);
+                                  std::uint64_t seed = 1, bool trainingActions = false);
     bool isTerminal() const { return engine_.state().terminal; }
     std::optional<Id> currentDecisionPlayer() const { return engine_.state().decisionPlayer(); }
     Id currentNation() const { return engine_.state().currentNation(); }
@@ -40,6 +41,7 @@ class CampaignEnv {
   private:
     struct DecisionCache;
     Engine engine_;
+    bool trainingActions_ {false};
     std::shared_ptr<const json::Value> context_;
     // Engine state is exposed as const; successful wrapper mutations are the
     // only invalidation points. Search reseeding leaves decision identity alone.

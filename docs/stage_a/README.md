@@ -1,8 +1,8 @@
 # Stage A: completed-episode campaign learning
 
-Status: first completed-episode pilot, scaling measurements, decision reuse and
-native input compilation verified, 24 October 2026. Stage A remains an early
-learning experiment; it is not a completed
+Status: first completed-episode pilot, scaling measurements, decision reuse,
+native input compilation and bounded AI orders verified, 24 October 2026.
+Stage A remains an early learning experiment; it is not a completed
 playing-strength gate. [The scaling follow-up](scaling_2026_10_23.md) completes
 one small-budget eleven-round game, but stronger-search collection still needs
 performance work before larger learning.
@@ -23,9 +23,23 @@ including exact graph/numeric-bit comparisons and identical model outputs and
 training gradients. Stronger-search games still reach their wall guard; larger
 training remains on hold.
 
+The [AI order interface](action_interface_2026_10_24.md) removes reversible naval
+editing from self-play and rejects dead-end order starts. It also bounds repeated
+role/deck configurations and identical declined railway requests. All 297 Python
+tests and 26 C++ suites pass. This changes the action representation; its new
+games and training samples need not match the preceding performance repeats.
+All four two-round games at 16 simulations/depth 16 completed in 310.09 seconds
+when given a longer execution guard, while the primary four-minute test still
+completed 0/4. The eight-game one-round training repeat completed in 107.60
+seconds with 434 decision records. These different trajectories establish
+progress and completion for the measured cases, not a raw speedup or strength
+improvement.
+
 The original eight-game one-round pilot finished in 346.62 seconds, with 386 decisions
-and 52 chance events. All 386 training rows have observed terminal targets; none
-are bootstrapped or dropped. Policy samples: Axis 90, Allies 96, Comintern 200
+and 52 chance events. All 386 saved decision records were retained for training
+and labelled with the actual scores at the end of their one-round games. No
+mid-game score prediction replaced an ending result. Policy samples: Axis 90,
+Allies 96, Comintern 200
 (the latter controls both CCP and Mongolia turns). Two frozen-policy generations
 performed 32 sampled Adam steps per agent.
 
@@ -86,9 +100,9 @@ The observed improvement is completion behavior and outcome prediction. Allies/
 Comintern scores did not improve on these two dice seeds. Eight training games
 and one training seed do not establish robust strategic strength. The scaling
 follow-up now measures stronger search, later positions and longer horizons.
-Decision reuse and native graph construction are now implemented. Next measure
-remaining rule/tensor costs and address repeated naval planning at the stronger
-search budget, then expand one-round learning
+Decision reuse, native graph construction and bounded naval order selection are
+now implemented. Next measure remaining rule/tensor costs and establish reliable
+completion across seeds at the larger search budgets, then expand one-round learning
 and evaluation across several seeds before claiming strategic strength.
 
 The completed run includes 19 purchases, 35 land moves and 12 land-battle starts,
@@ -164,6 +178,7 @@ state.
 - [Search/campaign scaling report](scaling_2026_10_23.md)
 - [Decision reuse and matched performance results](decision_reuse_2026_10_24.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
+- [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)
 - [Matched-position operation profile](position_profile_2026_10_23.json)
 - [Paired comparison and limits](comparison_2026_10_23.json)

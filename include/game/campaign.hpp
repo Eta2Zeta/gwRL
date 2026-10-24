@@ -226,6 +226,9 @@ struct State {
     std::optional<ChanceRequest> chance;
     std::map<Id, int> flags;
     std::vector<Event> history;
+    // Versioned AI action-construction state. Empty for the human/game API.
+    // Public source data, included in observations, keys, clones and saves.
+    json::Value actionInterface {json::Value::Object{}};
     bool terminal {false};
 
     State clone() const;  // Value-copy mutable data; share immutable definition.
@@ -287,6 +290,7 @@ class Rules {
 
 class Engine {
   public:
+    Id rulesId() const { return rules_->id(); }
     // Wrap an already prepared state; no start-of-turn hook is re-applied.
     Engine(State initial, std::shared_ptr<const Rules> rules, std::uint64_t seed = 1);
     // A fresh campaign invokes the first nation's beginTurn exactly once.

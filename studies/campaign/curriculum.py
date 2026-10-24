@@ -20,19 +20,23 @@ CURRICULUM_VERSION = "regional-horizon-curriculum-v1"
 
 
 def make_env(seed: int, *, calendar_rounds: int | None = None,
-             scenario: Path = SCENARIO) -> CampaignAdapter:
-    raw = (gwrl_cpp.CampaignEnv(str(scenario), seed) if calendar_rounds is None else
-           gwrl_cpp.CampaignEnv.curriculum(str(scenario), calendar_rounds, seed))
+             scenario: Path = SCENARIO, training_actions: bool = True) -> CampaignAdapter:
+    raw = (gwrl_cpp.CampaignEnv(str(scenario), seed, training_actions=training_actions) if calendar_rounds is None else
+           gwrl_cpp.CampaignEnv.curriculum(str(scenario), calendar_rounds, seed, training_actions=training_actions))
     return CampaignAdapter(raw)
 
 
 def compatibility(env: CampaignAdapter) -> dict[str, str]:
     state = json.loads(env.raw.serialize())
-    encoded = json.dumps(env.context()["rules"], sort_keys=True, separators=(",", ":"))
-    return {"scenario": state["state"]["definition_fingerprint"],
+    context = env.context()
+    encoded = json.dumps(context["rules"], sort_keys=True, separators=(",", ":"))
+    result = {"scenario": state["state"]["definition_fingerprint"],
             "rules": hashlib.sha256(encoded.encode()).hexdigest(),
             "schema": f"{gwrl_cpp.CAMPAIGN_SCHEMA}+{ADAPTER_SCHEMA}",
             "curriculum": CURRICULUM_VERSION}
+    if "action_interface" in context:
+        result["actions"] = context["action_interface"]
+    return result
 
 
 def task_manifest(env: CampaignAdapter) -> dict:

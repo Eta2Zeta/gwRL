@@ -15,6 +15,7 @@ ext_modules = [
         [
             "src/campaign_benchmarks.cpp",
             "src/campaign_audit.cpp",
+            "src/campaign_actions.cpp",
             "src/campaign_env.cpp",
             "src/campaign_objective.cpp",
             "src/campaign_runtime.cpp",

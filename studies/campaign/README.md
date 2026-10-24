@@ -117,6 +117,15 @@ Unicode tokenization and numerical features. Reports identify the backend in
 `software.graph_compiler`. Rebuild the extension after pulling this change;
 the model architecture, input schema and learned-gradient behavior are unchanged.
 
+Self-play now uses the versioned [AI order interface](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md)
+by default. Fleet and screening selection make forward progress; undo/cancel
+editing is kept in the ordinary game API. Unchanged role/deck configuration
+cycles and repeated declined railway requests are also bounded. Context and
+checkpoint compatibility identify `campaign-orders-v1`; old replay/optimizer
+state is not implicitly migrated. Explicit frozen model-weight transfers remain
+available for comparisons, and historical recordings select their original
+action interface for exact verification. Rebuild the native extension first.
+
 RSS means **resident set size**: the physical memory currently occupied by a
 process. The benchmark samples and sums the supervisor and worker RSS, reporting
 the highest sampled total in bytes. For example, 2.58 GB means roughly that much
@@ -173,11 +182,13 @@ It includes first-use parsing and warm calls; menu size and game phase matter.
 
 ## Starting a larger experiment
 
-The current next step is to reduce first-use observation-graph construction and
-profile remaining costs, then complete a bounded stronger-search episode batch
-before expanding learning. Decision reuse is implemented and verified; the stronger
-batch still reaches its guard. Both performance follow-ups measure collection
-and search, not new learning updates.
+Decision reuse, native graph construction and bounded AI order construction are
+implemented. Next measure remaining rules/tensor costs and verify completion
+across seeds and search budgets before expanding learning. The four-minute
+16-simulation batch still reaches its guard. The order-interface report records
+4/4 two-round completions in 310.09 seconds under a longer execution guard and
+separates frozen-policy collection from actual
+eight-game learning repeats, which include network updates and checkpoint writes.
 
 The original small two-batch smoke took 14.30
 seconds across stop/resume; 100 similar batches would take roughly 12 minutes

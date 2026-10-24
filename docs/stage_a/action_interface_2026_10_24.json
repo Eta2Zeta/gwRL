@@ -1,0 +1,3064 @@
+{
+  "after_working_tree_based_on_commit": "ad6eec22060cdefd4ef63b6d6db271430cfe0756",
+  "authorized_resources": {
+    "cpu_cores": 12,
+    "memory_bytes": 30000000000
+  },
+  "baseline_manifest": {
+    "bytes": 1784,
+    "path": "tmp/action-interface-2026-10-24/baseline_manifest.json",
+    "sha256": "d6d3d40406f534ad92127d90115877f247b9b94de70ecca4afafb153c4ab0ea0"
+  },
+  "before_commit": "ad6eec22060cdefd4ef63b6d6db271430cfe0756",
+  "candidate_exact_replay_and_behavior": {
+    "extended_complete": {
+      "roots": [
+        {
+          "artifact": {
+            "bytes": 13951,
+            "path": "tmp/action-interface-2026-10-24/candidate-extended-root0.json",
+            "sha256": "fad35b93d7482f3970676760d45069397536967a209de9dab32e1813196f3962"
+          },
+          "checks_sha256": "b8596770421d8f9f256509982e41996fbc6947456214f3885f42e239a079289e",
+          "decision_menus_checked": 146,
+          "final_state_rng_sha256": "e212f236ccbd6c4325ccb6a29e79e875e807e3fd197b1a5bbf7d48bdfe6a79b5",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 3,
+          "naval_orders_committed": 2,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 2,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": [
+            42.30000000000001,
+            -62.5,
+            -75.3
+          ],
+          "role_or_carrier_configuration_actions": 1,
+          "root": 0,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": true,
+          "verified_transitions": 146
+        },
+        {
+          "artifact": {
+            "bytes": 14282,
+            "path": "tmp/action-interface-2026-10-24/candidate-extended-root1.json",
+            "sha256": "f2a02918606fbe697b5c644e0fadadaf893a9685df7a423b920f74d3ba3d4b62"
+          },
+          "checks_sha256": "a400abf047e29f15111df2d852d33a6a90183197e319660dbe3a131ea2f176ae",
+          "decision_menus_checked": 183,
+          "final_state_rng_sha256": "767fa33c9630b1cbb03fd35efba2c54d644b5cfd487271f0d66595368f6e6d95",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 3,
+          "naval_orders_committed": 3,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 3,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": [
+            29.700000000000003,
+            -40.099999999999994,
+            -92.89999999999999
+          ],
+          "role_or_carrier_configuration_actions": 4,
+          "root": 1,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": true,
+          "verified_transitions": 183
+        },
+        {
+          "artifact": {
+            "bytes": 13770,
+            "path": "tmp/action-interface-2026-10-24/candidate-extended-root2.json",
+            "sha256": "dae07fde20366bc5ade1ae7e55626faca1adedeb7e536d892e74687140e6142e"
+          },
+          "checks_sha256": "ea30e00eba14b51224cf66d2651e3aa96fe0f895359a8d02e6600f788f76450b",
+          "decision_menus_checked": 112,
+          "final_state_rng_sha256": "f8d742c73aa652496eb481c0873caab69287a67a90a54c21c59bfd3356572fe4",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 0,
+          "naval_orders_committed": 0,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 0,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": [
+            41.8,
+            -50.4,
+            -87.60000000000001
+          ],
+          "role_or_carrier_configuration_actions": 1,
+          "root": 2,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": true,
+          "verified_transitions": 112
+        },
+        {
+          "artifact": {
+            "bytes": 14113,
+            "path": "tmp/action-interface-2026-10-24/candidate-extended-root3.json",
+            "sha256": "9d67e439e2074bc7bdccf23a2d5d6ed385a7c0f90ecc524f984604de7f83b0bc"
+          },
+          "checks_sha256": "b5717f21819f57efe26e1b2cae851ac39de64c30ed9a5d22c64798d0c33fb57e",
+          "decision_menus_checked": 150,
+          "final_state_rng_sha256": "05e06309610109d2cff89534bd071df6b650dac6f11174fd1290d8c5b855ab54",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 1,
+          "naval_orders_committed": 1,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 1,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": [
+            29.599999999999994,
+            -48.40000000000001,
+            -84.00000000000001
+          ],
+          "role_or_carrier_configuration_actions": 1,
+          "root": 3,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": true,
+          "verified_transitions": 150
+        }
+      ],
+      "scope": "Exact same-version actual action/state/execution-RNG replay, including current legal menus. Reversible configuration checks apply within remembered contexts, which reset on meaningful game progress. No global non-repetition claim.",
+      "totals": {
+        "decision_menus_checked": 591,
+        "forbidden_editor_choices_executed": 0,
+        "forbidden_editor_choices_present_in_menus": 0,
+        "force_additions_with_monotonic_progress": 7,
+        "naval_orders_committed": 6,
+        "naval_orders_pending": 0,
+        "naval_orders_started": 6,
+        "remembered_configuration_revisits": 0,
+        "role_or_carrier_configuration_actions": 7,
+        "screen_additions_with_monotonic_progress": 0,
+        "verified_transitions": 591
+      }
+    },
+    "full11": {
+      "roots": [
+        {
+          "artifact": {
+            "bytes": 14173,
+            "path": "tmp/action-interface-2026-10-24/candidate-full11-root0.json",
+            "sha256": "3e2a2f5319f92fb1bfd993868edde86d8858d1842066ff7ad78954e9669e3e06"
+          },
+          "checks_sha256": "89f99d7445fba33ddf268134b9345188590ce24aa97613a58c39983afcdd1fda",
+          "decision_menus_checked": 633,
+          "final_state_rng_sha256": "ac5e6ae2bf7f64e0d7cd81c950d7956051f50f7b58fb2820a5f29d3aa7327278",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 0,
+          "naval_orders_committed": 0,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 0,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": [
+            48.499999999999986,
+            -73.9,
+            -95.7
+          ],
+          "role_or_carrier_configuration_actions": 4,
+          "root": 0,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": true,
+          "verified_transitions": 633
+        }
+      ],
+      "scope": "Exact same-version actual action/state/execution-RNG replay, including current legal menus. Reversible configuration checks apply within remembered contexts, which reset on meaningful game progress. No global non-repetition claim.",
+      "totals": {
+        "decision_menus_checked": 633,
+        "forbidden_editor_choices_executed": 0,
+        "forbidden_editor_choices_present_in_menus": 0,
+        "force_additions_with_monotonic_progress": 0,
+        "naval_orders_committed": 0,
+        "naval_orders_pending": 0,
+        "naval_orders_started": 0,
+        "remembered_configuration_revisits": 0,
+        "role_or_carrier_configuration_actions": 4,
+        "screen_additions_with_monotonic_progress": 0,
+        "verified_transitions": 633
+      }
+    },
+    "primary_guarded": {
+      "roots": [
+        {
+          "artifact": {
+            "bytes": 13778,
+            "path": "tmp/action-interface-2026-10-24/candidate-primary-root0.json",
+            "sha256": "5b443de1c479b734d22bf4c334c22a131ad4c63e3db1c9a77f98b6fe05476c80"
+          },
+          "checks_sha256": "ac52d22f240e79f6a0199a991ec6c9890c1023d1a0a55b8d3e7bebf583a93752",
+          "decision_menus_checked": 110,
+          "final_state_rng_sha256": "164ea0674f21f0e3a656fca5d819ebca932d1ef998bf7fea915fb134ade3d5bd",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 3,
+          "naval_orders_committed": 1,
+          "naval_orders_pending": 1,
+          "naval_orders_started": 2,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": null,
+          "role_or_carrier_configuration_actions": 1,
+          "root": 0,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": false,
+          "verified_transitions": 110
+        },
+        {
+          "artifact": {
+            "bytes": 13915,
+            "path": "tmp/action-interface-2026-10-24/candidate-primary-root1.json",
+            "sha256": "41f409dd2f3db5a79a25caa3c4440942e9554c857484548e39125628ff95f400"
+          },
+          "checks_sha256": "f38c8bc3f208c9a0d3442ddbe2159aa87058b6f1a4a4e30748441271ac377305",
+          "decision_menus_checked": 110,
+          "final_state_rng_sha256": "d4ddd6dbf70dd6acc84eef459eaae828155f2b9a0ab71cf030191a4ab48c8424",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 1,
+          "naval_orders_committed": 2,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 2,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": null,
+          "role_or_carrier_configuration_actions": 3,
+          "root": 1,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": false,
+          "verified_transitions": 110
+        },
+        {
+          "artifact": {
+            "bytes": 13657,
+            "path": "tmp/action-interface-2026-10-24/candidate-primary-root2.json",
+            "sha256": "e6e556dcb7e24a8acb447a058e67faa97236ac8ab45baa24990dba52d9385fba"
+          },
+          "checks_sha256": "adee41a12f93728bc9a36e3ee8632fb1d03fc46503082756aa7b5e58a5e2b66b",
+          "decision_menus_checked": 110,
+          "final_state_rng_sha256": "f77ffca94eea71bd42ef48d17a9ef617de65b17cff603763cbb5a02b37ebf7c7",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 0,
+          "naval_orders_committed": 0,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 0,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": null,
+          "role_or_carrier_configuration_actions": 1,
+          "root": 2,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": false,
+          "verified_transitions": 110
+        },
+        {
+          "artifact": {
+            "bytes": 13756,
+            "path": "tmp/action-interface-2026-10-24/candidate-primary-root3.json",
+            "sha256": "591d2d05898b14ffe35d7fa1574d72f0013b33931b6b5e1720c5dbd5992e99d7"
+          },
+          "checks_sha256": "59a0d127984730f45b6df334058f4f1f7f94213a70700a0fe6a3380cb8a24dae",
+          "decision_menus_checked": 110,
+          "final_state_rng_sha256": "9e6dd45a5909417eaf5f397e1c1e4e5aab9d02caabef2df0fcc219f3c3520ddc",
+          "forbidden_editor_choices_executed": 0,
+          "forbidden_editor_choices_present_in_menus": 0,
+          "force_additions_with_monotonic_progress": 1,
+          "naval_orders_committed": 1,
+          "naval_orders_pending": 0,
+          "naval_orders_started": 1,
+          "passed": true,
+          "remembered_configuration_revisits": 0,
+          "returns": null,
+          "role_or_carrier_configuration_actions": 1,
+          "root": 3,
+          "screen_additions_with_monotonic_progress": 0,
+          "terminal": false,
+          "verified_transitions": 110
+        }
+      ],
+      "scope": "Exact same-version actual action/state/execution-RNG replay, including current legal menus. Reversible configuration checks apply within remembered contexts, which reset on meaningful game progress. No global non-repetition claim.",
+      "totals": {
+        "decision_menus_checked": 440,
+        "forbidden_editor_choices_executed": 0,
+        "forbidden_editor_choices_present_in_menus": 0,
+        "force_additions_with_monotonic_progress": 5,
+        "naval_orders_committed": 4,
+        "naval_orders_pending": 1,
+        "naval_orders_started": 5,
+        "remembered_configuration_revisits": 0,
+        "role_or_carrier_configuration_actions": 6,
+        "screen_additions_with_monotonic_progress": 0,
+        "verified_transitions": 440
+      }
+    }
+  },
+  "candidate_native": {
+    "bytes": 3137200,
+    "path": "gwrl_cpp.cpython-313-darwin.so",
+    "sha256": "4cfca90da6f600b23d9b853fe3b04b6fc93b2f2e6ab972a0d3ff6e8aa1022be4"
+  },
+  "candidate_runtime_source_manifest_sha256": "56901abd219342278aaadadba6f68b13cb2ac067f743734dd695a70150f9f6d9",
+  "candidate_runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "d3a44c0b7b9f0769ac5137aad96aa10374109ddb3bd01ac59cb7fc6ecebafb16",
+    "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "89e82e43014090130c365bd8c49386bdf1cd4a772ccedb1b6bf1732ce16325b6",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+    "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "3919edbb4c0e732fb00c41b4558081a0026cdb57b678b8b939d2af0b91029a1b",
+    "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "f2ba46163cc97391e0f659b632eda9b4ed9fe992e81af2bcde27ac00e069289e",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "3cf51ef2821adf34c8eb5b133d9480dac1a83eff054fdb7f514e57f48985b251",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "e5d5fde2bd7e9dc9c42f2b238c862e7e12624917566527406f1c19d1b7a218c6",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+    "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+    "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+    "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "6e043462adf5c5fb6bc0ff8d34eebd077d6f57f62fa8b81f6b47c225396aa016",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+    "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4",
+    "studies/campaign/features.py": "15cf244d5312536b78e4f4adcdd858ce50b3531acba58c52b48c6f20a0238752",
+    "studies/campaign/learning.py": "dd70ca35bc69059d63a058dd5892045adfb7eb3392194508c46659b5047cc707",
+    "studies/campaign/neural.py": "c8530ef33e1861c62f9f5de7e06834a1e015efead156979605545878048ed598",
+    "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+    "studies/campaign/run.py": "61c5ea3a348ed08c2539269b92da59a1887b7642d67805a618a777b2daf78ae1",
+    "studies/campaign/scaling_benchmark.py": "303831c3317ee21ef95a7521c492d68dc1fc57a0e48ff90b7b303fa8539bddd3",
+    "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+    "studies/shared/campaign_adapter.py": "cef35f5730550ec9ef418fd328a75b32dc362bd43b9301ea3c7552e869e64a16",
+    "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+    "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+  },
+  "cases": [
+    {
+      "candidate": {
+        "actual_transitions": 633,
+        "chance_events": 76,
+        "completed_games": 1,
+        "executed_decisions": 557,
+        "prepared_state_sha256": [
+          "e33240f9fb5ff6179dcfdacfacba0bd17fa0956754994740c9f4ba26761b6f9f"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 76,
+            "clock": {
+              "completed_rounds": 11,
+              "income_collected": true,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "44",
+              "round_index": 10
+            },
+            "decisions": 557,
+            "index": 0,
+            "observed_terminal_returns": [
+              48.499999999999986,
+              -73.9,
+              -95.7
+            ],
+            "terminal": true,
+            "transitions": 633
+          }
+        ],
+        "roots": 1,
+        "sampled_peak_rss_bytes": 1516306432,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 11,
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+            "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": true,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          [
+            48.499999999999986,
+            -73.9,
+            -95.7
+          ]
+        ],
+        "wall_seconds": 107.83468870899378,
+        "warm_mean_seconds": 0.14954169493154146,
+        "whole_search_wave_seconds": null
+      },
+      "candidate_actions": {
+        "actual_action_counts": {
+          "economy_advance": 17,
+          "economy_approve_rail": 1,
+          "economy_decline_rail": 1,
+          "economy_finish_research": 11,
+          "economy_lease_declare": 1,
+          "economy_lease_deliver": 6,
+          "economy_lease_place": 1,
+          "economy_lease_upgrade": 5,
+          "economy_place": 46,
+          "economy_purchase": 45,
+          "economy_request_rail": 2,
+          "economy_research": 5,
+          "end_phase": 221,
+          "influence_roll": 7,
+          "land_begin_battle": 15,
+          "land_continue_fighting": 5,
+          "land_progress_battle": 15,
+          "land_retreat_begin": 3,
+          "land_retreat_unit": 3,
+          "land_take_casualty": 17,
+          "movement_route": 82,
+          "naval_begin_assault": 1,
+          "naval_declare_assault": 1,
+          "naval_designate_raider": 2,
+          "naval_finish_shore_selection": 1,
+          "naval_load": 5,
+          "naval_remove_raider": 2,
+          "naval_unload": 6,
+          "politics_declare_war": 1,
+          "politics_priority_declare": 1,
+          "politics_priority_decline": 1,
+          "recruitment_place_infantry": 4,
+          "recruitment_place_militia": 1,
+          "recruitment_roll": 22
+        },
+        "by_root": {
+          "0": {
+            "economy_advance": 17,
+            "economy_approve_rail": 1,
+            "economy_decline_rail": 1,
+            "economy_finish_research": 11,
+            "economy_lease_declare": 1,
+            "economy_lease_deliver": 6,
+            "economy_lease_place": 1,
+            "economy_lease_upgrade": 5,
+            "economy_place": 46,
+            "economy_purchase": 45,
+            "economy_request_rail": 2,
+            "economy_research": 5,
+            "end_phase": 221,
+            "influence_roll": 7,
+            "land_begin_battle": 15,
+            "land_continue_fighting": 5,
+            "land_progress_battle": 15,
+            "land_retreat_begin": 3,
+            "land_retreat_unit": 3,
+            "land_take_casualty": 17,
+            "movement_route": 82,
+            "naval_begin_assault": 1,
+            "naval_declare_assault": 1,
+            "naval_designate_raider": 2,
+            "naval_finish_shore_selection": 1,
+            "naval_load": 5,
+            "naval_remove_raider": 2,
+            "naval_unload": 6,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 4,
+            "recruitment_place_militia": 1,
+            "recruitment_roll": 22
+          }
+        },
+        "complete_trace_records": 1190,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 5547438,
+          "path": "tmp/action-interface-2026-10-24/candidate-results/full11-s4.trace.jsonl",
+          "sha256": "ab961e96a57c3ff61d68cbc0ed2e0cd01b6931660230275a802b2dead19e8038"
+        }
+      },
+      "case": "full11-s4",
+      "comparison_scope": "Action representation/search granularity changed. Equal numerical budgets and frozen weights do not establish equal search work, equal physical lookahead or identical trajectories. Completion/time is operational evidence, not a pure implementation speedup or playing-strength claim.",
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 8,
+        "max_state_visits": 12,
+        "max_transitions": 2000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 1,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 4,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 4
+      },
+      "historical": {
+        "actual_transitions": 631,
+        "chance_events": 71,
+        "completed_games": 1,
+        "executed_decisions": 560,
+        "prepared_state_sha256": [
+          "1e74c054e96a3f355fab362ce9d73311dd8f9e680f3c2e17043999859677f42d"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 71,
+            "clock": {
+              "completed_rounds": 11,
+              "income_collected": true,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "44",
+              "round_index": 10
+            },
+            "decisions": 560,
+            "index": 0,
+            "observed_terminal_returns": [
+              51.599999999999994,
+              -70.6,
+              -99.4
+            ],
+            "terminal": true,
+            "transitions": 631
+          }
+        ],
+        "roots": 1,
+        "sampled_peak_rss_bytes": 1559412736,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 11,
+          "compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+            "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": true,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          [
+            51.599999999999994,
+            -70.6,
+            -99.4
+          ]
+        ],
+        "wall_seconds": 104.5802980419976,
+        "warm_mean_seconds": 0.14451485533624264,
+        "whole_search_wave_seconds": null
+      },
+      "historical_actions": {
+        "actual_action_counts": {
+          "economy_advance": 17,
+          "economy_approve_rail": 1,
+          "economy_decline_rail": 1,
+          "economy_finish_research": 11,
+          "economy_lease_declare": 1,
+          "economy_lease_deliver": 6,
+          "economy_lease_place": 1,
+          "economy_lease_upgrade": 5,
+          "economy_place": 55,
+          "economy_purchase": 56,
+          "economy_request_rail": 2,
+          "economy_research": 5,
+          "end_phase": 220,
+          "influence_roll": 7,
+          "land_begin_battle": 14,
+          "land_continue_fighting": 5,
+          "land_progress_battle": 14,
+          "land_retreat_begin": 2,
+          "land_retreat_unit": 2,
+          "land_take_casualty": 17,
+          "movement_route": 74,
+          "naval_designate_raider": 3,
+          "naval_load": 5,
+          "naval_remove_raider": 3,
+          "naval_unload": 5,
+          "politics_declare_war": 1,
+          "politics_priority_declare": 1,
+          "politics_priority_decline": 1,
+          "recruitment_place_infantry": 4,
+          "recruitment_roll": 21
+        },
+        "by_root": {
+          "0": {
+            "economy_advance": 17,
+            "economy_approve_rail": 1,
+            "economy_decline_rail": 1,
+            "economy_finish_research": 11,
+            "economy_lease_declare": 1,
+            "economy_lease_deliver": 6,
+            "economy_lease_place": 1,
+            "economy_lease_upgrade": 5,
+            "economy_place": 55,
+            "economy_purchase": 56,
+            "economy_request_rail": 2,
+            "economy_research": 5,
+            "end_phase": 220,
+            "influence_roll": 7,
+            "land_begin_battle": 14,
+            "land_continue_fighting": 5,
+            "land_progress_battle": 14,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 2,
+            "land_take_casualty": 17,
+            "movement_route": 74,
+            "naval_designate_raider": 3,
+            "naval_load": 5,
+            "naval_remove_raider": 3,
+            "naval_unload": 5,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 4,
+            "recruitment_roll": 21
+          }
+        },
+        "complete_trace_records": 1191,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 5479513,
+          "path": "tmp/encoder-pass-2026-10-24/optimized-results/full11-s4.trace.jsonl",
+          "sha256": "519eb159d3496b37b6e3b1def0d205c5e55149fc0c64233cc6ff4db39e60d022"
+        }
+      },
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "tasks_equal": false
+    },
+    {
+      "candidate": {
+        "actual_transitions": 0,
+        "chance_events": 0,
+        "completed_games": null,
+        "executed_decisions": 0,
+        "prepared_state_sha256": [
+          "7dd8e7b326efc73d040aac2e2b0ed652e8596075cec1e264340435b0069b359b",
+          "c563b8358376c2f2f0d640bb74b5b1d942a3029b44754b6b6f6091eba75b9481",
+          "acd62f431703e4d6081f8640ec2d21549fd63992165c9bf0512a6ef500e32a58",
+          "1ae7dc0da4e9bb6d5a9109fb7d66cd36c731a1bde0752db925a691a7bde41054"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 0,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 1,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 2,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 3,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          }
+        ],
+        "roots": 4,
+        "sampled_peak_rss_bytes": 1444790272,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 11,
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+            "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": true,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "wall_seconds": 22.795970833001775,
+        "warm_mean_seconds": 4.227401270498376,
+        "whole_search_wave_seconds": [
+          4.215847332998237,
+          4.086788665998029,
+          4.368013874998724
+        ]
+      },
+      "candidate_actions": {
+        "actual_action_counts": {
+          "economy_advance": 8,
+          "economy_finish_research": 4,
+          "economy_place": 4,
+          "economy_purchase": 12,
+          "economy_research": 4,
+          "end_phase": 44,
+          "influence_roll": 4,
+          "land_begin_battle": 4,
+          "land_continue_fighting": 4,
+          "land_progress_battle": 4,
+          "land_take_casualty": 6,
+          "movement_route": 12,
+          "politics_declare_war": 4,
+          "politics_priority_declare": 4,
+          "politics_priority_decline": 4,
+          "recruitment_place_infantry": 5,
+          "recruitment_roll": 8
+        },
+        "by_root": {
+          "0": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_progress_battle": 1,
+            "land_take_casualty": 2,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          },
+          "1": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_progress_battle": 1,
+            "land_take_casualty": 1,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          },
+          "2": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 1,
+            "land_take_casualty": 1,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 2,
+            "recruitment_roll": 2
+          },
+          "3": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 1,
+            "land_take_casualty": 2,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          }
+        },
+        "complete_trace_records": 170,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 641873,
+          "path": "tmp/action-interface-2026-10-24/candidate-results/opening-s16.trace.jsonl",
+          "sha256": "f8951df30f9c7c51b5428d33593968e436ccf2cd058d377fef4a51e86e89b010"
+        }
+      },
+      "case": "opening-s16",
+      "comparison_scope": "Action representation/search granularity changed. Equal numerical budgets and frozen weights do not establish equal search work, equal physical lookahead or identical trajectories. Completion/time is operational evidence, not a pure implementation speedup or playing-strength claim.",
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1024,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 150.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "historical": {
+        "actual_transitions": 0,
+        "chance_events": 0,
+        "completed_games": null,
+        "executed_decisions": 0,
+        "prepared_state_sha256": [
+          "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+          "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+          "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+          "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 0,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 1,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 2,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "chance_events": 0,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "decisions": 0,
+            "index": 3,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 0
+          }
+        ],
+        "roots": 4,
+        "sampled_peak_rss_bytes": 1458896896,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 11,
+          "compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+            "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": true,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "wall_seconds": 21.20080987500114,
+        "warm_mean_seconds": 3.746958916501171,
+        "whole_search_wave_seconds": [
+          3.733511833001103,
+          3.6512183330050902,
+          3.842699499997252
+        ]
+      },
+      "historical_actions": {
+        "actual_action_counts": {
+          "economy_advance": 8,
+          "economy_finish_research": 4,
+          "economy_place": 4,
+          "economy_purchase": 12,
+          "economy_research": 4,
+          "end_phase": 44,
+          "influence_roll": 4,
+          "land_begin_battle": 4,
+          "land_continue_fighting": 4,
+          "land_progress_battle": 4,
+          "land_take_casualty": 6,
+          "movement_route": 12,
+          "politics_declare_war": 4,
+          "politics_priority_declare": 4,
+          "politics_priority_decline": 4,
+          "recruitment_place_infantry": 5,
+          "recruitment_roll": 8
+        },
+        "by_root": {
+          "0": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_progress_battle": 1,
+            "land_take_casualty": 2,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          },
+          "1": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_progress_battle": 1,
+            "land_take_casualty": 1,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          },
+          "2": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 1,
+            "land_take_casualty": 1,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 2,
+            "recruitment_roll": 2
+          },
+          "3": {
+            "economy_advance": 2,
+            "economy_finish_research": 1,
+            "economy_place": 1,
+            "economy_purchase": 3,
+            "economy_research": 1,
+            "end_phase": 11,
+            "influence_roll": 1,
+            "land_begin_battle": 1,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 1,
+            "land_take_casualty": 2,
+            "movement_route": 3,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          }
+        },
+        "complete_trace_records": 170,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 641862,
+          "path": "tmp/encoder-pass-2026-10-24/optimized-results/opening-s16.trace.jsonl",
+          "sha256": "972d0420529e403ea2f86f54bc73a83cb822271856cd68fe20e5e658178ea1a8"
+        }
+      },
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "tasks_equal": false
+    },
+    {
+      "candidate": {
+        "actual_transitions": 591,
+        "chance_events": 84,
+        "completed_games": 4,
+        "executed_decisions": 507,
+        "prepared_state_sha256": [
+          "1684a05c12e7d31b901fd761b9aab5f42c5d931aab4642825153eb3ecce3ebae",
+          "43d5ae14fe6e1e8a85c24ef786468f98ade42f2be5d5aee4525dea4025c41010",
+          "94f6f29168f6daa8eda5b17c31ed28e175cb88632d602ea8290e9cc49e07aceb",
+          "dd4b98d7cd81412f52d56680dbcbec8b283594416db4bd55450f6ba307d2c0b9"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 21,
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": true,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "8",
+              "round_index": 1
+            },
+            "decisions": 125,
+            "index": 0,
+            "observed_terminal_returns": [
+              42.30000000000001,
+              -62.5,
+              -75.3
+            ],
+            "terminal": true,
+            "transitions": 146
+          },
+          {
+            "chance_events": 26,
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": true,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "8",
+              "round_index": 1
+            },
+            "decisions": 157,
+            "index": 1,
+            "observed_terminal_returns": [
+              29.700000000000003,
+              -40.099999999999994,
+              -92.89999999999999
+            ],
+            "terminal": true,
+            "transitions": 183
+          },
+          {
+            "chance_events": 16,
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": true,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "8",
+              "round_index": 1
+            },
+            "decisions": 96,
+            "index": 2,
+            "observed_terminal_returns": [
+              41.8,
+              -50.4,
+              -87.60000000000001
+            ],
+            "terminal": true,
+            "transitions": 112
+          },
+          {
+            "chance_events": 21,
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": true,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "8",
+              "round_index": 1
+            },
+            "decisions": 129,
+            "index": 3,
+            "observed_terminal_returns": [
+              29.599999999999994,
+              -48.40000000000001,
+              -84.00000000000001
+            ],
+            "terminal": true,
+            "transitions": 150
+          }
+        ],
+        "roots": 4,
+        "sampled_peak_rss_bytes": 2004959232,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 2,
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "10622810b2dfade66d521aa886e4528e05787be9c31986cdedd8a32ba50ce9c5",
+            "scenario": "4226a302f57c73e709e6c1874572243209a95ab33573a2fe1215169cf38de66c",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": false,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          [
+            42.30000000000001,
+            -62.5,
+            -75.3
+          ],
+          [
+            29.700000000000003,
+            -40.099999999999994,
+            -92.89999999999999
+          ],
+          [
+            41.8,
+            -50.4,
+            -87.60000000000001
+          ],
+          [
+            29.599999999999994,
+            -48.40000000000001,
+            -84.00000000000001
+          ]
+        ],
+        "wall_seconds": 310.08827195799677,
+        "warm_mean_seconds": 1.601868499283551,
+        "whole_search_wave_seconds": null
+      },
+      "candidate_actions": {
+        "actual_action_counts": {
+          "air_end_patrol": 1,
+          "air_fly": 1,
+          "air_land": 1,
+          "air_land_noncombat": 5,
+          "air_start_patrol": 2,
+          "air_support": 5,
+          "economy_advance": 4,
+          "economy_approve_rail": 4,
+          "economy_decline_rail": 1,
+          "economy_finish_research": 8,
+          "economy_place": 22,
+          "economy_purchase": 31,
+          "economy_request_rail": 5,
+          "economy_research": 8,
+          "end_phase": 162,
+          "influence_roll": 5,
+          "land_begin_battle": 20,
+          "land_continue_fighting": 7,
+          "land_progress_battle": 21,
+          "land_retreat_begin": 8,
+          "land_retreat_unit": 12,
+          "land_take_casualty": 26,
+          "movement_route": 53,
+          "naval_begin_assault": 3,
+          "naval_declare_assault": 4,
+          "naval_designate_raider": 5,
+          "naval_enter_port": 2,
+          "naval_finish_shore_selection": 3,
+          "naval_force_add": 7,
+          "naval_load": 20,
+          "naval_remove_raider": 2,
+          "naval_route": 6,
+          "naval_start_move": 6,
+          "naval_unload": 9,
+          "pass_interrupt": 3,
+          "politics_choose_capital": 1,
+          "politics_declare_war": 6,
+          "politics_priority_declare": 2,
+          "politics_priority_decline": 4,
+          "recruitment_place_infantry": 2,
+          "recruitment_roll": 10
+        },
+        "by_root": {
+          "0": {
+            "air_end_patrol": 1,
+            "air_land_noncombat": 1,
+            "air_start_patrol": 1,
+            "economy_advance": 1,
+            "economy_finish_research": 2,
+            "economy_place": 3,
+            "economy_purchase": 6,
+            "economy_research": 2,
+            "end_phase": 40,
+            "influence_roll": 3,
+            "land_begin_battle": 4,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 4,
+            "land_retreat_begin": 1,
+            "land_retreat_unit": 3,
+            "land_take_casualty": 5,
+            "movement_route": 19,
+            "naval_designate_raider": 1,
+            "naval_enter_port": 2,
+            "naval_force_add": 3,
+            "naval_load": 5,
+            "naval_route": 2,
+            "naval_start_move": 2,
+            "naval_unload": 5,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 4
+          },
+          "1": {
+            "air_fly": 1,
+            "air_land": 1,
+            "air_land_noncombat": 4,
+            "air_support": 3,
+            "economy_advance": 1,
+            "economy_approve_rail": 2,
+            "economy_decline_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 6,
+            "economy_purchase": 5,
+            "economy_request_rail": 3,
+            "economy_research": 2,
+            "end_phase": 41,
+            "land_begin_battle": 7,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 8,
+            "land_retreat_begin": 3,
+            "land_retreat_unit": 5,
+            "land_take_casualty": 9,
+            "movement_route": 13,
+            "naval_begin_assault": 2,
+            "naval_declare_assault": 3,
+            "naval_designate_raider": 2,
+            "naval_finish_shore_selection": 2,
+            "naval_force_add": 3,
+            "naval_load": 6,
+            "naval_remove_raider": 2,
+            "naval_route": 3,
+            "naval_start_move": 3,
+            "naval_unload": 4,
+            "pass_interrupt": 2,
+            "politics_choose_capital": 1,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 1
+          },
+          "2": {
+            "economy_advance": 1,
+            "economy_approve_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 5,
+            "economy_purchase": 9,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 40,
+            "influence_roll": 1,
+            "land_begin_battle": 4,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 4,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 2,
+            "land_take_casualty": 2,
+            "movement_route": 9,
+            "naval_designate_raider": 1,
+            "naval_load": 3,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 3
+          },
+          "3": {
+            "air_start_patrol": 1,
+            "air_support": 2,
+            "economy_advance": 1,
+            "economy_approve_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 8,
+            "economy_purchase": 11,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 41,
+            "influence_roll": 1,
+            "land_begin_battle": 5,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 5,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 2,
+            "land_take_casualty": 10,
+            "movement_route": 12,
+            "naval_begin_assault": 1,
+            "naval_declare_assault": 1,
+            "naval_designate_raider": 1,
+            "naval_finish_shore_selection": 1,
+            "naval_force_add": 1,
+            "naval_load": 6,
+            "naval_route": 1,
+            "naval_start_move": 1,
+            "pass_interrupt": 1,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 2
+          }
+        },
+        "complete_trace_records": 772,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 5720359,
+          "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16-extended.trace.jsonl",
+          "sha256": "faad7b7cb40e62aa6d86d07b59a00a088c998ec89cfe3ba5959acf0818d37eb5"
+        }
+      },
+      "case": "two-round-s16-extended",
+      "comparison_scope": "Action representation/search granularity changed. Equal numerical budgets and frozen weights do not establish equal search work, equal physical lookahead or identical trajectories. Completion/time is operational evidence, not a pure implementation speedup or playing-strength claim.",
+      "config": {
+        "calendar_rounds": 2,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 600.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 4
+      },
+      "historical": null,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "actual_transitions": 440,
+        "chance_events": 60,
+        "completed_games": 0,
+        "executed_decisions": 380,
+        "prepared_state_sha256": [
+          "1684a05c12e7d31b901fd761b9aab5f42c5d931aab4642825153eb3ecce3ebae",
+          "43d5ae14fe6e1e8a85c24ef786468f98ade42f2be5d5aee4525dea4025c41010",
+          "94f6f29168f6daa8eda5b17c31ed28e175cb88632d602ea8290e9cc49e07aceb",
+          "dd4b98d7cd81412f52d56680dbcbec8b283594416db4bd55450f6ba307d2c0b9"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 13,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "non_combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "decisions": 97,
+            "index": 0,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 110
+          },
+          {
+            "chance_events": 13,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "decisions": 97,
+            "index": 1,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 110
+          },
+          {
+            "chance_events": 16,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 3,
+              "phase": "place_units",
+              "player_turn_serial": "7",
+              "round_index": 1
+            },
+            "decisions": 94,
+            "index": 2,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 110
+          },
+          {
+            "chance_events": 18,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 1,
+              "phase": "combat",
+              "player_turn_serial": "5",
+              "round_index": 1
+            },
+            "decisions": 92,
+            "index": 3,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 110
+          }
+        ],
+        "roots": 4,
+        "sampled_peak_rss_bytes": 1929183232,
+        "status": "wall_limit",
+        "task": {
+          "calendar_rounds": 2,
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "10622810b2dfade66d521aa886e4528e05787be9c31986cdedd8a32ba50ce9c5",
+            "scenario": "4226a302f57c73e709e6c1874572243209a95ab33573a2fe1215169cf38de66c",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": false,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "wall_seconds": 240.09699287500553,
+        "warm_mean_seconds": 2.0190977728804826,
+        "whole_search_wave_seconds": null
+      },
+      "candidate_actions": {
+        "actual_action_counts": {
+          "air_end_patrol": 1,
+          "air_fly": 1,
+          "air_land_noncombat": 2,
+          "air_start_patrol": 2,
+          "air_support": 2,
+          "economy_advance": 3,
+          "economy_approve_rail": 1,
+          "economy_decline_rail": 1,
+          "economy_finish_research": 7,
+          "economy_place": 14,
+          "economy_purchase": 23,
+          "economy_request_rail": 2,
+          "economy_research": 7,
+          "end_phase": 131,
+          "influence_roll": 5,
+          "land_begin_battle": 14,
+          "land_continue_fighting": 4,
+          "land_progress_battle": 14,
+          "land_retreat_begin": 7,
+          "land_retreat_unit": 11,
+          "land_take_casualty": 15,
+          "movement_route": 43,
+          "naval_declare_assault": 2,
+          "naval_designate_raider": 5,
+          "naval_force_add": 5,
+          "naval_load": 18,
+          "naval_remove_raider": 1,
+          "naval_route": 4,
+          "naval_start_move": 5,
+          "naval_unload": 4,
+          "pass_interrupt": 3,
+          "politics_declare_war": 6,
+          "politics_priority_declare": 2,
+          "politics_priority_decline": 4,
+          "recruitment_place_infantry": 2,
+          "recruitment_roll": 9
+        },
+        "by_root": {
+          "0": {
+            "air_end_patrol": 1,
+            "air_land_noncombat": 1,
+            "air_start_patrol": 1,
+            "economy_advance": 1,
+            "economy_finish_research": 2,
+            "economy_place": 2,
+            "economy_purchase": 5,
+            "economy_research": 2,
+            "end_phase": 33,
+            "influence_roll": 3,
+            "land_begin_battle": 2,
+            "land_progress_battle": 2,
+            "land_retreat_begin": 1,
+            "land_retreat_unit": 3,
+            "land_take_casualty": 2,
+            "movement_route": 13,
+            "naval_designate_raider": 1,
+            "naval_force_add": 3,
+            "naval_load": 5,
+            "naval_route": 1,
+            "naval_start_move": 2,
+            "naval_unload": 4,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 4
+          },
+          "1": {
+            "air_fly": 1,
+            "air_land_noncombat": 1,
+            "economy_advance": 1,
+            "economy_decline_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 4,
+            "economy_purchase": 3,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 31,
+            "land_begin_battle": 4,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 4,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 4,
+            "land_take_casualty": 2,
+            "movement_route": 11,
+            "naval_declare_assault": 2,
+            "naval_designate_raider": 2,
+            "naval_force_add": 1,
+            "naval_load": 5,
+            "naval_remove_raider": 1,
+            "naval_route": 2,
+            "naval_start_move": 2,
+            "pass_interrupt": 2,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 1
+          },
+          "2": {
+            "economy_advance": 1,
+            "economy_approve_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 4,
+            "economy_purchase": 9,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 39,
+            "influence_roll": 1,
+            "land_begin_battle": 4,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 4,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 2,
+            "land_take_casualty": 2,
+            "movement_route": 9,
+            "naval_designate_raider": 1,
+            "naval_load": 3,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 3
+          },
+          "3": {
+            "air_start_patrol": 1,
+            "air_support": 2,
+            "economy_finish_research": 1,
+            "economy_place": 4,
+            "economy_purchase": 6,
+            "economy_research": 1,
+            "end_phase": 28,
+            "influence_roll": 1,
+            "land_begin_battle": 4,
+            "land_continue_fighting": 2,
+            "land_progress_battle": 4,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 2,
+            "land_take_casualty": 9,
+            "movement_route": 10,
+            "naval_designate_raider": 1,
+            "naval_force_add": 1,
+            "naval_load": 5,
+            "naval_route": 1,
+            "naval_start_move": 1,
+            "pass_interrupt": 1,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 1
+          }
+        },
+        "complete_trace_records": 550,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 4173174,
+          "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16.trace.jsonl",
+          "sha256": "2b9fcab0daa558d26550c5734185f4e0d902a875aadaa8062d97b252355d9639"
+        }
+      },
+      "case": "two-round-s16",
+      "comparison_scope": "Action representation/search granularity changed. Equal numerical budgets and frozen weights do not establish equal search work, equal physical lookahead or identical trajectories. Completion/time is operational evidence, not a pure implementation speedup or playing-strength claim.",
+      "config": {
+        "calendar_rounds": 2,
+        "checkpoint_weights": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 4
+      },
+      "historical": {
+        "actual_transitions": 448,
+        "chance_events": 50,
+        "completed_games": 0,
+        "executed_decisions": 398,
+        "prepared_state_sha256": [
+          "16a25aa9d775b8396cbf4ed95c1adc821e07b294219080fbb81ddf7d851a0a3c",
+          "e7f66fc04f1c9ba4b8c862ecbffead7758fa649769e0c6a37e66d7221d9b4007",
+          "aabc8cd73f38d191b8ecc507e0d2051d127f5ea8909b86f1f26c2962864879a0",
+          "1059d779f5d01c202c08f8f06162aefeb83ccf31a7637875c655faf4e8b4129f"
+        ],
+        "root_progress": [
+          {
+            "chance_events": 15,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "decisions": 97,
+            "index": 0,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 112
+          },
+          {
+            "chance_events": 13,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "decisions": 99,
+            "index": 1,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 112
+          },
+          {
+            "chance_events": 10,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "decisions": 102,
+            "index": 2,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 112
+          },
+          {
+            "chance_events": 12,
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "combat",
+              "player_turn_serial": "4",
+              "round_index": 1
+            },
+            "decisions": 100,
+            "index": 3,
+            "observed_terminal_returns": null,
+            "terminal": false,
+            "transitions": 112
+          }
+        ],
+        "roots": 4,
+        "sampled_peak_rss_bytes": 1899855872,
+        "status": "wall_limit",
+        "task": {
+          "calendar_rounds": 2,
+          "compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "10622810b2dfade66d521aa886e4528e05787be9c31986cdedd8a32ba50ce9c5",
+            "scenario": "4226a302f57c73e709e6c1874572243209a95ab33573a2fe1215169cf38de66c",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": false,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "terminal_returns": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "wall_seconds": 240.07798237500538,
+        "warm_mean_seconds": 2.007034257522743,
+        "whole_search_wave_seconds": null
+      },
+      "historical_actions": {
+        "actual_action_counts": {
+          "air_fly": 5,
+          "air_land_noncombat": 7,
+          "air_start_patrol": 5,
+          "air_support": 1,
+          "economy_advance": 4,
+          "economy_approve_rail": 1,
+          "economy_decline_rail": 2,
+          "economy_finish_research": 7,
+          "economy_place": 12,
+          "economy_purchase": 20,
+          "economy_request_rail": 3,
+          "economy_research": 7,
+          "end_phase": 116,
+          "influence_roll": 4,
+          "land_begin_battle": 12,
+          "land_continue_fighting": 3,
+          "land_progress_battle": 12,
+          "land_retreat_begin": 4,
+          "land_retreat_unit": 6,
+          "land_take_casualty": 10,
+          "movement_route": 47,
+          "naval_cancel_move": 3,
+          "naval_declare_assault": 1,
+          "naval_designate_raider": 4,
+          "naval_enter_port": 1,
+          "naval_force_add": 33,
+          "naval_force_remove": 12,
+          "naval_load": 18,
+          "naval_remove_raider": 1,
+          "naval_route": 3,
+          "naval_start_move": 9,
+          "naval_unload": 1,
+          "pass_interrupt": 3,
+          "politics_declare_war": 6,
+          "politics_priority_declare": 2,
+          "politics_priority_decline": 4,
+          "recruitment_place_infantry": 2,
+          "recruitment_roll": 7
+        },
+        "by_root": {
+          "0": {
+            "economy_advance": 1,
+            "economy_decline_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 4,
+            "economy_purchase": 7,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 31,
+            "influence_roll": 2,
+            "land_begin_battle": 3,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 3,
+            "land_retreat_begin": 1,
+            "land_retreat_unit": 1,
+            "land_take_casualty": 3,
+            "movement_route": 12,
+            "naval_cancel_move": 1,
+            "naval_force_add": 10,
+            "naval_force_remove": 2,
+            "naval_load": 1,
+            "naval_start_move": 2,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 3
+          },
+          "1": {
+            "air_fly": 1,
+            "economy_advance": 1,
+            "economy_decline_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 4,
+            "economy_purchase": 3,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 31,
+            "land_begin_battle": 4,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 4,
+            "land_retreat_begin": 2,
+            "land_retreat_unit": 4,
+            "land_take_casualty": 2,
+            "movement_route": 10,
+            "naval_cancel_move": 1,
+            "naval_designate_raider": 1,
+            "naval_force_add": 6,
+            "naval_force_remove": 3,
+            "naval_load": 4,
+            "naval_route": 1,
+            "naval_start_move": 3,
+            "pass_interrupt": 2,
+            "politics_declare_war": 1,
+            "politics_priority_declare": 1,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 1
+          },
+          "2": {
+            "air_fly": 2,
+            "air_land_noncombat": 2,
+            "air_start_patrol": 2,
+            "economy_advance": 2,
+            "economy_approve_rail": 1,
+            "economy_finish_research": 2,
+            "economy_place": 2,
+            "economy_purchase": 5,
+            "economy_request_rail": 1,
+            "economy_research": 2,
+            "end_phase": 31,
+            "influence_roll": 1,
+            "land_begin_battle": 3,
+            "land_progress_battle": 3,
+            "land_retreat_begin": 1,
+            "land_retreat_unit": 1,
+            "land_take_casualty": 1,
+            "movement_route": 9,
+            "naval_declare_assault": 1,
+            "naval_designate_raider": 1,
+            "naval_force_add": 10,
+            "naval_force_remove": 5,
+            "naval_load": 7,
+            "naval_start_move": 1,
+            "naval_unload": 1,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_roll": 2
+          },
+          "3": {
+            "air_fly": 2,
+            "air_land_noncombat": 5,
+            "air_start_patrol": 3,
+            "air_support": 1,
+            "economy_finish_research": 1,
+            "economy_place": 2,
+            "economy_purchase": 5,
+            "economy_research": 1,
+            "end_phase": 23,
+            "influence_roll": 1,
+            "land_begin_battle": 2,
+            "land_continue_fighting": 1,
+            "land_progress_battle": 2,
+            "land_take_casualty": 4,
+            "movement_route": 16,
+            "naval_cancel_move": 1,
+            "naval_designate_raider": 2,
+            "naval_enter_port": 1,
+            "naval_force_add": 7,
+            "naval_force_remove": 2,
+            "naval_load": 6,
+            "naval_remove_raider": 1,
+            "naval_route": 2,
+            "naval_start_move": 3,
+            "pass_interrupt": 1,
+            "politics_declare_war": 2,
+            "politics_priority_decline": 1,
+            "recruitment_place_infantry": 1,
+            "recruitment_roll": 1
+          }
+        },
+        "complete_trace_records": 560,
+        "incomplete_trailing_record": false,
+        "trace": {
+          "bytes": 4347303,
+          "path": "tmp/encoder-pass-2026-10-24/optimized-results/two-round-s16.trace.jsonl",
+          "sha256": "d128191fd33c5b09741a1bd090b664323b12745ca4fd3c233e3ae64688797c6c"
+        }
+      },
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "tasks_equal": false
+    }
+  ],
+  "eight_game_learning_pilot": {
+    "candidate": {
+      "counters": {
+        "batches": 2,
+        "chance_events": 60,
+        "decisions": 434,
+        "episodes": 8,
+        "transitions": 494,
+        "updates": 2
+      },
+      "environment_limits": {
+        "MKL_NUM_THREADS": "4",
+        "NUMEXPR_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "VECLIB_MAXIMUM_THREADS": "4"
+      },
+      "invocation_seconds_after_initialization": 104.40292254200176,
+      "memory_scope": "Summed sampled RSS of training process and monitor; shared pages can be counted twice and sub-sample peaks missed; no kernel allocation cap.",
+      "native_module_sha256": "4cfca90da6f600b23d9b853fe3b04b6fc93b2f2e6ab972a0d3ff6e8aa1022be4",
+      "resource_scope": "Training process plus external monitor. Four search workers, four tensor threads and two coordinators: 10 conservative cores.",
+      "sampled_aggregate_peak_rss_bytes": 2599698432,
+      "status": "completed",
+      "timings_seconds": {
+        "checkpoint_save": 8.72197491600673,
+        "collection": 65.01118654498714,
+        "learning_updates": 26.54156320799666,
+        "progress_reporting": 4.124760450948088
+      },
+      "wall_seconds": 107.60156741600076
+    },
+    "command": [
+      "/Users/home/Desktop/gwRL/.venv/bin/python",
+      "-m",
+      "studies.campaign.run",
+      "train",
+      "--run-dir",
+      "/Users/home/Desktop/gwRL/tmp/action-interface-2026-10-24/training-new-interface",
+      "--seed",
+      "1951",
+      "--complete-episodes",
+      "--calendar-rounds",
+      "1",
+      "--batches",
+      "2",
+      "--transitions-per-batch",
+      "1500",
+      "--parallel-envs",
+      "4",
+      "--simulations",
+      "4",
+      "--max-depth",
+      "8",
+      "--hidden-dim",
+      "16",
+      "--message-layers",
+      "1",
+      "--token-buckets",
+      "2048",
+      "--batch-size",
+      "32",
+      "--epochs",
+      "16",
+      "--replay-capacity",
+      "16384",
+      "--threads",
+      "4",
+      "--cpu-budget",
+      "11",
+      "--checkpoint-every-waves",
+      "32"
+    ],
+    "config": {
+      "batch_size": 32,
+      "batches": 2,
+      "calendar_rounds": 1,
+      "checkpoint_every_waves": 32,
+      "complete_episodes": true,
+      "cpu_budget": 11,
+      "epochs": 16,
+      "hidden_dim": 16,
+      "learning_rate": 0.001,
+      "max_depth": 8,
+      "message_layers": 1,
+      "parallel_envs": 4,
+      "replay_capacity": 16384,
+      "seed": 1951,
+      "simulations": 4,
+      "threads": 4,
+      "token_buckets": 2048,
+      "transitions_per_batch": 1500,
+      "value_scale": 100.0
+    },
+    "historical": {
+      "counters": {
+        "batches": 2,
+        "chance_events": 52,
+        "decisions": 386,
+        "episodes": 8,
+        "transitions": 438,
+        "updates": 2
+      },
+      "environment_limits": {
+        "MKL_NUM_THREADS": "4",
+        "NUMEXPR_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "VECLIB_MAXIMUM_THREADS": "4"
+      },
+      "invocation_seconds_after_initialization": 83.98361020900484,
+      "memory_scope": "Summed sampled RSS of training process and monitor; shared pages can be counted twice and sub-sample peaks missed; no kernel allocation cap.",
+      "native_module_sha256": "9e8e667be7e4339503c49484658c5e41a014f55c6f8596c12479ef2eacd4e561",
+      "resource_scope": "Training process plus external monitor. Four search workers, four tensor threads and two coordinators:10 conservative cores.",
+      "sampled_aggregate_peak_rss_bytes": 2195947520,
+      "status": "completed",
+      "timings_seconds": {
+        "checkpoint_save": 6.732394832986756,
+        "collection": 52.031159702040895,
+        "learning_updates": 22.82063699900027,
+        "progress_reporting": 2.3967112120153615
+      },
+      "wall_seconds": 87.10730624999997
+    },
+    "historical_provenance": {
+      "bytes": 11950,
+      "path": "tmp/action-interface-2026-10-24/historical_training_baseline.json",
+      "sha256": "ea9a67b78b43659fd5bf7c0b3fdf396f0fb7e79036647be1dabab1b4d09473dd"
+    },
+    "measurement_artifact": {
+      "bytes": 10599,
+      "path": "tmp/action-interface-2026-10-24/training-new-interface.measurement.json",
+      "sha256": "7748fb2a868a5cb008c7828409717a5737733380d984a5831a7bba64b0016fee"
+    },
+    "no_dropped_rows": true,
+    "same_initial_network_parameters": true,
+    "same_numeric_command_except_run_directory": true,
+    "scope": "Eight one-round curriculum games, not eight July1941 campaigns. New interface changes actual games, targets, model weights and optimizer trajectories; elapsed difference is not an implementation-only speed comparison. No learning-strength evaluation.",
+    "verification": {
+      "actual_action_counts": {
+        "air_failed_landing": 1,
+        "air_fly": 3,
+        "air_ground_attack": 2,
+        "air_land": 2,
+        "air_land_noncombat": 5,
+        "air_support": 1,
+        "economy_advance": 4,
+        "economy_approve_rail": 4,
+        "economy_decline_rail": 1,
+        "economy_finish_research": 8,
+        "economy_place": 20,
+        "economy_purchase": 17,
+        "economy_request_rail": 5,
+        "economy_research": 4,
+        "end_phase": 162,
+        "influence_roll": 10,
+        "land_begin_battle": 11,
+        "land_continue_fighting": 4,
+        "land_progress_battle": 12,
+        "land_retreat_begin": 4,
+        "land_retreat_unit": 3,
+        "land_take_casualty": 11,
+        "movement_route": 29,
+        "naval_designate_raider": 4,
+        "naval_force_add": 6,
+        "naval_load": 8,
+        "naval_route": 12,
+        "naval_start_move": 12,
+        "naval_unload": 15,
+        "pass_interrupt": 15,
+        "politics_choose_capital": 2,
+        "politics_declare_war": 14,
+        "politics_priority_declare": 2,
+        "politics_priority_decline": 8,
+        "recruitment_place_infantry": 1,
+        "recruitment_place_militia": 1,
+        "recruitment_roll": 11
+      },
+      "all_actual_transitions_replayed_with_exact_planning_keys": true,
+      "all_replay_observations_menus_and_terminal_targets_match_actual_games": true,
+      "artifacts": [
+        {
+          "bytes": 548453,
+          "path": "tmp/action-interface-2026-10-24/training-new-interface/initial.pt",
+          "sha256": "d28a24ac1e000562e76d424e49276ebb1a856fc6db2c82e73d59ec94f0bf0075"
+        },
+        {
+          "bytes": 49305548,
+          "path": "tmp/action-interface-2026-10-24/training-new-interface/checkpoint.pt",
+          "sha256": "cc6cc71cdcbe59785baf514e297e3c210732507a3f0d2229278ca2b5cd300ca2"
+        },
+        {
+          "bytes": 58503,
+          "path": "tmp/action-interface-2026-10-24/training-new-interface/manifest.json",
+          "sha256": "cf8ddba5e49fd050203a4cddab24b38522424ab8db170b011dbcf85969c9825d"
+        },
+        {
+          "bytes": 200628,
+          "path": "tmp/action-interface-2026-10-24/training-replayed-checks.jsonl",
+          "sha256": "25fd1401019732785986d57b4d1808063e3f799a62d8de5c2d97450108c475f3"
+        }
+      ],
+      "bootstrap_target_rows": 0,
+      "compatibility": {
+        "actions": "campaign-orders-v1",
+        "curriculum": "regional-horizon-curriculum-v1",
+        "rules": "7edbb9d6ae9d9214efef4e4c005b100790a6858474edc01e77aa369bb90a8d30",
+        "scenario": "fccdf897a22fd119ca1a016bfcea691f28acc6908a50eb4603a55de3a587e8f3",
+        "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+      },
+      "completed_games": 8,
+      "counters": {
+        "batches": 2,
+        "chance_events": 60,
+        "decisions": 434,
+        "episodes": 8,
+        "transitions": 494,
+        "updates": 2
+      },
+      "cross_interface_learning_equivalence_claimed": false,
+      "episodes": [
+        {
+          "batch": 0,
+          "final_state_rng_sha256": "054ddd71a34a06762a77786bbbfe80fe968243194cedfcb4a2f847c3c4d4df0c",
+          "observed_terminal_returns": [
+            29.799999999999997,
+            -39.2,
+            -93.8
+          ],
+          "root": 0,
+          "seed": 3893811448908990722,
+          "terminal": true,
+          "transitions": 59
+        },
+        {
+          "batch": 0,
+          "final_state_rng_sha256": "270e11e737ef5ec4e224a1ab79ea29859310e06bd9ad476ab68cf50e5c985de6",
+          "observed_terminal_returns": [
+            49.7,
+            -59.10000000000001,
+            -75.7
+          ],
+          "root": 1,
+          "seed": 6563938874301275647,
+          "terminal": true,
+          "transitions": 49
+        },
+        {
+          "batch": 0,
+          "final_state_rng_sha256": "4df3af1221b4edf07bf4a6fe2e38cf1b87c3aec125faf498c40a2bb116521885",
+          "observed_terminal_returns": [
+            44.89999999999999,
+            -53.70000000000001,
+            -81.30000000000001
+          ],
+          "root": 2,
+          "seed": 5046673378298423682,
+          "terminal": true,
+          "transitions": 55
+        },
+        {
+          "batch": 0,
+          "final_state_rng_sha256": "f391e502bac3a4a53c5db88a1330a6254091fc730990a3d937bc7c34cbe8d4c7",
+          "observed_terminal_returns": [
+            50.2,
+            -58.8,
+            -76.2
+          ],
+          "root": 3,
+          "seed": 5466516857604415370,
+          "terminal": true,
+          "transitions": 45
+        },
+        {
+          "batch": 1,
+          "final_state_rng_sha256": "ceca92f040ea2e9e60fc5e90fb327cb6424e621d8931bc8a4f31bccf50a4e2ca",
+          "observed_terminal_returns": [
+            29.400000000000006,
+            -39.599999999999994,
+            -95.39999999999999
+          ],
+          "root": 0,
+          "seed": 8202341100937541654,
+          "terminal": true,
+          "transitions": 64
+        },
+        {
+          "batch": 1,
+          "final_state_rng_sha256": "d60402b0103e5022142004819ad67fefa55eab2312fbcca1a79d19546144b292",
+          "observed_terminal_returns": [
+            42.2,
+            -49.199999999999996,
+            -85.8
+          ],
+          "root": 1,
+          "seed": 3047951898809189481,
+          "terminal": true,
+          "transitions": 61
+        },
+        {
+          "batch": 1,
+          "final_state_rng_sha256": "803fc4137711993f066301cfc19834b44d52d74d05daf46d520fc9fb79b20175",
+          "observed_terminal_returns": [
+            50.400000000000006,
+            -58.80000000000001,
+            -78.4
+          ],
+          "root": 2,
+          "seed": 3139566501633256141,
+          "terminal": true,
+          "transitions": 114
+        },
+        {
+          "batch": 1,
+          "final_state_rng_sha256": "914f2126c5794dabd8a9526dc1d028d7c4a90802ba0e7661bf2a70ba8c934d68",
+          "observed_terminal_returns": [
+            50.0,
+            -59.4,
+            -75.6
+          ],
+          "root": 3,
+          "seed": 6668411721441586417,
+          "terminal": true,
+          "transitions": 47
+        }
+      ],
+      "final_model_versions": {
+        "allies": "allies:generation-2:b6ec89413031986bd9eabb33de4fa677af0b9b1719be9af8128efd49cebe49c6",
+        "axis": "axis:generation-2:e17269e3afdd6cd07d1c8f038cd988bd3922e419cddfd80996938b92737949bf",
+        "comintern": "comintern:generation-2:8556bae778b3057a70a263c3c1391a6a722e8db43b5d4492f4f9d468c2e99e10"
+      },
+      "initial_model_versions": {
+        "allies": "allies:generation-0:77c88df9a8a06189561d604be4b7f87b8909e95e8fa5f0f4033c4faf314c7a64",
+        "axis": "axis:generation-0:afaa8eecdbc3f74cbf119b07688ccbe1e123da61d9af6107fef1591702425b1f",
+        "comintern": "comintern:generation-0:5637477f3c902dbe82f198242cd003dbe5922eef8cdea3224a881df9c9de8277"
+      },
+      "initial_model_weights_equal_historical_pilot": true,
+      "last_four_serialized_states_and_execution_rng_match_checkpoint": true,
+      "model_config": {
+        "hidden_dim": 16,
+        "message_layers": 1,
+        "policy_factorization": true,
+        "token_buckets": 2048,
+        "value_scale": 100.0
+      },
+      "optimizer_steps_per_alliance": {
+        "allies": 32,
+        "axis": 32,
+        "comintern": 32
+      },
+      "passed": true,
+      "process_peak_rss_bytes": 897302528,
+      "retained_rows": 434,
+      "schema": "campaign-new-interface-training-verification-v1",
+      "scope": "Same-version replay of actual chosen actions/dice only, with all eight real terminal outcomes and retained training rows checked. No neural search or optimizer rerun; no equality of post-training weights or trajectories with the old interface.",
+      "terminal_target_rows": 434,
+      "wall_seconds": 20.94705379199877
+    },
+    "verification_artifact": {
+      "bytes": 6940,
+      "path": "tmp/action-interface-2026-10-24/training-verification.json",
+      "sha256": "b5b76e8e9f8a15f55026c95a1b8179637a1ea414e52f068cd2341a90197e199a"
+    }
+  },
+  "guard_extension": {
+    "actual_action_counts_extended": {
+      "air_end_patrol": 1,
+      "air_fly": 1,
+      "air_land": 1,
+      "air_land_noncombat": 5,
+      "air_start_patrol": 2,
+      "air_support": 5,
+      "economy_advance": 4,
+      "economy_approve_rail": 4,
+      "economy_decline_rail": 1,
+      "economy_finish_research": 8,
+      "economy_place": 22,
+      "economy_purchase": 31,
+      "economy_request_rail": 5,
+      "economy_research": 8,
+      "end_phase": 162,
+      "influence_roll": 5,
+      "land_begin_battle": 20,
+      "land_continue_fighting": 7,
+      "land_progress_battle": 21,
+      "land_retreat_begin": 8,
+      "land_retreat_unit": 12,
+      "land_take_casualty": 26,
+      "movement_route": 53,
+      "naval_begin_assault": 3,
+      "naval_declare_assault": 4,
+      "naval_designate_raider": 5,
+      "naval_enter_port": 2,
+      "naval_finish_shore_selection": 3,
+      "naval_force_add": 7,
+      "naval_load": 20,
+      "naval_remove_raider": 2,
+      "naval_route": 6,
+      "naval_start_move": 6,
+      "naval_unload": 9,
+      "pass_interrupt": 3,
+      "politics_choose_capital": 1,
+      "politics_declare_war": 6,
+      "politics_priority_declare": 2,
+      "politics_priority_decline": 4,
+      "recruitment_place_infantry": 2,
+      "recruitment_roll": 10
+    },
+    "artifact": {
+      "bytes": 1889,
+      "path": "tmp/action-interface-2026-10-24/extension-verification.json",
+      "sha256": "5c1926f2775a9373e6b31f166e7847c65b8581305ac76ee1692cbce4a4408b1d"
+    },
+    "completed_games_extended": 4,
+    "completed_games_primary": 0,
+    "extended_prefix_canonical_bytes_equal": true,
+    "extended_wall_seconds": 310.08827195799677,
+    "identical_sources_models_tasks_initial_states": true,
+    "only_configuration_difference": {
+      "seconds": {
+        "extended": 600.0,
+        "primary": 240.0
+      }
+    },
+    "passed": true,
+    "primary_complete_semantic_records": 550,
+    "primary_prefix_sha256": "2b9fcab0daa558d26550c5734185f4e0d902a875aadaa8062d97b252355d9639",
+    "schema": "campaign-execution-guard-extension-check-v1",
+    "scope": "Same-interface guard extension only. Preserves the primary guarded result; not a speedup against an unfinished batch."
+  },
+  "helpers": [
+    {
+      "bytes": 10412,
+      "path": "tmp/action-interface-2026-10-24/final_summary.py",
+      "sha256": "5adf2b9806bf245807f1f5ad32b7e8c99aa8b26c04b29f4f3b85516dfa103207"
+    },
+    {
+      "bytes": 3806,
+      "path": "tmp/action-interface-2026-10-24/run_candidates.py",
+      "sha256": "9a487eac8a961e99464d8d6e42aa73357d645db1bf5c1fa2ab5db76d4b829e86"
+    },
+    {
+      "bytes": 4852,
+      "path": "tmp/action-interface-2026-10-24/run_training.py",
+      "sha256": "a37f75f8c9965960514d77e3ccffe9e0f7af8e6483c5f5f426cf71e926a0283c"
+    },
+    {
+      "bytes": 6324,
+      "path": "tmp/action-interface-2026-10-24/summarize_behavior.py",
+      "sha256": "5dfe761797fc9111a85c7a87238cf0fec0a82f79e438e72c99ee3d977d05ac24"
+    },
+    {
+      "bytes": 5311,
+      "path": "tmp/action-interface-2026-10-24/trace_benchmark.py",
+      "sha256": "da5263b0554b2be4b83cd8bb4aa929fbcd276ad57ef44483759b4c6c8cd66d23"
+    },
+    {
+      "bytes": 7623,
+      "path": "tmp/action-interface-2026-10-24/verify_candidate_trace.py",
+      "sha256": "cda046c96cd8617884da82bfff7a0e2fe79c02c07dca22abdbda393dbbae727b"
+    },
+    {
+      "bytes": 5585,
+      "path": "tmp/action-interface-2026-10-24/verify_legacy_replay.py",
+      "sha256": "2f0af777f5db79be1de7843edd12a713dd3ae01604bacf022a3163d1901e8c71"
+    },
+    {
+      "bytes": 6934,
+      "path": "tmp/action-interface-2026-10-24/verify_training.py",
+      "sha256": "ac20d8d23a9a80f6d6a4c8f488eecd700409d72a3061fb2f917157bbd3cf6c3c"
+    }
+  ],
+  "historical_provenance": {
+    "bytes": 11236,
+    "path": "tmp/action-interface-2026-10-24/historical_baseline_checks.json",
+    "sha256": "464e84d2d99b49a670b0100ed2f7b9ae941cff3f568dba7ff10acdb97c43845e"
+  },
+  "legacy_compatibility": {
+    "actual_action_interface": null,
+    "artifact": {
+      "bytes": 16085,
+      "path": "tmp/action-interface-2026-10-24/legacy-full631-verification.json",
+      "sha256": "cd92afd159702b4e1b632911eb14a81d88a52c4ccf31821f820569a2127256d9"
+    },
+    "attempted_transitions": 631,
+    "checks_sha256": "7f31174d50e3383b29c93b660a837fbec4ce6ccfdf1cc982a1e659e51e9f95f4",
+    "error": null,
+    "exact_export_passed": true,
+    "final_state_rng_sha256": "bbee2703a3170c75523add962be25a30d0ca9355c61d75be13898d408fc232cc",
+    "historical_observation_comparison": {
+      "all_equal": true,
+      "differences": [],
+      "fields_compared": [
+        "state",
+        "observation_sha256",
+        "actions_sha256",
+        "planning_key",
+        "actor",
+        "decision_kind",
+        "kind"
+      ],
+      "states_compared": 631
+    },
+    "initial_state_sha256": "1e74c054e96a3f355fab362ce9d73311dd8f9e680f3c2e17043999859677f42d",
+    "legacy_interface_selected": true,
+    "menu_checks_sha256": "1046701d183a011298c11afae40f8cb0bcc7b8bf961f1adeca373e137669f9de",
+    "menu_drift_count": 0,
+    "menu_drift_details": [],
+    "native_sha256": "4cfca90da6f600b23d9b853fe3b04b6fc93b2f2e6ab972a0d3ff6e8aa1022be4",
+    "peak_rss_bytes": 381501440,
+    "recorded_action_interface": null,
+    "returns": [
+      51.599999999999994,
+      -70.6,
+      -99.4
+    ],
+    "schema": "campaign-legacy-full-trajectory-replay-verification-v1",
+    "scope": "Legacy action replay/export only, source drift explicitly allowed. Every old search menu/payload and selected action/state+execution RNG hash remains authoritative. No neural search, training, budget change or drift suppression.",
+    "search_menus_checked": 560,
+    "source_report_sha256": "f9c5fc8f7f295dbcdf4106a74d2c5ead0371d9b790747d68f2217b9481e30c06",
+    "task_compatibility_matches": true,
+    "terminal": true,
+    "verified_transitions": 631,
+    "wall_seconds": 21.479314666998107
+  },
+  "local_summary_artifact": {
+    "bytes": 118079,
+    "path": "tmp/action-interface-2026-10-24/action_interface_2026_10_24.json",
+    "sha256": "e684b186a74b964ffb04e8736204d7fff77d8c2485e05451361abc1f96c7d890"
+  },
+  "raw_artifacts": [
+    {
+      "bytes": 1784,
+      "path": "tmp/action-interface-2026-10-24/baseline_manifest.json",
+      "sha256": "d6d3d40406f534ad92127d90115877f247b9b94de70ecca4afafb153c4ab0ea0"
+    },
+    {
+      "bytes": 74225,
+      "path": "tmp/action-interface-2026-10-24/behavior-cases.json",
+      "sha256": "3949bd5fafd0ffb8919186a0e175a095480495dd9af94bb38b076add7e928577"
+    },
+    {
+      "bytes": 95484,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root0.checks.jsonl",
+      "sha256": "b8596770421d8f9f256509982e41996fbc6947456214f3885f42e239a079289e"
+    },
+    {
+      "bytes": 120668,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root0.final-state-with-rng.json",
+      "sha256": "e34b904bb756811e04bc27dcd7b32e409147f427c58ab3c0b126b7898225ec27"
+    },
+    {
+      "bytes": 13951,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root0.json",
+      "sha256": "fad35b93d7482f3970676760d45069397536967a209de9dab32e1813196f3962"
+    },
+    {
+      "bytes": 119741,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root1.checks.jsonl",
+      "sha256": "a400abf047e29f15111df2d852d33a6a90183197e319660dbe3a131ea2f176ae"
+    },
+    {
+      "bytes": 133561,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root1.final-state-with-rng.json",
+      "sha256": "91698452b37b85cb5ba34cbac1a7b143817cba467ff719b4886af1d463aa07cf"
+    },
+    {
+      "bytes": 14282,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root1.json",
+      "sha256": "f2a02918606fbe697b5c644e0fadadaf893a9685df7a423b920f74d3ba3d4b62"
+    },
+    {
+      "bytes": 73111,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root2.checks.jsonl",
+      "sha256": "ea30e00eba14b51224cf66d2651e3aa96fe0f895359a8d02e6600f788f76450b"
+    },
+    {
+      "bytes": 109018,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root2.final-state-with-rng.json",
+      "sha256": "b56b9f816f9609f6b018ed1371738f83ce43f8000ac267929d7c616a42cf6839"
+    },
+    {
+      "bytes": 13770,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root2.json",
+      "sha256": "dae07fde20366bc5ade1ae7e55626faca1adedeb7e536d892e74687140e6142e"
+    },
+    {
+      "bytes": 98008,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root3.checks.jsonl",
+      "sha256": "b5717f21819f57efe26e1b2cae851ac39de64c30ed9a5d22c64798d0c33fb57e"
+    },
+    {
+      "bytes": 120169,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root3.final-state-with-rng.json",
+      "sha256": "6d230091a00b6a86e349f44db668bc324f6435343c34008615f7d3a421757601"
+    },
+    {
+      "bytes": 14113,
+      "path": "tmp/action-interface-2026-10-24/candidate-extended-root3.json",
+      "sha256": "9d67e439e2074bc7bdccf23a2d5d6ed385a7c0f90ecc524f984604de7f83b0bc"
+    },
+    {
+      "bytes": 415046,
+      "path": "tmp/action-interface-2026-10-24/candidate-full11-root0.checks.jsonl",
+      "sha256": "89f99d7445fba33ddf268134b9345188590ce24aa97613a58c39983afcdd1fda"
+    },
+    {
+      "bytes": 288117,
+      "path": "tmp/action-interface-2026-10-24/candidate-full11-root0.final-state-with-rng.json",
+      "sha256": "7e32f394a36dcaae4e26771f911747e60d5671c62643d7f4e7ca63758cc9944b"
+    },
+    {
+      "bytes": 14173,
+      "path": "tmp/action-interface-2026-10-24/candidate-full11-root0.json",
+      "sha256": "3e2a2f5319f92fb1bfd993868edde86d8858d1842066ff7ad78954e9669e3e06"
+    },
+    {
+      "bytes": 16805297,
+      "path": "tmp/action-interface-2026-10-24/candidate-full11-root0.replay.json",
+      "sha256": "dbf8deaa45dd717ae0fda5ec0443c7358e3b26df26a7e4056371ab8b250e210b"
+    },
+    {
+      "bytes": 72009,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root0.checks.jsonl",
+      "sha256": "ac52d22f240e79f6a0199a991ec6c9890c1023d1a0a55b8d3e7bebf583a93752"
+    },
+    {
+      "bytes": 115283,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root0.final-state-with-rng.json",
+      "sha256": "d65e6e7e2280c477cfefc8a80173616f6c3bcc441c2daff5ee28744555a06dab"
+    },
+    {
+      "bytes": 13778,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root0.json",
+      "sha256": "5b443de1c479b734d22bf4c334c22a131ad4c63e3db1c9a77f98b6fe05476c80"
+    },
+    {
+      "bytes": 71998,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root1.checks.jsonl",
+      "sha256": "f38c8bc3f208c9a0d3442ddbe2159aa87058b6f1a4a4e30748441271ac377305"
+    },
+    {
+      "bytes": 110786,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root1.final-state-with-rng.json",
+      "sha256": "451f067bf552e93a73cbc9d50fd1a7ba46d30c09f3ca63e0fb79513ce642844e"
+    },
+    {
+      "bytes": 13915,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root1.json",
+      "sha256": "41f409dd2f3db5a79a25caa3c4440942e9554c857484548e39125628ff95f400"
+    },
+    {
+      "bytes": 71799,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root2.checks.jsonl",
+      "sha256": "adee41a12f93728bc9a36e3ee8632fb1d03fc46503082756aa7b5e58a5e2b66b"
+    },
+    {
+      "bytes": 108366,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root2.final-state-with-rng.json",
+      "sha256": "49ebbc12dad26ccb406b0370ca5189ce4df378217b271a9861838ca34cfaac14"
+    },
+    {
+      "bytes": 13657,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root2.json",
+      "sha256": "e6e556dcb7e24a8acb447a058e67faa97236ac8ab45baa24990dba52d9385fba"
+    },
+    {
+      "bytes": 71737,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root3.checks.jsonl",
+      "sha256": "59a0d127984730f45b6df334058f4f1f7f94213a70700a0fe6a3380cb8a24dae"
+    },
+    {
+      "bytes": 104981,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root3.final-state-with-rng.json",
+      "sha256": "b8ffa9d6a94dc4a3503c97b7c900a2fe248dffd2cd8e44bf4b69e77ab41eff1a"
+    },
+    {
+      "bytes": 13756,
+      "path": "tmp/action-interface-2026-10-24/candidate-primary-root3.json",
+      "sha256": "591d2d05898b14ffe35d7fa1574d72f0013b33931b6b5e1720c5dbd5992e99d7"
+    },
+    {
+      "bytes": 753095,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/full11-s4.json",
+      "sha256": "b9734db3ba3936114288bf2c94d96554ad006315018276a7e398a01a92e12806"
+    },
+    {
+      "bytes": 5547438,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/full11-s4.trace.jsonl",
+      "sha256": "ab961e96a57c3ff61d68cbc0ed2e0cd01b6931660230275a802b2dead19e8038"
+    },
+    {
+      "bytes": 34012,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/opening-s16.json",
+      "sha256": "7aef262e24de14c1cf48ba4e09ac6073a0c3e1a2959001befaadc667b6c5fbc5"
+    },
+    {
+      "bytes": 641873,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/opening-s16.trace.jsonl",
+      "sha256": "f8951df30f9c7c51b5428d33593968e436ccf2cd058d377fef4a51e86e89b010"
+    },
+    {
+      "bytes": 589097,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16-extended.json",
+      "sha256": "d1da9aa36f114aa45346095f0ff7800355afd6e29fbbffe930328c366ef12def"
+    },
+    {
+      "bytes": 5720359,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16-extended.trace.jsonl",
+      "sha256": "faad7b7cb40e62aa6d86d07b59a00a088c998ec89cfe3ba5959acf0818d37eb5"
+    },
+    {
+      "bytes": 433729,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16.json",
+      "sha256": "6754cb25c9e48f9b6da82121e343047267d639341e96b9c9d59606133b415623"
+    },
+    {
+      "bytes": 4173174,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16.trace.jsonl",
+      "sha256": "2b9fcab0daa558d26550c5734185f4e0d902a875aadaa8062d97b252355d9639"
+    },
+    {
+      "bytes": 1889,
+      "path": "tmp/action-interface-2026-10-24/extension-verification.json",
+      "sha256": "5c1926f2775a9373e6b31f166e7847c65b8581305ac76ee1692cbce4a4408b1d"
+    },
+    {
+      "bytes": 11236,
+      "path": "tmp/action-interface-2026-10-24/historical_baseline_checks.json",
+      "sha256": "464e84d2d99b49a670b0100ed2f7b9ae941cff3f568dba7ff10acdb97c43845e"
+    },
+    {
+      "bytes": 11950,
+      "path": "tmp/action-interface-2026-10-24/historical_training_baseline.json",
+      "sha256": "ea9a67b78b43659fd5bf7c0b3fdf396f0fb7e79036647be1dabab1b4d09473dd"
+    },
+    {
+      "bytes": 363819,
+      "path": "tmp/action-interface-2026-10-24/legacy-full631-checks.jsonl",
+      "sha256": "7f31174d50e3383b29c93b660a837fbec4ce6ccfdf1cc982a1e659e51e9f95f4"
+    },
+    {
+      "bytes": 290633,
+      "path": "tmp/action-interface-2026-10-24/legacy-full631-final-state-with-rng.json",
+      "sha256": "4efae7587b9d28044222ab97d3bb0bf79e423ba4698f278b371fcf6b6d7517a4"
+    },
+    {
+      "bytes": 52570,
+      "path": "tmp/action-interface-2026-10-24/legacy-full631-menu-checks.jsonl",
+      "sha256": "1046701d183a011298c11afae40f8cb0bcc7b8bf961f1adeca373e137669f9de"
+    },
+    {
+      "bytes": 16617141,
+      "path": "tmp/action-interface-2026-10-24/legacy-full631-replay.json",
+      "sha256": "6c544e1fab5fa987e3403614601aff43ecdd8a2ccdd2b7020d7ac549e05a505a"
+    },
+    {
+      "bytes": 16085,
+      "path": "tmp/action-interface-2026-10-24/legacy-full631-verification.json",
+      "sha256": "cd92afd159702b4e1b632911eb14a81d88a52c4ccf31821f820569a2127256d9"
+    },
+    {
+      "bytes": 49305548,
+      "path": "tmp/action-interface-2026-10-24/training-new-interface/checkpoint.pt",
+      "sha256": "cc6cc71cdcbe59785baf514e297e3c210732507a3f0d2229278ca2b5cd300ca2"
+    },
+    {
+      "bytes": 548453,
+      "path": "tmp/action-interface-2026-10-24/training-new-interface/initial.pt",
+      "sha256": "d28a24ac1e000562e76d424e49276ebb1a856fc6db2c82e73d59ec94f0bf0075"
+    },
+    {
+      "bytes": 58503,
+      "path": "tmp/action-interface-2026-10-24/training-new-interface/manifest.json",
+      "sha256": "cf8ddba5e49fd050203a4cddab24b38522424ab8db170b011dbcf85969c9825d"
+    },
+    {
+      "bytes": 358770,
+      "path": "tmp/action-interface-2026-10-24/training-new-interface/progress.jsonl",
+      "sha256": "d41f7b9ead878a7ef40911cefd64c3e1389bc78fc5a842e968dc53fcabc66a9c"
+    },
+    {
+      "bytes": 10599,
+      "path": "tmp/action-interface-2026-10-24/training-new-interface.measurement.json",
+      "sha256": "7748fb2a868a5cb008c7828409717a5737733380d984a5831a7bba64b0016fee"
+    },
+    {
+      "bytes": 200628,
+      "path": "tmp/action-interface-2026-10-24/training-replayed-checks.jsonl",
+      "sha256": "25fd1401019732785986d57b4d1808063e3f799a62d8de5c2d97450108c475f3"
+    },
+    {
+      "bytes": 6940,
+      "path": "tmp/action-interface-2026-10-24/training-verification.json",
+      "sha256": "b5b76e8e9f8a15f55026c95a1b8179637a1ea414e52f068cd2341a90197e199a"
+    }
+  ],
+  "raw_files": [
+    {
+      "bytes": 753095,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/full11-s4.json",
+      "sha256": "b9734db3ba3936114288bf2c94d96554ad006315018276a7e398a01a92e12806"
+    },
+    {
+      "bytes": 5547438,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/full11-s4.trace.jsonl",
+      "sha256": "ab961e96a57c3ff61d68cbc0ed2e0cd01b6931660230275a802b2dead19e8038"
+    },
+    {
+      "bytes": 34012,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/opening-s16.json",
+      "sha256": "7aef262e24de14c1cf48ba4e09ac6073a0c3e1a2959001befaadc667b6c5fbc5"
+    },
+    {
+      "bytes": 641873,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/opening-s16.trace.jsonl",
+      "sha256": "f8951df30f9c7c51b5428d33593968e436ccf2cd058d377fef4a51e86e89b010"
+    },
+    {
+      "bytes": 589097,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16-extended.json",
+      "sha256": "d1da9aa36f114aa45346095f0ff7800355afd6e29fbbffe930328c366ef12def"
+    },
+    {
+      "bytes": 5720359,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16-extended.trace.jsonl",
+      "sha256": "faad7b7cb40e62aa6d86d07b59a00a088c998ec89cfe3ba5959acf0818d37eb5"
+    },
+    {
+      "bytes": 433729,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16.json",
+      "sha256": "6754cb25c9e48f9b6da82121e343047267d639341e96b9c9d59606133b415623"
+    },
+    {
+      "bytes": 4173174,
+      "path": "tmp/action-interface-2026-10-24/candidate-results/two-round-s16.trace.jsonl",
+      "sha256": "2b9fcab0daa558d26550c5734185f4e0d902a875aadaa8062d97b252355d9639"
+    }
+  ],
+  "resource_and_measurement_notes": {
+    "authorized_total_cores": 12,
+    "authorized_total_memory_bytes": 30000000000,
+    "coverage_limit": "Observed extended games exercised 6/6 committed routes,7 canonical force additions,7 role/deck configuration changes. No screening addition was observed; screening/legal subset coverage comes from focused native tests. Raw legacy rules remain accessible.",
+    "maximum_configured_benchmark_or_pilot_conservative_cores": 10,
+    "maximum_sampled_benchmark_or_pilot_rss_bytes": 2599698432,
+    "overlap": "At most one parent profiling core overlapped candidate full11/primary collection; at most one replay core plus one light parent core overlapped extended collection. Four final replay verifier processes ran after benchmark/training ended. All activity stayed within the 12-core allocation.",
+    "peak_scope": "RSS is sampled process-group RSS per invocation, not instantaneous total across all task activities. Shared pages can be counted twice and brief peaks can be missed. External 0.1s monitor with 128MiB margin; no kernel memory cap.",
+    "repeat_scope": "Single matched numerical workload per case on one machine; no confidence interval. Primary240s 0/4 remains unchanged. Extended600s completion is separate evidence, not a speedup against an unfinished batch."
+  },
+  "schema": "campaign-action-interface-behavior-comparison-v1",
+  "scope": "Changed campaign action interface and search tree, with unchanged approved rule setup. Same numerical budgets and frozen transferred inference weights where reported. Actual eight-game learning is separately identified. No pure implementation speedup, cross-interface trajectory/learning equality, or playing-strength claim.",
+  "verification_suites": {
+    "ctest": {
+      "build_commands": [
+        "cmake -S . -B build/action-interface -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON",
+        "cmake --build build/action-interface -j 3"
+      ],
+      "command": "ctest --test-dir build/action-interface --output-on-failure -j 1",
+      "log": {
+        "bytes": 2816,
+        "path": "tmp/action-interface-2026-10-24/cmake-all-tests.log",
+        "sha256": "ca5a4f526c75d9e17437b5b3372cdf4d7a55311b805e75979a1620292ddf70e9"
+      },
+      "passed": 26,
+      "seconds": 33.92
+    },
+    "native_extension": {
+      "command": "./.venv/bin/python setup.py build_ext --inplace --parallel 2",
+      "log": {
+        "bytes": 18122,
+        "path": "tmp/action-interface-2026-10-24/native-build.log",
+        "sha256": "def7b61af1190d623495cf3a7b7dc4afa965624b72c3c900eb3bfbb6c8317ef9"
+      },
+      "passed": true
+    },
+    "python": {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 ./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+      "log": {
+        "bytes": 838,
+        "path": "tmp/action-interface-2026-10-24/python-tests.log",
+        "sha256": "8a8addcd281c769f8d45be09cfbe2a7d0f28f06f05c6443981c568bdc449e1c5"
+      },
+      "note": "Intentional viewer existing-output rejection is printed by a passing negative test.",
+      "passed": 297,
+      "seconds": 201.588
+    }
+  }
+}

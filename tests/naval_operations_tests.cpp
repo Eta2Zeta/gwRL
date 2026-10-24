@@ -260,6 +260,42 @@ void capturedShipRollPreservesDamage() {
   scuttle.resolveChance();
   check(!scuttle.state().units.contains("bb"), "Scuttle boundary wrong");
 }
+void portUnloadAlternativeNeedsOwnedCargo() {
+  for (const bool ownCargo : {false, true}) {
+    auto s = fixture(Phase::NonCombatMovement);
+    ensureDadao(s);
+    add(s, "transport", "naval_transport", "japan", p16);
+    add(s, "foreign", "infantry", "dadao", p16);
+    attachCargo(s, "transport", "foreign");
+    if (ownCargo) {
+      add(s, "own", "infantry", "japan", p16);
+      attachCargo(s, "transport", "own");
+    }
+    s.facilities["home_port"] = {
+        "home_port", "major_port", tokyo, 0, {{"border:" + p16, 1}}};
+    Engine engine(s, rules(), 57);
+    int choices = 0;
+    bool unload = false;
+    for (const auto &a : engine.legalActions())
+      if (a.kind == "naval_enter_port" &&
+          a.parameters.require("unit").asString() == "transport" &&
+          a.parameters.require("facility").asString() == "home_port") {
+        ++choices;
+        unload |= a.parameters.require("unload").asBool();
+      }
+    check(choices == (ownCargo ? 2 : 1) && unload == ownCargo,
+          "Port entry offers a duplicate foreign-only unload or loses owned unloading");
+    if (ownCargo) {
+      choose(engine, "naval_enter_port", [](const Action &a) {
+        return a.parameters.require("facility").asString() == "home_port" &&
+               a.parameters.require("unload").asBool();
+      });
+      check(!engine.state().units.at("own").carriedBy &&
+                engine.state().units.at("foreign").carriedBy == "transport",
+            "Port unload changed allied cargo or failed to unload owned cargo");
+    }
+  }
+}
 void temporaryCrewAndSkeletonRestriction() {
   auto s = fixture(Phase::Combat);
   add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
@@ -1164,6 +1200,7 @@ int main() {
              {"waiting second wave", waitingArmorRemainsAboardUntilFoothold},
              {"shore and coastal fire", shoreBombardmentAndCoastalFirstStrike},
              {"berthing", berthLocksMovementAndKeepsCargo},
+             {"port unload alternatives", portUnloadAlternativeNeedsOwnedCargo},
              {"capture and scuttle", capturedShipRollPreservesDamage},
              {"temporary ship crew", temporaryCrewAndSkeletonRestriction},
              {"amphibious double casualties",

@@ -1,4 +1,5 @@
 #include "game/campaign.hpp"
+#include "game/campaign_actions.hpp"
 #include "game/catalog.hpp"
 #include "game/politics.hpp"
 
@@ -147,6 +148,7 @@ V State::toJson(bool includeHistory) const {
     for(const auto& d:decisions)ds.push_back(decisionJson(d));
     for(const auto& [id,pair]:turnStart.units)snapshotUnits.emplace(id,V(A{V(pair.first),V(pair.second)}));
     O result{{"schema_version",number(1)},{"definition_fingerprint",V(definition->fingerprint)},{"nations",V(std::move(n))},{"territories",V(std::move(t))},{"units",V(std::move(u))},{"facilities",V(std::move(f))},{"rails",V(std::move(r))},{"construction",V(std::move(b))},{"repairs",V(std::move(j))},{"clock",V(O{{"round_index",number(clock.roundIndex)},{"nation_index",number(clock.nationIndex)},{"phase",V(toString(clock.phase))},{"completed_rounds",number(clock.completedRounds)},{"player_turn_serial",V(std::to_string(clock.playerTurnSerial))},{"income_collected",V(clock.incomeCollected)}})},{"turn_start",V(O{{"possessions",optionalIdMap(turnStart.possessions)},{"units",V(std::move(snapshotUnits))}})},{"politics",politicsJson(politics)},{"completed_turns",intMap(completedTurns)},{"decisions",V(std::move(ds))},{"battles",V(std::move(bs))},{"battle_order",strings(battleOrder)},{"chance",chance?chanceJson(*chance):V(nullptr)},{"flags",intMap(flags)},{"terminal",V(terminal)}};
+    if(!actionInterface.asObject().empty()) result.emplace("action_interface",actionInterface);
     if(includeHistory) { for(const auto& e:history)events.emplace_back(O{{"kind",V(e.kind)},{"payload",e.payload},{"after_state_key",V(e.afterStateKey)}});result.emplace("history",V(std::move(events))); }
     return V(std::move(result));
 }
@@ -163,6 +165,7 @@ State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     const auto& c=v.require("clock");s.clock={c.require("round_index").asInt(),c.require("nation_index").asInt(),parsePhase(c.require("phase").asString()),c.require("completed_rounds").asInt(),readCounter(c.require("player_turn_serial")),c.require("income_collected").asBool()};
     const auto& snapshot=v.require("turn_start");s.turnStart.possessions=readOptionalIdMap(snapshot.require("possessions"));for(const auto& [id,x]:snapshot.require("units").asObject()) { const auto& a=x.asArray();require(a.size()==2,"Snapshot unit needs owner and zone");s.turnStart.units.emplace(id,std::pair{a[0].asString(),a[1].asString()}); }
     if(const auto* p=v.find("politics"))s.politics=readPolitics(*p);
+    if(const auto* p=v.find("action_interface"))s.actionInterface=*p;
     s.completedTurns=readIntMap(v.require("completed_turns"));for(const auto& x:v.require("decisions").asArray())s.decisions.push_back(readDecision(x));
     for(const auto& [id,x]:v.require("battles").asObject())s.battles.emplace(id,BattleState{x.require("id").asString(),x.require("zone").asString(),x.require("attacker").asString(),x.require("defender").asString(),x.require("stage").asString(),readStrings(x.require("attackers")),readStrings(x.require("defenders")),readIntMap(x.require("pending_hits")),readIntMap(x.require("flags")),x.find("data")?x.require("data"):V(O{})});
     s.battleOrder=readStrings(v.require("battle_order"));if(!v.require("chance").isNull())s.chance=readChance(v.require("chance"));s.flags=readIntMap(v.require("flags"));s.terminal=v.require("terminal").asBool();
@@ -175,6 +178,8 @@ V State::observation() const { auto object=toJson(false).asObject();object.erase
 
 void State::validate() const {
     require(definition!=nullptr&&!definition->fingerprint.empty(),"State requires a frozen definition");
+    require(actionInterface.isObject(),"Action-interface state must be an object");
+    validateTrainingActionState(*this);
     const auto& nodes=definition->geography.require("nodes").asObject();
     const auto zone=[&](const Id& id){require(nodes.contains(id),"Unknown zone: "+id);};
     const auto land=[&](const Id& id){zone(id);require(nodes.at(id).require("type").asString()=="land","Expected land zone: "+id);};

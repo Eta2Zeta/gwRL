@@ -1,5 +1,6 @@
 #include "game/campaign_env.hpp"
 #include "game/campaign_audit.hpp"
+#include "game/campaign_actions.hpp"
 #include "game/catalog.hpp"
 
 #include <stdexcept>
@@ -11,7 +12,7 @@ using V = json::Value;
 using O = V::Object;
 using A = V::Array;
 
-V staticContext(const State& s) {
+V staticContext(const State& s, bool trainingActions) {
     if (!s.definition->catalog) throw std::runtime_error("Campaign observations require the shared catalog");
     O factions;
     for (const auto& [id, f] : s.definition->factions) {
@@ -22,9 +23,11 @@ V staticContext(const State& s) {
     }
     A players;
     for (const auto& player : allianceOrder) players.emplace_back(player);
-    return V(O{{"schema", V(std::string("campaign_entities_v1"))}, {"players", V(std::move(players))},
+    O result{{"schema", V(std::string("campaign_entities_v1"))}, {"players", V(std::move(players))},
         {"geography", s.definition->geography}, {"factions", V(std::move(factions))},
-        {"catalog", s.definition->catalog->sourceData()}, {"rules", s.definition->rules}});
+        {"catalog", s.definition->catalog->sourceData()}, {"rules", s.definition->rules}};
+    if (trainingActions) result["action_interface"] = V(std::string(trainingActionSchema));
+    return V(std::move(result));
 }
 }  // namespace
 
@@ -34,15 +37,16 @@ struct CampaignEnv::DecisionCache {
     std::optional<V> observation;
 };
 
-CampaignEnv::CampaignEnv(const std::filesystem::path& path, std::uint64_t seed)
-    : CampaignEnv(Engine::start(loadScenario(path), campaignRules(), seed)) {}
+CampaignEnv::CampaignEnv(const std::filesystem::path& path, std::uint64_t seed, bool trainingActions)
+    : CampaignEnv(Engine::start(loadScenario(path), trainingActions ? trainingCampaignRules() : campaignRules(), seed)) {}
 
 CampaignEnv::CampaignEnv(Engine engine)
-    : engine_(std::move(engine)), context_(std::make_shared<const V>(staticContext(engine_.state()))),
+    : engine_(std::move(engine)), trainingActions_(engine_.rulesId() == trainingCampaignRules()->id()),
+      context_(std::make_shared<const V>(staticContext(engine_.state(), trainingActions_))),
       decisionCache_(std::make_shared<DecisionCache>()) {}
 
 CampaignEnv CampaignEnv::curriculum(const std::filesystem::path& path, int calendarRounds,
-                                    std::uint64_t seed) {
+                                    std::uint64_t seed, bool trainingActions) {
     auto initial = loadScenario(path);
     auto definition = *initial.definition;
     if (calendarRounds < 1 || calendarRounds > definition.calendarRounds)
@@ -59,7 +63,7 @@ CampaignEnv CampaignEnv::curriculum(const std::filesystem::path& path, int calen
     definition.rules = V(std::move(rules));
     initial.definition = freezeDefinition(std::move(definition));
     initial.validate();
-    return CampaignEnv(Engine::start(std::move(initial), campaignRules(), seed));
+    return CampaignEnv(Engine::start(std::move(initial), trainingActions ? trainingCampaignRules() : campaignRules(), seed));
 }
 
 std::string CampaignEnv::decisionKind() const {
@@ -115,7 +119,8 @@ void CampaignEnv::resolveChance() {
 }
 void CampaignEnv::restore(const std::string& serialized) {
     auto fresh = std::make_shared<DecisionCache>();
-    engine_ = Engine::restore(engine_.state().definition, campaignRules(), serialized);
+    engine_ = Engine::restore(engine_.state().definition,
+                             trainingActions_ ? trainingCampaignRules() : campaignRules(), serialized);
     decisionCache_ = std::move(fresh);
 }
 
