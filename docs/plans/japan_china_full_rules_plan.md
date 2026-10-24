@@ -1004,9 +1004,16 @@ exists to make completeness testable before implementation.
 self-play games with terminal-only labels and a paired initial-versus-trained
 comparison. Broader strategic strength is unestablished.
 
-**Next work:** measure representative deeper-search and longer-horizon throughput
-before larger training. Then expand one-round learning/evaluation across several
-training and dice seeds, followed by starting positions, horizon and opponent pairs.
+**Scaling follow-up:** 13 bounded cases now cover deeper search, later positions,
+larger models and longer horizons within the user's 12-core/30 GB allowance.
+One small-budget eleven-round game completes in 187.56 seconds; the stronger
+16-simulation two-round batch reaches its 240-second guard without a completed
+game. See [the scaling report](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md).
+
+**Next work:** reduce repeated legal-menu/observation generation and graph
+construction, then verify stronger-search collection before larger training.
+Expand one-round learning/evaluation across several training and dice seeds,
+followed by starting positions, horizon and opponent pairs.
 M12 closes the final planned implementation gate with reproducible training,
 exact interrupt/resume, evaluation and profiling. Its six learned-policy smoke
 games are explicitly truncated; two scripted controls reach a real one-round

@@ -1,0 +1,808 @@
+{
+  "actual_state_and_rng_unchanged": true,
+  "diagnostic_source_sha256": "d902e16ad50b2736d300c5e948e399ab473098a0489340737c053395cd04eb8c",
+  "limits": [
+    "Frozen inference-only timing, not training or a claim of strategic strength.",
+    "Operation profile compares the same real menu; first calls include token parsing.",
+    "Cumulative profiler rows overlap and must not be added together.",
+    "Native engine/PyTorch internals appear at their Python-call boundaries.",
+    "Single-root serial profiling does not measure independent-root batching efficiency."
+  ],
+  "matched_report": {
+    "path": "/Users/home/Desktop/gwRL/studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-s16-d16.json",
+    "sha256": "1c8f54d60ade13e4cdf2f2e4a3722833df1d3954d29b4b7d5055546a673f3f7d"
+  },
+  "model_weights_unchanged": true,
+  "models": {
+    "larger": {
+      "config": {
+        "hidden_dim": 64,
+        "message_layers": 2,
+        "policy_factorization": true,
+        "token_buckets": 16384,
+        "value_scale": 100.0
+      },
+      "frozen": true,
+      "initialization": "fresh weights seeded identically to the matrix",
+      "versions": {
+        "allies": "24a53c7b263602387e99db6e83852202721ce13f5cfc442c9ec9466bbba939a9",
+        "axis": "956255d20378b2a30506e09579d5832e9fc3a60a9bd6059c229872ca67aec6f8",
+        "comintern": "43131d1a59fe4c7ccaa5e7daff348ad3559798f9872ffe5e4b18b61152a6c715"
+      }
+    },
+    "pilot": {
+      "config": {
+        "hidden_dim": 16,
+        "message_layers": 1,
+        "policy_factorization": true,
+        "token_buckets": 2048,
+        "value_scale": 100.0
+      },
+      "frozen": true,
+      "initialization": "checkpoint model weights only",
+      "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+      "source_compatibility": {
+        "curriculum": "regional-horizon-curriculum-v1",
+        "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+        "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+        "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+      },
+      "source_sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+      "versions": {
+        "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+        "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+        "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+      }
+    }
+  },
+  "position": {
+    "actor": "axis",
+    "clock": {
+      "completed_rounds": 0,
+      "income_collected": false,
+      "nation_index": 2,
+      "phase": "combat_movement",
+      "player_turn_serial": "2",
+      "round_index": 0
+    },
+    "decision_kind": "combat_movement",
+    "legal_menu_kinds": {
+      "air_fly": 191,
+      "air_ground_attack": 21,
+      "air_start_patrol": 23,
+      "end_phase": 1,
+      "movement_route": 39,
+      "naval_designate_raider": 1,
+      "naval_load": 16,
+      "naval_start_move": 24
+    },
+    "legal_menu_size": 316,
+    "matched_first_root": true,
+    "matched_first_root_sha256": "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+    "planning_key": "494dfac973d1c8f1c45ce84258cffb34fc92408ce2b33d0e45311bc5517cca8e",
+    "preparation_policy": "campaign-active-baseline-v2:balanced",
+    "preparation_seconds": 0.6739482081029564,
+    "preparation_transitions": 39,
+    "prepared_state_sha256": "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+    "seed": 1951,
+    "task": {
+      "calendar_rounds": 11,
+      "compatibility": {
+        "curriculum": "regional-horizon-curriculum-v1",
+        "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+        "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+        "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+      },
+      "full_target_game": true,
+      "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+      "setup": "unchanged approved 99-piece,37-node July1936 setup",
+      "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+      "version": "regional-horizon-curriculum-v1"
+    }
+  },
+  "profiles": {
+    "larger_operations": {
+      "actual_state_unchanged": true,
+      "decision_kinds": [
+        "combat_movement"
+      ],
+      "environments": 1,
+      "evaluator_version": "12c5b02ba0fbe1544e73dd314c8bc81d64a09866507b9ee3c29e44953be746f0",
+      "inference_batch_sizes": [
+        1,
+        1,
+        1
+      ],
+      "legal_menu_sizes": [
+        316
+      ],
+      "limits": [
+        "Timings include first-use token parsing and later warm calls.",
+        "A rule transition is one legal action or chance on a clone, not an entire turn."
+      ],
+      "repeats": 3,
+      "schema": "campaign-operation-profile-v1",
+      "timings_seconds": {
+        "clone": {
+          "mean": 8.952800029267867e-05,
+          "median": 8.579203858971596e-05,
+          "samples": [
+            8.362496737390757e-05,
+            8.579203858971596e-05,
+            9.91669949144125e-05
+          ],
+          "total": 0.000268584000878036
+        },
+        "context": {
+          "mean": 0.003239083685912192,
+          "median": 0.003123000031337142,
+          "samples": [
+            0.003123000031337142,
+            0.003102416987530887,
+            0.0034918340388685465
+          ],
+          "total": 0.009717251057736576
+        },
+        "inference_batch": {
+          "mean": 0.10403975002312411,
+          "median": 0.10332066600676626,
+          "samples": [
+            0.10188604204449803,
+            0.10332066600676626,
+            0.10691254201810807
+          ],
+          "total": 0.31211925006937236
+        },
+        "inference_scalar": {
+          "mean": 0.14935565301372358,
+          "median": 0.1084042500006035,
+          "samples": [
+            0.23697720898780972,
+            0.10268550005275756,
+            0.1084042500006035
+          ],
+          "total": 0.4480669590411708
+        },
+        "legal_actions": {
+          "mean": 0.025437083328142762,
+          "median": 0.024962999974377453,
+          "samples": [
+            0.02665608306415379,
+            0.024962999974377453,
+            0.024692166945897043
+          ],
+          "total": 0.07631124998442829
+        },
+        "observation": {
+          "mean": 0.05316511095346262,
+          "median": 0.05360979191027582,
+          "samples": [
+            0.05360979191027582,
+            0.052167666028253734,
+            0.05371787492185831
+          ],
+          "total": 0.15949533286038786
+        },
+        "rule_transition": {
+          "mean": 0.052521333331242204,
+          "median": 0.05256450001616031,
+          "samples": [
+            0.05300225003156811,
+            0.05199724994599819,
+            0.05256450001616031
+          ],
+          "total": 0.1575639999937266
+        }
+      }
+    },
+    "pilot_operations": {
+      "actual_state_unchanged": true,
+      "decision_kinds": [
+        "combat_movement"
+      ],
+      "environments": 1,
+      "evaluator_version": "0850e2170469d8788c8897a49f3be86f9bc0ec29976bc23919af7aa7ef2c142a",
+      "inference_batch_sizes": [
+        1,
+        1,
+        1
+      ],
+      "legal_menu_sizes": [
+        316
+      ],
+      "limits": [
+        "Timings include first-use token parsing and later warm calls.",
+        "A rule transition is one legal action or chance on a clone, not an entire turn."
+      ],
+      "repeats": 3,
+      "schema": "campaign-operation-profile-v1",
+      "timings_seconds": {
+        "clone": {
+          "mean": 8.41943547129631e-05,
+          "median": 8.483300916850567e-05,
+          "samples": [
+            8.483300916850567e-05,
+            7.816706784069538e-05,
+            8.958298712968826e-05
+          ],
+          "total": 0.0002525830641388893
+        },
+        "context": {
+          "mean": 0.0033604866669823727,
+          "median": 0.0031537089962512255,
+          "samples": [
+            0.0038200420094653964,
+            0.003107708995230496,
+            0.0031537089962512255
+          ],
+          "total": 0.010081460000947118
+        },
+        "inference_batch": {
+          "mean": 0.07711361131320398,
+          "median": 0.07767862500622869,
+          "samples": [
+            0.07767862500622869,
+            0.07544937497004867,
+            0.07821283396333456
+          ],
+          "total": 0.2313408339396119
+        },
+        "inference_scalar": {
+          "mean": 0.1264964723183463,
+          "median": 0.07336699997540563,
+          "samples": [
+            0.2329054999863729,
+            0.07336699997540563,
+            0.07321691699326038
+          ],
+          "total": 0.3794894169550389
+        },
+        "legal_actions": {
+          "mean": 0.025520347369213898,
+          "median": 0.025560084031894803,
+          "samples": [
+            0.025285167037509382,
+            0.025560084031894803,
+            0.025715791038237512
+          ],
+          "total": 0.0765610421076417
+        },
+        "observation": {
+          "mean": 0.05582563862359772,
+          "median": 0.05678174993954599,
+          "samples": [
+            0.05761766596697271,
+            0.05678174993954599,
+            0.053077499964274466
+          ],
+          "total": 0.16747691587079316
+        },
+        "rule_transition": {
+          "mean": 0.052682916284538805,
+          "median": 0.053172290907241404,
+          "samples": [
+            0.053172290907241404,
+            0.05319849995430559,
+            0.05167795799206942
+          ],
+          "total": 0.15804874885361642
+        }
+      }
+    }
+  },
+  "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/profile-position-validated/report.json",
+  "raw_sha256": "03b12b18035bde1f548aceb752242631cc69bca0f537b18b9194a6ea787448ce",
+  "resources": {
+    "conservative_thread_budget": 7,
+    "cpu_budget": 12,
+    "interop_threads": 1,
+    "memory_limit_bytes": 30000000000,
+    "serial_searches": 1,
+    "tensor_threads": 4
+  },
+  "runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "0d6d96013d5d554a0c7668dec2008f5a18e01dc8d7649e288262f332aa8c3397",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "62bb0a1d920c50e98972e57aeb5a024d13d02af989db4ba21ff80a099bfdd1c9",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "3919edbb4c0e732fb00c41b4558081a0026cdb57b678b8b939d2af0b91029a1b",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "b5e1c880a1071532a7c5deb0e261c7e8783b155e4d7c53afd8cd4bdefea642d3",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "f0f5384b723633561f573dbdff6c98992f084d597a28aae5437ec61c12467b97",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_operations.cpp": "0bf7f336c18f003342ef53b4da7781454a784ead48498439a0a9e0633cad5e66",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "34b920a92deed84cfd6605d0f59c69e44d00dadc65d783266c727bdafd20fa0a",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4",
+    "studies/campaign/features.py": "24616dca93973eddf741c31c4bd70b0e7f735db41bd3e708ed941c7a56398436",
+    "studies/campaign/learning.py": "acbc5ebedd5eb8557060eb813fe29589f6dc248a681c9e5869c7d34ae4a22ac6",
+    "studies/campaign/neural.py": "c8530ef33e1861c62f9f5de7e06834a1e015efead156979605545878048ed598",
+    "studies/campaign/run.py": "c2e02aad7b78704e8acea07dbf371ec6ce384810d7e955be510f5b369b70e328",
+    "studies/campaign/scaling_benchmark.py": "d2b0d1a80367652fa930262f80a846d99a55c1ce4603a26a244c2d3adb25d931",
+    "studies/shared/campaign_adapter.py": "5435cf3c7a71f65f65064b5d70cbbbd662c5a46bcc9f3f134cf92f560a777f98",
+    "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+    "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+  },
+  "schema": "campaign-fixed-position-diagnostic-v1",
+  "serial_search": {
+    "actual_actions_executed": 0,
+    "actual_state_and_rng_unchanged": true,
+    "add_root_noise": true,
+    "cache_scope": "Root features warmed by three operation-profile repeats; descendants first-use",
+    "config": {
+      "c_puct": 1.5,
+      "max_depth": 16,
+      "mode": "multiplayer",
+      "record_trace": true,
+      "root_dirichlet_alpha": 0.3,
+      "root_dirichlet_epsilon": 0.25,
+      "rules_version": "gw36-v43-campaign-v1",
+      "seed": 13799257478488982565,
+      "simulations": 16,
+      "target_player": null
+    },
+    "note": "Serial cProfile timings include profiler overhead and are not batched throughput estimates",
+    "primitive_calls": 4334559,
+    "profile_accounting_note": "Compare recorded self-time with search wall time before attributing costs. If they differ materially, profiler rows are partial diagnostics; use the separate operation wall timers rather than percentages of total search.",
+    "profile_self_seconds": 1.2053683170000002,
+    "profile_wall_time_fully_accounted": false,
+    "selected_action": {
+      "decision": null,
+      "id": "end_phase",
+      "kind": "end_phase",
+      "nation": "japan",
+      "parameters": {},
+      "player": "axis"
+    },
+    "simulation_depth_histogram": {
+      "1": 15,
+      "2": 1
+    },
+    "simulation_leaf_sources": {
+      "evaluator": 16
+    },
+    "top20_cumulative": [
+      {
+        "calls": 287,
+        "cumulative_seconds": 0.6399851980000001,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "compile_graph",
+        "line": 68,
+        "primitive_calls": 287,
+        "self_seconds": 0.019286182000000002
+      },
+      {
+        "calls": 16,
+        "cumulative_seconds": 0.623313957,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "cached_observation",
+        "line": 170,
+        "primitive_calls": 16,
+        "self_seconds": 0.000838414
+      },
+      {
+        "calls": 110150,
+        "cumulative_seconds": 0.6095728690000001,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "visit",
+        "line": 85,
+        "primitive_calls": 287,
+        "self_seconds": 0.3754428
+      },
+      {
+        "calls": 1236,
+        "cumulative_seconds": 0.11835716500000001,
+        "file": "/Users/home/Desktop/gwRL/.venv/lib/python3.13/site-packages/torch/nn/modules/module.py",
+        "function": "_call_impl",
+        "line": 1783,
+        "primitive_calls": 24,
+        "self_seconds": 0.012819135
+      },
+      {
+        "calls": 19323,
+        "cumulative_seconds": 0.08887410800000001,
+        "file": "~",
+        "function": "<built-in method torch.tensor>",
+        "line": 0,
+        "primitive_calls": 19323,
+        "self_seconds": 0.08887410800000001
+      },
+      {
+        "calls": 47,
+        "cumulative_seconds": 0.073766625,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/neural.py",
+        "function": "forward",
+        "line": 110,
+        "primitive_calls": 11,
+        "self_seconds": 0.07830582600000001
+      },
+      {
+        "calls": 21376,
+        "cumulative_seconds": 0.06823646,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "canonical",
+        "line": 36,
+        "primitive_calls": 21376,
+        "self_seconds": 0.004501038000000001
+      },
+      {
+        "calls": 21395,
+        "cumulative_seconds": 0.06314694400000001,
+        "file": "/opt/anaconda3/lib/python3.13/json/__init__.py",
+        "function": "dumps",
+        "line": 183,
+        "primitive_calls": 21395,
+        "self_seconds": 0.008633562000000001
+      },
+      {
+        "calls": 21395,
+        "cumulative_seconds": 0.052765283,
+        "file": "/opt/anaconda3/lib/python3.13/json/encoder.py",
+        "function": "encode",
+        "line": 183,
+        "primitive_calls": 21395,
+        "self_seconds": 0.007165297
+      },
+      {
+        "calls": 17,
+        "cumulative_seconds": 0.047570752,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/neural.py",
+        "function": "_factored_logits",
+        "line": 202,
+        "primitive_calls": 17,
+        "self_seconds": 0.004609449000000001
+      },
+      {
+        "calls": 1722,
+        "cumulative_seconds": 0.046580540000000004,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/neural.py",
+        "function": "<lambda>",
+        "line": 76,
+        "primitive_calls": 1722,
+        "self_seconds": 0.00021867900000000003
+      },
+      {
+        "calls": 8851,
+        "cumulative_seconds": 0.043224477000000004,
+        "file": "/opt/anaconda3/lib/python3.13/json/__init__.py",
+        "function": "loads",
+        "line": 299,
+        "primitive_calls": 8851,
+        "self_seconds": 0.002785292
+      },
+      {
+        "calls": 17130,
+        "cumulative_seconds": 0.04253158,
+        "file": "/opt/anaconda3/lib/python3.13/json/encoder.py",
+        "function": "iterencode",
+        "line": 205,
+        "primitive_calls": 17130,
+        "self_seconds": 0.04253158
+      },
+      {
+        "calls": 8851,
+        "cumulative_seconds": 0.039484835,
+        "file": "/opt/anaconda3/lib/python3.13/json/decoder.py",
+        "function": "decode",
+        "line": 340,
+        "primitive_calls": 8851,
+        "self_seconds": 0.004580394000000001
+      },
+      {
+        "calls": 656486,
+        "cumulative_seconds": 0.036442777,
+        "file": "~",
+        "function": "<built-in method builtins.isinstance>",
+        "line": 0,
+        "primitive_calls": 653290,
+        "self_seconds": 0.035367686
+      },
+      {
+        "calls": 664247,
+        "cumulative_seconds": 0.036253709,
+        "file": "~",
+        "function": "<method 'append' of 'list' objects>",
+        "line": 0,
+        "primitive_calls": 664247,
+        "self_seconds": 0.036253709
+      },
+      {
+        "calls": 4265,
+        "cumulative_seconds": 0.035607738,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "action_factors",
+        "line": 221,
+        "primitive_calls": 4265,
+        "self_seconds": 0.004185039000000001
+      },
+      {
+        "calls": 61897,
+        "cumulative_seconds": 0.034989482,
+        "file": "/opt/anaconda3/lib/python3.13/re/__init__.py",
+        "function": "fullmatch",
+        "line": 169,
+        "primitive_calls": 61897,
+        "self_seconds": 0.012647158
+      },
+      {
+        "calls": 8530,
+        "cumulative_seconds": 0.031908997,
+        "file": "/Users/home/Desktop/gwRL/studies/shared/campaign_adapter.py",
+        "function": "features",
+        "line": 38,
+        "primitive_calls": 8530,
+        "self_seconds": 0.001362624
+      },
+      {
+        "calls": 8851,
+        "cumulative_seconds": 0.031159818000000002,
+        "file": "/opt/anaconda3/lib/python3.13/json/decoder.py",
+        "function": "raw_decode",
+        "line": 351,
+        "primitive_calls": 8851,
+        "self_seconds": 0.031159818000000002
+      }
+    ],
+    "top20_self": [
+      {
+        "calls": 110150,
+        "cumulative_seconds": 0.6095728690000001,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "visit",
+        "line": 85,
+        "primitive_calls": 287,
+        "self_seconds": 0.3754428
+      },
+      {
+        "calls": 19323,
+        "cumulative_seconds": 0.08887410800000001,
+        "file": "~",
+        "function": "<built-in method torch.tensor>",
+        "line": 0,
+        "primitive_calls": 19323,
+        "self_seconds": 0.08887410800000001
+      },
+      {
+        "calls": 47,
+        "cumulative_seconds": 0.073766625,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/neural.py",
+        "function": "forward",
+        "line": 110,
+        "primitive_calls": 11,
+        "self_seconds": 0.07830582600000001
+      },
+      {
+        "calls": 17130,
+        "cumulative_seconds": 0.04253158,
+        "file": "/opt/anaconda3/lib/python3.13/json/encoder.py",
+        "function": "iterencode",
+        "line": 205,
+        "primitive_calls": 17130,
+        "self_seconds": 0.04253158
+      },
+      {
+        "calls": 664247,
+        "cumulative_seconds": 0.036253709,
+        "file": "~",
+        "function": "<method 'append' of 'list' objects>",
+        "line": 0,
+        "primitive_calls": 664247,
+        "self_seconds": 0.036253709
+      },
+      {
+        "calls": 656486,
+        "cumulative_seconds": 0.036442777,
+        "file": "~",
+        "function": "<built-in method builtins.isinstance>",
+        "line": 0,
+        "primitive_calls": 653290,
+        "self_seconds": 0.035367686
+      },
+      {
+        "calls": 8851,
+        "cumulative_seconds": 0.031159818000000002,
+        "file": "/opt/anaconda3/lib/python3.13/json/decoder.py",
+        "function": "raw_decode",
+        "line": 351,
+        "primitive_calls": 8851,
+        "self_seconds": 0.031159818000000002
+      },
+      {
+        "calls": 255,
+        "cumulative_seconds": 0.028298258000000003,
+        "file": "~",
+        "function": "<method 'index_add_' of 'torch._C.TensorBase' objects>",
+        "line": 0,
+        "primitive_calls": 255,
+        "self_seconds": 0.028298258000000003
+      },
+      {
+        "calls": 425,
+        "cumulative_seconds": 0.0270413,
+        "file": "~",
+        "function": "<built-in method torch._C._nn.linear>",
+        "line": 0,
+        "primitive_calls": 425,
+        "self_seconds": 0.0270413
+      },
+      {
+        "calls": 440600,
+        "cumulative_seconds": 0.026768855,
+        "file": "~",
+        "function": "<built-in method math.log1p>",
+        "line": 0,
+        "primitive_calls": 440600,
+        "self_seconds": 0.026768855
+      },
+      {
+        "calls": 316636,
+        "cumulative_seconds": 0.025102798000000003,
+        "file": "~",
+        "function": "<method 'extend' of 'list' objects>",
+        "line": 0,
+        "primitive_calls": 316636,
+        "self_seconds": 0.025102798000000003
+      },
+      {
+        "calls": 51,
+        "cumulative_seconds": 0.020487043,
+        "file": "~",
+        "function": "<built-in method torch.embedding_bag>",
+        "line": 0,
+        "primitive_calls": 51,
+        "self_seconds": 0.020487043
+      },
+      {
+        "calls": 366666,
+        "cumulative_seconds": 0.019399573,
+        "file": "~",
+        "function": "<built-in method builtins.len>",
+        "line": 0,
+        "primitive_calls": 366666,
+        "self_seconds": 0.019399573
+      },
+      {
+        "calls": 287,
+        "cumulative_seconds": 0.6399851980000001,
+        "file": "/Users/home/Desktop/gwRL/studies/campaign/features.py",
+        "function": "compile_graph",
+        "line": 68,
+        "primitive_calls": 287,
+        "self_seconds": 0.019286182000000002
+      },
+      {
+        "calls": 263601,
+        "cumulative_seconds": 0.019056802,
+        "file": "~",
+        "function": "<method 'get' of 'dict' objects>",
+        "line": 0,
+        "primitive_calls": 263601,
+        "self_seconds": 0.019056802
+      },
+      {
+        "calls": 287,
+        "cumulative_seconds": 0.0,
+        "file": "/Users/home/Desktop/gwRL/.venv/lib/python3.13/site-packages/torch/autograd/grad_mode.py",
+        "function": "__enter__",
+        "line": 289,
+        "primitive_calls": 0,
+        "self_seconds": 0.01750617
+      },
+      {
+        "calls": 8853,
+        "cumulative_seconds": 0.015535308000000001,
+        "file": "~",
+        "function": "<method 'index_select' of 'torch._C.TensorBase' objects>",
+        "line": 0,
+        "primitive_calls": 8853,
+        "self_seconds": 0.015535308000000001
+      },
+      {
+        "calls": 438,
+        "cumulative_seconds": 0.014728705000000002,
+        "file": "~",
+        "function": "<built-in method torch.cat>",
+        "line": 0,
+        "primitive_calls": 438,
+        "self_seconds": 0.014728705000000002
+      },
+      {
+        "calls": 1236,
+        "cumulative_seconds": 0.11835716500000001,
+        "file": "/Users/home/Desktop/gwRL/.venv/lib/python3.13/site-packages/torch/nn/modules/module.py",
+        "function": "_call_impl",
+        "line": 1783,
+        "primitive_calls": 24,
+        "self_seconds": 0.012819135
+      },
+      {
+        "calls": 61897,
+        "cumulative_seconds": 0.034989482,
+        "file": "/opt/anaconda3/lib/python3.13/re/__init__.py",
+        "function": "fullmatch",
+        "line": 169,
+        "primitive_calls": 61897,
+        "self_seconds": 0.012647158
+      }
+    ],
+    "total_calls": 4455675,
+    "values": [
+      46.58505606651306,
+      -57.83348226547241,
+      -85.25893688201904
+    ],
+    "visit_count_sum": 16,
+    "wall_seconds": 3.1009370000101626
+  },
+  "software": {
+    "device": "cpu",
+    "python": "3.13.5",
+    "torch": "2.11.0"
+  },
+  "source_checkpoint_unchanged": true,
+  "status": "completed",
+  "training_updates": 0,
+  "watchdog": {
+    "aggregate_sampled_peak_rss_bytes": 948879360,
+    "elapsed_seconds": 8.748171249986626,
+    "limitation": "Sampled RSS with a safety margin, not an instantaneous kernel allocation cap",
+    "memory_limit_bytes": 30000000000,
+    "memory_stop_threshold_bytes": 29865782272,
+    "poll_interval_seconds": 0.1,
+    "scope": "Supervisor and one worker; serial search, CPU-only model inference",
+    "wall_limit_seconds": 90.0,
+    "worker_returncode": 0
+  }
+}

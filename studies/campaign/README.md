@@ -90,8 +90,21 @@ Manifests now separate invocation time into collection/search, learning updates,
 checkpoint saves and reporting, and report collection transitions per second.
 Timing stays outside deterministic checkpoint state. Full results and numerical
 limits are in the [Stage A report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
-Measure representative deeper-search and longer-horizon throughput before
-expanding learning; the pilot timing alone does not establish scalability.
+The [scaling follow-up](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md)
+now records 13 bounded cases: later positions, stronger search, a larger model,
+parallelism comparisons and actual one/two/eleven-round collection. A small-budget
+full campaign completes, but the 16-simulation two-round batch reaches its wall
+limit before completing. Repeated legal-menu and observation work needs a
+performance pass before expanding learning at that search budget.
+
+`python -m studies.campaign.scaling_benchmark --help` describes the supervised
+CPU-only benchmark. Its current resource envelope is 12 cores and 30 GB, with
+separate wall/RSS guards and preserved progress on cutoff. It supports exact
+round/nation/phase/decision-kind targeting, repeated searches on unchanged roots,
+actual episodes, and explicit inference-only model-weight transfer from a
+trusted local checkpoint. It never resumes old game/replay state or updates
+weights. Fixed-root queries are not executed moves or training rows. See the
+scaling report for measured results and reproduction commands.
 
 ## Evaluation and profiling
 
@@ -131,11 +144,16 @@ It includes first-use parsing and warm calls; menu size and game phase matter.
 
 ## Starting a larger experiment
 
-No large experiment runs automatically. The small two-batch smoke took 14.30
+The current next step is to optimize repeated legal-menu/observation generation,
+then repeat the matched benchmarks and a bounded stronger-search episode batch.
+The 13-case follow-up is a collection/search measurement, not a new training run.
+
+The original small two-batch smoke took 14.30
 seconds across stop/resume; 100 similar batches would take roughly 12 minutes
 if position costs stayed comparable. The default larger model measured 247ms
 per same-actor batch of four inference requests, before rules/search/updates.
-These are small-menu CPU measurements, not a full-game duration estimate.
+These historical small-menu CPU measurements predate the performance/scaling
+follow-ups and are not a current full-game duration estimate.
 
 First inspect the smoke profile and choose a run size that fits foreground time
 and memory. For the larger settings below, initially use one batch and six

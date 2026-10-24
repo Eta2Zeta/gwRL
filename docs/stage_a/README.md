@@ -1,7 +1,10 @@
 # Stage A: completed-episode campaign learning
 
-Status: first completed-episode pilot complete, 23 October 2026. Stage A remains
-an early learning experiment; it is not a completed playing-strength gate.
+Status: first completed-episode pilot and scaling measurements complete, 23
+October 2026. Stage A remains an early learning experiment; it is not a completed
+playing-strength gate. [The scaling follow-up](scaling_2026_10_23.md) completes
+one small-budget eleven-round game, but stronger-search collection still needs
+performance work before larger learning.
 
 Eight real one-round self-play games finished in 346.62 seconds, with 386 decisions
 and 52 chance events. All 386 training rows have observed terminal targets; none
@@ -64,21 +67,23 @@ counts; it does not prevent an actual policy from repeating legal actions.
 
 The observed improvement is completion behavior and outcome prediction. Allies/
 Comintern scores did not improve on these two dice seeds. Eight training games
-and one training seed do not establish robust strategic strength. The next
-step is to measure representative deeper-search and longer-horizon throughput
-before larger training. Then expand one-round learning and evaluation across
-several seeds before claiming strategic strength.
+and one training seed do not establish robust strategic strength. The scaling
+follow-up now measures stronger search, later positions and longer horizons.
+Next reduce repeated legal-menu/observation work and verify completion at the
+stronger budget, then expand one-round learning and evaluation across several
+seeds before claiming strategic strength.
 
 The completed run includes 19 purchases, 35 land moves and 12 land-battle starts,
 but demonstrates no naval movement/combat learning. All 230 Python tests and 24 C++
 suites pass after the preparation/diagnostic fixes.
 
-The user authorized actual Stage A
-learning and up to 80% of available compute cores. This Apple M4 Max exposes 14
-CPU cores; the configured CPU budget is 11, rounded down from 80%. Four search
-workers, four tensor threads and one coordinator fit a conservative 9-thread
-budget. BLAS/tensor environment limits are explicit; accelerator training is
-not used in this pilot.
+The original Stage A pilot used the then-authorized 80% CPU allowance. This
+Apple M4 Max exposes 14 CPU cores; that pilot's configured budget was 11, rounded
+down from 80%. Four search workers, four tensor threads and one coordinator fit
+a conservative 9-thread budget. On 23 October the user authorized **12 CPU cores
+and 30 GB of memory** for the rule synchronization and scaling benchmarks.
+Those benchmarks count their separate watchdog supervisor as well. BLAS/tensor
+environment limits are explicit; the pilot and benchmarks use CPU inference.
 
 The first experiment uses the unchanged approved 99-piece/37-node setup and rules,
 with an explicit one-round calendar (four national turns). Four independent
@@ -138,6 +143,9 @@ state.
 
 - [Training and per-episode results](training_2026_10_23.json)
 - [Performance follow-up and identical-workload repeat](performance_2026_10_23.json)
+- [Search/campaign scaling report](scaling_2026_10_23.md)
+- [Thirteen bounded scaling cases](scaling_2026_10_23.json)
+- [Matched-position operation profile](position_profile_2026_10_23.json)
 - [Paired comparison and limits](comparison_2026_10_23.json)
 - [Initial-model evaluation](evaluation_initial_2026_10_23.json)
 - [Trained-model evaluation](evaluation_final_2026_10_23.json)

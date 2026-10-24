@@ -1,0 +1,3627 @@
+{
+  "all_case_training_updates": 0,
+  "authorized_resources": {
+    "cpu_cores": 12,
+    "memory_bytes": 30000000000
+  },
+  "benchmark_source_sha256": {
+    "studies/campaign/scaling_benchmark.py": "d2b0d1a80367652fa930262f80a846d99a55c1ce4603a26a244c2d3adb25d931",
+    "tools/profile_campaign_position.py": "d902e16ad50b2736d300c5e948e399ab473098a0489340737c053395cd04eb8c"
+  },
+  "cases": [
+    {
+      "actual_state_and_rng_unchanged": null,
+      "aggregate_sampled_peak_rss_gb": 2.05406208,
+      "case": "episode-full-eleven-round-s4-d8",
+      "chance_events": 71,
+      "completed_search_waves": 560,
+      "completed_wave_search_decisions_per_second": 3.8372398830093433,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 8,
+        "max_state_visits": 12,
+        "max_transitions": 2000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 1,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 4,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 4
+      },
+      "decision_kind_counts": {
+        "combat": 72,
+        "combat_movement": 112,
+        "declaration_offer": 1,
+        "economy_rail_permission": 2,
+        "land_casualty": 17,
+        "land_retreat_destination": 2,
+        "land_retreat_or_continue": 7,
+        "non_combat_movement": 66,
+        "place_units": 134,
+        "politics_declaration_priority": 2,
+        "production": 141,
+        "recruitment_choice": 4
+      },
+      "executed_decisions": 560,
+      "executed_decisions_per_invocation_second": 2.9857169160872714,
+      "first_wave_seconds": null,
+      "inference_batch_histogram": {
+        "1": 2795
+      },
+      "inference_batches": 2795,
+      "menu_size_max": 567,
+      "menu_size_min": 1,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 2795,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          }
+        ],
+        "target": {
+          "decision_kind": null,
+          "nation": "ccp",
+          "nation_index": 0,
+          "phase": "production",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "1e74c054e96a3f355fab362ce9d73311dd8f9e680f3c2e17043999859677f42d"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/episode-full-eleven-round-s4-d8.json",
+      "raw_sha256": "e09f15737b9ccedef59bb57ce86d5370455d593321b1887981bd8391df872e52",
+      "resources": {
+        "conservative_thread_budget": 7,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 1,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 71,
+          "clock": {
+            "completed_rounds": 11,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "44",
+            "round_index": 10
+          },
+          "decisions": 560,
+          "index": 0,
+          "observed_terminal_returns": [
+            51.599999999999994,
+            -70.6,
+            -99.4
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 631
+        }
+      ],
+      "searched_decisions": 560,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 8.004604783491232,
+        "inference": 85.13143707998097,
+        "initialization": 1.852441249997355,
+        "preparation": 0.001180000021122396,
+        "search": 145.93823088298086,
+        "search_outside_inference": 60.80679380299989
+      },
+      "wall_seconds": 187.5596433749888,
+      "warm_searched_decisions_per_second": null,
+      "warm_wave_seconds": [],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 2054062080,
+        "elapsed_seconds": 187.5596433749888,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": null,
+      "aggregate_sampled_peak_rss_gb": 1.929445376,
+      "case": "episode-one-round-s4-d8",
+      "chance_events": 35,
+      "completed_search_waves": 74,
+      "completed_wave_search_decisions_per_second": 6.316899850155488,
+      "config": {
+        "calendar_rounds": 1,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 8,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 180.0,
+        "seed": 1951,
+        "simulations": 4,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat": 28,
+        "combat_movement": 44,
+        "declaration_offer": 9,
+        "economy_rail_permission": 6,
+        "land_casualty": 4,
+        "land_retreat_destination": 3,
+        "land_retreat_or_continue": 5,
+        "naval_force_selection": 1,
+        "non_combat_movement": 21,
+        "place_units": 43,
+        "politics_declaration_priority": 7,
+        "production": 45,
+        "recruitment_choice": 3
+      },
+      "executed_decisions": 219,
+      "executed_decisions_per_invocation_second": 4.453489434031478,
+      "first_wave_seconds": null,
+      "inference_batch_histogram": {
+        "1": 55,
+        "2": 66,
+        "3": 89,
+        "4": 156
+      },
+      "inference_batches": 366,
+      "menu_size_max": 462,
+      "menu_size_min": 1,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 1078,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          }
+        ],
+        "target": {
+          "decision_kind": null,
+          "nation": "ccp",
+          "nation_index": 0,
+          "phase": "production",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "8460bef9d0d137ad60b364fc5b5267bfa0e1ad50aef5434e7698640f2933ddbc",
+        "8642fed6b56397ef0a68fdeca5bf1653d6d1db2d7b921ae10f3afafa2db7f45b",
+        "635701fcac3c51f4749df26df60e9b40440c50a764efb4cee0ac841156f4e033",
+        "77af009ea8f665764f45c59ba9bdbe23292d7834b4152ddac19fac16a10493cb"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/episode-one-round-s4-d8.json",
+      "raw_sha256": "4ec83d4bed1090027f9f3247ad9663952721a81b4ca89988b854f453ba63ab3b",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 6,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "decisions": 48,
+          "index": 0,
+          "observed_terminal_returns": [
+            48.900000000000006,
+            -58.099999999999994,
+            -76.89999999999999
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 54
+        },
+        {
+          "chance_events": 8,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "decisions": 57,
+          "index": 1,
+          "observed_terminal_returns": [
+            42.10000000000001,
+            -50.69999999999999,
+            -84.3
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 65
+        },
+        {
+          "chance_events": 10,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "decisions": 49,
+          "index": 2,
+          "observed_terminal_returns": [
+            43.900000000000006,
+            -54.099999999999994,
+            -80.89999999999999
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 59
+        },
+        {
+          "chance_events": 11,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "4",
+            "round_index": 0
+          },
+          "decisions": 65,
+          "index": 3,
+          "observed_terminal_returns": [
+            44.599999999999994,
+            -54.00000000000001,
+            -81.0
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 76
+        }
+      ],
+      "searched_decisions": 219,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 1,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "7edbb9d6ae9d9214efef4e4c005b100790a6858474edc01e77aa369bb90a8d30",
+          "scenario": "fccdf897a22fd119ca1a016bfcea691f28acc6908a50eb4603a55de3a587e8f3",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 1.7006771721644327,
+        "inference": 21.513743631425314,
+        "initialization": 6.51824316708371,
+        "preparation": 0.017739208065904677,
+        "search": 34.66890487342607,
+        "search_outside_inference": 13.155161242000759
+      },
+      "wall_seconds": 49.17492300004233,
+      "warm_searched_decisions_per_second": null,
+      "warm_wave_seconds": [],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1929445376,
+        "elapsed_seconds": 49.17492300004233,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": null,
+      "aggregate_sampled_peak_rss_gb": 2.554544128,
+      "case": "episode-two-round-s16-d16",
+      "chance_events": 29,
+      "completed_search_waves": 66,
+      "completed_wave_search_decisions_per_second": 1.0832992126951255,
+      "config": {
+        "calendar_rounds": 2,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat": 28,
+        "combat_movement": 67,
+        "declaration_offer": 9,
+        "economy_rail_permission": 1,
+        "land_casualty": 5,
+        "land_retreat_destination": 3,
+        "land_retreat_or_continue": 3,
+        "naval_force_selection": 18,
+        "non_combat_movement": 21,
+        "place_units": 33,
+        "politics_declaration_priority": 6,
+        "production": 44,
+        "recruitment_choice": 1
+      },
+      "executed_decisions": 236,
+      "executed_decisions_per_invocation_second": 0.98310861023406,
+      "first_wave_seconds": null,
+      "inference_batch_histogram": {
+        "1": 1,
+        "2": 85,
+        "3": 307,
+        "4": 729
+      },
+      "inference_batches": 1122,
+      "menu_size_max": 466,
+      "menu_size_min": 1,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 4008,
+      "pending_wave": {
+        "index": 66,
+        "root_indices": [
+          1,
+          2,
+          3
+        ],
+        "search_configs": [
+          {
+            "c_puct": 1.5,
+            "max_depth": 16,
+            "mode": "multiplayer",
+            "record_trace": false,
+            "root_dirichlet_alpha": 0.3,
+            "root_dirichlet_epsilon": 0.25,
+            "rules_version": "gw36-v43-campaign-v1",
+            "seed": 17078689679715138898,
+            "simulations": 16,
+            "target_player": null
+          },
+          {
+            "c_puct": 1.5,
+            "max_depth": 16,
+            "mode": "multiplayer",
+            "record_trace": false,
+            "root_dirichlet_alpha": 0.3,
+            "root_dirichlet_epsilon": 0.25,
+            "rules_version": "gw36-v43-campaign-v1",
+            "seed": 3140475525737063835,
+            "simulations": 16,
+            "target_player": null
+          },
+          {
+            "c_puct": 1.5,
+            "max_depth": 16,
+            "mode": "multiplayer",
+            "record_trace": false,
+            "root_dirichlet_alpha": 0.3,
+            "root_dirichlet_epsilon": 0.25,
+            "rules_version": "gw36-v43-campaign-v1",
+            "seed": 3188548989231566761,
+            "simulations": 16,
+            "target_player": null
+          }
+        ]
+      },
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          }
+        ],
+        "target": {
+          "decision_kind": null,
+          "nation": "ccp",
+          "nation_index": 0,
+          "phase": "production",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "16a25aa9d775b8396cbf4ed95c1adc821e07b294219080fbb81ddf7d851a0a3c",
+        "e7f66fc04f1c9ba4b8c862ecbffead7758fa649769e0c6a37e66d7221d9b4007",
+        "aabc8cd73f38d191b8ecc507e0d2051d127f5ea8909b86f1f26c2962864879a0",
+        "1059d779f5d01c202c08f8f06162aefeb83ccf31a7637875c655faf4e8b4129f"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/episode-two-round-s16-d16.json",
+      "raw_sha256": "2d1d489193f040ccf66989afd36b49b466e4cb64ba2c4ff6452afb1716707182",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 7,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 0,
+            "phase": "combat",
+            "player_turn_serial": "4",
+            "round_index": 1
+          },
+          "decisions": 60,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "terminal": false,
+          "transitions": 67
+        },
+        {
+          "chance_events": 7,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 0,
+            "phase": "combat_movement",
+            "player_turn_serial": "4",
+            "round_index": 1
+          },
+          "decisions": 59,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "terminal": false,
+          "transitions": 66
+        },
+        {
+          "chance_events": 8,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 0,
+            "phase": "combat",
+            "player_turn_serial": "4",
+            "round_index": 1
+          },
+          "decisions": 58,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "terminal": false,
+          "transitions": 66
+        },
+        {
+          "chance_events": 7,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 59,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "terminal": false,
+          "transitions": 66
+        }
+      ],
+      "searched_decisions": 236,
+      "status": "wall_limit",
+      "task": {
+        "calendar_rounds": 2,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "10622810b2dfade66d521aa886e4528e05787be9c31986cdedd8a32ba50ce9c5",
+          "scenario": "4226a302f57c73e709e6c1874572243209a95ab33573a2fe1215169cf38de66c",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 2.970199631876312,
+        "inference": 119.43657104147132,
+        "initialization": 6.545675833011046,
+        "preparation": 0.017412584042176604,
+        "search": 217.853015339002,
+        "search_outside_inference": 98.41644429753069
+      },
+      "wall_seconds": 240.05486020899843,
+      "warm_searched_decisions_per_second": null,
+      "warm_wave_seconds": [],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 2554544128,
+        "elapsed_seconds": 240.05486020899843,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": -9
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": null,
+      "aggregate_sampled_peak_rss_gb": 2.032451584,
+      "case": "episode-two-round-s4-d8",
+      "chance_events": 55,
+      "completed_search_waves": 126,
+      "completed_wave_search_decisions_per_second": 5.593537923999325,
+      "config": {
+        "calendar_rounds": 2,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 8,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 4,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat": 54,
+        "combat_movement": 84,
+        "declaration_offer": 9,
+        "economy_rail_permission": 6,
+        "land_casualty": 6,
+        "land_retreat_destination": 6,
+        "land_retreat_or_continue": 9,
+        "naval_force_selection": 7,
+        "non_combat_movement": 63,
+        "place_units": 73,
+        "politics_declaration_priority": 7,
+        "production": 78,
+        "recruitment_choice": 4
+      },
+      "executed_decisions": 406,
+      "executed_decisions_per_invocation_second": 4.206019855043031,
+      "first_wave_seconds": null,
+      "inference_batch_histogram": {
+        "1": 25,
+        "2": 84,
+        "3": 254,
+        "4": 262
+      },
+      "inference_batches": 625,
+      "menu_size_max": 471,
+      "menu_size_min": 1,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 2003,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 0
+          }
+        ],
+        "target": {
+          "decision_kind": null,
+          "nation": "ccp",
+          "nation_index": 0,
+          "phase": "production",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "16a25aa9d775b8396cbf4ed95c1adc821e07b294219080fbb81ddf7d851a0a3c",
+        "e7f66fc04f1c9ba4b8c862ecbffead7758fa649769e0c6a37e66d7221d9b4007",
+        "aabc8cd73f38d191b8ecc507e0d2051d127f5ea8909b86f1f26c2962864879a0",
+        "1059d779f5d01c202c08f8f06162aefeb83ccf31a7637875c655faf4e8b4129f"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/episode-two-round-s4-d8.json",
+      "raw_sha256": "9f940e5c91c77555d4d49ca25da845eaa382ef31936818f067ee2803cbf4ab6f",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 8,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "8",
+            "round_index": 1
+          },
+          "decisions": 88,
+          "index": 0,
+          "observed_terminal_returns": [
+            49.7,
+            -59.099999999999994,
+            -78.89999999999999
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 96
+        },
+        {
+          "chance_events": 16,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "8",
+            "round_index": 1
+          },
+          "decisions": 110,
+          "index": 1,
+          "observed_terminal_returns": [
+            41.39999999999999,
+            -50.800000000000004,
+            -87.2
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 126
+        },
+        {
+          "chance_events": 17,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "8",
+            "round_index": 1
+          },
+          "decisions": 99,
+          "index": 2,
+          "observed_terminal_returns": [
+            41.400000000000006,
+            -50.599999999999994,
+            -87.39999999999999
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 116
+        },
+        {
+          "chance_events": 14,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "8",
+            "round_index": 1
+          },
+          "decisions": 109,
+          "index": 3,
+          "observed_terminal_returns": [
+            45.0,
+            -54.8,
+            -83.2
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 123
+        }
+      ],
+      "searched_decisions": 406,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 2,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "10622810b2dfade66d521aa886e4528e05787be9c31986cdedd8a32ba50ce9c5",
+          "scenario": "4226a302f57c73e709e6c1874572243209a95ab33573a2fe1215169cf38de66c",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 3.80357254575938,
+        "inference": 44.53845441353042,
+        "initialization": 6.561508166021667,
+        "preparation": 0.017678042058832943,
+        "search": 72.58375745662488,
+        "search_outside_inference": 28.045303043094464
+      },
+      "wall_seconds": 96.52831274992786,
+      "warm_searched_decisions_per_second": null,
+      "warm_wave_seconds": [],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 2032451584,
+        "elapsed_seconds": 96.52831274992786,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 1.836826624,
+      "case": "japan-r1-larger-model-s16-d16",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.353603051181973,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": null,
+        "cpu_budget": 12,
+        "hidden_dim": 64,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 2,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 16384,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 12
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 11.660521499929018,
+      "inference_batch_histogram": {
+        "4": 51
+      },
+      "inference_batches": 51,
+      "menu_size_max": 321,
+      "menu_size_min": 316,
+      "model": {
+        "config": {
+          "hidden_dim": 64,
+          "message_layers": 2,
+          "policy_factorization": true,
+          "token_buckets": 16384,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "fresh seeded weights",
+        "training_updates": 0,
+        "versions": {
+          "allies": "24a53c7b263602387e99db6e83852202721ce13f5cfc442c9ec9466bbba939a9",
+          "axis": "956255d20378b2a30506e09579d5832e9fc3a60a9bd6059c229872ca67aec6f8",
+          "comintern": "43131d1a59fe4c7ccaa5e7daff348ad3559798f9872ffe5e4b18b61152a6c715"
+        },
+        "weights_transfer": null
+      },
+      "neural_requests": 204,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 39
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+        "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+        "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+        "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-larger-model-s16-d16.json",
+      "raw_sha256": "d4dfc652f20e3058bdadc570c5b3b1831a8be5a4e4e4f371d61c0c864d9ce294",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 12,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.01072454103268683,
+        "inference": 17.65019662072882,
+        "initialization": 6.262209333013743,
+        "preparation": 2.888788582989946,
+        "search": 33.9363587499829,
+        "search_outside_inference": 16.28616212925408
+      },
+      "wall_seconds": 46.840895291999914,
+      "warm_searched_decisions_per_second": 0.359133527067794,
+      "warm_wave_seconds": [
+        10.899517083074898,
+        11.376320166978985
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1836826624,
+        "elapsed_seconds": 46.840895291999914,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 2.154676224,
+      "case": "japan-r1-s16-d16-six-roots",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.37794331657576996,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 6,
+        "seconds": 180.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 18
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 16.285213999915868,
+      "inference_batch_histogram": {
+        "6": 51
+      },
+      "inference_batches": 51,
+      "menu_size_max": 321,
+      "menu_size_min": 316,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 306,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 39
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 4,
+            "seed": 1955,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 5,
+            "seed": 1956,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 47
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+        "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+        "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+        "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2",
+        "39a687c1b9dde3e1320fa02cfa7989c4d78251a2854826a52e5eabd540affd74",
+        "fab5f7a977ef4afc92df1b84f1c8e6fab801657952e3723c53ddd91597c1454a"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-s16-d16-six-roots.json",
+      "raw_sha256": "59841ab2cd7de685e979927a77761aec17f76aa4d4e3a85bd8dd342c23732991",
+      "resources": {
+        "conservative_thread_budget": 12,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 6,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 4,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 5,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 18,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.015490997931919992,
+        "inference": 24.204273918177933,
+        "initialization": 9.636271000024863,
+        "preparation": 4.854380500037223,
+        "search": 47.62618945899885,
+        "search_outside_inference": 23.42191554082092
+      },
+      "wall_seconds": 67.56962220801506,
+      "warm_searched_decisions_per_second": 0.3828853385774966,
+      "warm_wave_seconds": [
+        15.472400209051557,
+        15.868575250031427
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 2154676224,
+        "elapsed_seconds": 67.56962220801506,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 1.71188224,
+      "case": "japan-r1-s16-d16-six-tensor-threads",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.3776553107171895,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1024,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 150.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 6,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 12
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 10.831406541983597,
+      "inference_batch_histogram": {
+        "4": 51
+      },
+      "inference_batches": 51,
+      "menu_size_max": 321,
+      "menu_size_min": 316,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 204,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 39
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+        "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+        "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+        "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-s16-d16-six-tensor-threads.json",
+      "raw_sha256": "d5278b3dd888c85a80b41c5e067980b07a0ad371c031dc6252480013f1746132",
+      "resources": {
+        "conservative_thread_budget": 12,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 6
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 12,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.010787209030240774,
+        "inference": 16.21468721004203,
+        "initialization": 6.511187249911018,
+        "preparation": 2.9880608330713585,
+        "search": 31.775006624986418,
+        "search_outside_inference": 15.560319414944388
+      },
+      "wall_seconds": 45.08141358406283,
+      "warm_searched_decisions_per_second": 0.381978263922856,
+      "warm_wave_seconds": [
+        10.299511749995872,
+        10.644088333006948
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1711882240,
+        "elapsed_seconds": 45.08141358406283,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 1.702526976,
+      "case": "japan-r1-s16-d16",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.3803623554037152,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 150.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 12
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 10.635992542025633,
+      "inference_batch_histogram": {
+        "4": 51
+      },
+      "inference_batches": 51,
+      "menu_size_max": 321,
+      "menu_size_min": 316,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 204,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 39
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+        "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+        "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+        "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-s16-d16.json",
+      "raw_sha256": "1c8f54d60ade13e4cdf2f2e4a3722833df1d3954d29b4b7d5055546a673f3f7d",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 12,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.0105458750622347,
+        "inference": 16.05538741417695,
+        "initialization": 6.5824146249797195,
+        "preparation": 2.985070583061315,
+        "search": 31.54886341805104,
+        "search_outside_inference": 15.493476003874093
+      },
+      "wall_seconds": 44.896970459027216,
+      "warm_searched_decisions_per_second": 0.3825395397611922,
+      "warm_wave_seconds": [
+        10.318485792027786,
+        10.594385083997622
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1702526976,
+        "elapsed_seconds": 44.896970459027216,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 1.144766464,
+      "case": "japan-r1-s4-d8",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 1.5184324010572585,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 8,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 120.0,
+        "seed": 1951,
+        "simulations": 4,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 12
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 2.946348041994497,
+      "inference_batch_histogram": {
+        "4": 15
+      },
+      "inference_batches": 15,
+      "menu_size_max": 321,
+      "menu_size_min": 316,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 60,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 39
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+        "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+        "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+        "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-s4-d8.json",
+      "raw_sha256": "841a74aa0a4aa5816ecd40f42505044214c0defc9f8258950577e7801910abd5",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 12,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.010395084973424673,
+        "inference": 4.06048262573313,
+        "initialization": 6.646408958942629,
+        "preparation": 3.0096311670495197,
+        "search": 7.902887208969332,
+        "search_outside_inference": 3.8424045832362026
+      },
+      "wall_seconds": 21.34097533300519,
+      "warm_searched_decisions_per_second": 1.6140294125593897,
+      "warm_wave_seconds": [
+        2.4849795000627637,
+        2.4715596669120714
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1144766464,
+        "elapsed_seconds": 21.34097533300519,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 2.577170432,
+      "case": "japan-r1-s64-d32",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.11225095070161184,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 32,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 64,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 12
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 36.40059350000229,
+      "inference_batch_histogram": {
+        "4": 195
+      },
+      "inference_batches": 195,
+      "menu_size_max": 321,
+      "menu_size_min": 316,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 780,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 39
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 38
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 2,
+            "seed": 1953,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          },
+          {
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "index": 3,
+            "seed": 1954,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 45
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 1
+        }
+      },
+      "prepared_state_sha256": [
+        "c4bbc968639dcbea30061b474eb0d3aee5fb6d71fbeaa1a069a081d4c38c722b",
+        "56c10f1822c80db33fbbb4ea833c834fea8de0bdac4fb74b4ad839672119dc29",
+        "71823314cb41ca25c97d60028b348691be341431091f2ccf47720ef24102d012",
+        "90b8f5c77a0f7bac319a01924bf8b00c875fa5c0baba147425942515f53634d2"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r1-s64-d32.json",
+      "raw_sha256": "78eeccff07017797c1375bb05d23d2cb0856cbeb5f3293d30da2e08da1f3aa06",
+      "resources": {
+        "conservative_thread_budget": 10,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 4,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 12,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.011166458949446678,
+        "inference": 49.22143324802164,
+        "initialization": 6.550229040905833,
+        "preparation": 3.0108875000150874,
+        "search": 106.90332620788831,
+        "search_outside_inference": 57.68189295986667
+      },
+      "wall_seconds": 120.49940108391456,
+      "warm_searched_decisions_per_second": 0.11347077897173717,
+      "warm_wave_seconds": [
+        34.98023112490773,
+        35.52250158297829
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 2577170432,
+        "elapsed_seconds": 120.49940108391456,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 1.092714496,
+      "case": "japan-r3-s16-d16",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.3732258166585643,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 2,
+        "seconds": 180.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 3,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 6
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 5.567102000000887,
+      "inference_batch_histogram": {
+        "2": 51
+      },
+      "inference_batches": 51,
+      "menu_size_max": 193,
+      "menu_size_min": 124,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 102,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "10",
+              "round_index": 2
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 522
+          },
+          {
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "10",
+              "round_index": 2
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 517
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 3
+        }
+      },
+      "prepared_state_sha256": [
+        "ed3b8281e6f7001daf6edb4920ba8a49ff1859b05722087187b7be6955a49167",
+        "159444fe260fd13a5c3960e5767add10662ffc1ee5d7de5d35af0c27ec27984e"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r3-s16-d16.json",
+      "raw_sha256": "676223adb4c750f0bfe3939974b6453726ec6f54b60f088c35ce34410e126978",
+      "resources": {
+        "conservative_thread_budget": 8,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 2,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "10",
+            "round_index": 2
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "10",
+            "round_index": 2
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 6,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.013640001066960394,
+        "inference": 6.9644597069127485,
+        "initialization": 3.4267477919347584,
+        "preparation": 37.636339749908075,
+        "search": 16.076058333041146,
+        "search_outside_inference": 9.111598626128398
+      },
+      "wall_seconds": 59.65340987499803,
+      "warm_searched_decisions_per_second": 0.38062771156674824,
+      "warm_wave_seconds": [
+        5.166271916008554,
+        5.342684417031705
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1092714496,
+        "elapsed_seconds": 59.65340987499803,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 1.553678336,
+      "case": "japan-r3-s64-d32",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.11067035004648158,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 32,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 2,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 64,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 3,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 6
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 18.586674457998015,
+      "inference_batch_histogram": {
+        "2": 195
+      },
+      "inference_batches": 195,
+      "menu_size_max": 193,
+      "menu_size_min": 124,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 390,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "10",
+              "round_index": 2
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 522
+          },
+          {
+            "clock": {
+              "completed_rounds": 2,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "10",
+              "round_index": 2
+            },
+            "index": 1,
+            "seed": 1952,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 517
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 3
+        }
+      },
+      "prepared_state_sha256": [
+        "ed3b8281e6f7001daf6edb4920ba8a49ff1859b05722087187b7be6955a49167",
+        "159444fe260fd13a5c3960e5767add10662ffc1ee5d7de5d35af0c27ec27984e"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r3-s64-d32.json",
+      "raw_sha256": "390994f64aa8e772d3f0300fa59bbfc070a2b0908a8d761f80b0e56d8746ba14",
+      "resources": {
+        "conservative_thread_budget": 8,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 2,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "10",
+            "round_index": 2
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 2,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "10",
+            "round_index": 2
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 6,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.013397584087215364,
+        "inference": 20.04906257870607,
+        "initialization": 3.4282448750454932,
+        "preparation": 38.059789333026856,
+        "search": 54.215062999981456,
+        "search_outside_inference": 34.166000421275385
+      },
+      "wall_seconds": 98.32755820790771,
+      "warm_searched_decisions_per_second": 0.11227002297020866,
+      "warm_wave_seconds": [
+        17.673625166993588,
+        17.954763374989852
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1553678336,
+        "elapsed_seconds": 98.32755820790771,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    },
+    {
+      "actual_state_and_rng_unchanged": true,
+      "aggregate_sampled_peak_rss_gb": 0.9777152,
+      "case": "japan-r6-s16-d16",
+      "chance_events": 0,
+      "completed_search_waves": 3,
+      "completed_wave_search_decisions_per_second": 0.3267274191865037,
+      "config": {
+        "calendar_rounds": null,
+        "checkpoint_weights": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 12,
+        "max_transitions": 1500,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 1,
+        "seconds": 240.0,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 6,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decision_kind_counts": {
+        "combat_movement": 3
+      },
+      "executed_decisions": 0,
+      "executed_decisions_per_invocation_second": 0.0,
+      "first_wave_seconds": 3.1143535419832915,
+      "inference_batch_histogram": {
+        "1": 51
+      },
+      "inference_batches": 51,
+      "menu_size_max": 179,
+      "menu_size_min": 179,
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "checkpoint weights transfer",
+        "training_updates": 0,
+        "versions": {
+          "allies": "14184646c150da74eb4dce017b4d203300acf7d9c6441f7e4e88da458ff20a65",
+          "axis": "1f91acf4788975afd726cb62b95a335046dba62fc9212baf3054c8b0054f09bb",
+          "comintern": "56fe28636e2e2f8cee1cdbdb56110ffda3e68fe9b55d01cbe6b76134e2b1ff24"
+        },
+        "weights_transfer": {
+          "purpose": "inference-only transfer into fresh current-rule environments; not a training resume",
+          "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00",
+          "source": "/Users/home/Desktop/gwRL/studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+          "source_compatibility": {
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "db84b3e43efdee117b6824696dd1defcfb4cb89053c4e60bd797e011311a05c1",
+            "scenario": "d800deabf59c9270aa625c07b05fab05dc553592e8e2adc4e7e1dcf82fbf8a77",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          }
+        }
+      },
+      "neural_requests": 51,
+      "pending_wave": null,
+      "preparation": {
+        "national_turn_order": [
+          "ccp",
+          "mongolia",
+          "japan",
+          "kmt"
+        ],
+        "policy": "campaign-active-baseline-v2:balanced",
+        "roots": [
+          {
+            "clock": {
+              "completed_rounds": 5,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "22",
+              "round_index": 5
+            },
+            "index": 0,
+            "seed": 1951,
+            "status": "reached",
+            "terminal": false,
+            "transitions": 1063
+          }
+        ],
+        "target": {
+          "decision_kind": "combat_movement",
+          "nation": "japan",
+          "nation_index": 2,
+          "phase": "combat_movement",
+          "round": 6
+        }
+      },
+      "prepared_state_sha256": [
+        "b4d6ec2e727407d3bd9d95459d813706ad05ee812774b870c1dae98fe83184a6"
+      ],
+      "raw_output": "studies/campaign/runs/scaling-2026-10-23-rcl014/japan-r6-s16-d16.json",
+      "raw_sha256": "651dcc1ada7f057e259f0c7c219faed926fff294ce17780ada0a19ae00ba021a",
+      "resources": {
+        "conservative_thread_budget": 7,
+        "coordinators": 2,
+        "cpu_budget": 12,
+        "interop_threads": 1,
+        "memory_limit_bytes": 30000000000,
+        "search_workers": 1,
+        "tensor_threads": 4
+      },
+      "root_progress": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 5,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "22",
+            "round_index": 5
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "searched_decisions": 3,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 11,
+        "compatibility": {
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "4b1742e8b2ff7b0cee07eedce25439826e9ab8c99a1a5fa7cee27b2c4210fae8",
+          "scenario": "f3e2914cb3fcf1ab16aa807d9eabb469756ec3f3c1de77bf5054284211b55174",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": true,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timings_seconds": {
+        "execution": 0.01174383400939405,
+        "inference": 3.7391605849843472,
+        "initialization": 1.8636311249574646,
+        "preparation": 49.623541665961966,
+        "search": 9.181965833995491,
+        "search_outside_inference": 5.442805249011144
+      },
+      "wall_seconds": 62.46453387499787,
+      "warm_searched_decisions_per_second": 0.32961895120308365,
+      "warm_wave_seconds": [
+        3.077111875056289,
+        2.9905004169559106
+      ],
+      "watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 977715200,
+        "elapsed_seconds": 62.46453387499787,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      }
+    }
+  ],
+  "date": "2026-10-23",
+  "engine_commit": "3296d6a",
+  "hardware": {
+    "logical_cpu_cores": 14,
+    "physical_memory_bytes": 38654705664,
+    "platform": "Apple M4 Max, arm64 macOS"
+  },
+  "limits": [
+    "One machine; one invocation per case; limited seeds. These are throughput and completion measurements, not strategic learning results.",
+    "Fixed-position query throughput excludes process/model startup and scripted preparation; warm repeat caches differ from new self-play positions.",
+    "Episode budgets alter trajectories; episode timings are not matched-workload budget multipliers.",
+    "No optimizer updates, replay accumulation, or training checkpoint writes. Training memory and total training throughput are unmeasured here.",
+    "RSS guards sample supervisor plus worker with a safety margin; they are not instantaneous kernel allocation caps.",
+    "Cutoff counts retain completed waves only; watchdog wall time includes unfinished pending search."
+  ],
+  "matched_position_checks": {
+    "fixed_roots_preserve_state_and_execution_rng": true,
+    "opening_four_roots": [
+      "japan-r1-s4-d8",
+      "japan-r1-s16-d16",
+      "japan-r1-s64-d32",
+      "japan-r1-s16-d16-six-tensor-threads",
+      "japan-r1-larger-model-s16-d16"
+    ],
+    "opening_six_roots_first_four_match": true,
+    "round_three_16_and_64_match": true
+  },
+  "maximum_aggregate_sampled_rss_bytes": 2577170432,
+  "original_optimized_checkpoint": {
+    "path": "studies/campaign/runs/stage-a-speedcheck-2026-10-23/checkpoint.pt",
+    "preserved": true,
+    "sha256": "9e61ea722e3d240f0b56bec014b541b1f0c9495820cd382d87f5fe729ab70f00"
+  },
+  "position_profile": "position_profile_2026_10_23.json",
+  "runtime_source_sha256": {
+    "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+    "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+    "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+    "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+    "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+    "include/game/campaign.hpp": "5eea74d140c1022b80f5fd8003995405575525d6cf1756ffc2c23018f79a4369",
+    "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+    "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+    "include/game/campaign_env.hpp": "0d6d96013d5d554a0c7668dec2008f5a18e01dc8d7649e288262f332aa8c3397",
+    "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+    "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+    "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+    "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+    "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+    "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+    "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+    "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+    "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+    "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+    "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+    "include/game/naval.hpp": "62bb0a1d920c50e98972e57aeb5a024d13d02af989db4ba21ff80a099bfdd1c9",
+    "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+    "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+    "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+    "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+    "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+    "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+    "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+    "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+    "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+    "src/air.cpp": "3919edbb4c0e732fb00c41b4558081a0026cdb57b678b8b939d2af0b91029a1b",
+    "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+    "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+    "src/campaign_env.cpp": "b5e1c880a1071532a7c5deb0e261c7e8783b155e4d7c53afd8cd4bdefea642d3",
+    "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+    "src/campaign_runtime.cpp": "f0f5384b723633561f573dbdff6c98992f084d597a28aae5437ec61c12467b97",
+    "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+    "src/campaign_state.cpp": "4f6a2b254d30b378270701642753b20809aed2183ec3984ea79412873388629c",
+    "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+    "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+    "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+    "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+    "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+    "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+    "src/land_combat.cpp": "d88f4660de6e497c3d2851584a9110234b21ea30ab0f953aeb245722b637c727",
+    "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+    "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+    "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+    "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+    "src/naval_movement.cpp": "0f8493771e63b6b3dbc2aa1ff0c50829c1b65714da0b0a3a16b203eddc4e78a3",
+    "src/naval_operations.cpp": "0bf7f336c18f003342ef53b4da7781454a784ead48498439a0a9e0633cad5e66",
+    "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+    "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+    "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+    "src/python_bindings.cpp": "34b920a92deed84cfd6605d0f59c69e44d00dadc65d783266c727bdafd20fa0a",
+    "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+    "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+    "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+    "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+    "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+    "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+    "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+    "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+    "studies/campaign/curriculum.py": "98107f09fe65ba696a64de19524a0fd43d5fd5ee8f6636a4b755be3593722b19",
+    "studies/campaign/evaluation.py": "3de0eff64b60a40f715c9835eced53a843d02943634b790902ca7aa2b4017dc4",
+    "studies/campaign/features.py": "24616dca93973eddf741c31c4bd70b0e7f735db41bd3e708ed941c7a56398436",
+    "studies/campaign/learning.py": "acbc5ebedd5eb8557060eb813fe29589f6dc248a681c9e5869c7d34ae4a22ac6",
+    "studies/campaign/neural.py": "c8530ef33e1861c62f9f5de7e06834a1e015efead156979605545878048ed598",
+    "studies/campaign/run.py": "c2e02aad7b78704e8acea07dbf371ec6ce384810d7e955be510f5b369b70e328",
+    "studies/campaign/scaling_benchmark.py": "d2b0d1a80367652fa930262f80a846d99a55c1ce4603a26a244c2d3adb25d931",
+    "studies/shared/campaign_adapter.py": "5435cf3c7a71f65f65064b5d70cbbbd662c5a46bcc9f3f134cf92f560a777f98",
+    "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+    "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+  },
+  "schema": "stage-a-scaling-followup-v1",
+  "scope": "Bounded search and frozen-policy collection benchmarks, zero optimizer updates",
+  "verification": {
+    "cpp_command": "ctest --test-dir build/rcl014 --output-on-failure",
+    "cpp_seconds": 78.31,
+    "cpp_suites": 24,
+    "historical_evidence": "preserved; stale-checkpoint test now creates a current-rule terminal by legal phase passing while retaining old-checkpoint rejection",
+    "independent_report_review": "passed: raw hashes, matched roots/models, caps, counts, cutoff/terminal separation, timing arithmetic and profile limits",
+    "naval_combat_fixture_groups": 17,
+    "naval_operations_fixture_groups": 27,
+    "new_scaling_tests": 9,
+    "python_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 ./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+    "python_seconds": 101.391,
+    "python_tests": 250,
+    "reader_generation": "strict; 14 sources, 277 sections, 12 annotations, no missing anchors",
+    "source_hashes_match_current_runtime": true,
+    "status": "passed"
+  }
+}
