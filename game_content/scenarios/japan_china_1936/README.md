@@ -47,8 +47,10 @@ M7 land combat is complete, including shared-zone truce resolution under
 RCL-012. M8 air operations are complete, including adopted RCL-013 artillery city
 bombardment. M9 naval operations and M10 integration completed their gates on
 23 October, including two exact-replay full 44-turn campaign traces. M11 exposes
-the campaign API and tested stochastic vector search. RCL-014 and RCL-015 are
-provisionally adopted pending developer clarification. These source profiles are
+the campaign API and tested stochastic vector search. RCL-014 now follows the
+developer clarification: evacuating ships defend and the fleet already at sea
+attacks. RCL-015 remains provisionally adopted pending developer clarification.
+These source profiles are
 fingerprinted with the scenario definition; earlier verification files remain
 historical snapshots. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds entity-graph models, batched self-play, exact resume and held-out evaluation. Its explicit short-horizon tasks preserve this approved setup; the full constructor retains eleven rounds. Bounded smoke runs do not establish playing strength.
 

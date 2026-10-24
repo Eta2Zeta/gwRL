@@ -367,9 +367,9 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
   s.nations.at("ccp").atWarWith.insert("kmt");
   s.nations.at("kmt").atWarWith.insert("ccp");
   Engine e(s, rules());
-  // Bombing damage, two attacking shots, two defending return shots,
-  // round two, the last unopposed transport, then the suspended facility AA.
-  e.setDiceTapeForTesting({1, 1, 12, 1, 12, 1, 12, 1, 12});
+  // Bombing damage, two shots from the outside destroyers, the evacuating
+  // cruisers' return fire, round two, the last unopposed transport, then AA.
+  e.setDiceTapeForTesting({1, 1, 12, 1, 12, 12, 1, 1, 12});
   const auto checkpoint = e.serialize();
   choose(e, "air_bomb", [](const Action &a) {
     return a.parameters.require("target").asString() == "port";
@@ -390,12 +390,12 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
   choose(e, "naval_evacuate_port", [](const Action &a) {
     return a.parameters.require("unit").asString() == "transport";
   });
-  check(e.state().chance && e.state().chance->nation == "kmt" &&
+  check(e.state().chance && e.state().chance->nation == "ccp" &&
             e.state().chance->dice.size() == 2,
-        "Evacuating fleet did not make the first attacking volley together");
+        "Outside fleet did not make the first attacking volley together");
   const auto battle = e.state().chance->continuation;
   const auto &b = e.state().battles.at(battle);
-  check(b.attacker == "kmt" && b.defender == "ccp" && b.attackers.size() == 3 &&
+  check(b.attacker == "ccp" && b.defender == "kmt" && b.attackers.size() == 3 &&
             b.defenders.size() == 3 &&
             b.data.require("naval_entry_origins").asArray().empty(),
         "Third-party evacuation roles, full enemy fleet, or port origin wrong");
@@ -406,28 +406,28 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
   check(!offered(e, "air_resume_bombing") && e.legalInterrupts().empty(),
         "Unrelated calendar activity escaped the immediate naval battle");
   e.resolveChance();
-  check(e.state().decisionPlayer() == "comintern",
-        "Third-party fleet casualty belonged to the active Japan policy");
+  check(e.state().decisionPlayer() == "allies",
+        "Evacuating defender casualty belonged to the active Japan policy");
   choose(e, "naval_take_casualty", [](const Action &a) {
-    return a.parameters.require("unit").asString() == "destroyer_a";
+    return a.parameters.require("unit").asString() == "cruiser_a";
   });
   check(e.state().chance && e.state().chance->dice.size() == 2,
         "Selected defending casualty lost its return shot");
   e.resolveChance();
-  check(e.state().decisionPlayer() == "allies",
-        "Evacuating attacker casualty belonged to the active Japan policy");
+  check(e.state().decisionPlayer() == "comintern",
+        "Third-party attacker casualty belonged to the active Japan policy");
   choose(e, "naval_take_casualty", [](const Action &a) {
-    return a.parameters.require("unit").asString() == "cruiser_a";
+    return a.parameters.require("unit").asString() == "destroyer_a";
   });
   check(e.state().chance &&
             e.state().battles.at(battle).data.require("round").asInt() == 2 &&
             !offered(e, "naval_retreat_begin"),
         "Port evacuation invented an adjacent retreat sea or a one-round cap");
   e.resolveChance();
+  e.resolveChance();
   choose(e, "naval_take_casualty", [](const Action &a) {
     return a.parameters.require("unit").asString() == "destroyer_b";
   });
-  e.resolveChance();
   e.resolveChance();
   choose(e, "naval_take_casualty");
   check(
@@ -451,7 +451,7 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
                 .exactReplayIdentity() == e.exactReplayIdentity(),
         "Third-party evacuation/bombing exact replay differs");
 }
-void activeEnemyDefendsEvacuationAndSelectionMayStop() {
+void activeEnemyAttacksEvacuationAndSelectionMayStop() {
   auto s = fixture(Phase::Combat);
   for (const auto &id : {Id("cruiser"), Id("waiting")}) {
     add(s, id, "heavy_cruiser", "kmt", shantung);
@@ -465,17 +465,18 @@ void activeEnemyDefendsEvacuationAndSelectionMayStop() {
       "port", "major_port", shantung, 1, {{"border:" + p14, 1}}};
   queueDamagedPortEvacuation(s, "port");
   Engine e(s, rules());
-  e.setDiceTapeForTesting({1, 12});
+  e.setDiceTapeForTesting({12, 1});
   const auto checkpoint = e.serialize();
   choose(e, "naval_evacuate_port", [](const Action &a) {
     return a.parameters.require("unit").asString() == "cruiser";
   });
   choose(e, "naval_finish_evacuation");
-  check(e.state().chance && e.state().chance->nation == "kmt",
-        "Active enemy incorrectly became attacking fleet");
+  check(e.state().chance && e.state().chance->nation == "japan",
+        "Active enemy did not become the attacking fleet");
   const auto &battle = e.state().battles.at(e.state().chance->continuation);
-  check(battle.attacker == "kmt" && battle.defender == "japan" &&
-            battle.defenders == std::vector<Id>{"active_enemy"},
+  check(battle.attacker == "japan" && battle.defender == "kmt" &&
+            battle.attackers == std::vector<Id>{"active_enemy"} &&
+            battle.defenders == std::vector<Id>{"cruiser"},
         "Calendar nation or neutral ships corrupted evacuation participants");
   finishBattles(e);
   check(
@@ -485,6 +486,222 @@ void activeEnemyDefendsEvacuationAndSelectionMayStop() {
   check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
                 .exactReplayIdentity() == e.exactReplayIdentity(),
         "Partial fleet selection replay differs");
+}
+void evacuationUsesAttackAndDefenseValues() {
+  auto s = fixture(Phase::Combat);
+  add(s, "carrier", "fleet_carrier", "kmt", shantung);
+  s.units.at("carrier").gameFlags["in_port:port"] = 1;
+  add(s, "outside", "coastal_defense_ship", "japan", p14);
+  s.facilities["port"] = {
+      "port", "major_port", shantung, 1, {{"border:" + p14, 1}}};
+  queueDamagedPortEvacuation(s, "port");
+  Engine e(s, rules());
+  // A coastal defense ship attacks at 4 rather than defending at 6. The
+  // evacuating carrier has no attack but defends at 2.
+  e.setDiceTapeForTesting({5, 2});
+  const auto checkpoint = e.serialize();
+  choose(e, "naval_evacuate_port");
+  const auto battle = e.state().chance->continuation;
+  const auto &attacking = e.state().battles.at(battle).data.require("naval_shots");
+  check(attacking.asArray().size() == 1 &&
+            attacking.asArray().front().require("unit").asString() == "outside" &&
+            attacking.asArray().front().require("threshold").asInt() == 4,
+        "Outside fleet used its defense value or the carrier attacked");
+  e.resolveChance();
+  const auto &defending = e.state().battles.at(battle).data.require("naval_shots");
+  check(e.state().chance && defending.asArray().size() == 1 &&
+            defending.asArray().front().require("unit").asString() == "carrier" &&
+            defending.asArray().front().require("threshold").asInt() == 2,
+        "Evacuating carrier failed to use its defense value");
+  e.resolveChance();
+  check(e.state().decisionPlayer() == "axis",
+        "Outside attacking fleet casualty was assigned to the evacuee");
+  choose(e, "naval_take_casualty");
+  finishBattles(e);
+  check(e.state().units.contains("carrier") &&
+            e.state().units.at("carrier").damage == 0 &&
+            !e.state().units.contains("outside"),
+        "Asymmetric attack/defense rolls produced the wrong evacuation result");
+  check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
+                .exactReplayIdentity() == e.exactReplayIdentity(),
+        "Asymmetric evacuation combat replay differs");
+}
+void evacuatingSubmarineMakesDefendingChoicesAndSubmerges() {
+  auto s = fixture(Phase::Combat);
+  add(s, "sub", "submarine", "kmt", shantung);
+  s.units.at("sub").gameFlags["in_port:base"] = 1;
+  add(s, "outside", "destroyer", "japan", p14);
+  s.facilities["base"] = {
+      "base", "submarine_base", shantung, 1, {{"border:" + p14, 1}}};
+  queueDamagedPortEvacuation(s, "base");
+  Engine e(s, rules());
+  e.setDiceTapeForTesting({12});
+  const auto checkpoint = e.serialize();
+  choose(e, "naval_evacuate_port");
+  check(!e.state().chance &&
+            e.state().decisions.back().kind == "naval_submarine_participation" &&
+            e.state().decisionPlayer() == "allies" &&
+            offered(e, "naval_sub_decline"),
+        "Evacuating submarine lost its defending participation choice");
+  choose(e, "naval_sub_protected");
+  e.resolveChance();
+  finishBattles(e);
+  check(e.state().units.contains("sub") &&
+            e.state().units.at("sub").turnFlags.at("submerged") == 1 &&
+            e.state().units.at("sub").zone == p14,
+        "Evacuating defending submarine failed to submerge after one round");
+  check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
+                .exactReplayIdentity() == e.exactReplayIdentity(),
+        "Evacuating submarine replay differs");
+}
+void evacuationScramblesOnlySupportTheDefendingFleet() {
+  auto s = fixture(Phase::Combat);
+  add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
+  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  add(s, "defending_fighter", "fighter", "kmt", shantung);
+  add(s, "outside", "destroyer", "japan", p14);
+  add(s, "attacking_fighter", "fighter", "japan", beiping);
+  s.facilities["port"] = {
+      "port", "major_port", shantung, 1, {{"border:" + p14, 1}}};
+  s.facilities["defending_airbase"] = {
+      "defending_airbase", "airbase", shantung, 0, {}};
+  s.facilities["attacking_airbase"] = {
+      "attacking_airbase", "airbase", beiping, 0, {}};
+  queueDamagedPortEvacuation(s, "port");
+  Engine e(s, rules());
+  e.setDiceTapeForTesting({1});
+  const auto checkpoint = e.serialize();
+  choose(e, "naval_evacuate_port");
+  check(!e.state().chance && e.state().decisionPlayer() == "allies",
+        "Evacuation scramble was assigned to the outside attacking fleet");
+  for (const auto &a : e.legalActions())
+    check(a.parameters.require("unit").asString() == "defending_fighter",
+          "The outside attacking fleet received a defensive air scramble");
+  choose(e, "air_scramble");
+  choose(e, "naval_progress_battle");
+  const auto &battle = e.state().battles.at(e.state().chance->continuation);
+  check(battle.defenders == std::vector<Id>({"cruiser", "defending_fighter"}) &&
+            e.state().units.at("attacking_fighter").zone == beiping,
+        "Airbase scramble joined the wrong side of evacuation combat");
+  finishBattles(e);
+  check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
+                .exactReplayIdentity() == e.exactReplayIdentity(),
+        "Evacuation defensive air scramble replay differs");
+}
+void multinationalOutsideFleetUsesActualCasualtyPolicies() {
+  auto s = fixture(Phase::Combat);
+  add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
+  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  add(s, "axis_ship", "destroyer", "japan", p14);
+  add(s, "comintern_ship", "destroyer", "ccp", p14);
+  s.nations.at("ccp").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("ccp");
+  s.facilities["port"] = {
+      "port", "major_port", shantung, 1, {{"border:" + p14, 1}}};
+  queueDamagedPortEvacuation(s, "port");
+  Engine e(s, rules());
+  e.setDiceTapeForTesting({12, 12, 4, 1, 1});
+  const auto checkpoint = e.serialize();
+  choose(e, "naval_evacuate_port");
+  const auto &battle = e.state().battles.at(e.state().chance->continuation);
+  check(battle.attackers == std::vector<Id>({"axis_ship", "comintern_ship"}) &&
+            battle.defenders == std::vector<Id>{"cruiser"},
+        "Role reversal omitted an enemy already required to fight outside");
+  e.resolveChance();
+  e.resolveChance();
+  choose(e, "naval_take_casualty", [](const Action &a) {
+    return a.parameters.require("unit").asString() == "axis_ship";
+  });
+  check(e.state().decisionPlayer() == "comintern" &&
+            offered(e, "naval_casualty_accept"),
+        "Second attacking policy did not consent to the joint fleet casualty");
+  choose(e, "naval_casualty_accept");
+  e.resolveChance();
+  choose(e, "naval_take_casualty");
+  e.resolveChance();
+  check(e.state().decisionPlayer() == "comintern",
+        "Last surviving attacking policy's casualty went to an eliminated fleet");
+  choose(e, "naval_take_casualty");
+  finishBattles(e);
+  check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
+                .exactReplayIdentity() == e.exactReplayIdentity(),
+        "Multinational evacuation combat replay differs");
+}
+void currentTurnOutsideFleetMayRetreatToItsRealEntrySea() {
+  auto s = fixture();
+  const Id origin = "sea_p15";
+  add(s, "bomber", "medium_bomber", "japan", beiping);
+  add(s, "outside", "destroyer", "japan", origin);
+  add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
+  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  s.facilities["port"] = {
+      "port", "major_port", shantung, 0, {{"border:" + p14, 1}}};
+  Engine e(s, rules());
+  e.setDiceTapeForTesting({1, 12, 12, 12});
+  const auto checkpoint = e.serialize();
+  choose(e, "air_bomb", [](const Action &a) {
+    return a.parameters.require("target").asString() == "port";
+  });
+  choose(e, "naval_start_move", [](const Action &a) {
+    return a.parameters.require("unit").asString() == "outside";
+  });
+  choose(e, "naval_route", [&](const Action &a) {
+    return canonicalJson(a.parameters.require("request").require("path")) ==
+           canonicalJson(V(V::Array{V(origin), V(p14)}));
+  });
+  choose(e, "end_phase");
+  choose(e, "air_begin_bombing");
+  e.resolveChance();
+  const auto clock = canonicalJson(e.state().toJson(false).require("clock"));
+  choose(e, "naval_evacuate_port");
+  e.resolveChance();
+  e.resolveChance();
+  check(offered(e, "naval_retreat_begin") &&
+            e.state().decisionPlayer() == "axis",
+        "Outside fleet lost the retreat earned by its actual combat movement");
+  choose(e, "naval_retreat_begin");
+  for (const auto &a : e.legalActions())
+    check(a.parameters.require("zone").asString() == origin,
+          "Forced evacuation combat invented an unused retreat sea");
+  choose(e, "naval_retreat_unit");
+  choose(e, "naval_finish_battle");
+  check(e.state().units.at("outside").zone == origin &&
+            e.state().units.at("outside").movementRemaining == 0 &&
+            e.state().units.at("cruiser").zone == p14 &&
+            canonicalJson(e.state().toJson(false).require("clock")) == clock &&
+            offered(e, "air_resume_bombing"),
+        "Outside fleet retreat lost its origin, advanced the turn, or lost bombing");
+  choose(e, "air_resume_bombing");
+  finishBattles(e);
+  check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
+                .exactReplayIdentity() == e.exactReplayIdentity(),
+        "Current-turn outside fleet retreat replay differs");
+}
+void mandatoryEvacuationDoesNotMergeOrdinaryNavalDeclarations() {
+  for (const bool evacuationFirst : {false, true}) {
+    auto s = fixture(Phase::Combat);
+    add(s, "outside", "destroyer", "japan", p14);
+    add(s, "evacuated", "heavy_cruiser", "kmt", p14);
+    add(s, "ordinary_defender", "destroyer", "kmt", p14);
+    const V ordinary(V::Object{
+        {"context", V(Id("standard"))},
+        {"defenders", V(V::Array{V(Id("ordinary_defender"))})}});
+    const V evacuation(V::Object{
+        {"context", V(Id("standard"))},
+        {"port_evacuation", V(Id("port"))},
+        {"defenders", V(V::Array{V(Id("evacuated"))})}});
+    const auto first = registerNavalBattle(
+        s, p14, "japan", {"outside"}, {},
+        evacuationFirst ? evacuation : ordinary);
+    const auto second = registerNavalBattle(
+        s, p14, "japan", {"outside"}, {},
+        evacuationFirst ? ordinary : evacuation);
+    check(first != second && s.battles.size() == 2 &&
+              s.battles.at(first).defenders.size() == 1 &&
+              s.battles.at(second).defenders.size() == 1 &&
+              s.battles.at(first).defenders != s.battles.at(second).defenders,
+          "Mandatory evacuation merged with an ordinary pending declaration");
+  }
 }
 void separateEvacuationSeasResolveBeforeCalendarResumes() {
   auto s = fixture(Phase::NonCombatMovement);
@@ -505,7 +722,7 @@ void separateEvacuationSeasResolveBeforeCalendarResumes() {
                           {{"border:" + p15, 1}, {"border:" + p16, 1}}};
   queueDamagedPortEvacuation(s, "port");
   Engine e(s, rules());
-  e.setDiceTapeForTesting({1, 12, 1, 12});
+  e.setDiceTapeForTesting({12, 1, 12, 1});
   const auto checkpoint = e.serialize();
   const auto clock = canonicalJson(e.state().toJson(false).require("clock"));
   choose(e, "naval_evacuate_port", [&](const Action &a) {
@@ -519,11 +736,11 @@ void separateEvacuationSeasResolveBeforeCalendarResumes() {
   check(e.state().battles.size() == 2 && e.state().chance,
         "Separate sea evacuations were not retained as immediate combats");
   e.resolveChance();
-  choose(e, "naval_take_casualty");
   e.resolveChance();
+  choose(e, "naval_take_casualty");
   choose(e, "naval_finish_battle");
   check(e.state().battles.size() == 1 && e.state().chance &&
-            e.state().chance->nation == "kmt" && e.legalInterrupts().empty(),
+            e.state().chance->nation == "ccp" && e.legalInterrupts().empty(),
         "First cleanup failed to start the next required evacuation combat");
   finishBattles(e);
   check(canonicalJson(e.state().toJson(false).require("clock")) == clock &&
@@ -955,8 +1172,20 @@ int main() {
               damagedPortEvacuationSuspendsAndResumesBombing},
              {"third-party evacuation fleet",
               thirdPartyEvacuationUsesFleetRolesAndPreservesBombing},
-             {"active enemy defends evacuation",
-              activeEnemyDefendsEvacuationAndSelectionMayStop},
+             {"active enemy attacks evacuation",
+              activeEnemyAttacksEvacuationAndSelectionMayStop},
+             {"evacuation attack and defense values",
+              evacuationUsesAttackAndDefenseValues},
+             {"evacuating submarine defense",
+              evacuatingSubmarineMakesDefendingChoicesAndSubmerges},
+             {"evacuation defensive air scramble",
+              evacuationScramblesOnlySupportTheDefendingFleet},
+             {"multinational evacuation casualties",
+              multinationalOutsideFleetUsesActualCasualtyPolicies},
+             {"current-turn outside fleet retreat",
+              currentTurnOutsideFleetMayRetreatToItsRealEntrySea},
+             {"isolated evacuation declaration",
+              mandatoryEvacuationDoesNotMergeOrdinaryNavalDeclarations},
              {"separate evacuation seas",
               separateEvacuationSeasResolveBeforeCalendarResumes},
              {"shared shore casualty consent",

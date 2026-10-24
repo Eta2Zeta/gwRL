@@ -271,6 +271,12 @@ bool isTargeted(const State& s, const V& hit, const std::vector<Id>& eligible) {
             if (has(s, s.units.at(id), c.asString())) return true;
     return false;
 }
+Id casualtyOwner(const State& s, const BattleState& b, const V& hit, const std::vector<Id>& candidates) {
+    const auto primary = hit.require("victim_attacker").asBool() ? b.attacker : b.defender;
+    for (const auto& id : candidates)
+        if (politicalPlayer(s, s.units.at(id).owner) == politicalPlayer(s, primary)) return primary;
+    return s.units.at(candidates.front()).owner;
+}
 void chooseHit(State& s, BattleState& b) {
     const auto hits = array(b, "naval_hits");
     int index = integer(b, "naval_hit_index");
@@ -279,17 +285,17 @@ void chooseHit(State& s, BattleState& b) {
         auto candidates = eligibleHit(s, b, hit);
         if (candidates.empty()) { put(b, "naval_hit_index", num(++index)); continue; }
         const bool targeted = isTargeted(s, hit, candidates);
-        Id chooser = targeted ? hit.require("nation").asString() :
-                     hit.require("victim_attacker").asBool() ? b.attacker : b.defender;
+        const auto victim = casualtyOwner(s, b, hit, candidates);
+        Id chooser = targeted ? hit.require("nation").asString() : victim;
         const auto proposal = string(b, "naval_casualty_proposal");
-        if (!targeted && !hit.require("victim_attacker").asBool() && !proposal.empty()) {
+        if (!targeted && !proposal.empty()) {
             const auto consents = object(b, "naval_casualty_consents");
             std::set<Id> players;
             for (const auto& id : candidates) players.insert(politicalPlayer(s, s.units.at(id).owner));
             for (const auto& id : candidates) {
                 const auto owner = s.units.at(id).owner;
                 const auto player = politicalPlayer(s, owner);
-                if (player != politicalPlayer(s, b.defender) && !consents.contains(player)) {
+                if (player != politicalPlayer(s, victim) && !consents.contains(player)) {
                     decision(s, b, owner, "naval_casualty_consent", {
                         action(s, owner, "naval_casualty_accept", {{"battle", V(b.id)}}),
                         action(s, owner, "naval_casualty_dispute", {{"battle", V(b.id)}})}); return;
@@ -537,11 +543,13 @@ Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
     const bool attackingRaider = std::any_of(attackers.begin(), attackers.end(), [&](const Id& id) {
         return s.units.contains(id) && s.units.at(id).type == "battlecruiser" && marked(s.units.at(id).gameFlags, "raider");
     });
-    require(!attackingRaider || attackers.size() == 1, "A designated raider cannot combine with other attackers");
+    const bool evacuation = options.find("port_evacuation");
+    require(evacuation || !attackingRaider || attackers.size() == 1, "A designated raider cannot combine with other attackers");
     const Id context = options.find("context") ? options.require("context").asString() : "standard";
     for (auto& [bid, existing] : s.battles)
         if (marked(existing.flags, "naval_battle") && existing.stage == "naval_declared" &&
             existing.zone == zone && existing.attacker == attacker && string(existing, "context") == context &&
+            !evacuation && !existing.data.find("port_evacuation") &&
             (context != "port_attack" || string(existing, "facility") == (options.find("facility") ? options.require("facility").asString() : ""))) {
             require(!attackingRaider && std::none_of(existing.attackers.begin(), existing.attackers.end(), [&](const Id& id) {
                 return s.units.contains(id) && s.units.at(id).type == "battlecruiser" && marked(s.units.at(id).gameFlags, "raider");
@@ -563,8 +571,8 @@ Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
     if (!b.data.find("context")) put(b, "context", V(std::string("standard")));
     O originData; A entries;
     for (const auto& id : attackers) {
-        require(s.units.contains(id) && s.units.at(id).owner == attacker && s.units.at(id).zone == zone,
-                "Naval attackers must be one nation's units in the battle zone");
+        require(s.units.contains(id) && (evacuation || s.units.at(id).owner == attacker) && s.units.at(id).zone == zone,
+                "Naval attackers must be one nation's units in the battle zone outside mandatory port evacuations");
         require(has(s, s.units.at(id), "naval") || plane(s, s.units.at(id)), "Invalid naval attacker type");
         if (origins.contains(id)) {
             originData[id] = V(origins.at(id));
@@ -582,6 +590,11 @@ Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
                 "Invalid naval defender");
         if (b.defender.empty()) b.defender = s.units.at(id).owner;
     }
+    if (evacuation)
+        for (const auto& id : b.attackers)
+            require(std::all_of(b.defenders.begin(), b.defenders.end(), [&](const Id& defender) {
+                return hostile(s, s.units.at(id).owner, s.units.at(defender).owner);
+            }), "Port evacuation attacker is not hostile to the evacuating fleet");
     if (b.defender.empty()) b.defender = attacker;
     put(b, "origins", V(originData)); put(b, "naval_entry_origins", V(entries)); put(b, "round", num(1));
     const auto id = b.id; s.battleOrder.push_back(id); s.battles.emplace(id, std::move(b));
@@ -641,11 +654,12 @@ bool applyNavalCombatAction(State& s, const Action& a) {
     if (a.kind == "naval_take_casualty") {
         release(s, a); const auto selected = a.parameters.require("unit").asString();
         const auto hits = array(b, "naval_hits"); const auto& hit = hits.at(static_cast<std::size_t>(integer(b, "naval_hit_index")));
-        if (!a.parameters.require("targeted").asBool() && !hit.require("victim_attacker").asBool() &&
+        if (!a.parameters.require("targeted").asBool() &&
             !marked(b.flags, "naval_casualty_dispute_decided")) {
             const auto candidates = eligibleHit(s, b, hit);
+            const auto victim = casualtyOwner(s, b, hit, candidates);
             const bool joint = std::any_of(candidates.begin(), candidates.end(), [&](const Id& unit) {
-                return politicalPlayer(s, s.units.at(unit).owner) != politicalPlayer(s, b.defender);
+                return politicalPlayer(s, s.units.at(unit).owner) != politicalPlayer(s, victim);
             });
             if (joint) { put(b, "naval_casualty_proposal", V(selected)); put(b, "naval_casualty_consents", V(O{})); chooseHit(s, b); return true; }
         }

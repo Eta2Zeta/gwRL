@@ -1,9 +1,10 @@
 # M9: naval, carrier and amphibious operations
 
-**Status: implemented and source exit verified, 23 October 2026.** The user provisionally
-adopted RCL-014: an evacuating fleet attacks and the fleet already at sea defends.
-That case now resolves during the existing calendar turn and resumes the
-suspended operation afterward. Developer clarification remains pending.
+**Status: implemented and source exit verified, 23 October 2026.** RCL-014 now
+follows the developer clarification supplied by the user: an evacuating fleet
+defends and the enemy fleet already at sea attacks, even during a third nation's
+turn. The battle resolves during the existing calendar turn and resumes the
+suspended operation afterward. This supersedes the earlier provisional roles.
 
 Naval movement supports explicit fleet selection, real sea routes, supplied and
 damaged movement, carrier-aircraft independence, transport loading/unloading,
@@ -39,9 +40,10 @@ shot at across a dotted line. Convoy raiding, interdiction and Kido Butai remain
 inactive under the frozen campaign profile.
 
 Current targeted coverage: **21 naval-movement groups, 17 naval-combat groups,
-and 21 naval-operations groups**, with shared land-combat and air-integration
+and 27 naval-operations groups**, with shared land-combat and air-integration
 checks. The [source exit record](source_exit_2026_10_23.json) records the source
-findings, test commands and evidence hashes. The
+findings, test commands and evidence hashes before the RCL-014 role correction;
+its provisional-role statements are historical. The
 [checkpoint record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m9/checkpoint_2026_10_22.json)
 preserves the earlier 22 October partial checkpoint.
 

@@ -28,8 +28,10 @@ carpet bombing use focused runtime fixtures. They are not attributed to the two
 complete games. The Truce fixtures include a legal Japanese conquest and Chinese
 land gift that triggers evolution; the carpet fixture requires immediate return
 after round one, checkpoints during that choice, preserves ordinary aircraft for
-round two and replays exactly. RCL-014 and RCL-015 use the user's provisional
-adoptions, with no publisher confirmation claimed.
+round two and replays exactly. The recorded integration evidence predates the
+RCL-014 role correction: evacuating ships now defend and the fleet already at
+sea attacks, following the developer clarification. RCL-015 retains the user's
+provisional adoption, with no publisher confirmation claimed.
 
 The integration audit fixed actual source-backed failures: temporary independent
 warlord defense and reciprocal war cleanup; nearest-Friendly neutral relocation;

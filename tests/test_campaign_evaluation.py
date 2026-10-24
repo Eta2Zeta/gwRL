@@ -347,11 +347,36 @@ class CampaignEvaluationTests(unittest.TestCase):
 
         root = Path(__file__).resolve().parents[1]
         trace = json.loads((root / "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/mixed_seed_1936/trace.json").read_text())
+        scenario = str(root / "game_content/scenarios/japan_china_1936")
+        # Historical evidence retains its original definition fingerprint; its
+        # old checkpoint must never be relabeled as a current-rule checkpoint.
+        completed = gwrl_cpp.CampaignEnv(scenario, int(trace["seed"]))
+        initial = completed.serialize()
+        with self.assertRaisesRegex(RuntimeError, "definition fingerprint mismatch"):
+            completed.restore(trace["final_checkpoint"])
+        self.assertEqual(completed.serialize(), initial)
+        # This reporting fixture needs a true terminal game, not a particular
+        # combat history. Legally decline research and pass every phase of a
+        # fresh full campaign so current rules generate the endpoint and its
+        # compatible checkpoint.
+        for _ in range(256):
+            if completed.is_terminal():
+                break
+            menu = completed.legal_actions()
+            actions = [action for action in menu
+                       if action.kind in {"end_phase", "economy_finish_research"}]
+            self.assertEqual(len(actions), 1,
+                             (completed.decision_kind(), [action.kind for action in menu]))
+            completed.apply_action(actions[0])
+        checkpoint = completed.serialize()
+        self.assertTrue(completed.is_terminal())
+        self.assertEqual(json.loads(checkpoint)["state"]["completed_turns"],
+                         {nation: 11 for nation in ("ccp", "mongolia", "japan", "kmt")})
         actual = []
 
         def factory(seed):
-            raw = gwrl_cpp.CampaignEnv(str(root / "game_content/scenarios/japan_china_1936"), seed)
-            raw.restore(trace["final_checkpoint"])
+            raw = gwrl_cpp.CampaignEnv(scenario, seed)
+            raw.restore(checkpoint)
             env = CampaignAdapter(raw)
             actual.append(env)
             return env

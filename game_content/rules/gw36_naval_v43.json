@@ -333,10 +333,11 @@
   "adopted_clarifications": [
     {
       "id": "RCL-014",
-      "status": "provisionally_adopted_by_user",
+      "status": "closed_developer_clarification",
       "date": "2026-10-23",
-      "ruling": "The fleet evacuating the damaged port attacks; the enemy fleet already at sea defends, including combat during a third party calendar turn.",
-      "authority": "User instruction; pending developer clarification, not publisher errata."
+      "ruling": "The fleet evacuating the damaged port defends; the enemy fleet already at sea attacks, including combat during a third nation calendar turn.",
+      "authority": "The Warden developer clarification in a user-provided Discord screenshot, 2026-10-23; supersedes the provisional user ruling.",
+      "authority_detail": "The developer example is Commonwealth evacuation into Italian ships during German bombing. Applying these roles to KMT evacuation into CCP ships during Japan's turn extends the same principle to three alliances; that exact example was not in the message."
     }
   ]
 }

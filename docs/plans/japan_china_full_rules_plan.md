@@ -1,6 +1,6 @@
 # Japan-China full-rules theatre: implementation and RL plan
 
-Status: **M0 frozen; M1–M12 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 and RCL-015 are provisionally adopted by the user; developer clarification remains pending. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and interruptible operations pass their bounded operational gate; the first eight-game Stage A pilot is complete, with robust playing strength still unestablished.**
+Status: **M0 frozen; M1–M12 implementation gates complete, 23 October 2026. M9 naval source review, two full 44-turn M10 campaign replays and the M11 multi-agent API/vector-search checks pass. RCL-014 is closed following developer clarification; RCL-015 remains provisionally adopted pending developer clarification. RCL-010 remains an adopted campaign interpretation. M12 neural training, evaluation and interruptible operations pass their bounded operational gate; the first eight-game Stage A pilot is complete, with robust playing strength still unestablished.**
 
 Prepared 11 September; synchronized 23 October 2026 against the current repository,
 the local Global War 1936 v4.3 rulebook/national sheets, and the user's decisions.
@@ -30,8 +30,9 @@ verification and the [frozen baseline](/Users/home/Desktop/gwRL/game_content/sce
 Reusable official-rule decisions and source checks
 live in the
 [shared rule clarification register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md),
-with stable RCL IDs. RCL-013 is adopted; RCL-014 and RCL-015 are provisionally
-adopted project interpretations pending developer clarification. This plan defines
+with stable RCL IDs. RCL-013 is adopted; RCL-014 is closed after developer
+clarification, and RCL-015 remains a provisional project interpretation pending
+developer clarification. This plan defines
 the regional implementation and its scoped verification gates. The M0 historical
 review predates the implemented gameplay layers.
 
@@ -533,7 +534,7 @@ and failed-landing scenarios with full decision/replay traces.
 
 ### M9. Implement naval, carrier and amphibious operations
 
-Status: complete, 23 October 2026; source exit verified with four combined naval/landing traces. RCL-014 is provisionally adopted. See docs/m9/README.md.
+Status: complete, 23 October 2026; source exit verified with four combined naval/landing traces. RCL-014 now follows the developer clarification: evacuating ships defend and the fleet already at sea attacks. Earlier source-exit evidence retains the superseded provisional roles. See docs/m9/README.md.
 
 Depends on: M3, M5-M8.
 
@@ -1020,8 +1021,9 @@ RCL-004–008 and RCL-011 are closed after source/developer checks. RCL-010
 remains a campaign interpretation pending developer clarification. RCL-012 is closed: combat roles follow the reported developer ruling, and the
 user clarified that attacking KMT has the same elimination consequence after
 automatic termination.
-RCL-013 is adopted and implemented. RCL-014 and RCL-015 were provisionally adopted
-by the user on 23 October 2026, pending developer clarification.
+RCL-013 is adopted and implemented. RCL-014 now follows the developer clarification
+supplied on 23 October 2026: evacuating ships defend and the fleet already at sea
+attacks. RCL-015 remains provisionally adopted pending developer clarification.
 Tannu Tuva is excluded and is not a blocker.
 The M2-M4 deliveries do not implement a reward evaluator, full gameplay handlers,
 training agent or large training run.

@@ -54,7 +54,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-010 | Dadao lend-lease: recipient has no original Home Country | Adopted: Dadao-possessed Chinese Home Country destinations; pending developer clarification |
 | RCL-012 | Chinese Truce combat and retreat | Closed: developer-confirmed roles; same KMT elimination after voluntary or automatic termination |
 | RCL-013 | Does artillery city bombing use attrition's range and movement restrictions? | Adopted: use the same starting-adjacency and no-movement conditions |
-| RCL-014 | Combat roles when ships evacuate into a third party's fleet | Provisionally adopted: evacuating fleet attacks; fleet already at sea defends |
+| RCL-014 | Combat roles when ships evacuate into a third party's fleet | Closed: evacuating fleet defends; fleet already at sea attacks; developer clarification |
 | RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
 
 ## Pilot discussion review
@@ -242,17 +242,19 @@ attrition hit-at-2 roll against units.
 
 ## RCL-014: Third-party combat after damaged-port evacuation
 
-**Status: provisionally adopted by the user, 23 October 2026; pending developer clarification.**
+**Status: closed — developer clarification supplied by the user, 23 October 2026.**
 
-**Sources:** RB §0.2 p5; §11.5 p78.
+**Sources:** RB §0.2 p5; §11.5 p78; user-provided screenshot of The Warden's
+Discord explanation, 23 October 2026 (direct message link not supplied).
 
-**Question:** Japan bombs a KMT port during Japan's turn. KMT evacuates ships
-into a sea zone containing enemy CCP warships, with no Japanese ships present.
-The port rule requires combat, but the normal active-player definition assigns
-neither Chinese faction as attacker. Who attacks and who defends?
+**Clarified rule:** when damaged-port evacuation forces combat, the evacuating
+fleet defends and the enemy fleet already at sea attacks, including during a
+third nation's turn. This replaces the earlier provisional ruling.
 
-**Adopted ruling:** the evacuating fleet attacks; the fleet already at sea defends.
-This is a provisional project interpretation, not a developer-confirmed rule.
+The developer's example is German bombing that forces Commonwealth ships to
+fight Italian ships outside the port. Applying the same roles to KMT evacuation
+into CCP ships during Japan's turn extends that principle to three alliances;
+that exact example was not in the developer's message.
 
 ## RCL-015: Neutral relocation with no Friendly destination
 

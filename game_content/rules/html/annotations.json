@@ -177,18 +177,19 @@
     },
     {
       "id": "RCL-014",
-      "category": "project",
+      "category": "clarification",
       "title": "Port evacuation into a third party’s enemy fleet",
-      "body": "Provisional project ruling: when a damaged-port evacuation forces combat with an enemy fleet, the evacuating fleet attacks and the fleet already at sea defends. This applies even when another nation owns the current calendar turn.",
+      "body": "When damaged-port evacuation forces combat with an enemy fleet, the evacuating fleet defends and the fleet already at sea attacks, even during a third nation's turn. This developer clarification replaces the earlier provisional project ruling.",
       "section_ids": [
         "rb-11-5"
       ],
       "date": "2026-10-23",
-      "authority": "User-adopted provisional interpretation",
+      "authority": "Developer clarification supplied by user",
       "scope": "prior_register_outside_pilot",
       "reference_url": "../clarifications.md#rcl-014-third-party-combat-after-damaged-port-evacuation",
       "reference_label": "Rule register",
-      "authority_detail": "The user adopted the proposed ruling for now on 23 October 2026. The source does not assign these third-party combat roles; developer clarification is still pending."
+      "authority_detail": "Source: user-provided Discord screenshot, 23 October 2026; direct message link not supplied. The example has Commonwealth ships defending against Italian ships during German bombing. The campaign applies the same roles to three-alliance cases; that exact example was not in the message.",
+      "author": "The Warden"
     },
     {
       "id": "RCL-015",

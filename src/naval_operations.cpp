@@ -471,7 +471,7 @@ void commitEvacuation(State &s, const Id &facility, int moved,
       s.units.at(cargo).zone = water;
     fleets[{water, u.owner}].push_back(id);
   }
-  for (const auto &[destination, attackers] : fleets) {
+  for (const auto &[destination, defenders] : fleets) {
     const auto &[water, owner] = destination;
     const bool fight =
         std::any_of(s.units.begin(), s.units.end(), [&](const auto &entry) {
@@ -482,11 +482,31 @@ void commitEvacuation(State &s, const Id &facility, int moved,
         });
     if (!fight)
       continue;
-    // RCL-014: the ships leaving port attack the enemy force already at sea.
-    // The port is not an adjacent entry sea, so it creates no retreat origin.
+    std::vector<Id> attackers;
+    std::map<Id, Id> origins;
+    for (const auto &[id, u] : s.units)
+      if (u.zone == water && hostile(s, owner, u.owner) &&
+          (ship(s, u) || isAircraft(s, u))) {
+        attackers.push_back(id);
+        if (ship(s, u) && movementController(s, u.owner) &&
+            u.commitments.contains("combat_move") && !u.route.empty() &&
+            u.route.back() == water) {
+          const auto origin =
+              u.route.size() > 1 ? u.route[u.route.size() - 2] : u.turnOrigin;
+          if (sea(s, origin) && adjacent(s, origin, water) &&
+              flag(u.turnFlags, "naval_last_origin:" + origin) ==
+                  static_cast<int>(s.clock.playerTurnSerial + 1))
+            origins[id] = origin;
+        }
+      }
+    // RCL-014: ships slipping out defend against the enemy force at sea,
+    // including when neither fleet owns the current calendar turn. Only a
+    // real entry sea from this turn's Combat Movement permits naval retreat;
+    // the damaged port does not create one for either fleet.
     const auto battle = registerNavalBattle(
-        s, water, owner, attackers, {},
+        s, water, s.units.at(attackers.front()).owner, attackers, origins,
         V(O{{"context", V(Id("standard"))},
+            {"defenders", V(ids(defenders))},
             {"port_evacuation", V(facility)},
             {"evacuated", V(static_cast<double>(moved + selected.size()))},
             {"evacuation_selection_complete", V(true)}}));
