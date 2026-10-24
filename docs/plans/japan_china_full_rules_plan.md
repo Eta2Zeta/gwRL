@@ -694,6 +694,19 @@ The following stages describe that search-guided candidate and its opponent
 pool; comparable direct-policy training uses the same authoritative engine,
 objectives and evaluation conditions.
 
+Training efficiency is a standing implementation requirement in
+[AGENTS.md](/Users/home/Desktop/gwRL/AGENTS.md), alongside rule correctness.
+The current prototype has neural policy/value guidance, search visit targets,
+batched inference and self-play, adapted to three alliances and explicit dice;
+this does not establish production-level efficiency. Reference implementations
+demonstrate batching, inference caches and compiled execution:
+[OpenSpiel AlphaZero](https://github.com/google-deepmind/open_spiel/blob/master/docs/alpha_zero.md)
+and [DeepMind Mctx](https://github.com/google-deepmind/mctx). These are engineering
+references; the campaign's tested multiplayer values and dice semantics must
+remain intact. Reuse unchanged decision data, reduce repeated data conversion
+and measure complete-game costs before expanding training within the current
+12-core/30 GB allowance.
+
 AlphaZero did not permanently assign a frozen policy to one color while training
 the other. One network played both sides, guided by MCTS. Search produced policy
 targets; completed games supplied outcome targets; training updated the network
@@ -720,11 +733,17 @@ finds better Axis completion and much smaller value error, with unchanged Allies
 Comintern scores on two dice seeds. This is an early Stage A result, not a
 completed strength/generalization gate. See [the pilot report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
 
-The performance follow-up repeats the same eight games in 118.68 seconds,
+The first performance follow-up repeats the same eight games in 118.68 seconds,
 compared with 346.62 seconds originally, with identical actions, policy targets
-and final game states. All 241 Python tests and 24 C++ suites pass. Larger
-training remains on hold while representative deeper-search and longer-horizon
-throughput is measured; this pilot repeat alone does not establish scalability.
+and final game states. At that revision, all 241 Python tests and 24 C++ suites
+pass. The subsequent scaling follow-up completes 13 bounded cases covering
+deeper search, later positions, larger models and longer horizons. One
+small-budget full campaign completes, while the 16-simulation two-round batch
+reaches its time guard without a completed game. Larger training remains on hold
+for the measured legal-menu/observation and input-construction performance work,
+followed by matched benchmarks and a completed stronger-search collection batch.
+See [the scaling report](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md);
+the pilot repeat alone does not establish scalability.
 
 Before campaign learning, check the shared search against exact tiny deterministic
 and stochastic three-side fixtures. Then start with this synchronized loop:
