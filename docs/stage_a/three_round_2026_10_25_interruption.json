@@ -1,0 +1,64 @@
+{
+  "actual_failure_utc": "2026-10-25T03:15:28Z",
+  "baseline_evaluation": {
+    "interpretation": "Untrained comparison only; no learning-strength result.",
+    "network_only_terminal_games": 8,
+    "newly_held_chinese_territories_every_game": 0,
+    "search_terminal_games": 8
+  },
+  "checkpoint": {
+    "all_original_artifacts_preserved": true,
+    "completed_learning_updates": 0,
+    "completed_training_games": 0,
+    "counters": {
+      "batches": 0,
+      "chance_events": 29,
+      "decisions": 163,
+      "episodes": 0,
+      "transitions": 192,
+      "updates": 0
+    },
+    "initial_sha256": "a58918ec4c3c621ecbc188fecb671d671f1b97cdc11dbf0ec982b6a0d5b2694c",
+    "last_logged_wave": 57,
+    "pending_policy_samples": 163,
+    "previous_sha256": "407df84624be4f970ed769e7ce045161143fceb212f8f51d9aafc74d76d6331a",
+    "sha256": "fa79adac82f4e2a169dfe2dba5fd1b83cb0c680d93365ee5174116e7d5db3019",
+    "total_waves": 48,
+    "unfinished_games": 4
+  },
+  "deadline_utc": "2026-10-25T12:27:28Z",
+  "error": "ValueError: Nonterminal decision has no legal action",
+  "failure": {
+    "cause": "Plain flight offered and accepted without a legal landing continuation; phase completion then correctly refused while aircraft remained airborne.",
+    "destination": "neutral land, unavailable for landing",
+    "flight": [
+      "land_jap_tokyo",
+      "land_jap_honshu",
+      "sea_p15",
+      "sea_p32",
+      "sea_p41",
+      "land_hainan"
+    ],
+    "illegal_flight_also_present_in_saved_pending_menus": true,
+    "movement_remaining": 0,
+    "owner": "axis",
+    "pending_targets_rewritten": false,
+    "phase": "combat_movement",
+    "raw_legal_actions": 0,
+    "reproduced_from_saved_checkpoint": true,
+    "resume_source_checks_bypassed": false,
+    "root_planning_key": "ffcf486d8c0b2d18282eefdd05cae4fb7f1463195bc9905d05bb111b6f508a78",
+    "unit": "setup_japan_land_jap_tokyo_tactical_bomber_1"
+  },
+  "next_step": "Validate a flight correction without removing valid carrier/flight orderings; verify compatibility before resuming. Preserve old inputs rather than silently retagging incompatible samples.",
+  "observed_by_followup_utc": "2026-10-25T03:32:30Z",
+  "recorded_utc": "2026-10-25T03:40:59.887771+00:00",
+  "resources": {
+    "aggregate_sampled_peak_rss_bytes": 1808089088,
+    "training_worker_charged_seconds": 135.80528404199868
+  },
+  "run_root": "studies/campaign/runs/three-round-10h-2026-10-24-r2",
+  "schema": "campaign-three-round-interruption-v1",
+  "stage": "training",
+  "status": "paused_for_engine_correction"
+}

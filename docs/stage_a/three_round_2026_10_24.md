@@ -33,6 +33,25 @@ fresh parameters identical to the original untrained baseline. That baseline
 gained no Chinese land and lost Rehe; it is a comparison point, not evidence of
 learning.
 
+### First self-play interruption
+
+The corrected run completed all sixteen initial evaluation games, then stopped
+in its first self-play batch at 03:15:28 UTC on 25 October. Search reached a
+position with no legal choices: a plain flight had spent the Tokyo tactical
+bomber's five movement points reaching neutral Hainan without a landing plan.
+The engine had offered that flight but correctly refused phase completion once
+the plane was stranded. This needs an engine correction, not a new reward or
+search setting.
+
+The saved checkpoint contains four unfinished games at wave 48 and 163 pending
+policy samples, with zero completed training games or learning updates. The
+last progress record reached wave 57. Some saved policy menus include the
+invalid flight, so they must not be silently retagged as corrected data. All
+original checkpoints and logs remain intact. The
+[interruption record](three_round_2026_10_25_interruption.json) pins the evidence;
+compatibility and valid flight/carrier orderings must be checked before recovery.
+The original absolute deadline remains unchanged.
+
 ## Question and fixed settings
 
 Does three-round self-play improve Japan's ability to acquire and retain
