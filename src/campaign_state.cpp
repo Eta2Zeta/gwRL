@@ -7,6 +7,7 @@
 #include <array>
 #include <charconv>
 #include <cmath>
+#include <deque>
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -66,6 +67,47 @@ V definitionJson(const Definition& d) {
     O factions; for (const auto& [k,f]:d.factions) factions.emplace(k,V(O{{"id",V(f.id)},{"display_name",V(f.displayName)},{"home_country",strings(f.homeCountry)},{"home_country_known",V(f.homeCountryKnown)},{"dormant",V(f.dormant)}}));
     return V(O{{"scenario_id",V(d.scenarioId)},{"geography",d.geography},{"rules",d.rules},{"factions",V(std::move(factions))},{"turn_order",strings(d.turnOrder)},{"players",strings(d.players)},{"start_year",number(d.startYear)},{"start_month",number(d.startMonth)},{"calendar_rounds",number(d.calendarRounds)}});
 }
+std::shared_ptr<const IndexedGeography> indexGeography(const V::Object& nodes) {
+    auto index=std::make_shared<IndexedGeography>();
+    index->nodeIds.reserve(nodes.size());
+    index->nodeIndices.reserve(nodes.size());
+    for(const auto& [id,node]:nodes) {
+        index->nodeIndices.emplace(id,index->nodeIds.size());
+        index->nodeIds.push_back(id);
+    }
+    index->adjacency.resize(nodes.size());
+    for(const auto& [id,node]:nodes) {
+        // Some catalog-free state fixtures deliberately omit physical edges.
+        // Preserve their validation/late-error behavior rather than inventing
+        // an empty map or imposing an additional definition requirement.
+        const auto* neighbors=node.find("neighbors");
+        if(!neighbors || !neighbors->isArray()) return nullptr;
+        auto& adjacent=index->adjacency[index->nodeIndices.at(id)];
+        adjacent.reserve(neighbors->asArray().size());
+        for(const auto& edge:neighbors->asArray()) {
+            if(!edge.isObject()) return nullptr;
+            const auto* neighbor=edge.find("neighbor_id");
+            if(!neighbor || !neighbor->isString()) return nullptr;
+            const auto found=index->nodeIndices.find(neighbor->asString());
+            if(found==index->nodeIndices.end()) return nullptr;
+            adjacent.push_back(found->second);
+        }
+    }
+    index->hopDistances.assign(nodes.size(),std::vector<int>(nodes.size(),-1));
+    for(std::size_t origin=0;origin<nodes.size();++origin) {
+        auto& distances=index->hopDistances[origin];
+        distances[origin]=0;
+        std::deque<std::size_t> pending{origin};
+        while(!pending.empty()) {
+            const auto from=pending.front(); pending.pop_front();
+            for(const auto to:index->adjacency[from]) if(distances[to]<0) {
+                distances[to]=distances[from]+1;
+                pending.push_back(to);
+            }
+        }
+    }
+    return index;
+}
 V politicsJson(const PoliticalState& p) {
     O attacks, pending;
     for(const auto& [id,actors]:p.attackedWarlords)attacks.emplace(id,strings(actors));
@@ -120,9 +162,22 @@ std::shared_ptr<const Definition> freezeDefinition(Definition d) {
     for(const auto& [id,f]:d.factions) { require(!id.empty()&&f.id==id&&!f.displayName.empty(),"Invalid faction identity"); for(const auto& zone:f.homeCountry) require(nodes.contains(zone)&&nodes.at(zone).require("type").asString()=="land","Home-country reference is not retained land"); }
     std::set<Id> turns; for(const auto& id:d.turnOrder) require(d.factions.contains(id)&&turns.insert(id).second,"Invalid/duplicate national turn order"); for(const auto& id:d.players)require(!id.empty(),"Empty player identity");
     require(d.startYear>0&&(d.startMonth==1||d.startMonth==7)&&d.calendarRounds>0,"Invalid half-year calendar");
+    // Always rebuild: callers can copy a definition and edit its source map.
+    d.indexedGeography=indexGeography(nodes);
     auto encoded=definitionJson(d).asObject();
     if(d.catalog) { d.catalog->requireComplete(); encoded.emplace("catalog_fingerprint",V(d.catalog->fingerprint())); }
     d.fingerprint=contentDigest(canonicalJson(V(std::move(encoded)))); return std::make_shared<const Definition>(std::move(d));
+}
+
+std::set<Id> IndexedGeography::withinHops(const Id& origin,int range) const {
+    const auto& distances=hopDistances.at(nodeIndices.at(origin));
+    std::set<Id> zones;
+    // The original search always included its origin, even with negative fuel.
+    const int bound=std::max(range,0);
+    for(std::size_t to=0;to<nodeIds.size();++to)
+        if(distances[to]>=0 && distances[to]<=bound)
+            zones.emplace_hint(zones.end(),nodeIds[to]);
+    return zones;
 }
 
 V actionJson(const Action& a) { return V(O{{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}}); }

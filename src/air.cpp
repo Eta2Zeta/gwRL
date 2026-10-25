@@ -708,6 +708,10 @@ bool airLandingPlanAvailable(const State &s, const std::vector<Id> &aircraft) {
 namespace {
 using CarrierLandingBounds = std::map<Id, std::set<Id>>;
 std::set<Id> potentialFlightZones(const State& state, const Id& start, int range) {
+    // This bound depends only on physical geometry. Permissions and enemy
+    // Fighters remain in the actual flight/landing checks below.
+    if(state.definition->indexedGeography)
+        return state.definition->indexedGeography->withinHops(start,range);
     std::set<Id> zones{start};
     std::deque<std::pair<Id, int>> queue{{start, 0}};
     while (!queue.empty()) {

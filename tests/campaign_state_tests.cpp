@@ -1,6 +1,7 @@
 #include "game/campaign.hpp"
 
 #include <functional>
+#include <deque>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -117,5 +118,49 @@ void nationalityRoutingCalendarAndSnapshot() {
     s.captureTurnStart();s.territories.at("a").possessor="kmt";s.units.erase("defender");check(s.turnStart.possessions.at("a")=="japan"&&s.turnStart.units.contains("defender"),"Beginning-turn snapshot changed with mutable state");
     s.battles.clear();s.battleOrder.clear();s.clock.completedRounds=11;s.clock.incomeCollected=true;s.clock.nationIndex=3;s.clock.phase=Phase::PlaceUnits;for(const auto& id:s.definition->turnOrder)s.completedTurns[id]=11;s.terminal=true;s.validate();auto incomplete=s.clone();incomplete.completedTurns["ccp"]=10;rejects([&]{incomplete.validate();},"Premature national-turn completion accepted");check(!s.decisionPlayer(),"Terminal state still exposes actor");
 }
+std::set<Id> referenceGeometry(const Definition& definition,const Id& start,int range) {
+    std::set<Id> zones{start};
+    std::deque<std::pair<Id,int>> pending{{start,0}};
+    while(!pending.empty()) {
+        const auto [zone,distance]=pending.front();pending.pop_front();
+        if(distance>=range)continue;
+        for(const auto& edge:definition.geography.require("nodes").require(zone).require("neighbors").asArray()) {
+            const auto& next=edge.require("neighbor_id").asString();
+            if(zones.insert(next).second)pending.emplace_back(next,distance+1);
+        }
+    }
+    return zones;
 }
-int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+void immutableIndexedGeometry() {
+    auto source=definition();
+    O nodes;
+    const std::map<Id,std::vector<Id>> links{{"a",{"c","b","c"}},{"b",{"d"}},{"c",{"a","d"}},{"d",{"sea"}},{"isolated",{}},{"sea",{}}};
+    for(const auto& [id,neighbors]:links) {
+        V::Array edges;for(const auto& next:neighbors)edges.emplace_back(O{{"neighbor_id",V(next)}});
+        nodes.emplace(id,V(O{{"id",V(id)},{"type",V(std::string(id=="sea"?"sea":"land"))},{"neighbors",V(std::move(edges))}}));
+    }
+    source.geography=V(O{{"nodes",V(nodes)}});
+    const auto frozen=freezeDefinition(source);
+    check(frozen->indexedGeography!=nullptr,"Complete geography was not indexed");
+    const auto& index=*frozen->indexedGeography;
+    check(index.nodeIds==std::vector<Id>({"a","b","c","d","isolated","sea"}),"Dense IDs lost lexical ordering");
+    std::vector<Id> adjacent;for(auto next:index.adjacency.at(index.nodeIndices.at("a")))adjacent.push_back(index.nodeIds.at(next));
+    check(adjacent==links.at("a"),"Dense adjacency changed source order or duplicate edges");
+    for(const auto& [start,neighbors]:links)for(int range=-2;range<=8;++range)
+        check(index.withinHops(start,range)==referenceGeometry(*frozen,start,range),"Indexed directed reachability differs from reference BFS");
+    check(!index.withinHops("sea",8).contains("a"),"Directed geometry became undirected");
+    auto unchanged=*frozen;unchanged.indexedGeography.reset();
+    check(freezeDefinition(unchanged)->fingerprint==frozen->fingerprint,"Derived geometry changed definition identity");
+    auto edited=*frozen;
+    auto a=nodes.at("a").asObject();a["neighbors"]=V(V::Array{});nodes["a"]=V(a);edited.geography=V(O{{"nodes",V(nodes)}});
+    const auto refrozen=freezeDefinition(edited);
+    check(refrozen->indexedGeography.get()!=frozen->indexedGeography.get(),"Re-freeze reused a potentially stale geometry view");
+    check(refrozen->indexedGeography->withinHops("a",8)==std::set<Id>{"a"} && index.withinHops("a",8).contains("sea"),"Edited geometry corrupted or reused prior distances");
+    check(!freezeDefinition(definition())->indexedGeography,"Incomplete foundation map received invented adjacency");
+    const auto actual=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
+    check(actual.definition->indexedGeography!=nullptr,"Campaign geography has no dense view");
+    for(const auto& start:actual.definition->indexedGeography->nodeIds)for(int range=-1;range<=10;++range)
+        check(actual.definition->indexedGeography->withinHops(start,range)==referenceGeometry(*actual.definition,start,range),"Campaign geometry differs from reference BFS");
+}
+}
+int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

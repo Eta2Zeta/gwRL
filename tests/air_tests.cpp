@@ -68,6 +68,27 @@ bool offered(Engine &e, const Id &kind) {
     auto a = e.legalActions();
     return std::any_of(a.begin(), a.end(), [&](const auto &x) { return x.kind == kind; });
 }
+void indexedGeometryPreservesAircraftMenus() {
+    for(const auto phase:{Phase::CombatMovement,Phase::NonCombatMovement}) {
+        auto state=fixture(phase);
+        add(state,"test_fighter","fighter","japan",beiping);
+        add(state,"test_bomber","tactical_bomber","japan",tokyo);
+        add(state,"test_carrier","fleet_carrier","japan","sea_p15");
+        add(state,"test_enemy","fighter","kmt",hopeh);
+        state.captureTurnStart();
+        const auto before=state.serialize();
+        const auto fast=AirRules{}.actions(state);
+        auto referenceDefinition=std::make_shared<Definition>(*state.definition);
+        referenceDefinition->indexedGeography.reset();
+        state.definition=referenceDefinition;
+        const auto reference=AirRules{}.actions(state);
+        check(fast.size()==reference.size(),"Indexed flight bound changed menu size");
+        for(std::size_t i=0;i<fast.size();++i)
+            check(canonicalJson(actionJson(fast[i]))==canonicalJson(actionJson(reference[i])),
+                  "Indexed flight bound changed aircraft choices or order");
+        check(state.serialize()==before,"Derived flight bound changed state or fingerprint");
+    }
+}
 void resolveToLanding(Engine &e) {
     for (int n = 0; n < 100 && !e.state().battles.empty(); ++n) {
         if (e.state().chance) {
@@ -337,7 +358,8 @@ int main() {
         airliftHeavyCapacityAndContinuation();
         failedLanding();
         noAircraftCapture();
-        std::cout << "12 air fixture groups passed\n";
+        indexedGeometryPreservesAircraftMenus();
+        std::cout << "13 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

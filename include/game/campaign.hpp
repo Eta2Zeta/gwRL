@@ -9,6 +9,7 @@
 #include <optional>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // The shared campaign foundation. The prototype API remains available while
@@ -30,10 +31,24 @@ struct FactionDefinition {
     bool dormant {false};
 };
 
+// Derived solely from frozen map geometry. Source-order adjacency and lexical
+// node IDs retain the authoring data's traversal/output order. This shared view
+// is neither serialized nor part of the definition fingerprint.
+struct IndexedGeography {
+    std::vector<Id> nodeIds;
+    std::unordered_map<Id, std::size_t> nodeIndices;
+    std::vector<std::vector<std::size_t>> adjacency;
+    std::vector<std::vector<int>> hopDistances;  // -1 means unreachable.
+
+    std::set<Id> withinHops(const Id& origin, int range) const;
+};
+
 struct Definition {
     Id scenarioId;
     std::string fingerprint;  // Computed by freezeDefinition, never a policy feature.
     json::Value geography;
+    // Rebuilt by freezeDefinition; absent for incomplete foundation fixtures.
+    std::shared_ptr<const IndexedGeography> indexedGeography;
     json::Value rules;
     std::shared_ptr<const Catalog> catalog;
     std::map<Id, FactionDefinition> factions;
