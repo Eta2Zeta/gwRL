@@ -56,6 +56,12 @@ replaced atomically; the checkpoint is the authority if a crash occurs between
 those two replacements. New runs refuse a nonempty directory and default to
 unique ignored `runs/` directories.
 
+Checkpoint bytes are flushed before replacement, and `checkpoint.pt.previous`
+keeps the preceding complete snapshot. If the newest file is damaged, explicitly
+resume that backup; the first recovery save preserves it instead of backing up
+the damaged file. Abrupt interruption can repeat waves since the latest saved
+checkpoint, but never requires discarding all completed training or active games.
+
 Checkpoints contain the live and frozen models, optimizer moments, replay,
 pending samples, all active game states, declaration scheduling, all random
 generators, counters, configuration, scenario/rule/schema fingerprints and
@@ -63,6 +69,15 @@ runtime source hashes. Resume rejects configuration, source or schema changes;
 a changed implementation needs an explicit migration or a new run. Only load
 trusted local Torch checkpoints produced by this runner. CPU thread count and
 software versions are part of exact continuation compatibility.
+
+For the authorized [three-round experiment](/Users/home/Desktop/gwRL/docs/stage_a/three_round_2026_10_24.md),
+`tools/run_three_round_experiment.py --plan PLAN.json` orchestrates initial
+evaluation, resource-supervised training and paired final evaluation. Its fixed
+deadline persists across restarts. The run uses a committed runtime snapshot,
+so edits in the main checkout do not break continuation. The lighter standalone
+`tools/supervise_campaign_training.py` also supports a fixed active-time budget,
+bounded transient retries and graceful resource/deadline stops; it reserves its
+coordinator within the configured twelve-core allowance.
 
 ## Completed-episode Stage A pilot
 

@@ -8,7 +8,8 @@ import random
 import unittest
 from unittest.mock import patch
 
-from studies.campaign.evaluation import evaluate, profile, uncertainty, validate_heldout_seeds
+from studies.campaign.evaluation import (JapanTerritoryTracker, evaluate, profile, uncertainty,
+                                         validate_heldout_seeds)
 from studies.shared.multiplayer_mcts import Evaluation, OpponentPolicy, PLAYERS
 
 
@@ -137,6 +138,77 @@ class ToggleEnv(EvaluationEnv):
 
 
 class CampaignEvaluationTests(unittest.TestCase):
+    def test_network_only_uses_batched_priors_without_search_or_fake_root_values(self):
+        actual = []
+
+        class PriorEvaluator(CountingEvaluator):
+            def evaluate(self, env, actions):
+                return Evaluation([0., 1.], [10., -5., -8.])
+
+        def factory(seed):
+            env = EvaluationEnv(seed)
+            actual.append(env)
+            return env
+
+        with patch("studies.campaign.evaluation.search_many", side_effect=AssertionError("No search allowed")):
+            report = evaluate(factory, PriorEvaluator(), target_player="axis", seeds=[7, 11],
+                              selection_mode="network_only", simulations=16, max_depth=16, max_transitions=5)
+        self.assertEqual(report["search_mode"], "network_only")
+        self.assertEqual((report["simulations"], report["max_depth"]), (0, 0))
+        self.assertEqual(report["terminal_games"], 2)
+        self.assertEqual(report["inference_batches"]["search_calls"], 0)
+        self.assertEqual(report["inference_batches"]["requests"], 4)
+        self.assertEqual(report["inference_batches"]["batch_sizes"], [2, 2])
+        for env, game in zip(actual, report["games"], strict=True):
+            self.assertEqual(env.applied[:2], [("axis", "b"), ("axis", "b")])
+            self.assertIsNone(game["first_search_value_prediction"])
+            self.assertEqual(game["first_network_value_prediction"], [10., -5., -8.])
+        with self.assertRaises(ValueError):
+            evaluate(EvaluationEnv, PriorEvaluator(), target_player="axis", seeds=[7],
+                     selection_mode="network_only", target_script="balanced")
+
+    def test_japanese_expansion_distinguishes_new_holdings_recaptures_and_losses(self):
+        state = {"territories": {"a": {"possessor": "japan"}, "b": {"possessor": "kmt"},
+                                  "c": {"possessor": "warlord"}, "other": {"possessor": "kmt"}},
+                 "clock": {"round_index": 0}}
+        context = {"factions": {"kmt": {"home_country_known": True, "home_country": ["a", "b", "c"]}},
+                   "geography": {"nodes": {zone: {"ipp_value": value}
+                                               for zone, value in (("a", 1), ("b", 2), ("c", 3), ("other", 99))}}}
+        tracker = JapanTerritoryTracker(context, state)
+        for index, (zone, owner) in enumerate((("b", "japan"), ("b", "kmt"), ("b", "japan"),
+                                                ("a", "kmt"), ("c", "japan"), ("c", "warlord"),
+                                                ("other", "japan")), 1):
+            state["territories"][zone]["possessor"] = owner
+            tracker.record(state, index, "fixture_transition")
+        result = tracker.summary(terminal=False)
+        self.assertEqual(result["newly_held"], {"zones": ["b"], "count": 1, "ipp": 2})
+        self.assertEqual(result["initial_holdings_lost"], {"zones": ["a"], "count": 1, "ipp": 1})
+        self.assertEqual(result["new_acquisitions_lost_again"], {"zones": ["c"], "count": 1, "ipp": 3})
+        self.assertEqual((result["gross_acquisition_events"], result["gross_acquired_ipp"]), (3, 7))
+        self.assertEqual((result["gross_loss_events"], result["gross_lost_ipp"]), (3, 6))
+        self.assertEqual(result["net_ipp_change"], 1)
+        self.assertFalse(result["terminal"])
+        self.assertEqual(len(result["events"]), 6)
+        self.assertEqual(result["events"][0]["clock"], {"round_index": 0})
+        state["clock"]["round_index"] = 10
+        self.assertEqual(result["events"][0]["clock"], {"round_index": 0})
+
+    def test_external_stop_keeps_unfinished_outcomes_unobserved(self):
+        calls = 0
+
+        def stop():
+            nonlocal calls
+            calls += 1
+            return calls >= 3
+
+        report = evaluate(EvaluationEnv, CountingEvaluator(), target_player="axis", seeds=[7],
+                          selection_mode="network_only", stop_requested=stop)
+        game = report["games"][0]
+        self.assertEqual(game["stop_reason"], "external_stop")
+        self.assertEqual(game["counts"]["transitions"], 2)
+        self.assertIsNone(game["observed_terminal_returns"])
+        self.assertEqual(report["observed_return_statistics"]["axis"]["n"], 0)
+
     def test_repeated_state_guard_is_a_nonterminal_four_step_cutoff(self):
         actual = []
 

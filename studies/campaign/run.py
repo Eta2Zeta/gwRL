@@ -87,6 +87,8 @@ def _json(path: Path, value):
     try:
         with os.fdopen(descriptor, "w") as handle:
             handle.write(json.dumps(value, sort_keys=True, indent=2, allow_nan=False) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
         os.replace(temporary, path)
     finally:
         if os.path.exists(temporary):
@@ -107,12 +109,27 @@ def _learner(config: RunConfig, template):
     return CampaignLearner(models, model_config, learning, compatibility=compatibility(template))
 
 
-def _save(path: Path, learner: CampaignLearner, runner: dict):
+def _save(path: Path, learner: CampaignLearner, runner: dict, *, backup_current=True):
     payload = {"schema": RUN_SCHEMA, "runner": runner, "learner": learner.checkpoint()}
     descriptor, temporary = tempfile.mkstemp(prefix=".checkpoint-", suffix=".pt", dir=path.parent)
-    os.close(descriptor)
     try:
-        torch.save(payload, temporary)
+        with os.fdopen(descriptor, "wb") as handle:
+            torch.save(payload, handle)
+            handle.flush()
+            os.fsync(handle.fileno())
+        if backup_current and path.exists():
+            # Keep the last fully written snapshot independently of the new
+            # rename. A hard link shares immutable bytes, not another copy of
+            # what may be a large replay buffer. Both names are on this volume.
+            backup_descriptor, backup = tempfile.mkstemp(prefix=".checkpoint-previous-", dir=path.parent)
+            os.close(backup_descriptor)
+            os.unlink(backup)
+            try:
+                os.link(path, backup)
+                os.replace(backup, path.with_name(path.name + ".previous"))
+            finally:
+                if os.path.exists(backup):
+                    os.unlink(backup)
         os.replace(temporary, path)
     finally:
         if os.path.exists(temporary):
@@ -183,6 +200,8 @@ def train(args) -> int:
 
     old_handlers = {number: signal.signal(number, request_stop) for number in (signal.SIGINT, signal.SIGTERM)}
     manifest_path, checkpoint_path = output / "manifest.json", output / "checkpoint.pt"
+    recovering_previous = loaded is not None and args.resume.resolve() == checkpoint_path.with_name(
+        checkpoint_path.name + ".previous").resolve()
     started = time.perf_counter()
     initial_waves = runner["total_waves"]
     initial_transitions = learner.counters["transitions"]
@@ -198,8 +217,13 @@ def train(args) -> int:
             timings[name] += time.perf_counter() - before
 
     def save_checkpoint(path):
+        nonlocal recovering_previous
         with measure("checkpoint_save"):
-            _save(path, learner, runner)
+            # A caller explicitly recovering the backup has not vouched for
+            # the newest file. Do not overwrite that known-good backup with it.
+            _save(path, learner, runner, backup_current=not (recovering_previous and path == checkpoint_path))
+            if path == checkpoint_path:
+                recovering_previous = False
 
     def factory(seed):
         runner["training_environment_seeds"].append(seed)

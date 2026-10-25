@@ -11,7 +11,7 @@ from collections import Counter
 from dataclasses import asdict
 from typing import Any, Callable, Mapping, Sequence
 
-from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, action_key, vector
+from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, action_key, probabilities, vector
 from .baselines import raw_action, scripted_policy
 from .batching import BatchStats, search_many
 
@@ -84,10 +84,69 @@ def _merge_stats(total: BatchStats, wave: BatchStats) -> None:
     total.elapsed_seconds += wave.elapsed_seconds
 
 
+class JapanTerritoryTracker:
+    """Possession changes in the authoritative Chinese Home Country.
+
+    Acquisition is deliberately broader than a combat capture: influence,
+    alignment and postcombat possession choices can also change possession.
+    These are evaluation diagnostics, never additional learning rewards.
+    """
+    def __init__(self, context: Mapping[str, Any], state: Mapping[str, Any]):
+        faction = context.get("factions", {}).get("kmt", {})
+        if not faction.get("home_country_known") or not faction.get("home_country"):
+            raise ValueError("Japanese expansion metrics require known Chinese Home Country")
+        nodes = context["geography"]["nodes"]
+        self.values = {zone: float(nodes[zone].get("ipp_value") or 0)
+                       for zone in faction["home_country"] if zone in state["territories"]}
+        if not self.values or any(not math.isfinite(value) or value < 0 for value in self.values.values()):
+            raise ValueError("Chinese Home Country metrics need finite nonnegative land values")
+        self.previous = {zone: state["territories"][zone].get("possessor") for zone in self.values}
+        self.initial = {zone for zone, owner in self.previous.items() if owner == "japan"}
+        self.events: list[dict[str, Any]] = []
+
+    def record(self, state: Mapping[str, Any], transition: int, kind: str) -> None:
+        for zone, previous in self.previous.items():
+            current = state["territories"][zone].get("possessor")
+            if current != previous and "japan" in (previous, current):
+                self.events.append({"zone": zone, "ipp_value": self.values[zone],
+                    "previous_possessor": previous, "possessor": current,
+                    "transition": transition, "action_kind": kind,
+                    "clock": _plain(state["clock"])})
+            self.previous[zone] = current
+
+    def summary(self, *, terminal: bool) -> dict[str, Any]:
+        final = {zone for zone, owner in self.previous.items() if owner == "japan"}
+
+        def holdings(zones):
+            return {"zones": sorted(zones), "count": len(zones),
+                    "ipp": math.fsum(self.values[zone] for zone in zones)}
+
+        acquisitions = [event for event in self.events if event["possessor"] == "japan"]
+        losses = [event for event in self.events if event["previous_possessor"] == "japan"]
+        return {"scope": "KMT Chinese Home Country intersected with campaign land zones",
+            "scope_zones": sorted(self.values), "nation": "japan", "terminal": terminal,
+            "initial": holdings(self.initial), "at_stop": holdings(final),
+            "newly_held": holdings(final - self.initial),
+            "initial_holdings_lost": holdings(self.initial - final),
+            "net_ipp_change": math.fsum(self.values[zone] for zone in final) -
+                              math.fsum(self.values[zone] for zone in self.initial),
+            "gross_acquisition_events": len(acquisitions),
+            "gross_acquired_ipp": math.fsum(event["ipp_value"] for event in acquisitions),
+            "gross_loss_events": len(losses),
+            "gross_lost_ipp": math.fsum(event["ipp_value"] for event in losses),
+            "new_acquisitions_lost_again": holdings(
+                {event["zone"] for event in acquisitions} - self.initial - final),
+            "events": self.events,
+            "interpretation": "Possession acquisitions include influence/alignment, not only combat captures; "
+                              "gross events include recaptures. At-stop holdings are not terminal results unless terminal=true."}
+
+
 def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player: str,
              seeds: Sequence[int], baseline_style: str = "balanced", simulations: int = 2,
              max_depth: int = 4, max_transitions: int = 500,
-             target_script: str | None = None, max_state_visits: int | None = 20) -> dict[str, Any]:
+             target_script: str | None = None, max_state_visits: int | None = 20,
+             selection_mode: str = "search", track_japan: bool = False,
+             stop_requested: Callable[[], bool] | None = None) -> dict[str, Any]:
     """Search the target; sample the same fixed opponents in search and play.
 
     A transition cap stops collection only. Cutoff snapshots contribute neither
@@ -99,6 +158,10 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
     Call validate_heldout_seeds with the training seed log before a study run.
     """
     seeds = _seeds(seeds, unique=True, label="Evaluation seeds")
+    if selection_mode not in {"search", "network_only"}:
+        raise ValueError("Evaluation selection mode must be search or network_only")
+    if target_script is not None and selection_mode != "search":
+        raise ValueError("A scripted control cannot also use network_only selection")
     if target_player not in PLAYERS or not seeds:
         raise ValueError("Evaluation requires an actor and held-out seeds")
     if type(max_transitions) is not int or max_transitions <= 0:
@@ -121,6 +184,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
     counts = [Counter({"transitions": 0, "chance_events": 0}) for _ in seeds]
     owners = [Counter({player: 0 for player in PLAYERS}) for _ in seeds]
     previous_units = [_units(env) for env in envs]
+    territory_trackers = [JapanTerritoryTracker(env.context(), env.observation()["state"])
+                          if track_japan else None for env in envs]
     casualties, casualty_types = [Counter() for _ in seeds], [Counter() for _ in seeds]
     predictions, prediction_points = [None] * len(seeds), [None] * len(seeds)
     initial = [{"planning_key": env.planning_key(), "context_sha256": _context_key(env),
@@ -148,9 +213,16 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
             casualties[index][unit["owner"]] += 1
             casualty_types[index][(unit["owner"], unit["type"])] += 1
         previous_units[index] = units
+        if territory_trackers[index] is not None:
+            territory_trackers[index].record(envs[index].observation()["state"],
+                                             counts[index]["transitions"], kind)
         state_visits[index][envs[index].planning_key()] += 1
 
+    externally_stopped = False
     while True:
+        if stop_requested is not None and stop_requested():
+            externally_stopped = True
+            break
         active = [i for i, env in enumerate(envs)
                   if not env.is_terminal() and counts[i]["transitions"] < max_transitions and
                   not repeated_state_limit(i)]
@@ -182,18 +254,32 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
                 raise ValueError("Evaluation weights version changed between search waves")
             # The coordinator resets per-call stats; retain every wave.
             wave = BatchStats()
-            results = search_many(searches, evaluator, configs=configs,
-                                  opponent_policies=[opponent] * len(searches), add_root_noise=False, stats=wave)
+            if selection_mode == "search":
+                results = search_many(searches, evaluator, configs=configs,
+                                      opponent_policies=[opponent] * len(searches), add_root_noise=False, stats=wave)
+                selected = [result.best_action() for result in results]
+                search_calls += 1
+            else:
+                menus = [list(env.legal_actions()) for env in searches]
+                before = time.perf_counter()
+                results = evaluator.evaluate_batch(list(zip(searches, menus, strict=True)))
+                seconds = time.perf_counter() - before
+                wave.roots = wave.requests = len(searches)
+                wave.batches, wave.batch_sizes = 1, [len(searches)]
+                wave.inference_seconds = wave.elapsed_seconds = seconds
+                selected = []
+                for result, actions in zip(results, menus, strict=True):
+                    priors = probabilities(result.priors, len(actions))
+                    best = min(range(len(actions)), key=lambda i: (-priors[i], action_key(actions[i])))
+                    selected.append(actions[best])
             _merge_stats(batch_stats, wave)
-            search_calls += 1
-            for index, result in zip(indices, results, strict=True):
+            for index, result, action in zip(indices, results, selected, strict=True):
                 env = envs[index]
                 if predictions[index] is None:
                     predictions[index] = list(vector(result.values))
                     prediction_points[index] = {"planning_key": env.planning_key(),
                                                 "transitions": counts[index]["transitions"],
                                                 "clock": _plain(env.observation()["state"]["clock"])}
-                action = result.best_action()
                 env.apply_action(action)
                 record(index, raw_action(action)["kind"], target_player)
     elapsed = time.perf_counter() - started
@@ -212,7 +298,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
         for (nation, kind), amount in casualty_types[index].items():
             type_losses.setdefault(nation, {})[kind] = amount
         games.append({"seed": seed, "terminal": terminal, "truncated": not terminal,
-            "stop_reason": "terminal" if terminal else "repeated_state_guard" if guarded else "transition_budget",
+            "stop_reason": "terminal" if terminal else "external_stop" if externally_stopped else
+                           "repeated_state_guard" if guarded else "transition_budget",
             "transition_budget": max_transitions,
             "repeated_state_guard": {"threshold": max_state_visits, "max_seen": max_seen,
                 "repeated_key": repeated_key if max_seen > 1 else None,
@@ -223,18 +310,25 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
             "casualties_by_nation_and_type": type_losses,
             "territorial_control": dict(Counter(land.get("possessor") or "unpossessed" for land in state["territories"].values())),
             "wealth_components_at_stop": env.wealth(), "observed_terminal_returns": returns,
-            "first_search_value_prediction": prediction, "first_search_prediction_point": prediction_points[index],
+            "first_search_value_prediction": prediction if selection_mode == "search" else None,
+            "first_search_prediction_point": prediction_points[index] if selection_mode == "search" else None,
+            "first_network_value_prediction": prediction if selection_mode == "network_only" else None,
+            "first_network_prediction_point": prediction_points[index] if selection_mode == "network_only" else None,
             "terminal_value_error": errors,
             "terminal_squared_value_error": [error ** 2 for error in errors] if errors is not None else None,
-            "final_planning_key": env.planning_key(), "illegal_actions": 0})
+            "final_planning_key": env.planning_key(), "illegal_actions": 0,
+            **({"japan_chinese_home_country": territory_trackers[index].summary(terminal=terminal)}
+               if territory_trackers[index] is not None else {})})
     terminal_games = [game for game in games if game["terminal"]]
     calibrated = [game for game in terminal_games if game["terminal_value_error"] is not None]
     components = sorted({key for game in games for player in PLAYERS
                          for key in game["wealth_components_at_stop"][player]})
     return _plain({"schema": EVALUATION_SCHEMA, "target_player": target_player,
         "target_policy": target_policy.version if target_policy else evaluator_version,
-        "opponent_policy": opponent.version, "search_mode": "fixed_opponents" if target_policy is None else "scripted_control",
-        "root_noise": False, "simulations": simulations, "max_depth": max_depth,
+        "opponent_policy": opponent.version, "search_mode": ("fixed_opponents" if selection_mode == "search" else "network_only")
+            if target_policy is None else "scripted_control",
+        "root_noise": False, "simulations": simulations if selection_mode == "search" else 0,
+        "max_depth": max_depth if selection_mode == "search" else 0,
         "max_transitions": max_transitions, "max_state_visits": max_state_visits, "seeds": seeds, "games": games,
         "terminal_games": len(terminal_games), "truncated_games": len(games) - len(terminal_games),
         "observed_return_statistics": {player: uncertainty([game["observed_terminal_returns"][i] for game in terminal_games])
@@ -243,7 +337,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
             component: uncertainty([game["wealth_components_at_stop"][player][component] for game in terminal_games
                                     if component in game["wealth_components_at_stop"][player]])
             for component in components} for player in PLAYERS},
-        "value_calibration": {"prediction_source": "first target MCTS root mean, in raw three-vector units",
+        "value_calibration": {"prediction_source": ("first target MCTS root mean" if selection_mode == "search" else
+                                                   "first target network value") + ", in raw three-vector units",
             "complete_games": len(calibrated),
             "error": {player: uncertainty([game["terminal_value_error"][i] for game in calibrated]) for i, player in enumerate(PLAYERS)},
             "squared_error": {player: uncertainty([game["terminal_squared_value_error"][i] for game in calibrated]) for i, player in enumerate(PLAYERS)}},

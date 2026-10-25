@@ -7,6 +7,11 @@ playing-strength gate. [The scaling follow-up](scaling_2026_10_23.md) completes
 one small-budget eleven-round game, but stronger-search collection still needs
 performance work before larger learning.
 
+The authorized [three-round learning experiment](three_round_2026_10_24.md)
+tests basic Japanese expansion within a ten-hour resource budget, with exact
+training/self-play recovery and paired initial/final held-out evaluation. Its
+launch and eventual results are separate from the earlier eight-game pilots.
+
 The [24 October decision-reuse fix](decision_reuse_2026_10_24.md) removes repeated
 legal-menu generation and observation conversion. A matched full-game invocation
 falls from 198.42 to 112.72 seconds, preserving all search results, 560 choices,

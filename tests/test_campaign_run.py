@@ -14,6 +14,8 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import numpy as np
 import torch
@@ -174,8 +176,8 @@ class CampaignRunTests(unittest.TestCase):
                                 for name, tensor in initial.models[player].state_dict().items()),
                             f"Real training left {player} unchanged")
 
-    def test_sigint_after_first_flushed_rollout_saves_then_resumes_exactly(self):
-        directory = self.directory / "signal-resume"
+    def assert_signal_resume(self, stop_signal):
+        directory = self.directory / f"signal-resume-{stop_signal.name}"
         command = [sys.executable, "-m", "studies.campaign.run", "train", "--run-dir", str(directory), *self.flags]
         process = subprocess.Popen(command, cwd=ROOT, env=self.environment(), stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, text=True, bufsize=1)
@@ -198,7 +200,7 @@ class CampaignRunTests(unittest.TestCase):
                     except json.JSONDecodeError:
                         continue
                     if item.get("event") == "rollout":
-                        process.send_signal(signal.SIGINT)
+                        process.send_signal(stop_signal)
                         sent = True
                         break
             tail, _ = process.communicate(timeout=max(0.1, deadline - time.monotonic()))
@@ -216,9 +218,60 @@ class CampaignRunTests(unittest.TestCase):
         checkpoint = self.read(directory / "checkpoint.pt")
         self.assertIsNotNone(checkpoint["learner"]["frozen_models"])
         self.assertGreater(checkpoint["learner"]["counters"]["transitions"], 0)
-        self.assertTrue(any(json.loads(line).get("stop_reason") == "SIGINT"
+        self.assertTrue(any(json.loads(line).get("stop_reason") == stop_signal.name
                             for line in "".join(output).splitlines() if line.startswith("{")))
         resumed = self.command(["--resume", str(directory / "checkpoint.pt")])
+        self.assertEqual(resumed.returncode, 0, resumed.stderr[-3000:])
+        self.assert_completed_matches_reference(directory)
+
+    def test_sigint_after_first_flushed_rollout_saves_then_resumes_exactly(self):
+        self.assert_signal_resume(signal.SIGINT)
+
+    def test_sigterm_after_first_flushed_rollout_saves_then_resumes_exactly(self):
+        self.assert_signal_resume(signal.SIGTERM)
+
+    def test_sigkill_resumes_last_complete_checkpoint_without_partial_update(self):
+        directory = self.directory / "killed-resume"
+        command = [sys.executable, "-m", "studies.campaign.run", "train", "--run-dir", str(directory), *self.flags]
+        process = subprocess.Popen(command, cwd=ROOT, env=self.environment(), stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.PIPE, text=True)
+        deadline = time.monotonic() + 60
+        try:
+            while time.monotonic() < deadline and process.poll() is None:
+                manifest_path = directory / "manifest.json"
+                if manifest_path.is_file():
+                    manifest = json.loads(manifest_path.read_text())
+                    if manifest["status"] == "running" and manifest["runner"]["wave_index"] >= 1:
+                        process.kill()
+                        break
+                time.sleep(0.01)
+            _, error = process.communicate(timeout=max(0.1, deadline - time.monotonic()))
+            self.assertEqual(process.returncode, -signal.SIGKILL, error[-3000:])
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.communicate(timeout=5)
+            if process.stderr is not None:
+                process.stderr.close()
+        checkpoint = self.read(directory / "checkpoint.pt")
+        self.assertIsNotNone(checkpoint["learner"]["frozen_models"])
+        self.assertGreater(checkpoint["learner"]["counters"]["transitions"], 0)
+        self.assertEqual(checkpoint["learner"]["generation"], 0)
+        self.assertTrue((directory / "checkpoint.pt.previous").is_file())
+        resumed = self.command(["--resume", str(directory / "checkpoint.pt")])
+        self.assertEqual(resumed.returncode, 0, resumed.stderr[-3000:])
+        self.assert_completed_matches_reference(directory)
+
+    def test_previous_checkpoint_recovers_unfinished_games_if_latest_is_corrupt(self):
+        directory = self.directory / "previous-checkpoint-resume"
+        stopped = self.command(["--run-dir", str(directory), *self.flags, "--stop-after-waves", "3"])
+        self.assertEqual(stopped.returncode, 130, stopped.stderr[-3000:])
+        previous = directory / "checkpoint.pt.previous"
+        backup = self.read(previous)
+        self.assertIsNotNone(backup["learner"]["frozen_models"])
+        self.assertEqual(len(backup["learner"]["parallel_envs"]), 2)
+        (directory / "checkpoint.pt").write_bytes(b"injected damaged newest checkpoint")
+        resumed = self.command(["--resume", str(previous)])
         self.assertEqual(resumed.returncode, 0, resumed.stderr[-3000:])
         self.assert_completed_matches_reference(directory)
 
@@ -253,6 +306,38 @@ class CampaignRunTests(unittest.TestCase):
         self.assertIn("Choose an empty run directory", redirected_resume.stderr)
         self.assertEqual(self.files(occupied), before)
         self.assertEqual(self.files(self.reference_dir), expected)
+
+
+class CampaignAtomicCheckpointTests(unittest.TestCase):
+    def test_previous_checkpoint_is_valid_and_failed_write_preserves_both(self):
+        from studies.campaign import run
+        with tempfile.TemporaryDirectory(prefix="campaign-checkpoint-tests-") as temporary:
+            path = Path(temporary) / "checkpoint.pt"
+            previous = path.with_name(path.name + ".previous")
+            learner = SimpleNamespace(checkpoint=lambda: {"fixture": "learner"})
+            run._save(path, learner, {"generation": 0})
+            self.assertFalse(previous.exists())
+            first = path.read_bytes()
+            run._save(path, learner, {"generation": 1})
+            self.assertEqual(previous.read_bytes(), first)
+            self.assertEqual(CampaignRunTests.read(previous)["runner"], {"generation": 0})
+            second = path.read_bytes()
+
+            def fail_write(_value, handle):
+                handle.write(b"incomplete checkpoint")
+                raise OSError("injected disk write failure")
+
+            with patch.object(run.torch, "save", side_effect=fail_write):
+                with self.assertRaisesRegex(OSError, "injected disk write failure"):
+                    run._save(path, learner, {"generation": 2})
+            self.assertEqual(path.read_bytes(), second)
+            self.assertEqual(previous.read_bytes(), first)
+            self.assertEqual({item.name for item in Path(temporary).iterdir()},
+                             {"checkpoint.pt", "checkpoint.pt.previous"})
+            path.write_bytes(b"damaged newest snapshot")
+            run._save(path, learner, {"generation": 2}, backup_current=False)
+            self.assertEqual(previous.read_bytes(), first)
+            self.assertEqual(CampaignRunTests.read(path)["runner"], {"generation": 2})
 
 
 if __name__ == "__main__":
