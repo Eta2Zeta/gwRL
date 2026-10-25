@@ -11,7 +11,7 @@ import torch
 
 from studies.campaign import neural
 from studies.campaign.features import (SCHEMA, action_factors, canonical,
-                                      cached_action, cached_context, cached_observation)
+                                      cached_action, cached_context, cached_observation, context_source_key)
 from studies.shared.multiplayer_mcts import Evaluation, MctsConfig, PLAYERS, VectorMCTS
 
 
@@ -53,7 +53,7 @@ def _array_document(serialized, buckets, role):
 
 def _numeric(item, buckets=128):
     return {"schema": neural.NUMERIC_SCHEMA, "owner": item["observation"].get("owner"),
-            "context_key": canonical(item["context"]),
+            "context_key": context_source_key(canonical(item["context"])),
             "packed_graph": {
                 "context": _array_document(canonical(item["context"]), buckets, "context"),
                 "observation": _array_document(canonical(item["observation"]), buckets, "observation"),

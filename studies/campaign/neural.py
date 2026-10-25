@@ -18,7 +18,7 @@ from torch import Tensor, nn
 
 from studies.shared.multiplayer_mcts import Evaluation, PLAYERS, vector
 from .features import (EXTERNAL_REFERENCE, NODE_TYPES, NUMERIC_DIM, RELATIONS, SCHEMA,
-                       Graph, action_factors, cached_action, cached_context, cached_observation, canonical, make_input)
+                       Graph, action_factors, cached_action, cached_context, cached_observation, canonical, context_source_key, make_input)
 
 NUMERIC_SCHEMA = "campaign-numeric-input-v1"
 
@@ -204,6 +204,35 @@ class _ReferenceIndices:
 _REFERENCE_INDICES = _SourceCache(64 * 1024 * 1024, 4096)
 
 
+@dataclass
+class _ReferenceMetadata:
+    identities: dict[str, tuple[int, ...]]
+    references: tuple[tuple[int, str], ...]
+
+
+_REFERENCE_METADATA = _SourceCache(64 * 1024 * 1024, 256)
+
+
+def _reference_metadata(graph: Any) -> Any:
+    if isinstance(graph, Graph):
+        return graph
+    key = (id(graph),)
+    cached = _REFERENCE_METADATA.get(key)
+    if cached is not None:
+        return cached
+    # Packed arrays are zero-copy native views. Keep only reference metadata;
+    # mixed legacy/numeric replay must not box every graph scalar for matching.
+    fields = graph.packed_state() if hasattr(graph, "packed_state") else graph.debug_graph()
+    if isinstance(fields, Graph):
+        result = _ReferenceMetadata(fields.identities, fields.references)
+    else:
+        result = _ReferenceMetadata(fields["identities"], fields["references"])
+    size = 256 + sum(128 + 4 * len(name.encode()) + 48 * len(indices)
+                     for name, indices in result.identities.items())
+    size += sum(128 + 4 * len(name.encode()) for _, name in result.references)
+    return _REFERENCE_METADATA.put(key, result, size, sources=(graph,))
+
+
 def _reference_indices(graph: Any, context: Any, device: torch.device) -> _ReferenceIndices:
     key = (id(graph), id(context), device)
     cached = _REFERENCE_INDICES.get(key)
@@ -213,11 +242,9 @@ def _reference_indices(graph: Any, context: Any, device: torch.device) -> _Refer
         if hasattr(graph, "external_references") and hasattr(context, "arrays"):
             destinations, indices = graph.external_references(context)
         else:
-            # Mixed native/reference graphs are supported for diagnostics too.
-            reference = graph.debug_graph() if hasattr(graph, "debug_graph") else graph
-            registry = context.debug_graph() if hasattr(context, "debug_graph") else context
-            reference = Graph(**reference) if isinstance(reference, dict) else reference
-            registry = Graph(**registry) if isinstance(registry, dict) else registry
+            # A continued learner can legitimately mix historical JSON rows
+            # with new native rows while retaining the same registry encoding.
+            reference, registry = _reference_metadata(graph), _reference_metadata(context)
             destinations, indices = [], []
             for destination, identity in reference.references:
                 for index in registry.identities.get(identity, ()):
@@ -490,7 +517,7 @@ class CampaignPolicyValueNet(nn.Module):
                 packed = item["packed_graph"]
                 if not isinstance(packed, dict) or set(packed) != {"context", "observation", "actions", "action_factors"}:
                     raise ValueError("Numerical inputs need complete context, observation, actions and factors")
-                context_key = (NUMERIC_SCHEMA, item["context_key"])
+                context_key = item["context_key"]
                 context, observation, menu = packed["context"], packed["observation"], packed["actions"]
                 if any(getattr(graph, "token_buckets", self.config.token_buckets) != self.config.token_buckets
                        for graph in (context, observation, *menu)):
@@ -504,8 +531,9 @@ class CampaignPolicyValueNet(nn.Module):
                     raise ValueError("Unsupported campaign neural input schema")
                 if not isinstance(item["observation"], dict) or not isinstance(item["context"], dict) or not isinstance(item["actions"], list):
                     raise ValueError("Neural inputs need observation/context objects and an action list")
-                context_key = (SCHEMA, canonical(item["context"]))
-                context = cached_context(context_key[1], self.config.token_buckets)
+                context_text = canonical(item["context"])
+                context_key = context_source_key(context_text)
+                context = cached_context(context_text, self.config.token_buckets)
                 observation = cached_observation(canonical(item["observation"]), self.config.token_buckets)
                 menu, row_factors = [], []
                 for action in item["actions"]:

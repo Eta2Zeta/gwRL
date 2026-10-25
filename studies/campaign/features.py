@@ -302,6 +302,18 @@ NUMERIC_SCHEMA = "campaign-numeric-input-v1"
 
 
 @lru_cache(maxsize=8)
+def context_source_key(serialized: str) -> str:
+    """Use the same complete registry identity for raw and numeric replay.
+
+    Canonical source text uses UTF-8; historical recovery context fingerprints
+    use JSON ASCII escapes. Normalize that spelling once per fixed registry.
+    """
+    ascii_text = json.dumps(json.loads(serialized), sort_keys=True,
+                            separators=(",", ":"), allow_nan=False)
+    return hashlib.sha256(ascii_text.encode()).hexdigest()
+
+
+@lru_cache(maxsize=8)
 def numeric_compiler(buckets: int):
     from gwrl_cpp import CampaignNumericGraphCompiler
     return CampaignNumericGraphCompiler(buckets, lexical_ids, _string_descriptor, _numeric_features)
