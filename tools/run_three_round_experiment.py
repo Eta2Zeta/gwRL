@@ -104,6 +104,19 @@ def validate_plan(plan: dict):
         roots = int(argument_value(arguments, "--parallel-envs"))
         if int(argument_value(arguments, "--batches")) < math.ceil(expected / roots):
             raise ValueError("Training batch allowance cannot complete the expected episodes")
+        start = plan.get("starting_training_episodes", 0)
+        start_updates = plan.get("starting_training_updates", 0)
+        if type(start) is not int or not 0 <= start < expected:
+            raise ValueError("Starting training episodes must be a nonnegative offset below the total goal")
+        if type(start_updates) is not int or start_updates < 0 or start_updates != math.ceil(start / roots):
+            raise ValueError("Starting learning updates must match the completed collection batches")
+        if (start or start_updates) and plan.get("initial_model_generation") != start_updates:
+            raise ValueError("Continuation baseline generation must match the starting learning updates")
+    elif "starting_training_episodes" in plan or "starting_training_updates" in plan:
+        raise ValueError("Continuation offsets require an expected total training episode count")
+    if "initial_model_generation" in plan and (type(plan["initial_model_generation"]) is not int
+                                                or plan["initial_model_generation"] < 0):
+        raise ValueError("Initial model generation must be a nonnegative integer")
     if "require_terminal_evaluation" in plan and type(plan["require_terminal_evaluation"]) is not bool:
         raise ValueError("require_terminal_evaluation must be boolean")
     if int(argument_value(arguments, "--threads")) + int(argument_value(arguments, "--parallel-envs")) + 4 > 12:
@@ -153,7 +166,9 @@ def training_completion_contract(plan: dict, manifest: dict) -> dict:
         return {"required": False, "complete": True}
     expected = plan["expected_training_episodes"]
     roots = int(argument_value(plan["training_arguments"], "--parallel-envs"))
-    expected_updates = math.ceil(expected / roots)
+    start = plan.get("starting_training_episodes", 0)
+    start_updates = plan.get("starting_training_updates", 0)
+    expected_updates = start_updates + math.ceil((expected - start) / roots)
     counters = manifest.get("counters", {})
     updates = manifest.get("runner", {}).get("updates", [])
     errors = []
@@ -179,7 +194,12 @@ def training_completion_contract(plan: dict, manifest: dict) -> dict:
         errors.append("Training records do not describe exactly the required three-round terminal games")
     return {"required": True, "complete": not errors, "expected_episodes": expected,
             "actual_episodes": counters.get("episodes"), "expected_updates": expected_updates,
-            "actual_updates": counters.get("updates"), "errors": errors}
+            "actual_updates": counters.get("updates"), "starting_episodes": start,
+            "expected_additional_episodes": expected - start,
+            "additional_episodes_completed": counters.get("episodes", 0) - start,
+            "starting_updates": start_updates,
+            "additional_updates_completed": counters.get("updates", 0) - start_updates,
+            "errors": errors}
 
 
 def evaluation_completion_contract(plan: dict, directory: Path, *, final: bool) -> dict:
@@ -396,11 +416,16 @@ class Experiment:
         manifest = read_json(self.training / "manifest.json", {})
         metadata = manifest.get("latest_model_export")
         if metadata is None:
+            if initial and self.plan.get("initial_model_generation", 0) != 0:
+                raise ValueError("Continuation initialization did not publish its starting-generation model export")
             return self.training / ("initial.pt" if initial else "checkpoint.pt")
         if not isinstance(metadata, dict) or not isinstance(metadata.get("path"), str):
             raise ValueError("Invalid model export metadata in training manifest")
-        candidate = (self.training / "models/generation-000000.pt" if initial
+        initial_generation = self.plan.get("initial_model_generation", 0)
+        candidate = (self.training / f"models/generation-{initial_generation:06d}.pt" if initial
                      else self.training / metadata["path"])
+        if initial and initial_generation != 0 and metadata.get("generation") != initial_generation:
+            raise ValueError("Initial evaluation generation differs from the continuation's starting networks")
         if not candidate.resolve().is_relative_to(self.training.resolve()):
             raise ValueError("Model export must belong to this training run")
         if not candidate.is_file():

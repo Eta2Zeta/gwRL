@@ -438,6 +438,77 @@ class ThreeRoundExperimentTests(unittest.TestCase):
         self.assertFalse(state["goal_achieved"])
         self.assertFalse(state["completion_contracts"]["final_evaluation"]["complete"])
 
+    def continuation_plan(self):
+        self.strict_plan()
+        self.plan.update(expected_training_episodes=120, starting_training_episodes=60,
+                         starting_training_updates=15, initial_model_generation=15)
+        arguments = self.plan["training_arguments"]
+        arguments[arguments.index("--batches") + 1] = "30"
+        arguments[arguments.index("--max-episodes") + 1] = "120"
+        return self.plan
+
+    def test_continuation_contract_counts_sixty_additional_games_above_saved_offsets(self):
+        self.continuation_plan()
+        validate_plan(self.plan)
+        beginning = training_completion_contract(self.plan, self.training_fixture(60))
+        self.assertFalse(beginning["complete"])
+        self.assertEqual(beginning["additional_episodes_completed"], 0)
+        final = training_completion_contract(self.plan, self.training_fixture(120))
+        self.assertTrue(final["complete"])
+        self.assertEqual(final["expected_episodes"], 120)
+        self.assertEqual(final["expected_updates"], 30)
+        self.assertEqual(final["expected_additional_episodes"], 60)
+        self.assertEqual(final["additional_episodes_completed"], 60)
+        self.assertEqual(final["additional_updates_completed"], 15)
+        for changes in ({"starting_training_episodes": -1}, {"starting_training_episodes": 120},
+                        {"starting_training_updates": 14}, {"initial_model_generation": 0},
+                        {"initial_model_generation": True}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                validate_plan({**self.plan, **changes})
+
+    def test_continuation_initial_evaluation_uses_saved_generation_fifteen_not_random_zero(self):
+        self.continuation_plan()
+        experiment = Experiment(self.plan)
+        models = self.root / "training/models"
+        models.mkdir(parents=True)
+        zero, starting = models / "generation-000000.pt", models / "generation-000015.pt"
+        zero.write_bytes(b"random untrained models")
+        starting.write_bytes(b"the resumed learned models")
+        manifest = models.parent / "manifest.json"
+        metadata = {"path": "models/generation-000015.pt", "bytes": starting.stat().st_size, "generation": 15}
+        manifest.write_text(json.dumps({"latest_model_export": metadata}))
+        self.assertEqual(experiment.evaluation_source(initial=True), starting)
+        command = experiment.command("initial_evaluation", self.plan["deadline_epoch"])
+        self.assertEqual(command[command.index("--checkpoint") + 1], str(starting))
+        metadata["generation"] = 16
+        manifest.write_text(json.dumps({"latest_model_export": metadata}))
+        with self.assertRaisesRegex(ValueError, "starting networks"):
+            experiment.evaluation_source(initial=True)
+        manifest.write_text("{}")
+        with self.assertRaisesRegex(ValueError, "starting-generation"):
+            experiment.evaluation_source(initial=True)
+
+    def test_preinitialized_continuation_preserves_saved_games_before_initial_evaluation(self):
+        self.install_strict_worker(episodes=120)
+        self.continuation_plan()
+        training = self.root / "training"
+        models = training / "models"
+        models.mkdir(parents=True)
+        (training / "checkpoint.pt").write_text("resumed games and RNG at generation fifteen")
+        (training / "initial.pt").write_text("initial weights")
+        starting = models / "generation-000015.pt"
+        starting.write_text("the resumed learned models")
+        manifest = self.training_fixture(60)
+        manifest["latest_model_export"] = {"path": "models/generation-000015.pt",
+            "bytes": starting.stat().st_size, "generation": 15}
+        (training / "manifest.json").write_text(json.dumps(manifest))
+        state = self.experiment().run()
+        self.assertEqual(state["status"], "completed")
+        self.assertTrue(state["goal_achieved"])
+        self.assertNotIn("initialize", (self.root / "executed.jsonl").read_text().splitlines())
+        self.assertTrue(any(event["kind"] == "initial_checkpoints_reused" for event in state["events"]))
+        self.assertEqual(state["completion_contracts"]["training"]["additional_episodes_completed"], 60)
+
 
 if __name__ == "__main__":
     unittest.main()
