@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import copy
 import os
 from pathlib import Path
 import signal
@@ -11,7 +12,10 @@ import tempfile
 import time
 import unittest
 
-from tools.run_three_round_experiment import Experiment, STAGES, digest, freeze_checkpoint, validate_plan, verify_runtime_manifest
+from tools.run_three_round_experiment import (
+    Experiment, STAGES, digest, fingerprint, freeze_checkpoint, validate_plan,
+    verify_runtime_manifest, training_completion_contract, evaluation_completion_contract,
+)
 
 
 class ThreeRoundExperimentTests(unittest.TestCase):
@@ -292,6 +296,147 @@ class ThreeRoundExperimentTests(unittest.TestCase):
             if experiment.guardian_process is not None and experiment.guardian_process.poll() is None:
                 experiment.guardian_process.kill()
                 experiment.guardian_process.wait(timeout=5)
+
+    def strict_plan(self):
+        self.plan.update(expected_training_episodes=60, require_terminal_evaluation=True)
+        self.plan["training_arguments"] = ["--calendar-rounds", "3", "--complete-episodes",
+            "--batches", "15", "--max-episodes", "60", "--parallel-envs", "4", "--threads", "4", "--cpu-budget", "11"]
+        return self.plan
+
+    @staticmethod
+    def terminal_clock():
+        return {"completed_rounds": 3, "round_index": 2, "nation_index": 3,
+                "phase": "place_units", "income_collected": True}
+
+    def training_fixture(self, episodes=60):
+        batches = episodes // 4
+        return {"counters": {"episodes": episodes, "updates": batches, "batches": batches},
+                "runner": {"updates": [{"rollout": {"bootstrap_samples": 0},
+                    "episodes": [{"terminal": True, "clock": self.terminal_clock()} for _ in range(4)]}
+                    for _ in range(batches)]}}
+
+    def evaluation_fixture(self, *, final=False):
+        plan = {"evaluation": {"seeds": self.plan["heldout_seeds"], "modes": ["network_only", "search"]}}
+        key = fingerprint(plan)
+        records = []
+        for mode in plan["evaluation"]["modes"]:
+            for seed in self.plan["heldout_seeds"]:
+                records.append({"mode": mode, "seed": seed, "contract_sha256": key,
+                    "result": {"territorial_tracking_schema": "campaign-national-chinese-possession-tracking-v2",
+                        "terminal_games": 1, "truncated_games": 0,
+                        "games": [{"seed": seed, "terminal": True, "truncated": False, "stop_reason": "terminal",
+                            "clock": self.terminal_clock(), "observed_terminal_returns": [1., 2., 3.],
+                            "completed_turns_at_stop": {"ccp": 3, "mongolia": 3, "japan": 3, "kmt": 3},
+                            "dadao_chinese_home_country": {"nation": "dadao", "terminal": True,
+                                "at_stop": {}, "newly_held": {}, "events": []}}]}})
+        report = {"status": "completed", "contract_sha256": key, "records": records,
+            "by_mode": {mode: {"terminal_games": len(self.plan["heldout_seeds"]), "truncated_games": 0}
+                        for mode in plan["evaluation"]["modes"]}}
+        if final:
+            report["paired_comparison"] = {"by_mode": {mode: {"complete_pairs": len(self.plan["heldout_seeds"])}
+                for mode in plan["evaluation"]["modes"]}}
+        return plan, report
+
+    def write_evaluation_fixture(self, directory, plan, report):
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / "plan.json").write_text(json.dumps(plan))
+        (directory / "report.json").write_text(json.dumps(report))
+
+    def install_strict_worker(self, *, episodes=60, initial_terminal=True, final_terminal=True):
+        self.strict_plan()
+        (self.directory / "training-fixture.json").write_text(json.dumps(self.training_fixture(episodes)))
+        for name, terminal in (("initial", initial_terminal), ("final", final_terminal)):
+            plan, report = self.evaluation_fixture(final=name == "final")
+            if not terminal:
+                report["records"][0]["result"]["games"][0]["terminal"] = False
+            self.write_evaluation_fixture(self.directory / ("fixture-" + name), plan, report)
+        self.worker.write_text(self.worker.read_text() +
+            "\nif stage == 'training':\n"
+            "    (training / 'manifest.json').write_text((root.parent / 'training-fixture.json').read_text())\n"
+            "if stage in ('initial_evaluation', 'final_evaluation'):\n"
+            "    name = 'initial' if stage == 'initial_evaluation' else 'final'\n"
+            "    fixture = root.parent / ('fixture-' + name)\n"
+            "    output = root / ('evaluation-' + name)\n"
+            "    for name in ('plan.json', 'report.json'): (output / name).write_text((fixture / name).read_text())\n")
+
+    def test_strict_plan_requires_matching_count_and_boolean_evaluation_flag(self):
+        self.strict_plan()
+        validate_plan(self.plan)
+        for invalid in (True, 0, -1, 60.0):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                validate_plan({**self.plan, "expected_training_episodes": invalid})
+        with self.assertRaisesRegex(ValueError, "match --max-episodes"):
+            validate_plan({**self.plan, "expected_training_episodes": 64})
+        with self.assertRaisesRegex(ValueError, "boolean"):
+            validate_plan({**self.plan, "require_terminal_evaluation": 1})
+        bad = self.plan["training_arguments"].copy()
+        bad[bad.index("--batches") + 1] = "14"
+        with self.assertRaisesRegex(ValueError, "batch allowance"):
+            validate_plan({**self.plan, "training_arguments": bad})
+
+    def test_training_completion_requires_exact_terminals_updates_and_zero_bootstraps(self):
+        self.strict_plan()
+        fixture = self.training_fixture()
+        self.assertTrue(training_completion_contract(self.plan, fixture)["complete"])
+        changes = [lambda value: value["counters"].update(episodes=56),
+            lambda value: value["counters"].update(updates=14),
+            lambda value: value["runner"]["updates"][0]["rollout"].update(bootstrap_samples=1),
+            lambda value: value["runner"]["updates"][0]["episodes"][0].update(terminal=False),
+            lambda value: value["runner"]["updates"][0]["episodes"][0]["clock"].update(completed_rounds=2)]
+        for change in changes:
+            value = copy.deepcopy(fixture)
+            change(value)
+            self.assertFalse(training_completion_contract(self.plan, value)["complete"])
+
+    def test_strict_evaluation_rejects_complete_record_lists_with_invalid_terminal_proof(self):
+        self.strict_plan()
+        directory = self.root / "evaluation-final"
+        plan, fixture = self.evaluation_fixture(final=True)
+        self.write_evaluation_fixture(directory, plan, fixture)
+        self.assertTrue(evaluation_completion_contract(self.plan, directory, final=True)["complete"])
+        changes = [lambda value: value["records"][0]["result"]["games"][0].update(terminal=False),
+            lambda value: value["records"][0]["result"]["games"][0]["clock"].update(completed_rounds=2),
+            lambda value: value["records"][0]["result"]["games"][0].update(observed_terminal_returns=[None] * 3),
+            lambda value: value["records"].append(copy.deepcopy(value["records"][0])),
+            lambda value: value["records"][0].update(contract_sha256="different"),
+            lambda value: value["records"][0]["result"].update(territorial_tracking_schema="old"),
+            lambda value: value["paired_comparison"]["by_mode"]["search"].update(complete_pairs=0)]
+        for change in changes:
+            value = copy.deepcopy(fixture)
+            change(value)
+            self.write_evaluation_fixture(directory, plan, value)
+            self.assertFalse(evaluation_completion_contract(self.plan, directory, final=True)["complete"])
+
+    def test_strict_success_requires_all_sixty_games_and_both_terminal_evaluations(self):
+        self.install_strict_worker()
+        state = self.experiment().run()
+        self.assertEqual(state["status"], "completed")
+        self.assertTrue(state["goal_achieved"])
+        self.assertTrue(all(value["complete"] for value in state["completion_contracts"].values()))
+
+    def test_strict_partial_training_is_evaluated_but_never_reported_as_goal_complete(self):
+        self.install_strict_worker(episodes=4)
+        state = self.experiment().run()
+        self.assertEqual(state["status"], "budget_exhausted")
+        self.assertFalse(state["goal_achieved"])
+        self.assertFalse(state["completion_contracts"]["training"]["complete"])
+        self.assertTrue((self.root / "evaluation-final/report.json").exists())
+        self.assertTrue((self.root / "training/checkpoint.pt").exists())
+
+    def test_strict_nonterminal_initial_evaluation_blocks_training_with_concrete_reason(self):
+        self.install_strict_worker(initial_terminal=False)
+        state = self.experiment().run()
+        self.assertEqual(state["status"], "attention_required")
+        self.assertEqual(state["stage"], "initial_evaluation")
+        self.assertFalse((self.root / "training-control").exists())
+        self.assertIn("genuine three-round terminal", state["events"][-1]["reason"])
+
+    def test_strict_nonterminal_final_evaluation_cannot_mark_completed(self):
+        self.install_strict_worker(final_terminal=False)
+        state = self.experiment().run()
+        self.assertEqual(state["status"], "budget_exhausted")
+        self.assertFalse(state["goal_achieved"])
+        self.assertFalse(state["completion_contracts"]["final_evaluation"]["complete"])
 
 
 if __name__ == "__main__":

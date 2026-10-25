@@ -75,7 +75,7 @@ def validate_plan(plan: dict):
     if not isinstance(plan["deadline_epoch"], (int, float)) or not math.isfinite(plan["deadline_epoch"]):
         raise ValueError("Plan deadline must be finite")
     if plan["deadline_epoch"] > time.time() + 10 * 3600 + 1:
-        raise ValueError("Plan deadline exceeds the authorized ten-hour allowance")
+        raise ValueError("Plan deadline exceeds the pipeline's ten-hour hard ceiling")
     arguments = plan["training_arguments"]
     if not isinstance(arguments, list) or not all(isinstance(item, str) for item in arguments):
         raise ValueError("Training arguments must be an explicit string list")
@@ -95,6 +95,17 @@ def validate_plan(plan: dict):
         raise ValueError("Held-out seeds must be unique unsigned integers")
     if "--record-replay" in arguments:
         raise ValueError("Resumable training cannot use the fresh-run-only replay writer")
+    if "expected_training_episodes" in plan:
+        expected = plan["expected_training_episodes"]
+        if type(expected) is not int or expected <= 0:
+            raise ValueError("Expected training episodes must be a positive integer")
+        if int(argument_value(arguments, "--max-episodes")) != expected:
+            raise ValueError("Expected training episodes must match --max-episodes")
+        roots = int(argument_value(arguments, "--parallel-envs"))
+        if int(argument_value(arguments, "--batches")) < math.ceil(expected / roots):
+            raise ValueError("Training batch allowance cannot complete the expected episodes")
+    if "require_terminal_evaluation" in plan and type(plan["require_terminal_evaluation"]) is not bool:
+        raise ValueError("require_terminal_evaluation must be boolean")
     if int(argument_value(arguments, "--threads")) + int(argument_value(arguments, "--parallel-envs")) + 4 > 12:
         raise ValueError("Tensor workers, search roots and four coordinators exceed 12 cores")
     memory = plan.get("memory_bytes", 26_000_000_000)
@@ -128,6 +139,106 @@ def verify_runtime_manifest(plan):
         if not path.is_relative_to(runtime) or not isinstance(value, str) or digest(path) != value:
             raise ValueError(f"Frozen runtime file changed: {name}")
     return expected
+
+
+def _terminal_three_round_clock(clock) -> bool:
+    return (isinstance(clock, dict) and clock.get("completed_rounds") == 3
+            and clock.get("round_index") == 2 and clock.get("nation_index") == 3
+            and clock.get("phase") == "place_units" and clock.get("income_collected") is True)
+
+
+def training_completion_contract(plan: dict, manifest: dict) -> dict:
+    """Check exact completed work from durable metadata, without loading replay."""
+    if "expected_training_episodes" not in plan:
+        return {"required": False, "complete": True}
+    expected = plan["expected_training_episodes"]
+    roots = int(argument_value(plan["training_arguments"], "--parallel-envs"))
+    expected_updates = math.ceil(expected / roots)
+    counters = manifest.get("counters", {})
+    updates = manifest.get("runner", {}).get("updates", [])
+    errors = []
+    if counters.get("episodes") != expected:
+        errors.append(f"Expected {expected} completed training games; found {counters.get('episodes')}")
+    if counters.get("updates") != expected_updates or counters.get("batches") != expected_updates:
+        errors.append(f"Expected {expected_updates} completed learning batches and updates")
+    episodes = []
+    if not isinstance(updates, list) or len(updates) != expected_updates:
+        errors.append(f"Expected {expected_updates} durable learning records")
+    if isinstance(updates, list):
+        for update in updates:
+            rollout = update.get("rollout") if isinstance(update, dict) else None
+            if not isinstance(rollout, dict) or type(rollout.get("bootstrap_samples")) is not int or rollout["bootstrap_samples"] != 0:
+                errors.append("A learning record has missing or nonzero bootstrap samples")
+            batch_episodes = update.get("episodes", []) if isinstance(update, dict) else []
+            if not isinstance(batch_episodes, list):
+                errors.append("A learning record has invalid game records")
+                continue
+            episodes.extend(batch_episodes)
+    if len(episodes) != expected or any(not isinstance(episode, dict) or episode.get("terminal") is not True
+            or not _terminal_three_round_clock(episode.get("clock")) for episode in episodes):
+        errors.append("Training records do not describe exactly the required three-round terminal games")
+    return {"required": True, "complete": not errors, "expected_episodes": expected,
+            "actual_episodes": counters.get("episodes"), "expected_updates": expected_updates,
+            "actual_updates": counters.get("updates"), "errors": errors}
+
+
+def evaluation_completion_contract(plan: dict, directory: Path, *, final: bool) -> dict:
+    """A complete seed list alone is insufficient: every game must be terminal."""
+    if not plan.get("require_terminal_evaluation", False):
+        return {"required": False, "complete": True}
+    report, contract = read_json(directory / "report.json", {}), read_json(directory / "plan.json", {})
+    seeds = plan.get("heldout_seeds", list(HELDOUT_SEEDS))
+    modes = ("network_only", "search")
+    expected = {(mode, seed) for mode in modes for seed in seeds}
+    errors, seen = [], set()
+    contract_sha = fingerprint(contract)
+    evaluation = contract.get("evaluation", {})
+    if evaluation.get("seeds") != seeds or evaluation.get("modes") != list(modes):
+        errors.append("Evaluation contract has different held-out seeds or modes")
+    if report.get("status") != "completed" or report.get("contract_sha256") != contract_sha:
+        errors.append("Evaluation report is incomplete or has a different contract")
+    records = report.get("records", [])
+    if not isinstance(records, list):
+        records = []
+        errors.append("Evaluation records must be a list")
+    for row in records:
+        if not isinstance(row, dict):
+            errors.append("Invalid evaluation record")
+            continue
+        pair = row.get("mode"), row.get("seed")
+        if pair not in expected or pair in seen or row.get("contract_sha256") != contract_sha:
+            errors.append("Evaluation has a foreign, duplicate or mismatched seed/mode record")
+        seen.add(pair)
+        result = row.get("result", {})
+        result = result if isinstance(result, dict) else {}
+        games = result.get("games", [])
+        game = games[0] if isinstance(games, list) and len(games) == 1 and isinstance(games[0], dict) else {}
+        dadao = game.get("dadao_chinese_home_country", {})
+        if (result.get("territorial_tracking_schema") != "campaign-national-chinese-possession-tracking-v2"
+                or not isinstance(dadao, dict) or dadao.get("nation") != "dadao" or dadao.get("terminal") is not True
+                or not isinstance(dadao.get("at_stop"), dict) or not isinstance(dadao.get("newly_held"), dict)
+                or not isinstance(dadao.get("events"), list)):
+            errors.append(f"Evaluation {pair} lacks the current separate Dadao territorial diagnostics")
+        returns = game.get("observed_terminal_returns")
+        valid_returns = (isinstance(returns, list) and len(returns) == 3
+                         and all(type(value) in (int, float) and math.isfinite(value) for value in returns))
+        if (game.get("seed") != row.get("seed") or game.get("terminal") is not True
+                or game.get("truncated") is not False or game.get("stop_reason") != "terminal"
+                or not _terminal_three_round_clock(game.get("clock"))
+                or game.get("completed_turns_at_stop") != {"ccp": 3, "mongolia": 3, "japan": 3, "kmt": 3}
+                or not valid_returns or result.get("terminal_games") != 1 or result.get("truncated_games") != 0):
+            errors.append(f"Evaluation {pair} did not reach its genuine three-round terminal")
+    if seen != expected or len(records) != len(expected):
+        errors.append(f"Expected exactly {len(expected)} unique held-out evaluation games")
+    for mode in modes:
+        summary = report.get("by_mode", {}).get(mode, {})
+        if summary.get("terminal_games") != len(seeds) or summary.get("truncated_games") != 0:
+            errors.append(f"Evaluation {mode} terminal totals differ from the held-out set")
+        paired = report.get("paired_comparison") or {}
+        if final and paired.get("by_mode", {}).get(mode, {}).get("complete_pairs") != len(seeds):
+            errors.append(f"Final evaluation {mode} lacks a complete paired comparison")
+    return {"required": True, "complete": not errors, "expected_games": len(expected),
+            "recorded_games": len(records), "errors": errors}
 
 
 def _event(state: dict, kind: str, **details):
@@ -451,7 +562,9 @@ class Experiment:
                               "attempts": [], "events": [], "child_process_group": None,
                               "aggregate_sampled_peak_rss_bytes": 0, "known_process_groups": [],
                               "resource_scope": "Pipeline, independent guardian, sleep prevention, supervisor and full child process tree; sampled RSS with 1 GB safety margin",
-                              "deadline_scope": "Absolute ten-hour deadline includes downtime; stage deadlines are persisted and never reset"}
+                              "deadline_scope": "Absolute plan deadline includes downtime; stage deadlines are persisted and never reset"}
+                if "expected_training_episodes" in self.plan or self.plan.get("require_terminal_evaluation", False):
+                    self.state["goal_achieved"] = False
                 _event(self.state, "pipeline_initialized")
             self.state["pipeline_pid"] = os.getpid()
             try:
@@ -528,10 +641,31 @@ class Experiment:
                                 return self.fail("Evaluation worker failed", record["number"])
                             elif stage == "initial_evaluation" and not (self.root / "evaluation-initial/plan.json").is_file():
                                 return self.fail("Initial evaluation did not save a compatible comparison plan", record["number"])
+                        if stage == "initial_evaluation" and self.plan.get("require_terminal_evaluation", False):
+                            check = evaluation_completion_contract(self.plan, self.root / "evaluation-initial", final=False)
+                            self.state.setdefault("completion_contracts", {})[stage] = check
+                            if not check["complete"]:
+                                return self.fail("Initial held-out evaluation did not complete: " + "; ".join(check["errors"][:3]))
+                        if stage == "training" and "expected_training_episodes" in self.plan:
+                            check = training_completion_contract(self.plan, read_json(self.training / "manifest.json", {}))
+                            self.state.setdefault("completion_contracts", {})[stage] = check
+                            if not check["complete"]:
+                                _event(self.state, "training_goal_incomplete", contract=check)
                         self.state["stage_index"] += 1
                         self.persist()
                     report = read_json(self.root / "evaluation-final/report.json", {})
-                    self.state["status"] = "completed" if report.get("status") == "completed" else "budget_exhausted"
+                    complete = report.get("status") == "completed"
+                    if "expected_training_episodes" in self.plan or self.plan.get("require_terminal_evaluation", False):
+                        checks = {"training": training_completion_contract(
+                            self.plan, read_json(self.training / "manifest.json", {})),
+                            "initial_evaluation": evaluation_completion_contract(
+                                self.plan, self.root / "evaluation-initial", final=False),
+                            "final_evaluation": evaluation_completion_contract(
+                                self.plan, self.root / "evaluation-final", final=True)}
+                        self.state["completion_contracts"] = checks
+                        self.state["goal_achieved"] = all(check["complete"] for check in checks.values())
+                        complete = complete and self.state["goal_achieved"]
+                    self.state["status"] = "completed" if complete else "budget_exhausted"
                     _event(self.state, "pipeline_finished", final_evaluation_status=report.get("status", "not_saved"))
                     self.persist()
                     return self.state
