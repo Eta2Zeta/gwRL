@@ -164,6 +164,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
 
     py::class_<game::neural::NumericGraph, std::shared_ptr<game::neural::NumericGraph>>(module, "CampaignNumericGraph")
         .def("arrays", &game::neural::NumericGraph::arrays)
+        .def("__eq__", &game::neural::NumericGraph::equals, py::is_operator(), py::call_guard<py::gil_scoped_release>())
         .def("debug_graph", &game::neural::NumericGraph::debugGraph)
         .def("external_references", &game::neural::NumericGraph::externalReferences)
         .def_property_readonly("node_count", &game::neural::NumericGraph::nodeCount)

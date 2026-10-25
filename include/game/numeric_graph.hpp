@@ -19,6 +19,7 @@ public:
     std::size_t nodeCount() const;
     std::size_t leafCount() const;
     std::size_t retainedBytes() const;
+    bool equals(const NumericGraph& other) const;
     std::int64_t bucketCount() const;
     pybind11::dict arrays() const;
     pybind11::dict debugGraph() const;

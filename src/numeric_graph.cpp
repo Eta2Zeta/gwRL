@@ -450,6 +450,24 @@ std::size_t NumericGraph::leafCount() const { return data_->leaves; }
 std::int64_t NumericGraph::bucketCount() const { return data_->buckets; }
 std::size_t NumericGraph::retainedBytes() const { return retainedBytes_; }
 
+bool NumericGraph::equals(const NumericGraph& other) const {
+    if (data_ == other.data_) return true;
+    const auto& a = *data_;
+    const auto& b = *other.data_;
+    if (a.buckets != b.buckets || a.leaves != b.leaves || a.tokenIds != b.tokenIds ||
+        a.tokenOffsets != b.tokenOffsets || a.types != b.types || a.sources != b.sources ||
+        a.targets != b.targets || a.relations != b.relations || a.numeric.size() != b.numeric.size() ||
+        a.identities.size() != b.identities.size() || a.references.size() != b.references.size()) return false;
+    if (!a.numeric.empty() && std::memcmp(a.numeric.data(), b.numeric.data(), a.numeric.size() * sizeof(double))) return false;
+    for (const auto& identity : a.identities) {
+        const auto found = b.identityLookup.find(identity.name);
+        if (found == b.identityLookup.end() || identity.nodes != b.identities[found->second].nodes) return false;
+    }
+    for (std::size_t i = 0; i < a.references.size(); ++i)
+        if (a.references[i].source != b.references[i].source || a.references[i].identity != b.references[i].identity) return false;
+    return true;
+}
+
 py::dict NumericGraph::arrays() const {
     py::dict result;
     result["token_ids"] = arrayView(data_, data_->tokenIds);

@@ -270,6 +270,19 @@ class CampaignNumericExportTests(unittest.TestCase):
         np.testing.assert_array_equal(actual[1], indices)
         self.assertIsNot(restored, graph)
 
+    def test_graph_value_equality_compares_complete_buffers_and_numeric_bits(self):
+        graph = numeric_compiler(BUCKETS).compile(self.raw.numeric_context())
+        loaded = pickle.loads(pickle.dumps(graph, protocol=5))
+        self.assertEqual(graph, loaded)
+        self.assertEqual(graph, graph)
+        self.assertNotEqual(graph, object())
+        packed = graph.packed_state()
+        numeric = np.array(packed["numeric"], copy=True)
+        row, col = np.argwhere(numeric == 0)[0]
+        numeric[row, col] = -0.0 if not np.signbit(numeric[row, col]) else 0.0
+        changed = gwrl_cpp.CampaignNumericGraph.from_packed({**packed, "numeric": numeric})
+        self.assertNotEqual(graph, changed)
+
     def test_packed_restore_rejects_corrupt_shapes_types_offsets_edges_and_metadata(self):
         graph = numeric_compiler(BUCKETS).compile(self.raw.numeric_context())
         packed = graph.packed_state()
