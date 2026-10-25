@@ -307,6 +307,9 @@ struct NumericGraphCompiler::Impl {
             } else if (value.isNumber()) {
                 kind = Number;
                 number = value.asNumber();
+                // Public native JSON canonicalizes numeric -0.0 to 0. Retain
+                // that established feature spelling without text round trips.
+                if (number == 0) number = 0.0;
                 if (!std::isfinite(number)) throw std::invalid_argument("Neural features require finite JSON numbers");
             } else if (value.isString()) {
                 kind = String;

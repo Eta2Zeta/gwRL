@@ -54,6 +54,15 @@ struct NumericSnapshot {
     using V = game::json::Value;
     std::shared_ptr<const V> source;
     V::Object overrides;
+    std::shared_ptr<const std::string> actionSourceKey;
+    bool passAction {false};
+
+    py::object cacheKey() const {
+        if (!overrides.empty() || (!actionSourceKey && !passAction)) return py::none();
+        const auto& fields = source->asObject();
+        return py::make_tuple(fields.at("id").asString(), fields.at("kind").asString(),
+            fields.at("player").asString(), actionSourceKey ? py::object(py::str(*actionSourceKey)) : py::object(py::none()));
+    }
 
     V materialize() const {
         if (overrides.empty()) return *source;
@@ -89,7 +98,8 @@ struct NumericSnapshot {
     static NumericSnapshot scheduledAction(const game::campaign::Action* action,
             const std::string& id, const std::string& kind, const std::string& player) {
         return {std::make_shared<const V>(V::Object{{"id", V(id)}, {"kind", V(kind)},
-            {"player", V(player)}, {"action", action ? game::campaign::actionJson(*action) : V(nullptr)}}), {}};
+            {"player", V(player)}, {"action", action ? game::campaign::actionJson(*action) : V(nullptr)}}), {},
+            action ? action->neuralSourceKey : nullptr, action == nullptr};
     }
 
     std::vector<std::string> factorJson() const {
@@ -152,6 +162,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                "Compile complete public JSON features without engine state or learned tensors.");
 
     py::class_<NumericSnapshot>(module, "CampaignNumericSnapshot")
+        .def_property_readonly("cache_key", &NumericSnapshot::cacheKey)
         .def("scheduled_context", &NumericSnapshot::scheduledContext, py::call_guard<py::gil_scoped_release>())
         .def("scheduled_observation", &NumericSnapshot::scheduledObservation, py::call_guard<py::gil_scoped_release>())
         .def("factor_json", &NumericSnapshot::factorJson, py::call_guard<py::gil_scoped_release>())

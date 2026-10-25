@@ -270,6 +270,17 @@ class CampaignNumericExportTests(unittest.TestCase):
         np.testing.assert_array_equal(actual[1], indices)
         self.assertIsNot(restored, graph)
 
+    def test_native_numeric_zero_and_finite_free_fields_match_public_json(self):
+        value = json.loads(self.raw.serialize())
+        value["state"]["politics"]["pending"]["numeric_export_fixture"] = {
+            "negative_zero": -0.0, "positive_zero": 0.0, "fraction": 0.125,
+            "extreme": 1.7976931348623157e308,
+        }
+        self.raw.restore(json.dumps(value))
+        self.env = CampaignAdapter(self.raw)
+        actions = self.env.legal_actions()
+        self.assert_input_equal(make_numeric_input(self.env, actions, BUCKETS), make_input(self.env, actions))
+
     def test_graph_value_equality_compares_complete_buffers_and_numeric_bits(self):
         graph = numeric_compiler(BUCKETS).compile(self.raw.numeric_context())
         loaded = pickle.loads(pickle.dumps(graph, protocol=5))
