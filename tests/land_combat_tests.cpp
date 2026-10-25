@@ -326,6 +326,80 @@ void ordinaryLowMoraleWithoutAnOriginIsUnsupported() {
     check(rejected, "Ordinary Low Morale inherited the shared-Truce elimination exception");
     check(e.serialize() == before, "Unsupported ordinary Low Morale changed units, events or RNG");
 }
+void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
+    const Id counterOrigin = "land_china_suiyuan";
+    auto s = fixture("kmt");
+    clearTerrain(s, hopeh);
+    clearTerrain(s, beiping);
+    s.territories.at(hopeh).possessor = "japan";
+    s.territories.at(beiping).possessor = "kmt";
+    s.territories.at(counterOrigin).possessor = "ccp";
+    s.nations.at("ccp").atWarWith.insert("kmt");
+    s.nations.at("kmt").atWarWith.insert("ccp");
+    add(s, "retreater", "kmt", hopeh);
+    add(s, "counter", "ccp", counterOrigin);
+    const auto firstBattle = battle(s, {"retreater"}, {{"retreater", beiping}}, hopeh, "kmt");
+    s.captureTurnStart();
+    auto gameplay = std::make_shared<PoliticsRules>(std::make_shared<MovementRules>(
+        std::make_shared<AirRules>(std::make_shared<LandCombatRules>(std::make_shared<EconomyRules>()))));
+    Engine e(s, gameplay, 123);
+    e.setDiceTapeForTesting({10, 12, 1});
+    const auto initial = e.serialize();
+    begin(e);
+    e.resolveChance();
+    check(e.state().units.at("retreater").zone == beiping &&
+              e.state().units.at("retreater").commitments.contains("retreated") &&
+              e.state().units.at("retreater").movementRemaining == 0,
+          "Low Morale retreat lost its movement restriction");
+    const auto& excluded = e.state().battles.at(firstBattle).data.require("retreated_units").asArray();
+    check(excluded.size() == 1 && excluded.front().asString() == "retreater",
+          "Low Morale exclusion was not recorded in its actual battle");
+    choose(e, "land_progress_battle");
+    for (int step = 0; step < 80 && !(e.state().currentNation() == "ccp" &&
+             e.state().clock.phase == Phase::CombatMovement); ++step) {
+        const auto actions = e.legalActions();
+        const auto end = std::find_if(actions.begin(), actions.end(),
+                                     [](const Action& action) { return action.kind == "end_phase"; });
+        if (end != actions.end()) e.step(*end);
+        else e.step(select(actions, "economy_finish_research"));
+    }
+    check(e.state().currentNation() == "ccp" && e.state().clock.phase == Phase::CombatMovement,
+          "Counterattack fixture did not reach the intervening CCP turn");
+    check(flag(e.state().units.at("retreater").turnFlags, "land_retreating") &&
+              e.state().units.at("retreater").commitments.contains("retreated"),
+          "Fixture cleared the old retreat before testing another faction's attack");
+    e.step(select(e.legalActions(), "movement_route", [](const Action& action) {
+        return action.parameters.require("unit").asString() == "counter" &&
+               action.parameters.require("path").asArray().back().asString() == beiping;
+    }));
+    choose(e, "end_phase");
+    begin(e);
+    e.resolveChance(); // CCP misses; the retreated KMT infantry must return fire.
+    check(e.state().chance && e.state().chance->dice.size() == 1 &&
+              e.state().battles.at(e.state().chance->continuation).stage == "defender_fire" &&
+              e.state().battles.at(e.state().chance->continuation).data.require("shots").asArray()
+                  .front().require("unit").asString() == "retreater",
+          "Retreated KMT infantry was suppressed as an intervening-turn defender");
+    check(e.state().territories.at(beiping).possessor == "kmt" && e.state().units.contains("retreater"),
+          "Enemy captured a territory while its retreated defender was still alive");
+    const auto checkpoint = e.serialize();
+    auto clone = e.clone();
+    e.resolveChance();
+    clone.resolveChance();
+    check(clone.exactReplayIdentity() == e.exactReplayIdentity(),
+          "Retreated defender clone/checkpoint diverged");
+    auto restored = Engine::restore(s.definition, gameplay, checkpoint);
+    restored.resolveChance();
+    check(restored.exactReplayIdentity() == e.exactReplayIdentity(),
+          "Retreated defender checkpoint lost its return fire");
+    drain(e);
+    check(e.state().units.contains("retreater") && !e.state().units.contains("counter") &&
+              e.state().territories.at(beiping).possessor == "kmt",
+          "Retreated defender could not defeat the later counterattack");
+    auto replayed = Engine::replay(s.definition, gameplay, initial, e.state().history);
+    check(replayed.exactReplayIdentity() == e.exactReplayIdentity(),
+          "Low Morale retreat and later defense replay diverged");
+}
 void artilleryPairingAndSurvivorRecalculation() {
     auto s = fixture();
     clearTerrain(s, hopeh);
@@ -1079,6 +1153,7 @@ int main() {
                  {"KMT empty origins", kmtLowMoraleEmptyAndOrigins},
                  {"KMT protected retreaters", lowMoraleUnitsCannotBeCasualties},
                  {"ordinary KMT missing origin", ordinaryLowMoraleWithoutAnOriginIsUnsupported},
+                 {"KMT retreat and later defense", lowMoraleRetreatersDefendBeforeTheirNextTurn},
                  {"artillery pairs", artilleryPairingAndSurvivorRecalculation},
                  {"land retreat entry source", onlyLandEntriesCreateRetreatDestinations},
                  {"city round limit", cityRoundLimitAndRetreatChoice},

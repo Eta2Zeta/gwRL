@@ -121,7 +121,10 @@ bool operational(const State &s, const BattleState &b, const Id &id) {
         !u.commitments.contains("air_battle:" + b.id))
         return false;
     const auto grounded = object(b, "grounded");
-    return !grounded.contains(id) && !marked(u.turnFlags, "land_retreating");
+    const auto *retreated = b.data.find("retreated_units");
+    return !grounded.contains(id) && (!retreated ||
+        std::none_of(retreated->asArray().begin(), retreated->asArray().end(),
+                     [&](const V& unit) { return unit.asString() == id; }));
 }
 std::vector<Id> living(const State &s, const BattleState &b, bool attacker) {
     std::vector<Id> out;
@@ -277,12 +280,17 @@ bool pendingDead(const BattleState &b, const Id &id) {
     }
     return false;
 }
-void retreatUnit(State &s, const Id &id, const Id &to) {
+void retreatUnit(State &s, BattleState &battle, const Id &id, const Id &to) {
     auto &u = s.units.at(id);
     u.zone = to;
     u.movementRemaining = 0;
     u.turnFlags["land_retreating"] = 1;
     u.commitments.insert("retreated");
+    // Retreat removes a unit from this battle. Its movement commitment lasts
+    // until its next turn, but must not suppress defense in another battle.
+    auto retreated = array(battle, "retreated_units");
+    retreated.emplace_back(id);
+    put(battle, "retreated_units", V(std::move(retreated)));
 }
 void pruneUnits(State &s, BattleState &b) {
     for (auto *v : {&b.attackers, &b.defenders})
@@ -1510,7 +1518,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "land_retreat_unit") {
         release(s, a);
-        retreatUnit(s, a.parameters.require("unit").asString(), a.parameters.require("zone").asString());
+        retreatUnit(s, b, a.parameters.require("unit").asString(), a.parameters.require("zone").asString());
         assignRetreat(s, b);
         return;
     }
@@ -1576,7 +1584,7 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
                             politicallyFriendly(s, s.units.at(unit).owner,
                                                 *s.territories.at(from).possessor),
                         "Unsupported rule state: KMT Low Morale has no legal attack-origin retreat");
-                retreatUnit(s, unit, from);
+                retreatUnit(s, b, unit, from);
             }
             continue;
         }

@@ -4,6 +4,35 @@ Authorized 24 October 2026: at most 12 CPU cores, 30,000,000,000 bytes of memory
 and ten hours for a three-round campaign learning experiment. This is a test of
 basic useful behavior, not a claim of eleven-round campaign competence.
 
+## Preflight correction
+
+The first held-out game exposed a combat bug before any learning update. KMT
+infantry retreated from Rehe to Beiping in round one. Its old retreat flag then
+incorrectly excluded it from defending Beiping during CCP's following turn.
+CCP could capture the zone while that infantry remained alive; a later KMT Low
+Morale retreat failed because its attack origin had become hostile.
+
+Retreat participation is now recorded per battle. A withdrawn unit stays out of
+its original battle, retains its movement restriction, and can defend in another
+battle. The ordinary attack-origin retreat safeguard and the adopted shared-zone
+truce rules remain unchanged. This is an implementation correction, not a new
+rule interpretation. The new regression follows a genuine Low Morale retreat
+through the calendar to an intervening CCP attack and checks defense, movement
+restrictions, clone/checkpoint continuation and exact replay.
+
+The failed launch and its runtime/checkpoints are preserved at
+`studies/campaign/runs/three-round-10h-2026-10-24/`. It performed four initial
+decisions and zero learning updates. The corrected experiment starts fresh in
+the sibling `three-round-10h-2026-10-24-r2/` directory with the same initialization,
+settings and absolute deadline. No incompatible checkpoint is silently migrated.
+
+Validation after the correction: all 346 Python tests pass (236.796 seconds),
+all 26 CTest suites pass (87.35 seconds), and the 33 land-combat fixture groups
+pass. The formerly failing held-out seed 40009 now completes three rounds with
+fresh parameters identical to the original untrained baseline. That baseline
+gained no Chinese land and lost Rehe; it is a comparison point, not evidence of
+learning.
+
 ## Question and fixed settings
 
 Does three-round self-play improve Japan's ability to acquire and retain
@@ -99,6 +128,6 @@ fixed budgets, process locks, resource stops and bounded transient retries.
 
 Large models, progress logs, evaluation events, frozen runtime and raw resource
 measurements remain ignored under
-`studies/campaign/runs/three-round-10h-2026-10-24/`. Curated launch/result evidence
+`studies/campaign/runs/three-round-10h-2026-10-24-r2/`. Curated launch/result evidence
 will identify the source revision, native hash, settings, timings, counts and
 the limits of any learning conclusion.
