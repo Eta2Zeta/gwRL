@@ -186,8 +186,13 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def_static("from_packed", &game::neural::NumericGraph::fromPacked)
         .def("__deepcopy__", [](const std::shared_ptr<game::neural::NumericGraph>& graph, py::dict) { return graph; })
         .def(py::pickle(
-            [](const game::neural::NumericGraph& graph) { return graph.packedState(); },
-            [](const py::dict& state) { return game::neural::NumericGraph::fromPacked(state); }));
+            [](const game::neural::NumericGraph& graph) -> py::object {
+                return py::module_::import("studies.campaign.numeric_storage").attr("pack_graph")(graph.packedState());
+            },
+            [](const py::object& state) {
+                const auto packed = py::module_::import("studies.campaign.numeric_storage").attr("unpack_graph")(state);
+                return game::neural::NumericGraph::fromPacked(packed.cast<py::dict>());
+            }));
     py::class_<game::neural::NumericGraphCompiler>(module, "CampaignNumericGraphCompiler")
         .def(py::init<std::int64_t, py::function, py::function, py::function>())
         .def("compile", [](game::neural::NumericGraphCompiler& compiler, const NumericSnapshot& snapshot) {

@@ -166,6 +166,18 @@ struct NumericGraphData {
     std::size_t leaves = 0;
     std::int64_t buckets = 0;
 
+    void compact() {
+        tokenIds.shrink_to_fit();
+        tokenOffsets.shrink_to_fit();
+        types.shrink_to_fit();
+        numeric.shrink_to_fit();
+        sources.shrink_to_fit();
+        targets.shrink_to_fit();
+        relations.shrink_to_fit();
+        references.shrink_to_fit();
+        identities.shrink_to_fit();
+    }
+
     void addEdge(std::int64_t source, std::int64_t target, std::int64_t relation) {
         sources.push_back(source);
         targets.push_back(target);
@@ -285,6 +297,9 @@ struct NumericGraphCompiler::Impl {
                 }
             }
             addAdjacency(value, rootOverrides);
+            // Published graphs are immutable. Do not retain the transient
+            // append-growth capacity in every replay position for the run.
+            graph->compact();
             return std::move(graph);
         }
 
@@ -633,6 +648,7 @@ std::shared_ptr<NumericGraph> NumericGraph::fromPacked(const py::dict& state) {
         if (source != strings[index]) throw std::invalid_argument("Packed campaign graph references are not in string traversal order");
         data->references.push_back({source, py::cast<std::string>(reference[1])});
     }
+    data->compact();
     return std::shared_ptr<NumericGraph>(new NumericGraph(std::move(data)));
 }
 
