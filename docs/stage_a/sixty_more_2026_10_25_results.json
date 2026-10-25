@@ -1,0 +1,1712 @@
+{
+  "completed_at_utc": "2026-10-25T23:46:23.983801+00:00",
+  "conclusion": "The 60-additional-game continuation completed, but neither network-only nor search evaluation showed any new Japanese Chinese territorial acquisitions. Mixed loss/wealth changes do not establish improved offensive play.",
+  "evaluation": {
+    "by_mode": {
+      "network_only": {
+        "generation_15": {
+          "axis_terminal_wealth": {
+            "approximate_95_percent_interval": [
+              69.03699268021035,
+              70.81300731978965
+            ],
+            "mean": 69.925,
+            "n": 8,
+            "standard_error": 0.453064959076353
+          },
+          "axis_terminal_wealth_gap": {
+            "approximate_95_percent_interval": [
+              43.17778403528713,
+              47.44721596471287
+            ],
+            "mean": 45.3125,
+            "n": 8,
+            "standard_error": 1.0891407983228933
+          },
+          "dadao_chinese_acquisition_events": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "dadao_newly_held_chinese_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "dadao_newly_held_chinese_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_gross_acquisitions_including_recaptures": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_new_acquisition_events_excluding_original_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_acquired_zones_lost_again": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_ipp_lost": {
+            "approximate_95_percent_interval": [
+              -0.12,
+              0.37
+            ],
+            "mean": 0.125,
+            "n": 8,
+            "standard_error": 0.125
+          },
+          "japan_original_zones_lost": {
+            "approximate_95_percent_interval": [
+              -0.12,
+              0.37
+            ],
+            "mean": 0.125,
+            "n": 8,
+            "standard_error": 0.125
+          },
+          "japan_units_removed": {
+            "approximate_95_percent_interval": [
+              -0.05727938162695567,
+              1.5572793816269557
+            ],
+            "mean": 0.75,
+            "n": 8,
+            "standard_error": 0.411877235523957
+          }
+        },
+        "generation_30": {
+          "axis_terminal_wealth": {
+            "approximate_95_percent_interval": [
+              70.14832798750227,
+              70.50167201249774
+            ],
+            "mean": 70.325,
+            "n": 8,
+            "standard_error": 0.09013878188659918
+          },
+          "axis_terminal_wealth_gap": {
+            "approximate_95_percent_interval": [
+              45.53844155089299,
+              47.236558449107015
+            ],
+            "mean": 46.3875,
+            "n": 8,
+            "standard_error": 0.4331930862790866
+          },
+          "dadao_chinese_acquisition_events": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "dadao_newly_held_chinese_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "dadao_newly_held_chinese_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_gross_acquisitions_including_recaptures": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_new_acquisition_events_excluding_original_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_acquired_zones_lost_again": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_ipp_lost": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_zones_lost": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_units_removed": {
+            "approximate_95_percent_interval": [
+              -0.009842500152596911,
+              1.259842500152597
+            ],
+            "mean": 0.625,
+            "n": 8,
+            "standard_error": 0.3238992347717331
+          }
+        }
+      },
+      "search": {
+        "generation_15": {
+          "axis_terminal_wealth": {
+            "approximate_95_percent_interval": [
+              69.93869162281707,
+              70.81130837718293
+            ],
+            "mean": 70.375,
+            "n": 8,
+            "standard_error": 0.22260631488924865
+          },
+          "axis_terminal_wealth_gap": {
+            "approximate_95_percent_interval": [
+              38.79734091194907,
+              47.65265908805093
+            ],
+            "mean": 43.225,
+            "n": 8,
+            "standard_error": 2.259009738801495
+          },
+          "dadao_chinese_acquisition_events": {
+            "approximate_95_percent_interval": [
+              -0.12,
+              0.37
+            ],
+            "mean": 0.125,
+            "n": 8,
+            "standard_error": 0.125
+          },
+          "dadao_newly_held_chinese_ipp": {
+            "approximate_95_percent_interval": [
+              -0.12,
+              0.37
+            ],
+            "mean": 0.125,
+            "n": 8,
+            "standard_error": 0.125
+          },
+          "dadao_newly_held_chinese_zones": {
+            "approximate_95_percent_interval": [
+              -0.12,
+              0.37
+            ],
+            "mean": 0.125,
+            "n": 8,
+            "standard_error": 0.125
+          },
+          "japan_gross_acquisitions_including_recaptures": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_new_acquisition_events_excluding_original_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_acquired_zones_lost_again": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_ipp_lost": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_zones_lost": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_units_removed": {
+            "approximate_95_percent_interval": [
+              -0.009842500152596911,
+              1.259842500152597
+            ],
+            "mean": 0.625,
+            "n": 8,
+            "standard_error": 0.3238992347717331
+          }
+        },
+        "generation_30": {
+          "axis_terminal_wealth": {
+            "approximate_95_percent_interval": [
+              69.70677905315064,
+              70.26822094684935
+            ],
+            "mean": 69.9875,
+            "n": 8,
+            "standard_error": 0.14322497288232525
+          },
+          "axis_terminal_wealth_gap": {
+            "approximate_95_percent_interval": [
+              45.86371594984845,
+              47.28628405015156
+            ],
+            "mean": 46.575,
+            "n": 8,
+            "standard_error": 0.36290002558752676
+          },
+          "dadao_chinese_acquisition_events": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "dadao_newly_held_chinese_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "dadao_newly_held_chinese_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_gross_acquisitions_including_recaptures": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_new_acquisition_events_excluding_original_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_acquired_zones_lost_again": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_ipp": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_newly_held_zones": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_ipp_lost": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_original_zones_lost": {
+            "approximate_95_percent_interval": [
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "n": 8,
+            "standard_error": 0.0
+          },
+          "japan_units_removed": {
+            "approximate_95_percent_interval": [
+              0.1882504095377996,
+              1.5617495904622003
+            ],
+            "mean": 0.875,
+            "n": 8,
+            "standard_error": 0.35038244411336755
+          }
+        }
+      }
+    },
+    "complete_terminal_games_per_generation": 16,
+    "complete_terminal_games_total": 32,
+    "contract": {
+      "max_depth": 16,
+      "max_state_visits": 20,
+      "max_transitions": 5000,
+      "modes": [
+        "network_only",
+        "search"
+      ],
+      "network_selection": "maximum prior, action-key tie break",
+      "opponent": "campaign-active-baseline-v2:balanced",
+      "root_noise": false,
+      "seeds": [
+        40009,
+        40013,
+        40031,
+        40037,
+        40039,
+        40063,
+        40087,
+        40093
+      ],
+      "simulations": 16,
+      "target": "axis",
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "territorial_scope": "authoritative KMT Chinese Home Country, Japan possession only"
+    },
+    "dadao_initial_search_gain": {
+      "ipp": 1,
+      "recorded_trigger_kind": "chance_events",
+      "seed": 40013,
+      "separate_from_japan": true,
+      "zone": "land_china_suiyuan"
+    },
+    "final_generation": 30,
+    "initial_generation": 15,
+    "paired_final_minus_initial": {
+      "network_only": {
+        "axis_terminal_wealth": {
+          "approximate_95_percent_interval": [
+            -0.44139883527373724,
+            1.241398835273738
+          ],
+          "mean": 0.40000000000000036,
+          "n": 8,
+          "standard_error": 0.42928512003762126
+        },
+        "axis_terminal_wealth_gap": {
+          "approximate_95_percent_interval": [
+            -0.709395976233973,
+            2.8593959762339787
+          ],
+          "mean": 1.0750000000000028,
+          "n": 8,
+          "standard_error": 0.9104061103234571
+        },
+        "dadao_chinese_acquisition_events": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "dadao_newly_held_chinese_ipp": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "dadao_newly_held_chinese_zones": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_gross_acquisitions_including_recaptures": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_new_acquisition_events_excluding_original_zones": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_newly_acquired_zones_lost_again": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_newly_held_ipp": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_newly_held_zones": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_original_ipp_lost": {
+          "approximate_95_percent_interval": [
+            -0.37,
+            0.12
+          ],
+          "mean": -0.125,
+          "n": 8,
+          "standard_error": 0.125
+        },
+        "japan_original_zones_lost": {
+          "approximate_95_percent_interval": [
+            -0.37,
+            0.12
+          ],
+          "mean": -0.125,
+          "n": 8,
+          "standard_error": 0.125
+        },
+        "japan_units_removed": {
+          "approximate_95_percent_interval": [
+            -0.7032949074650406,
+            0.45329490746504064
+          ],
+          "mean": -0.125,
+          "n": 8,
+          "standard_error": 0.29504842217604116
+        }
+      },
+      "search": {
+        "axis_terminal_wealth": {
+          "approximate_95_percent_interval": [
+            -0.7642177325266244,
+            -0.010782267473377682
+          ],
+          "mean": -0.38750000000000107,
+          "n": 8,
+          "standard_error": 0.19220292475848133
+        },
+        "axis_terminal_wealth_gap": {
+          "approximate_95_percent_interval": [
+            -0.5343125517908556,
+            7.234312551790858
+          ],
+          "mean": 3.3500000000000014,
+          "n": 8,
+          "standard_error": 1.9817921182606413
+        },
+        "dadao_chinese_acquisition_events": {
+          "approximate_95_percent_interval": [
+            -0.37,
+            0.12
+          ],
+          "mean": -0.125,
+          "n": 8,
+          "standard_error": 0.125
+        },
+        "dadao_newly_held_chinese_ipp": {
+          "approximate_95_percent_interval": [
+            -0.37,
+            0.12
+          ],
+          "mean": -0.125,
+          "n": 8,
+          "standard_error": 0.125
+        },
+        "dadao_newly_held_chinese_zones": {
+          "approximate_95_percent_interval": [
+            -0.37,
+            0.12
+          ],
+          "mean": -0.125,
+          "n": 8,
+          "standard_error": 0.125
+        },
+        "japan_gross_acquisitions_including_recaptures": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_new_acquisition_events_excluding_original_zones": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_newly_acquired_zones_lost_again": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_newly_held_ipp": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_newly_held_zones": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_original_ipp_lost": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_original_zones_lost": {
+          "approximate_95_percent_interval": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n": 8,
+          "standard_error": 0.0
+        },
+        "japan_units_removed": {
+          "approximate_95_percent_interval": [
+            -0.07078029864690877,
+            0.5707802986469088
+          ],
+          "mean": 0.25,
+          "n": 8,
+          "standard_error": 0.16366341767699427
+        }
+      }
+    },
+    "per_seed_metrics": [
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.2,
+          "axis_terminal_wealth_gap": 43.5,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 1
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70,
+          "axis_terminal_wealth_gap": 46.10000000000001,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "mode": "network_only",
+        "seed": 40009
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 44.3,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 47.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "network_only",
+        "seed": 40013
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 69.9,
+          "axis_terminal_wealth_gap": 47.000000000000014,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 69.9,
+          "axis_terminal_wealth_gap": 47.60000000000001,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "mode": "network_only",
+        "seed": 40031
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 48.3,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 48.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "network_only",
+        "seed": 40037
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 46.2,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 45.900000000000006,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "network_only",
+        "seed": 40039
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 47.3,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 44.8,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "network_only",
+        "seed": 40063
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 66.8,
+          "axis_terminal_wealth_gap": 38.8,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 1,
+          "japan_units_removed": 3
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.2,
+          "axis_terminal_wealth_gap": 44.7,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 1
+        },
+        "mode": "network_only",
+        "seed": 40087
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 47.099999999999994,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.5,
+          "axis_terminal_wealth_gap": 47.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "network_only",
+        "seed": 40093
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 69.8,
+          "axis_terminal_wealth_gap": 34.099999999999994,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 69.8,
+          "axis_terminal_wealth_gap": 45.7,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "mode": "search",
+        "seed": 40009
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 71.8,
+          "axis_terminal_wealth_gap": 49.599999999999994,
+          "dadao_newly_held_chinese_ipp": 1.0,
+          "dadao_newly_held_chinese_zones": 1,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.3,
+          "axis_terminal_wealth_gap": 47.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "search",
+        "seed": 40013
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 69.8,
+          "axis_terminal_wealth_gap": 47.69999999999999,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 69.7,
+          "axis_terminal_wealth_gap": 47.599999999999994,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "mode": "search",
+        "seed": 40031
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.4,
+          "axis_terminal_wealth_gap": 48.10000000000001,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.2,
+          "axis_terminal_wealth_gap": 48.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "search",
+        "seed": 40037
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.4,
+          "axis_terminal_wealth_gap": 46.30000000000001,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.4,
+          "axis_terminal_wealth_gap": 46.000000000000014,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "search",
+        "seed": 40039
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.4,
+          "axis_terminal_wealth_gap": 37.900000000000006,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70,
+          "axis_terminal_wealth_gap": 46.400000000000006,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 1
+        },
+        "mode": "search",
+        "seed": 40063
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.10000000000001,
+          "axis_terminal_wealth_gap": 35.10000000000001,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 1
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 69.2,
+          "axis_terminal_wealth_gap": 44.900000000000006,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 2
+        },
+        "mode": "search",
+        "seed": 40087
+      },
+      {
+        "generation_15": {
+          "axis_terminal_wealth": 70.3,
+          "axis_terminal_wealth_gap": 47.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "generation_30": {
+          "axis_terminal_wealth": 70.3,
+          "axis_terminal_wealth_gap": 47.0,
+          "dadao_newly_held_chinese_ipp": 0.0,
+          "dadao_newly_held_chinese_zones": 0,
+          "japan_new_acquisition_events_excluding_original_zones": 0,
+          "japan_newly_held_ipp": 0.0,
+          "japan_newly_held_zones": 0,
+          "japan_original_zones_lost": 0,
+          "japan_units_removed": 0
+        },
+        "mode": "search",
+        "seed": 40093
+      }
+    ]
+  },
+  "goal_achieved": true,
+  "incidents": [
+    {
+      "clean_recovery_save": true,
+      "invocation": 1,
+      "reason": "memory_monitor_failure",
+      "retained_work_lost": false,
+      "sequence": 1
+    },
+    {
+      "discarded_completion_executions": 15,
+      "discarded_update_executions": 4,
+      "hard_stop_epoch": 1792969469.687243,
+      "invocation": 2,
+      "reason": "guardian_soft_then_hard_memory_limit",
+      "recovered_additional_completions": 41,
+      "recovered_new_updates": 10,
+      "sequence": 2,
+      "soft_stop_epoch": 1792969438.239418,
+      "unfinished_checkpoint_preserved": true,
+      "unfinished_checkpoint_write_bytes": 0
+    },
+    {
+      "clean_recovery_save": true,
+      "invocation": 3,
+      "reason": "memory_monitor_failure",
+      "retained_work_lost": false,
+      "sequence": 3
+    }
+  ],
+  "limitations": [
+    "Network-only and search changes are reported separately against unchanged fixed opponents.",
+    "Japan possession is the primary metric; Dadao Chinese possessions are supplementary and never count as Japan.",
+    "Acquisitions include influence/alignment and recaptures; only recorded action kind is claimed as causal evidence.",
+    "Unit removals include combat, surrender and forced removal, not combat casualties alone.",
+    "Matching seeds do not imply identical later dice events once policies choose different actions.",
+    "Eight seeds and one continued initialization do not establish general playing strength.",
+    "No new Japanese acquisition events occurred in these 32 held-out games; zero ending gains did not hide temporary acquisitions.",
+    "Observed loss and wealth changes are mixed and do not establish offensive improvement or full eleven-round competence.",
+    "75 completion executions include 15 discarded and recomputed outcomes; only 60 additional completions are retained.",
+    "Time buckets and summed progress timers are incomplete for killed/overwritten invocation reports; inclusive supervisor charged time is reported separately.",
+    "The 17 cycle intervals include repeated work; they are physical measurements, not 17 unique batches.",
+    "Live menus/allocation history exceeded the synthetic preflight envelope; memory scaling remains unresolved.",
+    "Resource peaks are sampled, not a kernel memory cap. The sampled 26.008 GB peak is below the 30 GB user allowance.",
+    "Final recovery artifact was stream-hashed and separately restored under a 24 GB guard; that verification is outside training throughput."
+  ],
+  "provenance": {
+    "artifacts": {
+      "final_model": {
+        "bytes": 510513,
+        "path": "/Users/home/Desktop/gwRL/studies/campaign/runs/three-round-60more-2026-10-25/training/models/generation-000030.pt",
+        "sha256": "e1d6b6508ab304fa0e6fbb209861ba53a512d48f0d7f6fdd18ed348c4cf638d6"
+      },
+      "final_recovery": {
+        "bytes": 1436717127,
+        "path": "/Users/home/Desktop/gwRL/studies/campaign/runs/three-round-60more-2026-10-25/training/checkpoint.pt",
+        "sha256": "37e71823f499b8fee11eb0fa3f062b6fc4290f358ed11408936cfe73be65b312"
+      },
+      "original_checkpoint": {
+        "bytes": 1864875191,
+        "path": "/Users/home/Desktop/gwRL/studies/campaign/runs/three-round-10h-2026-10-24-r3/training/checkpoint.pt",
+        "sha256": "3fa2022a1e894c9a44937399584600d87d9c308553be561492a951e44eaf5ebd"
+      }
+    },
+    "final_generation30_model_versions": {
+      "allies": "allies:generation-30:b45781088533ca50351c90bdd399de2feb6858a59158f3444411f9587ab472bb",
+      "axis": "axis:generation-30:13359d482d9703c54b0b9c67ef347d6045bc84e897247f44fcddca743b977ae9",
+      "comintern": "comintern:generation-30:c254fc8fdda863a38dc8bedab2203d3255895e97680105486924b5b1cc98a771"
+    },
+    "initial_generation15_model_sha256": "b5ee96ba879e2e8fc680f91ec17c272a053aba04b7e7f685c04f4410d280ef85",
+    "initial_training_runtime_commit": "cafbd911438983e229099d0079edfe687ddf03eb",
+    "migrated_initial_checkpoint_sha256": "0dc6c3d3e21806c92eef23164ed15f623cfce73d4c6c759b4abf150bbb15c022",
+    "native_module_sha256": "6b6718f2cc8d9e1ac77265b4b700935d554f38e5fd970417891199f04f461303",
+    "operational_migration_scope": "monitor diagnostics and bounded setuid-ps EPERM/ESRCH exit-race retries only; tests and launch docs",
+    "operational_monitor_runtime_commit": "6d89b2ecc3e9cf69b7317747743ea9024bc9a81a",
+    "original_frozen_source_commit": "88981035ec1d80ff73f5b1d4e3b4c5ec3fd2580d",
+    "runtime_manifest_sha256": "c13332a5b3170301cbf4772f8999ced1b297e8cf29963265914932499bb4bbde",
+    "small_evidence_sha256": {
+      "studies/campaign/runs/three-round-60more-2026-10-25/bootstrap-proof.json": "38d9644023d20a48ca7235f16f2915c2626172035c0f9728ac664c32a1a295db",
+      "studies/campaign/runs/three-round-60more-2026-10-25/continuation-proof.json": "12a344c2527ff3db57a03f0cb27269c341c8a82a6e1d809f52bb4752e6ebcaed",
+      "studies/campaign/runs/three-round-60more-2026-10-25/evaluation-final/plan.json": "c6c1b391bb7826554e5229f862f7d5f125f68f0ed96ae6571c0bc43c4425f92c",
+      "studies/campaign/runs/three-round-60more-2026-10-25/evaluation-final/report.json": "6020e814f7761655efd0cb11e7f30971e0034822b40ec66fe6f3968554f17d3c",
+      "studies/campaign/runs/three-round-60more-2026-10-25/evaluation-initial/plan.json": "bc29d763b1264be49c44ce9f7202d1bd95f4a34d8f6a360de3a3ed265685bc95",
+      "studies/campaign/runs/three-round-60more-2026-10-25/evaluation-initial/report.json": "a87ff239c0236f471e5974af230881e3e2f07c6f14f2b6d575c378572debadc4",
+      "studies/campaign/runs/three-round-60more-2026-10-25/final-restore-proof.json": "07c438404ac66ffcaa12dbb3796d1233ea5890a98bf5dd4d4edb67dbde351bc8",
+      "studies/campaign/runs/three-round-60more-2026-10-25/guardian-state.json": "09ab2d23bbcf06e5529f4a38574ccc64783aa314875e950c34ee3cef87f6b5b9",
+      "studies/campaign/runs/three-round-60more-2026-10-25/monitor-diagnostics-migration-proof.json": "09531bf705f78d35c0a9c88ad22736869dd3cdad204501a1a07fe90bc649d070",
+      "studies/campaign/runs/three-round-60more-2026-10-25/pipeline-plan.json": "fe3045a780f283d6dc8635abba95984f632fcc5114f74bd4c75cffdae74af400",
+      "studies/campaign/runs/three-round-60more-2026-10-25/pipeline-state.json": "e0196ba51fd1daa36b8f5e7c6322c9f80f0f0612173b2fb768c76bd2252ea509",
+      "studies/campaign/runs/three-round-60more-2026-10-25/training/manifest.json": "875b926eecca2f0ec1de04319b22485a1cda593ebf154a327f695521957a8c44",
+      "studies/campaign/runs/three-round-60more-2026-10-25/verify-final-state.json": "8febbaa62ee602b72d4e3f58314f110954830e42da388b93ae7c2a44844c68aa",
+      "tmp/sixty-memory-preflight-2026-10-25/final-artifacts.json": "0c27f38069589a4393b761dac062da86a24cc42c14af6408b0550cb436a8efa5",
+      "tmp/sixty-memory-preflight-2026-10-25/japan-evaluation-final.json": "99e38ca9f63534324f016aa45de96c66c59f4c9d25e64ebedfa1ced0f69f40a8",
+      "tmp/sixty-memory-preflight-2026-10-25/replayed-overlap-002-004-final.json": "a34b219ef775e5d26b5096b188769e2017655ff8736a7406fb3ad95820ce04b2",
+      "tmp/sixty-memory-preflight-2026-10-25/training-timing-final.json": "a781a684b93f044176e6915fac4f4db71d72d064e4b3604df0e6ce47096b576c"
+    }
+  },
+  "resources": {
+    "authorized_bytes": 30000000000,
+    "authorized_cpu_cores": 12,
+    "below_authorized_allowance_in_samples": true,
+    "deadline_epoch_unchanged": 1792978160.268948,
+    "guardian_status": "completed",
+    "hard_guard_bytes": 26000000000,
+    "memory_scaling_solved": false,
+    "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)",
+    "resource_scope": "Pipeline, independent guardian, sleep prevention, supervisor and full child process tree; sum of per-process max(RSS, macOS physical footprint including compressed pages); sampled with 1 GB safety margin",
+    "sampled_peak_charged_bytes": 26007771096,
+    "soft_stop_bytes": 25000000000
+  },
+  "run_root": "studies/campaign/runs/three-round-60more-2026-10-25",
+  "schema": "campaign-sixty-additional-curated-results-v1",
+  "status": "completed",
+  "timing": {
+    "between_children_downtime_seconds_utc_second_precision": 629.3127360343933,
+    "evaluation": {
+      "final": {
+        "evaluated_policy_sha256": "e1d6b6508ab304fa0e6fbb209861ba53a512d48f0d7f6fdd18ed348c4cf638d6",
+        "games": 16,
+        "generation": 30,
+        "recorded_game_wall_seconds_by_mode": {
+          "network_only": 20.443892750961822,
+          "search": 230.27420254301978
+        },
+        "reported_evaluation_loop_seconds": 276.98417404199427,
+        "status": "completed"
+      },
+      "initial": {
+        "evaluated_policy_sha256": "b5ee96ba879e2e8fc680f91ec17c272a053aba04b7e7f685c04f4410d280ef85",
+        "games": 16,
+        "generation": 15,
+        "recorded_game_wall_seconds_by_mode": {
+          "network_only": 18.27145758300321,
+          "search": 231.68807995798124
+        },
+        "reported_evaluation_loop_seconds": 276.95324858299864,
+        "status": "completed"
+      }
+    },
+    "four_game_physical_cycle_intervals": {
+      "intervals": [
+        {
+          "ending_generation": 17,
+          "invocation": 2,
+          "seconds": 385.55630799999926
+        },
+        {
+          "ending_generation": 18,
+          "invocation": 2,
+          "seconds": 305.2852327080036
+        },
+        {
+          "ending_generation": 19,
+          "invocation": 2,
+          "seconds": 333.4567420839885
+        },
+        {
+          "ending_generation": 20,
+          "invocation": 2,
+          "seconds": 378.11165308300406
+        },
+        {
+          "ending_generation": 21,
+          "invocation": 2,
+          "seconds": 461.6907736669964
+        },
+        {
+          "ending_generation": 22,
+          "invocation": 2,
+          "seconds": 359.67531879100716
+        },
+        {
+          "ending_generation": 23,
+          "invocation": 2,
+          "seconds": 440.5125428750034
+        },
+        {
+          "ending_generation": 24,
+          "invocation": 2,
+          "seconds": 327.75535662499897
+        },
+        {
+          "ending_generation": 25,
+          "invocation": 2,
+          "seconds": 337.50889912499406
+        },
+        {
+          "ending_generation": 26,
+          "invocation": 2,
+          "seconds": 422.75162024999736
+        },
+        {
+          "ending_generation": 27,
+          "invocation": 2,
+          "seconds": 324.83018504201027
+        },
+        {
+          "ending_generation": 28,
+          "invocation": 2,
+          "seconds": 329.72851145800087
+        },
+        {
+          "ending_generation": 29,
+          "invocation": 2,
+          "seconds": 349.9281714589888
+        },
+        {
+          "ending_generation": 27,
+          "invocation": 4,
+          "seconds": 315.97095891700883
+        },
+        {
+          "ending_generation": 28,
+          "invocation": 4,
+          "seconds": 333.41429229099595
+        },
+        {
+          "ending_generation": 29,
+          "invocation": 4,
+          "seconds": 348.95139691699296
+        },
+        {
+          "ending_generation": 30,
+          "invocation": 4,
+          "seconds": 408.026500167005
+        }
+      ],
+      "max_seconds": 461.6907736669964,
+      "median_seconds": 348.95139691699296,
+      "min_seconds": 305.2852327080036,
+      "n": 17,
+      "scope": "Update-to-update intervals within the same child invocation, excluding each first partial batch; include collection, learning, saves and reporting plus repeated work. They are not 17 unique batches."
+    },
+    "invocation_timers": [
+      {
+        "complete_through_termination_progress": true,
+        "number": 1,
+        "physical_logged_counter_increments": {
+          "batches": 0,
+          "chance_events": 19,
+          "decisions": 145,
+          "episodes": 0,
+          "transitions": 164,
+          "updates": 0
+        },
+        "post_initialization_seconds": 126.80748483400384,
+        "timing_buckets_available": false
+      },
+      {
+        "complete_through_termination_progress": false,
+        "number": 2,
+        "physical_logged_counter_increments": {
+          "batches": 14,
+          "chance_events": 1854,
+          "decisions": 13804,
+          "episodes": 56,
+          "transitions": 15658,
+          "updates": 14
+        },
+        "post_initialization_seconds": 5051.935966874997,
+        "timing_buckets_available": true
+      },
+      {
+        "complete_through_termination_progress": true,
+        "number": 3,
+        "physical_logged_counter_increments": {
+          "batches": 0,
+          "chance_events": 2,
+          "decisions": 55,
+          "episodes": 0,
+          "transitions": 57,
+          "updates": 0
+        },
+        "post_initialization_seconds": 94.7204718330031,
+        "timing_buckets_available": true
+      },
+      {
+        "complete_through_termination_progress": true,
+        "number": 4,
+        "physical_logged_counter_increments": {
+          "batches": 5,
+          "chance_events": 601,
+          "decisions": 4244,
+          "episodes": 19,
+          "transitions": 4845,
+          "updates": 5
+        },
+        "post_initialization_seconds": 1546.0081097500079,
+        "timing_buckets_available": true
+      }
+    ],
+    "known_bucket_seconds_lower_bounds": {
+      "checkpoint_save": 277.8647897080082,
+      "collection": 5329.086663950424,
+      "learning_updates": 629.8517655810138,
+      "model_export": 0.38543004092935007,
+      "progress_reporting": 279.31525241874624
+    },
+    "missing_termination_progress_timers": [
+      2
+    ],
+    "pipeline_attention_downtime_seconds_overlaps_child_downtime": 542.0038168430328,
+    "pipeline_seconds_including_evaluations_and_downtime": 8223.714853048325,
+    "post_initialization_progress_seconds_lower_bound": 6819.4720332920115,
+    "preflight_excluded_from_training_throughput": {
+      "bootstrap_restore_validation_export_seconds": 66.68258041700756,
+      "exact_continuation_verification_seconds": 287.7702250480652
+    },
+    "retained_completions_per_charged_training_hour": 30.735783117513176,
+    "supervisor_charged_training_seconds": 7027.639386123978,
+    "unavailable_bucket_invocations": [
+      1
+    ]
+  },
+  "training": {
+    "carried_pending_rows": 665,
+    "config": {
+      "batch_size": 32,
+      "batches": 30,
+      "calendar_rounds": 3,
+      "checkpoint_every_waves": null,
+      "checkpoint_interval_seconds": 1800.0,
+      "complete_episodes": true,
+      "cpu_budget": 11,
+      "epochs": 16,
+      "hidden_dim": 16,
+      "learning_rate": 0.001,
+      "max_depth": 16,
+      "max_episodes": 120,
+      "message_layers": 1,
+      "parallel_envs": 4,
+      "replay_capacity": 16384,
+      "seed": 1951,
+      "simulations": 16,
+      "threads": 4,
+      "token_buckets": 2048,
+      "transitions_per_batch": 5000,
+      "value_scale": 100.0
+    },
+    "extra_physical_work_beyond_retained": {
+      "batches": 4,
+      "chance_events": 547,
+      "decisions": 3731,
+      "episodes": 15,
+      "transitions": 4278,
+      "updates": 4
+    },
+    "final_retained_counters": {
+      "batches": 30,
+      "chance_events": 4220,
+      "decisions": 31357,
+      "episodes": 120,
+      "transitions": 35577,
+      "updates": 30
+    },
+    "fresh_games_completed": 56,
+    "new_bootstrap_samples": 0,
+    "physical_logged_work_including_discarded_and_reexecuted": {
+      "batches": 19,
+      "chance_events": 2476,
+      "decisions": 18248,
+      "episodes": 75,
+      "transitions": 20724,
+      "updates": 19
+    },
+    "physically_executed_adam_steps_per_agent": {
+      "allies": 304,
+      "axis": 304,
+      "comintern": 304
+    },
+    "resumed_existing_games": {
+      "active_seconds_through_generation_16_update": 245.99936095900193,
+      "completed_in_first_new_batch": true,
+      "count": 4,
+      "seeds": [
+        1067441524980708580,
+        6111884122362480265,
+        7430160285612060575,
+        4724656343595490346
+      ]
+    },
+    "retained_adam_steps_per_agent": {
+      "allies": 240,
+      "axis": 240,
+      "comintern": 240
+    },
+    "retained_new_decisions": 14517,
+    "retained_new_terminal_rows": 15182,
+    "retained_new_work": {
+      "batches": 15,
+      "chance_events": 1929,
+      "decisions": 14517,
+      "episodes": 60,
+      "transitions": 16446,
+      "updates": 15
+    },
+    "rollbacks": [
+      {
+        "before_invocation": 3,
+        "last_logged_counters": {
+          "batches": 29,
+          "chance_events": 4164,
+          "decisions": 30789,
+          "episodes": 116,
+          "transitions": 34953,
+          "updates": 29
+        },
+        "logged_work_abandoned_at_recovery": {
+          "batches": 4,
+          "chance_events": 547,
+          "decisions": 3731,
+          "episodes": 15,
+          "transitions": 4278,
+          "updates": 4
+        },
+        "restored_counters": {
+          "batches": 25,
+          "chance_events": 3617,
+          "decisions": 27058,
+          "episodes": 101,
+          "transitions": 30675,
+          "updates": 25
+        }
+      }
+    ],
+    "sampled_policy_rows_per_agent_with_repeats": {
+      "allies": 1773,
+      "axis": 3697,
+      "comintern": 2210
+    },
+    "sampled_value_rows_per_agent_with_repeats": {
+      "allies": 7680,
+      "axis": 7680,
+      "comintern": 7680
+    },
+    "starting_counters_excluded": {
+      "batches": 15,
+      "chance_events": 2291,
+      "decisions": 16840,
+      "episodes": 60,
+      "transitions": 19131,
+      "updates": 15
+    }
+  },
+  "verification": {
+    "continuation_status": "verified",
+    "control_tests_after_monitor_fix": 64,
+    "final_readonly_recovery_restore": {
+      "actions_or_dice_executed": false,
+      "all_four_saved_games_terminal": true,
+      "all_replay_targets_terminal": true,
+      "checkpoint_rewritten": false,
+      "elapsed_seconds": 34.25756324999384,
+      "episodes": 120,
+      "frozen_rollout": false,
+      "generation": 30,
+      "learner_non_sample_bitwise_sha256": "fb3d652de4ae9997262475a5816c096af6f53e27fbf450307c8311c0f93e0e26",
+      "pending_samples": 0,
+      "replay_rows_validated": 16384,
+      "status": "verified"
+    },
+    "final_restore_guard": {
+      "ended_epoch": 1792972343.321436,
+      "limit_bytes": 24000000000,
+      "metric": "max(RSS,macOS physical footprint)",
+      "peak_memory_bytes": 17962071624,
+      "pid": 67277,
+      "returncode": 0,
+      "started_epoch": 1792972305.598704,
+      "status": "completed"
+    },
+    "final_restore_models_equal_evaluated_export": true,
+    "final_runtime_manifest_verified": true,
+    "full_tests_before_launch": 451,
+    "labeled_replay_inputs_checked": 16175,
+    "monitor_migration_checkpoint_deserialized_or_rewritten": false,
+    "monitor_migration_status": "verified",
+    "no_actions_or_dice_during_continuation_proof_and_bootstrap": true,
+    "original_checkpoint_unchanged": true,
+    "pending_inputs_checked": 665,
+    "recomputed_generations_with_existing_export_weights_validated": [
+      26,
+      27,
+      28,
+      29
+    ],
+    "replayed_logged_overlap": {
+      "exact_match_action_events": 4221,
+      "exact_match_records": 1208,
+      "first_overlap_event": [
+        "rollout",
+        25,
+        249
+      ],
+      "ignored_fields": [
+        "elapsed_seconds"
+      ],
+      "last_overlap_event": [
+        "rollout",
+        29,
+        135
+      ],
+      "limitations": [
+        "This compares only the captured logged overlap; future appended records are not part of this snapshot.",
+        "It does not inspect unlogged MCTS internals, hidden intermediate states or optimizer tensors.",
+        "A state-key match is not a substitute for the separate continuation checkpoint proof or model-export validation."
+      ],
+      "original_overlap_sha256": "60a3b7caaee8ae43e27a9be62bd3db0b2c1671ef9195d629bcf39ddf2e35fa47",
+      "replayed_overlap_sha256": "60a3b7caaee8ae43e27a9be62bd3db0b2c1671ef9195d629bcf39ddf2e35fa47",
+      "scope": "All emitted fields other than elapsed time, including exact action order/parameters and before/after planning keys; recorded clocks, terminal flags, returns and counters.",
+      "status": "verified"
+    },
+    "saved_inputs_checked": 16840,
+    "unchanged_engine_learner_source_files": 83
+  }
+}

@@ -1,5 +1,7 @@
 # Sixty additional three-round games — 25 October 2026
 
+Completed: see the [results and recovery limitations](sixty_more_2026_10_25_results.md).
+
 The continuation is launched from the previously trained **generation 15**, with **60 completed games** already retained. Its target is **60 additional completions**, ending at **120 total games / generation 30**. The four games saved during their second round resume first; their eventual completions count toward the additional sixty. This is not a fresh initialization.
 
 The run’s four-hour operational limit starts at **2026-10-25T21:29:20.268948+00:00** and ends at **2026-10-26T01:29:20.268948+00:00** (4:29–8:29 p.m. Chicago time). It includes initial evaluation, training, final evaluation, recovery and downtime. The completed prior ten-hour allocation is unchanged. The initial held-out evaluation was active when this launch record was captured; no new learning result is claimed here. [Launch evidence](sixty_more_2026_10_25_launch.json) records exact plans, hashes and checks.
