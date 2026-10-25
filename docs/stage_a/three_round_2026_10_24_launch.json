@@ -1,0 +1,141 @@
+{
+  "budget": {
+    "authorized_total_cpu_cores": 12,
+    "authorized_total_memory_bytes": 30000000000,
+    "budget_started_epoch": 1792895248.0,
+    "deadline_epoch": 1792931248.0,
+    "final_eval_reserve_seconds": 3600,
+    "memory_bytes": 26000000000,
+    "memory_soft_bytes": 25000000000,
+    "shutdown_seconds": 180
+  },
+  "checkpoint_at_recording": {
+    "counters": {
+      "batches": 0,
+      "chance_events": 0,
+      "decisions": 4,
+      "episodes": 0,
+      "transitions": 4,
+      "updates": 0
+    },
+    "initial_sha256": "a58918ec4c3c621ecbc188fecb671d671f1b97cdc11dbf0ec982b6a0d5b2694c",
+    "latest_sha256": "d77ff9f0570e343bcba6049deaee82bd4f4e30ffbf7f61c69859b9a5ce8d00c0",
+    "previous_sha256": "a58918ec4c3c621ecbc188fecb671d671f1b97cdc11dbf0ec982b6a0d5b2694c",
+    "total_waves": 1
+  },
+  "deadline_utc": "2026-10-25T12:27:28Z",
+  "evaluation": {
+    "max_depth": 16,
+    "modes": [
+      "network_only",
+      "search"
+    ],
+    "opponents": "fixed balanced scripted opponents",
+    "paired_initial_final": true,
+    "simulations": 16,
+    "terminal_targets_only": true
+  },
+  "heldout_seeds": [
+    40009,
+    40013,
+    40031,
+    40037,
+    40039,
+    40063,
+    40087,
+    40093
+  ],
+  "limits": [
+    "Three-round practice task; no eleven-round competence claim.",
+    "Eight evaluation seeds and one initialization do not establish robust playing strength.",
+    "Terminal wealth-gap reward is unchanged; no reward shaping, demonstrations or unfinished-game bootstrap labels.",
+    "A crash may repeat work since the latest complete checkpoint."
+  ],
+  "preflight_correction": {
+    "checkpoint_migrated_across_engine_change": false,
+    "failed_run_learning_updates": 0,
+    "failed_run_root": "studies/campaign/runs/three-round-10h-2026-10-24",
+    "fixed_seed": 40009,
+    "fixed_seed_three_rounds_completed": true,
+    "fresh_initial_parameter_bits_match_original": true,
+    "issue": "Global retreat flag incorrectly suppressed defense in a later battle. Retreat exclusion is now battle-specific."
+  },
+  "recorded_utc": "2026-10-25T03:02:33.223178+00:00",
+  "recovery": {
+    "absolute_deadline_preserved_on_resume": true,
+    "automatic_followup_minutes": 30,
+    "checkpoint_every_waves": 16,
+    "model_optimizer_replay_all_rng_saved": true,
+    "pending_games_and_samples_saved": true,
+    "previous_checkpoint_retained": true,
+    "resume_command": "studies/campaign/runs/three-round-10h-2026-10-24-r2/resume.sh"
+  },
+  "resources_at_recording": {
+    "aggregate_sampled_peak_rss_bytes": 1181843456,
+    "sampled_memory_is_not_a_kernel_cap": true
+  },
+  "run_root": "studies/campaign/runs/three-round-10h-2026-10-24-r2",
+  "runtime": {
+    "frozen_file_count": 416,
+    "native_module_sha256": "bc702f48fb0bcc7c8b1331e2fac432dcecba07029835e9b428010d6b5b3946d8",
+    "plan_sha256": "867cf72faafe095843b094fc7564db9caaa0396a3cb003394d746a0534348120",
+    "runtime_manifest_sha256": "fa9e2655894b9ed02b56e41a6565efcd6e0c1dae615f6ff4094f0b908b087b5e",
+    "source_commit": "8921c3f08e32f276b698ab459d26dee83929dadc"
+  },
+  "schema": "campaign-three-round-launch-evidence-v1",
+  "status_at_recording": {
+    "guardian": "watching",
+    "note": "Baseline evaluation precedes learning. No training-strength result is claimed.",
+    "pipeline": "running",
+    "stage": "initial_evaluation"
+  },
+  "training_arguments": [
+    "--seed",
+    "1951",
+    "--calendar-rounds",
+    "3",
+    "--complete-episodes",
+    "--batches",
+    "10000",
+    "--transitions-per-batch",
+    "5000",
+    "--parallel-envs",
+    "4",
+    "--simulations",
+    "16",
+    "--max-depth",
+    "16",
+    "--hidden-dim",
+    "16",
+    "--message-layers",
+    "1",
+    "--token-buckets",
+    "2048",
+    "--batch-size",
+    "32",
+    "--epochs",
+    "16",
+    "--learning-rate",
+    "0.001",
+    "--replay-capacity",
+    "16384",
+    "--threads",
+    "4",
+    "--cpu-budget",
+    "11",
+    "--checkpoint-every-waves",
+    "16"
+  ],
+  "verification": {
+    "ctest": {
+      "passed": 26,
+      "seconds": 87.35
+    },
+    "land_combat_fixture_groups": 33,
+    "python": {
+      "passed": 346,
+      "seconds": 236.796
+    },
+    "real_signal_and_backup_recovery_regressions": true
+  }
+}

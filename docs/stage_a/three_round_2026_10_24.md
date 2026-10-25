@@ -131,3 +131,10 @@ measurements remain ignored under
 `studies/campaign/runs/three-round-10h-2026-10-24-r2/`. Curated launch/result evidence
 will identify the source revision, native hash, settings, timings, counts and
 the limits of any learning conclusion.
+
+The [launch record](three_round_2026_10_24_launch.json) pins the corrected runtime
+and initial checkpoint hashes. The budget ends at 2026-10-25 12:27:28 UTC
+(7:27:28 a.m. Chicago). Restart with the run directory's `resume.sh`; its fixed
+plan resumes completed stages and pending self-play without extending that
+deadline. A half-hour follow-up checks for interruption and records the final
+paired evaluation when the experiment ends.
