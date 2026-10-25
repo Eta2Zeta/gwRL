@@ -131,13 +131,20 @@ def process_memory_charge(pid: int, resident_bytes: int) -> int:
         raise ValueError("Resident memory must be a nonnegative byte count")
     if sys.platform != "darwin":
         return resident_bytes
-    try:
-        return max(resident_bytes, _darwin_physical_footprint(pid))
-    except OSError as error:
-        error.monitor_pid = pid
-        if _process_disappeared(pid):
-            return 0
-        raise
+    for attempt in range(3):
+        try:
+            return max(resident_bytes, _darwin_physical_footprint(pid))
+        except OSError as error:
+            error.monitor_pid = pid
+            if _process_disappeared(pid):
+                return 0
+            # Concurrent samplers can briefly see each other's setuid ps
+            # process. Its live footprint is inaccessible until ps exits.
+            # Retry only these exit/permission races; an inaccessible process
+            # that stays live still fails closed after at most 40 ms of waits.
+            if error.errno not in (errno.EPERM, errno.ESRCH) or attempt == 2:
+                raise
+            time.sleep(0.02)
 
 
 @dataclass(frozen=True)

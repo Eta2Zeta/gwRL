@@ -373,6 +373,57 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
             with patch(prefix + "_process_table", return_value=[]):
                 self.assertEqual(process_memory_charge(123, 10240), 0)
 
+    def test_darwin_transient_privileged_process_exit_is_confirmed_on_retry(self):
+        prefix = "tools.supervise_campaign_training."
+        with patch(prefix + "sys.platform", "darwin"), \
+             patch(prefix + "_darwin_physical_footprint", side_effect=[OSError(errno.EPERM, "privileged ps"),
+                                                                      OSError(errno.ESRCH, "ps exited")]) as sample, \
+             patch(prefix + "_process_disappeared", side_effect=[False, True]) as disappeared, \
+             patch(prefix + "time.sleep") as sleep:
+            self.assertEqual(process_memory_charge(123, 10240), 0)
+        self.assertEqual(sample.call_count, 2)
+        self.assertEqual(disappeared.call_count, 2)
+        sleep.assert_called_once_with(0.02)
+
+    def test_darwin_successful_retry_charges_footprint_without_rss_fallback(self):
+        prefix = "tools.supervise_campaign_training."
+        with patch(prefix + "sys.platform", "darwin"), \
+             patch(prefix + "_darwin_physical_footprint", side_effect=[OSError(errno.ESRCH, "exit race"),
+                                                                      5_000_000_000]) as sample, \
+             patch(prefix + "_process_disappeared", return_value=False), \
+             patch(prefix + "time.sleep") as sleep:
+            self.assertEqual(process_memory_charge(123, 10240), 5_000_000_000)
+        self.assertEqual(sample.call_count, 2)
+        sleep.assert_called_once_with(0.02)
+
+    def test_darwin_persistent_live_permission_failure_remains_fail_closed(self):
+        prefix = "tools.supervise_campaign_training."
+        failure = OSError(errno.EPERM, "live privileged process")
+        with patch(prefix + "sys.platform", "darwin"), \
+             patch(prefix + "_darwin_physical_footprint", side_effect=failure) as sample, \
+             patch(prefix + "_process_disappeared", return_value=False) as disappeared, \
+             patch(prefix + "time.sleep") as sleep:
+            with self.assertRaises(OSError) as caught:
+                process_memory_charge(123, 10240)
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(caught.exception.monitor_pid, 123)
+        self.assertEqual(sample.call_count, 3)
+        self.assertEqual(disappeared.call_count, 3)
+        self.assertEqual(sleep.call_args_list, [unittest.mock.call(0.02), unittest.mock.call(0.02)])
+
+    def test_darwin_nontransient_io_failure_has_no_retry(self):
+        prefix = "tools.supervise_campaign_training."
+        failure = OSError(errno.EIO, "physical API failure")
+        with patch(prefix + "sys.platform", "darwin"), \
+             patch(prefix + "_darwin_physical_footprint", side_effect=failure) as sample, \
+             patch(prefix + "_process_disappeared", return_value=False), \
+             patch(prefix + "time.sleep") as sleep:
+            with self.assertRaises(OSError) as caught:
+                process_memory_charge(123, 10240)
+        self.assertIs(caught.exception, failure)
+        sample.assert_called_once_with(123)
+        sleep.assert_not_called()
+
     def test_aggregate_charges_each_owned_process_once_and_excludes_unrelated_processes(self):
         parent = os.getpid()
         rows = [(parent, 1, parent, 10), (123, parent, 123, 20), (124, 123, 123, 30),
