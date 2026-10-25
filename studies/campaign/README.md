@@ -50,8 +50,11 @@ Press Ctrl-C in the training terminal to finish the current search wave, save
 
 `--stop-after-waves 2` provides the same safe boundary for a bounded resume check.
 An interrupted run exits with code 130; a completed run exits with code 0.
-Periodic checkpoints default to every four waves and after each update. A crash
-can resume the latest completed checkpoint. The manifest and checkpoint are
+Full recovery checkpoints default to every 1,800 wall-clock seconds and orderly
+shutdown. Learning updates publish small model exports, without forcing full
+recovery writes. An explicit `--checkpoint-every-waves N` overrides the timer for
+controlled comparisons and recovery tests. A crash can resume the latest
+completed recovery checkpoint. The manifest and checkpoint are
 replaced atomically; the checkpoint is the authority if a crash occurs between
 those two replacements. New runs refuse a nonempty directory and default to
 unique ignored `runs/` directories.
@@ -59,8 +62,9 @@ unique ignored `runs/` directories.
 Checkpoint bytes are flushed before replacement, and `checkpoint.pt.previous`
 keeps the preceding complete snapshot. If the newest file is damaged, explicitly
 resume that backup; the first recovery save preserves it instead of backing up
-the damaged file. Abrupt interruption can repeat waves since the latest saved
-checkpoint, but never requires discarding all completed training or active games.
+the damaged file. Abrupt interruption can lose games and learning updates since
+the latest recovery point. Saving models separately does not preserve Adam,
+replay or in-progress games; that is the tradeoff for infrequent recovery saves.
 
 Checkpoints contain the live and frozen models, optimizer moments, replay,
 pending samples, all active game states, declaration scheduling, all random
@@ -86,7 +90,12 @@ reaches its true endpoint. Each new batch creates fresh games. Every row in this
 mode receives an observed terminal target; a transition guard saves frozen pending
 work without bootstrapping or updating and exits with code 2. Increase only that
 execution guard explicitly when resuming with `--extend-episode-budget N`.
-The starting model is archived in `initial.pt` before any action or update.
+Small model exports live in `models/generation-000000.pt` and subsequent
+generation files, starting before any action or update. `initial.pt` remains an
+archive of the empty initial learner for compatibility. Add `--max-episodes 10`
+with at least three batches and four parallel games to finish exactly ten games
+in batches of four, four and two. The shorter tail batch changes random-stream
+interleaving relative to four-root collection.
 
 `--cpu-budget N` conservatively checks tensor threads plus parallel search workers
 plus one coordinator against the available core budget. Set BLAS environment
@@ -102,7 +111,7 @@ The performance follow-up repeats that same pilot in 118.68 seconds (2.92 times
 faster) with identical actions, policy targets and final game states. It reuses
 immutable source features and skips unused policy work without reducing search.
 Manifests now separate invocation time into collection/search, learning updates,
-checkpoint saves and reporting, and report collection transitions per second.
+checkpoint saves, small model exports and reporting, and report collection transitions per second.
 Timing stays outside deterministic checkpoint state. Full results and numerical
 limits are in the [Stage A report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
 The [scaling follow-up](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md)
@@ -166,10 +175,14 @@ uses the same versioned scripted opponents both inside search and during actual
 play. The two baseline styles buy, move, attack and make reactions. They are
 simple controls, with no claim of expert play. Each side is evaluated separately.
 Seeds must differ from the base run seed and every logged training episode seed.
+Evaluation accepts small model exports directly, without constructing a learner
+or restoring its optimizer, replay and active games. Legacy recovery files remain
+supported through full compatibility-checked restoration. Profiling retained
+positions still uses a full recovery checkpoint.
 
 ```sh
 ./.venv/bin/python -m studies.campaign.run evaluate \
-  --checkpoint studies/campaign/runs/YOUR_RUN/checkpoint.pt \
+  --checkpoint studies/campaign/runs/YOUR_RUN/models/generation-000001.pt \
   --output studies/campaign/runs/YOUR_RUN/evaluation.json \
   --target all --seeds 1009,1013 --max-transitions 40
 ./.venv/bin/python -m studies.campaign.run profile \

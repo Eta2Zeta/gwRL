@@ -8,6 +8,7 @@
 - [Native neural-input compiler](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md): complete feature graphs in C++, exact numerical parity and matched performance checks.
 - [AI order construction](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md): forward-only naval orders and bounded configuration/permission choices, with separate replay compatibility.
 - [Three-round learning results](/Users/home/Desktop/gwRL/docs/stage_a/three_round_2026_10_25_results.md): sixty completed games, separate Japan/Dadao possession results, saved continuation and measured checkpoint overhead.
+- [Checkpoint saving pilot](/Users/home/Desktop/gwRL/docs/stage_a/checkpoint_pilot_2026_10_25.md): small model exports, thirty-minute recovery saves and ten three-round games in 30m 51s; matched first-eight elapsed time reduced by 10.8%.
 - [Campaign learning](/Users/home/Desktop/gwRL/studies/campaign/README.md): foreground training, interrupt/resume, evaluation and profiling; [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md).
 - [Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md): local map viewer, self-play replay, optional live following and recorded MCTS decisions.
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.

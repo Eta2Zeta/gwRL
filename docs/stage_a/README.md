@@ -6,8 +6,16 @@ games, 15 learning batches and no Japanese-owned Chinese Home Country acquisitio
 in the held-out tests. One trained-search game ended with a Dadao-held zone,
 reported separately. Trained search preserved more units/wealth than initial
 search; the network alone showed no clear strength improvement. Checkpointing
-consumed 60.33% of the training interval and is the largest measured operational
-bottleneck. Four unfinished games and all continuation state remain saved.
+consumed 60.33% of that training interval. Four unfinished games and all
+continuation state remain saved.
+
+The [checkpoint saving pilot](checkpoint_pilot_2026_10_25.md) separates small model
+exports from full recovery and changes normal recovery saves to thirty-minute
+intervals plus shutdown. Ten three-round games completed in **30m 51s**, with
+checkpoint work at **1.46%** of this fresh run. The exactly matched first eight
+games and learned weights took **24m 59s**, versus **28m 00s** before (10.8% less
+time). Game collection/search now accounts for **94%** of the pilot. This small
+buffer does not establish mature-buffer throughput or improved playing strength.
 
 Stage A remains an early learning experiment; it is not a completed
 playing-strength gate. The earlier [scaling follow-up](scaling_2026_10_23.md) completes
