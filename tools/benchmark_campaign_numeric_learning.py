@@ -151,6 +151,68 @@ def replay_graph_digest(samples, buckets):
             "scope": "Every retained row's complete ordered numeric graph, exact reference metadata and action factors; source JSON transport is normalized."}
 
 
+def replay_features_equal(first, second):
+    """Compare every saved input with its live source, without recompilation.
+
+    Native graph equality compares numeric bits and all reference metadata.
+    Legacy canonical JSON retains signed zero and scalar spelling. Static
+    context contents are compared once per owning pair, even across many rows.
+    """
+    import gwrl_cpp
+    from studies.campaign.features import canonical
+
+    if len(first) != len(second):
+        return False
+    contexts = set()
+    native_type = getattr(gwrl_cpp, "CampaignNumericGraph", None)
+
+    def native_equal(left, right):
+        return native_type is not None and isinstance(left, native_type) and isinstance(right, native_type) and left == right
+
+    for left_sample, right_sample in zip(first, second, strict=True):
+        left, right = left_sample.get("input"), right_sample.get("input")
+        if not isinstance(left, dict) or not isinstance(right, dict) or left.keys() != right.keys():
+            return False
+        if left.get("schema") != right.get("schema"):
+            return False
+        if left.get("schema") == "campaign-numeric-input-v1":
+            if set(left) != {"schema", "owner", "context_key", "packed_graph"}:
+                return False
+            if left["owner"] != right["owner"] or left["context_key"] != right["context_key"]:
+                return False
+            left_pack, right_pack = left["packed_graph"], right["packed_graph"]
+            if (not isinstance(left_pack, dict) or not isinstance(right_pack, dict) or
+                    set(left_pack) != {"context", "observation", "actions", "action_factors"} or
+                    left_pack.keys() != right_pack.keys()):
+                return False
+            pair = (id(left_pack["context"]), id(right_pack["context"]))
+            if pair not in contexts:
+                if not native_equal(left_pack["context"], right_pack["context"]):
+                    return False
+                contexts.add(pair)
+            if not native_equal(left_pack["observation"], right_pack["observation"]):
+                return False
+            if (left_pack["action_factors"] != right_pack["action_factors"] or
+                    len(left_pack["actions"]) != len(right_pack["actions"])):
+                return False
+            if any(not native_equal(a, b) for a, b in zip(left_pack["actions"], right_pack["actions"], strict=True)):
+                return False
+        elif left.get("schema") == "campaign-neural-input-v1":
+            if set(left) != {"schema", "context", "observation", "actions"}:
+                return False
+            pair = (id(left["context"]), id(right["context"]))
+            if pair not in contexts:
+                if canonical(left["context"]) != canonical(right["context"]):
+                    return False
+                contexts.add(pair)
+            if (canonical(left["observation"]) != canonical(right["observation"]) or
+                    canonical(left["actions"]) != canonical(right["actions"])):
+                return False
+        else:
+            return False
+    return True
+
+
 def learner_core(learner):
     import random
     import numpy as np
@@ -291,6 +353,9 @@ def worker(args):
     report["checkpoint_reconstruction_seconds"] = time.perf_counter() - before
     restored_core = learner_core(restored)
     checks["validated_restore_exact_logical_core"] = restored_core == core
+    before = time.perf_counter()
+    checks["restored_replay_features_exact"] = replay_features_equal(learner.replay, restored.replay)
+    report["checkpoint_replay_verification_seconds"] = time.perf_counter() - before
     report["restored_logical_core_sha256"] = tree_digest(restored_core)
     report["logical_checkpoint_sha256"] = tree_digest({"core": core,
         "replay_feature_graphs": report["replay_feature_graphs"]})
