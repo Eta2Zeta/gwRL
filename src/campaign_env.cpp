@@ -34,7 +34,7 @@ V staticContext(const State& s, bool trainingActions) {
 struct CampaignEnv::DecisionCache {
     std::mutex mutex;
     std::optional<std::string> planningKey;
-    std::optional<V> observation;
+    std::shared_ptr<const V> observation;
 };
 
 CampaignEnv::CampaignEnv(const std::filesystem::path& path, std::uint64_t seed, bool trainingActions)
@@ -74,9 +74,11 @@ std::string CampaignEnv::decisionKind() const {
     return toString(s.clock.phase);
 }
 
-const V& CampaignEnv::observation() const {
+const V& CampaignEnv::observation() const { return *observationSnapshot(); }
+
+std::shared_ptr<const V> CampaignEnv::observationSnapshot() const {
     std::lock_guard lock(decisionCache_->mutex);
-    if (decisionCache_->observation) return *decisionCache_->observation;
+    if (decisionCache_->observation) return decisionCache_->observation;
     const auto owner = currentDecisionPlayer();
     A actions, interrupts;
     for (const auto& action : legalActions()) actions.push_back(actionJson(action));
@@ -84,11 +86,11 @@ const V& CampaignEnv::observation() const {
     // Entity maps retain every rule status, route/origin, relationship, pending
     // choice and chance request. Geography/catalog registries are shared context.
     // Execution RNG, dice tapes, history and planning hashes are never features.
-    decisionCache_->observation = V(O{{"schema", V(std::string("campaign_entities_v1"))}, {"state", engine_.state().observation()},
+    decisionCache_->observation = std::make_shared<const V>(O{{"schema", V(std::string("campaign_entities_v1"))}, {"state", engine_.state().observation()},
         {"current_decision_player", owner ? V(*owner) : V(nullptr)},
         {"decision_kind", V(decisionKind())}, {"legal_actions", V(std::move(actions))},
         {"legal_interrupts", V(std::move(interrupts))}});
-    return *decisionCache_->observation;
+    return decisionCache_->observation;
 }
 
 CampaignEnv CampaignEnv::clone() const { return *this; }

@@ -27,6 +27,8 @@ class CampaignEnv {
     // need an independently mutable snapshot can copy the returned value.
     const json::Value& observation() const;
     json::Value context() const { return *context_; }
+    std::shared_ptr<const json::Value> contextSnapshot() const { return context_; }
+    std::shared_ptr<const json::Value> observationSnapshot() const;
     CampaignEnv clone() const;
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
     std::string planningKey() const;

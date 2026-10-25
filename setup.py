@@ -32,6 +32,7 @@ ext_modules = [
             "src/naval_combat.cpp",
             "src/naval_operations.cpp",
             "src/neural_graph.cpp",
+            "src/numeric_graph.cpp",
             "src/politics.cpp",
             "src/politics_influence.cpp",
             "src/politics_warlords.cpp",

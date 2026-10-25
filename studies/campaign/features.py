@@ -294,3 +294,56 @@ def action_factors(action: dict[str, Any]) -> tuple[str, str, str, str]:
     )
     return (canonical(raw.get("kind", action.get("kind", "unspecified"))),
             *(canonical({key: parameters[key] for key in keys if key in parameters}) for keys in groups))
+
+# The graph/model meaning is unchanged; only its transport/storage is numerical.
+NUMERIC_SCHEMA = "campaign-numeric-input-v1"
+
+
+@lru_cache(maxsize=8)
+def numeric_compiler(buckets: int):
+    from gwrl_cpp import CampaignNumericGraphCompiler
+    return CampaignNumericGraphCompiler(buckets, lexical_ids, _string_descriptor, _numeric_features)
+
+
+def compile_numeric(snapshot: Any, buckets: int):
+    return numeric_compiler(buckets).compile(snapshot)
+
+
+@lru_cache(maxsize=16384)
+def _native_factor(serialized: str) -> str:
+    # Four small category keys retain Python's exact JSON spelling, including
+    # unusual numeric/Unicode parameters. No board or menu is parsed here.
+    return canonical(json.loads(serialized))
+
+
+def make_numeric_input(env: Any, actions: Any, buckets: int) -> dict[str, Any]:
+    """Use complete native numerical snapshots; keep external JSON fallback."""
+    actions = tuple(actions)
+    export = getattr(env, "numeric_input", None)
+    if export is None:
+        return make_input(env, actions)
+    prepared = export(actions, buckets)
+    return make_input(env, actions) if prepared is None else prepared
+
+
+def validate_numeric_input(item: Any, *, buckets: int | None = None) -> int:
+    """Validate numerical replay structure without rebuilding its JSON source."""
+    if (not isinstance(item, dict) or set(item) != {"schema", "owner", "context_key", "packed_graph"}
+            or item.get("schema") != NUMERIC_SCHEMA or item["owner"] not in ("axis", "allies", "comintern", None)
+            or not isinstance(item["context_key"], str) or len(item["context_key"]) != 64):
+        raise ValueError("Invalid numerical replay input")
+    packed = item["packed_graph"]
+    if not isinstance(packed, dict) or set(packed) != {"context", "observation", "actions", "action_factors"}:
+        raise ValueError("Incomplete numerical replay graph")
+    actions, factors = packed["actions"], packed["action_factors"]
+    if not isinstance(actions, (tuple, list)) or not isinstance(factors, (tuple, list)) or len(actions) != len(factors):
+        raise ValueError("Numerical legal menu and factors disagree")
+    from gwrl_cpp import CampaignNumericGraph
+    for graph in (packed["context"], packed["observation"], *actions):
+        if not isinstance(graph, CampaignNumericGraph) or graph.node_count < 1:
+            raise ValueError("Invalid numerical graph handle")
+        if buckets is not None and graph.token_buckets != buckets:
+            raise ValueError("Numerical graph vocabulary differs from model")
+    if any(len(factor) != 4 or any(not isinstance(value, str) for value in factor) for factor in factors):
+        raise ValueError("Invalid numerical action factors")
+    return len(actions)

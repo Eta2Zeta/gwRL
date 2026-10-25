@@ -5,6 +5,7 @@
 #include "game/campaign_env.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
+#include "game/numeric_graph.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -47,6 +48,71 @@ class NativeCampaignEnv {
 
 using CampaignEnv = game::campaign::CampaignEnv;
 
+// Immutable owning views outlive an environment mutation without copying its
+// state tree. Only small scheduler fields overlay the complete native document.
+struct NumericSnapshot {
+    using V = game::json::Value;
+    std::shared_ptr<const V> source;
+    V::Object overrides;
+
+    V materialize() const {
+        if (overrides.empty()) return *source;
+        auto result = source->asObject();
+        for (const auto& [key, value] : overrides) result.insert_or_assign(key, value);
+        return V(std::move(result));
+    }
+
+    NumericSnapshot scheduledContext(const std::string& schema, const std::vector<std::string>& order) const {
+        auto result = *this;
+        V::Array sequence;
+        for (const auto& owner : order) sequence.emplace_back(owner);
+        result.overrides["interrupt_scheduler"] = V(V::Object{{"schema", V(schema)}, {"order", V(std::move(sequence))}});
+        return result;
+    }
+
+    NumericSnapshot scheduledObservation(const std::optional<std::string>& owner, const std::string& kind,
+            const std::vector<NumericSnapshot>& actions, const std::string& schema,
+            const std::vector<std::string>& order, const std::vector<std::string>& passed) const {
+        auto result = scheduledContext(schema, order);
+        result.overrides["current_decision_player"] = owner ? V(*owner) : V(nullptr);
+        result.overrides["decision_kind"] = V(kind);
+        V::Array menu, passSequence;
+        for (const auto& action : actions) menu.emplace_back(action.materialize());
+        for (const auto& player : passed) passSequence.emplace_back(player);
+        result.overrides["legal_actions"] = V(std::move(menu));
+        auto scheduler = result.overrides.at("interrupt_scheduler").asObject();
+        scheduler["passed"] = V(std::move(passSequence));
+        result.overrides["interrupt_scheduler"] = V(std::move(scheduler));
+        return result;
+    }
+
+    static NumericSnapshot scheduledAction(const game::campaign::Action* action,
+            const std::string& id, const std::string& kind, const std::string& player) {
+        return {std::make_shared<const V>(V::Object{{"id", V(id)}, {"kind", V(kind)},
+            {"player", V(player)}, {"action", action ? game::campaign::actionJson(*action) : V(nullptr)}}), {}};
+    }
+
+    std::vector<std::string> factorJson() const {
+        const auto& wrapped = source->asObject();
+        const auto* action = source->find("action");
+        const auto& raw = action && action->isObject() ? *action : *source;
+        const auto* kind = raw.find("kind");
+        const auto* parameters = raw.find("parameters");
+        const std::vector<std::vector<std::string>> groups{
+            {"source", "from", "origin", "source_zone", "unit", "units", "group", "force", "transport", "carrier", "facility", "battle"},
+            {"path", "route", "sea_route", "land_route"},
+            {"target", "destination", "to", "zone", "recipient", "endpoint"}};
+        std::vector<std::string> result{game::campaign::canonicalJson(kind ? *kind : wrapped.at("kind"))};
+        for (const auto& fields : groups) {
+            V::Object group;
+            if (parameters && parameters->isObject()) for (const auto& field : fields)
+                if (const auto* value = parameters->find(field)) group.emplace(field, *value);
+            result.push_back(game::campaign::canonicalJson(V(std::move(group))));
+        }
+        return result;
+    }
+};
+
 std::string describeAction(const game::Action& action) {
     std::string description(game::toString(action.kind));
     bool hasDetails = false;
@@ -85,6 +151,39 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                py::arg("string_descriptor"), py::arg("numeric_features"),
                "Compile complete public JSON features without engine state or learned tensors.");
 
+    py::class_<NumericSnapshot>(module, "CampaignNumericSnapshot")
+        .def("scheduled_context", &NumericSnapshot::scheduledContext, py::call_guard<py::gil_scoped_release>())
+        .def("scheduled_observation", &NumericSnapshot::scheduledObservation, py::call_guard<py::gil_scoped_release>())
+        .def("factor_json", &NumericSnapshot::factorJson, py::call_guard<py::gil_scoped_release>())
+        .def("to_python", [](const NumericSnapshot& snapshot) {
+            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(snapshot.materialize()));
+        });
+    module.def("campaign_pass_snapshot", [](const std::string& id, const std::string& kind, const std::string& player) {
+        return NumericSnapshot::scheduledAction(nullptr, id, kind, player);
+    }, py::call_guard<py::gil_scoped_release>());
+
+    py::class_<game::neural::NumericGraph, std::shared_ptr<game::neural::NumericGraph>>(module, "CampaignNumericGraph")
+        .def("arrays", &game::neural::NumericGraph::arrays)
+        .def("debug_graph", &game::neural::NumericGraph::debugGraph)
+        .def("external_references", &game::neural::NumericGraph::externalReferences)
+        .def_property_readonly("node_count", &game::neural::NumericGraph::nodeCount)
+        .def_property_readonly("leaf_count", &game::neural::NumericGraph::leafCount)
+        .def_property_readonly("token_buckets", &game::neural::NumericGraph::bucketCount)
+        .def_property_readonly("nbytes", &game::neural::NumericGraph::retainedBytes)
+        .def("packed_state", &game::neural::NumericGraph::packedState)
+        .def_static("from_packed", &game::neural::NumericGraph::fromPacked)
+        .def("__deepcopy__", [](const std::shared_ptr<game::neural::NumericGraph>& graph, py::dict) { return graph; })
+        .def(py::pickle(
+            [](const game::neural::NumericGraph& graph) { return graph.packedState(); },
+            [](const py::dict& state) { return game::neural::NumericGraph::fromPacked(state); }));
+    py::class_<game::neural::NumericGraphCompiler>(module, "CampaignNumericGraphCompiler")
+        .def(py::init<std::int64_t, py::function, py::function, py::function>())
+        .def("compile", [](game::neural::NumericGraphCompiler& compiler, const NumericSnapshot& snapshot) {
+            return compiler.compile(*snapshot.source, snapshot.overrides);
+        })
+        .def("clear_caches", &game::neural::NumericGraphCompiler::clearCaches)
+        .def("cache_stats", &game::neural::NumericGraphCompiler::cacheStats);
+
     py::enum_<game::UnitKind>(module, "UnitKind")
         .value("Infantry", game::UnitKind::Infantry)
         .value("Artillery", game::UnitKind::Artillery)
@@ -122,6 +221,10 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def_readonly("nation", &game::campaign::Action::nation)
         .def_readonly("player", &game::campaign::Action::player)
         .def_readonly("decision", &game::campaign::Action::decision)
+        .def("scheduled_snapshot", [](const game::campaign::Action& action,
+                const std::string& id, const std::string& kind, const std::string& player) {
+            return NumericSnapshot::scheduledAction(&action, id, kind, player);
+        }, py::call_guard<py::gil_scoped_release>())
         .def_property_readonly("parameters", [](const game::campaign::Action &a) {
             return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(a.parameters));
         })
@@ -179,6 +282,12 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("observation", [](const NativeCampaignEnv& self) {
             auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.observation()); });
             return py::module_::import("json").attr("loads")(text);
+        })
+        .def("numeric_observation", [](const NativeCampaignEnv& self) {
+            return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.observationSnapshot(); }), {}};
+        })
+        .def("numeric_context", [](const NativeCampaignEnv& self) {
+            return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.contextSnapshot(); }), {}};
         })
         .def("context", [](const NativeCampaignEnv& self) {
             auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.context()); });
