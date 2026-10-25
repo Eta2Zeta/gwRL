@@ -1,0 +1,208 @@
+{
+  "bootstrap": {
+    "all_learner_values_preserved": true,
+    "gen15_archive_and_checkpoint_share_inode": true,
+    "generation": 15,
+    "heldout_disjoint_from_existing_and_remaining_training_seeds": true,
+    "initial_model_export": "studies/campaign/runs/three-round-60more-2026-10-25/training/models/generation-000015.pt",
+    "initial_model_export_bytes": 510001,
+    "initial_model_export_sha256": "b5ee96ba879e2e8fc680f91ec17c272a053aba04b7e7f685c04f4410d280ef85",
+    "migrated_checkpoint_sha256": "0dc6c3d3e21806c92eef23164ed15f623cfce73d4c6c759b4abf150bbb15c022",
+    "model_versions": {
+      "allies": "allies:generation-15:c9f894632b01870f1a7a6438d9e5d647a50978619447f2f045ae5c0715d8a156",
+      "axis": "axis:generation-15:1b5f4db03c936b9cd89d4e9fbb8b5a79946b6066e390c4cdf801e6aa5cf8819d",
+      "comintern": "comintern:generation-15:068908737d7e85a5e6795adcae42e51c715ea92da547973daa71f6ae601938ea"
+    },
+    "no_actions_or_dice_executed": true,
+    "proof": "studies/campaign/runs/three-round-60more-2026-10-25/bootstrap-proof.json",
+    "scope": "Only explicit operational runner limits/source metadata changed after proof. Models, Adam, replay, pending/frozen batch and all RNG were restored exactly.",
+    "status": "verified"
+  },
+  "compatibility": {
+    "all_saved_action_orders_equal_native_order": true,
+    "no_actions_or_dice_executed": true,
+    "non_sample_learner_bitwise_sha256": "427a27580146752a04134f10fcb4cecb7e506d55b48ac2e2675bd733195681b2",
+    "proof": "studies/campaign/runs/three-round-60more-2026-10-25/continuation-proof.json",
+    "regenerated_input_sha256": "f93be29c17c4f9f1df2ee2138ab4057fc5ac14b2628b75243cef19a03d7bcd71",
+    "rows_verified": {
+      "batch_records": 0,
+      "parallel_pending[0]": 164,
+      "parallel_pending[1]": 167,
+      "parallel_pending[2]": 169,
+      "parallel_pending[3]": 165,
+      "pending": 0,
+      "replay": 16175
+    },
+    "sample_labels_policy_versions_sha256": "46ed8a607707fd9480dff438513bc7eb6c8fb6298fe01004ed797881c22bc11e",
+    "saved_input_sha256": "f93be29c17c4f9f1df2ee2138ab4057fc5ac14b2628b75243cef19a03d7bcd71",
+    "scope": "Menu/observation proof only; original active serialized games alone continue.",
+    "status": "verified"
+  },
+  "evaluation": {
+    "final_generation": 30,
+    "fixed_opponent": "versioned balanced scripted policy",
+    "games_per_checkpoint": 16,
+    "heldout_seeds": [
+      40009,
+      40013,
+      40031,
+      40037,
+      40039,
+      40063,
+      40087,
+      40093
+    ],
+    "initial_generation": 15,
+    "modes": [
+      "network_only",
+      "search"
+    ],
+    "paired_seed_comparison_required": true,
+    "primary_metric": "New Japanese-held Chinese Home Country land and printed IPP; gross gains/losses, unit removals, wealth and completion also reported.",
+    "root_noise": false,
+    "search_depth_cap": 16,
+    "search_simulations": 16,
+    "supplementary_metric": "Dadao-held Chinese Home Country land/IPP and acquisition/loss events tracked separately.",
+    "terminal_required": true
+  },
+  "frozen_runtime": {
+    "files": 449,
+    "manifest": "studies/campaign/runs/three-round-60more-2026-10-25/runtime-manifest.json",
+    "manifest_sha256": "825935c5e6ea078631d4bef9c24102564fd510b3587adb51a3fdc710e561524b",
+    "native_sha256": "6b6718f2cc8d9e1ac77265b4b700935d554f38e5fd970417891199f04f461303",
+    "source_commit": "cafbd911438983e229099d0079edfe687ddf03eb"
+  },
+  "goal": {
+    "additional_adam_steps_per_agent": 240,
+    "additional_completed_games": 60,
+    "additional_learning_batches": 15,
+    "initial_unfinished_games": 4,
+    "starting_completed_games": 60,
+    "starting_generation": 15,
+    "target_generation": 30,
+    "target_total_completed_games": 120,
+    "unfinished_completions_count_toward_additional_games": true
+  },
+  "immutable_artifacts_sha256": {
+    "studies/campaign/runs/three-round-60more-2026-10-25/bootstrap-proof.json": "38d9644023d20a48ca7235f16f2915c2626172035c0f9728ac664c32a1a295db",
+    "studies/campaign/runs/three-round-60more-2026-10-25/bootstrap-state.json": "596aaabf7462fbeef186b6e06c5e1bc205c5ede748f053f41d8a21fece09416f",
+    "studies/campaign/runs/three-round-60more-2026-10-25/continuation-proof.json": "12a344c2527ff3db57a03f0cb27269c341c8a82a6e1d809f52bb4752e6ebcaed",
+    "studies/campaign/runs/three-round-60more-2026-10-25/pipeline-plan.json": "5075c13b4e8cea1b7553618d43568a595d049d826fc7aa3d4fa48beecf39edd9",
+    "studies/campaign/runs/three-round-60more-2026-10-25/resume.sh": "5bf2880823244a711554ac98ffd982220554117c7b6f675c2d2f2312c304b27d",
+    "studies/campaign/runs/three-round-60more-2026-10-25/runtime-manifest.json": "825935c5e6ea078631d4bef9c24102564fd510b3587adb51a3fdc710e561524b",
+    "studies/campaign/runs/three-round-60more-2026-10-25/validation-state.json": "9632d10d3a7348a4e5ac2378cb631940729a494804a991201341e2a06d98d2b6",
+    "tmp/sixty-memory-preflight-2026-10-25/final-tests.log": "b88a36cc589470a394fcee48424060db11d0298d13caddb76b07b862852908ea",
+    "tmp/sixty-memory-preflight-2026-10-25/growth-storage-v2.json": "32771101ebc8b0efd5b423a4dd1f723404472ffeaf9e960c9fac2eb75896f745",
+    "tmp/sixty-memory-preflight-2026-10-25/roundtrip-v2.json": "8e8cd1f1f64a6199ddd6b9fca595d85c2c41eac937bf88fa082bc5d2a01d2fc2",
+    "tmp/sixty-memory-preflight-2026-10-25/rusage-layout.json": "2f843cc8cb766da2a22d13810c3b04af8315eeaac378d12ddf9e94cb6f1a47aa"
+  },
+  "interpretation": "Launch evidence only. Completion or lower prediction loss is not proof of stronger play. Success requires sixty additional genuine terminals and complete paired initial/final evaluation.",
+  "launch": {
+    "absolute_deadline_utc": "2026-10-26T01:29:20.268948+00:00",
+    "goal_achieved_at_recording": false,
+    "observed_stage_at_recording": "initial_evaluation",
+    "observed_status_at_recording": "running",
+    "operational_budget_seconds": 14400.0,
+    "plan": "studies/campaign/runs/three-round-60more-2026-10-25/pipeline-plan.json",
+    "plan_file_sha256": "5075c13b4e8cea1b7553618d43568a595d049d826fc7aa3d4fa48beecf39edd9",
+    "plan_identity_sha256": "cace4fb658674d2ca3ee4db0bdea23734d923e5f32de5024343ccd328b2c0f13",
+    "resume_script": "studies/campaign/runs/three-round-60more-2026-10-25/resume.sh",
+    "run_root": "studies/campaign/runs/three-round-60more-2026-10-25",
+    "scope": "New four-hour allowance from launch, including evaluation, training, recovery and downtime; no extension of the completed prior experiment.",
+    "started_utc": "2026-10-25T21:29:20.268948+00:00"
+  },
+  "preflight": {
+    "four_game_roundtrip_checks": {
+      "all_graphs_arrays_and_metadata": true,
+      "entire_checkpoint_bitwise_tree": true,
+      "legacy_load": true,
+      "original_unchanged": true
+    },
+    "limitation": "Storage stress proof uses cyclic measured states and reserved workspace; it is not a completed training run or a guarantee for all future positions. Live charged-memory guards remain active.",
+    "measured_four_game_checkpoint_before_bytes": 935887301,
+    "measured_four_game_checkpoint_compact_bytes": 99018977,
+    "python_test_seconds": 312.298,
+    "python_tests": 451,
+    "storage_all_bitwise_checks": {
+      "every_graph_and_policy_metadata_bit_exact": true,
+      "independent_observation_buffers": true,
+      "loaded_observations_independent": true,
+      "reserve_all_bytes_unchanged": true,
+      "row_count": true,
+      "source_unchanged": true,
+      "synthetic_schema": true
+    },
+    "storage_checkpoint_bytes": 1266447431,
+    "storage_graph_schema": "campaign-numeric-graph-zlib-storage-v2",
+    "storage_guard_limit_bytes": 24000000000,
+    "storage_incompressible_reserve_bytes": 4000000000,
+    "storage_independent_observation_rows": 16384,
+    "storage_peak_charged_bytes": 22814950800,
+    "storage_scope": "V2 streamed compressed Torch byte storage, outerpickle5. Storage-only stress test; cyclic measured state distribution, each observation has distinct native C++ numeric arrays. Context/action sources legitimately share exact immutable payloads. This dataset is never training data.",
+    "storage_status": "completed",
+    "storage_synthetic_only": true,
+    "validation_peak_charged_bytes": 17504417760,
+    "validation_status": "completed"
+  },
+  "recorded_at_utc": "2026-10-25T21:32:41.217804+00:00",
+  "resources": {
+    "authorized_cpu_cores": 12,
+    "authorized_memory_bytes": 30000000000,
+    "checkpoint_interval_seconds": 1800,
+    "conservative_cpu_accounting": "4 search roots +4 tensor workers +4 coordinators =12; stages sequential, no concurrent heavy work",
+    "hard_stop_bytes": 26000000000,
+    "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)",
+    "previous_checkpoint_retained": true,
+    "sampling_seconds": 0.5,
+    "shutdown_grace_seconds": 180,
+    "soft_stop_bytes": 25000000000
+  },
+  "schema": "campaign-sixty-more-launch-evidence-v1",
+  "source": {
+    "original_checkpoint": "studies/campaign/runs/three-round-10h-2026-10-24-r3/training/checkpoint.pt",
+    "original_checkpoint_sha256": "3fa2022a1e894c9a44937399584600d87d9c308553be561492a951e44eaf5ebd",
+    "original_checkpoint_unchanged": true,
+    "original_commit": "88981035ec1d80ff73f5b1d4e3b4c5ec3fd2580d",
+    "original_counters": {
+      "batches": 15,
+      "chance_events": 2291,
+      "decisions": 16840,
+      "episodes": 60,
+      "transitions": 19131,
+      "updates": 15
+    },
+    "original_generation": 15,
+    "pending_rows_by_game": [
+      164,
+      167,
+      169,
+      165
+    ],
+    "pending_rows_preserved": 665,
+    "replay_rows_preserved": 16175
+  },
+  "status": "launched",
+  "training_config": {
+    "batch_size": 32,
+    "batches": 30,
+    "calendar_rounds": 3,
+    "checkpoint_every_waves": null,
+    "checkpoint_interval_seconds": 1800.0,
+    "complete_episodes": true,
+    "cpu_budget": 11,
+    "epochs": 16,
+    "hidden_dim": 16,
+    "learning_rate": 0.001,
+    "max_depth": 16,
+    "max_episodes": 120,
+    "message_layers": 1,
+    "parallel_envs": 4,
+    "replay_capacity": 16384,
+    "seed": 1951,
+    "simulations": 16,
+    "threads": 4,
+    "token_buckets": 2048,
+    "transitions_per_batch": 5000,
+    "value_scale": 100.0
+  }
+}
