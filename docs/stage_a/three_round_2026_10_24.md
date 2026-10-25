@@ -38,7 +38,7 @@ learning.
 The corrected run completed all sixteen initial evaluation games, then stopped
 in its first self-play batch at 03:15:28 UTC on 25 October. Search reached a
 position with no legal choices: a plain flight had spent the Tokyo tactical
-bomber's five movement points reaching neutral Hainan without a landing plan.
+bomber's five movement points reaching hostile Hainan without a landing plan.
 The engine had offered that flight but correctly refused phase completion once
 the plane was stranded. This needs an engine correction, not a new reward or
 search setting.
@@ -51,6 +51,32 @@ original checkpoints and logs remain intact. The
 [interruption record](three_round_2026_10_25_interruption.json) pins the evidence;
 compatibility and valid flight/carrier orderings must be checked before recovery.
 The original absolute deadline remains unchanged.
+
+The read-only recovery proof matched the first 141 actual transitions and 117
+stored policy inputs exactly, then found a changed menu: 21 stranded flights
+were removed (316 choices became 295). The board state was identical and the
+checkpoint bytes remained unchanged. The old pending targets therefore cannot
+be relabelled as corrected data. A fresh first batch is required; the preserved
+run has no learned progress to lose.
+
+Plain flights now reject provable landing dead ends. The check uses optimistic
+aircraft and carrier reachability, preserving partial flights, deck-vacating
+possibilities and aircraft-first/carrier-later sequences. It is a necessary
+condition, not a promise that every retained partial plan can be completed.
+Actual flight permissions and the final joint landing assignment still apply;
+MAP designation is unchanged. The implementation previews one aircraft and
+shares a bounded carrier-reachability calculation within a menu.
+
+After this correction, all 346 Python tests pass (233.953 seconds), all 26 CTest
+suites pass (71.06 seconds), and all 12 air fixture groups pass. New fixtures
+exercise exhausted flights, a positive-fuel dead end, split flight/landing,
+both aircraft/carrier orderings, cloning and exact replay.
+
+On four identical saved Japanese combat-movement positions, five fresh-menu
+trials per position added a mean 1.59 ms to the position medians (32.10 to
+33.69 ms, about 4.9%). Only stranded `air_fly` choices disappeared; other action
+counts and all state/RNG snapshots matched. This measures the correctness
+check's menu cost, not completed-game throughput or training feasibility.
 
 ## Question and fixed settings
 

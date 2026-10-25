@@ -3,6 +3,7 @@
 #include "game/economy.hpp"
 #include "game/land_combat.hpp"
 #include "game/movement.hpp"
+#include "game/naval.hpp"
 #include "game/politics.hpp"
 #include <algorithm>
 #include <functional>
@@ -108,6 +109,109 @@ void landingTimingAndCarrierCapacity() {
     attachCargo(s, "cv", "g");
     attachCargo(s, "cv", "h");
     check(!airLandingAvailable(s, "f", "cv"), "Full carrier accepted extra aircraft");
+}
+void ordinaryFlightsKeepALandingContinuation() {
+    const Id formosa = "land_formosa", hainan = "land_hainan";
+    auto s = fixture();
+    s.nations.at("japan").atWarWith.insert("warlord_kwangtung_hainan");
+    s.nations.at("warlord_kwangtung_hainan").atWarWith.insert("japan");
+    add(s, "b", "tactical_bomber", "japan", tokyo);
+    s.units.at("b").movementAllowance = s.units.at("b").movementRemaining = 5;
+    const std::vector<Id> stranded{tokyo, honshu, "sea_p15", "sea_p32", "sea_p41", hainan};
+    check(validateFlight(s, "b", stranded, true).allowed,
+          "Stranded-flight fixture did not pass ordinary path/range checks");
+    Engine e(s, rules());
+    for (const auto& action : e.legalActions())
+        check(action.kind != "air_fly" || action.parameters.require("path").asArray().back().asString() != hainan,
+              "A zero-fuel flight was offered onto unlandable Hainan");
+    Action invalid;
+    invalid.kind = "air_fly";
+    V::Array path;
+    for (const auto& zone : stranded) path.emplace_back(zone);
+    invalid.parameters = V(O{{"unit", V("b")}, {"path", V(path)}});
+    const auto before = canonicalJson(s.toJson());
+    bool rejected = false;
+    try { AirRules{}.apply(s, invalid); } catch (const std::runtime_error&) { rejected = true; }
+    check(rejected && canonicalJson(s.toJson()) == before,
+          "Authoritative flight application accepted or mutated a stranded flight");
+    const auto initial = e.serialize();
+    choose(e, "air_fly", [](const Action& action) {
+        return action.parameters.require("path").asArray().back().asString() == "sea_p15";
+    });
+    check(e.state().units.at("b").turnFlags.at("air_in_flight") && !offered(e, "end_phase"),
+          "A valid split flight was rejected or prematurely grounded");
+    auto clone = e.clone();
+    const auto landing = select(e, "air_land_noncombat", [&](const Action& action) {
+        return action.parameters.require("destination").asString() == formosa;
+    });
+    e.step(landing); clone.step(landing);
+    check(offered(e, "end_phase") && e.state().units.at("b").zone == formosa &&
+              clone.exactReplayIdentity() == e.exactReplayIdentity(),
+          "A split flight lost its later landing or clone identity");
+    auto replay = Engine::replay(s.definition, rules(), initial, e.state().history);
+    check(replay.exactReplayIdentity() == e.exactReplayIdentity(), "Split flight replay diverged");
+
+    auto culdesac = fixture();
+    culdesac.nations.at("japan").atWarWith.insert("warlord_kwangtung_hainan");
+    culdesac.nations.at("warlord_kwangtung_hainan").atWarWith.insert("japan");
+    add(culdesac, "b", "strategic_bomber", "japan", tokyo);
+    culdesac.units.at("b").movementAllowance = culdesac.units.at("b").movementRemaining = 6;
+    Engine oneFuel(culdesac, rules());
+    for (const auto& action : oneFuel.legalActions())
+        check(action.kind != "air_fly" || action.parameters.require("path").asArray().back().asString() != hainan,
+              "A one-fuel cul-de-sac flight had no reachable landing continuation");
+    auto atSea = fixture();
+    add(atSea, "t", "air_transport", "japan", tokyo);
+    atSea.units.at("t").movementAllowance = atSea.units.at("t").movementRemaining = 3;
+    Engine noCarrier(atSea, rules());
+    for (const auto& action : noCarrier.legalActions())
+        check(action.kind != "air_fly" || action.parameters.require("path").asArray().back().asString() != "sea_p32",
+              "A zero-fuel transport was offered a sea destination with no landing carrier or MAP option");
+}
+void flightMayPrecedeItsLandingCarrier() {
+    const Id formosa = "land_formosa", landingSea = "sea_p41";
+    auto s = fixture();
+    add(s, "f", "fighter", "japan", formosa);
+    s.units.at("f").movementAllowance = s.units.at("f").movementRemaining = 1;
+    add(s, "cv", "fleet_carrier", "japan", "sea_p15");
+    s.captureTurnStart();
+    auto gameplay = std::make_shared<NavalRules>(rules());
+    auto fly = [&](Engine& engine) {
+        choose(engine, "air_fly", [&](const Action& action) {
+            return action.parameters.require("unit").asString() == "f" &&
+                   action.parameters.require("path").asArray().back().asString() == landingSea;
+        });
+    };
+    auto sail = [&](Engine& engine) {
+        choose(engine, "naval_start_move", [](const Action& action) {
+            return action.parameters.require("unit").asString() == "cv";
+        });
+        choose(engine, "naval_route", [&](const Action& action) {
+            return action.parameters.require("request").require("path").asArray().back().asString() == landingSea;
+        });
+    };
+    auto landOnCarrier = [&](Engine& engine) {
+        choose(engine, "air_land_noncombat", [](const Action& action) {
+            return action.parameters.require("destination").asString() == "cv";
+        });
+    };
+    Engine airFirst(s, gameplay);
+    const auto initial = airFirst.serialize();
+    fly(airFirst);
+    check(airFirst.state().units.at("f").movementRemaining == 0 &&
+              !airLandingPlanAvailable(airFirst.state()) && !offered(airFirst, "end_phase"),
+          "Future-carrier fixture did not require an actual later ship move");
+    sail(airFirst); landOnCarrier(airFirst);
+    check(offered(airFirst, "end_phase") && airFirst.state().units.at("f").carriedBy == "cv",
+          "An aircraft-first/carrier-later sequence lost its legal landing");
+    Engine carrierFirst(s, gameplay);
+    sail(carrierFirst); fly(carrierFirst); landOnCarrier(carrierFirst);
+    check(carrierFirst.state().units.at("f").zone == airFirst.state().units.at("f").zone &&
+              carrierFirst.state().units.at("f").carriedBy == airFirst.state().units.at("f").carriedBy,
+          "Changing flight/carrier ordering changed the final landing choice");
+    auto replay = Engine::replay(s.definition, gameplay, initial, airFirst.state().history);
+    check(replay.exactReplayIdentity() == airFirst.exactReplayIdentity(),
+          "Future-carrier landing replay diverged");
 }
 void bombingDamageThenAAAndReplay() {
     auto s = fixture();
@@ -223,6 +327,8 @@ int main() {
     try {
         flightPermissionAndRange();
         landingTimingAndCarrierCapacity();
+        ordinaryFlightsKeepALandingContinuation();
+        flightMayPrecedeItsLandingCarrier();
         bombingDamageThenAAAndReplay();
         interceptorAndEscortSimultaneous();
         railroadSideAndAllTracks();
@@ -231,7 +337,7 @@ int main() {
         airliftHeavyCapacityAndContinuation();
         failedLanding();
         noAircraftCapture();
-        std::cout << "10 air fixture groups passed\n";
+        std::cout << "12 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

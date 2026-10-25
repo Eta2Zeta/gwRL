@@ -26,11 +26,20 @@
     "total_waves": 48,
     "unfinished_games": 4
   },
+  "correction": {
+    "actual_flight_and_end_phase_joint_checks_unchanged": true,
+    "carrier_geometry_cache_scope": "one legal menu",
+    "full_state_clone_per_candidate": false,
+    "limitation": "Optimistic geometry proves some dead ends impossible; it does not guarantee completion of every retained partial plan.",
+    "map_designation_changed": false,
+    "preserves_partial_flights_and_future_carrier_movement": true,
+    "scope": "plain-flight necessary-condition landing guard"
+  },
   "deadline_utc": "2026-10-25T12:27:28Z",
   "error": "ValueError: Nonterminal decision has no legal action",
   "failure": {
     "cause": "Plain flight offered and accepted without a legal landing continuation; phase completion then correctly refused while aircraft remained airborne.",
-    "destination": "neutral land, unavailable for landing",
+    "destination": "hostile Hainan land, unavailable for landing",
     "flight": [
       "land_jap_tokyo",
       "land_jap_honshu",
@@ -47,18 +56,108 @@
     "raw_legal_actions": 0,
     "reproduced_from_saved_checkpoint": true,
     "resume_source_checks_bypassed": false,
-    "root_planning_key": "ffcf486d8c0b2d18282eefdd05cae4fb7f1463195bc9905d05bb111b6f508a78",
+    "simulated_leaf_planning_key": "ffcf486d8c0b2d18282eefdd05cae4fb7f1463195bc9905d05bb111b6f508a78",
     "unit": "setup_japan_land_jap_tokyo_tactical_bomber_1"
   },
-  "next_step": "Validate a flight correction without removing valid carrier/flight orderings; verify compatibility before resuming. Preserve old inputs rather than silently retagging incompatible samples.",
+  "menu_cost_measurement": {
+    "added_mean_median_cost_percent": 4.941592897051805,
+    "added_mean_median_cost_seconds": 0.001586458249221323,
+    "new_mean_of_position_medians_seconds": 0.03369064575053926,
+    "new_native_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+    "old_mean_of_position_medians_seconds": 0.03210418750131794,
+    "old_native_sha256": "bc702f48fb0bcc7c8b1331e2fac432dcecba07029835e9b428010d6b5b3946d8",
+    "positions": [
+      {
+        "checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1",
+        "new_median_seconds": 0.03362554100021953,
+        "new_menu_size": 295,
+        "old_median_seconds": 0.032237250001344364,
+        "old_menu_size": 316,
+        "only_air_fly_removed": true,
+        "other_kind_counts_unchanged": true,
+        "seed": 1951
+      },
+      {
+        "checkpoint_sha256": "0e72a10075b6d4546226c4961f1d1e1de6b95b7dc835fe5576195dc61fa2c396",
+        "new_median_seconds": 0.03553020799881779,
+        "new_menu_size": 296,
+        "old_median_seconds": 0.03264004200173076,
+        "old_menu_size": 321,
+        "only_air_fly_removed": true,
+        "other_kind_counts_unchanged": true,
+        "seed": 1952
+      },
+      {
+        "checkpoint_sha256": "386be86feb4dd2e56208212c3c846bd10d26d6da20e54247a49d0f76f4d9ec32",
+        "new_median_seconds": 0.03213183399930131,
+        "new_menu_size": 295,
+        "old_median_seconds": 0.03076770799816586,
+        "old_menu_size": 316,
+        "only_air_fly_removed": true,
+        "other_kind_counts_unchanged": true,
+        "seed": 1953
+      },
+      {
+        "checkpoint_sha256": "2a8d4b5e19bff3839667b1df022b5da65be00ce3d7e6d999af9307440166a6f2",
+        "new_median_seconds": 0.03347500000381842,
+        "new_menu_size": 295,
+        "old_median_seconds": 0.032771750004030764,
+        "old_menu_size": 316,
+        "only_air_fly_removed": true,
+        "other_kind_counts_unchanged": true,
+        "seed": 1954
+      }
+    ],
+    "raw_artifact_sha256": "92c3a594fe11160e569d23c3d6556ca9f438c9aeb7dcee2a8dd95b0077c9d714",
+    "repeats_per_position": 5,
+    "scope": "Same four serialized first Japanese combat-movement positions, one CPU, five fresh-restore first-menu trials each. Restore excluded from timing. Correctness cost only; no trajectory, whole-game throughput or learning-strength claim.",
+    "state_and_rng_unchanged_all_trials": true,
+    "supporting_artifact_sha256": {
+      "menu_cost.py": "7f78def4b5b7b121da7796e9a7853694f13b5f01c7af1e33bd1bae8024b57022",
+      "new.json": "e8e71982ec67fb5e9a8c1367430ba7f50c0cf9e5855a1b238135ff6d54edd4ed",
+      "old.json": "f037318efc066dbef184de63d16590eae3aa30ac7d48331052a7827176a53bb2",
+      "snapshots/manifest.json": "d12654587c406d091dcdd32dc1bf09b775ee395dae0881cb378931ec483a0a0b"
+    }
+  },
+  "next_step": "Validate the flight correction and matched menu-generation cost, then restart the untrained first batch under the original absolute deadline. Keep all incompatible r2 partial games and pending samples intact for diagnosis.",
   "observed_by_followup_utc": "2026-10-25T03:32:30Z",
   "recorded_utc": "2026-10-25T03:40:59.887771+00:00",
   "resources": {
     "aggregate_sampled_peak_rss_bytes": 1808089088,
     "training_worker_charged_seconds": 135.80528404199868
   },
+  "resume_proof": {
+    "added_actions": 0,
+    "board_state_identical_at_mismatch": true,
+    "changed_action_payloads": 0,
+    "changed_runtime_source_paths": [
+      "src/air.cpp"
+    ],
+    "checkpoint_bytes_unchanged": true,
+    "first_changed_root": 1,
+    "new_menu_size": 295,
+    "new_native_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+    "old_menu_size": 316,
+    "removed_stranded_flights": 21,
+    "status": "rejected_incompatible_pending_menu",
+    "verified_actual_transitions": 141,
+    "verified_pending_policy_rows": 117
+  },
   "run_root": "studies/campaign/runs/three-round-10h-2026-10-24-r2",
   "schema": "campaign-three-round-interruption-v1",
   "stage": "training",
-  "status": "paused_for_engine_correction"
+  "status": "paused_for_engine_correction",
+  "verification": {
+    "air_fixture_groups": 12,
+    "clone_and_replay_pass": true,
+    "ctest": {
+      "passed": 26,
+      "seconds": 71.06
+    },
+    "python": {
+      "passed": 346,
+      "seconds": 233.953
+    },
+    "valid_aircraft_first_and_carrier_first_sequences_pass": true
+  }
 }
