@@ -1,0 +1,1141 @@
+{
+  "diagnostics": {
+    "later": {
+      "inference_fraction_of_search_wall": 0.5741401627477835,
+      "interpretation": "Coordinator inclusive inference/forward contains child input/graph timers. Exclusive remaining forward includes Python canonicalization/cache/action-factor work and is not pure tensor arithmetic. Worker wall/CPU sums overlap across concurrent workers; they are work totals, not fractions of elapsed time. thread_cpu covers each calling Python/native thread, not every internal PyTorch worker.",
+      "native_legal_generation": {
+        "aggregate_worker_thread_cpu_seconds": 8.505748791999999,
+        "average_worker_thread_cpu_ms_per_call": 41.49145752195121,
+        "calls": 205
+      },
+      "nested_accounting": {
+        "coordinator:engine.is_terminal": {
+          "calls": 248,
+          "exclusive_thread_cpu_seconds": 0.000448902999952594,
+          "exclusive_wall_seconds": 0.0004617910017259419,
+          "thread_cpu_seconds": 0.000448902999952594,
+          "wall_seconds": 0.0004617910017259419
+        },
+        "coordinator:engine.observation": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.2539189180000072,
+          "exclusive_wall_seconds": 0.25451592200261075,
+          "thread_cpu_seconds": 0.2539189180000072,
+          "wall_seconds": 0.25451592200261075
+        },
+        "coordinator:engine.planning_key": {
+          "calls": 496,
+          "exclusive_thread_cpu_seconds": 0.0004974150000229827,
+          "exclusive_wall_seconds": 0.000534290200448595,
+          "thread_cpu_seconds": 0.0004974150000229827,
+          "wall_seconds": 0.000534290200448595
+        },
+        "coordinator:engine.serialize": {
+          "calls": 12,
+          "exclusive_thread_cpu_seconds": 0.01640150199998658,
+          "exclusive_wall_seconds": 0.0164283769991016,
+          "thread_cpu_seconds": 0.01640150199998658,
+          "wall_seconds": 0.0164283769991016
+        },
+        "coordinator:inference.total": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 0.01580275899999961,
+          "exclusive_wall_seconds": 0.01598178678250406,
+          "thread_cpu_seconds": 4.260189666999992,
+          "wall_seconds": 4.360252162950928
+        },
+        "coordinator:input.compile_graph": {
+          "calls": 893,
+          "exclusive_thread_cpu_seconds": 0.29765629299999574,
+          "exclusive_wall_seconds": 0.3001727458758978,
+          "thread_cpu_seconds": 0.29765629299999574,
+          "wall_seconds": 0.3001727458758978
+        },
+        "coordinator:input.graph_tensors": {
+          "calls": 33644,
+          "exclusive_thread_cpu_seconds": 1.2990819459994434,
+          "exclusive_wall_seconds": 1.3028805631911382,
+          "thread_cpu_seconds": 1.2990819459994434,
+          "wall_seconds": 1.3028805631911382
+        },
+        "coordinator:input.prepare": {
+          "calls": 204,
+          "exclusive_thread_cpu_seconds": 0.5561586670000054,
+          "exclusive_wall_seconds": 0.5588815810042433,
+          "thread_cpu_seconds": 0.810209045000029,
+          "wall_seconds": 0.8135277499677613
+        },
+        "coordinator:network.forward_with_input_graphs": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 1.8367536780005587,
+          "exclusive_wall_seconds": 1.9269706499471795,
+          "thread_cpu_seconds": 3.433491916999998,
+          "wall_seconds": 3.5300239590142155
+        },
+        "search_worker:engine.apply_action": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.6273451740000001,
+          "exclusive_wall_seconds": 0.6350659599265782,
+          "thread_cpu_seconds": 0.6273451740000001,
+          "wall_seconds": 0.6350659599265782
+        },
+        "search_worker:engine.clone_for_search": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.07798604300000003,
+          "exclusive_wall_seconds": 0.11850596503063571,
+          "thread_cpu_seconds": 0.07798604300000003,
+          "wall_seconds": 0.11850596503063571
+        },
+        "search_worker:engine.current_decision_player": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.0002341169999999712,
+          "exclusive_wall_seconds": 0.0002403300313744694,
+          "thread_cpu_seconds": 0.0002341169999999712,
+          "wall_seconds": 0.0002403300313744694
+        },
+        "search_worker:engine.decision_kind": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.00016479500000009858,
+          "exclusive_wall_seconds": 0.00016704804147593677,
+          "thread_cpu_seconds": 0.00016479500000009858,
+          "wall_seconds": 0.00016704804147593677
+        },
+        "search_worker:engine.is_terminal": {
+          "calls": 1023,
+          "exclusive_thread_cpu_seconds": 0.0007373800000003195,
+          "exclusive_wall_seconds": 0.0007774600817356259,
+          "thread_cpu_seconds": 0.0007373800000003195,
+          "wall_seconds": 0.0007774600817356259
+        },
+        "search_worker:engine.legal_actions": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 8.505748791999999,
+          "exclusive_wall_seconds": 8.563695501099573,
+          "thread_cpu_seconds": 8.505748791999999,
+          "wall_seconds": 8.563695501099573
+        },
+        "search_worker:engine.legal_interrupts": {
+          "calls": 195,
+          "exclusive_thread_cpu_seconds": 0.004016833000000161,
+          "exclusive_wall_seconds": 0.005246043976512738,
+          "thread_cpu_seconds": 0.004016833000000161,
+          "wall_seconds": 0.005246043976512738
+        },
+        "search_worker:engine.planning_key": {
+          "calls": 3104,
+          "exclusive_thread_cpu_seconds": 0.1604085319999962,
+          "exclusive_wall_seconds": 0.16325833353039343,
+          "thread_cpu_seconds": 0.1604085319999962,
+          "wall_seconds": 0.16325833353039343
+        }
+      },
+      "per_model_forward_batch_sizes": {
+        "4": 51
+      },
+      "source_artifact": {
+        "path": "later-instrumented.json",
+        "sha256": "d3d6e174c234f44f29ec7b8b8d03f22975a54b319ec5257814eee0850317c18a"
+      },
+      "timing_seconds": {
+        "execution": 0.01939216699975077,
+        "inference": 4.360996123010409,
+        "initialization": 6.627209625003161,
+        "preparation": 19.210621999998693,
+        "search": 7.595699458019226,
+        "search_outside_inference": 3.234703335008817
+      }
+    },
+    "opening": {
+      "inference_fraction_of_search_wall": 0.6931662460225814,
+      "interpretation": "Coordinator inclusive inference/forward contains child input/graph timers. Exclusive remaining forward includes Python canonicalization/cache/action-factor work and is not pure tensor arithmetic. Worker wall/CPU sums overlap across concurrent workers; they are work totals, not fractions of elapsed time. thread_cpu covers each calling Python/native thread, not every internal PyTorch worker.",
+      "native_legal_generation": {
+        "aggregate_worker_thread_cpu_seconds": 6.179345752999999,
+        "average_worker_thread_cpu_ms_per_call": 30.14315001463414,
+        "calls": 205
+      },
+      "nested_accounting": {
+        "coordinator:engine.is_terminal": {
+          "calls": 248,
+          "exclusive_thread_cpu_seconds": 0.00038016299999021896,
+          "exclusive_wall_seconds": 0.00038533014594577253,
+          "thread_cpu_seconds": 0.00038016299999021896,
+          "wall_seconds": 0.00038533014594577253
+        },
+        "coordinator:engine.observation": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.29961208500000147,
+          "exclusive_wall_seconds": 0.30042728992702905,
+          "thread_cpu_seconds": 0.29961208500000147,
+          "wall_seconds": 0.30042728992702905
+        },
+        "coordinator:engine.planning_key": {
+          "calls": 496,
+          "exclusive_thread_cpu_seconds": 0.0004352419999804624,
+          "exclusive_wall_seconds": 0.0004545458505162969,
+          "thread_cpu_seconds": 0.0004352419999804624,
+          "wall_seconds": 0.0004545458505162969
+        },
+        "coordinator:engine.serialize": {
+          "calls": 12,
+          "exclusive_thread_cpu_seconds": 0.009835415999999597,
+          "exclusive_wall_seconds": 0.009895957991830073,
+          "thread_cpu_seconds": 0.009835415999999597,
+          "wall_seconds": 0.009895957991830073
+        },
+        "coordinator:inference.total": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 0.016209083000020996,
+          "exclusive_wall_seconds": 0.016450836759759113,
+          "thread_cpu_seconds": 5.0890485420000005,
+          "wall_seconds": 5.212614955016761
+        },
+        "coordinator:input.compile_graph": {
+          "calls": 859,
+          "exclusive_thread_cpu_seconds": 0.3432524579999541,
+          "exclusive_wall_seconds": 0.3467727683018893,
+          "thread_cpu_seconds": 0.3432524579999541,
+          "wall_seconds": 0.3467727683018893
+        },
+        "coordinator:input.graph_tensors": {
+          "calls": 48581,
+          "exclusive_thread_cpu_seconds": 1.1552977399999769,
+          "exclusive_wall_seconds": 1.1595408417779254,
+          "thread_cpu_seconds": 1.1552977399999769,
+          "wall_seconds": 1.1595408417779254
+        },
+        "coordinator:input.prepare": {
+          "calls": 204,
+          "exclusive_thread_cpu_seconds": 0.7290440530000044,
+          "exclusive_wall_seconds": 0.7346253702562535,
+          "thread_cpu_seconds": 1.0287762589999865,
+          "wall_seconds": 1.0351712831034092
+        },
+        "coordinator:network.forward_with_input_graphs": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 2.544932427000072,
+          "exclusive_wall_seconds": 2.654094221885316,
+          "thread_cpu_seconds": 4.043482625000003,
+          "wall_seconds": 4.160407831965131
+        },
+        "search_worker:engine.apply_action": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.43467716299999926,
+          "exclusive_wall_seconds": 0.468502038216684,
+          "thread_cpu_seconds": 0.43467716299999926,
+          "wall_seconds": 0.468502038216684
+        },
+        "search_worker:engine.clone_for_search": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.029720461000000076,
+          "exclusive_wall_seconds": 0.09493316808948293,
+          "thread_cpu_seconds": 0.029720461000000076,
+          "wall_seconds": 0.09493316808948293
+        },
+        "search_worker:engine.current_decision_player": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.00028121000000055213,
+          "exclusive_wall_seconds": 0.0005341838841559365,
+          "thread_cpu_seconds": 0.00028121000000055213,
+          "wall_seconds": 0.0005341838841559365
+        },
+        "search_worker:engine.decision_kind": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.00016420800000000683,
+          "exclusive_wall_seconds": 0.00016645508003421128,
+          "thread_cpu_seconds": 0.00016420800000000683,
+          "wall_seconds": 0.00016645508003421128
+        },
+        "search_worker:engine.is_terminal": {
+          "calls": 1023,
+          "exclusive_thread_cpu_seconds": 0.0008320270000002353,
+          "exclusive_wall_seconds": 0.0008731360721867532,
+          "thread_cpu_seconds": 0.0008320270000002353,
+          "wall_seconds": 0.0008731360721867532
+        },
+        "search_worker:engine.legal_actions": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 6.179345752999999,
+          "exclusive_wall_seconds": 6.4315355840954,
+          "thread_cpu_seconds": 6.179345752999999,
+          "wall_seconds": 6.4315355840954
+        },
+        "search_worker:engine.legal_interrupts": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.002715874999999745,
+          "exclusive_wall_seconds": 0.004375456104753539,
+          "thread_cpu_seconds": 0.002715874999999745,
+          "wall_seconds": 0.004375456104753539
+        },
+        "search_worker:engine.planning_key": {
+          "calls": 3104,
+          "exclusive_thread_cpu_seconds": 0.16121082400000097,
+          "exclusive_wall_seconds": 0.169512251886772,
+          "thread_cpu_seconds": 0.16121082400000097,
+          "wall_seconds": 0.169512251886772
+        }
+      },
+      "per_model_forward_batch_sizes": {
+        "4": 51
+      },
+      "source_artifact": {
+        "path": "opening-instrumented.json",
+        "sha256": "7490ada160b3ce864c46fe6c54ae5ba2f3334e8ebb2dde576ba2790c387d589f"
+      },
+      "timing_seconds": {
+        "execution": 0.011543376007466577,
+        "inference": 5.213354168983642,
+        "initialization": 6.573954915991635,
+        "preparation": 1.7557039579987759,
+        "search": 7.521073333991808,
+        "search_outside_inference": 2.307719165008166
+      }
+    }
+  },
+  "generated_at_utc": "2026-10-25T17:36:41.345606+00:00",
+  "limits": [
+    "One before/after timed workload per case, not repeated-run variance estimates.",
+    "Search positions use unchanged roots and exclude initialization/scripted preparation/native-probe time.",
+    "Episode case includes four complete three-round frozen-policy games; no optimizer updates or recovery saves.",
+    "Diagnostic instrumentation has overhead; use uninstrumented cases for speed comparisons.",
+    "Native-probe speedup is a restricted engine workload and is not full training speedup.",
+    "No playing-strength, eleven-round or optimal-learning-method claim follows from these timings."
+  ],
+  "matched_cases": {
+    "episodes": {
+      "actual_decisions": 1101,
+      "chance_events": 136,
+      "checks": {
+        "completed": true,
+        "config": true,
+        "final_engine_state_and_rng_sha256": true,
+        "instrumented": true,
+        "model": true,
+        "prepared_state_sha256": true,
+        "roots": true,
+        "samples": true,
+        "search_count": true,
+        "search_results_sha256": true,
+        "task": true,
+        "uninstrumented": true,
+        "wrapper_sha256": true
+      },
+      "completed_games": 4,
+      "config": {
+        "calendar_rounds": 3,
+        "checkpoint_weights": null,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 1800,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decisions": 1101,
+      "end_to_end_speedup": 1.3282572080286776,
+      "final_engine_state_and_rng_sha256": [
+        "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+        "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+        "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+        "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b"
+      ],
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "fresh seeded weights",
+        "training_updates": 0,
+        "versions": {
+          "allies": "b5c68bdb518241aa3dee48812c9d2c8c14dd4aec543abd16cebda266a4f36c22",
+          "axis": "24b7f4f04d9bb1e859a0addae65bd6e3e96accfa0d4a50f29f451e5f5abf5ce6",
+          "comintern": "618b8d1c39b5d416abe1a878a04ce2f95341fd9a4b12a6e5191e07e602065876"
+        },
+        "weights_transfer": null
+      },
+      "new_end_to_end_seconds": 525.6019668330118,
+      "new_native_sha256": "1b52106f80e55afcf73b60e3b93c5adcc1aa8f80685ace5acca5adcb19803746",
+      "new_search_execution_seconds": 493.66794708116504,
+      "new_timing_seconds": {
+        "execution": 4.727370999069535,
+        "inference": 286.5884665186459,
+        "initialization": 6.642404875005013,
+        "preparation": 0.004512500003329478,
+        "search": 488.9405760820955,
+        "search_outside_inference": 202.35210956344963
+      },
+      "new_watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1556152320,
+        "elapsed_seconds": 525.6019668330118,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      },
+      "new_worker_elapsed_seconds": 524.5962423339952,
+      "old_end_to_end_seconds": 698.1346009999979,
+      "old_native_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+      "old_search_execution_seconds": 665.493775572002,
+      "old_timing_seconds": {
+        "execution": 4.786609417977161,
+        "inference": 302.2434553001658,
+        "initialization": 6.5995352500031,
+        "preparation": 0.004204707991448231,
+        "search": 660.7071661540249,
+        "search_outside_inference": 358.4637108538591
+      },
+      "old_watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1471954944,
+        "elapsed_seconds": 698.1346009999979,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      },
+      "old_worker_elapsed_seconds": 697.0881165000028,
+      "roots": [
+        {
+          "chance_events": 34,
+          "clock": {
+            "completed_rounds": 3,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "12",
+            "round_index": 2
+          },
+          "decisions": 318,
+          "index": 0,
+          "observed_terminal_returns": [
+            28.0,
+            -51.400000000000006,
+            -81.0
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "clock": {
+            "completed_rounds": 3,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "12",
+            "round_index": 2
+          },
+          "decisions": 264,
+          "index": 1,
+          "observed_terminal_returns": [
+            32.000000000000014,
+            -44.2,
+            -94.0
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "clock": {
+            "completed_rounds": 3,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "12",
+            "round_index": 2
+          },
+          "decisions": 215,
+          "index": 2,
+          "observed_terminal_returns": [
+            42.60000000000001,
+            -53.79999999999999,
+            -95.19999999999999
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "clock": {
+            "completed_rounds": 3,
+            "income_collected": true,
+            "nation_index": 3,
+            "phase": "place_units",
+            "player_turn_serial": "12",
+            "round_index": 2
+          },
+          "decisions": 304,
+          "index": 3,
+          "observed_terminal_returns": [
+            31.39999999999999,
+            -48.20000000000001,
+            -87.80000000000001
+          ],
+          "stop_reason": "terminal",
+          "terminal": true,
+          "transitions": 333
+        }
+      ],
+      "search_elapsed_reduction_fraction": 0.2599738566054647,
+      "search_execution_speedup": 1.3480595195753853,
+      "search_results_sha256": "011a8843289a3e2e7f8f170250de43f1655f9ddc364562fd91043737aaa9ec70",
+      "search_speedup": 1.3513036112656132,
+      "source_artifacts": {
+        "new": {
+          "path": "episodes-new.json",
+          "sha256": "7902dbf590f8b5d98622c5850afb45a330fc8e19c5820f7d71dce75fdddd4c6b"
+        },
+        "old": {
+          "path": "episodes-old.json",
+          "sha256": "bf8f5fe81072b5cc23708df4663c4ca7ac86723b7c86227450091b60df45ec4a"
+        }
+      },
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "wrapper_sha256": "d1cbf3f1cacd4f1cab52a3ce13744401ddad40f18f9085236bc9e19960241db2"
+    },
+    "later": {
+      "actual_decisions": 0,
+      "chance_events": 0,
+      "checks": {
+        "completed": true,
+        "config": true,
+        "final_engine_state_and_rng_sha256": true,
+        "instrumented": true,
+        "model": true,
+        "prepared_state_sha256": true,
+        "roots": true,
+        "samples": true,
+        "search_count": true,
+        "search_results_sha256": true,
+        "task": true,
+        "uninstrumented": true,
+        "wrapper_sha256": true
+      },
+      "config": {
+        "calendar_rounds": 3,
+        "checkpoint_weights": null,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 2,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decisions": 12,
+      "final_engine_state_and_rng_sha256": [
+        "1c5042c3d9f1c1699faa80abbaecf4b8a34a1a90474e7f431aa072822cf92d10",
+        "ecf6bc539383b342ec8645257e39266bd503e6414a4d59af034453381ac4dc32",
+        "f555a8678ac73c77c80556275327269d28beb6772f18d59da030f61326000cb3",
+        "fa18f9b24b1d649c195baa9843ff8f949b2174896bf356ca54adedd4cfa9d988"
+      ],
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "fresh seeded weights",
+        "training_updates": 0,
+        "versions": {
+          "allies": "b5c68bdb518241aa3dee48812c9d2c8c14dd4aec543abd16cebda266a4f36c22",
+          "axis": "24b7f4f04d9bb1e859a0addae65bd6e3e96accfa0d4a50f29f451e5f5abf5ce6",
+          "comintern": "618b8d1c39b5d416abe1a878a04ce2f95341fd9a4b12a6e5191e07e602065876"
+        },
+        "weights_transfer": null
+      },
+      "native_probe": {
+        "new": {
+          "matched": true,
+          "outcome_sha256": [
+            "b48d8dd0db6469263abfbd02679db0dfcac834fdd5a548cbbe04f378786ac609",
+            "762cedc8861cdb8bef324f3b07c6d8c4d61969ad950dee3ac3d482d7d4be39cd",
+            "4e62b8ef8a93d9a3cd10d5471a375cd3f4af0c3a1d131f1a4668ffe1e6338ab5",
+            "ab3da9152ac3f39533aacbf76b64e50774e478ff97970175c8318b928a2f6f08"
+          ],
+          "repeats_per_root": 20,
+          "roots": 4,
+          "scope": "After primary measurement; serial then threaded restores/legal-action/serialization on independent native clones.",
+          "serial_over_threaded": 3.365929344315044,
+          "serial_seconds": 4.511410500010243,
+          "threaded_seconds": 1.3403164589981316
+        },
+        "old": {
+          "matched": true,
+          "outcome_sha256": [
+            "b48d8dd0db6469263abfbd02679db0dfcac834fdd5a548cbbe04f378786ac609",
+            "762cedc8861cdb8bef324f3b07c6d8c4d61969ad950dee3ac3d482d7d4be39cd",
+            "4e62b8ef8a93d9a3cd10d5471a375cd3f4af0c3a1d131f1a4668ffe1e6338ab5",
+            "ab3da9152ac3f39533aacbf76b64e50774e478ff97970175c8318b928a2f6f08"
+          ],
+          "repeats_per_root": 20,
+          "roots": 4,
+          "scope": "After primary measurement; serial then threaded restores/legal-action/serialization on independent native clones.",
+          "serial_over_threaded": 0.985726334562612,
+          "serial_seconds": 4.520118833010201,
+          "threaded_seconds": 4.585571750008967
+        }
+      },
+      "new_native_sha256": "1b52106f80e55afcf73b60e3b93c5adcc1aa8f80685ace5acca5adcb19803746",
+      "new_timing_seconds": {
+        "execution": 0.020377916007419117,
+        "inference": 3.8180937089782674,
+        "initialization": 6.580470667002373,
+        "preparation": 18.392670875007752,
+        "search": 6.996136540998123,
+        "search_outside_inference": 3.1780428320198553
+      },
+      "new_watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1051754496,
+        "elapsed_seconds": 38.70887216700066,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      },
+      "new_worker_elapsed_seconds": 32.05175983400841,
+      "old_native_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+      "old_timing_seconds": {
+        "execution": 0.019902583997463807,
+        "inference": 3.8790255419444293,
+        "initialization": 6.646811833008542,
+        "preparation": 18.712924499996006,
+        "search": 13.119559667014983,
+        "search_outside_inference": 9.240534125070553
+      },
+      "old_watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1064566784,
+        "elapsed_seconds": 48.56291808300011,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      },
+      "old_worker_elapsed_seconds": 38.56335100000433,
+      "roots": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "6",
+            "round_index": 1
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "6",
+            "round_index": 1
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "6",
+            "round_index": 1
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 1,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "6",
+            "round_index": 1
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "search_elapsed_reduction_fraction": 0.4667399883406367,
+      "search_results_sha256": "b0f501682be56588cc0e8385a6409057f1bd06a1fa98cd7b5df14bb1d4c3aa71",
+      "search_speedup": 1.8752578069528707,
+      "source_artifacts": {
+        "new": {
+          "path": "later-new.json",
+          "sha256": "97e3c7d69f5b246347e89874466d6ca5d4d917a6a40b72260581ce8206d475c6"
+        },
+        "old": {
+          "path": "later-old.json",
+          "sha256": "2293dd80fcd79ff24f3fbbb43b25f1832cae7edd2c1d6ca47324f1719acc54da"
+        }
+      },
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "wrapper_sha256": "d1cbf3f1cacd4f1cab52a3ce13744401ddad40f18f9085236bc9e19960241db2"
+    },
+    "opening": {
+      "actual_decisions": 0,
+      "chance_events": 0,
+      "checks": {
+        "completed": true,
+        "config": true,
+        "final_engine_state_and_rng_sha256": true,
+        "instrumented": true,
+        "model": true,
+        "prepared_state_sha256": true,
+        "roots": true,
+        "samples": true,
+        "search_count": true,
+        "search_results_sha256": true,
+        "task": true,
+        "uninstrumented": true,
+        "wrapper_sha256": true
+      },
+      "config": {
+        "calendar_rounds": 3,
+        "checkpoint_weights": null,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 180,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "decisions": 12,
+      "final_engine_state_and_rng_sha256": [
+        "30d67fd120a44b557e864c6c669cc750e8c7ec60f0d2bdc15a1e32a00c3f2c84",
+        "a89a8589d05efb4345c7fb0c3be4b39050e8ca8482510973ad7aa6dab76ebd77",
+        "f23d89c6617bd8f8a266d72715c26f73cbc0195966e9c983d0955ed9965bee2a",
+        "8f207ff161082945feaf6329e49228a44e3c146369fd223b5e9b1f4e88d2224f"
+      ],
+      "model": {
+        "config": {
+          "hidden_dim": 16,
+          "message_layers": 1,
+          "policy_factorization": true,
+          "token_buckets": 2048,
+          "value_scale": 100.0
+        },
+        "frozen": true,
+        "initialization": "fresh seeded weights",
+        "training_updates": 0,
+        "versions": {
+          "allies": "b5c68bdb518241aa3dee48812c9d2c8c14dd4aec543abd16cebda266a4f36c22",
+          "axis": "24b7f4f04d9bb1e859a0addae65bd6e3e96accfa0d4a50f29f451e5f5abf5ce6",
+          "comintern": "618b8d1c39b5d416abe1a878a04ce2f95341fd9a4b12a6e5191e07e602065876"
+        },
+        "weights_transfer": null
+      },
+      "native_probe": {
+        "new": {
+          "matched": true,
+          "outcome_sha256": [
+            "eda0f1b48bfa5539b933233d47f6b977c0c1364e581720876ef9aab6551ad773",
+            "5e3a29fb406c0dba9bf4f5ec12582bc5fdafe7bb9e3dcfe2d7e7cc3c0b96c2ed",
+            "9af2022dd0333be1bae1bd29434bfd9dc888359587e71f76a39a7166459e9f9b",
+            "40e0506e20ad5ba3a1325d9cb2147d86671796d6ad7f1e4a3c33a9a9e83ecd30"
+          ],
+          "repeats_per_root": 20,
+          "roots": 4,
+          "scope": "After primary measurement; serial then threaded restores/legal-action/serialization on independent native clones.",
+          "serial_over_threaded": 3.719328655747498,
+          "serial_seconds": 3.133070249998127,
+          "threaded_seconds": 0.8423752079979749
+        },
+        "old": {
+          "matched": true,
+          "outcome_sha256": [
+            "eda0f1b48bfa5539b933233d47f6b977c0c1364e581720876ef9aab6551ad773",
+            "5e3a29fb406c0dba9bf4f5ec12582bc5fdafe7bb9e3dcfe2d7e7cc3c0b96c2ed",
+            "9af2022dd0333be1bae1bd29434bfd9dc888359587e71f76a39a7166459e9f9b",
+            "40e0506e20ad5ba3a1325d9cb2147d86671796d6ad7f1e4a3c33a9a9e83ecd30"
+          ],
+          "repeats_per_root": 20,
+          "roots": 4,
+          "scope": "After primary measurement; serial then threaded restores/legal-action/serialization on independent native clones.",
+          "serial_over_threaded": 0.973736727532759,
+          "serial_seconds": 3.171405707995291,
+          "threaded_seconds": 3.256943708009203
+        }
+      },
+      "new_native_sha256": "1b52106f80e55afcf73b60e3b93c5adcc1aa8f80685ace5acca5adcb19803746",
+      "new_timing_seconds": {
+        "execution": 0.011382416996639222,
+        "inference": 4.940864585048985,
+        "initialization": 6.586800292003318,
+        "preparation": 1.7401968330086675,
+        "search": 7.196876416986925,
+        "search_outside_inference": 2.25601183193794
+      },
+      "new_watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1150844928,
+        "elapsed_seconds": 21.01095991600596,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      },
+      "new_worker_elapsed_seconds": 15.65627512500214,
+      "old_native_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+      "old_timing_seconds": {
+        "execution": 0.010889999000937678,
+        "inference": 5.00743233099638,
+        "initialization": 6.6316174579988,
+        "preparation": 1.7543000830046367,
+        "search": 11.932090500020422,
+        "search_outside_inference": 6.924658169024042
+      },
+      "old_watchdog": {
+        "aggregate_sampled_peak_rss_bytes": 1183268864,
+        "elapsed_seconds": 27.639591165992897,
+        "last_progress_preserved": true,
+        "limitation": "Sampled RSS with a safety margin, not a kernel-enforced instantaneous limit",
+        "memory_limit_bytes": 30000000000,
+        "memory_stop_threshold_bytes": 29865782272,
+        "poll_interval_seconds": 0.1,
+        "scope": "Supervisor and single worker RSS; worker search uses threads, no subprocesses",
+        "worker_returncode": 0
+      },
+      "old_worker_elapsed_seconds": 20.402802874988993,
+      "roots": [
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 0,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 1,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 2,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        },
+        {
+          "chance_events": 0,
+          "clock": {
+            "completed_rounds": 0,
+            "income_collected": false,
+            "nation_index": 2,
+            "phase": "combat_movement",
+            "player_turn_serial": "2",
+            "round_index": 0
+          },
+          "decisions": 0,
+          "index": 3,
+          "observed_terminal_returns": null,
+          "stop_reason": "completed",
+          "terminal": false,
+          "transitions": 0
+        }
+      ],
+      "search_elapsed_reduction_fraction": 0.39684698025257126,
+      "search_results_sha256": "762fe1c4404c7ea86ea44c349f225e5624433b9a65ac1783008c51dfc5004878",
+      "search_speedup": 1.6579540634957801,
+      "source_artifacts": {
+        "new": {
+          "path": "opening-new.json",
+          "sha256": "ba2b88f4b5ed563c337f216dbd27b7d082468483c475ab3028b187d37c2e5657"
+        },
+        "old": {
+          "path": "opening-old.json",
+          "sha256": "4e6f2fb53c38a561b550e33f5503b174d4526d408d62522520ff25f920cee395"
+        }
+      },
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "wrapper_sha256": "d1cbf3f1cacd4f1cab52a3ce13744401ddad40f18f9085236bc9e19960241db2"
+    }
+  },
+  "measurement_plan": {
+    "configs": {
+      "episodes": {
+        "calendar_rounds": 3,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "episode",
+        "roots": 4,
+        "seconds": 1800,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": null,
+        "start_nation_index": 0,
+        "start_phase": "production",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "later": {
+        "calendar_rounds": 3,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "roots": 4,
+        "seconds": 240,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 2,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "opening": {
+        "calendar_rounds": 3,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "roots": 4,
+        "seconds": 180,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "smoke": {
+        "calendar_rounds": 3,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 2,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "roots": 2,
+        "seconds": 30,
+        "seed": 1951,
+        "simulations": 1,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 1,
+        "token_buckets": 2048,
+        "waves": 1
+      }
+    },
+    "cpu_budget": 12,
+    "memory_bytes": 30000000000,
+    "native_new_sha256": "1b52106f80e55afcf73b60e3b93c5adcc1aa8f80685ace5acca5adcb19803746",
+    "native_old_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+    "new_runtime": "/Users/home/Desktop/gwRL/studies/campaign/runs/native-concurrency-2026-10-25/runtime-new",
+    "old_runtime": "/Users/home/Desktop/gwRL/studies/campaign/runs/checkpoint-pilot-10games-2026-10-25/runtime",
+    "source_commit": "332866c4fe6bdcb8fe8281a979e096776457ced7",
+    "wrapper_sha256": "d1cbf3f1cacd4f1cab52a3ce13744401ddad40f18f9085236bc9e19960241db2"
+  },
+  "measurement_plan_sha256": "6303e822ea2079eb2965dae35e72f97a54da9c1d6d4d901c0e04e3d4b2f274d3",
+  "measurement_state_sha256": "0ba4544452b739cbd4eb33d1cdf81a0ecb718bdd33a1b28543a35475d8a86c74",
+  "runtime_file_count_verified": 428,
+  "runtime_manifest_sha256": "8a808f999ca987b9e8a5790e4185f98dcaa676fdc0c71c218d32a5060eb8732d",
+  "runtime_verified": true,
+  "sampled_peak_rss_bytes": 1556152320,
+  "schema": "campaign-native-concurrency-results-v1",
+  "source_commit": "332866c4fe6bdcb8fe8281a979e096776457ced7",
+  "verification": {
+    "ctest_suites_passed": 26,
+    "gil_negative_control": {
+      "current_binary_sha256": "1b52106f80e55afcf73b60e3b93c5adcc1aa8f80685ace5acca5adcb19803746",
+      "current_six_test_suite_passed": true,
+      "old_binary": "/Users/home/Desktop/gwRL/studies/campaign/runs/checkpoint-pilot-10games-2026-10-25/runtime/gwrl_cpp.cpython-313-darwin.so",
+      "old_binary_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+      "old_expected_assertion": "Python heartbeat could not run during the native engine call",
+      "old_returncode": 1,
+      "old_stderr_tail": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen runpy>\", line 287, in run_path\n  File \"<frozen runpy>\", line 98, in _run_module_code\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Users/home/Desktop/gwRL/tests/test_campaign_native_concurrency.py\", line 282, in <module>\n    print(json.dumps(PROBES[sys.argv[2]]()))\n                     ~~~~~~~~~~~~~~~~~~~^^\n  File \"/Users/home/Desktop/gwRL/tests/test_campaign_native_concurrency.py\", line 243, in gil_release_probe\n    require(progressed_during_native_call, \"Python heartbeat could not run during the native engine call\")\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/home/Desktop/gwRL/tests/test_campaign_native_concurrency.py\", line 28, in require\n    raise AssertionError(message)\nAssertionError: Python heartbeat could not run during the native engine call\n"
+    },
+    "gil_negative_control_artifact_sha256": "26796386114a631ac165020d3e1dda473342c6a4a9632631592a08649327a7b2",
+    "python_tests_passed": 372
+  }
+}

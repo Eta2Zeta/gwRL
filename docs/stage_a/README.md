@@ -17,6 +17,13 @@ games and learned weights took **24m 59s**, versus **28m 00s** before (10.8% les
 time). Game collection/search now accounts for **94%** of the pilot. This small
 buffer does not establish mature-buffer throughput or improved playing strength.
 
+The subsequent [native concurrency correction](native_concurrency_2026_10_25.md)
+lets independent games execute C++ work concurrently while protecting each board.
+Four matched three-round games with frozen policies took **8m 46s**, versus
+**11m 38s** before (24.7% less elapsed time); complete search outputs and final
+state/dice/history hashes match. Opening/later position searches improved by
+40%/47%. This measures collection, without optimizer updates or recovery saves.
+
 Stage A remains an early learning experiment; it is not a completed
 playing-strength gate. The earlier [scaling follow-up](scaling_2026_10_23.md) completes
 one small-budget eleven-round game, but stronger-search collection still needs

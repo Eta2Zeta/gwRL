@@ -94,6 +94,11 @@ lock. The four-game search structure and sequential simulations within each
 individual MCTS search are unchanged. Rebuild the extension after pulling this
 binding change, as shown above.
 
+The [matched concurrency measurements](/Users/home/Desktop/gwRL/docs/stage_a/native_concurrency_2026_10_25.md)
+collected four complete three-round frozen-policy games in 8m 46s, versus
+11m 38s before, with identical search results and final state/dice/history hashes.
+This is collection throughput; optimizer updates and recovery saving are excluded.
+
 ## Completed-episode Stage A pilot
 
 Add `--complete-episodes` to freeze a batch until each independent short game
