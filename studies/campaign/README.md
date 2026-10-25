@@ -83,6 +83,17 @@ so edits in the main checkout do not break continuation. The lighter standalone
 bounded transient retries and graceful resource/deadline stops; it reserves its
 coordinator within the configured twelve-core allowance.
 
+Native campaign calls now release Python's interpreter lock while executing
+pure C++ work. Each Python-facing environment protects its own operations with
+an independent mutex; clones get separate mutexes, so different boards can run
+native operations concurrently. Overlapping operations on one board remain
+serialized. This is per-call protection, not a transaction across several calls
+on a shared Python adapter; search workers continue owning independent adapters.
+Python JSON conversion and graph-compiler callbacks still require the interpreter
+lock. The four-game search structure and sequential simulations within each
+individual MCTS search are unchanged. Rebuild the extension after pulling this
+binding change, as shown above.
+
 ## Completed-episode Stage A pilot
 
 Add `--complete-episodes` to freeze a batch until each independent short game

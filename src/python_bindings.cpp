@@ -11,10 +11,41 @@
 
 #include <stdexcept>
 #include <string>
+#include <memory>
+#include <mutex>
+#include <utility>
 
 namespace py = pybind11;
 
 namespace {
+
+// Keep Python's synchronization policy at its boundary, not in the rules core.
+// Each bound environment owns its operation mutex; cloned boards get new ones.
+// Always release the GIL BEFORE waiting for this mutex. The reverse order could
+// deadlock with a native operation that is returning to Python. Owned native
+// results are prepared under the mutex, which is released before GIL reacquire.
+class NativeCampaignEnv {
+  public:
+    explicit NativeCampaignEnv(game::campaign::CampaignEnv env) : env_(std::move(env)) {}
+
+    template <class Function> auto call(Function&& function) {
+        py::gil_scoped_release release;
+        std::lock_guard lock(mutex_);
+        return std::forward<Function>(function)(env_);
+    }
+
+    template <class Function> auto call(Function&& function) const {
+        py::gil_scoped_release release;
+        std::lock_guard lock(mutex_);
+        return std::forward<Function>(function)(std::as_const(env_));
+    }
+
+  private:
+    game::campaign::CampaignEnv env_;
+    mutable std::mutex mutex_;
+};
+
+using CampaignEnv = game::campaign::CampaignEnv;
 
 std::string describeAction(const game::Action& action) {
     std::string description(game::toString(action.kind));
@@ -98,41 +129,87 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return game::campaign::canonicalJson(game::campaign::actionJson(a));
         });
 
-    py::class_<game::campaign::CampaignEnv>(module, "CampaignEnv")
+    py::class_<NativeCampaignEnv>(module, "CampaignEnv",
+        "Native operations release Python's lock. Each environment protects its own state; "
+        "independent environments and clones can execute concurrently.")
         .def(py::init([](const std::string& scenario, std::uint64_t seed, bool trainingActions) {
-            return game::campaign::CampaignEnv(std::filesystem::path(scenario), seed, trainingActions);
+            py::gil_scoped_release release;
+            return std::make_unique<NativeCampaignEnv>(
+                CampaignEnv(std::filesystem::path(scenario), seed, trainingActions));
         }), py::arg("scenario_path"), py::arg("seed") = 1, py::arg("training_actions") = false)
         .def_static("curriculum", [](const std::string& scenario, int rounds, std::uint64_t seed, bool trainingActions) {
-            return game::campaign::CampaignEnv::curriculum(std::filesystem::path(scenario), rounds, seed, trainingActions);
+            py::gil_scoped_release release;
+            return std::make_unique<NativeCampaignEnv>(
+                CampaignEnv::curriculum(std::filesystem::path(scenario), rounds, seed, trainingActions));
         }, py::arg("scenario_path"), py::arg("calendar_rounds"), py::arg("seed") = 1, py::arg("training_actions") = false)
-        .def("is_terminal", &game::campaign::CampaignEnv::isTerminal)
-        .def("current_decision_player", &game::campaign::CampaignEnv::currentDecisionPlayer)
-        .def("current_nation", &game::campaign::CampaignEnv::currentNation)
-        .def("decision_kind", &game::campaign::CampaignEnv::decisionKind)
-        .def("legal_actions", &game::campaign::CampaignEnv::legalActions)
-        .def("legal_interrupts", &game::campaign::CampaignEnv::legalInterrupts)
-        .def("apply_action", &game::campaign::CampaignEnv::applyAction)
-        .def("apply_interrupt", &game::campaign::CampaignEnv::applyInterrupt)
-        .def("resolve_chance", &game::campaign::CampaignEnv::resolveChance)
-        .def("returns", &game::campaign::CampaignEnv::returns)
-        .def("wealth", [](const game::campaign::CampaignEnv& env) {
-            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(env.wealth()));
+        .def("is_terminal", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.isTerminal(); });
         })
-        .def("observation", [](const game::campaign::CampaignEnv& env) {
-            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(env.observation()));
+        .def("current_decision_player", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.currentDecisionPlayer(); });
         })
-        .def("context", [](const game::campaign::CampaignEnv& env) {
-            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(env.context()));
+        .def("current_nation", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.currentNation(); });
         })
-        .def("clone", &game::campaign::CampaignEnv::clone)
-        .def("clone_for_search", &game::campaign::CampaignEnv::cloneForSearch)
-        .def("planning_key", &game::campaign::CampaignEnv::planningKey)
-        .def("serialize", &game::campaign::CampaignEnv::serialize)
-        .def("history_size", &game::campaign::CampaignEnv::historySize)
-        .def("history_since", [](const game::campaign::CampaignEnv& env, std::size_t index) {
-            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(env.historySince(index)));
+        .def("decision_kind", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.decisionKind(); });
+        })
+        .def("legal_actions", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.legalActions(); });
+        })
+        .def("legal_interrupts", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.legalInterrupts(); });
+        })
+        .def("apply_action", [](NativeCampaignEnv& self, game::campaign::Action action) {
+            self.call([&](CampaignEnv& env) { env.applyAction(action); });
+        })
+        .def("apply_interrupt", [](NativeCampaignEnv& self, game::campaign::Action action) {
+            self.call([&](CampaignEnv& env) { env.applyInterrupt(action); });
+        })
+        .def("resolve_chance", [](NativeCampaignEnv& self) {
+            self.call([](CampaignEnv& env) { env.resolveChance(); });
+        })
+        .def("returns", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.returns(); });
+        })
+        .def("wealth", [](const NativeCampaignEnv& self) {
+            auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.wealth()); });
+            return py::module_::import("json").attr("loads")(text);
+        })
+        .def("observation", [](const NativeCampaignEnv& self) {
+            auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.observation()); });
+            return py::module_::import("json").attr("loads")(text);
+        })
+        .def("context", [](const NativeCampaignEnv& self) {
+            auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.context()); });
+            return py::module_::import("json").attr("loads")(text);
+        })
+        .def("clone", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) {
+                return std::make_unique<NativeCampaignEnv>(env.clone());
+            });
+        })
+        .def("clone_for_search", [](const NativeCampaignEnv& self, std::uint64_t seed) {
+            return self.call([&](const CampaignEnv& env) {
+                return std::make_unique<NativeCampaignEnv>(env.cloneForSearch(seed));
+            });
+        })
+        .def("planning_key", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.planningKey(); });
+        })
+        .def("serialize", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.serialize(); });
+        })
+        .def("history_size", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.historySize(); });
+        })
+        .def("history_since", [](const NativeCampaignEnv& self, std::size_t index) {
+            auto text = self.call([&](const CampaignEnv& env) { return game::campaign::canonicalJson(env.historySince(index)); });
+            return py::module_::import("json").attr("loads")(text);
         }, py::arg("index"))
-        .def("restore", &game::campaign::CampaignEnv::restore);
+        .def("restore", [](NativeCampaignEnv& self, const std::string& serialized) {
+            self.call([&](CampaignEnv& env) { env.restore(serialized); });
+        });
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
     module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;
 

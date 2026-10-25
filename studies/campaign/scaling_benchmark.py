@@ -390,7 +390,8 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
             replay_writer.close()
 
 
-def supervise(config: BenchmarkConfig, output: Path, *, record_replay: bool = False) -> dict:
+def supervise(config: BenchmarkConfig, output: Path, *, record_replay: bool = False,
+              worker_prefix: list[str] | None = None) -> dict:
     """Enforce a wall deadline even if native code or an inference call stalls."""
     replay_output = output.with_suffix(".replay.jsonl") if record_replay else None
     if record_replay and config.mode != "episode":
@@ -409,7 +410,8 @@ def supervise(config: BenchmarkConfig, output: Path, *, record_replay: bool = Fa
                        "MKL_NUM_THREADS": str(config.threads), "OPENBLAS_NUM_THREADS": "1",
                        "VECLIB_MAXIMUM_THREADS": str(config.threads), "NUMEXPR_NUM_THREADS": "1"}
         with (directory / "stdout").open("w") as stdout, (directory / "stderr").open("w") as stderr:
-            process = subprocess.Popen([sys.executable, "-m", "studies.campaign.scaling_benchmark",
+            prefix = worker_prefix or [sys.executable, "-m", "studies.campaign.scaling_benchmark"]
+            process = subprocess.Popen([*prefix,
                 "--_worker", str(settings), "--output", str(progress),
                 *(["--replay-output", str(replay_output)] if replay_output is not None else [])], env=environment,
                 stdout=stdout, stderr=stderr)
