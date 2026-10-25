@@ -143,6 +143,9 @@ struct Action {
     Id nation;
     std::optional<Id> decision;
     json::Value parameters {json::Value::Object {}};
+    // Derived immutable bytes from the authoritative menu. Never serialized,
+    // supplied by a policy, or trusted as proof of legality.
+    std::shared_ptr<const std::string> neuralSourceKey;
 };
 
 struct Decision {

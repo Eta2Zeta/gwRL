@@ -1,5 +1,7 @@
 #include "game/campaign.hpp"
+#include "game/campaign_actions.hpp"
 
+#include <cmath>
 #include <functional>
 #include <deque>
 #include <iostream>
@@ -162,5 +164,50 @@ void immutableIndexedGeometry() {
     for(const auto& start:actual.definition->indexedGeography->nodeIds)for(int range=-1;range<=10;++range)
         check(actual.definition->indexedGeography->withinHops(start,range)==referenceGeometry(*actual.definition,start,range),"Campaign geometry differs from reference BFS");
 }
+V nestedNumber(double number) {
+    return V(O{{"outer",V(V::Array{V(nullptr),V(true),V("opaque\n中国"),V(O{{"number",V(number)}})})}});
 }
-int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+void everyFreeFormPayloadRetainsFiniteValidation() {
+    const std::vector<std::function<void(State&,const V&)>> payloads{
+        [](State& s,const V& v){s.politics.pending["opaque_finite_fixture"]=v;},
+        [](State& s,const V& v){s.decisions.back().options.front().parameters=v;},
+        [](State& s,const V& v){s.battles.begin()->second.data=v;},
+        [](State& s,const V& v){s.history.front().payload=v;},
+    };
+    for(const auto& replace:payloads) {
+        for(const double number:{std::numeric_limits<double>::quiet_NaN(),
+                std::numeric_limits<double>::infinity(),-std::numeric_limits<double>::infinity()}) {
+            auto state=fixture();replace(state,nestedNumber(number));
+            rejects([&]{state.validate();},"Nested nonfinite free-form state number accepted");
+        }
+        for(const double number:{-0.0,0.0,1.25,std::numeric_limits<double>::max(),
+                std::numeric_limits<double>::lowest(),std::numeric_limits<double>::denorm_min()}) {
+            auto state=fixture();replace(state,nestedNumber(number));
+            const auto before=canonicalJson(state.toJson());state.validate();
+            check(canonicalJson(state.toJson())==before,"Finite validation changed a payload or its canonical spelling");
+        }
+    }
+    // Action-interface numbers have their own integer/schema checks as well.
+    // Exercise a valid nested raider-configuration field, not an unknown field
+    // that would be rejected regardless of whether its number was finite.
+    auto state=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
+    state.units.clear();
+    UnitState unit;unit.id="finite_raider";unit.type="battlecruiser";unit.owner=state.currentNation();
+    unit.zone=unit.turnOrigin="sea_p15";unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags["raider"]=0;
+    state.units.emplace(unit.id,unit);
+    auto configuration=[&](double number) {
+        return V(O{{"schema",V(trainingActionSchema)},{"visited_configurations",V(V::Array{V(O{
+            {"raiders",V(O{{unit.id,V(O{{"raider",V(number)}})}})},
+            {"aircraft",V(O{})},{"carriers",V(O{})}})})},{"declined_rail_requests",V(V::Array{})}});
+    };
+    state.actionInterface=configuration(-0.0);state.validate();
+    check(std::signbit(state.actionInterface.require("visited_configurations").asArray().front()
+        .require("raiders").require(unit.id).require("raider").asNumber()),"Validation normalized a stored negative zero");
+    for(const double number:{std::numeric_limits<double>::quiet_NaN(),
+            std::numeric_limits<double>::infinity(),-std::numeric_limits<double>::infinity()}) {
+        state.actionInterface=configuration(number);
+        rejects([&]{state.validate();},"Nested nonfinite action-interface number accepted");
+    }
+}
+}
+int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

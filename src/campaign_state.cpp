@@ -63,6 +63,12 @@ void writeJson(std::string& out,const V& v) {
     else if (v.isArray()) { out+='['; bool first=true; for (const auto& x:v.asArray()) { if (!first) out+=','; first=false; writeJson(out,x); } out+=']'; }
     else { out+='{'; bool first=true; for (const auto& [k,x]:v.asObject()) { if (!first) out+=','; first=false; writeString(out,k); out+=':'; writeJson(out,x); } out+='}'; }
 }
+void validateJsonNumbers(const V& value) {
+    if(value.isNumber()) {require(std::isfinite(value.asNumber()),"JSON numbers must be finite");return;}
+    if(value.isNull() || value.isBool() || value.isString())return;
+    if(value.isArray()) {for(const auto& item:value.asArray())validateJsonNumbers(item);return;}
+    for(const auto& [key,item]:value.asObject())validateJsonNumbers(item);
+}
 V definitionJson(const Definition& d) {
     O factions; for (const auto& [k,f]:d.factions) factions.emplace(k,V(O{{"id",V(f.id)},{"display_name",V(f.displayName)},{"home_country",strings(f.homeCountry)},{"home_country_known",V(f.homeCountryKnown)},{"dormant",V(f.dormant)}}));
     return V(O{{"scenario_id",V(d.scenarioId)},{"geography",d.geography},{"rules",d.rules},{"factions",V(std::move(factions))},{"turn_order",strings(d.turnOrder)},{"players",strings(d.players)},{"start_year",number(d.startYear)},{"start_month",number(d.startMonth)},{"calendar_rounds",number(d.calendarRounds)}});
@@ -281,7 +287,7 @@ void State::validate() const {
     unique(politics.alignmentQueue,"Duplicate political alignment queue entry");for(const auto& id:politics.alignmentQueue)nation(id);
     for(const auto& [id,capital]:politics.capitals){nation(id);land(capital);}
     for(const auto& id:politics.surrendered)nation(id);for(const auto& id:politics.evolutionAwarded)nation(id);
-    for(const auto& [id,payload]:politics.pending){require(!id.empty(),"Empty political continuation");(void)canonicalJson(payload);}
+    for(const auto& [id,payload]:politics.pending){require(!id.empty(),"Empty political continuation");validateJsonNumbers(payload);}
     require(!politics.surrendered.contains("ccp"),"CCP cannot surrender");
     const auto politicalKind=[](const Id& kind) {
         return kind.rfind("politics_",0)==0||kind.rfind("warlord_",0)==0||kind.rfind("truce_",0)==0
@@ -298,7 +304,14 @@ void State::validate() const {
         require(clock.roundIndex==definition->calendarRounds-1&&clock.nationIndex==static_cast<int>(definition->turnOrder.size())-1&&clock.phase==Phase::PlaceUnits,"Terminal state is not at the final national turn");
         for(const auto& id:definition->turnOrder) require(completedTurns.contains(id)&&completedTurns.at(id)==definition->calendarRounds,"Terminal state has incomplete national turns");
     }
-    // Validate free-form payload numbers even when no serialization was requested.
-    (void)canonicalJson(toJson());
+    // Every typed numeric member above is an int, optional<int>, integer
+    // container or a decimal-string execution counter. Only these free-form
+    // payloads can contain nonfinite doubles. Inspect them in place instead of
+    // copying/formatting the entire state and history just for validation.
+    // Political continuations were checked at their existing position above.
+    validateJsonNumbers(actionInterface);
+    for(const auto& decision:decisions)for(const auto& action:decision.options)validateJsonNumbers(action.parameters);
+    for(const auto& [id,battle]:battles)validateJsonNumbers(battle.data);
+    for(const auto& event:history)validateJsonNumbers(event.payload);
 }
 } // namespace game::campaign

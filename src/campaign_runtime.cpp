@@ -113,13 +113,16 @@ void prepareTurnStart(State& state) {
 
 struct Engine::ActionMenu {
     std::vector<Action> actions;
-    std::map<Id, std::string> canonicalById;
+    std::map<Id, std::shared_ptr<const std::string>> canonicalById;
 };
 
 struct Engine::DecisionCache {
     std::mutex mutex;
     std::shared_ptr<const ActionMenu> actions;
     std::shared_ptr<const ActionMenu> interrupts;
+    // Seeded only from a newly computed final runtime-event key; loaded event
+    // history can contain intermediate/stale keys and is never trusted here.
+    std::optional<std::string> stateKey;
 };
 
 void Engine::invalidateDecisionCache() {
@@ -265,7 +268,7 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
             return action.kind != "land_begin_battle" && action.kind != "land_progress_battle";
         }), actions.end());
     std::set<Id> ids;
-    for (const auto& action : actions) {
+    for (auto& action : actions) {
         require(!action.id.empty() && !action.kind.empty() && !reserved(action), "Rules action uses an empty or reserved identity");
         require(action.parameters.isObject(), "Action parameters must be an object");
         require(ids.insert(action.id).second, "Rules actions have duplicate IDs");
@@ -284,12 +287,14 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
                      controlledBy(state_,action.nation,state_.currentNation()) || directAxis) && !action.decision,
                     "Rules action does not match active nation");
         }
-        menu->canonicalById.emplace(action.id, canonicalJson(actionJson(action)));
+        action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
+        menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
     if (!decisionPending && phaseWorkClear(state_) && rules_->phaseComplete(state_)) {
         actions.push_back(endPhaseAction(state_, *player));
-        const auto& action = actions.back();
-        menu->canonicalById.emplace(action.id, canonicalJson(actionJson(action)));
+        auto& action = actions.back();
+        action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
+        menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
     return finish();
 }
@@ -302,7 +307,7 @@ void Engine::step(const Action& action) {
     const auto proposed = canonicalJson(actionJson(action));
     const auto menu = actionMenu();
     const auto found = menu->canonicalById.find(action.id);
-    require(found != menu->canonicalById.end() && found->second == proposed, "Illegal campaign action");
+    require(found != menu->canonicalById.end() && *found->second == proposed, "Illegal campaign action");
     Engine next = clone();
     next.invalidateDecisionCache();
     if (reserved(action)) next.endPhase();
@@ -313,7 +318,9 @@ void Engine::step(const Action& action) {
         checkHookClock(next.state_, before, terminal);
     }
     next.state_.validate();
-    next.state_.history.push_back(Event{"action", actionJson(action), next.state_.planningKey()});
+    const auto stateKey=next.state_.planningKey();
+    next.state_.history.push_back(Event{"action", actionJson(action), stateKey});
+    next.decisionCache_->stateKey=stateKey;
     *this = std::move(next);
 }
 
@@ -333,13 +340,14 @@ std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
     auto& actions=menu->actions;
     actions=rules_->interrupts(state_);
     std::set<Id> ids;
-    for(const auto& action:actions) {
+    for(auto& action:actions) {
         require(!reserved(action)&&!action.id.empty()&&ids.insert(action.id).second,
                 "Invalid political interrupt identity");
         require(state_.nations.contains(action.nation)&&state_.nations.at(action.nation).player==action.player,
                 "Interrupt entitlement mismatch");
         require(!action.decision&&action.parameters.isObject(),"Invalid interrupt payload");
-        menu->canonicalById.emplace(action.id, canonicalJson(actionJson(action)));
+        action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
+        menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
     return finish();
 }
@@ -352,7 +360,7 @@ void Engine::interrupt(const Action& action) {
     const auto proposed=canonicalJson(actionJson(action));
     const auto menu=interruptMenu();
     const auto found=menu->canonicalById.find(action.id);
-    require(found!=menu->canonicalById.end()&&found->second==proposed, "Illegal campaign interrupt");
+    require(found!=menu->canonicalById.end()&&*found->second==proposed, "Illegal campaign interrupt");
     auto next=clone();
     next.invalidateDecisionCache();
     const auto before=next.state_.clock;
@@ -360,7 +368,9 @@ void Engine::interrupt(const Action& action) {
     next.rules_->apply(next.state_,action);
     checkHookClock(next.state_,before,beforeTerminal);
     next.state_.validate();
-    next.state_.history.push_back(Event{"interrupt",actionJson(action),next.state_.planningKey()});
+    const auto stateKey=next.state_.planningKey();
+    next.state_.history.push_back(Event{"interrupt",actionJson(action),stateKey});
+    next.decisionCache_->stateKey=stateKey;
     *this=std::move(next);
 }
 
@@ -387,7 +397,9 @@ void Engine::resolveChance() {
     next.rules_->applyChance(next.state_, request, outcome);
     checkHookClock(next.state_, before, terminal);
     next.state_.validate();
-    next.state_.history.push_back(Event{"chance", V(O{{"request_id", V(request.id)}, {"outcome", outcomeJson(outcome)}}), next.state_.planningKey()});
+    const auto stateKey=next.state_.planningKey();
+    next.state_.history.push_back(Event{"chance", V(O{{"request_id", V(request.id)}, {"outcome", outcomeJson(outcome)}}), stateKey});
+    next.decisionCache_->stateKey=stateKey;
     *this = std::move(next);
 }
 
@@ -499,7 +511,9 @@ Engine Engine::replay(std::shared_ptr<const Definition> definition, std::shared_
 std::string Engine::exactReplayIdentity() const { return contentDigest(serialize()); }
 
 std::string Engine::planningKey() const {
-    return contentDigest(canonicalJson(V(O{{"rules_id", V(rules_->id())}, {"state_key", V(state_.planningKey())}})));
+    std::lock_guard lock(decisionCache_->mutex);
+    if(!decisionCache_->stateKey)decisionCache_->stateKey=state_.planningKey();
+    return contentDigest(canonicalJson(V(O{{"rules_id", V(rules_->id())}, {"state_key", V(*decisionCache_->stateKey)}})));
 }
 
 }  // namespace game::campaign

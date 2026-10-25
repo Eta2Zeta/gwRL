@@ -571,6 +571,87 @@ void decisionMenusAreReusedAndTransactional() {
             "Concurrent clones regenerated their shared unchanged menu");
 }
 
+void runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys() {
+    const auto expected=[](const Engine& engine) {
+        return contentDigest(canonicalJson(V(O{{"rules_id",V(engine.rulesId())},
+            {"state_key",V(engine.state().planningKey())}})));
+    };
+    const auto checkKey=[&](const Engine& engine,bool finalEvent) {
+        require(engine.planningKey()==expected(engine),"Cached runtime key differs from complete decision state");
+        require(engine.planningKey()==expected(engine),"Repeated runtime key changed");
+        if(finalEvent)require(engine.state().history.back().afterStateKey==engine.state().planningKey(),
+            "Final runtime event key does not describe the committed state");
+    };
+    auto rules=std::make_shared<CountingRules>();
+    auto engine=Engine::start(initialState(),rules,41);
+    checkKey(engine,false);  // Start hooks finish before the first cached key.
+    const auto original=engine.planningKey();
+    auto branch=engine.cloneForSearch(73);
+    require(branch.planningKey()==original,"Search RNG reseeding changed cached state identity");
+    engine.step(findAction(engine,"mark"));checkKey(engine,true);
+    require(engine.planningKey()!=original && branch.planningKey()==original,"Key cache leaked across a clone mutation");
+    engine.interrupt(engine.legalInterrupts().front());checkKey(engine,true);
+    engine.step(findAction(engine,"request_chance"));checkKey(engine,true);
+    const auto chanceKey=engine.planningKey();
+    engine.setDiceTapeForTesting({2,12});
+    require(engine.planningKey()==chanceKey,"Future test tape changed decision identity");
+    engine.resolveChance();checkKey(engine,true);
+    endPhase(engine);checkKey(engine,true);
+    const auto beforeFailure=engine.planningKey();
+    rejects([&]{engine.step(findAction(engine,"throw_after_mutation"));},"Throwing mutation was committed");
+    require(engine.planningKey()==beforeFailure,"Failed action changed the prior key cache");
+
+    auto encoded=game::json::parse(engine.serialize()).asObject();
+    auto state=encoded.at("state").asObject();auto history=state.at("history").asArray();
+    auto event=history.back().asObject();event["after_state_key"]=V("untrusted historical key");
+    history.back()=V(std::move(event));state["history"]=V(std::move(history));encoded["state"]=V(std::move(state));
+    const auto restored=Engine::restore(engine.state().definition,rules,canonicalJson(V(std::move(encoded))));
+    checkKey(restored,false);
+    require(restored.planningKey()==engine.planningKey(),"Restore trusted a loaded historical key");
+    auto externallyPrepared=engine.state().clone();externallyPrepared.flags["prepared_outside_runtime"]=1;
+    Engine wrapped(std::move(externallyPrepared),rules);
+    checkKey(wrapped,false);
+    require(wrapped.planningKey()!=engine.planningKey(),"Wrapping a state reused a stale historical key");
+
+    Engine cold(initialState(),rules);auto left=cold.clone();auto right=cold.cloneForSearch(91);
+    auto first=std::async(std::launch::async,[&]{return left.planningKey();});
+    auto second=std::async(std::launch::async,[&]{return right.planningKey();});
+    require(first.get()==second.get() && cold.planningKey()==expected(cold),"Concurrent cold clone keys diverged");
+}
+
+void menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions() {
+    const auto verify=[](const std::vector<Action>& actions) {
+        for(const auto& action:actions) {
+            require(action.neuralSourceKey && *action.neuralSourceKey==canonicalJson(actionJson(action)),
+                "Derived action source key omits or changes a public feature");
+            const auto external=actionFromJson(actionJson(action));
+            require(!external.neuralSourceKey && canonicalJson(actionJson(external))==*action.neuralSourceKey,
+                "Derived source metadata leaked into external action features");
+        }
+    };
+    auto rules=std::make_shared<CountingRules>();
+    Engine engine(initialState(),rules,92);
+    const auto actions=engine.legalActions();verify(actions);
+    auto branch=engine.clone();const auto repeated=branch.legalActions();
+    for(std::size_t i=0;i<actions.size();++i)
+        require(actions[i].neuralSourceKey==repeated[i].neuralSourceKey,"Unchanged clone copied derived source bytes");
+    const auto mark=findAction(engine,"mark");
+    auto forged=mark;forged.parameters=V(O{{"value",V(999.0)}});
+    rejects([&]{engine.step(forged);},"A retained source key authorized a forged action payload");
+    auto alteredMetadata=mark;alteredMetadata.neuralSourceKey=std::make_shared<const std::string>("external derived metadata");
+    engine.step(alteredMetadata);branch.step(mark);
+    require(engine.serialize()==branch.serialize(),"Derived source metadata changed rule execution or history");
+    const auto changed=findAction(engine,"mark");
+    require(changed.id==mark.id && *changed.neuralSourceKey!=*mark.neuralSourceKey,
+        "Same action ID with changed parameters reused stale source bytes");
+    const auto interrupts=engine.legalInterrupts();verify(interrupts);
+    engine.interrupt(interrupts.front());
+    engine.step(findAction(engine,"request_reaction"));
+    const auto pending=engine.legalActions();verify(pending);
+    require(pending.front().decision && pending.front().player=="allies",
+        "Source-key fixture lost its defender decision metadata");
+}
+
 }  // namespace
 
 int main() {
@@ -589,6 +670,8 @@ int main() {
         {"exact replay and restore", replayAndRestoreAreExact},
         {"clone and search isolation", cloneAndSearchRandomnessAreIsolated},
         {"decision menu reuse and invalidation", decisionMenusAreReusedAndTransactional},
+        {"state key reuse and invalidation", runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys},
+        {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
     };
     for (const auto& [name, test] : tests) {
         try { test(); std::cout << "PASS " << name << '\n'; }
