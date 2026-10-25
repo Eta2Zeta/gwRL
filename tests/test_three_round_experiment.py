@@ -154,6 +154,42 @@ class ThreeRoundExperimentTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_plan({**self.plan, "deadline_epoch": time.time() + 11 * 3600})
 
+    def test_model_exports_are_selected_without_loading_full_recovery_files(self):
+        experiment = Experiment(self.plan)
+        models = self.root / "training/models"
+        models.mkdir(parents=True, exist_ok=True)
+        initial, final = models / "generation-000000.pt", models / "generation-000003.pt"
+        initial.write_bytes(b"initial small policies")
+        final.write_bytes(b"latest small policies")
+        (models.parent / "manifest.json").write_text(json.dumps({"latest_model_export": {
+            "path": "models/generation-000003.pt", "bytes": final.stat().st_size, "generation": 3}}))
+        command = experiment.command("initial_evaluation", self.plan["deadline_epoch"])
+        self.assertEqual(command[command.index("--checkpoint") + 1], str(initial))
+        self.assertEqual(experiment.evaluation_source(initial=False), final)
+        # No initial.pt or checkpoint.pt is needed merely to select evaluation weights.
+        self.assertFalse((models.parent / "checkpoint.pt").exists())
+        final.unlink()
+        with self.assertRaisesRegex(ValueError, "Declared model export is missing"):
+            experiment.evaluation_source(initial=False)
+
+    def test_final_freeze_uses_independently_valid_latest_model_export(self):
+        script = self.worker.read_text().replace(
+            "assert (root / 'evaluation-checkpoint.pt').read_text() == 'trained weights'",
+            "assert (root / 'evaluation-checkpoint.pt').read_text() == 'trained small policies'")
+        script = script.replace("    (training / 'checkpoint.pt').write_text('trained weights')",
+            "    (training / 'checkpoint.pt').write_text('older recovery weights')\n"
+            "    models = training / 'models'\n"
+            "    models.mkdir(exist_ok=True)\n"
+            "    target = models / 'generation-000001.pt'\n"
+            "    target.write_text('trained small policies')\n"
+            "    (training / 'manifest.json').write_text(json.dumps({'latest_model_export': "
+            "{'path': 'models/generation-000001.pt', 'bytes': target.stat().st_size, 'generation': 1}}))")
+        self.worker.write_text(script)
+        state = self.experiment().run()
+        self.assertEqual(state["status"], "completed")
+        self.assertEqual((self.root / "evaluation-checkpoint.pt").read_text(), "trained small policies")
+        self.assertEqual(state["evaluation_model_source"], "training/models/generation-000001.pt")
+
     def test_frozen_runtime_inventory_and_native_binary_are_verified(self):
         runtime = self.directory / "frozen-runtime"
         runtime.mkdir()

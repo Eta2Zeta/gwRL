@@ -276,6 +276,28 @@ class Experiment:
     def request_stop(self, number, _frame):
         self.stopped = signal.Signals(number).name
 
+    def evaluation_source(self, *, initial: bool) -> Path:
+        """New runs evaluate small policy exports; old runs keep their contract.
+
+        An explicitly declared export must exist. Falling back to an older full
+        checkpoint after an export error could silently evaluate different weights.
+        """
+        manifest = read_json(self.training / "manifest.json", {})
+        metadata = manifest.get("latest_model_export")
+        if metadata is None:
+            return self.training / ("initial.pt" if initial else "checkpoint.pt")
+        if not isinstance(metadata, dict) or not isinstance(metadata.get("path"), str):
+            raise ValueError("Invalid model export metadata in training manifest")
+        candidate = (self.training / "models/generation-000000.pt" if initial
+                     else self.training / metadata["path"])
+        if not candidate.resolve().is_relative_to(self.training.resolve()):
+            raise ValueError("Model export must belong to this training run")
+        if not candidate.is_file():
+            raise ValueError("Declared model export is missing; refusing older recovery weights")
+        if not initial and candidate.stat().st_size != metadata.get("bytes"):
+            raise ValueError("Declared model export size differs from training manifest")
+        return candidate
+
     def command(self, stage: str, deadline: float):
         if self.command_builder is not None:
             return self.command_builder(stage, deadline, self)
@@ -296,7 +318,8 @@ class Experiment:
                     "--poll-seconds", str(self.poll_seconds), "--adopt-checkpoint", "--", *arguments]
         initial = stage == "initial_evaluation"
         command = [python, str(self.runtime / "tools/evaluate_three_round_campaign.py"),
-                   "--checkpoint", str(self.training / "initial.pt" if initial else self.root / "evaluation-checkpoint.pt"),
+                   "--checkpoint", str(self.evaluation_source(initial=True) if initial
+                                       else self.root / "evaluation-checkpoint.pt"),
                    "--output-dir", str(self.root / ("evaluation-initial" if initial else "evaluation-final")),
                    "--seeds", ",".join(map(str, self.plan.get("heldout_seeds", HELDOUT_SEEDS))),
                    "--modes", "network_only,search", "--simulations", "16", "--max-depth", "16",
@@ -457,11 +480,13 @@ class Experiment:
                             self.persist()
                             return self.state
                         if stage == "freeze_checkpoint":
-                            value = freeze_checkpoint(self.training / "checkpoint.pt", self.root / "evaluation-checkpoint.pt")
+                            source = self.evaluation_source(initial=False)
+                            value = freeze_checkpoint(source, self.root / "evaluation-checkpoint.pt")
                             old = self.state.get("evaluation_checkpoint_sha256")
                             if old is not None and value != old:
                                 return self.fail("Frozen evaluation checkpoint changed")
                             self.state["evaluation_checkpoint_sha256"] = value
+                            self.state["evaluation_model_source"] = str(source.relative_to(self.root))
                             self.state["stage_index"] += 1
                             self.persist()
                             continue

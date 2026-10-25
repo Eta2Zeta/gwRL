@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Paired, resumable held-out Japanese expansion evaluation for three-round runs.
 
-Example (trusted local checkpoint only)::
+Example (trusted local model export or legacy recovery checkpoint)::
 
     .venv/bin/python tools/evaluate_three_round_campaign.py \
-        --checkpoint studies/campaign/runs/three-round/initial.pt \
+        --checkpoint studies/campaign/runs/three-round/models/generation-000000.pt \
         --output-dir studies/campaign/runs/three-round/evaluation-initial
 
 Reissue exactly the same command after interruption. Completed seed/mode files
@@ -107,7 +107,8 @@ def main(argv=None) -> int:
     from studies.campaign.curriculum import make_env, task_manifest
     from studies.campaign.evaluation import evaluate, validate_heldout_seeds
     from studies.campaign.neural import NeuralEvaluator
-    from studies.campaign.run import RunConfig, _json, _learner, _read
+    from studies.campaign.run import RunConfig, _json
+    from studies.campaign.model_export import load_evaluation_models
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -132,20 +133,18 @@ def main(argv=None) -> int:
     # and a coordinator fit a conservative three-core allowance.
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
-    loaded = _read(args.checkpoint)
-    config = RunConfig(**loaded["runner"]["config"])
+    loaded = load_evaluation_models(args.checkpoint)
+    config = RunConfig(**loaded["config"])
     if config.calendar_rounds != 3:
         raise ValueError("This evaluation requires the explicit three-round campaign")
     separation = validate_heldout_seeds({player: seeds for player in PLAYERS},
-        [config.seed, *loaded["runner"]["training_environment_seeds"]])
+        [config.seed, *loaded["training_environment_seeds"]])
     template = make_env(config.seed, calendar_rounds=3)
-    learner = _learner(config, template)
-    learner.restore(loaded["learner"], env_template=template)
-    # _learner respects the training thread setting; evaluation is deliberately
-    # one thread even when the saved training run used more.
+    # Legacy recovery loading may construct a learner using the training thread
+    # setting; exports never do. Evaluation remains deliberately one thread.
     torch.set_num_threads(1)
-    versions = learner.model_versions()
-    evaluator = NeuralEvaluator(learner.models, version=fingerprint(versions))
+    versions = loaded["model_versions"]
+    evaluator = NeuralEvaluator(loaded["models"], version=fingerprint(versions))
     evaluation_contract = {"task": task_manifest(template), "seeds": seeds, "modes": modes,
         "target": "axis", "opponent": scripted_policy("balanced").version,
         "simulations": args.simulations, "max_depth": args.max_depth,
@@ -154,7 +153,8 @@ def main(argv=None) -> int:
         "territorial_scope": "authoritative KMT Chinese Home Country, Japan possession only"}
     contract = {"schema": SCHEMA, "evaluation": evaluation_contract,
         "checkpoint_sha256": digest(args.checkpoint), "model_versions": versions,
-        "runtime_source_sha256": loaded["runner"]["runtime_source_sha256"],
+        "runtime_source_sha256": loaded["runtime_source_sha256"],
+        "model_artifact_schema": loaded["source_schema"], "generation": loaded["generation"],
         "helper_sha256": digest(Path(__file__)), "seed_separation": separation}
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)

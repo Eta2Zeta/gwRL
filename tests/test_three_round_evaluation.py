@@ -8,7 +8,6 @@ import unittest
 from contextlib import ExitStack
 from dataclasses import asdict
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 from test_campaign_evaluation import CountingEvaluator, EvaluationEnv
@@ -31,18 +30,16 @@ class ThreeRoundEvaluationTests(unittest.TestCase):
         self.checkpoint = self.directory / "checkpoint.pt"
         self.checkpoint.write_bytes(b"test-only trusted checkpoint stub")
         self.output = self.directory / "evaluation"
-        self.loaded = {"runner": {"config": asdict(RunConfig(calendar_rounds=3)),
+        self.loaded = {"config": asdict(RunConfig(calendar_rounds=3)),
                                   "training_environment_seeds": [1936, 1937],
-                                  "runtime_source_sha256": {"fixture": "frozen"}},
-                       "learner": {"fixture": "frozen"}}
+                                  "runtime_source_sha256": {"fixture": "frozen"},
+                       "models": {}, "generation": 0, "source_schema": "campaign-evaluation-models-v1"}
         self.versions = {"axis": "initial-axis", "allies": "initial-allies", "comintern": "initial-comintern"}
-        self.learner = SimpleNamespace(models={}, restore=lambda *args, **kwargs: None,
-                                       model_versions=lambda: self.versions)
         self.stack = ExitStack()
         self.stack.enter_context(patch("torch.set_num_interop_threads"))
         self.stack.enter_context(patch("torch.set_num_threads"))
-        self.stack.enter_context(patch("studies.campaign.run._read", return_value=self.loaded))
-        self.stack.enter_context(patch("studies.campaign.run._learner", return_value=self.learner))
+        self.stack.enter_context(patch("studies.campaign.model_export.load_evaluation_models",
+            side_effect=lambda _path: {**self.loaded, "model_versions": self.versions}))
         self.stack.enter_context(patch("studies.campaign.curriculum.make_env", side_effect=lambda seed, **kw: ExpansionEnv(seed)))
         self.stack.enter_context(patch("studies.campaign.curriculum.task_manifest", return_value={"calendar_rounds": 3}))
         self.stack.enter_context(patch("studies.campaign.neural.NeuralEvaluator", side_effect=lambda *args, **kw: CountingEvaluator()))
@@ -100,7 +97,7 @@ class ThreeRoundEvaluationTests(unittest.TestCase):
             main(different)
 
     def test_training_seed_overlap_is_rejected_before_any_evaluation(self):
-        self.loaded["runner"]["training_environment_seeds"].append(1009)
+        self.loaded["training_environment_seeds"].append(1009)
         with self.assertRaisesRegex(ValueError, "overlap training"):
             main(self.arguments())
         self.assertFalse(self.output.exists())

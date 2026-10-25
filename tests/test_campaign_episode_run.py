@@ -79,7 +79,7 @@ class CampaignEpisodeRunTests(unittest.TestCase):
               "transitions_per_batch": 10, "parallel_envs": 4, "simulations": 2,
               "max_depth": 6, "hidden_dim": 8, "message_layers": 1, "token_buckets": 128,
               "batch_size": 8, "epochs": 1, "replay_capacity": 128, "threads": 1,
-              "checkpoint_every_waves": 1, "complete_episodes": True}
+              "checkpoint_every_waves": None, "complete_episodes": True}
 
     def setUp(self):
         self.old_threads = torch.get_num_threads()
@@ -93,7 +93,9 @@ class CampaignEpisodeRunTests(unittest.TestCase):
         self.stack.enter_context(patch.object(run, "make_env", side_effect=self.environment))
         self.stack.enter_context(patch.object(run, "_learner", side_effect=self.learner))
         self.stack.enter_context(patch.object(run, "task_manifest", return_value={
-            "full_target_game": False, "calendar_rounds": 1, "fixture": "episode-run-toy-v1"}))
+            "full_target_game": False, "calendar_rounds": 1, "fixture": "episode-run-toy-v1",
+            "compatibility": {"scenario": "toy-scenario-v1", "rules": "toy-rules-v1",
+                              "schema": "toy-schema-v1"}}))
         self.stack.enter_context(patch.object(run, "source_hashes", return_value={
             "test-only-fixture": "stable-toy-runtime-v1"}))
 
@@ -201,6 +203,88 @@ class CampaignEpisodeRunTests(unittest.TestCase):
             self.assertTrue(learner["optimizers"][player]["state"])
             self.assertTrue(any(not torch.equal(value, learner["models"][player][name])
                                 for name, value in initial["learner"]["models"][player].items()))
+
+    def test_default_recovery_timer_does_not_rewrite_full_state_each_wave_or_update(self):
+        self.assertIsNone(run.RunConfig().checkpoint_every_waves)
+        self.assertEqual(run.RunConfig().checkpoint_interval_seconds, 1800.0)
+        directory = self.directory / "infrequent-recovery"
+        with patch.object(run, "_save", wraps=run._save) as saves:
+            status, checkpoint = self.train(directory)
+        self.assertEqual(status, 0)
+        self.assertEqual(checkpoint["runner"]["batch_index"], 2)
+        self.assertEqual(checkpoint["learner"]["counters"]["episodes"], 8)
+        # Initial immutable state, initialized recovery state, orderly exit.
+        # Neither ten collection waves nor the two updates force full saves.
+        self.assertEqual([call.args[0].name for call in saves.call_args_list],
+                         ["initial.pt", "checkpoint.pt", "checkpoint.pt"])
+        manifest = json.loads((directory / "manifest.json").read_text())
+        self.assertEqual(manifest["checkpoint_saves_this_invocation"], 3)
+        self.assertEqual(manifest["model_exports_this_invocation"], 3)
+        self.assertEqual(sorted(path.name for path in (directory / "models").glob("*.pt")),
+                         ["generation-000000.pt", "generation-000001.pt", "generation-000002.pt"])
+        self.assertEqual(manifest["latest_model_export"]["path"], "models/generation-000002.pt")
+
+    def test_wall_clock_recovery_timer_saves_at_boundaries_without_sleeping(self):
+        directory = self.directory / "timed-recovery"
+        clock = [0.0]
+        saves = []
+        original_collect = CampaignLearner.collect_many
+        original_save = run._save
+
+        def collect_then_advance(learner, *args, **kwargs):
+            result = original_collect(learner, *args, **kwargs)
+            clock[0] += 10.0
+            return result
+
+        def record_save(path, learner, runner, **kwargs):
+            saves.append((path.name, runner["total_waves"], runner["batch_index"], runner["wave_index"]))
+            return original_save(path, learner, runner, **kwargs)
+
+        with patch.object(CampaignLearner, "collect_many", collect_then_advance), \
+                patch.object(run.time, "perf_counter", side_effect=lambda: clock[0]), \
+                patch.object(run.time, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(run, "_save", side_effect=record_save):
+            status, checkpoint = self.train(directory, checkpoint_interval_seconds=30.0)
+        self.assertEqual(status, 0)
+        self.assertEqual(saves, [("initial.pt", 0, 0, 0), ("checkpoint.pt", 0, 0, 0),
+                                 ("checkpoint.pt", 3, 0, 3), ("checkpoint.pt", 6, 1, 1),
+                                 ("checkpoint.pt", 9, 1, 4), ("checkpoint.pt", 10, 2, 0)])
+        self.assertEqual(checkpoint["learner"]["counters"]["episodes"], 8)
+        manifest = json.loads((directory / "manifest.json").read_text())
+        self.assertEqual(manifest["checkpoint_saves_this_invocation"], 6)
+
+    def test_ten_episode_limit_uses_short_final_batch_and_resumes_it_exactly(self):
+        status, reference = self.train(self.directory / "ten-reference", batches=3, max_episodes=10)
+        self.assertEqual(status, 0)
+        self.assertEqual(reference["learner"]["counters"]["episodes"], 10)
+        self.assertEqual(reference["learner"]["generation"], 3)
+        self.assertEqual([len(batch["episodes"]) for batch in reference["runner"]["updates"]], [4, 4, 2])
+        self.assertEqual(len(reference["runner"]["training_environment_seeds"]), 10)
+        self.assertTrue(all(batch["rollout"]["bootstrap_samples"] == 0
+                            for batch in reference["runner"]["updates"]))
+        for waves in (11, reference["runner"]["total_waves"]):
+            with self.subTest(stopped_after_waves=waves):
+                directory = self.directory / f"ten-resume-{waves}"
+                status, stopped = self.train(directory, batches=3, max_episodes=10, stop_after_waves=waves)
+                self.assertEqual(status, 130)
+                self.assertEqual(stopped["runner"]["batch_index"], 2)
+                self.assertEqual(stopped["runner"]["wave_index"], waves - 10)
+                self.assertEqual(stopped["learner"]["counters"]["episodes"], 8 if waves == 11 else 10)
+                self.assertEqual(len(stopped["learner"]["parallel_envs"]), 2)
+                self.assertIsNotNone(stopped["learner"]["frozen_models"])
+                calls = len(self.factory_calls)
+                status, resumed = self.train(directory, resume=True)
+                self.assertEqual(status, 0)
+                self.assert_tree_equal(reference["learner"], resumed["learner"])
+                self.assert_tree_equal(reference["runner"], resumed["runner"], "runner")
+                # Even when all ten games finished just before interruption,
+                # resume must update the saved tail batch without new roots.
+                self.assertEqual(self.factory_calls[calls:], [self.config["seed"]])
+
+    def test_recovery_timer_requires_positive_finite_seconds(self):
+        for interval in (0, -1, float("inf"), float("nan"), True):
+            with self.subTest(interval=interval), self.assertRaisesRegex(ValueError, "[Cc]heckpoint"):
+                run.RunConfig(checkpoint_interval_seconds=interval)
 
     def test_exhausted_episode_guard_preserves_frozen_pending_without_bootstrap_or_update(self):
         directory = self.directory / "exhausted"

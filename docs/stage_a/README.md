@@ -145,8 +145,22 @@ An explicit monotonic `--extend-episode-budget` can increase only this execution
 guard on resume. It does not change the game horizon or objective. The existing
 bounded-segment mode remains available for explicitly bootstrapped experiments.
 
-Every fresh run archives `initial.pt` before any action/update for paired held-out
-evaluation. Progress includes actual action kinds/parameters, entitled actors,
+Every fresh run exports `models/generation-000000.pt` before any action/update,
+then exports each updated generation for paired held-out evaluation. These small
+files contain the three networks and their configuration/task/source metadata;
+evaluation loads them without restoring Adam, replay or unfinished games.
+`initial.pt` remains a compatibility archive of the empty initial learner.
+Full recovery checkpoints now default to every 1,800 wall-clock seconds and
+orderly shutdown, with latest and previous snapshots retained. Updates no longer
+trigger full recovery writes. An explicit `--checkpoint-every-waves` overrides
+the timer for controlled comparisons and recovery tests, not normal training.
+`--max-episodes 10 --complete-episodes --batches 3 --parallel-envs 4` caps a run
+at ten genuinely completed games in batches of four, four and two, with a normal
+learning update after each completed batch. A partial final batch has different
+random-stream interleaving from four-root collection; compare the first eight
+games when checking against a four-root reference.
+
+Progress includes actual action kinds/parameters, entitled actors,
 per-root clocks/completion and real terminal returns. Updates report per-actor
 policy samples, so a changed value head alone cannot stand for policy learning.
 Full static rules context is shared as immutable source JSON across replay rows;
@@ -162,7 +176,7 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=4 VECLIB_MAXIMUM_THREADS=4 PYTHONHASHSEED
   --transitions-per-batch 1500 --parallel-envs 4 \
   --simulations 4 --max-depth 8 --hidden-dim 16 --message-layers 1 \
   --token-buckets 2048 --batch-size 32 --epochs 16 --replay-capacity 16384 \
-  --threads 4 --cpu-budget 11 --checkpoint-every-waves 32
+  --threads 4 --cpu-budget 11 --checkpoint-interval-seconds 1800
 ```
 
 The small model/search settings are measured pilot choices, not tuned strengths.

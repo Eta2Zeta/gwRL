@@ -103,7 +103,8 @@ class CampaignRunTests(unittest.TestCase):
 
     def assert_invocation_timings(self, manifest):
         timings = manifest["timings_seconds_this_invocation"]
-        self.assertEqual(set(timings), {"collection", "learning_updates", "checkpoint_save", "progress_reporting"})
+        self.assertEqual(set(timings), {"collection", "learning_updates", "checkpoint_save", "model_export",
+                                        "progress_reporting"})
         self.assertTrue(all(math.isfinite(value) and value >= 0 for value in timings.values()))
         for name in ("collection", "learning_updates", "checkpoint_save"):
             self.assertGreater(timings[name], 0)

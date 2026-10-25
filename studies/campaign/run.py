@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import random
 import signal
@@ -27,6 +28,7 @@ from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
+from .model_export import load_evaluation_models, save_model_export, validate_model_export
 from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 
 RUN_SCHEMA = "campaign-foreground-run-v1"
@@ -50,14 +52,16 @@ class RunConfig:
     learning_rate: float = 0.001
     replay_capacity: int = 512
     threads: int = 1
-    checkpoint_every_waves: int = 4
+    checkpoint_every_waves: int | None = None
+    checkpoint_interval_seconds: float = 1800.0
     complete_episodes: bool = False
+    max_episodes: int | None = None
     cpu_budget: int | None = None
 
     def __post_init__(self):
         positive = ("batches", "transitions_per_batch", "parallel_envs", "simulations", "max_depth",
                     "hidden_dim", "message_layers", "token_buckets", "batch_size", "epochs",
-                    "replay_capacity", "threads", "checkpoint_every_waves")
+                    "replay_capacity", "threads")
         if any(type(getattr(self, key)) is not int or getattr(self, key) <= 0 for key in positive):
             raise ValueError("Run counts and dimensions must be positive integers")
         if self.calendar_rounds is not None and (type(self.calendar_rounds) is not int or not 1 <= self.calendar_rounds <= 11):
@@ -66,6 +70,15 @@ class RunConfig:
             raise ValueError("Run seed must be an unsigned 64-bit integer")
         if type(self.complete_episodes) is not bool:
             raise ValueError("complete_episodes must be Boolean")
+        if self.checkpoint_every_waves is not None and (
+                type(self.checkpoint_every_waves) is not int or self.checkpoint_every_waves <= 0):
+            raise ValueError("Explicit checkpoint wave interval must be a positive integer")
+        if (type(self.checkpoint_interval_seconds) not in (int, float)
+                or not math.isfinite(self.checkpoint_interval_seconds) or self.checkpoint_interval_seconds <= 0):
+            raise ValueError("Checkpoint time interval must be positive and finite")
+        if self.max_episodes is not None and (
+                type(self.max_episodes) is not int or self.max_episodes <= 0 or not self.complete_episodes):
+            raise ValueError("An exact episode limit requires complete episodes and a positive integer")
         if self.cpu_budget is not None:
             if type(self.cpu_budget) is not int or self.cpu_budget <= 0 or self.cpu_budget > (os.cpu_count() or 1):
                 raise ValueError("CPU budget must fit available logical cores")
@@ -146,6 +159,17 @@ def _read(path: Path):
     return value
 
 
+def recovery_checkpoint_due(config: RunConfig, wave_index: int, last_saved: float, now: float) -> bool:
+    """Explicit wave cadence is retained for controlled comparisons and tests.
+
+    Normal runs use elapsed wall time, independently of game/learning progress.
+    The caller advances last_saved only after a successful durable write.
+    """
+    if config.checkpoint_every_waves is not None:
+        return wave_index % config.checkpoint_every_waves == 0
+    return now - last_saved >= config.checkpoint_interval_seconds
+
+
 def _config(args, saved=None):
     values = asdict(RunConfig()) if saved is None else dict(saved)
     for field in fields(RunConfig):
@@ -206,7 +230,12 @@ def train(args) -> int:
     initial_waves = runner["total_waves"]
     initial_transitions = learner.counters["transitions"]
     replay_writer = None
-    timings = {name: 0.0 for name in ("collection", "learning_updates", "checkpoint_save", "progress_reporting")}
+    timings = {name: 0.0 for name in (
+        "collection", "learning_updates", "checkpoint_save", "model_export", "progress_reporting")}
+    checkpoint_saves = 0
+    model_exports = 0
+    latest_model_export = None
+    last_checkpoint_time = time.monotonic()
 
     @contextmanager
     def measure(name):
@@ -217,23 +246,43 @@ def train(args) -> int:
             timings[name] += time.perf_counter() - before
 
     def save_checkpoint(path):
-        nonlocal recovering_previous
+        nonlocal recovering_previous, checkpoint_saves, last_checkpoint_time
         with measure("checkpoint_save"):
             # A caller explicitly recovering the backup has not vouched for
             # the newest file. Do not overwrite that known-good backup with it.
             _save(path, learner, runner, backup_current=not (recovering_previous and path == checkpoint_path))
+            checkpoint_saves += 1
             if path == checkpoint_path:
                 recovering_previous = False
+                last_checkpoint_time = time.monotonic()
+
+    def export_model():
+        nonlocal latest_model_export, model_exports
+        relative = Path("models") / f"generation-{learner.generation:06d}.pt"
+        with measure("model_export"):
+            if (output / relative).exists():
+                metadata = validate_model_export(output / relative, learner, runner)
+            else:
+                metadata = save_model_export(output / relative, learner, runner)
+                model_exports += 1
+        latest_model_export = {**metadata, "path": str(relative)}
 
     def factory(seed):
         runner["training_environment_seeds"].append(seed)
         return make_env(seed, calendar_rounds=config.calendar_rounds)
 
-    def persist(status):
-        save_checkpoint(checkpoint_path)
+    def persist(status, *, recovery=True):
+        if recovery:
+            save_checkpoint(checkpoint_path)
         with measure("progress_reporting"):
             _json(manifest_path, {"schema": RUN_SCHEMA, "status": status,
                 "checkpoint": checkpoint_path.name, "runner": runner, "counters": learner.counters,
+                "latest_model_export": latest_model_export,
+                "checkpoint_saves_this_invocation": checkpoint_saves,
+                "model_exports_this_invocation": model_exports,
+                "recovery_policy": {"interval_seconds": config.checkpoint_interval_seconds,
+                                    "explicit_wave_override": config.checkpoint_every_waves,
+                                    "save_after_each_update": False},
                 "replay_trace": replay_writer.path.name if replay_writer else None,
                 "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads,
                              "graph_compiler": graph_compiler_backend()},
@@ -275,15 +324,26 @@ def train(args) -> int:
                 "model_config": learner.model_config, "initial_model_versions": learner.model_versions()})
             learner.set_replay_observer(replay_writer)
         if loaded is None:
+            export_model()
             save_checkpoint(output / "initial.pt")
             persist("initialized")
-        while runner["batch_index"] < config.batches and not stopped:
+        else:
+            # Preserve already published generation files when restoring an
+            # earlier recovery point. The current recovery generation, rather
+            # than a possibly newer manifest/export, is authoritative here.
+            export_model()
+        while (runner["batch_index"] < config.batches and not stopped
+               and (config.max_episodes is None or learner.counters["episodes"] < config.max_episodes
+                    or learner.frozen_models is not None)):
             if learner.frozen_models is None:
                 with measure("collection"):
                     runner["batch_start_history"] = len(learner.action_history)
                     if config.complete_episodes or not learner.parallel_envs:
-                        roots = [learner._new_env(factory) for _ in range(config.parallel_envs)]
-                        runner["active_episode_seeds"] = runner["training_environment_seeds"][-config.parallel_envs:]
+                        root_count = config.parallel_envs
+                        if config.max_episodes is not None:
+                            root_count = min(root_count, config.max_episodes - learner.counters["episodes"])
+                        roots = [learner._new_env(factory) for _ in range(root_count)]
+                        runner["active_episode_seeds"] = runner["training_environment_seeds"][-root_count:]
                     else:
                         roots = learner.parallel_envs
                     learner.begin_batch_many(roots)
@@ -298,7 +358,7 @@ def train(args) -> int:
                 progress("episode_completed" if any(event["terminal"] for event in result["events"]) else "rollout", result)
                 completed_waves = runner["total_waves"] + 1
                 runner["total_waves"] = completed_waves
-                if runner["wave_index"] % config.checkpoint_every_waves == 0:
+                if recovery_checkpoint_due(config, runner["wave_index"], last_checkpoint_time, time.monotonic()):
                     persist("running")
                 if args.stop_after_waves is not None and completed_waves - initial_waves >= args.stop_after_waves:
                     stopped, signal_name = True, "bounded_smoke_stop"
@@ -325,7 +385,8 @@ def train(args) -> int:
                 runner["updates"].append({"rollout": rollout, "update": update, "episodes": episodes})
                 runner["batch_index"] += 1
                 runner["wave_index"] = 0
-                persist("running")
+                export_model()
+                persist("running", recovery=False)
                 progress("update")
         status = "interrupted" if stopped else "episode_budget_exhausted" if exhausted else "completed"
         persist(status)
@@ -345,18 +406,18 @@ def train(args) -> int:
 
 def evaluate_command(args) -> int:
     from .evaluation import evaluate, validate_heldout_seeds
-    loaded = _read(args.checkpoint)
-    config = RunConfig(**loaded["runner"]["config"])
+    torch.set_num_threads(1)
+    loaded = load_evaluation_models(args.checkpoint)
+    config = RunConfig(**loaded["config"])
+    torch.set_num_threads(config.threads)
     template = make_env(config.seed, calendar_rounds=config.calendar_rounds)
-    learner = _learner(config, template)
-    learner.restore(loaded["learner"], env_template=template)
-    versions = learner.model_versions()
+    versions = loaded["model_versions"]
     version = hashlib.sha256(json.dumps(versions, sort_keys=True).encode()).hexdigest()
-    evaluator = NeuralEvaluator(learner.models, version=version)
+    evaluator = NeuralEvaluator(loaded["models"], version=version)
     seeds = [int(value) for value in args.seeds.split(",")]
     targets = PLAYERS if args.target == "all" else (args.target,)
     separation = validate_heldout_seeds({player: seeds for player in PLAYERS},
-                                      [config.seed, *loaded["runner"]["training_environment_seeds"]])
+                                      [config.seed, *loaded["training_environment_seeds"]])
     report = {"schema": "campaign-evaluation-bundle-v1", "task": task_manifest(template),
               "training_seed": config.seed, "seed_separation": separation,
               "model_versions": versions, "results": []}
@@ -408,7 +469,7 @@ def main(argv=None) -> int:
             training.add_argument("--complete-episodes", action=argparse.BooleanOptionalAction, default=None,
                                   help="Freeze each batch until all games finish; a guard saves without updating")
             continue
-        kind = float if field.name in {"value_scale", "learning_rate"} else int
+        kind = float if field.name in {"value_scale", "learning_rate", "checkpoint_interval_seconds"} else int
         training.add_argument("--" + field.name.replace("_", "-"), type=kind, default=None)
     training.add_argument("--full-campaign", action="store_true", help="Use the original July1936–July1941 target")
     evaluation = commands.add_parser("evaluate", help="Held-out fixed-opponent games without training noise")
