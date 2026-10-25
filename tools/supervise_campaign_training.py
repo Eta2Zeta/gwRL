@@ -52,6 +52,42 @@ def memory_metric() -> str:
             if sys.platform == "darwin" else "sum of per-process RSS")
 
 
+def monitor_error_details(error: BaseException, operation: str, *, root_pid: int | None = None) -> dict:
+    """Bounded, JSON-safe diagnostics; callers retain their existing stop policy."""
+    def describe(value):
+        details = {"exception_type": type(value).__name__,
+                   "error": f"{type(value).__name__}: {value}"[:2000]}
+        for attribute in ("errno", "returncode", "timeout"):
+            field = getattr(value, attribute, None)
+            if type(field) in (int, float) and math.isfinite(field):
+                details[attribute] = field
+        pid = getattr(value, "monitor_pid", None)
+        if type(pid) is int:
+            details["sampled_pid"] = pid
+        command = getattr(value, "cmd", None)
+        if command is not None:
+            details["command"] = ([str(part)[:256] for part in command[:32]]
+                                  if isinstance(command, (list, tuple)) else str(command)[:2000])
+        for attribute in ("stdout", "stderr"):
+            field = getattr(value, attribute, None)
+            if field:
+                details[attribute] = str(field)[:2000]
+        return details
+
+    details = {"operation": operation, **describe(error)}
+    if root_pid is not None:
+        details["root_pid"] = root_pid
+    contexts, seen = [], {id(error)}
+    context = error.__cause__ or (None if error.__suppress_context__ else error.__context__)
+    while context is not None and id(context) not in seen and len(contexts) < 3:
+        seen.add(id(context))
+        contexts.append(describe(context))
+        context = context.__cause__ or (None if context.__suppress_context__ else context.__context__)
+    if contexts:
+        details["exception_context"] = contexts
+    return details
+
+
 @lru_cache(maxsize=1)
 def _darwin_rusage_function():
     try:
@@ -97,7 +133,8 @@ def process_memory_charge(pid: int, resident_bytes: int) -> int:
         return resident_bytes
     try:
         return max(resident_bytes, _darwin_physical_footprint(pid))
-    except OSError:
+    except OSError as error:
+        error.monitor_pid = pid
         if _process_disappeared(pid):
             return 0
         raise
@@ -363,8 +400,10 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                         try:
                             resident = rss_sampler(process.pid)
                             state["aggregate_sampled_peak_rss_bytes"] = max(state["aggregate_sampled_peak_rss_bytes"], resident)
-                        except (OSError, ValueError, subprocess.SubprocessError):
+                        except (OSError, ValueError, subprocess.SubprocessError) as error:
                             resident = None
+                            _event(state, "memory_monitor_error", phase="worker",
+                                   **monitor_error_details(error, "aggregate_memory_sample", root_pid=process.pid))
                             if process.poll() is None and stop_reason is None:
                                 stop_reason = "memory_monitor_failure"
                                 stopping_at = now
@@ -408,7 +447,9 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                                 stop_reason = "memory_limit"
                                 _send(process, signal.SIGKILL)
                                 break
-                        except (OSError, ValueError, subprocess.SubprocessError):
+                        except (OSError, ValueError, subprocess.SubprocessError) as error:
+                            _event(state, "memory_monitor_error", phase="orphan_cleanup",
+                                   **monitor_error_details(error, "aggregate_memory_sample", root_pid=process.pid))
                             stop_reason = "memory_monitor_failure"
                             _send(process, signal.SIGKILL)
                             break

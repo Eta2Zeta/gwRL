@@ -3,14 +3,17 @@ from __future__ import annotations
 
 import json
 import copy
+import errno
 import os
 from pathlib import Path
 import signal
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import Mock, patch
 
 from tools.run_three_round_experiment import (
     Experiment, STAGES, digest, fingerprint, freeze_checkpoint, validate_plan,
@@ -131,6 +134,60 @@ class ThreeRoundExperimentTests(unittest.TestCase):
         self.assertEqual(state["attempts"][0]["stop_reason"], "memory_limit")
         self.assertTrue(state["attempts"][0]["forced_kill"])
         self.assertEqual(state["aggregate_sampled_peak_rss_bytes"], 26_000_000_000)
+
+    def test_monitor_failure_records_sampling_or_group_discovery_operation(self):
+        self.root.mkdir()
+        for operation in ("aggregate_memory_sample", "process_group_discovery"):
+            with self.subTest(operation=operation):
+                exited = [False]
+                process = Mock(pid=987651, returncode=0)
+                process.poll.side_effect = lambda: 0 if exited[0] else None
+                failure = (OSError(errno.EPERM, "Cannot read footprint") if operation == "aggregate_memory_sample"
+                           else subprocess.TimeoutExpired(["ps", "-axo", "pid=,ppid=,pgid="], 5))
+                sampler = Mock(side_effect=failure) if operation == "aggregate_memory_sample" else lambda _pid: 123456
+                experiment = self.experiment(rss_sampler=sampler)
+                experiment.state = {"attempts": [], "events": [], "aggregate_sampled_peak_rss_bytes": 0}
+                groups = Mock(side_effect=[failure, {process.pid}]) if operation == "process_group_discovery" \
+                    else Mock(return_value={process.pid})
+                with (self.root / "test.lock").open("a+") as lock, \
+                     patch("tools.run_three_round_experiment.subprocess.Popen", return_value=process), \
+                     patch("tools.run_three_round_experiment._known_groups", groups), \
+                     patch("tools.run_three_round_experiment.process_group_alive", return_value=False), \
+                     patch("tools.run_three_round_experiment._signal_group", side_effect=lambda *_args: exited.__setitem__(0, True)) as send, \
+                     patch("tools.run_three_round_experiment.time.sleep"):
+                    record = experiment.run_worker("training", ["tiny-mocked-worker"], time.time() + 10, lock)
+                self.assertEqual(record["stop_reason"], "memory_monitor_failure")
+                send.assert_called_once_with(process.pid, signal.SIGTERM)
+                event = next(value for value in experiment.state["events"] if value["kind"] == "memory_monitor_error")
+                self.assertEqual(event["operation"], operation)
+                self.assertEqual(event["root_pid"], process.pid)
+                if operation == "aggregate_memory_sample":
+                    self.assertEqual(event["errno"], errno.EPERM)
+                else:
+                    self.assertEqual(event["exception_type"], "TimeoutExpired")
+                    self.assertEqual(event["timeout"], 5)
+                    self.assertEqual(event["command"], failure.cmd)
+                    self.assertEqual(experiment.state["aggregate_sampled_peak_rss_bytes"], 123456)
+
+    def test_cleanup_discovery_failure_is_persisted_then_rethrown(self):
+        self.root.mkdir()
+        process = Mock(pid=987651, returncode=0)
+        process.poll.return_value = 0
+        experiment = self.experiment()
+        experiment.state = {"attempts": [], "events": [], "aggregate_sampled_peak_rss_bytes": 0}
+        failure = subprocess.CalledProcessError(1, ["ps", "-axo", "pid=,ppid=,pgid="], stderr="inventory failed")
+        with (self.root / "test.lock").open("a+") as lock, \
+             patch("tools.run_three_round_experiment.subprocess.Popen", return_value=process), \
+             patch("tools.run_three_round_experiment._known_groups", side_effect=failure):
+            with self.assertRaises(subprocess.CalledProcessError) as caught:
+                experiment.run_worker("training", ["tiny-mocked-worker"], time.time() + 10, lock)
+        self.assertIs(caught.exception, failure)
+        saved = json.loads(experiment.path.read_text())
+        event = saved["events"][-1]
+        self.assertEqual(event["operation"], "process_group_discovery")
+        self.assertEqual(event["phase"], "orphan_discovery")
+        self.assertEqual(event["returncode"], 1)
+        self.assertEqual(event["stderr"], "inventory failed")
 
     def test_final_checkpoint_stays_immutable_after_later_training_replace(self):
         self.root.mkdir()

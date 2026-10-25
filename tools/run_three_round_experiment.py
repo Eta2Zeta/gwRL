@@ -29,7 +29,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from tools.supervise_campaign_training import (  # noqa: E402
     SupervisorConfig, aggregate_rss, atomic_json, exclusive_lock, process_group_alive,
-    validate_training_arguments, memory_metric,
+    validate_training_arguments, memory_metric, monitor_error_details,
 )
 
 SCHEMA = "campaign-three-round-experiment-v1"
@@ -493,12 +493,16 @@ class Experiment:
                     now = time.time()
                     resident = None
                     monitor_failed = False
+                    monitor_operation = "aggregate_memory_sample"
                     try:
                         resident = self.rss_sampler(process.pid)
                         self.state["aggregate_sampled_peak_rss_bytes"] = max(self.state["aggregate_sampled_peak_rss_bytes"], resident)
+                        monitor_operation = "process_group_discovery"
                         groups = _known_groups(process.pid, groups)
                         self.state["known_process_groups"] = sorted(groups)
-                    except (OSError, ValueError, subprocess.SubprocessError):
+                    except (OSError, ValueError, subprocess.SubprocessError) as error:
+                        _event(self.state, "memory_monitor_error", stage=stage,
+                               **monitor_error_details(error, monitor_operation, root_pid=process.pid))
                         monitor_failed = process.poll() is None
                     if resident is not None and resident >= self.memory_bytes:
                         stopping = "memory_limit"
@@ -525,7 +529,13 @@ class Experiment:
                     self.persist()
                     time.sleep(min(self.poll_seconds, max(0.01, deadline - time.time())))
                 process.wait()
-                groups = _known_groups(process.pid, groups)
+                try:
+                    groups = _known_groups(process.pid, groups)
+                except (OSError, ValueError, subprocess.SubprocessError) as error:
+                    _event(self.state, "memory_monitor_error", stage=stage, phase="orphan_discovery",
+                           **monitor_error_details(error, "process_group_discovery", root_pid=process.pid))
+                    self.persist()
+                    raise
                 for group in groups:
                     if process_group_alive(group):
                         _signal_group(group, signal.SIGKILL)

@@ -13,12 +13,12 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from tools.supervise_campaign_training import (
     SupervisorConfig, aggregate_rss, exclusive_lock, supervise, training_command,
     validate_training_arguments, process_group_alive,
-    process_memory_charge, _darwin_physical_footprint,
+    process_memory_charge, _darwin_physical_footprint, monitor_error_details,
 )
 
 
@@ -131,6 +131,61 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         self.assertEqual(state["status"], "memory_limit")
         self.assertTrue((self.run / "checkpoint.pt").exists())
         self.assertEqual(state["aggregate_sampled_peak_rss_bytes"], 29_500_000_000)
+
+    def test_monitor_failures_preserve_worker_and_orphan_diagnostics_without_retry(self):
+        for phase in ("worker", "orphan_cleanup"):
+            with self.subTest(phase=phase):
+                control, run = self.directory / phase, self.directory / (phase + "-training")
+                exited = [phase == "orphan_cleanup"]
+                process = Mock(pid=987651, returncode=0)
+                process.poll.side_effect = lambda: 0 if exited[0] else None
+                failure = OSError(errno.EPERM, "Cannot read live footprint")
+                failure.monitor_pid = 987652
+                groups = [True, True, False, False] if exited[0] else [False]
+                signals = []
+
+                def send(_process, number):
+                    signals.append(number)
+                    exited[0] = True
+
+                with patch("tools.supervise_campaign_training.subprocess.Popen", return_value=process), \
+                     patch("tools.supervise_campaign_training.process_group_alive", side_effect=groups), \
+                     patch("tools.supervise_campaign_training._send", side_effect=send), \
+                     patch("tools.supervise_campaign_training.time.sleep"):
+                    state = supervise(control, run, self.config, ARGUMENTS,
+                                      command_factory=lambda *_args: ["tiny-mocked-worker"],
+                                      rss_sampler=Mock(side_effect=failure))
+                event = next(value for value in state["events"] if value["kind"] == "memory_monitor_error")
+                self.assertEqual(event["phase"], phase)
+                self.assertEqual(event["operation"], "aggregate_memory_sample")
+                self.assertEqual(event["exception_type"], "PermissionError")
+                self.assertEqual(event["errno"], errno.EPERM)
+                self.assertEqual(event["root_pid"], process.pid)
+                self.assertEqual(event["sampled_pid"], 987652)
+                self.assertEqual(state["status"], "memory_monitor_failure")
+                self.assertEqual(state["error_restarts"], 0)
+                self.assertEqual(signals, [signal.SIGTERM] if phase == "worker"
+                                 else [signal.SIGTERM, signal.SIGKILL])
+
+    def test_monitor_diagnostics_are_bounded_and_retain_exception_context(self):
+        try:
+            physical = OSError(errno.ESRCH, "Footprint PID disappeared")
+            physical.monitor_pid = 987651
+            raise physical
+        except OSError:
+            try:
+                raise subprocess.TimeoutExpired(["ps", "-axo", "pid=,stat="], 5,
+                                                output="x" * 4000, stderr="y" * 4000)
+            except subprocess.TimeoutExpired as failure:
+                details = monitor_error_details(failure, "aggregate_memory_sample", root_pid=987650)
+        saved = json.loads(json.dumps(details, allow_nan=False))
+        self.assertEqual(saved["exception_type"], "TimeoutExpired")
+        self.assertEqual(saved["command"], ["ps", "-axo", "pid=,stat="])
+        self.assertEqual(saved["timeout"], 5)
+        self.assertEqual(len(saved["stdout"]), 2000)
+        self.assertEqual(len(saved["stderr"]), 2000)
+        self.assertEqual(saved["exception_context"][0]["errno"], errno.ESRCH)
+        self.assertEqual(saved["exception_context"][0]["sampled_pid"], 987651)
 
     def test_memory_is_sampled_during_grace_and_absolute_limit_kills_immediately(self):
         factory = self.factory("signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
@@ -309,8 +364,9 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         with patch(prefix + "sys.platform", "darwin"), \
              patch(prefix + "_darwin_physical_footprint", side_effect=OSError(errno.EPERM, "live query failed")), \
              patch(prefix + "os.kill") as alive, patch(prefix + "_process_table", return_value=[(123, 1, 123, 10)]):
-            with self.assertRaises(OSError):
+            with self.assertRaises(OSError) as captured:
                 process_memory_charge(123, 10240)
+            self.assertEqual(captured.exception.monitor_pid, 123)
             alive.side_effect = ProcessLookupError()
             self.assertEqual(process_memory_charge(123, 10240), 0)
             alive.side_effect = None

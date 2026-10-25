@@ -25,7 +25,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from tools.supervise_campaign_training import memory_metric, process_memory_charge
+from tools.supervise_campaign_training import memory_metric, monitor_error_details, process_memory_charge
 
 SCHEMA = "campaign-deadline-guardian-v1"
 
@@ -189,7 +189,12 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
         handlers = {number: signal.signal(number, stop) for number in (signal.SIGTERM, signal.SIGINT)}
         try:
             while True:
-                rows = sampler()
+                try:
+                    rows = sampler()
+                except (OSError, ValueError, subprocess.SubprocessError) as error:
+                    event("process_inventory_failure", **monitor_error_details(error, "process_inventory"))
+                    atomic_json(state_path, state)
+                    raise
                 by_pid = {process.pid: process for process in rows}
                 pipeline = read_json(run_root / "pipeline-state.json")
                 training = read_json(run_root / "training-control" / "state.json")
@@ -270,7 +275,7 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
                     # live job unmonitored when the physical API fails. RSS is
                     # only a diagnostic lower bound for this failed sample.
                     rss = sum(process.rss for process in rows if process.pid in owned_pids)
-                    monitor_error = f"{type(error).__name__}: {error}"
+                    monitor_error = monitor_error_details(error, "aggregate_memory_sample")
                 state["peak_rss_bytes"] = max(state["peak_rss_bytes"], rss)
                 state.update(sample_epoch=now(), rss_bytes=rss,
                              known_process_groups=sorted(active_groups),
@@ -296,7 +301,7 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
                         stopping = "deadline_shutdown"
                         stop_deadline = deadline
                     if stopping is not None:
-                        event(stopping, **({"error": monitor_error} if monitor_error is not None else {}))
+                        event(stopping, **(monitor_error if monitor_error is not None else {}))
                 if stopping is not None:
                     # RSS remains sampled every iteration during graceful
                     # shutdown; a hard-memory breach escalates immediately.

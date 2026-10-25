@@ -1,6 +1,7 @@
 """Independent deadline, orphan, memory-escalation and signal-target checks."""
 from __future__ import annotations
 
+import errno
 import fcntl
 import json
 import os
@@ -113,7 +114,7 @@ class CampaignGuardianTests(unittest.TestCase):
     def test_live_physical_monitor_failure_stops_job_instead_of_exiting_unguarded(self):
         clock, live = Clock(), [self.process(987652)]
         self.write(self.root / "training-control/state.json", {"child_process_group": 987652})
-        self.memory_charge.side_effect = OSError("Cannot read live process footprint")
+        self.memory_charge.side_effect = OSError(errno.EPERM, "Cannot read live process footprint")
 
         def signal_group(group, number):
             self.signals.append((group, number))
@@ -125,6 +126,27 @@ class CampaignGuardianTests(unittest.TestCase):
         self.assertEqual(result["status"], "stopped")
         self.assertEqual(result["stop_reason"], "memory_monitor_failure")
         self.assertIn("Cannot read live process footprint", result["events"][0]["error"])
+        self.assertEqual(result["events"][0]["operation"], "aggregate_memory_sample")
+        self.assertEqual(result["events"][0]["exception_type"], "PermissionError")
+        self.assertEqual(result["events"][0]["errno"], errno.EPERM)
+
+    def test_inventory_failure_is_persisted_then_rethrown_without_new_signals(self):
+        failure = subprocess.TimeoutExpired(["ps", "-axo", "pid=,ppid=,pgid=,rss=,stat="], 5)
+
+        def failed_inventory():
+            raise failure
+
+        with self.assertRaises(subprocess.TimeoutExpired) as caught:
+            guard(self.plan_path, sampler=failed_inventory, now=lambda: 100.,
+                  send_group=lambda *args: self.fail("Diagnostics must not change stop policy"),
+                  send_process=lambda *args: self.fail("Diagnostics must not change stop policy"))
+        self.assertIs(caught.exception, failure)
+        event = json.loads((self.root / "guardian-state.json").read_text())["events"][-1]
+        self.assertEqual(event["reason"], "process_inventory_failure")
+        self.assertEqual(event["operation"], "process_inventory")
+        self.assertEqual(event["exception_type"], "TimeoutExpired")
+        self.assertEqual(event["timeout"], 5)
+        self.assertEqual(event["command"], failure.cmd)
 
     def test_reused_pid_and_unrelated_registered_group_are_never_signaled(self):
         self.write(self.root / "guardian-state.json", {"schema": SCHEMA, "deadline_epoch": 102.,
