@@ -159,14 +159,18 @@ def worker(args):
 
     if args.instrument:
         neural.make_input = timers.wrap(neural.make_input, "input.prepare")
+        if hasattr(features, "make_numeric_input"):
+            features.make_numeric_input = timers.wrap(features.make_numeric_input, "input.prepare")
+        if hasattr(features, "compile_numeric"):
+            features.compile_numeric = timers.wrap(features.compile_numeric, "input.compile_numeric")
         neural._graph_tensors = timers.wrap(neural._graph_tensors, "input.graph_tensors")
         if features._native_compile_graph is not None:
             features._native_compile_graph = timers.wrap(features._native_compile_graph, "input.compile_graph")
         original_forward = neural.CampaignPolicyValueNet.forward_batch
-        def forward(self, inputs):
+        def forward(self, inputs, **kwargs):
             model_batch_sizes[len(inputs)] += 1
             with timers.measure("network.forward_with_input_graphs"):
-                return original_forward(self, inputs)
+                return original_forward(self, inputs, **kwargs)
         neural.CampaignPolicyValueNet.forward_batch = forward
         neural.NeuralEvaluator.evaluate_batch = timers.wrap(
             neural.NeuralEvaluator.evaluate_batch, "inference.total")

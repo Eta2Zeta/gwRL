@@ -190,14 +190,39 @@ class CampaignNumericNeuralTests(unittest.TestCase):
         item, model = _numeric(_item()), self.model().eval()
         with torch.inference_mode():
             model.forward_batch([item], model_version="weights")
-        graphs = item["packed_graph"]
-        for key, (reference, size) in neural._REFERENCE_INDICES.values.items():
-            self.assertGreaterEqual(size, neural._retained_graph_bytes((reference.graph, reference.context)))
-        for key, (layout, size) in neural._ENCODER_LAYOUTS.values.items():
-            retained = (*layout.graphs, *(graph for row in layout.contexts for graph in row))
-            self.assertGreaterEqual(size, neural._retained_graph_bytes(retained))
-        for values, size in model._static_contexts.values.values():
-            self.assertGreaterEqual(size, graphs["context"].nbytes)
+        for cache in (neural._REFERENCE_INDICES, neural._ENCODER_LAYOUTS, model._static_contexts):
+            expected_sources = {}
+            for key, identities in cache.entry_sources.items():
+                for identity in identities:
+                    expected_sources[identity] = expected_sources.get(identity, 0) + 1
+            for identity, (source, references, size) in cache.source_refs.items():
+                self.assertEqual(references, expected_sources[identity])
+                self.assertGreaterEqual(size, source.nbytes)
+            accounted = sum(size for _, size in cache.values.values())
+            accounted += sum(size for _, _, size in cache.source_refs.values())
+            self.assertEqual(cache.bytes, accounted)
+
+    def test_shared_source_storage_is_charged_once_and_released_after_last_eviction(self):
+        source = _numeric(_item())["packed_graph"]["context"]
+        source_size = neural._graph_source_bytes(source)
+        cache = neural._SourceCache(source_size + 12, 2)
+        cache.put(("a",), (source, "a"), 4, sources=(source, source))
+        cache.put(("b",), (source, "b"), 4, sources=(source,))
+        self.assertEqual(cache.bytes, source_size + 8)
+        self.assertEqual(cache.source_refs[id(source)][1], 2)
+        cache.put(("c",), (source, "c"), 4, sources=(source,))
+        self.assertIsNone(cache.get(("a",)))
+        self.assertEqual(cache.bytes, source_size + 8)
+        self.assertEqual(cache.source_refs[id(source)][1], 2)
+        cache.put(("plain",), "no source", 8)
+        self.assertEqual(cache.bytes, source_size + 12)
+        cache.put(("plain2",), "no source", 4)
+        self.assertEqual(cache.bytes, 12)
+        self.assertEqual(cache.source_refs, {})
+        self.assertEqual(len(cache.entry_sources), 2)
+        cache.clear()
+        self.assertEqual(cache.bytes, 0)
+        self.assertEqual(cache.entry_sources, {})
 
     def test_frozen_context_cache_requires_version_and_never_reuses_training_gradients(self):
         item, model = _numeric(_item()), self.model()

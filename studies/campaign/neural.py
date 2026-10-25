@@ -76,11 +76,6 @@ def _graph_source_bytes(graph: Any) -> int:
             + sum(160 + len(identity.encode("utf-8")) * 4 for _, identity in graph.references))
 
 
-def _retained_graph_bytes(graphs: Sequence[Any]) -> int:
-    unique = {id(graph): graph for graph in graphs}
-    return sum(_graph_source_bytes(graph) for graph in unique.values())
-
-
 # These tensors contain only source data, never model outputs or gradients.
 # Sharing them across actor models is safe; the byte limit also bounds large
 # observation/menu entries independently of the source-graph entry limits.
@@ -134,6 +129,8 @@ class _SourceCache:
     def __init__(self, limit: int, entries: int) -> None:
         self.limit, self.entries, self.bytes = limit, entries, 0
         self.values: OrderedDict[tuple, tuple[Any, int]] = OrderedDict()
+        self.source_refs: dict[int, tuple[Any, int, int]] = {}
+        self.entry_sources: dict[tuple, tuple[int, ...]] = {}
         self._lock = threading.RLock()
 
     def __getstate__(self) -> dict:
@@ -152,22 +149,46 @@ class _SourceCache:
                 return found[0]
         return None
 
-    def put(self, key: tuple, value: Any, size: int) -> Any:
+    def _remove(self, key: tuple) -> None:
+        _, size = self.values.pop(key)
+        self.bytes -= size
+        for identity in self.entry_sources.pop(key):
+            source, count, source_size = self.source_refs[identity]
+            if count == 1:
+                self.bytes -= source_size
+                del self.source_refs[identity]
+            else:
+                self.source_refs[identity] = source, count - 1, source_size
+
+    def put(self, key: tuple, value: Any, size: int, *, sources: Sequence[Any] = ()) -> Any:
+        unique = {id(source): source for source in sources}
+        source_sizes = {identity: _graph_source_bytes(source) for identity, source in unique.items()}
         with self._lock:
-            if size <= self.limit and self.entries:
-                old = self.values.pop(key, None)
-                if old is not None:
-                    self.bytes -= old[1]
-                while self.values and (self.bytes + size > self.limit or len(self.values) >= self.entries):
-                    _, (_, old_size) = self.values.popitem(last=False)
-                    self.bytes -= old_size
+            if size + sum(source_sizes.values()) <= self.limit and self.entries:
+                if key in self.values:
+                    self._remove(key)
+                def addition() -> int:
+                    return size + sum(source_size for identity, source_size in source_sizes.items()
+                                      if identity not in self.source_refs)
+                while self.values and (self.bytes + addition() > self.limit or len(self.values) >= self.entries):
+                    self._remove(next(iter(self.values)))
                 self.values[key] = value, size
                 self.bytes += size
+                self.entry_sources[key] = tuple(unique)
+                for identity, source in unique.items():
+                    if identity in self.source_refs:
+                        old_source, count, source_size = self.source_refs[identity]
+                        self.source_refs[identity] = old_source, count + 1, source_size
+                    else:
+                        self.source_refs[identity] = source, 1, source_sizes[identity]
+                        self.bytes += source_sizes[identity]
         return value
 
     def clear(self) -> None:
         with self._lock:
             self.values.clear()
+            self.source_refs.clear()
+            self.entry_sources.clear()
             self.bytes = 0
 
 
@@ -179,7 +200,7 @@ class _ReferenceIndices:
     indices: Tensor
 
 
-_REFERENCE_INDICES = _SourceCache(16 * 1024 * 1024, 4096)
+_REFERENCE_INDICES = _SourceCache(64 * 1024 * 1024, 4096)
 
 
 def _reference_indices(graph: Any, context: Any, device: torch.device) -> _ReferenceIndices:
@@ -204,8 +225,8 @@ def _reference_indices(graph: Any, context: Any, device: torch.device) -> _Refer
         result = _ReferenceIndices(graph, context,
                                    torch.tensor(destinations, dtype=torch.long, device=device),
                                    torch.tensor(indices, dtype=torch.long, device=device))
-    size = (result.indices.numel() + result.destinations.numel()) * 8 + 256 + _retained_graph_bytes((graph, context))
-    return _REFERENCE_INDICES.put(key, result, size)
+    size = (result.indices.numel() + result.destinations.numel()) * 8 + 256
+    return _REFERENCE_INDICES.put(key, result, size, sources=(graph, context))
 
 
 @dataclass
@@ -226,7 +247,7 @@ class _EncoderLayout:
     external: tuple[tuple[int, int, Tensor], ...]
 
 
-_ENCODER_LAYOUTS = _SourceCache(48 * 1024 * 1024, 256)
+_ENCODER_LAYOUTS = _SourceCache(64 * 1024 * 1024, 256)
 
 
 def _encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
@@ -278,8 +299,8 @@ def _encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedG
                             source_ids, target_ids, relation_ids, degree, owners, counts, tuple(external_indices))
     size = sum(value.numel() * value.element_size() for value in vars(result).values() if isinstance(value, Tensor))
     size += sum(indices.numel() * indices.element_size() for _, _, indices in result.external)
-    size += _retained_graph_bytes((*graphs, *(graph for row in contexts for graph in row)))
-    return _ENCODER_LAYOUTS.put(key, result, size + 256 + 32 * (len(graphs) + len(contexts)))
+    sources = (*graphs, *(graph for row in contexts for graph in row))
+    return _ENCODER_LAYOUTS.put(key, result, size + 256 + 32 * (len(graphs) + len(contexts)), sources=sources)
 
 
 @dataclass
@@ -301,8 +322,7 @@ def _factors_for_action(graph: Any, feature: dict) -> tuple[str, ...]:
     if cached is not None:
         return cached[1]
     factors = action_factors(feature)
-    _ACTION_FACTORS.put(key, (graph, factors), _graph_source_bytes(graph) +
-                        256 + sum(len(value.encode("utf-8")) for value in factors))
+    _ACTION_FACTORS.put(key, (graph, factors), 256 + sum(len(value.encode("utf-8")) for value in factors), sources=(graph,))
     return factors
 
 
@@ -394,7 +414,7 @@ class CampaignPolicyValueNet(nn.Module):
         self.factor_heads = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
                                          for _ in range(4))
         self.value_head = nn.Sequential(nn.Linear(dim, dim), nn.GELU(), nn.Linear(dim, 3))
-        self._static_contexts = _SourceCache(16 * 1024 * 1024, 8)
+        self._static_contexts = _SourceCache(64 * 1024 * 1024, 8)
         self._static_signature: tuple | None = None
         self.register_load_state_dict_post_hook(_clear_static_after_load)
 
@@ -427,8 +447,7 @@ class CampaignPolicyValueNet(nn.Module):
             return cached
         result = self.encoder(contexts)
         size = sum((item.nodes.numel() + item.pooled.numel()) * item.nodes.element_size() for item in result)
-        size += _retained_graph_bytes(contexts)
-        return self._static_contexts.put(key, result, size + 256 * len(result))
+        return self._static_contexts.put(key, result, size + 256 * len(result), sources=contexts)
 
     @staticmethod
     def _conditional_log_softmax(scores: Tensor, owners: Tensor, count: int) -> Tensor:
