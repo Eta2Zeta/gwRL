@@ -4,6 +4,13 @@ Authorized 24 October 2026: at most 12 CPU cores, 30,000,000,000 bytes of memory
 and ten hours for a three-round campaign learning experiment. This is a test of
 basic useful behavior, not a claim of eleven-round campaign competence.
 
+**Completed 25 October:** [results](three_round_2026_10_25_results.md). Sixty
+three-round games and fifteen learning batches completed. Japan acquired no
+Chinese Home Country land in either evaluation mode; trained search preserved
+more units/wealth than initial search. Checkpointing consumed 60.33% of the
+measured training interval. Four unfinished games remain saved for compatible
+continuation; the existing supervised plan is complete.
+
 ## Preflight correction
 
 The first held-out game exposed a combat bug before any learning update. KMT
@@ -187,8 +194,9 @@ the limits of any learning conclusion.
 
 The [original launch record](three_round_2026_10_24_launch.json) and
 [current relaunch record](three_round_2026_10_25_relaunch.json) pin the runtime
-and initial checkpoint hashes. The budget ends at 2026-10-25 12:27:28 UTC
-(7:27:28 a.m. Chicago). Restart with the run directory's `resume.sh`; its fixed
-plan resumes completed stages and pending self-play without extending that
-deadline. A half-hour follow-up checks for interruption and records the final
-paired evaluation when the experiment ends.
+and initial checkpoint hashes. The absolute deadline was 2026-10-25 12:27:28 UTC
+(7:27:28 a.m. Chicago); the pipeline completed at 11:33:03 UTC (6:33:03 a.m.).
+During execution, `resume.sh` was the fixed recovery entry point and could not
+extend that deadline. The completed plan does not launch more training. A future
+authorized allocation can continue from the preserved checkpoint. The completion
+follow-up is removed after the result report is published.

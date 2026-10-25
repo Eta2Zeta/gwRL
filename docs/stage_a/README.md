@@ -1,16 +1,24 @@
 # Stage A: completed-episode campaign learning
 
-Status: first completed-episode pilot, scaling measurements, decision reuse,
-native input compilation and bounded AI orders verified, 24 October 2026.
+Status: bounded three-round learning and paired evaluation completed,
+25 October 2026. [Read the results](three_round_2026_10_25_results.md): 60 complete
+games, 15 learning batches and no Japanese Chinese Home Country acquisitions
+in the held-out tests. Trained search preserved more units/wealth than initial
+search; the network alone showed no clear strength improvement. Checkpointing
+consumed 60.33% of the training interval and is the largest measured operational
+bottleneck. Four unfinished games and all continuation state remain saved.
+
 Stage A remains an early learning experiment; it is not a completed
-playing-strength gate. [The scaling follow-up](scaling_2026_10_23.md) completes
+playing-strength gate. The earlier [scaling follow-up](scaling_2026_10_23.md) completes
 one small-budget eleven-round game, but stronger-search collection still needs
 performance work before larger learning.
 
 The authorized [three-round learning experiment](three_round_2026_10_24.md)
-tests basic Japanese expansion within a ten-hour resource budget, with exact
+tested basic Japanese expansion within a ten-hour resource budget, with
 training/self-play recovery and paired initial/final held-out evaluation. Its
-launch and eventual results are separate from the earlier eight-game pilots.
+completed result is separate from the earlier eight-game pilots below.
+
+## Earlier pilots and performance work
 
 The [24 October decision-reuse fix](decision_reuse_2026_10_24.md) removes repeated
 legal-menu generation and observation conversion. A matched full-game invocation

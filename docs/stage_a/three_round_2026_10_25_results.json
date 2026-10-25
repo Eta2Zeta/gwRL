@@ -1,0 +1,1668 @@
+{
+  "budget": {
+    "absolute_deadline_utc": "2026-10-25T12:27:28+00:00",
+    "authorized_cpu_cores": 12,
+    "authorized_memory_bytes": 30000000000,
+    "budget_started_utc": "2026-10-25T02:27:28+00:00",
+    "elapsed_since_budget_start_seconds": 32735.149662971497,
+    "finished_utc": "2026-10-25T11:33:03.149663+00:00",
+    "forced_kills_or_worker_retries": 0,
+    "full_pipeline_conservative_cpu_budget": 12,
+    "peak_sampled_aggregate_rss_bytes": 17109057536,
+    "r3_elapsed_seconds": 27445.47110080719,
+    "sampled_memory_not_kernel_enforced": true,
+    "training_supervisor_charged_seconds": 26273.119460291993,
+    "training_worker_threads_and_coordinator": 9
+  },
+  "conclusion": {
+    "gross_possession_acquisitions_across_all_32_evaluation_games": 0,
+    "japanese_expansion_goal_met": false,
+    "network_only_strength_improvement_demonstrated": false,
+    "no_general_strength_or_eleven_round_claim": true,
+    "search_wealth_and_unit_preservation_improved_on_these_eight_seeds": true
+  },
+  "continuation": {
+    "current_supervised_plan_is_complete_and_does_not_extend_its_budget": true,
+    "earlier_r2_partial_games_preserved_but_not_reused": 4,
+    "earlier_r2_pending_samples_preserved_but_not_retagged": 163,
+    "full_checkpoint_restore_succeeded_in_final_evaluator": true,
+    "future_continuation_requires_a_new_authorized_compute_allocation": true,
+    "models_adam_replay_frozen_policies_and_all_rng_retained": true,
+    "partial_chance_events": 103,
+    "partial_real_transitions": 768,
+    "pending_count_evidence": "16840 total decisions minus16175 completed-game decision records; not independently deserialized.",
+    "pending_unlabeled_decision_records": 665,
+    "saved_batch_index": 15,
+    "saved_wave_index": 192,
+    "unfinished_clocks": [
+      {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 3,
+        "phase": "place_units",
+        "player_turn_serial": "7",
+        "round_index": 1
+      },
+      {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      }
+    ],
+    "unfinished_games": 4,
+    "unfinished_terminal_returns": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "evaluation": {
+    "by_mode": {
+      "network_only": {
+        "final": {
+          "attempted_games": 8,
+          "games": [
+            {
+              "axis_terminal_return": 43.5,
+              "axis_terminal_wealth": 70.2,
+              "chance_events": 54,
+              "decisions": 199,
+              "game_wall_seconds": 3.2260970000061207,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40009,
+              "source_record_sha256": "303df0f2aacddaf943eac38dac28f6188cf5938907dbb4fab0f698b46bbe2d60",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 44.3,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 36,
+              "decisions": 176,
+              "game_wall_seconds": 6.636320249992423,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40013,
+              "source_record_sha256": "b8c4092b792bbd7c29fcd5488b8722f09a1047a7f07c281fb056d3f2b54acb1e",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 47.000000000000014,
+              "axis_terminal_wealth": 69.9,
+              "chance_events": 53,
+              "decisions": 183,
+              "game_wall_seconds": 2.8517250410077395,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 2,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40031,
+              "source_record_sha256": "93325c2d2b550d109aaf7add4ee61f0ed0b41c2ede1e6ad86033ca31de75d7b7",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 48.3,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 44,
+              "decisions": 169,
+              "game_wall_seconds": 2.648937999998452,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40037,
+              "source_record_sha256": "7180ea10883d5f33c8aba8e4149dcab4cf492d0039bcf04a7e447bd669bffdd2",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 46.2,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 43,
+              "decisions": 176,
+              "game_wall_seconds": 2.6654987079964485,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40039,
+              "source_record_sha256": "0e7a6d9f1949cdddb258d9c00270a9c73768f7d6801246662e2618dde34422b9",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 47.3,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 45,
+              "decisions": 174,
+              "game_wall_seconds": 2.6824527499993565,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40063,
+              "source_record_sha256": "cf9c51feeebf04684a055f2b4a274a13490f9974d380647273d834441bdc5309",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 38.8,
+              "axis_terminal_wealth": 66.8,
+              "chance_events": 86,
+              "decisions": 218,
+              "game_wall_seconds": 3.446916749991942,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 1,
+              "initial_holdings_lost_ipp": 1.0,
+              "japanese_units_removed": 3,
+              "mode": "network_only",
+              "net_chinese_ipp_change": -1.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40087,
+              "source_record_sha256": "eed07d96e192f5fd86720bd7f99b5b8590151e295a30360fce55b517df51bc19",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 47.099999999999994,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 23,
+              "decisions": 149,
+              "game_wall_seconds": 2.28715508399182,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40093,
+              "source_record_sha256": "49b13aa0c1357b2bb77dfc960232cf82260e22df3f5cc4a3e3e937a2f84711d9",
+              "terminal": true
+            }
+          ],
+          "means": {
+            "axis_terminal_return": 45.3125,
+            "axis_terminal_wealth": 69.925,
+            "game_wall_seconds": 3.3056379478730378,
+            "initial_holdings_lost_count": 0.125,
+            "initial_holdings_lost_ipp": 0.125,
+            "japanese_units_removed": 0.75,
+            "net_chinese_ipp_change": -0.125,
+            "newly_held_ipp": 0.0,
+            "newly_held_land": 0
+          },
+          "reported_statistics": {
+            "attempted_games": 8,
+            "axis_terminal_return": {
+              "approximate_95_percent_interval": [
+                43.17778403528713,
+                47.44721596471287
+              ],
+              "mean": 45.3125,
+              "n": 8,
+              "standard_error": 1.0891407983228933
+            },
+            "axis_terminal_wealth": {
+              "approximate_95_percent_interval": [
+                69.03699268021035,
+                70.81300731978965
+              ],
+              "mean": 69.925,
+              "n": 8,
+              "standard_error": 0.453064959076353
+            },
+            "japanese_units_removed": {
+              "approximate_95_percent_interval": [
+                -0.05727938162695567,
+                1.5572793816269557
+              ],
+              "mean": 0.75,
+              "n": 8,
+              "standard_error": 0.411877235523957
+            },
+            "net_chinese_ipp_change": {
+              "approximate_95_percent_interval": [
+                -0.37,
+                0.12
+              ],
+              "mean": -0.125,
+              "n": 8,
+              "standard_error": 0.125
+            },
+            "newly_held_chinese_ipp": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_land": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "terminal_games": 8,
+            "truncated_games": 0
+          },
+          "terminal_games": 8,
+          "total_gross_acquired_ipp": 0.0,
+          "total_gross_acquisition_events": 0,
+          "truncated_games": 0
+        },
+        "initial": {
+          "attempted_games": 8,
+          "games": [
+            {
+              "axis_terminal_return": 41.8,
+              "axis_terminal_wealth": 66.7,
+              "chance_events": 62,
+              "decisions": 199,
+              "game_wall_seconds": 3.1092179999977816,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 1,
+              "initial_holdings_lost_ipp": 1.0,
+              "japanese_units_removed": 3,
+              "mode": "network_only",
+              "net_chinese_ipp_change": -1.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40009,
+              "source_record_sha256": "ee1343afb6dc25acb91a6a07498e4d1dead07615316263769196046bc84bf994",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 43.599999999999994,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 41,
+              "decisions": 184,
+              "game_wall_seconds": 2.737177499999234,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40013,
+              "source_record_sha256": "e8bd8a01f1a813a12d148639f5c5b0086a0518b347987f1c780cde7c369a3dd2",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 48.7,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 45,
+              "decisions": 172,
+              "game_wall_seconds": 2.5369472919992404,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40031,
+              "source_record_sha256": "5a1a14899304eac864b565bbc33fb4c716adc9df124d9348b30a9513ae15abed",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 48.599999999999994,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 49,
+              "decisions": 172,
+              "game_wall_seconds": 2.5659280409963685,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40037,
+              "source_record_sha256": "21667f60a07baf5a04d2211ca67cd012fcd2bef1eb0f0994345ee9587951c5a6",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 49.19999999999999,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 38,
+              "decisions": 168,
+              "game_wall_seconds": 2.4632520000013756,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40039,
+              "source_record_sha256": "60119ec8a9a1ff7c0e45df88827fadb893dd9a7debaba08bbabf4c5aac593ff4",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 48.099999999999994,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 39,
+              "decisions": 168,
+              "game_wall_seconds": 2.4220976249998785,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40063,
+              "source_record_sha256": "eb95af84cd989b75beb5aa1c298a1c40e6c61b1c35f9f97353bb9bc9427c0669",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 48.099999999999994,
+              "axis_terminal_wealth": 70.3,
+              "chance_events": 78,
+              "decisions": 203,
+              "game_wall_seconds": 3.0680683749960735,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40087,
+              "source_record_sha256": "c91856828dbeae9657757920d9e1c05cc1923a1559a8fab0cc18f0a21e382345",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 47.099999999999994,
+              "axis_terminal_wealth": 70.5,
+              "chance_events": 25,
+              "decisions": 149,
+              "game_wall_seconds": 2.200560042001598,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "network_only",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40093,
+              "source_record_sha256": "988fb50164c182c3ec97e15f50fa8361ff3acbe5e6e21743e934b6fe226f60f5",
+              "terminal": true
+            }
+          ],
+          "means": {
+            "axis_terminal_return": 46.89999999999999,
+            "axis_terminal_wealth": 70.0,
+            "game_wall_seconds": 2.6379061093739438,
+            "initial_holdings_lost_count": 0.125,
+            "initial_holdings_lost_ipp": 0.125,
+            "japanese_units_removed": 0.5,
+            "net_chinese_ipp_change": -0.125,
+            "newly_held_ipp": 0.0,
+            "newly_held_land": 0
+          },
+          "reported_statistics": {
+            "attempted_games": 8,
+            "axis_terminal_return": {
+              "approximate_95_percent_interval": [
+                45.02514960596851,
+                48.774850394031475
+              ],
+              "mean": 46.89999999999999,
+              "n": 8,
+              "standard_error": 0.9565563234854493
+            },
+            "axis_terminal_wealth": {
+              "approximate_95_percent_interval": [
+                69.07472814805594,
+                70.92527185194406
+              ],
+              "mean": 70.0,
+              "n": 8,
+              "standard_error": 0.47207747548166545
+            },
+            "japanese_units_removed": {
+              "approximate_95_percent_interval": [
+                -0.24081036709808534,
+                1.2408103670980855
+              ],
+              "mean": 0.5,
+              "n": 8,
+              "standard_error": 0.3779644730092272
+            },
+            "net_chinese_ipp_change": {
+              "approximate_95_percent_interval": [
+                -0.37,
+                0.12
+              ],
+              "mean": -0.125,
+              "n": 8,
+              "standard_error": 0.125
+            },
+            "newly_held_chinese_ipp": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_land": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "terminal_games": 8,
+            "truncated_games": 0
+          },
+          "terminal_games": 8,
+          "total_gross_acquired_ipp": 0.0,
+          "total_gross_acquisition_events": 0,
+          "truncated_games": 0
+        },
+        "paired_statistics": {
+          "complete_pairs": 8,
+          "delta_statistics": {
+            "axis_terminal_return": {
+              "approximate_95_percent_interval": [
+                -3.9639999999999938,
+                0.7890000000000037
+              ],
+              "mean": -1.587499999999995,
+              "n": 8,
+              "standard_error": 1.2124999999999995
+            },
+            "axis_terminal_wealth": {
+              "approximate_95_percent_interval": [
+                -1.3797256416580452,
+                1.2297256416580467
+              ],
+              "mean": -0.07499999999999929,
+              "n": 8,
+              "standard_error": 0.6656763477847173
+            },
+            "japanese_units_removed": {
+              "approximate_95_percent_interval": [
+                -0.6382004278314665,
+                1.1382004278314666
+              ],
+              "mean": 0.25,
+              "n": 8,
+              "standard_error": 0.4531634835874829
+            },
+            "net_chinese_ipp_change": {
+              "approximate_95_percent_interval": [
+                -0.37040518354904267,
+                0.37040518354904267
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.1889822365046136
+            },
+            "newly_held_chinese_ipp": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_land": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            }
+          }
+        }
+      },
+      "search": {
+        "final": {
+          "attempted_games": 8,
+          "games": [
+            {
+              "axis_terminal_return": 34.099999999999994,
+              "axis_terminal_wealth": 69.8,
+              "chance_events": 67,
+              "decisions": 247,
+              "game_wall_seconds": 56.44967737499974,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 2,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40009,
+              "source_record_sha256": "5a049e225b7c8c075363f85bc52562fc3574ce5e5e50e0ec459e7f1ac8766747",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 49.599999999999994,
+              "axis_terminal_wealth": 71.8,
+              "chance_events": 41,
+              "decisions": 184,
+              "game_wall_seconds": 42.55629120900994,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40013,
+              "source_record_sha256": "840741f1b145546adfa9bafc3a031c17757f4e445eb24a0612e0da4eeb694480",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 47.69999999999999,
+              "axis_terminal_wealth": 69.8,
+              "chance_events": 47,
+              "decisions": 176,
+              "game_wall_seconds": 31.899680542002898,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 2,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40031,
+              "source_record_sha256": "052f52723195f36c50cf942d2071ffdead47c532bdfaa335a7566fbc5613deee",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 48.10000000000001,
+              "axis_terminal_wealth": 70.4,
+              "chance_events": 50,
+              "decisions": 174,
+              "game_wall_seconds": 36.87628308299463,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40037,
+              "source_record_sha256": "90b737763ab3d175d67ebd8fb240eef9f524333720f30203bada492480abb346",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 46.30000000000001,
+              "axis_terminal_wealth": 70.4,
+              "chance_events": 49,
+              "decisions": 180,
+              "game_wall_seconds": 29.853903208000702,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40039,
+              "source_record_sha256": "444a649e32cc1136d752d675b1108a1ad3767cf9ff27ae8ac5fac28b2885db69",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 37.900000000000006,
+              "axis_terminal_wealth": 70.4,
+              "chance_events": 69,
+              "decisions": 251,
+              "game_wall_seconds": 59.088179375001346,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40063,
+              "source_record_sha256": "23675dc111b8b9e8e38fa7498a377d87bc20be29ff58a42d6f03fc2ace0d231a",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 35.10000000000001,
+              "axis_terminal_wealth": 70.10000000000001,
+              "chance_events": 58,
+              "decisions": 243,
+              "game_wall_seconds": 57.77334054200037,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40087,
+              "source_record_sha256": "b8fe2bb26b8855d1e2037cb6d9afe8076b3f587f1d5f91b121cd9a720611598d",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 47.0,
+              "axis_terminal_wealth": 70.3,
+              "chance_events": 25,
+              "decisions": 152,
+              "game_wall_seconds": 37.02991258299153,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 0,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40093,
+              "source_record_sha256": "dd296d99a4f040b0b50966789a785fa9fd5753451b3300ced0b5a2c5a2c024bc",
+              "terminal": true
+            }
+          ],
+          "means": {
+            "axis_terminal_return": 43.225,
+            "axis_terminal_wealth": 70.375,
+            "game_wall_seconds": 43.940908489625144,
+            "initial_holdings_lost_count": 0,
+            "initial_holdings_lost_ipp": 0.0,
+            "japanese_units_removed": 0.625,
+            "net_chinese_ipp_change": 0.0,
+            "newly_held_ipp": 0.0,
+            "newly_held_land": 0
+          },
+          "reported_statistics": {
+            "attempted_games": 8,
+            "axis_terminal_return": {
+              "approximate_95_percent_interval": [
+                38.79734091194907,
+                47.65265908805093
+              ],
+              "mean": 43.225,
+              "n": 8,
+              "standard_error": 2.259009738801495
+            },
+            "axis_terminal_wealth": {
+              "approximate_95_percent_interval": [
+                69.93869162281707,
+                70.81130837718293
+              ],
+              "mean": 70.375,
+              "n": 8,
+              "standard_error": 0.22260631488924865
+            },
+            "japanese_units_removed": {
+              "approximate_95_percent_interval": [
+                -0.009842500152596911,
+                1.259842500152597
+              ],
+              "mean": 0.625,
+              "n": 8,
+              "standard_error": 0.3238992347717331
+            },
+            "net_chinese_ipp_change": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_ipp": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_land": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "terminal_games": 8,
+            "truncated_games": 0
+          },
+          "terminal_games": 8,
+          "total_gross_acquired_ipp": 0.0,
+          "total_gross_acquisition_events": 0,
+          "truncated_games": 0
+        },
+        "initial": {
+          "attempted_games": 8,
+          "games": [
+            {
+              "axis_terminal_return": 34.5,
+              "axis_terminal_wealth": 67.5,
+              "chance_events": 74,
+              "decisions": 346,
+              "game_wall_seconds": 72.99292383300053,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 3,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40009,
+              "source_record_sha256": "d9922ce7cdd18127eea75d254184512cf416c5cfb8c3a0eec244aa0993610807",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 35.8,
+              "axis_terminal_wealth": 69.5,
+              "chance_events": 59,
+              "decisions": 284,
+              "game_wall_seconds": 50.0705220000018,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40013,
+              "source_record_sha256": "57ad79341b649049c47ff8ff521f3a6bb31626ab6e90d31f7072059becf79559",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 36.39999999999999,
+              "axis_terminal_wealth": 69.5,
+              "chance_events": 61,
+              "decisions": 323,
+              "game_wall_seconds": 82.15310433299601,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40031,
+              "source_record_sha256": "17cc773a282809b2442ef2fb4bb30a0b4cfaed085394d955e2403980acf94b2d",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 32.89999999999999,
+              "axis_terminal_wealth": 67.5,
+              "chance_events": 45,
+              "decisions": 316,
+              "game_wall_seconds": 79.78742354200222,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 3,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40037,
+              "source_record_sha256": "52f519c4626c2320a08cb245037ff12a1edc0502ef55edd8fc2063c6ea5dd078",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 34.0,
+              "axis_terminal_wealth": 67.3,
+              "chance_events": 57,
+              "decisions": 325,
+              "game_wall_seconds": 75.6954020829944,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 4,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40039,
+              "source_record_sha256": "1ecf1634ac0c539246bae3ebef7aa4ba33f3cb0bdf6d97733b24d0b7f8b2ee96",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 34.8,
+              "axis_terminal_wealth": 69.5,
+              "chance_events": 45,
+              "decisions": 290,
+              "game_wall_seconds": 64.6319081670008,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40063,
+              "source_record_sha256": "9ccd61a21bd37cb1264361d593220ffaf087ac3389549a5dd68a945edc757db9",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 24.099999999999994,
+              "axis_terminal_wealth": 61.7,
+              "chance_events": 76,
+              "decisions": 330,
+              "game_wall_seconds": 80.65059270899656,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 1,
+              "initial_holdings_lost_ipp": 1.0,
+              "japanese_units_removed": 8,
+              "mode": "search",
+              "net_chinese_ipp_change": -1.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40087,
+              "source_record_sha256": "9b34fa1dd0f13303ad2420c764a4a78c7e600522eff9fdc3e5fc127b191ac059",
+              "terminal": true
+            },
+            {
+              "axis_terminal_return": 34.3,
+              "axis_terminal_wealth": 69.5,
+              "chance_events": 53,
+              "decisions": 327,
+              "game_wall_seconds": 82.0307095829994,
+              "gross_acquired_ipp": 0.0,
+              "gross_acquisition_events": 0,
+              "initial_holdings_lost_count": 0,
+              "initial_holdings_lost_ipp": 0.0,
+              "japanese_units_removed": 1,
+              "mode": "search",
+              "net_chinese_ipp_change": 0.0,
+              "newly_held_ipp": 0.0,
+              "newly_held_land": 0,
+              "seed": 40093,
+              "source_record_sha256": "41f90a3770da067d9c80114bc416e58d56f4040d8296e6b8d71808fc07231f6f",
+              "terminal": true
+            }
+          ],
+          "means": {
+            "axis_terminal_return": 33.349999999999994,
+            "axis_terminal_wealth": 67.75,
+            "game_wall_seconds": 73.50157328124897,
+            "initial_holdings_lost_count": 0.125,
+            "initial_holdings_lost_ipp": 0.125,
+            "japanese_units_removed": 2.75,
+            "net_chinese_ipp_change": -0.125,
+            "newly_held_ipp": 0.0,
+            "newly_held_land": 0
+          },
+          "reported_statistics": {
+            "attempted_games": 8,
+            "axis_terminal_return": {
+              "approximate_95_percent_interval": [
+                30.655700090932704,
+                36.044299909067284
+              ],
+              "mean": 33.349999999999994,
+              "n": 8,
+              "standard_error": 1.3746428107486168
+            },
+            "axis_terminal_wealth": {
+              "approximate_95_percent_interval": [
+                65.91322347575978,
+                69.58677652424022
+              ],
+              "mean": 67.75,
+              "n": 8,
+              "standard_error": 0.9371308797143999
+            },
+            "japanese_units_removed": {
+              "approximate_95_percent_interval": [
+                1.062724088952847,
+                4.437275911047153
+              ],
+              "mean": 2.75,
+              "n": 8,
+              "standard_error": 0.8608550566567107
+            },
+            "net_chinese_ipp_change": {
+              "approximate_95_percent_interval": [
+                -0.37,
+                0.12
+              ],
+              "mean": -0.125,
+              "n": 8,
+              "standard_error": 0.125
+            },
+            "newly_held_chinese_ipp": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_land": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "terminal_games": 8,
+            "truncated_games": 0
+          },
+          "terminal_games": 8,
+          "total_gross_acquired_ipp": 0.0,
+          "total_gross_acquisition_events": 0,
+          "truncated_games": 0
+        },
+        "paired_statistics": {
+          "complete_pairs": 8,
+          "delta_statistics": {
+            "axis_terminal_return": {
+              "approximate_95_percent_interval": [
+                6.057894159182906,
+                13.692105840817105
+              ],
+              "mean": 9.875000000000005,
+              "n": 8,
+              "standard_error": 1.9475029800087242
+            },
+            "axis_terminal_wealth": {
+              "approximate_95_percent_interval": [
+                0.8568243865497975,
+                4.393175613450206
+              ],
+              "mean": 2.6250000000000018,
+              "n": 8,
+              "standard_error": 0.9021304150256144
+            },
+            "japanese_units_removed": {
+              "approximate_95_percent_interval": [
+                -3.84,
+                -0.41000000000000014
+              ],
+              "mean": -2.125,
+              "n": 8,
+              "standard_error": 0.8749999999999999
+            },
+            "net_chinese_ipp_change": {
+              "approximate_95_percent_interval": [
+                -0.12,
+                0.37
+              ],
+              "mean": 0.125,
+              "n": 8,
+              "standard_error": 0.125
+            },
+            "newly_held_chinese_ipp": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            },
+            "newly_held_chinese_land": {
+              "approximate_95_percent_interval": [
+                0.0,
+                0.0
+              ],
+              "mean": 0.0,
+              "n": 8,
+              "standard_error": 0.0
+            }
+          }
+        }
+      }
+    },
+    "contract": {
+      "max_depth": 16,
+      "max_state_visits": 20,
+      "max_transitions": 5000,
+      "modes": [
+        "network_only",
+        "search"
+      ],
+      "network_selection": "maximum prior, action-key tie break",
+      "opponent": "campaign-active-baseline-v2:balanced",
+      "root_noise": false,
+      "seeds": [
+        40009,
+        40013,
+        40031,
+        40037,
+        40039,
+        40063,
+        40087,
+        40093
+      ],
+      "simulations": 16,
+      "target": "axis",
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "territorial_scope": "authoritative KMT Chinese Home Country, Japan possession only"
+    },
+    "final_elapsed_seconds_after_restore": 406.18620479200035,
+    "heldout_seed_count": 8,
+    "heldout_seeds_disjoint_from_all_training_seeds": true,
+    "initial_elapsed_seconds_after_restore": 635.4773436670002,
+    "paired_games": [
+      {
+        "delta": {
+          "axis_terminal_return": 1.7000000000000028,
+          "axis_terminal_wealth": 3.5,
+          "initial_holdings_lost_ipp": -1.0,
+          "japanese_units_removed": -2,
+          "net_chinese_ipp_change": 1.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40009
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 0.7000000000000028,
+          "axis_terminal_wealth": 0.0,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 0,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40013
+      },
+      {
+        "delta": {
+          "axis_terminal_return": -1.6999999999999886,
+          "axis_terminal_wealth": -0.5999999999999943,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 2,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40031
+      },
+      {
+        "delta": {
+          "axis_terminal_return": -0.29999999999999716,
+          "axis_terminal_wealth": 0.0,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 0,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40037
+      },
+      {
+        "delta": {
+          "axis_terminal_return": -2.999999999999986,
+          "axis_terminal_wealth": 0.0,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 0,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40039
+      },
+      {
+        "delta": {
+          "axis_terminal_return": -0.7999999999999972,
+          "axis_terminal_wealth": 0.0,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 0,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40063
+      },
+      {
+        "delta": {
+          "axis_terminal_return": -9.299999999999997,
+          "axis_terminal_wealth": -3.5,
+          "initial_holdings_lost_ipp": 1.0,
+          "japanese_units_removed": 2,
+          "net_chinese_ipp_change": -1.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40087
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 0.0,
+          "axis_terminal_wealth": 0.0,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 0,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "network_only",
+        "seed": 40093
+      },
+      {
+        "delta": {
+          "axis_terminal_return": -0.4000000000000057,
+          "axis_terminal_wealth": 2.299999999999997,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": -1,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40009
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 13.799999999999997,
+          "axis_terminal_wealth": 2.299999999999997,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": -1,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40013
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 11.299999999999997,
+          "axis_terminal_wealth": 0.29999999999999716,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": 1,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40031
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 15.200000000000017,
+          "axis_terminal_wealth": 2.9000000000000057,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": -3,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40037
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 12.300000000000011,
+          "axis_terminal_wealth": 3.1000000000000085,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": -4,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40039
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 3.1000000000000085,
+          "axis_terminal_wealth": 0.9000000000000057,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": -1,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40063
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 11.000000000000014,
+          "axis_terminal_wealth": 8.400000000000006,
+          "initial_holdings_lost_ipp": -1.0,
+          "japanese_units_removed": -7,
+          "net_chinese_ipp_change": 1.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40087
+      },
+      {
+        "delta": {
+          "axis_terminal_return": 12.700000000000003,
+          "axis_terminal_wealth": 0.7999999999999972,
+          "initial_holdings_lost_ipp": 0.0,
+          "japanese_units_removed": -1,
+          "net_chinese_ipp_change": 0.0,
+          "newly_held_ipp": 0.0,
+          "newly_held_land": 0
+        },
+        "mode": "search",
+        "seed": 40093
+      }
+    ],
+    "trained_search_vs_untrained_network_mean_wealth_difference": 0.375,
+    "untrained_network_alone_mean_wealth": 70.0
+  },
+  "generated_utc": "2026-10-25T11:37:33.383257+00:00",
+  "limits": [
+    "One initialization and eight held-out seeds per mode; outcomes do not establish broad playing strength.",
+    "Three-round curriculum is not the eleven-round campaign.",
+    "Same seeds do not imply identical dice events after policies choose different actions.",
+    "Unit removals include combat, surrender and other forced removals.",
+    "Current-state and post-training outcome evidence is not a direct per-action causal explanation; full action traces were not retained for these evaluation games.",
+    "Observed checkpoint cost cannot be presented as a measured checkpoint-free speedup.",
+    "Individual optimizer tensors/replay row contents were not independently deserialized in the final report audit."
+  ],
+  "next_steps": [
+    "Profile and reduce checkpoint construction/serialization cost while retaining exact continuation, atomic replacement and backup safety.",
+    "Inspect Japan action selection and search on profitable attack positions before allocating another long learning run.",
+    "Choose further training/search/curriculum changes from measured behavioral tests rather than increasing compute blindly."
+  ],
+  "primary_question": "Did three-round self-play teach Japan to acquire and retain Chinese Home Country land against fixed verification opponents?",
+  "provenance": {
+    "checkpoint_and_evaluation_sha256": "3fa2022a1e894c9a44937399584600d87d9c308553be561492a951e44eaf5ebd",
+    "checkpoint_bytes": 1864875191,
+    "evaluation_helper_sha256": "fb8a6783c4e2a011c8497631ec1162b5df0abe34df73467f78b32fdab47f95a7",
+    "final_contract_sha256": "1564851daa4ef9e42555d35362f1a789ec648df4ae2f395588c5f3f3bc07636f",
+    "final_model_versions": {
+      "allies": "allies:generation-15:c9f894632b01870f1a7a6438d9e5d647a50978619447f2f045ae5c0715d8a156",
+      "axis": "axis:generation-15:1b5f4db03c936b9cd89d4e9fbb8b5a79946b6066e390c4cdf801e6aa5cf8819d",
+      "comintern": "comintern:generation-15:068908737d7e85a5e6795adcae42e51c715ea92da547973daa71f6ae601938ea"
+    },
+    "frozen_commit": "88981035ec1d80ff73f5b1d4e3b4c5ec3fd2580d",
+    "frozen_file_count": 418,
+    "initial_contract_sha256": "43d6135563c5e4fcb1cf91f864481c5777267cf40efb3517a9e23c2a83f4f41a",
+    "initial_model_versions": {
+      "allies": "allies:generation-0:77c88df9a8a06189561d604be4b7f87b8909e95e8fa5f0f4033c4faf314c7a64",
+      "axis": "axis:generation-0:afaa8eecdbc3f74cbf119b07688ccbe1e123da61d9af6107fef1591702425b1f",
+      "comintern": "comintern:generation-0:5637477f3c902dbe82f198242cd003dbe5922eef8cdea3224a881df9c9de8277"
+    },
+    "latest_previous_and_evaluation_checkpoint_streaming_hash_audit": "All three match; inspected without checkpoint deserialization.",
+    "native_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+    "plan_canonical_json_sha256": "97f3066b5925c4e670799f66107a475b548e51bd2565f1824887b780aa5cfd64",
+    "plan_file_bytes_sha256": "e8c8727c4cc90c9fb8147e9a088e1bfe778b6792a06200e60f93e716093ed243",
+    "runtime_manifest_sha256": "b37aed6a4b2b5a75aac56c01d6f74d7a69e309afc8b22dfa59f81e244be43c88",
+    "source_artifact_sha256": {
+      "evaluation-final/plan.json": "f50c4a63111b908582bc2be1bcaffbdc6c9e64c97e54317e563d651e09fb5f69",
+      "evaluation-final/report.json": "4043a6bfebff21f7c1fb0df20f6b835f0b302f50bd76d0bce1b3d8f593747d91",
+      "evaluation-initial/plan.json": "800c69ee58fd5d02f742cf98b049d9df3dba473d9641a31286ff77e2136fd690",
+      "evaluation-initial/report.json": "b08994305d59369b2127c411ec789d3051b2cd8125cb260c8af86c380310bee7",
+      "pipeline-plan.json": "e8c8727c4cc90c9fb8147e9a088e1bfe778b6792a06200e60f93e716093ed243",
+      "runtime-manifest.json": "b37aed6a4b2b5a75aac56c01d6f74d7a69e309afc8b22dfa59f81e244be43c88",
+      "training-control/state.json": "28e5c3b467d22ef268c64a7f6c6ea39c75fbbc50c08cbd7a933fc3e06981ce93",
+      "training/manifest.json": "83f3f2167697efd51e6374e016569fdb09d21dea852574075419ee1cf2bc94c9"
+    },
+    "unchanged_runtime_source_hashes": {
+      "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+      "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+      "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+      "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+      "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+      "include/game/campaign.hpp": "d3a44c0b7b9f0769ac5137aad96aa10374109ddb3bd01ac59cb7fc6ecebafb16",
+      "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+      "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+      "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+      "include/game/campaign_env.hpp": "89e82e43014090130c365bd8c49386bdf1cd4a772ccedb1b6bf1732ce16325b6",
+      "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+      "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+      "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+      "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+      "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+      "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+      "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+      "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+      "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+      "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+      "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+      "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+      "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+      "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+      "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+      "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+      "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+      "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+      "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+      "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+      "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+      "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+      "src/air.cpp": "0fb9043a2900bc86a9a8be7462ed762838cf4e0de5e2cfd09f3c420c7c1621db",
+      "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+      "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+      "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+      "src/campaign_env.cpp": "f2ba46163cc97391e0f659b632eda9b4ed9fe992e81af2bcde27ac00e069289e",
+      "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+      "src/campaign_runtime.cpp": "3cf51ef2821adf34c8eb5b133d9480dac1a83eff054fdb7f514e57f48985b251",
+      "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+      "src/campaign_state.cpp": "e5d5fde2bd7e9dc9c42f2b238c862e7e12624917566527406f1c19d1b7a218c6",
+      "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+      "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+      "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+      "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+      "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+      "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+      "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+      "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+      "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+      "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+      "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+      "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+      "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+      "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+      "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+      "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+      "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+      "src/python_bindings.cpp": "6e043462adf5c5fb6bc0ff8d34eebd077d6f57f62fa8b81f6b47c225396aa016",
+      "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+      "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+      "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+      "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+      "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+      "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+      "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+      "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+      "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+      "studies/campaign/evaluation.py": "b563c7737943e3c464749cacff90e45d963695b75680d095301154309de91030",
+      "studies/campaign/features.py": "15cf244d5312536b78e4f4adcdd858ce50b3531acba58c52b48c6f20a0238752",
+      "studies/campaign/learning.py": "dd70ca35bc69059d63a058dd5892045adfb7eb3392194508c46659b5047cc707",
+      "studies/campaign/neural.py": "c8530ef33e1861c62f9f5de7e06834a1e015efead156979605545878048ed598",
+      "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+      "studies/campaign/run.py": "c1fa7b97d7e954ace7ee2982d2d527017a965b6a2e1ea08557fca9e5718807c3",
+      "studies/campaign/scaling_benchmark.py": "303831c3317ee21ef95a7521c492d68dc1fc57a0e48ff90b7b303fa8539bddd3",
+      "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+      "studies/shared/campaign_adapter.py": "cef35f5730550ec9ef418fd328a75b32dc362bd43b9301ea3c7552e869e64a16",
+      "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+      "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+    }
+  },
+  "run_root": "studies/campaign/runs/three-round-10h-2026-10-24-r3",
+  "schema": "campaign-three-round-final-evidence-v1",
+  "status": "completed",
+  "training": {
+    "adam_steps_per_agent": 240,
+    "bootstrap_records": 0,
+    "checkpoint_bucket_scope": "Checkpoint construction, deep copying, serialization, writing and fsync; not isolated storage-device time.",
+    "checkpoint_schedule": "Every16waves pluscollection/update batch boundaries and the final safe stop.",
+    "completed_games_per_invocation_hour": 8.223846505726524,
+    "completed_learning_batches": 15,
+    "completed_replay_records_below_capacity": true,
+    "completed_three_round_games": 60,
+    "config": {
+      "batch_size": 32,
+      "batches": 10000,
+      "calendar_rounds": 3,
+      "checkpoint_every_waves": 16,
+      "complete_episodes": true,
+      "cpu_budget": 11,
+      "epochs": 16,
+      "hidden_dim": 16,
+      "learning_rate": 0.001,
+      "max_depth": 16,
+      "message_layers": 1,
+      "parallel_envs": 4,
+      "replay_capacity": 16384,
+      "seed": 1951,
+      "simulations": 16,
+      "threads": 4,
+      "token_buckets": 2048,
+      "transitions_per_batch": 5000,
+      "value_scale": 100.0
+    },
+    "counters": {
+      "batches": 15,
+      "chance_events": 2291,
+      "decisions": 16840,
+      "episodes": 60,
+      "transitions": 19131,
+      "updates": 15
+    },
+    "elapsed_seconds_this_invocation": 26265.081656083,
+    "invocation_training_transitions_excluding_four_initialization_decisions": 19127,
+    "measured_collection_transitions_per_second": 1.9134302837430892,
+    "policy_owned_sample_draws": {
+      "allies": 1410,
+      "axis": 4200,
+      "comintern": 2070
+    },
+    "scope_of_training_counts": "Collected records are not unique sampled records, gradient steps or guaranteed coverage of every replay row.",
+    "shared_replay_row_draws_per_agent": 7680,
+    "stop": "Scheduled SIGTERM; complete checkpoint saved and worker exited130. No engine failure during the r3 training invocation.",
+    "terminal_labeled_decision_records": 16175,
+    "terminal_records_by_owner": {
+      "allies": 3394,
+      "axis": 8422,
+      "comintern": 4359
+    },
+    "timing_fractions": {
+      "checkpoint_save": 0.6033190876829421,
+      "collection": 0.38058832294124567,
+      "learning_updates": 0.0071546779722835045,
+      "progress_reporting": 0.008932782702016206
+    },
+    "timing_scope": "After initialization, non-overlapping buckets through this snapshot; current report write and later output excluded; learning includes finish_batch.",
+    "timings_seconds": {
+      "checkpoint_save": 15846.225102665972,
+      "collection": 9996.183379403505,
+      "learning_updates": 187.91820116500458,
+      "progress_reporting": 234.6202670845014
+    },
+    "training_environment_seeds": [
+      3893811448908990722,
+      6563938874301275647,
+      5046673378298423682,
+      5466516857604415370,
+      8202341100937541654,
+      3047951898809189481,
+      3139566501633256141,
+      6668411721441586417,
+      1177264717917617277,
+      8903943460878795437,
+      5263198987145333547,
+      6001597836637499519,
+      209613477447785031,
+      3132733701720429197,
+      7038652771248088193,
+      4321831537956154342,
+      2745859414828406943,
+      784559965546620365,
+      6096282094362035170,
+      2070041022673271201,
+      919599265991475534,
+      568241629313047452,
+      7581406989679336574,
+      2967925854089638377,
+      6063436438696524541,
+      3222475680903669324,
+      4445981642676331588,
+      5361282841520264225,
+      2259051999749160004,
+      4151681611039196057,
+      5385393793198609371,
+      4697786925171913718,
+      4358796644699577075,
+      2124786259565928089,
+      7055889137315003129,
+      219136616184492701,
+      553089211756742818,
+      4749228676787370677,
+      3829110159931282973,
+      1971759318782055676,
+      9068549478181428205,
+      8292873288456469953,
+      1721368932262718477,
+      6867512009713225298,
+      3098419169351432707,
+      1647208099903435682,
+      4848717354955548964,
+      5513947184408460813,
+      1257498586006354269,
+      3146005740959935067,
+      7768741407419483933,
+      8530073369113045556,
+      2292193950284833540,
+      2725711909006536226,
+      5140406362349758739,
+      7210753626786366819,
+      387608189384028469,
+      5143571398843626930,
+      2603748533894544486,
+      2943713214678383812,
+      1067441524980708580,
+      6111884122362480265,
+      7430160285612060575,
+      4724656343595490346
+    ],
+    "unique_training_seeds": 64,
+    "whole_training_invocation_transitions_per_second": 0.7282292227547742
+  },
+  "verification": {
+    "all_15_rollouts_terminal_only": true,
+    "all_32_games_genuine_three_round_terminals": true,
+    "initial_final_contracts_and_helper_match": true,
+    "last_code_validation_ctest_suites_passed": 26,
+    "last_code_validation_python_tests_passed": 346,
+    "no_production_source_change_for_this_report": true,
+    "paired_mean_deltas_independently_recomputed": true,
+    "pipeline_and_both_evaluations_completed": true,
+    "report_only_validation": "JSON, contracts, aggregate counts, checksums and independently recomputed paired statistics. Full code tests were not repeated for documentation-only output.",
+    "runtime_source_and_native_streaming_hash_audit_passed": true
+  }
+}
