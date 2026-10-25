@@ -15,6 +15,8 @@ import hashlib
 import json
 import math
 import re
+import threading
+from collections import OrderedDict
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
@@ -307,6 +309,94 @@ def numeric_compiler(buckets: int):
 
 def compile_numeric(snapshot: Any, buckets: int):
     return numeric_compiler(buckets).compile(snapshot)
+
+
+def _source_key_bytes(value: Any) -> int:
+    if isinstance(value, str):
+        return 96 + 4 * len(value.encode("utf-8"))
+    if isinstance(value, tuple):
+        return 64 + 16 * len(value) + sum(_source_key_bytes(item) for item in value)
+    return 64
+
+
+class _NumericSourceCache:
+    """Reuse immutable compiled sources across independent game roots.
+
+    Lookup and publication hold the lock; compiler callbacks never do. A second
+    check after compilation makes racing misses return the same owning handle.
+    Keys include the full authoritative action payload or full context digest.
+    """
+    def __init__(self, byte_limit: int, entry_limit: int) -> None:
+        self.byte_limit, self.entry_limit = byte_limit, entry_limit
+        self.values: OrderedDict[tuple, tuple[Any, int]] = OrderedDict()
+        self.bytes = self.hits = self.misses = 0
+        self.lock = threading.RLock()
+
+    def get(self, key: tuple) -> Any:
+        with self.lock:
+            found = self.values.get(key)
+            if found is None:
+                self.misses += 1
+                return None
+            self.hits += 1
+            self.values.move_to_end(key)
+            return found[0]
+
+    def publish(self, key: tuple, value: Any, size: int) -> Any:
+        with self.lock:
+            found = self.values.get(key)
+            if found is not None:
+                self.values.move_to_end(key)
+                return found[0]
+            if self.entry_limit and size <= self.byte_limit:
+                while self.values and (len(self.values) >= self.entry_limit or self.bytes + size > self.byte_limit):
+                    _, (_, old_size) = self.values.popitem(last=False)
+                    self.bytes -= old_size
+                self.values[key] = value, size
+                self.bytes += size
+        return value
+
+    def clear(self) -> None:
+        with self.lock:
+            self.values.clear()
+            self.bytes = self.hits = self.misses = 0
+
+    def cache_info(self) -> dict[str, int]:
+        with self.lock:
+            return {"entries": len(self.values), "bytes": self.bytes, "hits": self.hits, "misses": self.misses,
+                    "entry_limit": self.entry_limit, "byte_limit": self.byte_limit}
+
+
+_NUMERIC_ACTION_SOURCES = _NumericSourceCache(64 * 1024 * 1024, 4096)
+_NUMERIC_CONTEXT_SOURCES = _NumericSourceCache(128 * 1024 * 1024, 8)
+
+
+def cached_numeric_context(snapshot: Any, buckets: int, source_key: str):
+    """Intern a complete registry using the existing exact-source fingerprint."""
+    key = (source_key, buckets)
+    cached = _NUMERIC_CONTEXT_SOURCES.get(key)
+    if cached is not None:
+        return cached
+    graph = compile_numeric(snapshot, buckets)
+    return _NUMERIC_CONTEXT_SOURCES.publish(key, graph, graph.nbytes + _source_key_bytes(key) + 256)
+
+
+def cached_numeric_action(snapshot: Any, buckets: int):
+    """Return the complete action graph and factors, never keyed by action ID alone."""
+    from gwrl_cpp import CampaignNumericSnapshot
+    source_key = getattr(snapshot, "cache_key", None) if isinstance(snapshot, CampaignNumericSnapshot) else None
+    key = (source_key, buckets) if source_key is not None else None
+    if key is not None:
+        cached = _NUMERIC_ACTION_SOURCES.get(key)
+        if cached is not None:
+            return cached
+    graph = compile_numeric(snapshot, buckets)
+    factors = tuple(_native_factor(value) for value in snapshot.factor_json())
+    result = graph, factors
+    if key is None:
+        return result
+    size = graph.nbytes + _source_key_bytes(key) + _source_key_bytes(factors) + 256
+    return _NUMERIC_ACTION_SOURCES.publish(key, result, size)
 
 
 @lru_cache(maxsize=16384)

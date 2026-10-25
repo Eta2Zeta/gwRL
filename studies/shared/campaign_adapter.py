@@ -234,7 +234,8 @@ class CampaignAdapter:
         """Compile the unchanged complete decision directly from native trees."""
         if not hasattr(self.raw, "numeric_observation"):
             return None
-        from studies.campaign.features import NUMERIC_SCHEMA, compile_numeric, _native_factor
+        from studies.campaign.features import (NUMERIC_SCHEMA, cached_numeric_action,
+                                              cached_numeric_context, compile_numeric)
         decision = self._decision_cache()
         menu = self._legal_actions(decision)
         lookup = {action.id: index for index, action in enumerate(menu)}
@@ -255,7 +256,7 @@ class CampaignAdapter:
                 separators=(",", ":"), allow_nan=False).encode()).hexdigest()
             if len(self._numeric_contexts) >= 8:
                 self._numeric_contexts.clear()
-            self._numeric_contexts[context_key] = (source_key, compile_numeric(context, buckets))
+            self._numeric_contexts[context_key] = (source_key, cached_numeric_context(context, buckets, source_key))
         source_key, context_graph = self._numeric_contexts[context_key]
         if buckets not in decision.numeric:
             snapshots = tuple(action.numeric_snapshot() for action in menu)
@@ -263,8 +264,8 @@ class CampaignAdapter:
                 return None
             observation = self.raw.numeric_observation().scheduled_observation(
                 decision.owner, decision.kind, snapshots, SCHEMA, self.interrupt_order, sorted(self._passed))
-            graphs = tuple(compile_numeric(snapshot, buckets) for snapshot in snapshots)
-            factors = tuple(tuple(_native_factor(value) for value in snapshot.factor_json()) for snapshot in snapshots)
+            prepared = tuple(cached_numeric_action(snapshot, buckets) for snapshot in snapshots)
+            graphs, factors = tuple(item[0] for item in prepared), tuple(item[1] for item in prepared)
             if len(decision.numeric) >= 8:
                 decision.numeric.clear()
             decision.numeric[buckets] = (compile_numeric(observation, buckets), graphs, factors)
