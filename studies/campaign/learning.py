@@ -26,7 +26,7 @@ from torch import nn
 from studies.shared.multiplayer_mcts import (
     PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
 )
-from studies.shared.immutable_json import freeze_json
+from studies.shared.immutable_json import FrozenDict, freeze_json
 
 CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
 TARGET_SCHEMA = "campaign-raw-vector-target-v1"
@@ -719,7 +719,9 @@ class CampaignLearner:
             # Validate changing source JSON without serializing the shared
             # registry once per trajectory row during checkpoint restoration.
             _canonical({key: item for key, item in features.items() if key != "context"})
-            if not isinstance(features["context"], _ReadOnlyDict):
+            if isinstance(features["context"], FrozenDict):
+                features["context"].canonical_json
+            elif not isinstance(features["context"], _ReadOnlyDict):
                 _canonical(features["context"])
             if not isinstance(features.get("actions"), list):
                 raise ValueError("Replay sample must contain legal action features")

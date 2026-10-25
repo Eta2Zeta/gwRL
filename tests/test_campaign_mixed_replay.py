@@ -88,6 +88,30 @@ class MixedReplayTests(unittest.TestCase):
         return ([value.detach() for value in logits], values.detach(), gradients,
                 model.state_dict(), optimizer.state_dict())
 
+    def test_frozen_legacy_context_is_fully_validated_once_across_replay_rows(self):
+        import json
+        from studies.campaign.learning import CampaignLearner
+        from studies.shared.immutable_json import freeze_json
+
+        raw = rows()[0]
+        context = freeze_json(raw["context"])
+        sample = {"input": {**raw, "context": context}, "owner": "axis", "policy": [.5, .5],
+                  "rollout_version": "preserved-policy"}
+        original, checked = json.dumps, []
+
+        def dumps(value, **kwargs):
+            if value is context:
+                checked.append(value)
+            return original(value, **kwargs)
+
+        with patch("studies.shared.immutable_json.json.dumps", side_effect=dumps):
+            CampaignLearner._validate_sample(sample, labeled=False)
+            CampaignLearner._validate_sample(sample, labeled=False)
+        self.assertEqual(len(checked), 1)
+        invalid = {**sample, "input": {**raw, "context": freeze_json({"bad": float("nan")})}}
+        with self.assertRaises(ValueError):
+            CampaignLearner._validate_sample(invalid, labeled=False)
+
     def test_all_transport_orders_preserve_outputs_gradients_and_adam_with_one_context(self):
         raw = rows()
         packed = [numerical(item) for item in raw]

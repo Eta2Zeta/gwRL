@@ -324,7 +324,7 @@ class CampaignAtomicCheckpointTests(unittest.TestCase):
             self.assertEqual(CampaignRunTests.read(previous)["runner"], {"generation": 0})
             second = path.read_bytes()
 
-            def fail_write(_value, handle):
+            def fail_write(_value, handle, **_kwargs):
                 handle.write(b"incomplete checkpoint")
                 raise OSError("injected disk write failure")
 
