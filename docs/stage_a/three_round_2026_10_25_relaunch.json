@@ -1,0 +1,139 @@
+{
+  "budget": {
+    "authorized_total_cpu_cores": 12,
+    "authorized_total_memory_bytes": 30000000000,
+    "budget_started_epoch": 1792895248.0,
+    "deadline_epoch": 1792931248.0,
+    "final_eval_reserve_seconds": 3600,
+    "memory_bytes": 26000000000,
+    "memory_soft_bytes": 25000000000,
+    "shutdown_seconds": 180
+  },
+  "checkpoint_at_recording": {
+    "counters": {
+      "batches": 0,
+      "chance_events": 0,
+      "decisions": 4,
+      "episodes": 0,
+      "transitions": 4,
+      "updates": 0
+    },
+    "initial_sha256": "5962a09bb34ff3a1bf969ef7124fd1642613a138d8f7509239085e101931f935",
+    "latest_sha256": "7f4045db013e5eee9022fc8f0c9544eaa7ce0755956d75bc673a05d314edc9b1",
+    "previous_sha256": "5962a09bb34ff3a1bf969ef7124fd1642613a138d8f7509239085e101931f935"
+  },
+  "deadline_utc": "2026-10-25T12:27:28Z",
+  "execution_recovery": {
+    "atomic_checkpoints_with_previous_backup": true,
+    "frozen_runtime": true,
+    "old_idle_guardian_stopped": true,
+    "periodic_recovery_check_minutes": 30,
+    "resume_command": "studies/campaign/runs/three-round-10h-2026-10-24-r3/resume.sh",
+    "unfinished_games_optimizer_replay_frozen_policies_pending_samples_all_rng_preserved_on_compatible_resume": true
+  },
+  "heldout_seeds": [
+    40009,
+    40013,
+    40031,
+    40037,
+    40039,
+    40063,
+    40087,
+    40093
+  ],
+  "limits": [
+    "Initial evaluation is running; this is not a completed-training or playing-strength result.",
+    "Flight filter proves some dead ends impossible; it is not an exhaustive future joint-plan solver.",
+    "Three-round curriculum, 16 simulations/depth16 and architecture/reward unchanged.",
+    "Original failed runtime/checkpoints remain intact; their incompatible pending targets are excluded explicitly, never rewritten."
+  ],
+  "recorded_utc": "2026-10-25T03:56:39.218826+00:00",
+  "recovery_from_invalid_first_batch": {
+    "config_and_static_context_equal": true,
+    "deadline_extended": false,
+    "fresh_parameters_bitwise_equal_to_original_initialization": true,
+    "model_versions": {
+      "allies": "allies:generation-0:77c88df9a8a06189561d604be4b7f87b8909e95e8fa5f0f4033c4faf314c7a64",
+      "axis": "axis:generation-0:afaa8eecdbc3f74cbf119b07688ccbe1e123da61d9af6107fef1591702425b1f",
+      "comintern": "comintern:generation-0:5637477f3c902dbe82f198242cd003dbe5922eef8cdea3224a881df9c9de8277"
+    },
+    "old_checkpoint_sha256": "fa79adac82f4e2a169dfe2dba5fd1b83cb0c680d93365ee5174116e7d5db3019",
+    "old_completed_training_games": 0,
+    "old_games_preserved_but_not_reused": 4,
+    "old_learning_updates": 0,
+    "old_optimizer_updates": 0,
+    "old_pending_policy_samples_preserved_but_not_reused": 163,
+    "old_run_root": "studies/campaign/runs/three-round-10h-2026-10-24-r2",
+    "pending_targets_retagged": false,
+    "proof_report": "three_round_2026_10_25_interruption.json",
+    "source_or_compatibility_checks_bypassed": false
+  },
+  "resources_at_recording": {
+    "aggregate_sampled_peak_rss_bytes": 1515356160,
+    "sampled_not_kernel_enforced": true
+  },
+  "run_root": "studies/campaign/runs/three-round-10h-2026-10-24-r3",
+  "runtime": {
+    "frozen_file_count": 418,
+    "native_module_sha256": "05371fd29f42d4a7e4b444309785054b3b71da543430a0eef0854e7fe6dd8689",
+    "plan_sha256": "e8c8727c4cc90c9fb8147e9a088e1bfe778b6792a06200e60f93e716093ed243",
+    "runtime_manifest_sha256": "b37aed6a4b2b5a75aac56c01d6f74d7a69e309afc8b22dfa59f81e244be43c88",
+    "source_commit": "88981035ec1d80ff73f5b1d4e3b4c5ec3fd2580d"
+  },
+  "schema": "campaign-three-round-relaunch-evidence-v1",
+  "status_at_recording": {
+    "guardian": "watching",
+    "learning_result_available": false,
+    "pipeline": "running",
+    "stage": "initial_evaluation"
+  },
+  "training_arguments": [
+    "--seed",
+    "1951",
+    "--calendar-rounds",
+    "3",
+    "--complete-episodes",
+    "--batches",
+    "10000",
+    "--transitions-per-batch",
+    "5000",
+    "--parallel-envs",
+    "4",
+    "--simulations",
+    "16",
+    "--max-depth",
+    "16",
+    "--hidden-dim",
+    "16",
+    "--message-layers",
+    "1",
+    "--token-buckets",
+    "2048",
+    "--batch-size",
+    "32",
+    "--epochs",
+    "16",
+    "--learning-rate",
+    "0.001",
+    "--replay-capacity",
+    "16384",
+    "--threads",
+    "4",
+    "--cpu-budget",
+    "11",
+    "--checkpoint-every-waves",
+    "16"
+  ],
+  "verification": {
+    "air_fixture_groups": 12,
+    "ctest": {
+      "passed": 26,
+      "seconds": 71.06
+    },
+    "matched_menu_cost_report": "three_round_2026_10_25_interruption.json",
+    "python": {
+      "passed": 346,
+      "seconds": 233.953
+    }
+  }
+}

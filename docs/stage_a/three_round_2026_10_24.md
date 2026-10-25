@@ -78,6 +78,14 @@ trials per position added a mean 1.59 ms to the position medians (32.10 to
 counts and all state/RNG snapshots matched. This measures the correctness
 check's menu cost, not completed-game throughput or training feasibility.
 
+The replacement run is `three-round-10h-2026-10-24-r3/`. Its
+[relaunch record](three_round_2026_10_25_relaunch.json) pins the frozen corrected
+runtime, identical initial parameter bits and unchanged settings/deadline.
+Initial evaluation runs again under the corrected engine before self-play.
+Compatible interruptions still resume unfinished games and all learning/random
+state; this explicit fresh start addresses incompatible erroneous menus before
+the first learning update. The earlier run remains intact for inspection.
+
 ## Question and fixed settings
 
 Does three-round self-play improve Japan's ability to acquire and retain
@@ -173,11 +181,12 @@ fixed budgets, process locks, resource stops and bounded transient retries.
 
 Large models, progress logs, evaluation events, frozen runtime and raw resource
 measurements remain ignored under
-`studies/campaign/runs/three-round-10h-2026-10-24-r2/`. Curated launch/result evidence
+`studies/campaign/runs/three-round-10h-2026-10-24-r3/`. Curated launch/result evidence
 will identify the source revision, native hash, settings, timings, counts and
 the limits of any learning conclusion.
 
-The [launch record](three_round_2026_10_24_launch.json) pins the corrected runtime
+The [original launch record](three_round_2026_10_24_launch.json) and
+[current relaunch record](three_round_2026_10_25_relaunch.json) pin the runtime
 and initial checkpoint hashes. The budget ends at 2026-10-25 12:27:28 UTC
 (7:27:28 a.m. Chicago). Restart with the run directory's `resume.sh`; its fixed
 plan resumes completed stages and pending self-play without extending that
