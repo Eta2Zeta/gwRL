@@ -1,11 +1,12 @@
 # Three-round experiment results — 25 October 2026
 
-The run completed, but **Japan did not learn the requested territorial
-expansion**. Across eight held-out seeds, neither the network alone nor
+The run completed, but **Japanese-owned territorial expansion was not
+demonstrated**. Across eight held-out seeds, neither the network alone nor
 16-simulation search acquired any Chinese Home Country possession before or
 after training. Search with the trained network preserved more units and wealth
 than search with the initial network; the network alone showed no clear
-playing-strength improvement.
+playing-strength improvement. One trained-search game did end with a
+Dadao-held zone, which is outside the primary Japan-possession metric.
 
 The [verified result data](three_round_2026_10_25_results.json) includes individual
 seed results, paired statistics, settings, timing scopes and checkpoint hashes.
@@ -41,14 +42,20 @@ their genuine three-round ending; none was truncated or assigned a fake score.
 | New Chinese possessions acquired | 0 → 0 | 0 → 0 |
 | Newly held Chinese land at ending | 0 → 0 | 0 → 0 |
 | Newly held Chinese IPP | 0 → 0 | 0 → 0 |
+| Dadao-held zones at ending (supplementary) | 0 → 0 | 0 → 0.125 |
 | Initially Japanese Chinese land lost | 0.125 → 0.125 | 0.125 → 0 |
 | Japanese units removed | 0.50 → 0.75 | 2.75 → 0.625 |
 | Axis terminal wealth score | 70.000 → 69.925 | 67.750 → 70.375 |
 | Axis terminal wealth-gap return | 46.900 → 45.3125 | 33.350 → 43.225 |
 
-There were **zero gross possession acquisitions**, so these results do not
-hide temporary captures that were subsequently lost. The search result is a
-limited improvement in force/wealth preservation, not offensive expansion.
+There were **zero gross Japanese possession acquisitions**, so these results do
+not hide temporary Japanese captures that were subsequently lost. In final
+search seed 40013, Dadao held one zone;
+all initial evaluation games had none. The logs do not expose its exact zone,
+IPP or acquisition method. This limited Axis territorial activity must not be
+omitted or described as a verified Japanese combat capture. The clearest measured
+search improvement is force/wealth preservation; broader offensive behavior
+needs further checking.
 Its trained wealth score of 70.375 is also close to the initial network-alone
 score of 70.000; the experiment does not establish a compute-efficient benefit
 from adding search.

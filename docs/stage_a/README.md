@@ -2,8 +2,9 @@
 
 Status: bounded three-round learning and paired evaluation completed,
 25 October 2026. [Read the results](three_round_2026_10_25_results.md): 60 complete
-games, 15 learning batches and no Japanese Chinese Home Country acquisitions
-in the held-out tests. Trained search preserved more units/wealth than initial
+games, 15 learning batches and no Japanese-owned Chinese Home Country acquisitions
+in the held-out tests. One trained-search game ended with a Dadao-held zone,
+reported separately. Trained search preserved more units/wealth than initial
 search; the network alone showed no clear strength improvement. Checkpointing
 consumed 60.33% of the training interval and is the largest measured operational
 bottleneck. Four unfinished games and all continuation state remain saved.

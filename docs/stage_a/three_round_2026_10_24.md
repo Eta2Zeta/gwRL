@@ -6,8 +6,9 @@ basic useful behavior, not a claim of eleven-round campaign competence.
 
 **Completed 25 October:** [results](three_round_2026_10_25_results.md). Sixty
 three-round games and fifteen learning batches completed. Japan acquired no
-Chinese Home Country land in either evaluation mode; trained search preserved
-more units/wealth than initial search. Checkpointing consumed 60.33% of the
+Chinese Home Country land in either evaluation mode. One trained-search game
+ended with a Dadao-held zone, outside that Japan-only metric; trained search
+preserved more units/wealth than initial search. Checkpointing consumed 60.33% of the
 measured training interval. Four unfinished games remain saved for compatible
 continuation; the existing supervised plan is complete.
 
