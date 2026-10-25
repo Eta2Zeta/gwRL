@@ -17,6 +17,7 @@ from .batching import BatchStats, search_many
 
 EVALUATION_SCHEMA = "campaign-heldout-evaluation-v1"
 PROFILE_SCHEMA = "campaign-operation-profile-v1"
+TERRITORY_TRACKING_SCHEMA = "campaign-national-chinese-possession-tracking-v2"
 
 
 def _seeds(values: Sequence[int], *, unique: bool, label: str) -> list[int]:
@@ -69,10 +70,11 @@ def _context_key(env: Any) -> str:
     return hashlib.sha256(encoded.encode()).hexdigest()
 
 
-def _units(env: Any) -> dict[str, dict[str, Any]]:
+def _units(env: Any, *, state: Mapping[str, Any] | None = None) -> dict[str, dict[str, Any]]:
     # Snapshot even if a toy/public observation returns mutable unit objects.
+    state = env.observation()["state"] if state is None else state
     return {identity: {"owner": unit["owner"], "type": unit.get("type", "unspecified")}
-            for identity, unit in env.observation()["state"]["units"].items()}
+            for identity, unit in state["units"].items()}
 
 
 def _merge_stats(total: BatchStats, wave: BatchStats) -> None:
@@ -85,13 +87,19 @@ def _merge_stats(total: BatchStats, wave: BatchStats) -> None:
 
 
 class JapanTerritoryTracker:
-    """Possession changes in the authoritative Chinese Home Country.
+    """Separate national possession changes in Chinese Home Country.
+
+    Japan remains the default and the primary metric. Dadao uses an independent
+    tracker so its exact zones and IPP never count as Japanese expansion.
 
     Acquisition is deliberately broader than a combat capture: influence,
     alignment and postcombat possession choices can also change possession.
     These are evaluation diagnostics, never additional learning rewards.
     """
-    def __init__(self, context: Mapping[str, Any], state: Mapping[str, Any]):
+    def __init__(self, context: Mapping[str, Any], state: Mapping[str, Any], *, nation: str = "japan"):
+        if nation not in {"japan", "dadao"}:
+            raise ValueError("Chinese possession diagnostics require Japan or Dadao")
+        self.nation = nation
         faction = context.get("factions", {}).get("kmt", {})
         if not faction.get("home_country_known") or not faction.get("home_country"):
             raise ValueError("Japanese expansion metrics require known Chinese Home Country")
@@ -101,13 +109,13 @@ class JapanTerritoryTracker:
         if not self.values or any(not math.isfinite(value) or value < 0 for value in self.values.values()):
             raise ValueError("Chinese Home Country metrics need finite nonnegative land values")
         self.previous = {zone: state["territories"][zone].get("possessor") for zone in self.values}
-        self.initial = {zone for zone, owner in self.previous.items() if owner == "japan"}
+        self.initial = {zone for zone, owner in self.previous.items() if owner == self.nation}
         self.events: list[dict[str, Any]] = []
 
     def record(self, state: Mapping[str, Any], transition: int, kind: str) -> None:
         for zone, previous in self.previous.items():
             current = state["territories"][zone].get("possessor")
-            if current != previous and "japan" in (previous, current):
+            if current != previous and self.nation in (previous, current):
                 self.events.append({"zone": zone, "ipp_value": self.values[zone],
                     "previous_possessor": previous, "possessor": current,
                     "transition": transition, "action_kind": kind,
@@ -115,16 +123,16 @@ class JapanTerritoryTracker:
             self.previous[zone] = current
 
     def summary(self, *, terminal: bool) -> dict[str, Any]:
-        final = {zone for zone, owner in self.previous.items() if owner == "japan"}
+        final = {zone for zone, owner in self.previous.items() if owner == self.nation}
 
         def holdings(zones):
             return {"zones": sorted(zones), "count": len(zones),
                     "ipp": math.fsum(self.values[zone] for zone in zones)}
 
-        acquisitions = [event for event in self.events if event["possessor"] == "japan"]
-        losses = [event for event in self.events if event["previous_possessor"] == "japan"]
+        acquisitions = [event for event in self.events if event["possessor"] == self.nation]
+        losses = [event for event in self.events if event["previous_possessor"] == self.nation]
         return {"scope": "KMT Chinese Home Country intersected with campaign land zones",
-            "scope_zones": sorted(self.values), "nation": "japan", "terminal": terminal,
+            "scope_zones": sorted(self.values), "nation": self.nation, "terminal": terminal,
             "initial": holdings(self.initial), "at_stop": holdings(final),
             "newly_held": holdings(final - self.initial),
             "initial_holdings_lost": holdings(self.initial - final),
@@ -186,6 +194,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
     previous_units = [_units(env) for env in envs]
     territory_trackers = [JapanTerritoryTracker(env.context(), env.observation()["state"])
                           if track_japan else None for env in envs]
+    dadao_trackers = [JapanTerritoryTracker(env.context(), env.observation()["state"], nation="dadao")
+                      if track_japan else None for env in envs]
     casualties, casualty_types = [Counter() for _ in seeds], [Counter() for _ in seeds]
     predictions, prediction_points = [None] * len(seeds), [None] * len(seeds)
     initial = [{"planning_key": env.planning_key(), "context_sha256": _context_key(env),
@@ -207,15 +217,17 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
         if owner is not None:
             decisions += 1
             owners[index][owner] += 1
-        units = _units(envs[index])
+        state = envs[index].observation()["state"]
+        units = _units(envs[index], state=state)
         for identity in previous_units[index].keys() - units.keys():
             unit = previous_units[index][identity]
             casualties[index][unit["owner"]] += 1
             casualty_types[index][(unit["owner"], unit["type"])] += 1
         previous_units[index] = units
         if territory_trackers[index] is not None:
-            territory_trackers[index].record(envs[index].observation()["state"],
-                                             counts[index]["transitions"], kind)
+            territory_trackers[index].record(state, counts[index]["transitions"], kind)
+        if dadao_trackers[index] is not None:
+            dadao_trackers[index].record(state, counts[index]["transitions"], kind)
         state_visits[index][envs[index].planning_key()] += 1
 
     externally_stopped = False
@@ -317,13 +329,16 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
             "terminal_value_error": errors,
             "terminal_squared_value_error": [error ** 2 for error in errors] if errors is not None else None,
             "final_planning_key": env.planning_key(), "illegal_actions": 0,
-            **({"japan_chinese_home_country": territory_trackers[index].summary(terminal=terminal)}
+            **({"japan_chinese_home_country": territory_trackers[index].summary(terminal=terminal),
+                "dadao_chinese_home_country": dadao_trackers[index].summary(terminal=terminal)}
                if territory_trackers[index] is not None else {})})
     terminal_games = [game for game in games if game["terminal"]]
     calibrated = [game for game in terminal_games if game["terminal_value_error"] is not None]
     components = sorted({key for game in games for player in PLAYERS
                          for key in game["wealth_components_at_stop"][player]})
-    return _plain({"schema": EVALUATION_SCHEMA, "target_player": target_player,
+    return _plain({"schema": EVALUATION_SCHEMA,
+        **({"territorial_tracking_schema": TERRITORY_TRACKING_SCHEMA} if track_japan else {}),
+        "target_player": target_player,
         "target_policy": target_policy.version if target_policy else evaluator_version,
         "opponent_policy": opponent.version, "search_mode": ("fixed_opponents" if selection_mode == "search" else "network_only")
             if target_policy is None else "scripted_control",
