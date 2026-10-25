@@ -1,0 +1,1028 @@
+{
+  "artifacts_sha256": {
+    "studies/campaign/runs/native-concurrency-2026-10-25/indexed-geography-real.json": "da5d4f74e602e6cb730364f9254572a40f47f77f948aaabfa754ea14d1da2fc3",
+    "studies/campaign/runs/native-concurrency-2026-10-25/runtime-new-manifest.json": "8a808f999ca987b9e8a5790e4185f98dcaa676fdc0c71c218d32a5060eb8732d",
+    "studies/campaign/runs/native-concurrency-2026-10-25/state-costs-finite-key-cache.json": "83bbf0ef63cb131fe2437ae642d7549175f71324f1e2113b87d371a217b71309",
+    "studies/campaign/runs/native-concurrency-2026-10-25/state-costs-numeric-core.json": "1dbc3ec010d0a0e71052414b51ed04687dcb511e7ce1a6878489d1d8cd26d50a",
+    "studies/campaign/runs/numeric-input-2026-10-25/later-new.json": "4ffff30429457d81dcc271f7318f527abefb8a64663da3034f021cb57c542bc3",
+    "studies/campaign/runs/numeric-input-2026-10-25/later-old.json": "5526a79deee3f339623b2b0bee40d6bb740434ab82230f844eba6f6cd3ecefc8",
+    "studies/campaign/runs/numeric-input-2026-10-25/learning-old/manifest.json": "c3acc20b34c46fda58abdf67daa898966a69820ae57c71f336707d03224c78a2",
+    "studies/campaign/runs/numeric-input-2026-10-25/measurement-plan.json": "a4c33d5a21bf7d1448aafb15b5a74782e20006706c274b3bf39333eb2c793f1e",
+    "studies/campaign/runs/numeric-input-2026-10-25/measurement-state.json": "f3822b7441909609a17e9e1ca8d9a95c34d319c53bcccafc33c692708e0cc4ad",
+    "studies/campaign/runs/numeric-input-2026-10-25/opening-new.json": "bff9dbda691fd8aeb194f2274a9504dd763d5f5490330145b543d7b52ebba358",
+    "studies/campaign/runs/numeric-input-2026-10-25/opening-old.json": "ffefe6b4a288e3caebef6c9dbf0720256cd4bef28621ffe3cb9d281d7b79d6ff",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/later-instrumented.json": "738c87041a553a5b45d566a04154ce72f1214c31f35b08fb88b2f1d0790a3bb5",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/later-new.json": "0871e88b538efb6cf0ef516ee8f79f8b242f84c7b2c394fd70043b12e0693100",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/later-old.json": "03991e0a1b13ee0ca0d0a6663315f40287a585b6ff55f588600e884430df4a79",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/learning-new.json": "f0a5f98b2e03dd2b64bab9024123416eb51d06643f4f5b161ddcaabda57372e7",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/learning-old.json": "7fad6fc56b1c40061ab7fae8a48b7c3f439bf9136e68051276916a0f716c10e3",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/measurement-plan.json": "5b01bbcd178a1a727064ca98cfaa9b148fdfa8bc8f44c8d0280aaa85a2cb69e8",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/measurement-state.json": "b8035dd9be08e301d4c6d090eddd2898198b3401a44fd3f39c71774dd4695557",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/opening-instrumented.json": "06bf0842d82527154dd1fb0eb6b4e5cb4f5101810c76cb46048837664aa755e2",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/opening-new.json": "97d4c3e5bb6ee2b24ee582026a81290d7f61a97e4316d1811a49a9ff9422ce80",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/opening-old.json": "55575376364d568911cf0d211253c84e23afcb2277074a4031a43c6c4c3d6082",
+    "studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new-manifest.json": "0002dc0e848e5a4e0c5c847f1559fd46800d1b13a5712b5c8cb933b3314a9b69"
+  },
+  "canonical_payload_sha256": "74ab2ebe0e9ab626cd1187185569ad72982c93b77f37a72d493698a2f7ec534a",
+  "components": {
+    "indexed_geography": {
+      "distance_bytes": 5476,
+      "nodes": 37,
+      "results": [
+        {
+          "action_sha256": "dca553f344b202eb90dc8a4fdb84f16315589b8dcd8371de8b2b7ab0d785b769",
+          "actions": 214,
+          "checksum": 42800,
+          "indexed_seconds": 0.991253585,
+          "iterations_per_path": 100,
+          "matched": true,
+          "phase": "combat_movement",
+          "position": "studies/campaign/runs/native-concurrency-2026-10-25/index-opening-cm.json",
+          "reference_over_indexed": 1.0222174510470998,
+          "reference_seconds": 1.0132767129999998,
+          "round_index": 0,
+          "state_sha256": "308b33bf3e03c3391a9aa1a42e6855da6a3715edb4351dd2102167a83760cf82"
+        },
+        {
+          "action_sha256": "119327a0bfe497fbcac7a250e35d6b631419b9bd5a1e36ea8722bbfc10320824",
+          "actions": 39,
+          "checksum": 7800,
+          "indexed_seconds": 0.166283294,
+          "iterations_per_path": 100,
+          "matched": true,
+          "phase": "non_combat_movement",
+          "position": "studies/campaign/runs/native-concurrency-2026-10-25/index-opening-ncm.json",
+          "reference_over_indexed": 1.0807743019572367,
+          "reference_seconds": 0.17971471099999997,
+          "round_index": 0,
+          "state_sha256": "92c278ecb30f2626a062d71c36f3d6f0d6d3414e6f5ea21be4ebe9ea27644862"
+        },
+        {
+          "action_sha256": "1810fecf9b312dab3f04d55968ca87552b1aabb1174df4826db7a37dae8a71f2",
+          "actions": 173,
+          "checksum": 34600,
+          "indexed_seconds": 1.860982414,
+          "iterations_per_path": 100,
+          "matched": true,
+          "phase": "combat_movement",
+          "position": "studies/campaign/runs/native-concurrency-2026-10-25/index-later-cm.json",
+          "reference_over_indexed": 1.0191786476494884,
+          "reference_seconds": 1.8966735400000003,
+          "round_index": 1,
+          "state_sha256": "86484030a16b291aab399aaa83be7f1885d1496762fc1d9566cbfe2d8e6dbc9b"
+        }
+      ],
+      "schema": "campaign-indexed-geography-benchmark-v1",
+      "scope": "Isolated aircraft legal-menu timing; not completed-game throughput"
+    },
+    "scope": "Isolated primitives and aircraft menus only; these ratios are not completed-game/training speedups.",
+    "state_validation": [
+      {
+        "after_validation_seconds": 0.004859708,
+        "before_validation_seconds": 0.042787166,
+        "phase": "combat_movement",
+        "planning_key": "cb698d30e7f650ab5bc619c1e26bf259ba225344a0d0162d95a78f583dd27101",
+        "repetitions": 100,
+        "round_index": 0,
+        "source": "studies/campaign/runs/native-concurrency-2026-10-25/index-opening-cm.json",
+        "state_sha256": "308b33bf3e03c3391a9aa1a42e6855da6a3715edb4351dd2102167a83760cf82",
+        "validation_speedup": 8.804472614403993
+      },
+      {
+        "after_validation_seconds": 0.006339541,
+        "before_validation_seconds": 0.070016958,
+        "phase": "non_combat_movement",
+        "planning_key": "b8bfa74214244d82e577f6e4a914c8849566254b64f27fe8f36f307f45893570",
+        "repetitions": 100,
+        "round_index": 0,
+        "source": "studies/campaign/runs/native-concurrency-2026-10-25/index-opening-ncm.json",
+        "state_sha256": "92c278ecb30f2626a062d71c36f3d6f0d6d3414e6f5ea21be4ebe9ea27644862",
+        "validation_speedup": 11.044483819885384
+      },
+      {
+        "after_validation_seconds": 0.006185291,
+        "before_validation_seconds": 0.080488541,
+        "phase": "combat_movement",
+        "planning_key": "bc8dd3a92af2072ce7d2ec493743f77ca5b3443380657d7167a038f659263b28",
+        "repetitions": 100,
+        "round_index": 1,
+        "source": "studies/campaign/runs/native-concurrency-2026-10-25/index-later-cm.json",
+        "state_sha256": "86484030a16b291aab399aaa83be7f1885d1496762fc1d9566cbfe2d8e6dbc9b",
+        "validation_speedup": 13.012894785386814
+      }
+    ]
+  },
+  "fixed_position_search": {
+    "later": {
+      "after_seconds": 5.357055415996001,
+      "before_seconds": 7.002674458024558,
+      "comparison": {
+        "actual_search_seconds": 5.357055415996001,
+        "checks": {
+          "completed": true,
+          "config": true,
+          "final_engine_state_and_rng_sha256": true,
+          "model": true,
+          "prepared_states": true,
+          "roots": true,
+          "same_instrumentation": true,
+          "same_measurement_wrapper": true,
+          "samples": true,
+          "search_count": true,
+          "search_results_sha256": true,
+          "task": true
+        },
+        "instrumented_comparison": false,
+        "matched": true,
+        "reference_search_seconds": 7.002674458024558
+      },
+      "config": {
+        "calendar_rounds": 3,
+        "checkpoint_weights": null,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 240,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 2,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "diagnostic_instrumentation": {
+        "coordinator:engine.is_terminal": {
+          "calls": 248,
+          "exclusive_thread_cpu_seconds": 0.00024092399998920655,
+          "exclusive_wall_seconds": 0.00024228901020251215,
+          "thread_cpu_seconds": 0.00024092399998920655,
+          "wall_seconds": 0.00024228901020251215
+        },
+        "coordinator:engine.numeric_context": {
+          "calls": 4,
+          "exclusive_thread_cpu_seconds": 7.66800000207013e-06,
+          "exclusive_wall_seconds": 8.041999535635114e-06,
+          "thread_cpu_seconds": 7.66800000207013e-06,
+          "wall_seconds": 8.041999535635114e-06
+        },
+        "coordinator:engine.numeric_observation": {
+          "calls": 196,
+          "exclusive_thread_cpu_seconds": 0.17518741900000023,
+          "exclusive_wall_seconds": 0.17530023992003407,
+          "thread_cpu_seconds": 0.17518741900000023,
+          "wall_seconds": 0.17530023992003407
+        },
+        "coordinator:engine.planning_key": {
+          "calls": 496,
+          "exclusive_thread_cpu_seconds": 0.00040316200000489744,
+          "exclusive_wall_seconds": 0.00041833404975477606,
+          "thread_cpu_seconds": 0.00040316200000489744,
+          "wall_seconds": 0.00041833404975477606
+        },
+        "coordinator:engine.serialize": {
+          "calls": 12,
+          "exclusive_thread_cpu_seconds": 0.01998537300000791,
+          "exclusive_wall_seconds": 0.02001237693184521,
+          "thread_cpu_seconds": 0.01998537300000791,
+          "wall_seconds": 0.02001237693184521
+        },
+        "coordinator:inference.total": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 0.015317667000019242,
+          "exclusive_wall_seconds": 0.015384664089651778,
+          "thread_cpu_seconds": 2.179420628999992,
+          "wall_seconds": 2.2231208700686693
+        },
+        "coordinator:input.compile_numeric": {
+          "calls": 966,
+          "exclusive_thread_cpu_seconds": 0.18693739499995132,
+          "exclusive_wall_seconds": 0.18712526907620486,
+          "thread_cpu_seconds": 0.18693739499995132,
+          "wall_seconds": 0.18712526907620486
+        },
+        "coordinator:input.graph_tensors": {
+          "calls": 33594,
+          "exclusive_thread_cpu_seconds": 0.06286477000107027,
+          "exclusive_wall_seconds": 0.06467237668402959,
+          "thread_cpu_seconds": 0.06286477000107027,
+          "wall_seconds": 0.06467237668402959
+        },
+        "coordinator:input.prepare": {
+          "calls": 204,
+          "exclusive_thread_cpu_seconds": 0.10033535400000915,
+          "exclusive_wall_seconds": 0.10050756789860316,
+          "thread_cpu_seconds": 0.46260216199998894,
+          "wall_seconds": 0.46308274583134335
+        },
+        "coordinator:network.forward_with_input_graphs": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 1.6382371019989215,
+          "exclusive_wall_seconds": 1.6795797533850418,
+          "thread_cpu_seconds": 1.7011018719999917,
+          "wall_seconds": 1.7442521300690714
+        },
+        "search_worker:engine.apply_action": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.3814898309999997,
+          "exclusive_wall_seconds": 0.38410896201094147,
+          "thread_cpu_seconds": 0.3814898309999997,
+          "wall_seconds": 0.38410896201094147
+        },
+        "search_worker:engine.clone_for_search": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.09521999400000042,
+          "exclusive_wall_seconds": 0.13932858208136167,
+          "thread_cpu_seconds": 0.09521999400000042,
+          "wall_seconds": 0.13932858208136167
+        },
+        "search_worker:engine.current_decision_player": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.0002121629999996674,
+          "exclusive_wall_seconds": 0.00022403472394216806,
+          "thread_cpu_seconds": 0.0002121629999996674,
+          "wall_seconds": 0.00022403472394216806
+        },
+        "search_worker:engine.decision_kind": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.0001414100000001416,
+          "exclusive_wall_seconds": 0.000149664978380315,
+          "thread_cpu_seconds": 0.0001414100000001416,
+          "wall_seconds": 0.000149664978380315
+        },
+        "search_worker:engine.is_terminal": {
+          "calls": 1023,
+          "exclusive_thread_cpu_seconds": 0.0006642849999999325,
+          "exclusive_wall_seconds": 0.0006966859073145315,
+          "thread_cpu_seconds": 0.0006642849999999325,
+          "wall_seconds": 0.0006966859073145315
+        },
+        "search_worker:engine.legal_actions": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 9.281140168000002,
+          "exclusive_wall_seconds": 9.305405996958143,
+          "thread_cpu_seconds": 9.281140168000002,
+          "wall_seconds": 9.305405996958143
+        },
+        "search_worker:engine.legal_interrupts": {
+          "calls": 195,
+          "exclusive_thread_cpu_seconds": 0.004767382999999693,
+          "exclusive_wall_seconds": 0.005220409977482632,
+          "thread_cpu_seconds": 0.004767382999999693,
+          "wall_seconds": 0.005220409977482632
+        },
+        "search_worker:engine.planning_key": {
+          "calls": 3104,
+          "exclusive_thread_cpu_seconds": 0.004523769000002209,
+          "exclusive_wall_seconds": 0.005019289717893116,
+          "thread_cpu_seconds": 0.004523769000002209,
+          "wall_seconds": 0.005019289717893116
+        }
+      },
+      "diagnostic_timings": {
+        "execution": 0.023182125994935632,
+        "inference": 2.2238023750687717,
+        "initialization": 6.50663774998975,
+        "preparation": 16.06319433300814,
+        "search": 5.526908792016911,
+        "search_outside_inference": 3.3031064169481397
+      },
+      "exact_results": {
+        "final_engine_state_and_rng_sha256": [
+          "1c5042c3d9f1c1699faa80abbaecf4b8a34a1a90474e7f431aa072822cf92d10",
+          "ecf6bc539383b342ec8645257e39266bd503e6414a4d59af034453381ac4dc32",
+          "f555a8678ac73c77c80556275327269d28beb6772f18d59da030f61326000cb3",
+          "fa18f9b24b1d649c195baa9843ff8f949b2174896bf356ca54adedd4cfa9d988"
+        ],
+        "fingerprinting_seconds": 0.0018387510062893853,
+        "instrumentation": {},
+        "instrumented": false,
+        "native_extension": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new/gwrl_cpp.cpython-313-darwin.so",
+        "native_sha256": "6660551b3d125a6a2361194e48993808ff5b59dfa6aba20e9700b61203986bd2",
+        "per_model_forward_batch_sizes": {},
+        "python_gil_enabled": true,
+        "runtime": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new",
+        "scope": "Diagnostic counters start at first searched wave and include later progress/execution calls. Engine-call wall sums can overlap across workers; never divide them by total wall time. Model forward includes graph preparation, whose nested timers are reported separately. Instrumented timings are not throughput claims.",
+        "search_count": 12,
+        "search_results_sha256": "b0f501682be56588cc0e8385a6409057f1bd06a1fa98cd7b5df14bb1d4c3aa71",
+        "wrapper_sha256": "fae746817b529c4ffd2c5bd6566f127ad5075b1d95f281b686109279a8f905cb"
+      },
+      "scope": "Four unchanged Japan combat-movement roots, three waves; excludes startup, scripted preparation and diagnostic overhead.",
+      "speedup": 1.3071872351954377
+    },
+    "opening": {
+      "after_seconds": 5.260162541992031,
+      "before_seconds": 7.274845876003383,
+      "comparison": {
+        "actual_search_seconds": 5.260162541992031,
+        "checks": {
+          "completed": true,
+          "config": true,
+          "final_engine_state_and_rng_sha256": true,
+          "model": true,
+          "prepared_states": true,
+          "roots": true,
+          "same_instrumentation": true,
+          "same_measurement_wrapper": true,
+          "samples": true,
+          "search_count": true,
+          "search_results_sha256": true,
+          "task": true
+        },
+        "instrumented_comparison": false,
+        "matched": true,
+        "reference_search_seconds": 7.274845876003383
+      },
+      "config": {
+        "calendar_rounds": 3,
+        "checkpoint_weights": null,
+        "cpu_budget": 12,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 30000000000,
+        "message_layers": 1,
+        "mode": "search",
+        "preparation_transitions": 10000,
+        "roots": 4,
+        "seconds": 180,
+        "seed": 1951,
+        "simulations": 16,
+        "start_decision_kind": "combat_movement",
+        "start_nation_index": 2,
+        "start_phase": "combat_movement",
+        "start_round": 1,
+        "threads": 4,
+        "token_buckets": 2048,
+        "waves": 3
+      },
+      "diagnostic_instrumentation": {
+        "coordinator:engine.is_terminal": {
+          "calls": 248,
+          "exclusive_thread_cpu_seconds": 0.0002510040000167635,
+          "exclusive_wall_seconds": 0.0002522080030757934,
+          "thread_cpu_seconds": 0.0002510040000167635,
+          "wall_seconds": 0.0002522080030757934
+        },
+        "coordinator:engine.numeric_context": {
+          "calls": 4,
+          "exclusive_thread_cpu_seconds": 7.791000001589055e-06,
+          "exclusive_wall_seconds": 8.040995453484356e-06,
+          "thread_cpu_seconds": 7.791000001589055e-06,
+          "wall_seconds": 8.040995453484356e-06
+        },
+        "coordinator:engine.numeric_observation": {
+          "calls": 196,
+          "exclusive_thread_cpu_seconds": 0.21331915999999218,
+          "exclusive_wall_seconds": 0.2145714111829875,
+          "thread_cpu_seconds": 0.21331915999999218,
+          "wall_seconds": 0.2145714111829875
+        },
+        "coordinator:engine.planning_key": {
+          "calls": 496,
+          "exclusive_thread_cpu_seconds": 0.0004029960000000443,
+          "exclusive_wall_seconds": 0.0004125010163988918,
+          "thread_cpu_seconds": 0.0004029960000000443,
+          "wall_seconds": 0.0004125010163988918
+        },
+        "coordinator:engine.serialize": {
+          "calls": 12,
+          "exclusive_thread_cpu_seconds": 0.011699958000001232,
+          "exclusive_wall_seconds": 0.011698879025061615,
+          "thread_cpu_seconds": 0.011699958000001232,
+          "wall_seconds": 0.011698879025061615
+        },
+        "coordinator:inference.total": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 0.016241957000003637,
+          "exclusive_wall_seconds": 0.016554878864553757,
+          "thread_cpu_seconds": 3.0409351660000077,
+          "wall_seconds": 3.115953996006283
+        },
+        "coordinator:input.compile_numeric": {
+          "calls": 949,
+          "exclusive_thread_cpu_seconds": 0.23513646600000726,
+          "exclusive_wall_seconds": 0.23761711503902916,
+          "thread_cpu_seconds": 0.23513646600000726,
+          "wall_seconds": 0.23761711503902916
+        },
+        "coordinator:input.graph_tensors": {
+          "calls": 48531,
+          "exclusive_thread_cpu_seconds": 0.07131676000003395,
+          "exclusive_wall_seconds": 0.07456364488461986,
+          "thread_cpu_seconds": 0.07131676000003395,
+          "wall_seconds": 0.07456364488461986
+        },
+        "coordinator:input.prepare": {
+          "calls": 204,
+          "exclusive_thread_cpu_seconds": 0.13228749999999856,
+          "exclusive_wall_seconds": 0.1333041378238704,
+          "thread_cpu_seconds": 0.5808828320000057,
+          "wall_seconds": 0.5856335380667588
+        },
+        "coordinator:network.forward_with_input_graphs": {
+          "calls": 51,
+          "exclusive_thread_cpu_seconds": 2.3720804079999596,
+          "exclusive_wall_seconds": 2.4387879401037935,
+          "thread_cpu_seconds": 2.4433971679999935,
+          "wall_seconds": 2.5133515849884134
+        },
+        "search_worker:engine.apply_action": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.34377779399999997,
+          "exclusive_wall_seconds": 0.3470951238996349,
+          "thread_cpu_seconds": 0.34377779399999997,
+          "wall_seconds": 0.3470951238996349
+        },
+        "search_worker:engine.clone_for_search": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.03887299300000027,
+          "exclusive_wall_seconds": 0.09888325311476365,
+          "thread_cpu_seconds": 0.03887299300000027,
+          "wall_seconds": 0.09888325311476365
+        },
+        "search_worker:engine.current_decision_player": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.00020591599999973459,
+          "exclusive_wall_seconds": 0.00021183201170060784,
+          "thread_cpu_seconds": 0.00020591599999973459,
+          "wall_seconds": 0.00021183201170060784
+        },
+        "search_worker:engine.decision_kind": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 0.0001515379999998108,
+          "exclusive_wall_seconds": 0.00015679204079788178,
+          "thread_cpu_seconds": 0.0001515379999998108,
+          "wall_seconds": 0.00015679204079788178
+        },
+        "search_worker:engine.is_terminal": {
+          "calls": 1023,
+          "exclusive_thread_cpu_seconds": 0.0007855070000002391,
+          "exclusive_wall_seconds": 0.0017709278472466394,
+          "thread_cpu_seconds": 0.0007855070000002391,
+          "wall_seconds": 0.0017709278472466394
+        },
+        "search_worker:engine.legal_actions": {
+          "calls": 205,
+          "exclusive_thread_cpu_seconds": 6.696911914,
+          "exclusive_wall_seconds": 6.731809035933111,
+          "thread_cpu_seconds": 6.696911914,
+          "wall_seconds": 6.731809035933111
+        },
+        "search_worker:engine.legal_interrupts": {
+          "calls": 192,
+          "exclusive_thread_cpu_seconds": 0.002531497999999474,
+          "exclusive_wall_seconds": 0.0028731678903568536,
+          "thread_cpu_seconds": 0.002531497999999474,
+          "wall_seconds": 0.0028731678903568536
+        },
+        "search_worker:engine.planning_key": {
+          "calls": 3104,
+          "exclusive_thread_cpu_seconds": 0.004887060000000335,
+          "exclusive_wall_seconds": 0.00732172274729237,
+          "thread_cpu_seconds": 0.004887060000000335,
+          "wall_seconds": 0.00732172274729237
+        }
+      },
+      "diagnostic_timings": {
+        "execution": 0.013264833003631793,
+        "inference": 3.116723253901,
+        "initialization": 6.516263166995486,
+        "preparation": 1.5730791669921018,
+        "search": 5.413554541999474,
+        "search_outside_inference": 2.296831288098474
+      },
+      "exact_results": {
+        "final_engine_state_and_rng_sha256": [
+          "30d67fd120a44b557e864c6c669cc750e8c7ec60f0d2bdc15a1e32a00c3f2c84",
+          "a89a8589d05efb4345c7fb0c3be4b39050e8ca8482510973ad7aa6dab76ebd77",
+          "f23d89c6617bd8f8a266d72715c26f73cbc0195966e9c983d0955ed9965bee2a",
+          "8f207ff161082945feaf6329e49228a44e3c146369fd223b5e9b1f4e88d2224f"
+        ],
+        "fingerprinting_seconds": 0.0024576260038884357,
+        "instrumentation": {},
+        "instrumented": false,
+        "native_extension": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new/gwrl_cpp.cpython-313-darwin.so",
+        "native_sha256": "6660551b3d125a6a2361194e48993808ff5b59dfa6aba20e9700b61203986bd2",
+        "per_model_forward_batch_sizes": {},
+        "python_gil_enabled": true,
+        "runtime": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new",
+        "scope": "Diagnostic counters start at first searched wave and include later progress/execution calls. Engine-call wall sums can overlap across workers; never divide them by total wall time. Model forward includes graph preparation, whose nested timers are reported separately. Instrumented timings are not throughput claims.",
+        "search_count": 12,
+        "search_results_sha256": "762fe1c4404c7ea86ea44c349f225e5624433b9a65ac1783008c51dfc5004878",
+        "wrapper_sha256": "fae746817b529c4ffd2c5bd6566f127ad5075b1d95f281b686109279a8f905cb"
+      },
+      "scope": "Four unchanged Japan combat-movement roots, three waves; excludes startup, scripted preparation and diagnostic overhead.",
+      "speedup": 1.3830078097260448
+    }
+  },
+  "generated_at_utc": "2026-10-25T19:35:48.251747+00:00",
+  "learning": {
+    "after": {
+      "adam_step_calls": {
+        "allies": 16,
+        "axis": 16,
+        "comintern": 16
+      },
+      "checkpoint_load_seconds": 1.6986571250017732,
+      "checkpoint_reconstruction_seconds": 2.0999836249975488,
+      "checkpoint_replay_verification_seconds": 0.15606045900494792,
+      "checkpoint_saves": 3,
+      "checks": {
+        "four_terminal_episodes": true,
+        "no_bootstrap_samples": true,
+        "no_unfinished_examples": true,
+        "one_update": true,
+        "restored_replay_features_exact": true,
+        "sixteen_adam_calls_per_actor": true,
+        "validated_restore_exact_logical_core": true
+      },
+      "counters": {
+        "batches": 1,
+        "chance_events": 159,
+        "decisions": 1094,
+        "episodes": 4,
+        "transitions": 1253,
+        "updates": 1
+      },
+      "games_per_training_hour": 44.67292510226962,
+      "logical_checkpoint_sha256": "8fc83d0f8060b29a45984ff32cf6eb2325354c6ce36e3c445c18c179bc6d602a",
+      "logical_core": {
+        "action_history_count": 1253,
+        "action_history_sha256": "288955ef76cbe135e6e634456c3c6aa505b676f52c139f92068cd5cc9fbcd9d5",
+        "adam_sha256": "94ee7bb751d8b5a1cf1af7d1cd68626cbf07a530c9b3af08da358976a9e0825b",
+        "batch_records": 0,
+        "counters": {
+          "batches": 1,
+          "chance_events": 159,
+          "decisions": 1094,
+          "episodes": 4,
+          "transitions": 1253,
+          "updates": 1
+        },
+        "final_engine_state_and_rng_sha256": [
+          "c0627915013d031d343587275daebd298e1e4a7ac542d12cbcb72bc8d043f5d1",
+          "91c19e914ee2ff4cb21e2bf88477f32617960355bb65d4c4ac1eb83e689c6b3c",
+          "e97cf0e81576f8df9f6908d230b68c233d0f5d4980bb83a6562b40766eaa4e48",
+          "20918fea782b52a4d89c5349e50f074aba7a5b0353b0e96455c17de7e3e8b953"
+        ],
+        "frozen": false,
+        "generation": 1,
+        "metadata": {
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+            "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "config": {
+            "batch_size": 32,
+            "c_puct": 1.5,
+            "epochs": 16,
+            "learning_rate": 0.001,
+            "max_depth": 16,
+            "mode": "multiplayer",
+            "replay_capacity": 16384,
+            "root_dirichlet_alpha": 0.3,
+            "root_dirichlet_epsilon": 0.25,
+            "root_noise": true,
+            "seed": 1951,
+            "simulations": 16,
+            "temperature": 1.0,
+            "value_scale": 100.0
+          },
+          "model_config": {
+            "hidden_dim": 16,
+            "message_layers": 1,
+            "policy_factorization": true,
+            "token_buckets": 2048,
+            "value_scale": 100.0
+          },
+          "players": [
+            "axis",
+            "allies",
+            "comintern"
+          ],
+          "software": {
+            "devices": {
+              "allies": "cpu",
+              "axis": "cpu",
+              "comintern": "cpu"
+            },
+            "numpy": "2.4.3",
+            "python": "3.13.5",
+            "torch": "2.11.0",
+            "torch_threads": 4
+          },
+          "target_schema": "campaign-raw-vector-target-v1"
+        },
+        "model_tensor_sha256": "312adaa5089bc07c2f6889e228ca434d4305f5cceee0a5a8fbfde0ef0b039839",
+        "model_versions": {
+          "allies": "allies:generation-1:bc69112c9dc88fb0aa8bf5ce0e4fc3f1b4f502142ca73b21f28e7b6b3cde4324",
+          "axis": "axis:generation-1:92fc080498f8f5fe2de8990a2197522b99bb34a441cdf45e57aba36f33a805c6",
+          "comintern": "comintern:generation-1:60be8f4bf12238eb07db64755d4c952714b4cf35737c4f5fe56abf6cbfc36ca9"
+        },
+        "pending_rows": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "random_states_sha256": "aa3380bd6f7f7156ed994f584bee6074895953238e395292cf7644bb439f32a4",
+        "replay_rows": 1094,
+        "replay_targets_policy_provenance_sha256": "9023692fa399c7c3184397466bcd52d0b82f9a7061a709b48c89a26003fd9a17",
+        "terminal": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "terminal_returns": [
+          [
+            35.8,
+            -48.2,
+            -92.8
+          ],
+          [
+            28.799999999999997,
+            -43.60000000000001,
+            -85.80000000000001
+          ],
+          [
+            40.29999999999998,
+            -53.10000000000001,
+            -92.50000000000001
+          ],
+          [
+            27.299999999999997,
+            -36.3,
+            -94.7
+          ]
+        ]
+      },
+      "model_exports": 2,
+      "physical_checkpoint": {
+        "bytes": 935887301,
+        "path": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/learning-new/checkpoint.pt",
+        "scope": "Physical pickle/array layout differs between runtimes; this hash is provenance, not cross-format parity.",
+        "sha256": "9bf020cf6f3ccbd108ece8ed41c9a6b855b9a3aafa1f705521f2d363142fc0de"
+      },
+      "replay_feature_graphs": {
+        "rows": 1094,
+        "scope": "Every retained row's complete ordered numeric graph, exact reference metadata and action factors; source JSON transport is normalized.",
+        "sha256": "6dadab7b63837cd780d7eb924f984d504affd9714c7f61df938d59f24f6db045"
+      },
+      "restored_logical_core_sha256": "47765ba1f6453821eecccb85e5549ccbbef2f9f10265155673f3592d0f816667",
+      "runner_timings_seconds": {
+        "checkpoint_save": 4.035247876003268,
+        "collection": 289.7547726780758,
+        "learning_updates": 10.665670208996744,
+        "model_export": 0.026412208011606708,
+        "progress_reporting": 15.755562824051594
+      },
+      "sampled_aggregate_peak_rss_bytes": 5805162496,
+      "search": {
+        "count": 1094,
+        "sha256": "4d20d4722f5b507632d822e7ea22bd19785e1c40c2a1b9f963010922e040aff3"
+      },
+      "search_fingerprinting_seconds_in_collection": 0.06420057897048537,
+      "supervised_total_seconds": 333.5500043330103,
+      "training_environment_seeds": [
+        3893811448908990722,
+        6563938874301275647,
+        5046673378298423682,
+        5466516857604415370
+      ],
+      "training_wall_seconds": 322.3428948750079,
+      "training_worker_peak_rss_bytes": 5284446208,
+      "verification_graph_digest_seconds": 5.504425958002685
+    },
+    "before": {
+      "adam_step_calls": {
+        "allies": 16,
+        "axis": 16,
+        "comintern": 16
+      },
+      "checkpoint_load_seconds": 4.894595208999817,
+      "checkpoint_reconstruction_seconds": 6.742942917000619,
+      "checkpoint_replay_verification_seconds": 0.6774123329960275,
+      "checkpoint_saves": 3,
+      "checks": {
+        "four_terminal_episodes": true,
+        "no_bootstrap_samples": true,
+        "no_unfinished_examples": true,
+        "one_update": true,
+        "restored_replay_features_exact": true,
+        "sixteen_adam_calls_per_actor": true,
+        "validated_restore_exact_logical_core": true
+      },
+      "counters": {
+        "batches": 1,
+        "chance_events": 159,
+        "decisions": 1094,
+        "episodes": 4,
+        "transitions": 1253,
+        "updates": 1
+      },
+      "games_per_training_hour": 26.559810291095648,
+      "logical_checkpoint_sha256": "8fc83d0f8060b29a45984ff32cf6eb2325354c6ce36e3c445c18c179bc6d602a",
+      "logical_core": {
+        "action_history_count": 1253,
+        "action_history_sha256": "288955ef76cbe135e6e634456c3c6aa505b676f52c139f92068cd5cc9fbcd9d5",
+        "adam_sha256": "94ee7bb751d8b5a1cf1af7d1cd68626cbf07a530c9b3af08da358976a9e0825b",
+        "batch_records": 0,
+        "counters": {
+          "batches": 1,
+          "chance_events": 159,
+          "decisions": 1094,
+          "episodes": 4,
+          "transitions": 1253,
+          "updates": 1
+        },
+        "final_engine_state_and_rng_sha256": [
+          "c0627915013d031d343587275daebd298e1e4a7ac542d12cbcb72bc8d043f5d1",
+          "91c19e914ee2ff4cb21e2bf88477f32617960355bb65d4c4ac1eb83e689c6b3c",
+          "e97cf0e81576f8df9f6908d230b68c233d0f5d4980bb83a6562b40766eaa4e48",
+          "20918fea782b52a4d89c5349e50f074aba7a5b0353b0e96455c17de7e3e8b953"
+        ],
+        "frozen": false,
+        "generation": 1,
+        "metadata": {
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+            "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "config": {
+            "batch_size": 32,
+            "c_puct": 1.5,
+            "epochs": 16,
+            "learning_rate": 0.001,
+            "max_depth": 16,
+            "mode": "multiplayer",
+            "replay_capacity": 16384,
+            "root_dirichlet_alpha": 0.3,
+            "root_dirichlet_epsilon": 0.25,
+            "root_noise": true,
+            "seed": 1951,
+            "simulations": 16,
+            "temperature": 1.0,
+            "value_scale": 100.0
+          },
+          "model_config": {
+            "hidden_dim": 16,
+            "message_layers": 1,
+            "policy_factorization": true,
+            "token_buckets": 2048,
+            "value_scale": 100.0
+          },
+          "players": [
+            "axis",
+            "allies",
+            "comintern"
+          ],
+          "software": {
+            "devices": {
+              "allies": "cpu",
+              "axis": "cpu",
+              "comintern": "cpu"
+            },
+            "numpy": "2.4.3",
+            "python": "3.13.5",
+            "torch": "2.11.0",
+            "torch_threads": 4
+          },
+          "target_schema": "campaign-raw-vector-target-v1"
+        },
+        "model_tensor_sha256": "312adaa5089bc07c2f6889e228ca434d4305f5cceee0a5a8fbfde0ef0b039839",
+        "model_versions": {
+          "allies": "allies:generation-1:bc69112c9dc88fb0aa8bf5ce0e4fc3f1b4f502142ca73b21f28e7b6b3cde4324",
+          "axis": "axis:generation-1:92fc080498f8f5fe2de8990a2197522b99bb34a441cdf45e57aba36f33a805c6",
+          "comintern": "comintern:generation-1:60be8f4bf12238eb07db64755d4c952714b4cf35737c4f5fe56abf6cbfc36ca9"
+        },
+        "pending_rows": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "random_states_sha256": "aa3380bd6f7f7156ed994f584bee6074895953238e395292cf7644bb439f32a4",
+        "replay_rows": 1094,
+        "replay_targets_policy_provenance_sha256": "9023692fa399c7c3184397466bcd52d0b82f9a7061a709b48c89a26003fd9a17",
+        "terminal": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "terminal_returns": [
+          [
+            35.8,
+            -48.2,
+            -92.8
+          ],
+          [
+            28.799999999999997,
+            -43.60000000000001,
+            -85.80000000000001
+          ],
+          [
+            40.29999999999998,
+            -53.10000000000001,
+            -92.50000000000001
+          ],
+          [
+            27.299999999999997,
+            -36.3,
+            -94.7
+          ]
+        ]
+      },
+      "model_exports": 2,
+      "physical_checkpoint": {
+        "bytes": 122947973,
+        "path": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/learning-old/checkpoint.pt",
+        "scope": "Physical pickle/array layout differs between runtimes; this hash is provenance, not cross-format parity.",
+        "sha256": "1c539180fc8d17169d5d3c6b8bf65ca5ede56ee47a9e0f37a39b553e226f40b1"
+      },
+      "replay_feature_graphs": {
+        "rows": 1094,
+        "scope": "Every retained row's complete ordered numeric graph, exact reference metadata and action factors; source JSON transport is normalized.",
+        "sha256": "6dadab7b63837cd780d7eb924f984d504affd9714c7f61df938d59f24f6db045"
+      },
+      "restored_logical_core_sha256": "47765ba1f6453821eecccb85e5549ccbbef2f9f10265155673f3592d0f816667",
+      "runner_timings_seconds": {
+        "checkpoint_save": 5.552124791996903,
+        "collection": 505.2054283031175,
+        "learning_updates": 14.620323000010103,
+        "model_export": 0.026038792013423517,
+        "progress_reporting": 14.649562208869611
+      },
+      "sampled_aggregate_peak_rss_bytes": 3233529856,
+      "search": {
+        "count": 1094,
+        "sha256": "4d20d4722f5b507632d822e7ea22bd19785e1c40c2a1b9f963010922e040aff3"
+      },
+      "search_fingerprinting_seconds_in_collection": 0.06314683287928347,
+      "supervised_total_seconds": 565.9682486670063,
+      "training_environment_seeds": [
+        3893811448908990722,
+        6563938874301275647,
+        5046673378298423682,
+        5466516857604415370
+      ],
+      "training_wall_seconds": 542.1725472499966,
+      "training_worker_peak_rss_bytes": 3122692096,
+      "verification_graph_digest_seconds": 8.569923333008774
+    },
+    "comparison": {
+      "actual_training_wall_seconds": 322.3428948750079,
+      "checks": {
+        "adam_step_calls": true,
+        "completed": true,
+        "config": true,
+        "initial_model_versions": true,
+        "logical_checkpoint_sha256": true,
+        "logical_core": true,
+        "replay_feature_graphs": true,
+        "run_config": true,
+        "same_wrapper": true,
+        "search_count": true,
+        "search_sha256": true,
+        "task": true,
+        "training_environment_seeds": true,
+        "updates": true
+      },
+      "matched": true,
+      "reference_training_wall_seconds": 542.1725472499966,
+      "scope": "Training wall includes initialization, complete collection, real update, normal saves/exports/reporting and search fingerprinting; post-run graph verification/load/restore are separate.",
+      "training_speedup_if_matched": 1.6819745552642942
+    },
+    "run_config": {
+      "batch_size": 32,
+      "batches": 1,
+      "calendar_rounds": 3,
+      "checkpoint_every_waves": null,
+      "checkpoint_interval_seconds": 1800.0,
+      "complete_episodes": true,
+      "cpu_budget": 11,
+      "epochs": 16,
+      "hidden_dim": 16,
+      "learning_rate": 0.001,
+      "max_depth": 16,
+      "max_episodes": 4,
+      "message_layers": 1,
+      "parallel_envs": 4,
+      "replay_capacity": 16384,
+      "seed": 1951,
+      "simulations": 16,
+      "threads": 4,
+      "token_buckets": 2048,
+      "transitions_per_batch": 5000,
+      "value_scale": 100.0
+    },
+    "scope": "Four full three-round games plus one batch update (16 actual Adam calls per actor, 48 total), initialization, normal checkpoints/exports/reporting and search fingerprints. Imports/provenance startup and post-run graph verification/load/restore are outside training wall but inside guarded supervisor elapsed/RSS.",
+    "task": {
+      "calendar_rounds": 3,
+      "compatibility": {
+        "actions": "campaign-orders-v1",
+        "curriculum": "regional-horizon-curriculum-v1",
+        "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+        "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+        "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+      },
+      "full_target_game": false,
+      "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+      "setup": "unchanged approved 99-piece,37-node July1936 setup",
+      "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+      "version": "regional-horizon-curriculum-v1"
+    },
+    "training_wall_reduction_fraction": 0.4054606849609168,
+    "training_wall_speedup": 1.6819745552642942,
+    "update_counter_meaning": "One learner generation/update counter increment follows one completed four-game self-play batch and contains 16 actual Adam calls for each of three agents, 48 calls in total."
+  },
+  "limitations": [
+    "One old/new timed pair per workload, without repeated-run variance estimates.",
+    "Component validation and aircraft-menu ratios are not whole-game speedups and must not be multiplied together.",
+    "No rules, legal choices, dice, horizons, search budgets, model architecture, gradients or learning objective were reduced.",
+    "No playing-strength or eleven-round training conclusion follows from completion, parity or prediction losses.",
+    "Precompiled numerical replay increases memory and recovery-file size; larger replay populations require measurement before longer training.",
+    "Memory is sampled supervisor+worker RSS with a safety margin; not an instantaneous kernel allocation cap."
+  ],
+  "prior_attempt": {
+    "candidate_native_sha256": "5cc6ca700bfa230fd8adb10bcdc5f677907b6285835695e5d47bd17a9bc9f60b",
+    "candidate_source_commit": "1f17393de2c91d0833ff108b33a8488543b79d82",
+    "cases": {
+      "later": {
+        "candidate_search_seconds": 6.956218375999015,
+        "matched": true,
+        "old_search_seconds": 6.91120500001125
+      },
+      "opening": {
+        "candidate_search_seconds": 7.438431709000724,
+        "matched": true,
+        "old_search_seconds": 7.13463679200504
+      }
+    },
+    "interpretation": "The initial direct-buffer candidate preserved semantics but did not speed up these searches. Repeated action compilation across roots remained; the follow-up adds authoritative action/context source reuse and removes measured native validation/key repetition.",
+    "interrupted_baseline": {
+      "adopted": false,
+      "checkpoint": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-2026-10-25/learning-old/checkpoint.pt",
+      "checkpoint_bytes": 5148385,
+      "checkpoint_sha256": "58eb3f299dcd436b222cad7a7762532ba2c9adfc5da1f8eba979b7ccb125df70",
+      "counters": {
+        "batches": 0,
+        "chance_events": 5,
+        "decisions": 47,
+        "episodes": 0,
+        "transitions": 52,
+        "updates": 0
+      },
+      "scope": "Deliberately stopped prior-attempt baseline, preserved separately; no completed episodes or learning updates, never adopted into the final pair.",
+      "status": "interrupted"
+    }
+  },
+  "provenance": {
+    "learning_wrapper_sha256": "1360ebe1a07dc2b91884a889da67a22ec88d6b7eec135066badd7bd20eb9ce39",
+    "measurement_plan_sha256": "5b01bbcd178a1a727064ca98cfaa9b148fdfa8bc8f44c8d0280aaa85a2cb69e8",
+    "runtimes": {
+      "new": {
+        "manifest": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new-manifest.json",
+        "manifest_sha256": "0002dc0e848e5a4e0c5c847f1559fd46800d1b13a5712b5c8cb933b3314a9b69",
+        "native_sha256": "6660551b3d125a6a2361194e48993808ff5b59dfa6aba20e9700b61203986bd2",
+        "runtime": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25/runtime-new",
+        "source_commit": "45682e1f4d3923494558b4e1343a5988196a7723",
+        "verified_files": 441
+      },
+      "old": {
+        "manifest": "/Users/home/Desktop/gwRL/studies/campaign/runs/native-concurrency-2026-10-25/runtime-new-manifest.json",
+        "manifest_sha256": "8a808f999ca987b9e8a5790e4185f98dcaa676fdc0c71c218d32a5060eb8732d",
+        "native_sha256": "1b52106f80e55afcf73b60e3b93c5adcc1aa8f80685ace5acca5adcb19803746",
+        "runtime": "/Users/home/Desktop/gwRL/studies/campaign/runs/native-concurrency-2026-10-25/runtime-new",
+        "source_commit": "332866c4fe6bdcb8fe8281a979e096776457ced7",
+        "verified_files": 428
+      }
+    },
+    "search_wrapper_sha256": "fae746817b529c4ffd2c5bd6566f127ad5075b1d95f281b686109279a8f905cb"
+  },
+  "raw_directory": "/Users/home/Desktop/gwRL/studies/campaign/runs/numeric-input-reuse-2026-10-25",
+  "schema": "campaign-numeric-training-input-summary-v1",
+  "verification": {
+    "ctest_suites_passed": 26,
+    "parity": "Ordered search outputs, action/state traces, full serialized engine history/RNG, targets/policies, model tensors, Adam, all RNG states and every replay graph/factor match. Both checkpoints restore exact core and every saved input.",
+    "python_tests_passed": 413
+  }
+}
