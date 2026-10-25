@@ -23,14 +23,18 @@ the supervisor does not change the learning configuration or horizon.
 from __future__ import annotations
 
 import argparse
+import ctypes
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
+import errno
 import fcntl
+from functools import lru_cache
 import json
 import math
 import os
 from pathlib import Path
 import signal
+import struct
 import subprocess
 import sys
 import tempfile
@@ -41,6 +45,62 @@ SCHEMA = "campaign-training-supervisor-v1"
 MEMORY_MARGIN_BYTES = 1_000_000_000
 # Source/configuration errors normally exit 1 and must stop for inspection.
 RETRYABLE_RETURNCODES = {-signal.SIGKILL, -signal.SIGSEGV, -signal.SIGBUS, 75}
+
+
+def memory_metric() -> str:
+    return ("sum of per-process max(RSS, macOS physical footprint including compressed pages)"
+            if sys.platform == "darwin" else "sum of per-process RSS")
+
+
+@lru_cache(maxsize=1)
+def _darwin_rusage_function():
+    try:
+        library = ctypes.CDLL("/usr/lib/libproc.dylib", use_errno=True)
+        function = library.proc_pid_rusage
+    except (OSError, AttributeError) as error:
+        raise OSError("macOS physical-footprint monitoring is unavailable") from error
+    function.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_void_p]
+    function.restype = ctypes.c_int
+    return function
+
+
+def _darwin_physical_footprint(pid: int) -> int:
+    # SDK-verified rusage_info_v4 ABI: 296 bytes, ri_resident_size at 64,
+    # ri_phys_footprint at 72. The buffer belongs to this one sample only.
+    buffer = ctypes.create_string_buffer(296)
+    ctypes.set_errno(0)
+    if _darwin_rusage_function()(pid, 4, buffer) != 0:
+        number = ctypes.get_errno() or errno.EIO
+        raise OSError(number, f"Cannot read macOS physical footprint for PID {pid}")
+    return struct.unpack_from("=Q", buffer.raw, 72)[0]
+
+
+def _process_disappeared(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return True
+    except OSError:
+        return False  # Permission failure does not prove that a process exited.
+    # kill(pid, 0) succeeds for zombies. The fresh table omits them, and also
+    # closes the race where a process exits immediately after the signal probe.
+    return not any(row[0] == pid for row in _process_table())
+
+
+def process_memory_charge(pid: int, resident_bytes: int) -> int:
+    """Charge compressed Darwin pages too; a live API failure is never ignored."""
+    if type(pid) is not int or not 0 < pid <= 2**31 - 1:
+        raise ValueError("Memory sampling requires a positive C-int PID")
+    if type(resident_bytes) is not int or resident_bytes < 0:
+        raise ValueError("Resident memory must be a nonnegative byte count")
+    if sys.platform != "darwin":
+        return resident_bytes
+    try:
+        return max(resident_bytes, _darwin_physical_footprint(pid))
+    except OSError:
+        if _process_disappeared(pid):
+            return 0
+        raise
 
 
 @dataclass(frozen=True)
@@ -116,7 +176,7 @@ def _process_table():
 
 
 def aggregate_rss(child_pid: int) -> int:
-    """Sample this supervisor and every child descendant/group member once."""
+    """Legacy API name: sample the charged memory of this full process tree."""
     rows = _process_table()
     included = {os.getpid(), child_pid}
     while True:
@@ -125,7 +185,8 @@ def aggregate_rss(child_pid: int) -> int:
         if expanded == included:
             break
         included = expanded
-    return sum(resident * 1024 for pid, _, _, resident in rows if pid in included)
+    return sum(process_memory_charge(pid, resident * 1024)
+               for pid, _, _, resident in rows if pid in included)
 
 
 def process_group_alive(group: int | None) -> bool:
@@ -230,7 +291,9 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                      "charged_seconds": 0.0, "attempts": [], "error_restarts": 0,
                      "child_process_group": None, "aggregate_sampled_peak_rss_bytes": 0,
                      "timing_scope": "Conservatively reserved active wall time; startup, retries and shutdown included; downtime excluded",
-                     "memory_scope": "Sampled aggregate RSS of supervisor and complete child process tree; 1 GB safety margin, not a kernel allocation cap"}
+                     "memory_metric": memory_metric(),
+                     "memory_scope": "Supervisor and complete child process tree; " + memory_metric()
+                                     + "; 1 GB safety margin, not a kernel allocation cap"}
             _event(state, "supervisor_initialized")
         if extension is not None:
             _event(state, "explicit_episode_budget_extension", new_limit=extension)

@@ -283,6 +283,8 @@ class ThreeRoundExperimentTests(unittest.TestCase):
         tools.mkdir()
         source = Path(__file__).resolve().parents[1] / "tools/campaign_deadline_guardian.py"
         shutil.copyfile(source, tools / source.name)
+        helper = source.with_name("supervise_campaign_training.py")
+        shutil.copyfile(helper, tools / helper.name)
         experiment = Experiment(self.plan, command_builder=self.command, rss_sampler=lambda _pid: 1_000_000)
         try:
             state = experiment.run()

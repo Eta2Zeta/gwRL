@@ -29,7 +29,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from tools.supervise_campaign_training import (  # noqa: E402
     SupervisorConfig, aggregate_rss, atomic_json, exclusive_lock, process_group_alive,
-    validate_training_arguments,
+    validate_training_arguments, memory_metric,
 )
 
 SCHEMA = "campaign-three-round-experiment-v1"
@@ -586,7 +586,9 @@ class Experiment:
                               "status": "initialized", "stage_index": 0, "stage_deadlines": {}, "commands": {},
                               "attempts": [], "events": [], "child_process_group": None,
                               "aggregate_sampled_peak_rss_bytes": 0, "known_process_groups": [],
-                              "resource_scope": "Pipeline, independent guardian, sleep prevention, supervisor and full child process tree; sampled RSS with 1 GB safety margin",
+                              "memory_metric": memory_metric(),
+                              "resource_scope": "Pipeline, independent guardian, sleep prevention, supervisor and full child process tree; "
+                                                + memory_metric() + "; sampled with 1 GB safety margin",
                               "deadline_scope": "Absolute plan deadline includes downtime; stage deadlines are persisted and never reset"}
                 if "expected_training_episodes" in self.plan or self.plan.get("require_terminal_evaluation", False):
                     self.state["goal_achieved"] = False

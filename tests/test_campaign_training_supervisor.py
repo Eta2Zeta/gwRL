@@ -2,18 +2,23 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import ctypes
+import errno
 import json
 import os
 from pathlib import Path
 import signal
+import struct
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.supervise_campaign_training import (
     SupervisorConfig, aggregate_rss, exclusive_lock, supervise, training_command,
     validate_training_arguments, process_group_alive,
+    process_memory_charge, _darwin_physical_footprint,
 )
 
 
@@ -270,6 +275,57 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
             SupervisorConfig(seconds=float("nan"))
         with self.assertRaises(ValueError):
             SupervisorConfig(seconds=10, cpu_budget=13)
+
+    def test_darwin_charge_includes_compressed_footprint_and_keeps_larger_resident_count(self):
+        with patch("tools.supervise_campaign_training.sys.platform", "darwin"), \
+             patch("tools.supervise_campaign_training._darwin_physical_footprint", return_value=5_000_000_000):
+            self.assertEqual(process_memory_charge(123, 1_000_000_000), 5_000_000_000)
+            self.assertEqual(process_memory_charge(123, 6_000_000_000), 6_000_000_000)
+        with patch("tools.supervise_campaign_training.sys.platform", "linux"), \
+             patch("tools.supervise_campaign_training._darwin_physical_footprint", side_effect=AssertionError("No macOS API")):
+            self.assertEqual(process_memory_charge(123, 10), 10)
+        for pid, resident in ((0, 1), (-1, 1), (True, 1), (2**31, 1), (123, -1), (123, True)):
+            with self.subTest(pid=pid, resident=resident), self.assertRaises(ValueError):
+                process_memory_charge(pid, resident)
+
+    def test_rusage_v4_reads_verified_sdk_offset_and_reports_api_errno(self):
+        def function(pid, flavor, buffer):
+            self.assertEqual((pid, flavor, len(buffer)), (123, 4, 296))
+            ctypes.memmove(ctypes.addressof(buffer) + 64, struct.pack("=QQ", 987654, 27_000_000_000), 16)
+            return 0
+        with patch("tools.supervise_campaign_training._darwin_rusage_function", return_value=function):
+            self.assertEqual(_darwin_physical_footprint(123), 27_000_000_000)
+
+        def failure(*_args):
+            ctypes.set_errno(errno.EPERM)
+            return -1
+        with patch("tools.supervise_campaign_training._darwin_rusage_function", return_value=failure):
+            with self.assertRaises(OSError) as captured:
+                _darwin_physical_footprint(123)
+            self.assertEqual(captured.exception.errno, errno.EPERM)
+
+    def test_darwin_live_failures_fail_closed_but_finished_or_zombie_races_are_ignored(self):
+        prefix = "tools.supervise_campaign_training."
+        with patch(prefix + "sys.platform", "darwin"), \
+             patch(prefix + "_darwin_physical_footprint", side_effect=OSError(errno.EPERM, "live query failed")), \
+             patch(prefix + "os.kill") as alive, patch(prefix + "_process_table", return_value=[(123, 1, 123, 10)]):
+            with self.assertRaises(OSError):
+                process_memory_charge(123, 10240)
+            alive.side_effect = ProcessLookupError()
+            self.assertEqual(process_memory_charge(123, 10240), 0)
+            alive.side_effect = None
+            with patch(prefix + "_process_table", return_value=[]):
+                self.assertEqual(process_memory_charge(123, 10240), 0)
+
+    def test_aggregate_charges_each_owned_process_once_and_excludes_unrelated_processes(self):
+        parent = os.getpid()
+        rows = [(parent, 1, parent, 10), (123, parent, 123, 20), (124, 123, 123, 30),
+                (125, 124, 125, 40), (126, 1, 126, 1000)]
+        with patch("tools.supervise_campaign_training._process_table", return_value=rows), \
+             patch("tools.supervise_campaign_training.process_memory_charge", side_effect=lambda _pid, rss: rss + 1) as charge:
+            self.assertEqual(aggregate_rss(123), 100 * 1024 + 4)
+            self.assertEqual(charge.call_count, 4)
+            self.assertEqual({call.args[0] for call in charge.call_args_list}, {parent, 123, 124, 125})
 
 
 if __name__ == "__main__":

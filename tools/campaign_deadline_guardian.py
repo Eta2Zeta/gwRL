@@ -18,8 +18,14 @@ from pathlib import Path
 import signal
 import shlex
 import subprocess
+import sys
 import tempfile
 import time
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from tools.supervise_campaign_training import memory_metric, process_memory_charge
 
 SCHEMA = "campaign-deadline-guardian-v1"
 
@@ -162,6 +168,7 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
             "group_members": previous.get("group_members", {}),
             "pipeline_identities": previous.get("pipeline_identities", {}),
             "peak_rss_bytes": previous.get("peak_rss_bytes", 0), "events": previous.get("events", []),
+            "memory_metric": memory_metric(),
             "event_reason": previous.get("event_reason"), "started_epoch": now()}
         known = {group for group in state["known_process_groups"] if type(group) is int and group > 1}
         empty_groups = set()
@@ -254,7 +261,16 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
                 owned_pids.add(own_pid)
                 if accepted_pipeline is not None:
                     owned_pids.add(accepted_pipeline.pid)
-                rss = sum(process.rss for process in rows if process.pid in owned_pids)
+                monitor_error = None
+                try:
+                    rss = sum(process_memory_charge(process.pid, process.rss)
+                              for process in rows if process.pid in owned_pids)
+                except (OSError, ValueError, subprocess.SubprocessError) as error:
+                    # The independent guardian must not disappear and leave a
+                    # live job unmonitored when the physical API fails. RSS is
+                    # only a diagnostic lower bound for this failed sample.
+                    rss = sum(process.rss for process in rows if process.pid in owned_pids)
+                    monitor_error = f"{type(error).__name__}: {error}"
                 state["peak_rss_bytes"] = max(state["peak_rss_bytes"], rss)
                 state.update(sample_epoch=now(), rss_bytes=rss,
                              known_process_groups=sorted(active_groups),
@@ -264,7 +280,10 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
                              pipeline_pid=accepted_pipeline.pid if accepted_pipeline is not None else None)
                 current = now()
                 if stopping is None:
-                    if rss >= hard_memory:
+                    if monitor_error is not None:
+                        stopping = "memory_monitor_failure"
+                        stop_deadline = current
+                    elif rss >= hard_memory:
                         stopping = "hard_memory_limit"
                         stop_deadline = current
                     elif rss >= soft_memory:
@@ -277,7 +296,7 @@ def guard(plan_path: Path, *, sampler=process_table, now=time.time, sleep=time.s
                         stopping = "deadline_shutdown"
                         stop_deadline = deadline
                     if stopping is not None:
-                        event(stopping)
+                        event(stopping, **({"error": monitor_error} if monitor_error is not None else {}))
                 if stopping is not None:
                     # RSS remains sampled every iteration during graceful
                     # shutdown; a hard-memory breach escalates immediately.

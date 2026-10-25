@@ -11,6 +11,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 from tools.campaign_deadline_guardian import Process, SCHEMA, guard, process_table
 
@@ -38,6 +39,10 @@ class CampaignGuardianTests(unittest.TestCase):
         self.write(self.root / "pipeline-state.json", {"status": "running", "pipeline_pid": None,
                                                       "known_process_groups": []})
         self.signals = []
+        # Synthetic PID fixtures must never query real processes or libproc.
+        charge = patch("tools.campaign_deadline_guardian.process_memory_charge", side_effect=lambda _pid, rss: rss)
+        self.memory_charge = charge.start()
+        self.addCleanup(charge.stop)
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -85,6 +90,41 @@ class CampaignGuardianTests(unittest.TestCase):
         self.assertLess(self.signals[1][2], 100.5)
         self.assertEqual(result["peak_rss_bytes"], 26_100_000_000)
         self.assertEqual(result["status"], "stopped")
+
+    def test_compressed_footprint_triggers_independent_guard_even_when_rss_is_small(self):
+        clock, live = Clock(), [self.process(987652, rss=1_000_000)]
+        self.write(self.root / "pipeline-state.json", {"status": "running", "known_process_groups": [987652]})
+        footprint = [25_100_000_000]
+        self.memory_charge.side_effect = lambda _pid, rss: max(rss, footprint[0])
+
+        def signal_group(group, number):
+            self.signals.append((group, number, clock.now()))
+            if number == signal.SIGTERM:
+                footprint[0] = 26_100_000_000
+            else:
+                live.clear()
+
+        result = guard(self.plan_path, sampler=lambda: live.copy(), now=clock.now, sleep=clock.sleep,
+                       send_group=signal_group, send_process=lambda *args: self.fail("No pipeline is live"))
+        self.assertEqual([number for _, number, _ in self.signals], [signal.SIGTERM, signal.SIGKILL])
+        self.assertEqual(result["peak_rss_bytes"], 26_100_000_000)
+        self.assertIn("physical footprint", result["memory_metric"])
+
+    def test_live_physical_monitor_failure_stops_job_instead_of_exiting_unguarded(self):
+        clock, live = Clock(), [self.process(987652)]
+        self.write(self.root / "training-control/state.json", {"child_process_group": 987652})
+        self.memory_charge.side_effect = OSError("Cannot read live process footprint")
+
+        def signal_group(group, number):
+            self.signals.append((group, number))
+            live.clear()
+
+        result = guard(self.plan_path, sampler=lambda: live.copy(), now=clock.now, sleep=clock.sleep,
+                       send_group=signal_group, send_process=lambda *args: self.fail("No pipeline is live"))
+        self.assertEqual(self.signals, [(987652, signal.SIGKILL)])
+        self.assertEqual(result["status"], "stopped")
+        self.assertEqual(result["stop_reason"], "memory_monitor_failure")
+        self.assertIn("Cannot read live process footprint", result["events"][0]["error"])
 
     def test_reused_pid_and_unrelated_registered_group_are_never_signaled(self):
         self.write(self.root / "guardian-state.json", {"schema": SCHEMA, "deadline_epoch": 102.,
