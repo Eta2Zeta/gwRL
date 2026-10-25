@@ -224,6 +224,42 @@ class CampaignNumericNeuralTests(unittest.TestCase):
         self.assertEqual(cache.bytes, 0)
         self.assertEqual(cache.entry_sources, {})
 
+    def test_evaluator_preserves_legacy_subclass_contract_and_passes_supported_versions(self):
+        class Legacy(neural.CampaignPolicyValueNet):
+            def forward_batch(self, inputs):
+                self.received = [item["schema"] for item in inputs], None
+                self.assert_raw = [item["actions"] for item in inputs]
+                return super().forward_batch(inputs)
+
+        class Versioned(neural.CampaignPolicyValueNet):
+            def forward_batch(self, inputs, *, model_version=None):
+                self.received = [item["schema"] for item in inputs], model_version
+                return super().forward_batch(inputs, model_version=model_version)
+
+        class Flexible(neural.CampaignPolicyValueNet):
+            def forward_batch(self, inputs, **kwargs):
+                self.received = [item["schema"] for item in inputs], kwargs["model_version"]
+                return super().forward_batch(inputs, **kwargs)
+
+        reference, env = self.model(), _SearchEnv()
+        actions = env.legal_actions()
+        raw = neural.make_input(env, actions)
+        expected = None
+        for kind in (Legacy, Versioned, Flexible):
+            model = kind(reference.config)
+            model.load_state_dict(reference.state_dict())
+            evaluator = neural.NeuralEvaluator({player: model for player in PLAYERS}, "frozen-v1")
+            with mock.patch("studies.campaign.features.make_numeric_input", return_value=_numeric(raw)) as prepare:
+                actual = evaluator.evaluate(env, actions)
+            if kind is Legacy:
+                self.assertEqual(model.received, ([SCHEMA], None))
+                prepare.assert_not_called()
+                expected = actual
+            else:
+                self.assertEqual(model.received, ([neural.NUMERIC_SCHEMA], "frozen-v1"))
+                self.assertEqual(actual, expected)
+                prepare.assert_called_once()
+
     def test_frozen_context_cache_requires_version_and_never_reuses_training_gradients(self):
         item, model = _numeric(_item()), self.model()
         baseline = copy.deepcopy(model)

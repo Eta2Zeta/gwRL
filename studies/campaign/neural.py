@@ -6,6 +6,7 @@ before handing predictions to MCTS. The default scale is 100 IPP wealth units.
 """
 from __future__ import annotations
 
+import inspect
 import math
 import threading
 from collections import OrderedDict
@@ -564,6 +565,17 @@ class NeuralEvaluator:
         if not isinstance(version, str) or not version:
             raise ValueError("Neural evaluator needs a nonempty version")
         self.models, self.version = dict(models), version
+        self._versioned_forward: dict[str, bool] = {}
+        for player, model in self.models.items():
+            try:
+                parameters = inspect.signature(model.forward_batch).parameters.values()
+                supported = any(parameter.kind == inspect.Parameter.VAR_KEYWORD or
+                                (parameter.name == "model_version" and parameter.kind in
+                                 {inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY})
+                                for parameter in parameters)
+            except (TypeError, ValueError):
+                supported = False
+            self._versioned_forward[player] = isinstance(model, CampaignPolicyValueNet) and supported
 
     def evaluate(self, env: Any, actions: Sequence[Any]) -> Evaluation:
         return self.evaluate_batch([(env, actions)])[0]
@@ -583,7 +595,7 @@ class NeuralEvaluator:
 
             def input_for(player: str) -> dict:
                 model = self.models[player]
-                buckets = model.config.token_buckets if isinstance(model, CampaignPolicyValueNet) else None
+                buckets = model.config.token_buckets if self._versioned_forward[player] else None
                 if buckets not in prepared:
                     if buckets is None:
                         prepared[buckets] = make_input(env, actions)
@@ -616,7 +628,7 @@ class NeuralEvaluator:
             try:
                 with torch.inference_mode():
                     batch = [item for _, item in groups[player]]
-                    if isinstance(model, CampaignPolicyValueNet):
+                    if self._versioned_forward[player]:
                         logits, values = model.forward_batch(batch, model_version=self.version)
                     else:
                         logits, values = model.forward_batch(batch)
