@@ -914,7 +914,7 @@ class CampaignLearner:
         handle, temporary = tempfile.mkstemp(prefix=f".{target.name}.", dir=target.parent)
         os.close(handle)
         try:
-            torch.save(self.checkpoint(), temporary)
+            torch.save(self.checkpoint(), temporary, pickle_protocol=5)
             os.replace(temporary, target)
         finally:
             if os.path.exists(temporary):

@@ -127,7 +127,9 @@ def _save(path: Path, learner: CampaignLearner, runner: dict, *, backup_current=
     descriptor, temporary = tempfile.mkstemp(prefix=".checkpoint-", suffix=".pt", dir=path.parent)
     try:
         with os.fdopen(descriptor, "wb") as handle:
-            torch.save(payload, handle)
+            # Protocol 5 writes graph frame bytes directly; protocol 2 creates
+            # Latin-1 text copies that inflate mature replay snapshots.
+            torch.save(payload, handle, pickle_protocol=5)
             handle.flush()
             os.fsync(handle.fileno())
         if backup_current and path.exists():
@@ -189,6 +191,7 @@ def train(args) -> int:
     if getattr(args, "record_replay", False) and args.resume:
         raise ValueError("--record-replay currently requires a fresh run; existing replay prefixes are preserved")
     loaded = _read(args.resume) if args.resume else None
+    resuming = loaded is not None
     config = _config(args, loaded["runner"]["config"] if loaded else None)
     output = (args.run_dir or (args.resume.parent if args.resume else ROOT / "studies/campaign/runs" /
               f"{datetime.now():%Y%m%d-%H%M%S}-{uuid4().hex[:8]}" )).resolve()
@@ -206,6 +209,9 @@ def train(args) -> int:
         "episode_wave_limit": config.transitions_per_batch, "budget_extensions": []}
     if loaded:
         learner.restore(loaded["learner"], env_template=template)
+    # Restore owns its committed state. Keeping the input archive alive pins
+    # every original replay row even after the learner evicts those examples.
+    loaded = None
     extension = getattr(args, "extend_episode_budget", None)
     if extension is not None:
         old_limit = runner["episode_wave_limit"]
@@ -224,7 +230,7 @@ def train(args) -> int:
 
     old_handlers = {number: signal.signal(number, request_stop) for number in (signal.SIGINT, signal.SIGTERM)}
     manifest_path, checkpoint_path = output / "manifest.json", output / "checkpoint.pt"
-    recovering_previous = loaded is not None and args.resume.resolve() == checkpoint_path.with_name(
+    recovering_previous = resuming and args.resume.resolve() == checkpoint_path.with_name(
         checkpoint_path.name + ".previous").resolve()
     started = time.perf_counter()
     initial_waves = runner["total_waves"]
@@ -323,7 +329,7 @@ def train(args) -> int:
                 "runtime_source_sha256": runner["runtime_source_sha256"],
                 "model_config": learner.model_config, "initial_model_versions": learner.model_versions()})
             learner.set_replay_observer(replay_writer)
-        if loaded is None:
+        if not resuming:
             export_model()
             save_checkpoint(output / "initial.pt")
             persist("initialized")
@@ -441,6 +447,7 @@ def profile_command(args) -> int:
     template = make_env(config.seed, calendar_rounds=config.calendar_rounds)
     learner = _learner(config, template)
     learner.restore(loaded["learner"], env_template=template)
+    loaded = None
     versions = learner.model_versions()
     version = hashlib.sha256(json.dumps(versions, sort_keys=True).encode()).hexdigest()
     evaluator = NeuralEvaluator(learner.models, version=version)

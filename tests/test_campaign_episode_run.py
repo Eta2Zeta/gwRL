@@ -9,6 +9,7 @@ import json
 import random
 import tempfile
 import unittest
+import weakref
 from dataclasses import fields
 from pathlib import Path
 from unittest.mock import patch
@@ -165,6 +166,32 @@ class CampaignEpisodeRunTests(unittest.TestCase):
                 self.assert_tree_equal(first, second, f"{path}[{index}]")
         else:
             self.assertEqual(expected, actual, f"Value differs at {path}")
+
+    def test_resume_releases_input_archive_before_replay_collection(self):
+        directory = self.directory / "release-restored-archive"
+        self.train(directory, stop_after_waves=1)
+        original_read, original_collect = run._read, CampaignLearner.collect_many
+        archives = []
+
+        class Archive(dict):
+            pass
+
+        def read_archive(path):
+            archive = Archive(original_read(path))
+            archives.append(weakref.ref(archive))
+            return archive
+
+        def collect(learner, *args, **kwargs):
+            self.assertTrue(archives)
+            self.assertTrue(all(reference() is None for reference in archives),
+                            "The input checkpoint pins examples after restore")
+            return original_collect(learner, *args, **kwargs)
+
+        with patch.object(run, "_read", side_effect=read_archive), \
+             patch.object(CampaignLearner, "collect_many", collect):
+            status, result = self.train(directory, resume=True)
+        self.assertEqual(status, 0)
+        self.assertEqual(result["learner"]["counters"]["episodes"], 8)
 
     def test_two_batches_use_fresh_seeds_and_eight_genuine_terminal_episodes(self):
         directory = self.directory / "completed"
