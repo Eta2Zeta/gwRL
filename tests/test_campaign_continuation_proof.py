@@ -12,7 +12,8 @@ from studies.campaign.curriculum import make_env
 from studies.campaign.features import make_input
 from studies.campaign.run import RunConfig
 from tools.verify_campaign_continuation import (FEATURE_FUNCTIONS, ast_functions, canonical,
-    core_digest, migrated_payload, rehydrate_public_state, sample_groups, validate_output_paths)
+    audit_legacy_runtime_manifest, core_digest, digest_file, migrated_payload, rehydrate_public_state,
+    sample_groups, validate_output_paths)
 
 
 class ContinuationProofTests(unittest.TestCase):
@@ -96,6 +97,26 @@ class ContinuationProofTests(unittest.TestCase):
                     validate_output_paths(source, legacy, output, target)
             with self.assertRaises(ValueError):
                 validate_output_paths(source, legacy, report, report)
+
+    def test_legacy_runtime_manifest_pins_native_bytes_and_complete_inventory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = root / "runtime"; runtime.mkdir()
+            native, code = runtime / "engine.so", runtime / "source.py"
+            native.write_bytes(b"pinned native"); code.write_text("# pinned source\n")
+            manifest = root / "runtime-manifest.json"
+            files = {path.name: digest_file(path) for path in (native, code)}
+            manifest.write_text(json.dumps({"source_commit": "revision", "files": files}))
+            (root / "pipeline-plan.json").write_text(json.dumps({"source_commit": "revision",
+                "runtime_manifest_path": str(manifest), "runtime_manifest_sha256": digest_file(manifest)}))
+            self.assertEqual(audit_legacy_runtime_manifest(runtime)["native_files"], {"engine.so": files["engine.so"]})
+            native.write_bytes(b"wrong native")
+            with self.assertRaisesRegex(ValueError, "byte changed"):
+                audit_legacy_runtime_manifest(runtime)
+            native.write_bytes(b"pinned native")
+            (runtime / "untracked.py").write_text("# unexpected code\n")
+            with self.assertRaisesRegex(ValueError, "inventory"):
+                audit_legacy_runtime_manifest(runtime)
 
     def test_feature_ast_audit_catches_changed_semantics_but_ignores_formatting(self):
         with tempfile.TemporaryDirectory() as temporary:

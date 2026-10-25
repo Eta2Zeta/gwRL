@@ -98,8 +98,34 @@ def ast_feature_bindings(path):
     return result
 
 
+def audit_legacy_runtime_manifest(legacy_runtime):
+    runtime = Path(legacy_runtime).resolve()
+    plan_path = runtime.parent / "pipeline-plan.json"
+    require(plan_path.is_file(), "Legacy runtime requires its original pinned experiment plan")
+    plan = json.loads(plan_path.read_text())
+    manifest_path = Path(plan["runtime_manifest_path"])
+    require(manifest_path.is_file() and digest_file(manifest_path) == plan["runtime_manifest_sha256"],
+            "Legacy frozen runtime manifest differs from original experiment pin")
+    manifest = json.loads(manifest_path.read_text())
+    require(manifest.get("source_commit") == plan["source_commit"], "Legacy runtime source revision label changed")
+    files = manifest.get("files")
+    require(isinstance(files, dict) and files, "Legacy runtime manifest has no file inventory")
+    actual = {str(path.relative_to(runtime)) for path in runtime.rglob("*")
+              if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"}
+    require(set(files) == actual, "Legacy frozen runtime file inventory changed")
+    for name, expected in files.items():
+        path = (runtime / name).resolve()
+        require(path.is_relative_to(runtime) and digest_file(path) == expected,
+                f"Legacy frozen runtime byte changed: {name}")
+    native = {name: value for name, value in files.items() if name.endswith((".so", ".dylib"))}
+    require(native, "Legacy manifest does not pin a native engine")
+    return {"path": str(manifest_path), "sha256": plan["runtime_manifest_sha256"],
+            "source_commit": plan["source_commit"], "verified_files": len(files), "native_files": native}
+
+
 def audit_sources(runner, legacy_runtime, current_hashes):
     legacy_runtime = Path(legacy_runtime).resolve()
+    frozen_manifest = audit_legacy_runtime_manifest(legacy_runtime)
     old = runner["runtime_source_sha256"]
     require(isinstance(old, dict) and old, "Legacy checkpoint has no source pin")
     for name, expected in old.items():
@@ -117,7 +143,7 @@ def audit_sources(runner, legacy_runtime, current_hashes):
     changed = sorted(name for name in set(old) | set(current_hashes) if old.get(name) != current_hashes.get(name))
     unexpected = set(changed) - PERFORMANCE_SOURCE_CHANGES
     require(not unexpected, f"Unreviewed continuation source changes: {sorted(unexpected)}")
-    return {"legacy_files_verified": len(old), "feature_function_ast_identical": list(FEATURE_FUNCTIONS),
+    return {"legacy_frozen_runtime_manifest": frozen_manifest, "legacy_files_verified": len(old), "feature_function_ast_identical": list(FEATURE_FUNCTIONS),
             "feature_constant_ast_identical": sorted(FEATURE_BINDINGS),
             "unchanged_search_and_raw_native_compiler": True,
             "changed_reviewed_source_paths": changed,
@@ -252,6 +278,8 @@ def verify_payload(payload, legacy_runtime, progress=None, row_limit=None):
                                capture_output=True, text=True, timeout=600)
         require(child.returncode == 0, f"Legacy active-state witness failed: {child.stderr[-3000:]}")
         witness = json.loads(output.read_text())
+        require(witness["native_sha256"] in audit["legacy_frozen_runtime_manifest"]["native_files"].values(),
+                "Legacy witness loaded an unpinned native binary")
     active = []
     for item, old in zip(snapshots, witness["records"], strict=True):
         env = template.clone(); env.restore(item["state"])
@@ -367,14 +395,17 @@ def main(argv=None):
         parser.error("Migration destination already exists; original files are never overwritten")
     sys.path.insert(0, str(ROOT))
     import torch
+    import gwrl_cpp
     from studies.campaign.run import source_hashes
     torch.set_num_threads(1)
     source_digest = digest_file(args.checkpoint)
     if args.expected_checkpoint_sha256 is not None:
         require(source_digest == args.expected_checkpoint_sha256, "Original checkpoint SHA-256 differs from authorized source")
     verifier_digest = digest_file(__file__)
+    current_native_digest = digest_file(gwrl_cpp.__file__)
     report = {"schema": SCHEMA, "status": "loading", "verifier_sha256": verifier_digest,
               "legacy_runtime": str(args.legacy_runtime.resolve()),
+              "current_native_sha256": current_native_digest,
               "source_checkpoint": str(args.checkpoint.resolve()),
               "source_checkpoint_sha256": source_digest, "started_epoch": time.time()}
     write_json(args.report, report)
@@ -385,6 +416,7 @@ def main(argv=None):
         proof = verify_payload(payload, args.legacy_runtime, progress, args.row_limit)
         require(source_hashes() == proof["audit"]["current_runtime_source_sha256"], "Sources changed during verification")
         require(digest_file(__file__) == verifier_digest, "Verifier changed during verification")
+        require(digest_file(gwrl_cpp.__file__) == current_native_digest, "Current native binary changed during verification")
         require(digest_file(args.checkpoint) == source_digest, "Original checkpoint bytes changed during proof")
         report.update(proof, source_checkpoint_unchanged=True, completed_epoch=time.time())
         if args.migrate_to:
