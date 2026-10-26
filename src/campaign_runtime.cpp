@@ -390,17 +390,31 @@ void Engine::resolveChance() {
         }
         outcome.faces.push_back(std::move(faces));
     }
-    (void)effectiveResults(request, outcome);
-    const auto before = next.state_.clock;
-    const bool terminal = next.state_.terminal;
-    next.state_.chance.reset();
-    next.rules_->applyChance(next.state_, request, outcome);
-    checkHookClock(next.state_, before, terminal);
-    next.state_.validate();
-    const auto stateKey=next.state_.planningKey();
-    next.state_.history.push_back(Event{"chance", V(O{{"request_id", V(request.id)}, {"outcome", outcomeJson(outcome)}}), stateKey});
-    next.decisionCache_->stateKey=stateKey;
+    next.commitChance(request, outcome);
     *this = std::move(next);
+}
+
+void Engine::applyChanceOutcome(const std::string& expectedKey, const ChanceOutcome& outcome) {
+    require(!state_.terminal && state_.chance.has_value(), "No pending campaign chance request");
+    require(planningKey() == expectedKey, "Stale campaign chance outcome");
+    auto next = clone();
+    next.invalidateDecisionCache();
+    const auto request = *next.state_.chance;
+    next.commitChance(request, outcome);
+    *this = std::move(next);
+}
+
+void Engine::commitChance(const ChanceRequest& request, const ChanceOutcome& outcome) {
+    (void)effectiveResults(request, outcome);
+    const auto before = state_.clock;
+    const bool terminal = state_.terminal;
+    state_.chance.reset();
+    rules_->applyChance(state_, request, outcome);
+    checkHookClock(state_, before, terminal);
+    state_.validate();
+    const auto stateKey = state_.planningKey();
+    state_.history.push_back(Event{"chance", V(O{{"request_id", V(request.id)}, {"outcome", outcomeJson(outcome)}}), stateKey});
+    decisionCache_->stateKey = stateKey;
 }
 
 void Engine::endPhase() {

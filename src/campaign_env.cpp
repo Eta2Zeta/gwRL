@@ -119,6 +119,15 @@ void CampaignEnv::resolveChance() {
     engine_.resolveChance();
     decisionCache_ = std::move(fresh);
 }
+V CampaignEnv::chanceRequest() const {
+    const auto& request = engine_.state().chance;
+    return request ? chanceRequestJson(*request) : V(nullptr);
+}
+void CampaignEnv::applyChanceOutcome(const std::string& expectedKey, const ChanceOutcome& outcome) {
+    auto fresh = std::make_shared<DecisionCache>();
+    engine_.applyChanceOutcome(expectedKey, outcome);
+    decisionCache_ = std::move(fresh);
+}
 void CampaignEnv::restore(const std::string& serialized) {
     auto fresh = std::make_shared<DecisionCache>();
     engine_ = Engine::restore(engine_.state().definition,

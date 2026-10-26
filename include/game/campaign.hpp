@@ -269,6 +269,7 @@ json::Value actionJson(const Action& action);
 Action actionFromJson(const json::Value& value);
 json::Value outcomeJson(const ChanceOutcome& outcome);
 ChanceOutcome outcomeFromJson(const json::Value& value);
+json::Value chanceRequestJson(const ChanceRequest& request);
 
 struct RandomStreams {
     std::uint64_t actual {1};
@@ -319,6 +320,9 @@ class Engine {
     void step(const Action& action);
     void interrupt(const Action& action);
     void resolveChance();  // Execution service, never a policy action.
+    // Explicit conformance/replay input. Validates the complete current decision
+    // and every face/reroll, applies ordinary rules/history, and consumes no RNG.
+    void applyChanceOutcome(const std::string& expectedKey, const ChanceOutcome&);
     Engine clone() const;
     Engine cloneForSearch(std::uint64_t seed) const;
     void setDiceTapeForTesting(std::vector<int> tape);
@@ -341,6 +345,7 @@ class Engine {
     std::shared_ptr<const ActionMenu> actionMenu() const;
     std::shared_ptr<const ActionMenu> interruptMenu() const;
     void invalidateDecisionCache();
+    void commitChance(const ChanceRequest&, const ChanceOutcome&);
     void endPhase();
 };
 

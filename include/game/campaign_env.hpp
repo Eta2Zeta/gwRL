@@ -21,6 +21,8 @@ class CampaignEnv {
     void applyAction(const Action& action);
     void applyInterrupt(const Action& action);
     void resolveChance();
+    json::Value chanceRequest() const;
+    void applyChanceOutcome(const std::string& expectedKey, const ChanceOutcome&);
     std::array<double, 3> returns() const { return terminalReturns(engine_.state()); }
     json::Value wealth() const { return wealthJson(engine_.state()); }
     // Valid until this environment's next successful mutation. Callers that

@@ -206,6 +206,31 @@ class CampaignAdapter:
         self._invalidate_raw()
         self._sync()
 
+    def chance_request(self) -> dict[str, Any] | None:
+        """Inspect only the pending distribution, never future execution dice."""
+        if self.decision_kind() != "chance":
+            return None
+        return self.raw.chance_request()
+
+    def apply_chance_outcome(self, expected_key: str, faces: Any) -> None:
+        """Apply recorded faces for conformance; leave execution RNG unchanged."""
+        decision = self._decision_cache()
+        raw_key, order, passed = decision.key
+        scheduled_key = hashlib.sha256(json.dumps({"schema": SCHEMA, "raw_key": raw_key,
+            "order": order, "passed": passed}, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        if scheduled_key != expected_key or decision.kind != "chance":
+            raise ValueError("Stale or absent scheduled chance request")
+        if (not isinstance(faces, (tuple, list)) or any(
+                not isinstance(die, (tuple, list)) or any(type(face) is not int for face in die)
+                for die in faces)):
+            raise ValueError("Chance outcomes require complete integer face sequences")
+        # Keep the raw identity from the decision we authorized. Re-reading a
+        # newer key here could apply an old outcome to a concurrently changed
+        # request; the native check and application are one locked operation.
+        self.raw.apply_chance_outcome(raw_key, faces)
+        self._invalidate_raw()
+        self._sync()
+
     def is_terminal(self) -> bool:
         return bool(self.raw.is_terminal())
 

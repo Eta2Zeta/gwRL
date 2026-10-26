@@ -318,10 +318,46 @@ void handlerFailuresRollbackStateAndRandom() {
     rules->throwOnChance = true;
     rejects([&] { engine.resolveChance(); }, "Throwing chance handler accepted");
     require(engine.serialize() == pending, "Failed chance consumed actual RNG/state");
+    rejects([&] { engine.applyChanceOutcome(engine.planningKey(), ChanceOutcome{{{2}, {7}}}); },
+            "Throwing explicit chance handler accepted");
+    require(engine.serialize() == pending, "Failed explicit chance changed RNG/state");
     rules->throwOnChance = false;
     auto restored = Engine::restore(engine.state().definition, rules, pending);
     engine.resolveChance(); restored.resolveChance();
     require(engine.serialize() == restored.serialize(), "Chance rollback changed deterministic future");
+}
+
+void explicitChanceOutcomesMatchRulesWithoutConsumingRandom() {
+    auto rules = std::make_shared<FixtureRules>();
+    Engine explicitEngine(initialState(), rules, 765);
+    rejects([&] { explicitEngine.applyChanceOutcome(explicitEngine.planningKey(), ChanceOutcome{}); },
+            "Explicit outcome accepted without a pending chance request");
+    explicitEngine.step(findAction(explicitEngine, "request_chance"));
+    const auto pending = explicitEngine.serialize();
+    const auto key = explicitEngine.planningKey();
+    const auto randomBefore = game::json::parse(pending).require("random");
+    const ChanceOutcome valid{{{1, 5}, {7}}};
+    rejects([&] { explicitEngine.applyChanceOutcome("old decision", valid); }, "Stale explicit outcome accepted");
+    const std::vector<ChanceOutcome> invalid{
+        ChanceOutcome{}, ChanceOutcome{{{1}, {7}}}, ChanceOutcome{{{2, 5}, {7}}},
+        ChanceOutcome{{{7}, {7}}}, ChanceOutcome{{{1, 5, 6}, {7}}}, ChanceOutcome{{{2}, {0}}},
+    };
+    for (const auto& outcome : invalid) {
+        rejects([&] { explicitEngine.applyChanceOutcome(key, outcome); }, "Malformed explicit dice accepted");
+        require(explicitEngine.serialize() == pending, "Rejected explicit dice changed state/history/RNG");
+    }
+    auto sampled = explicitEngine.clone();
+    sampled.setDiceTapeForTesting({1, 5, 7});
+    sampled.resolveChance();
+    explicitEngine.applyChanceOutcome(key, valid);
+    require(canonicalJson(explicitEngine.state().toJson()) == canonicalJson(sampled.state().toJson()),
+            "Explicit and sampled outcomes apply different rules/history");
+    require(canonicalJson(game::json::parse(explicitEngine.serialize()).require("random")) == canonicalJson(randomBefore),
+            "Explicit chance consumed execution RNG");
+    require(explicitEngine.state().flags.at("result") == 13, "Explicit rerolls/modifiers were not applied");
+    const auto after = explicitEngine.serialize();
+    rejects([&] { explicitEngine.applyChanceOutcome(key, valid); }, "An outcome could be applied twice");
+    require(explicitEngine.serialize() == after, "Repeated outcome changed completed state");
 }
 
 void defenderDecisionPausesClock() {
@@ -661,6 +697,7 @@ int main() {
         {"test tape isolation and exact cursor", tapesAreTestOnlyAndExact},
         {"direct action validation", directActionsCannotBypassLegality},
         {"handler rollback", handlerFailuresRollbackStateAndRandom},
+        {"explicit chance parity and RNG isolation", explicitChanceOutcomesMatchRulesWithoutConsumingRandom},
         {"defender reaction routing", defenderDecisionPausesClock},
         {"five phases and eleven complete rounds", fivePhasesAndElevenFullRounds},
         {"fresh campaign start and restore boundary", freshCampaignStartAndRestoreBoundary},
