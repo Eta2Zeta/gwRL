@@ -96,7 +96,8 @@ def source_hashes() -> dict[str, str]:
              *sorted((ROOT / "studies/campaign/backends").rglob("*.py")),
              ROOT / "studies/shared/campaign_adapter.py", ROOT / "studies/shared/multiplayer_mcts.py",
              ROOT / "studies/shared/immutable_json.py",
-             *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp"))]
+             *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp")),
+             *sorted((ROOT / "src").rglob("*.inc"))]
     return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
 

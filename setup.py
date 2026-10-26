@@ -25,6 +25,8 @@ ext_modules = [
             "src/movement.cpp",
             "src/economy.cpp",
             "src/income_batch.cpp",
+            "src/device_state.cpp",
+            "src/income_ledger_batch.cpp",
             "src/economy_lendlease.cpp",
             "src/land_combat.cpp",
             "src/air.cpp",
@@ -43,6 +45,8 @@ ext_modules = [
         ],
         define_macros=[("GWRL_SOURCE_DIR", chr(34) + str(ROOT) + chr(34))],
         include_dirs=[str(ROOT / "include")],
+        depends=[str(path.relative_to(ROOT)) for path in
+                 sorted((ROOT / "include").rglob("*.hpp")) + sorted((ROOT / "src").rglob("*.inc"))],
         cxx_std=20,
         extra_compile_args=["-mmacosx-version-min=13.3"],
         extra_link_args=["-mmacosx-version-min=13.3"],

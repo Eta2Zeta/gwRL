@@ -4,6 +4,8 @@
 #include "game/mdp.hpp"
 #include "game/campaign_env.hpp"
 #include "game/income_batch.hpp"
+#include "game/device_state.hpp"
+#include "game/income_ledger_batch.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 #include "game/numeric_graph.hpp"
@@ -30,6 +32,8 @@ namespace {
 // deadlock with a native operation that is returning to Python. Owned native
 // results are prepared under the mutex, which is released before GIL reacquire.
 struct IncomeNativeAccess;
+struct DeviceStateNativeAccess;
+struct IncomeLedgerNativeAccess;
 class NativeCampaignEnv {
   public:
     explicit NativeCampaignEnv(game::campaign::CampaignEnv env) : env_(std::move(env)) {}
@@ -48,9 +52,23 @@ class NativeCampaignEnv {
 
   private:
     friend struct IncomeNativeAccess;
+    friend struct DeviceStateNativeAccess;
+    friend struct IncomeLedgerNativeAccess;
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
 };
+
+// Vector<Env*> casters do not retain each Python wrapper if another thread
+// clears the caller's mutable list while native code releases the GIL.
+std::vector<py::object> pinNativeEnvironments(const std::vector<NativeCampaignEnv*>& envs) {
+    std::vector<py::object> owners;
+    owners.reserve(envs.size());
+    for (auto* env : envs) {
+        if (!env) throw std::invalid_argument("Null campaign lane");
+        owners.emplace_back(py::cast(env, py::return_value_policy::reference));
+    }
+    return owners;
+}
 
 struct IncomeNativeAccess {
     using Context=game::campaign::IncomeContext;
@@ -60,6 +78,7 @@ struct IncomeNativeAccess {
         return env.call([](const auto& value){return std::make_shared<Context>(*value.engine().state().definition);});
     }
     static Batch capture(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs) {
+        const auto owners = pinNativeEnvironments(envs);
         py::gil_scoped_release release;
         Batch out(context,envs.size());
         for(std::size_t row=0;row<envs.size();++row) {
@@ -70,6 +89,7 @@ struct IncomeNativeAccess {
         return out;
     }
     static Oracle oracle(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs) {
+        const auto owners = pinNativeEnvironments(envs);
         py::gil_scoped_release release;
         Oracle out(context,envs.size());
         for(std::size_t row=0;row<envs.size();++row) {
@@ -81,6 +101,7 @@ struct IncomeNativeAccess {
     }
     static py::dict benchmark(const std::vector<NativeCampaignEnv*>& envs,std::size_t repeats) {
         if(!repeats)throw std::invalid_argument("Positive income repetitions required");
+        const auto owners = pinNativeEnvironments(envs);
         std::uint64_t calls=0,checksum=0;double seconds=0;
         {
             py::gil_scoped_release release;
@@ -146,6 +167,10 @@ void bindIncome(py::module_& module) {
 }
 
 using CampaignEnv = game::campaign::CampaignEnv;
+
+#include "python_device_state.inc"
+#include "python_income_ledger.inc"
+#include "python_random_metal.inc"
 
 // Immutable owning views outlive an environment mutation without copying its
 // state tree. Only small scheduler fields overlay the complete native document.
@@ -499,6 +524,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
     module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;
     bindIncome(module);
+    bindDeviceState(module);
+    bindIncomeLedger(module);
+    bindRandomProbe(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)

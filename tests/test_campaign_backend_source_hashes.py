@@ -16,6 +16,7 @@ class BackendSourceProvenanceTests(unittest.TestCase):
                 "studies/campaign/backends/gpu/kernel.py",
                 "studies/shared/campaign_adapter.py", "studies/shared/multiplayer_mcts.py",
                 "studies/shared/immutable_json.py", "include/game/fixture.hpp", "src/fixture.cpp",
+                "src/python_fixture.inc",
                 "studies/campaign/runs/ignored/runtime/studies/campaign/old.py",
             )
             for name in paths:
@@ -26,6 +27,7 @@ class BackendSourceProvenanceTests(unittest.TestCase):
                 before = source_hashes()
                 self.assertIn("studies/campaign/backends/gpu/kernel.py", before)
                 self.assertIn("studies/campaign/backends/protocol.py", before)
+                self.assertIn("src/python_fixture.inc", before)
                 self.assertEqual(len(before), len(paths) - 1)
                 self.assertFalse(any("/runs/" in name for name in before))
                 (root / paths[-1]).write_text("scratch output changes\n")
@@ -34,6 +36,10 @@ class BackendSourceProvenanceTests(unittest.TestCase):
                 after = source_hashes()
                 self.assertEqual([key for key in before if before[key] != after[key]],
                                  ["studies/campaign/backends/gpu/kernel.py"])
+                (root / "src/python_fixture.inc").write_text("changed native binding implementation\n")
+                included = source_hashes()
+                self.assertEqual([key for key in after if after[key] != included[key]],
+                                 ["src/python_fixture.inc"])
 
 
 if __name__ == "__main__":

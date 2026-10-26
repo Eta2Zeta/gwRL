@@ -225,6 +225,32 @@ engine.
 
 ## Remaining transition work
 
+The Apple port now has a privileged lossless resident state substrate in
+`backends/device_state.py`. Direct C++ field visitors export every mutable
+native state field and all RNG/tape data into tagged integer records, preserving
+double/uint64 bits without MPS float64. Frozen definition/catalog data and interned
+strings are shared. Device gathers and snapshots retain complete histories,
+decisions and continuations; they are ordinary clones, not yet search reseeds.
+These buffers must never be passed to policy/observation encoders.
+
+`backends/random_metal.py` samples native SplitMix64 streams on device, preserving
+rejection sampling, die/reroll order, all three streams, test-tape behavior and
+failure rollback. It returns the full outcome and next RNG state; combat/political
+effects still require their handlers. `backends/income_ledger.py` performs exact
+out-of-place income refresh/collection accounting, including payment-once and
+overflow checks. It does not run placement, surrender hooks or advance the clock.
+`backends/device_scheduler.py` performs the adapter's declaration-offer pass
+entirely on resident metadata, retaining every ordered raw menu choice; declaration
+execution is not yet ported. None is registered as a complete campaign backend.
+
+Lossless integer transport has a measured startup gate: the original PyTorch 2.11
+MPS `index_select` rounds large int64 words, including RNG/hash bits. CPU remains
+supported there; the tested isolated 2.14 GPU environment passes exact sentinel
+checks. Unsupported GPU integer runtimes fail explicitly. The cached probe runs
+at initialization, never inside each fork. Included native binding sources also
+participate in source fingerprints and extension rebuild dependencies. Bulk
+capture pins Python owners before releasing the GIL and locking each environment.
+
 Further engine ports must retain complete state, legal menus, pending choices,
 interrupt ownership and chance distributions on device, using this CPU reference
 and explicit outcomes for conformance. A kernel-level speedup alone does not

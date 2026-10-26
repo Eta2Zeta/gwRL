@@ -1,4 +1,5 @@
 #include "game/economy.hpp"
+#include "game/income_ledger.hpp"
 #include "game/catalog.hpp"
 #include "game/movement.hpp"
 #include "game/politics.hpp"
@@ -441,6 +442,16 @@ void refreshIncome(State &s) {
         n.incomeComponents = rate.components;
         n.incomeKnown = true;
     }
+}
+void applyIncomeLedger(State &s) {
+    refreshIncome(s);
+    auto &n = s.nations.at(s.currentNation());
+    const auto rate = evaluateIncome(s, s.currentNation());
+    if (!s.clock.incomeCollected && rate.collectable && n.treasury) {
+        require(*n.treasury <= std::numeric_limits<int>::max() - rate.total, "IPP overflow");
+        *n.treasury += rate.total;
+    }
+    s.clock.incomeCollected = true;
 }
 void reconcileCapturedFacilities(State &s, const Id &zone, const std::optional<Id> &oldOwner,
                                  const Id &newOwner) {
@@ -1043,14 +1054,7 @@ void EconomyRules::finishPhase(State &s) const {
 }
 void EconomyRules::finishTurn(State &s) const {
     finishEconomyPlacement(s);
-    refreshIncome(s);
-    auto &n = s.nations.at(s.currentNation());
-    const auto rate = evaluateIncome(s, s.currentNation());
-    if (!s.clock.incomeCollected && rate.collectable && n.treasury) {
-        require(*n.treasury <= std::numeric_limits<int>::max() - rate.total, "IPP overflow");
-        *n.treasury += rate.total;
-    }
-    s.clock.incomeCollected = true;
+    applyIncomeLedger(s);
     if (gameplay_)
         gameplay_->finishTurn(s);
 }

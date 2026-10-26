@@ -18,6 +18,7 @@ namespace game::campaign {
 
 using Id = std::string;
 class Catalog;
+struct DeviceStateAccess;
 
 enum class Phase { Production, CombatMovement, Combat, NonCombatMovement, PlaceUnits };
 std::string toString(Phase phase);
@@ -335,6 +336,7 @@ class Engine {
     std::string planningKey() const;
 
   private:
+    friend struct DeviceStateAccess;
     struct ActionMenu;
     struct DecisionCache;
     State state_;
