@@ -49,7 +49,9 @@ def write(path, value):
 def worker(config, output):
     import torch
     import gwrl_cpp
-    from studies.campaign.backends.tensor_rules import effective_results, inspect_outcomes, pack_outcomes
+    from studies.campaign.backends.tensor_rules import (effective_results, effective_results_metal,
+                                                        inspect_outcomes, pack_outcomes)
+    from studies.campaign.backends.tensor_rules_metal import metal_compilation_stats
     torch.set_num_threads(2)
     torch.set_num_interop_threads(1)
     if "mps" in config["devices"]:
@@ -59,7 +61,8 @@ def worker(config, output):
             raise RuntimeError("MPS CPU fallback must be disabled")
         recommended = torch.mps.recommended_max_memory()
         torch.mps.set_per_process_memory_fraction(min(GPU_RESERVE / recommended, 1.0))
-    paths = [ROOT / "studies/campaign/backends/tensor_rules.py", ROOT / "src/campaign_runtime.cpp",
+    paths = [ROOT / "studies/campaign/backends/tensor_rules.py", ROOT / "studies/campaign/backends/tensor_rules_metal.py",
+             ROOT / "src/campaign_runtime.cpp",
              ROOT / "src/python_bindings.cpp", ROOT / "src/campaign_state.cpp", ROOT / "include/game/campaign.hpp",
              Path(__file__).resolve(), Path(gwrl_cpp.__file__).resolve()]
     hashes = lambda: {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
@@ -68,6 +71,8 @@ def worker(config, output):
               "limits": ["This is only exact dice validation/results; native commit and all other rules remain CPU.",
                          "Native JSON preparation and result transport are separate from its internal C++ timer.",
                          "Torch resident timing includes validation/status masks and Python operator launches; GPU is synchronized.",
+                         "Implementation selection applies to MPS; CPU always supplies the portable Torch reference. Metal is explicit, one dispatch, and MPS-only.",
+                         "Metal compilation and first-call shape-buffer setup are included in separately reported warmup, excluded from resident timing.",
                          "Packing, transfer and diagnostic copies are separate costs, not included in resident ratios.",
                          "Two deterministic synthetic spec families and one timing sample per case do not establish whole-game speedup."]}
     write(output, report)
@@ -94,23 +99,32 @@ def worker(config, output):
                 sync = torch.mps.synchronize if device == "mps" else lambda: None
                 sync(); before = time.perf_counter(); resident = batch.to(device); sync()
                 transfer = time.perf_counter() - before
-                effective_results(resident); sync()  # one separately disclosed warmup
-                before = time.perf_counter()
-                for _ in range(config["repetitions"]):
-                    result = effective_results(resident)
-                sync(); elapsed = time.perf_counter() - before
-                before = time.perf_counter(); inspected = inspect_outcomes(result); sync()
-                inspection = time.perf_counter() - before
-                if not all(value["valid"] for value in inspected) or [list(value["effective"]) for value in inspected] != native["results"]:
-                    raise ValueError("Full native/Torch dice outcome parity failed")
-                row["devices"].append({"device": device, "device_tensor_bytes": sum(
-                    getattr(resident, field.name).numel() * 4 for field in fields(resident)),
-                    "transfer_seconds": transfer, "warmup_calls": 1,
-                    "resident_seconds": elapsed, "diagnostic_copy_seconds": inspection,
-                    "native_rules_over_resident_ratio": native["rules_seconds"] / elapsed,
-                    "all_results_and_error_masks_match_native": True,
-                    "driver_allocated_bytes": torch.mps.driver_allocated_memory() if device == "mps" else 0})
-                del resident, result
+                implementations = config["implementations"] if device == "mps" else ("portable",)
+                for implementation in implementations:
+                    execute = effective_results_metal if implementation == "metal" else effective_results
+                    compilation_before = metal_compilation_stats()["compilation_seconds"]
+                    before = time.perf_counter(); execute(resident); sync()
+                    warmup = time.perf_counter() - before
+                    compilation = metal_compilation_stats()["compilation_seconds"] - compilation_before
+                    before = time.perf_counter()
+                    for _ in range(config["repetitions"]):
+                        result = execute(resident)
+                    sync(); elapsed = time.perf_counter() - before
+                    before = time.perf_counter(); inspected = inspect_outcomes(result); sync()
+                    inspection = time.perf_counter() - before
+                    if not all(value["valid"] for value in inspected) or [list(value["effective"]) for value in inspected] != native["results"]:
+                        raise ValueError("Full native/Torch/Metal dice outcome parity failed")
+                    row["devices"].append({"device": device, "implementation": implementation,
+                        "device_tensor_bytes": sum(getattr(resident, field.name).numel() * 4 for field in fields(resident)),
+                        "transfer_seconds": transfer, "transfer_shared_between_implementations": device == "mps" and len(implementations) > 1,
+                        "warmup_calls": 1, "first_call_or_warmup_seconds": warmup,
+                        "new_metal_compilation_seconds_within_warmup": compilation,
+                        "resident_seconds": elapsed, "diagnostic_copy_seconds": inspection,
+                        "native_rules_over_resident_ratio": native["rules_seconds"] / elapsed,
+                        "all_results_and_error_masks_match_native": True,
+                        "driver_allocated_bytes": torch.mps.driver_allocated_memory() if device == "mps" else 0})
+                    del result
+                del resident
             report["rows"].append(row); write(output, report)
     report.update(status="completed", worker_seconds=time.perf_counter() - started,
                   sources_unchanged=hashes() == report["provenance_sha256"])
@@ -175,6 +189,8 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--lanes", default="4,256,4096")
     parser.add_argument("--devices", default="cpu,mps")
+    parser.add_argument("--implementation", default="portable,metal",
+                        help="MPS implementations to compare; CPU retains the portable reference")
     parser.add_argument("--dice-per-lane", type=int, default=16)
     parser.add_argument("--repetitions", type=int, default=20)
     parser.add_argument("--seconds", type=float, default=120)
@@ -185,12 +201,14 @@ def main(argv=None):
         worker(json.loads(args._worker.read_text()), args.output)
         return 0
     lanes, devices = tuple(int(value) for value in args.lanes.split(",")), tuple(args.devices.split(","))
+    implementations = tuple(args.implementation.split(","))
     if (not lanes or len(set(lanes)) != len(lanes) or any(not 1 <= value <= 4096 for value in lanes) or
             not devices or len(set(devices)) != len(devices) or set(devices) - {"cpu", "mps"} or
+            not implementations or len(set(implementations)) != len(implementations) or set(implementations) - {"portable", "metal"} or
             not 1 <= args.dice_per_lane <= 64 or not 1 <= args.repetitions <= 100 or
             not 0 < args.seconds <= 600 or not 3_000_000_000 < args.memory_bytes <= 30_000_000_000):
-        parser.error("Use unique lanes1..4096, cpu/mps, dice1..64, repetitions1..100, seconds<=600 and memory(3,30]GB")
-    report = supervise({"lanes": lanes, "devices": devices, "dice_per_lane": args.dice_per_lane,
+        parser.error("Use unique lanes1..4096, cpu/mps, portable/metal, dice1..64, repetitions1..100, seconds<=600 and memory(3,30]GB")
+    report = supervise({"lanes": lanes, "devices": devices, "implementations": implementations, "dice_per_lane": args.dice_per_lane,
         "repetitions": args.repetitions, "seconds": args.seconds, "memory_bytes": args.memory_bytes}, args.output)
     print(json.dumps({"status": report["status"], "output": str(args.output.resolve())}))
     return 0 if report["status"] == "completed" else 2

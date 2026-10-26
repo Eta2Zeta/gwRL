@@ -139,6 +139,21 @@ warm execution, numerical differences, actual inference batch sizes, synchronize
 network time and the remaining search/rules time. Fresh identical current
 weights are used, with no relabeling of historical learned checkpoints.
 
+The GPU path packs complete graph topology on CPU and uploads combined arrays,
+then gathers external learned vectors in one indexed operation. It preserves
+distinct encoded objects even when they share source graphs. Its four policy
+factor heads operate on disjoint groups across all rows of an actor batch.
+CPU execution retains its original operation order. These are execution changes,
+not smaller legal menus or a different network architecture.
+
+`tools/benchmark_campaign_device_updates.py` measures the actual three-policy
+learning update with unchanged minibatch size 32, 16 epochs, and the 16-dimensional
+one-layer model. It prepares a fresh genuine three-round game outside the timer,
+retains every numerical menu, and labels positions only from its terminal result.
+Policy targets come from the unchanged balanced baseline, so this measures a
+supervised update workload rather than MCTS learning strength. CPU/MPS workers
+use identical initial weights, fixture bytes and observed sampled minibatch order.
+
 ## First tensor rules component
 
 `studies/campaign/backends/tensor_rules.py` implements the native dice
@@ -154,6 +169,12 @@ decisions on CPU. The primitive is tested against authoritative native C++ and
 bit-exact CPU/MPS output; it is not inserted into the CPU trainer merely to count
 a GPU call. A separately named native benchmark probe times the existing C++
 primitive after parsing, allowing an honest component comparison.
+
+`effective_results_metal(batch)` is an explicit, fused Apple Metal implementation
+of the same integer contract. It uses one dispatch, caches only compiled code and
+small shape buffers, and requires contiguous MPS input. Portable CPU/CUDA/MPS
+tensor execution remains the default. The benchmark compares both implementations
+and reports Metal compilation/first-call costs separately from resident execution.
 
 ## Remaining transition work
 

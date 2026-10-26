@@ -12,7 +12,7 @@ import gwrl_cpp
 import torch
 
 from studies.campaign.backends.tensor_rules import (
-    DiceError, INT32_MAX, INT32_MIN, effective_results, inspect_outcomes, pack_outcomes,
+    DiceError, INT32_MAX, INT32_MIN, effective_results, effective_results_metal, inspect_outcomes, pack_outcomes,
 )
 
 
@@ -223,6 +223,68 @@ class TensorDiceRuleTests(unittest.TestCase):
         for repetitions in (True, 0, -1, 1000001, 1.5):
             with self.subTest(repetitions=repetitions), self.assertRaises((TypeError, ValueError)):
                 gwrl_cpp.campaign_effective_results_probe([], [], repetitions)
+
+    def test_metal_path_is_explicit_and_rejects_cpu_instead_of_falling_back(self):
+        batch = pack_outcomes([request([die()])], [[[1]]])
+        with self.assertRaisesRegex(ValueError, "MPS"):
+            effective_results_metal(batch)
+
+    @unittest.skipUnless(torch.backends.mps.is_available(), "MPS is unavailable")
+    def test_fused_metal_matches_native_and_portable_for_full_valid_corpus(self):
+        requests, outcomes = valid_corpus()
+        batch = pack_outcomes(requests, outcomes, device="mps")
+        expected, actual = effective_results(batch), effective_results_metal(batch)
+        for field in fields(expected):
+            self.assertTrue(torch.equal(getattr(actual, field.name).cpu(), getattr(expected, field.name).cpu()), field.name)
+        if hasattr(gwrl_cpp, "campaign_effective_results_probe"):
+            native = gwrl_cpp.campaign_effective_results_probe(
+                [json.dumps(spec) for spec in requests], [json.dumps({"faces": face}) for face in outcomes])
+            self.assertEqual([list(row["effective"]) for row in inspect_outcomes(actual)], native["results"])
+
+    @unittest.skipUnless(torch.backends.mps.is_available(), "MPS is unavailable")
+    def test_fused_metal_error_masks_match_portable_for_malformed_and_extreme_metadata(self):
+        requests, outcomes = valid_corpus()
+        requests.extend([request([die(1)]), request([die(12, INT32_MAX)]), request([die()]),
+                         request([die(6, 0, [1, 2], 2)]), request([die()]), request([die()])])
+        outcomes.extend([[[1]], [[1]], [[]], [[1]], [[0]], [[13]]])
+        batch = pack_outcomes(requests, outcomes, device="mps")
+        # Include invalid metadata, padded values and duplicates that the strict
+        # host packer cannot produce. Both device implementations must flag them.
+        batch.reroll_faces[-3, 0, 1] = 1
+        batch.dice_counts[0] = -1
+        batch.dice_counts[1] = INT32_MAX
+        batch.face_counts[2, 0] = INT32_MIN
+        batch.face_counts[3, 0] = INT32_MAX
+        batch.reroll_counts[4, 0] = INT32_MIN
+        batch.max_rerolls[5, 0] = INT32_MIN
+        batch.modifiers[2, 0] = INT32_MAX
+        batch.faces[2, 0, 0] = 12
+        expected, actual = effective_results(batch), effective_results_metal(batch)
+        for field in fields(expected):
+            self.assertTrue(torch.equal(getattr(actual, field.name).cpu(), getattr(expected, field.name).cpu()), field.name)
+
+    @unittest.skipUnless(torch.backends.mps.is_available(), "MPS is unavailable")
+    def test_fused_metal_zero_capacities_and_no_host_reads(self):
+        for requests, outcomes in (([], []), ([request([])], [[]]), ([request([die()])], [[[]]]),
+                                   ([request([die()])], [[[12]]])):
+            batch = pack_outcomes(requests, outcomes, device="mps")
+            expected = effective_results(batch)
+            with patch.object(torch.Tensor, "item", side_effect=AssertionError("host scalar read")), \
+                 patch.object(torch.Tensor, "tolist", side_effect=AssertionError("host list read")), \
+                 patch.object(torch.Tensor, "cpu", side_effect=AssertionError("host tensor copy")):
+                actual = effective_results_metal(batch)
+            for field in fields(expected):
+                self.assertTrue(torch.equal(getattr(actual, field.name).cpu(), getattr(expected, field.name).cpu()), field.name)
+
+    @unittest.skipUnless(torch.backends.mps.is_available(), "MPS is unavailable")
+    def test_fused_metal_rejects_noncontiguous_and_fallback_enabled_inputs(self):
+        batch = pack_outcomes([request([die(), die()]), request([die(), die()])],
+                              [[[1], [2]], [[3], [4]]], device="mps")
+        with self.assertRaisesRegex(ValueError, "contiguous"):
+            effective_results_metal(replace(batch, sides=batch.sides.t()))
+        with patch.dict(os.environ, {"PYTORCH_ENABLE_MPS_FALLBACK": "1"}):
+            with self.assertRaisesRegex(RuntimeError, "fallback"):
+                effective_results_metal(batch)
 
 
 if __name__ == "__main__":

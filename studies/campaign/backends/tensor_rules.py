@@ -263,3 +263,9 @@ def inspect_outcomes(result: TensorOutcomeResult) -> tuple[dict[str, Any], ...]:
         rows.append({"valid": error == 0, "errors": error,
                      "effective": tuple(value[:usable_count]), "die_errors": tuple(die[:usable_count])})
     return tuple(rows)
+
+
+def effective_results_metal(batch: TensorDiceBatch) -> TensorOutcomeResult:
+    """Opt in to the fused MPS primitive; the portable default is unchanged."""
+    from .tensor_rules_metal import effective_results_metal as execute
+    return execute(batch)
