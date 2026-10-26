@@ -9,6 +9,10 @@ import gwrl_cpp
 import numpy as np
 import torch
 
+from studies.campaign.backends.metal_validation import mps_int64_indexing_supported
+
+EXACT_MPS=torch.backends.mps.is_available() and mps_int64_indexing_supported()
+
 from studies.campaign.backends.device_state import DeviceStateBatch,DeviceStateContext
 from studies.campaign.backends.resident_wealth import PLAYERS,ResidentWealthContext,_component_sum_probe
 
@@ -31,7 +35,7 @@ def repair(owner,target,damage,endpoint=None):
                 restricts_action=False,endpoint=endpoint)
 
 
-@unittest.skipUnless(torch.backends.mps.is_available(),"Apple GPU unavailable")
+@unittest.skipUnless(EXACT_MPS,"Lossless Apple GPU runtime unavailable")
 class ResidentWealthTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):torch.set_num_threads(2)

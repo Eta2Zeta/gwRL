@@ -7,6 +7,7 @@
 #include "game/device_state.hpp"
 #include "game/income_ledger_batch.hpp"
 #include "game/wealth_context.hpp"
+#include "game/relations_context.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 #include "game/numeric_graph.hpp"
@@ -22,6 +23,7 @@
 #include <mutex>
 #include <utility>
 #include <chrono>
+#include <bit>
 
 namespace py = pybind11;
 
@@ -57,6 +59,7 @@ class NativeCampaignEnv {
     friend struct DeviceStateNativeAccess;
     friend struct IncomeLedgerNativeAccess;
     friend struct WealthNativeAccess;
+    friend struct RelationsNativeAccess;
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
 };
@@ -175,7 +178,9 @@ using CampaignEnv = game::campaign::CampaignEnv;
 #include "python_income_ledger.inc"
 #include "python_random_metal.inc"
 #include "python_wealth.inc"
+#include "python_relations.inc"
 #include "python_content_digest.inc"
+#include "python_canonical_json.inc"
 
 // Immutable owning views outlive an environment mutation without copying its
 // state tree. Only small scheduler fields overlay the complete native document.
@@ -533,7 +538,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     bindIncomeLedger(module);
     bindRandomProbe(module);
     bindWealth(module);
+    bindRelations(module);
     bindContentDigestProbe(module);
+    bindCanonicalJson(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)

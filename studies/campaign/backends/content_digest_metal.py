@@ -20,6 +20,13 @@ class MessageBatch:
 
 
 @dataclass(frozen=True)
+class RangedMessageBatch:
+    data: object             # uint8 [allocated bytes], may contain padding/gaps
+    ranges: object           # int64 [capacity,2], exact start/end for each message
+    count: object
+
+
+@dataclass(frozen=True)
 class DigestBatch:
     words: object            # int32 [capacity,8], raw unsigned32 payload bits
     hex_bytes: object        # uint8 [capacity,64], native lowercase ASCII hex
@@ -69,7 +76,9 @@ kernel void content_digests(device const uchar* data [[buffer(0)]],
     for(int i=0;i<64;++i)hex[ulong(row)*64+ulong(i)]=0;
     if(bad_count){errors[row]=1;return;}
     if(long(row)>=actual)return;
-    const long start=offsets[row],end=offsets[ulong(row)+1];
+    const bool ranged=dimensions[2]!=0;
+    const long start=offsets[ranged?ulong(row)*2:ulong(row)],
+               end=offsets[ranged?ulong(row)*2+1:ulong(row)+1];
     if(start<0||end<start||end>bytes){errors[row]=2;return;}
     const ulong length=ulong(end-start),bits=length*8;
     const ulong blocks=(length+9+63)/64,total=blocks*64;
@@ -129,12 +138,15 @@ def content_digests_metal(batch):
     if device.type!='mps':raise ValueError('Digest execution requires the explicit Apple GPU')
     if os.environ.get('PYTORCH_ENABLE_MPS_FALLBACK','0') not in {'','0'}:
         raise ValueError('MPS CPU fallback is forbidden')
-    if (batch.data.dtype!=torch.uint8 or batch.data.ndim!=1 or batch.offsets.dtype!=torch.int64 or
-        batch.offsets.ndim!=1 or batch.offsets.numel()<1 or batch.count.dtype!=torch.int64 or
+    ranged=isinstance(batch,RangedMessageBatch)
+    offsets=batch.ranges if ranged else batch.offsets
+    layout=(offsets.ndim==2 and offsets.shape[1]==2) if ranged else (offsets.ndim==1 and offsets.numel()>=1)
+    if (batch.data.dtype!=torch.uint8 or batch.data.ndim!=1 or offsets.dtype!=torch.int64 or
+        not layout or batch.count.dtype!=torch.int64 or
         batch.count.shape!=(1,) or any(value.device!=device or not value.is_contiguous()
-        for value in (batch.data,batch.offsets,batch.count))):
+        for value in (batch.data,offsets,batch.count))):
         raise ValueError('Digest buffers must retain complete contiguous byte/offset/count layouts')
-    B=batch.offsets.shape[0]-1
+    B=offsets.shape[0] if ranged else offsets.shape[0]-1
     if B>(1<<32)-1:raise OverflowError('Digest grid exceeds representable capacity; no messages truncated')
     words=torch.empty((B,8),dtype=torch.int32,device=device)
     hex_bytes=torch.empty((B,64),dtype=torch.uint8,device=device)
@@ -143,8 +155,8 @@ def content_digests_metal(batch):
     if _library is None:
         with _lock:
             if _library is None:_library=torch.mps.compile_shader(SOURCE)
-    args=(batch.data,batch.offsets,batch.count,words,hex_bytes,errors,batch_error,
-          _dimensions((B,batch.data.numel())))
+    args=(batch.data,offsets,batch.count,words,hex_bytes,errors,batch_error,
+          _dimensions((B,batch.data.numel(),int(ranged))))
     _library.content_digests(*(value if value.numel() else _dummy() for value in args),threads=max(B,1))
     return DigestBatch(words,hex_bytes,errors,batch_error,batch.count)
 

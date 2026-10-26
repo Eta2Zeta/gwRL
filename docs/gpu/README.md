@@ -51,6 +51,27 @@ The CPU path imports no optional GPU framework. Future neural-device selection
 is separate from engine-backend selection. Neither menus nor state are truncated
 to arbitrary fixed capacities.
 
+Resident Metal rules components now include source-bound political relation
+matrices and the complete `mayDeclareWar(LandAttack)` predicate. Static faction,
+map and Home Country metadata is uploaded once; changing control, truce, wars,
+unit presence and permissions are read from the resident state. Native directed
+queries, short-circuit errors and optional-player semantics are preserved.
+Neither component applies a declaration or moves units.
+
+Internal map/set/sequence builders preserve byte-ordered keys, unknown nested
+payloads, optional absence and complete transaction rollback. Capacity failures
+report required allocation sizes for retry. These are structural building blocks;
+game-action legality still belongs to the actual rule handler.
+
+`canonical_json_metal.py` writes native canonical bytes directly from resident
+generic JSON subtrees, with exact string escaping and no search-step JSON/Python
+conversion. Native ingress prepares an immutable cache of arbitrary binary64
+number spellings once. New exact int32 values are recognized bitwise and formatted
+on device; an uncached noninteger is an explicit error, never rounded or sent to
+a CPU fallback. Digest errors include serialization failures, so unusable output
+cannot silently become an action identity. Full typed State serialization and
+event-state hashing are the next connected unit.
+
 `clone_for_search(seeds, lanes=...)` can fork one source lane repeatedly with
 independent search seeds, without consuming the source game's execution RNG.
 Repeated source lanes are allowed for this read-only operation; mutating batches

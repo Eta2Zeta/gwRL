@@ -52,11 +52,7 @@ std::set<Id> terrains(const V *v) {
   return out;
 }
 bool hostile(const State &s, const Id &nation, const Id &other) {
-  return nation != other && s.nations.at(nation).atWarWith.contains(other);
-}
-bool logisticsFriendly(const State &s, const Id &nation, const Id &owner) {
-  return nation == owner || politicallyFriendly(s, nation, owner) ||
-         controlledBy(s, owner, nation);
+  return areAtWar(s, nation, other);
 }
 bool restrictedTerrain(const std::set<Id> &t) {
   for (const auto &x :
@@ -104,14 +100,7 @@ bool strategicPermission(const State &s, const Id &nation, const Id &zone) {
   const auto owner = s.territories.at(zone).possessor;
   if (!owner)
     return false;
-  if (*owner == nation)
-    return true;
-  if (!politicallyFriendly(s, nation, *owner))
-    return false;
-  // One alliance agent can give its own nations permission in this action.
-  if (s.nations.at(nation).player == s.nations.at(*owner).player)
-    return true;
-  return flag(s.nations.at(*owner).turnFlags, "rail_permission:" + nation);
+  return strategicRailPermission(s, nation, *owner);
 }
 bool gaugeChange(const State &s, const Id &a, const Id &b) {
   const auto *e = edge(s, a, b);
@@ -245,6 +234,20 @@ MovementMode parseMovementMode(const std::string &s) {
 }
 bool unitClass(const State &s, const UnitState &u, const Id &c) {
   return s.definition->catalog->unit(u.type).classes.contains(c);
+}
+bool areAtWar(const State &s, const Id &actor, const Id &target) {
+  return actor != target && s.nations.at(actor).atWarWith.contains(target);
+}
+bool logisticsFriendly(const State &s, const Id &actor, const Id &owner) {
+  return actor == owner || politicallyFriendly(s, actor, owner) ||
+         controlledBy(s, owner, actor);
+}
+bool strategicRailPermission(const State &s, const Id &actor, const Id &owner) {
+  if (actor == owner) return true;
+  if (!politicallyFriendly(s, actor, owner)) return false;
+  // Optional equality, including two absent players, is intentional.
+  if (s.nations.at(actor).player == s.nations.at(owner).player) return true;
+  return flag(s.nations.at(owner).turnFlags, "rail_permission:" + actor);
 }
 bool movementController(const State &s, const Id &nation) {
   return nation == s.currentNation() ||
@@ -386,6 +389,9 @@ bool riverRouteAvailable(const State &s, const Id &nation, const Id &from,
       return false;
   return true;
 }
+bool railGaugeChange(const State &s, const Id &from, const Id &to) {
+  return gaugeChange(s, from, to);
+}
 Id railRegion(const State &s, const Id &zone) {
   const auto *rg = s.definition->geography.find("rail_geography");
   const auto *memberships = rg ? rg->find("memberships") : nullptr;
@@ -517,7 +523,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
           !riverRouteAvailable(s, u.owner, a, b))
         return fail("This route is not a river route");
       if (railUndamaged(s, a, b) && !riverRouteAvailable(s, u.owner, a, b) &&
-          gaugeChange(s, a, b) && !hasTech(s, u.owner, "improved_logistics"))
+          railGaugeChange(s, a, b) && !hasTech(s, u.owner, "improved_logistics"))
         return fail("Gauge change requires Improved Logistics");
       out.regions.insert(railRegion(s, a));
       out.regions.insert(railRegion(s, b));

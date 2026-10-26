@@ -9,6 +9,10 @@ import gwrl_cpp
 import numpy as np
 import torch
 
+from studies.campaign.backends.metal_validation import mps_int64_indexing_supported
+
+EXACT_MPS=torch.backends.mps.is_available() and mps_int64_indexing_supported()
+
 from studies.campaign.backends.device_state import DeviceStateBatch, DeviceStateContext, SECTION_NAMES
 from studies.campaign.backends.resident_state_income import (
     ACCOUNTING_INPUT, PACKED_INPUT, WRONG_PHASE, ResidentIncomeContext,
@@ -26,7 +30,7 @@ def placement(env):
     return changed(env,lambda state:state["clock"].update(phase="place_units"))
 
 
-@unittest.skipUnless(torch.backends.mps.is_available(),"Apple GPU unavailable")
+@unittest.skipUnless(EXACT_MPS,"Lossless Apple GPU runtime unavailable")
 class ResidentIncomeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -46,6 +46,10 @@ struct SupplyRoute {
 };
 
 bool unitClass(const State &, const UnitState &, const Id &classification);
+// Shared directed political permissions. Control and alignment are distinct.
+bool areAtWar(const State &, const Id &actor, const Id &target);
+bool logisticsFriendly(const State &, const Id &actor, const Id &owner);
+bool strategicRailPermission(const State &, const Id &actor, const Id &owner);
 bool movementController(const State &, const Id &nation);
 bool landAccess(const State &, const Id &nation, const Id &zone,
                 bool combat = false);
@@ -60,6 +64,8 @@ bool heldSinceNationTurnStart(const State &, const Id &nation, const Id &zone,
 BorderApproach borderApproach(const State &, const Id &from, const Id &to);
 bool railUndamaged(const State &, const Id &from, const Id &to,
                    bool sinceTurnStart = false);
+// Exact native gauge predicate, also used to prepare immutable device metadata.
+bool railGaugeChange(const State &, const Id &from, const Id &to);
 bool riverRouteAvailable(const State &, const Id &nation, const Id &from,
                          const Id &to);
 Id railRegion(const State &, const Id &zone);
