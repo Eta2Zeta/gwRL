@@ -48,6 +48,8 @@ class DeviceStateContext:
         self.native = native
         self.definition_fingerprint = native.definition_fingerprint
         self.rules_id = native.rules_id
+        self.wire_context_fingerprint = native.wire_context_fingerprint
+        self.random_stream_ids = tuple(int(value) for value in native.prefix_lookup_ids(("actual", "search", "training")))
         self.records = torch.tensor(native.record_array(), dtype=torch.int64, device=target)
         self.string_bytes = torch.tensor(native.string_bytes(), dtype=torch.uint8, device=target)
         self.string_offsets = torch.tensor(native.string_offsets(), dtype=torch.int64, device=target)
@@ -58,7 +60,11 @@ class DeviceStateContext:
 
     @property
     def identity(self):
-        return SCHEMA, self.definition_fingerprint, self.rules_id
+        return SCHEMA, self.definition_fingerprint, self.rules_id, self.wire_context_fingerprint
+
+    def prefix_lookup_ids(self, names):
+        """One-time host metadata lookup of exact fixed protocol spellings."""
+        return self.native.prefix_lookup_ids(tuple(names))
 
 
 @dataclass(frozen=True)
@@ -77,7 +83,7 @@ class DeviceStateBatch:
             context = DeviceStateContext(native.context, "cpu" if device is None else device)
         elif device is not None and _device(device).type != context.device.type:
             raise ValueError("Explicit device does not match the shared state context")
-        if (native.context.definition_fingerprint, native.context.rules_id) != context.identity[1:]:
+        if (native.context.definition_fingerprint, native.context.rules_id, native.context.wire_context_fingerprint) != context.identity[1:]:
             raise ValueError("Device state definition/rules mismatch")
         if tuple(native.section_names) != SECTION_NAMES:
             raise ValueError("Unknown or missing device state fields")
@@ -184,7 +190,8 @@ class DeviceStateBatch:
         flat = np.concatenate(pieces, axis=0) if pieces else np.empty((0, 5), dtype=np.int64)
         offsets = np.asarray([0, *np.cumsum(lengths, dtype=np.int64)], dtype=np.int64)
         return gwrl_cpp.device_state_batch_from_packed(self.context.native, flat, offsets,
-            self.string_bytes.detach().cpu().numpy(), self.string_offsets.detach().cpu().numpy())
+            self.string_bytes.detach().cpu().numpy(), self.string_offsets.detach().cpu().numpy(),
+            self.context.wire_context_fingerprint)
 
     def restore_envs(self):
         """Fresh native oracle environments, for explicit inspection/conformance."""

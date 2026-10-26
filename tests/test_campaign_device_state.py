@@ -182,10 +182,10 @@ class CampaignDeviceStateTests(unittest.TestCase):
                   native.string_bytes().copy(), native.string_offsets().copy()]
         for column, value in ((0, 999), (1, 3), (4, len(arrays[0]) + 1)):
             modified = [a.copy() for a in arrays]; modified[0][0, column] = value
-            with self.assertRaises(ValueError): gwrl_cpp.device_state_batch_from_packed(context, *modified)
+            with self.assertRaises(ValueError): gwrl_cpp.device_state_batch_from_packed(context, *modified, wire_context_fingerprint=context.wire_context_fingerprint)
         modified = [a.copy() for a in arrays]; modified[1][0] = 1
-        with self.assertRaises(ValueError): gwrl_cpp.device_state_batch_from_packed(context, *modified)
-        with self.assertRaises(ValueError): gwrl_cpp.device_state_batch_from_packed(context, arrays[0].astype(np.float64), *arrays[1:])
+        with self.assertRaises(ValueError): gwrl_cpp.device_state_batch_from_packed(context, *modified, wire_context_fingerprint=context.wire_context_fingerprint)
+        with self.assertRaises(ValueError): gwrl_cpp.device_state_batch_from_packed(context, arrays[0].astype(np.float64), *arrays[1:], wire_context_fingerprint=context.wire_context_fingerprint)
         resident = DeviceStateBatch.from_native(native)
         with self.assertRaises(ValueError): dataclasses.replace(resident, lengths=resident.lengths.float()).to_native()
 
@@ -201,7 +201,7 @@ class CampaignDeviceStateTests(unittest.TestCase):
             extended = np.concatenate((original_bytes, repeated)).astype(np.uint8)
             extended_offsets = np.concatenate((offsets, np.array([len(extended)], dtype=np.int64)))
             with self.assertRaisesRegex(ValueError, "duplicate device string"):
-                gwrl_cpp.device_state_batch_from_packed(context, data, lanes, extended, extended_offsets)
+                gwrl_cpp.device_state_batch_from_packed(context, data, lanes, extended, extended_offsets, context.wire_context_fingerprint)
 
     def test_zero_lane_and_definition_mismatch_do_not_fabricate_states(self):
         env = real_states()[0]
@@ -226,6 +226,20 @@ class CampaignDeviceStateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Explicit device"):
             DeviceStateBatch.capture([env], device="cpu", context=mps)
         self.assertEqual(DeviceStateBatch.from_native(native, context=mps).device.type, "mps")
+
+    def test_wire_context_identity_and_fixed_protocol_strings_are_explicit(self):
+        env = real_states()[0]
+        context = gwrl_cpp.device_state_context(env)
+        repeated = gwrl_cpp.device_state_context(env)
+        self.assertEqual(context.wire_context_fingerprint, repeated.wire_context_fingerprint)
+        names = ("actual", "search", "training", "territorial", "china_control_bonus", "major", "city_ipp_lost", "city_damage")
+        ids = context.prefix_lookup_ids(names)
+        self.assertEqual(len(set(ids.tolist())), len(names))
+        with self.assertRaises(IndexError): context.prefix_lookup_ids(("unknown_fixed_protocol_string",))
+        native = gwrl_cpp.capture_device_states(context, [env])
+        with self.assertRaisesRegex(ValueError, "wire context mismatch"):
+            gwrl_cpp.device_state_batch_from_packed(context, native.record_array(), native.lane_offsets(),
+                native.string_bytes(), native.string_offsets(), "wrong-wire-context")
 
     def test_actual_future_chance_continues_from_identical_restored_streams(self):
         pending = real_states()[1]

@@ -253,6 +253,16 @@ at initialization, never inside each fork. Included native binding sources also
 participate in source fingerprints and extension rebuild dependencies. Bulk
 capture pins Python owners before releasing the GIL and locking each environment.
 
+The next connected layer uses `device_state_edits.py` for checked, out-of-place
+record subtree changes, with explicit capacity errors and rollback. Shared wire
+contexts carry their exact record/string fingerprint; mismatched prefixes are
+rejected. `device_search_clone.py` preserves complete State bits, seeds only the
+search stream and removes test tape exactly like native `cloneForSearch`.
+`packed_chance_metal.py` reads the native pending dice/RNG directly on device and
+returns an uncommitted outcome/next-RNG pair. `resident_state_income.py` reads and
+updates the complete packed income ledger at its placement/accounting seam. It
+does not apply placement, political hooks, phase advancement or action history.
+
 Further engine ports must retain complete state, legal menus, pending choices,
 interrupt ownership and chance distributions on device, using this CPU reference
 and explicit outcomes for conformance. A kernel-level speedup alone does not

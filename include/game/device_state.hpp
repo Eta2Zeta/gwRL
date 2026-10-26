@@ -20,12 +20,14 @@ enum class DeviceTag : std::int64_t {
 struct DeviceStateContext {
     std::shared_ptr<const Definition> definition;
     std::shared_ptr<const Rules> rules;
-    std::string definitionFingerprint, rulesId;
+    std::string definitionFingerprint, rulesId, wireContextFingerprint;
+    std::map<std::string,std::int64_t> stringIds;
     std::vector<DeviceRecord> records;
     std::vector<std::string> strings;
     std::vector<std::uint8_t> stringBytes;
     std::vector<std::int64_t> stringOffsets;
     explicit DeviceStateContext(const Engine&);
+    std::vector<std::int64_t> prefixLookupIds(const std::vector<std::string>&) const;
 };
 
 struct DeviceStateBatch {
@@ -48,7 +50,8 @@ struct DeviceStateBatch {
     // Import contiguous buffers from an explicit host snapshot boundary.
     static DeviceStateBatch fromPacked(std::shared_ptr<const DeviceStateContext>,
         std::vector<DeviceRecord>, std::vector<std::int64_t> offsets,
-        std::vector<std::uint8_t> bytes, std::vector<std::int64_t> stringOffsets);
+        std::vector<std::uint8_t> bytes, std::vector<std::int64_t> stringOffsets,
+        const std::string& expectedWireContextFingerprint);
     static const std::vector<std::string>& sectionNames();
 };
 } // namespace game::campaign

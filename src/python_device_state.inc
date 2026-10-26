@@ -50,6 +50,11 @@ void bindDeviceState(py::module_& module) {
         .def_property_readonly("schema",[](const C&){return game::campaign::deviceStateSchema;})
         .def_property_readonly("definition_fingerprint",[](const C& c){return c.definitionFingerprint;})
         .def_property_readonly("rules_id",[](const C& c){return c.rulesId;})
+        .def_property_readonly("wire_context_fingerprint",[](const C& c){return c.wireContextFingerprint;})
+        .def("prefix_lookup_ids",[](const C& c,const std::vector<std::string>& names){
+            const auto values=c.prefixLookupIds(names);py::array_t<std::int64_t> out(values.size());
+            std::copy(values.begin(),values.end(),out.mutable_data());return out;
+        })
         .def_property_readonly("string_count",[](const C& c){return c.strings.size();})
         .def("record_array",[](const C& c){return deviceStateArray(c,reinterpret_cast<const std::int64_t*>(c.records.data()),{static_cast<py::ssize_t>(c.records.size()),5});})
         .def("string_bytes",[](const C& c){return deviceStateArray(c,c.stringBytes.data(),{static_cast<py::ssize_t>(c.stringBytes.size())});})
@@ -69,7 +74,7 @@ void bindDeviceState(py::module_& module) {
     module.def("capture_device_states",&DeviceStateNativeAccess::capture);
     module.def("restore_device_states",&DeviceStateNativeAccess::restore);
     module.def("device_state_batch_from_packed",[](std::shared_ptr<C> context,const py::array& records,
-            const py::array& offsets,const py::array& bytes,const py::array& stringOffsets) {
+            const py::array& offsets,const py::array& bytes,const py::array& stringOffsets,const std::string& fingerprint) {
         auto data=deviceStateCopy<std::int64_t>(records,2);
         if(records.shape(1)!=5)throw py::value_error("Device state record width mismatch");
         std::vector<game::campaign::DeviceRecord> nodes(data.size()/5);
@@ -77,7 +82,7 @@ void bindDeviceState(py::module_& module) {
         auto lanes=deviceStateCopy<std::int64_t>(offsets,1);auto strings=deviceStateCopy<std::uint8_t>(bytes,1);
         auto indexes=deviceStateCopy<std::int64_t>(stringOffsets,1);
         py::gil_scoped_release release;
-        return B::fromPacked(context,std::move(nodes),std::move(lanes),std::move(strings),std::move(indexes));
-    });
+        return B::fromPacked(context,std::move(nodes),std::move(lanes),std::move(strings),std::move(indexes),fingerprint);
+    },py::arg("context"),py::arg("records"),py::arg("lane_offsets"),py::arg("string_bytes"),py::arg("string_offsets"),py::arg("wire_context_fingerprint"));
     module.attr("CAMPAIGN_DEVICE_STATE_SCHEMA")=game::campaign::deviceStateSchema;
 }

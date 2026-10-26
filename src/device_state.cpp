@@ -219,6 +219,26 @@ void validateOffsets(const std::vector<std::int64_t>& offsets,std::size_t size,c
 }
 }
 
+namespace {
+void fingerprintWord(std::string& bytes,std::uint64_t value) {
+    for(int byte=0;byte<8;++byte)bytes.push_back(static_cast<char>((value>>(byte*8))&255));
+}
+void fingerprintText(std::string& bytes,const std::string& text) {
+    fingerprintWord(bytes,text.size());bytes.append(text);
+}
+std::string wireFingerprint(const DeviceStateContext& context) {
+    std::string bytes;
+    fingerprintText(bytes,deviceStateSchema);fingerprintText(bytes,context.definitionFingerprint);fingerprintText(bytes,context.rulesId);
+    fingerprintWord(bytes,context.records.size());
+    for(const auto& row:context.records)for(const auto value:row)fingerprintWord(bytes,std::bit_cast<std::uint64_t>(value));
+    fingerprintWord(bytes,context.stringBytes.size());
+    bytes.append(reinterpret_cast<const char*>(context.stringBytes.data()),context.stringBytes.size());
+    fingerprintWord(bytes,context.stringOffsets.size());
+    for(const auto value:context.stringOffsets)fingerprintWord(bytes,std::bit_cast<std::uint64_t>(value));
+    return contentDigest(bytes);
+}
+}
+
 DeviceStateContext::DeviceStateContext(const Engine& engine):definition(engine.state().definition),
     rules(DeviceStateAccess::rules(engine)),definitionFingerprint(definition->fingerprint),rulesId(rules->id()) {
     require(!definitionFingerprint.empty()&&!rulesId.empty(),"Device state requires an identified frozen definition/rules");
@@ -227,7 +247,17 @@ DeviceStateContext::DeviceStateContext(const Engine& engine):definition(engine.s
     (void)indexed;
     const V catalogSource=catalog?catalog->sourceData():V(nullptr);
     writer.tuple(std::tie(scenario,fingerprint,geography,rulesData,catalogSource,factions,order,players,year,month,rounds));
+    // Fixed spellings needed by device rule handlers even when the corresponding
+    // dynamic flag/component map is empty. Append only after definition data.
+    for(const auto* text:{"actual","search","training","territorial","china_control_bonus","major","city_ipp_lost","city_damage"})pool.intern(text);
+    stringIds=pool.index;
     flattenStrings(strings,stringBytes,stringOffsets);
+    wireContextFingerprint=wireFingerprint(*this);
+}
+std::vector<std::int64_t> DeviceStateContext::prefixLookupIds(const std::vector<std::string>& names) const {
+    std::vector<std::int64_t> result;result.reserve(names.size());
+    for(const auto& name:names){const auto found=stringIds.find(name);if(found==stringIds.end())throw std::out_of_range("Unknown static device string: "+name);result.push_back(found->second);}
+    return result;
 }
 DeviceStateBatch::DeviceStateBatch(std::shared_ptr<const DeviceStateContext> c):context(std::move(c)),laneOffsets{0},stringOffsets{0} {
     require(context!=nullptr,"Absent device state context");
@@ -265,7 +295,8 @@ void DeviceStateBatch::validate() const {
 }
 DeviceStateBatch DeviceStateBatch::fromPacked(std::shared_ptr<const DeviceStateContext> context,
     std::vector<DeviceRecord> records,std::vector<std::int64_t> offsets,std::vector<std::uint8_t> bytes,
-    std::vector<std::int64_t> stringsOffsets) {
+    std::vector<std::int64_t> stringsOffsets,const std::string& expectedWireContextFingerprint) {
+    require(context&&context->wireContextFingerprint==expectedWireContextFingerprint,"Device wire context mismatch; raw buffers cannot be retagged");
     DeviceStateBatch result(std::move(context));result.records=std::move(records);result.laneOffsets=std::move(offsets);
     validateOffsets(result.laneOffsets,result.records.size(),"Invalid device lane offsets");
     validateOffsets(stringsOffsets,bytes.size(),"Invalid device string offsets");
