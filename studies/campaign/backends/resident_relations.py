@@ -7,6 +7,7 @@ This computes permissions; declaration legality and movement routes remain separ
 """
 from dataclasses import dataclass
 from functools import lru_cache
+import re
 import threading
 
 import torch
@@ -226,6 +227,77 @@ kernel void resident_relations(
 }
 """
 
+
+def _parallel_source(reference):
+    """Reuse the audited bodies, changing their scheduling rather than rules.
+
+    The serial kernel remains intact. The fallback deliberately runs that full
+    original body so malformed inputs preserve even its partial diagnostic data.
+    Each required marker is explicit: edits to the reference must consciously
+    update this construction rather than silently selecting a different block.
+    """
+    signature,body=reference.split('kernel void resident_relations(',1)[1].split(') {',1)
+    body=body.rsplit('}',1)[0]
+    plain=re.sub(r'\[\[.*?\]\]','',signature)
+    fallback='inline void relations_reference_fallback('+plain+') {'+body+'}\n'
+    argument_names=('records','lengths','prefix_bytes','prefix_offsets','suffix_bytes','suffix_offsets','usage','ids',
+                    'definition','source_errors','meta_all','pairs_all','pair_errors_all','nations_all','nation_errors_all',
+                    'present_all','permission_all','dims')
+    call='relations_reference_fallback('+','.join(argument_names)+',uint(lane));'
+    parallel_signature=signature.rsplit('uint lane [[thread_position_in_grid]]',1)[0]+\
+        'uint3 group [[threadgroup_position_in_grid]],uint tid [[thread_index_in_threadgroup]],uint3 group_size [[threads_per_threadgroup]]'
+    prelude=body.split('    if(source_errors[lane])valid=false;',1)[1].split('    const long ccp=',1)[0]
+    meta=body.split('    for(long a=0;valid&&a<N;++a){',1)[1].split('    if(!valid){',1)[0]
+    meta=meta.rsplit('\n    }',1)[0]
+    meta=meta.replace('if(root<0)continue;',
+        'if(root<0){if(!valid)atomic_fetch_or_explicit(&invalid,1,memory_order_relaxed);continue;}')
+    post=body.split('    for(long a=0;a<N;++a){',1)[1]
+    nation,pairs=post.split('        for(long b=0;b<N;++b){',1)
+    pairs=pairs.rsplit('\n        }\n    }',1)[0]
+    parallel=r'''
+    const long lane=long(group.x),B=dims[0],C=dims[1],N=dims[2],P=dims[3],stride=long(group_size.x);
+    if(lane>=B)return;
+    device long* meta=meta_all+ulong(lane)*N*10;
+    device long* pairs=pairs_all+ulong(lane)*N*N*7;device long* errors=pair_errors_all+ulong(lane)*N*N*7;
+    device long* nations=nations_all+ulong(lane)*N*3;device long* nerrors=nation_errors_all+ulong(lane)*N*3;
+    device long* permission=permission_all+ulong(lane)*N*N;
+    threadgroup long roots[5];threadgroup atomic_int invalid;
+    bool valid=true;
+    PackedStateView v=make_packed_state_view(records+ulong(lane)*C*5,lengths[lane],C,
+        prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7],usage,valid);
+    if(tid==0){atomic_store_explicit(&invalid,0,memory_order_relaxed);
+        if(source_errors[lane])valid=false;
+''' + prelude + r'''
+        roots[0]=ns;roots[1]=surrendered;roots[2]=pending;roots[3]=active;roots[4]=truce;
+        if(!valid)atomic_store_explicit(&invalid,1,memory_order_relaxed);
+    }
+    for(long i=tid;i<N*N*7;i+=stride){pairs[i]=0;errors[i]=0;}
+    for(long i=tid;i<N*3;i+=stride){nations[i]=0;nerrors[i]=0;}
+    for(long i=tid;i<N*N;i+=stride)permission[i]=0;
+    for(long a=tid;a<N;a+=stride){present_all[ulong(lane)*N+a]=0;
+        for(long k=0;k<10;++k)meta[a*10+k]=0;meta[a*10+1]=-1;meta[a*10+2]=-1;meta[a*10+3]=-1;meta[a*10+8]=-1;}
+    threadgroup_barrier(mem_flags::mem_threadgroup|mem_flags::mem_device);
+    if(atomic_load_explicit(&invalid,memory_order_relaxed)){if(tid==0){''' + call + r'''}return;}
+    const long ns=roots[0],surrendered=roots[1],pending=roots[2],active=roots[3];const bool truce=roots[4]!=0;
+    const long ccp=ids[N+P],kmt=ids[N+P+1],japan=ids[N+P+2],dadao=ids[N+P+3];
+    for(long a=tid;a<N;a+=stride){valid=true;
+''' + meta + r'''
+        if(!valid)atomic_fetch_or_explicit(&invalid,1,memory_order_relaxed);
+    }
+    threadgroup_barrier(mem_flags::mem_threadgroup|mem_flags::mem_device);
+    if(atomic_load_explicit(&invalid,memory_order_relaxed)){if(tid==0){''' + call + r'''}return;}
+    for(long a=tid;a<N;a+=stride){
+''' + nation + r'''
+    }
+    for(long pair=tid;pair<N*N;pair+=stride){const long a=pair/N,b=pair%N;
+''' + pairs + r'''
+    }
+'''
+    return fallback+'kernel void resident_relations_parallel('+parallel_signature+') {'+parallel+'}\n'
+
+
+SOURCE+=_parallel_source(SOURCE)
+
 _lock=threading.Lock()
 _library=None
 
@@ -255,9 +327,14 @@ class ResidentPoliticalRelations:
         fixed=tuple(int(x) for x in state_context.prefix_lookup_ids((*self.nation_ids,*self.player_ids)))
         self.ids=torch.tensor((*fixed,*special),dtype=torch.int64,device=state_context.device)
 
-    def compute(self,state):
+    def compute(self,state,*,implementation="reference",group_size=None):
         state._metadata();_device(state.device)
         if state.context.identity!=self.state_context.identity:raise ValueError("Relations packed wire context differs")
+        if implementation not in {"reference","parallel"}:raise ValueError("Choose reference or parallel relations implementation")
+        if group_size is not None and (type(group_size) is not int or group_size<=0):
+            raise ValueError("Relations group size must be a positive integer")
+        if implementation=="reference" and group_size is not None:
+            raise ValueError("Reference relations do not use a threadgroup override")
         B,C=state.records.shape[:2];N=len(self.nation_ids);device=state.device
         alloc=lambda *shape:torch.empty(shape,dtype=torch.int64,device=device)
         pairs,errors=alloc(B,N,N,7),alloc(B,N,N,7)
@@ -270,7 +347,12 @@ class ResidentPoliticalRelations:
                   state.string_offsets,state.suffix_usage,self.ids,state.context.records,state.errors,metadata,pairs,
                   errors,nations,nerrors,present,alloc(B,N,N),_dimensions(dims))
             if any(not x.is_contiguous() for x in args):raise ValueError("Relations inputs must be contiguous; no hidden copy")
-            _kernels().resident_relations(*(x if x.numel() else _dummy() for x in args),threads=B)
+            kernel=getattr(_kernels(),"resident_relations" if implementation=="reference" else "resident_relations_parallel")
+            if implementation=="reference":kernel(*(x if x.numel() else _dummy() for x in args),threads=B)
+            else:
+                size=min(128,kernel.max_threads_per_threadgroup) if group_size is None else group_size
+                if size>kernel.max_threads_per_threadgroup:raise ValueError("Relations group size exceeds Metal kernel limit")
+                kernel(*(x if x.numel() else _dummy() for x in args),threads=B*size,group_size=size)
         return PoliticalRelationsBatch(state,pairs,errors,nations,nerrors,present,metadata)
 
     def inspect(self,result,field):

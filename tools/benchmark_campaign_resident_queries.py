@@ -26,9 +26,11 @@ SCHEMA='campaign-resident-political-queries-benchmark-v1'
 class QueryConfig(StateConfig):
     devices: tuple[str,...]=('mps',)
     batch_sizes: tuple[int,...]=(1,4,64,256)
+    implementation: str='reference'
     def __post_init__(self):
         super().__post_init__()
         require(self.devices==('mps',),'Queries require explicit Apple MPS; no CPU fallback')
+        require(self.implementation in {'reference','parallel'},'Query implementation must be reference or parallel')
 
 
 def provenance():
@@ -100,7 +102,7 @@ def worker(config,device,progress,deadline):
             return relations,ResidentLandAttackDeclarations(relations)
         (relations,declarations),rule_upload_seconds=timed(prepare_rules,gpu=True)
         def gpu_query(state):
-            shared=relations.compute(state)
+            shared=relations.compute(state,implementation=config.implementation)
             return shared,declarations.compute(state,shared)
         _,initialization_seconds=timed(lambda:gpu_query(source),gpu=True)
         for size in config.batch_sizes:
@@ -160,6 +162,7 @@ def main(argv=None):
     parser.add_argument('--batch-sizes',nargs='+',type=int,default=(1,4,64,256))
     parser.add_argument('--repeats',type=int,default=5);parser.add_argument('--seconds',type=float,default=180)
     parser.add_argument('--memory-bytes',type=int,default=8_000_000_000)
+    parser.add_argument('--implementation',choices=('reference','parallel'),default='reference')
     parser.add_argument('--_worker',type=Path,help=argparse.SUPPRESS)
     parser.add_argument('--_device',choices=('mps',),help=argparse.SUPPRESS)
     parser.add_argument('--_deadline',type=float,help=argparse.SUPPRESS)
@@ -167,7 +170,8 @@ def main(argv=None):
     if args._worker:
         value=json.loads(args._worker.read_text());value['devices']=tuple(value['devices']);value['batch_sizes']=tuple(value['batch_sizes'])
         worker(QueryConfig(**value),args._device,args.output,args._deadline);return 0
-    config=QueryConfig(batch_sizes=tuple(args.batch_sizes),repeats=args.repeats,seconds=args.seconds,memory_bytes=args.memory_bytes)
+    config=QueryConfig(batch_sizes=tuple(args.batch_sizes),repeats=args.repeats,seconds=args.seconds,
+                       memory_bytes=args.memory_bytes,implementation=args.implementation)
     return 0 if run(config,args.output)['status']=='completed' else 2
 
 if __name__=='__main__':raise SystemExit(main())

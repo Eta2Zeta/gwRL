@@ -51,6 +51,10 @@ class ResidentRelationsTests(unittest.TestCase):
                                 (result.nations,oracle.nation_array()),(result.nation_errors,oracle.nation_error_array()),
                                 (result.present,oracle.present_array())):
             np.testing.assert_array_equal(actual.cpu().numpy(),expected)
+        parallel=kernel.compute(state,implementation="parallel")
+        for field in ("pairs","pair_errors","nations","nation_errors","present","metadata"):
+            self.assertTrue(torch.equal(getattr(result,field),getattr(parallel,field)),field)
+        self.assertIs(parallel.source,state)
         self.assertEqual([env.serialize() for env in envs],before)
         return state,kernel,result
 
@@ -173,6 +177,44 @@ class ResidentRelationsTests(unittest.TestCase):
         padded=torch.empty((*state.records.shape[:2],10),dtype=torch.int64,device="mps")
         padded[:,:,::2]=state.records
         with self.assertRaises(ValueError):kernel.compute(replace(state,records=padded[:,:,::2]))
+
+    def test_parallel_threadgroups_stride_over_all_factions_and_pairs(self):
+        env=gwrl_cpp.CampaignEnv(str(SCENARIO),4);state,kernel,_=self.setup_batch([env,env.clone(),env.clone(),env.clone()])
+        reference=kernel.compute(state)
+        # 7 threads intentionally underfills the faction axis: all loops must
+        # stride to completion, including every one of N squared pairs.
+        for size in (1,7,32,64,128):
+            result=kernel.compute(state,implementation="parallel",group_size=size)
+            for field in ("pairs","pair_errors","nations","nation_errors","present","metadata"):
+                self.assertTrue(torch.equal(getattr(reference,field),getattr(result,field)),(size,field))
+        for kwargs in ({"implementation":"unknown"},{"group_size":32},{"implementation":"parallel","group_size":0},
+                       {"implementation":"parallel","group_size":True}):
+            with self.assertRaises(ValueError):kernel.compute(state,**kwargs)
+
+    def test_parallel_invalid_diagnostics_match_full_serial_fallback(self):
+        env=gwrl_cpp.CampaignEnv(str(SCENARIO),4);state,kernel,_=self.setup_batch([env])
+        rows=state.records[0].cpu().tolist();root=state.section('state.nations').item();cursor=root+1
+        target=int(state.context.prefix_lookup_ids(('mongolia',))[0]);nation=-1
+        for _ in range(rows[root][1]):
+            value=rows[cursor][4]
+            if rows[cursor][1]==target:nation=value;break
+            cursor=rows[value][4]
+        self.assertGreaterEqual(nation,0)
+        records=state.records.clone();records[0,nation,1]=13
+        cases=[replace(state,records=records),replace(state,errors=torch.ones_like(state.errors))]
+        for invalid in cases:
+            reference=kernel.compute(invalid);parallel=kernel.compute(invalid,implementation='parallel',group_size=7)
+            for field in ('pairs','pair_errors','nations','nation_errors','present','metadata'):
+                self.assertTrue(torch.equal(getattr(reference,field),getattr(parallel,field)),field)
+
+    def test_parallel_has_no_host_state_reads(self):
+        env=gwrl_cpp.CampaignEnv(str(SCENARIO),4);state,kernel,_=self.setup_batch([env])
+        expected=kernel.compute(state,implementation='parallel');torch.mps.synchronize()
+        fail=AssertionError('Host state read forbidden in parallel permissions')
+        with patch.object(torch.Tensor,'cpu',side_effect=fail),patch.object(torch.Tensor,'item',side_effect=fail),\
+             patch.object(torch.Tensor,'tolist',side_effect=fail),patch.object(gwrl_cpp,'capture_device_states',side_effect=fail):
+            result=kernel.compute(state,implementation='parallel')
+        self.assertTrue(torch.equal(expected.pairs,result.pairs))
 
 
 if __name__=="__main__":unittest.main()

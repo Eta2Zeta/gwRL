@@ -7,7 +7,7 @@ class QueryBenchmarkContractTests(unittest.TestCase):
     def test_resource_and_explicit_device_limits(self):
         self.assertEqual(QueryConfig().devices,('mps',))
         for kwargs in ({'devices':('cpu',)},{'threads':12},{'memory_bytes':30_000_000_001},
-                       {'seconds':181},{'batch_sizes':(4,4)}):
+                       {'seconds':181},{'batch_sizes':(4,4)},{'implementation':'quiet-cpu-fallback'}):
             with self.subTest(kwargs=kwargs),self.assertRaises(ValueError):QueryConfig(**kwargs)
 
     def test_incomplete_or_duplicate_workloads_cannot_claim_exact_comparison(self):

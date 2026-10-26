@@ -9,6 +9,7 @@
 #include "game/wealth_context.hpp"
 #include "game/relations_context.hpp"
 #include "game/movement_context.hpp"
+#include "game/catalog_stats_context.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 #include "game/numeric_graph.hpp"
@@ -63,6 +64,7 @@ class NativeCampaignEnv {
     friend struct WealthNativeAccess;
     friend struct RelationsNativeAccess;
     friend struct StateJsonNativeAccess;
+    friend struct CatalogStatsNativeAccess;
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
 };
@@ -186,6 +188,9 @@ using CampaignEnv = game::campaign::CampaignEnv;
 #include "python_content_digest.inc"
 #include "python_canonical_json.inc"
 #include "python_state_json.inc"
+#include "python_action_ids.inc"
+#include "python_catalog_stats.inc"
+#include "python_event_append.inc"
 
 // Immutable owning views outlive an environment mutation without copying its
 // state tree. Only small scheduler fields overlay the complete native document.
@@ -548,6 +553,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     bindContentDigestProbe(module);
     bindCanonicalJson(module);
     bindStateJson(module);
+    bindActionIds(module);
+    bindCatalogStats(module);
+    bindEventAppendProbe(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)

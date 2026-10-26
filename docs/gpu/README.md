@@ -84,6 +84,19 @@ a separate operation. These helpers do not advance phases or apply political
 hooks. The static movement context and original route oracle prepare full map,
 terrain, rail, crossing and unit-class data once for the resident route port.
 
+Resident catalog-stat queries now cover every primary unit/damage state and all
+nine optional/dice statistics. Static base values, technology modifiers and flag
+requirements are prepared once. Current technology completion, flag precedence,
+major-power status and Home Country predicates are resolved from resident state,
+with original lazy errors and explicit inventory capacity retries.
+
+`resident_action_ids.py` composes all native action-ID families and the scheduler
+wrappers from resident bytes and canonical parameter digests. It preserves the
+original family-specific digest lengths and action order; it does not generate
+or validate a legal menu. Political queries additionally expose a cooperative
+`implementation="parallel"` path alongside the unchanged reference default;
+matched timings determine whether that path should become the default.
+
 `clone_for_search(seeds, lanes=...)` can fork one source lane repeatedly with
 independent search seeds, without consuming the source game's execution RNG.
 Repeated source lanes are allowed for this read-only operation; mutating batches
