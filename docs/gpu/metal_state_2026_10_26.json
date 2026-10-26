@@ -1,0 +1,2998 @@
+{
+  "artifacts": {
+    "studies/campaign/runs/gpu-backend-2026-10-26/random-t214.json": {
+      "bytes": 26539,
+      "sha256": "edaa3489a0df7650af6d6d7ff805548c87960135576ca97b19c88950745b440f"
+    },
+    "studies/campaign/runs/gpu-backend-2026-10-26/state-fork.json": {
+      "bytes": 125521,
+      "sha256": "f001bb204e90d001c56ac553963854417f7e216558ff001355384d85682bff22"
+    }
+  },
+  "date": "2026-10-26",
+  "implementation_commit": "519ae61",
+  "random": {
+    "config": {
+      "dice": 16,
+      "lanes": [
+        4,
+        256,
+        4096
+      ],
+      "memory_bytes": 6000000000,
+      "mps_reserve_bytes": 2000000000,
+      "repeats": 20,
+      "seconds": 120.0,
+      "seed": 9187,
+      "threads": 2,
+      "warmups": 2
+    },
+    "device": "mps",
+    "guard": {
+      "charge_scope": "Whole parent/worker process tree plus entire two-GB MPS allocator reservation; possible conservative double counting",
+      "elapsed_seconds": 2.821430792013416,
+      "memory_bytes": 6000000000,
+      "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)",
+      "mps_reservation_bytes": 2000000000,
+      "peak_charged_bytes": 2428705016,
+      "seconds": 120.0,
+      "stop_threshold_bytes": 5000000000,
+      "tensor_threads": 2,
+      "worker_returncode": 0
+    },
+    "limitation": "Exact RNG/dice component only; no combat effects, game completion, training throughput or learning-strength claim",
+    "provenance": {
+      "native_path": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+      "native_sha256": "d9339d06dc446ba4b3602cc3c402a0d06f4c2d4fd46705c9b4ccdf9e1d4d2987",
+      "parent_commit": "519ae61b1520dd87f4390a56722a423bdc38abfb",
+      "runtime_source_set_sha256": "a3e365d857e9dd7f2c29cce772e63bf2726a1070e8a7548dfe50dbe5f744baad",
+      "runtime_source_sha256": {
+        "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+        "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+        "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+        "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+        "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+        "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+        "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+        "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+        "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+        "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+        "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+        "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+        "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+        "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+        "include/game/device_state.hpp": "1561a788e00e7c6e881ca8feaa01f5a793a85522c659de511b5e04c7400ead08",
+        "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+        "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+        "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+        "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+        "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+        "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+        "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+        "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+        "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+        "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+        "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+        "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+        "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+        "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+        "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+        "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+        "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+        "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+        "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+        "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+        "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+        "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+        "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+        "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+        "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+        "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+        "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+        "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+        "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+        "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+        "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+        "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+        "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+        "src/device_state.cpp": "2630247f895df5584bdd04bbdddcc2416fe9667e2edb6ccf902a93180dfb420b",
+        "src/economy.cpp": "321dab0141e648dc048050fa53303d903e55b6b447d8b8b65bd0cb6bc195d351",
+        "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+        "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+        "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+        "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+        "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+        "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+        "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+        "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+        "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+        "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+        "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+        "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+        "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+        "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+        "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+        "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+        "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+        "src/python_bindings.cpp": "1e17f7d13c1069566603459b1ca044928b52d6521f124820dfc5cf2e44334976",
+        "src/python_device_state.inc": "01635a8fb63417ea5722fb04212917ae28d9afdc00b8d2bf91e52ba149fef05b",
+        "src/python_income_ledger.inc": "b485878c515457497e32fa1e6270cd618c990643ba7d9005ef0560c2f5d01b32",
+        "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+        "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+        "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+        "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+        "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+        "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+        "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+        "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+        "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+        "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+        "studies/campaign/backends/device_state.py": "ec681e766df715814394fcbc33cba6b1285927922827d2e7a61956b56c41b430",
+        "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+        "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+        "studies/campaign/backends/metal_validation.py": "312eab4918f96d823a47d5c7d96aa6418582a20f810bb020ab3df1b6a76e8786",
+        "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+        "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+        "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+        "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+        "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+        "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+        "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+        "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+        "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+        "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+        "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+        "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+        "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+        "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+        "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+        "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+        "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+        "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+        "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+        "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+        "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+      },
+      "tool_sha256": "35639fd8a354b8c00039f745a5cdf53f334ec778c2c862973377404ac1243f6c"
+    },
+    "recommended_max_bytes": 30150672384,
+    "rng_algorithm": "Unchanged native SplitMix64 + unsigned64 rejection sampling and exact conditional rerolls",
+    "schema": "campaign-exact-apple-random-benchmark-v1",
+    "source_stable": true,
+    "status": "completed",
+    "torch_version": "2.14.0",
+    "workloads": [
+      {
+        "cold_dispatch_and_synchronize_seconds": 0.0028494169819168746,
+        "device_memory": {
+          "driver_bytes": 8880128,
+          "live_tensor_bytes": 8704
+        },
+        "device_upload_and_synchronize_seconds": 0.014674750011181459,
+        "dice_per_lane": 16,
+        "explicit_host_inspection_and_verification_seconds": 0.006053334014723077,
+        "gpu_warm_dispatch_and_synchronize_seconds": 0.006481707998318598,
+        "gpu_warm_seconds_per_invocation": 0.0003240853999159299,
+        "host_json_encoding_seconds": 5.9666024753823876e-05,
+        "host_tensor_packing_seconds": 0.010106625006301329,
+        "lanes": 4,
+        "native_call_including_parse_and_output_seconds": 0.0004923329979646951,
+        "native_rules_over_gpu_warm_ratio": 0.059269254353891826,
+        "native_rules_seconds": 0.000384166,
+        "native_rules_seconds_per_invocation": 1.92083e-05,
+        "native_timing_scope": "Actual native RandomStreams::roll and effectiveResults, initial snapshots parsed once outside rules timer; each repeat starts from those snapshots",
+        "parity": {
+          "all_lanes_bit_exact": true,
+          "complete_outcome_sha256": "f08fef142f8993109b39714019d75f9a7afc11a4a45da2eba2fe5c81f33b386c",
+          "first_lane": {
+            "effective": [
+              7,
+              8,
+              6,
+              7,
+              7,
+              7,
+              8,
+              12,
+              4,
+              10,
+              4,
+              5,
+              5,
+              8,
+              11,
+              2
+            ],
+            "faces": [
+              [
+                8
+              ],
+              [
+                1,
+                8
+              ],
+              [
+                5
+              ],
+              [
+                8
+              ],
+              [
+                7
+              ],
+              [
+                6
+              ],
+              [
+                9
+              ],
+              [
+                12
+              ],
+              [
+                3
+              ],
+              [
+                2,
+                11
+              ],
+              [
+                4
+              ],
+              [
+                4
+              ],
+              [
+                6
+              ],
+              [
+                8
+              ],
+              [
+                10
+              ],
+              [
+                3
+              ]
+            ],
+            "random": {
+              "active": "actual",
+              "actual": "2298681937012504954",
+              "search": "18446744073709551615",
+              "tape_position": "0",
+              "test_tape": [],
+              "training": "9223372036854775808"
+            }
+          },
+          "forced_zero_draw_rejection_lanes": [
+            0,
+            1,
+            2
+          ],
+          "lanes_checked": 4,
+          "last_lane": {
+            "effective": [
+              5,
+              7,
+              6,
+              6,
+              6,
+              9,
+              11,
+              11,
+              8,
+              6,
+              11,
+              5,
+              10,
+              11,
+              5,
+              2
+            ],
+            "faces": [
+              [
+                6
+              ],
+              [
+                7
+              ],
+              [
+                5
+              ],
+              [
+                1,
+                2,
+                7
+              ],
+              [
+                6
+              ],
+              [
+                1,
+                8
+              ],
+              [
+                12
+              ],
+              [
+                11
+              ],
+              [
+                7
+              ],
+              [
+                7
+              ],
+              [
+                11
+              ],
+              [
+                4
+              ],
+              [
+                11
+              ],
+              [
+                1,
+                11
+              ],
+              [
+                4
+              ],
+              [
+                3
+              ]
+            ],
+            "random": {
+              "active": "actual",
+              "actual": "6708190535647657939",
+              "search": "16612916080929316041",
+              "tape_position": "0",
+              "test_tape": [],
+              "training": "2643710487928706575"
+            }
+          },
+          "sampled_faces_per_invocation": 74,
+          "splitmix_draws_per_invocation_including_rejections": 77,
+          "tape_lanes": 0
+        },
+        "repeats": 20,
+        "shader_compile_included_in_cold": true,
+        "warm_timing_scope": "Same complete immutable snapshots each repeat, one full sampler dispatch and synchronization per repeat; excludes packing/upload/inspection",
+        "workload_sha256": "0c492be0f08c135d30cf2f048ccd62c0ae469124032e1df85a9b018b821ad38e"
+      },
+      {
+        "cold_dispatch_and_synchronize_seconds": 0.0009475409751757979,
+        "device_memory": {
+          "driver_bytes": 8880128,
+          "live_tensor_bytes": 409344
+        },
+        "device_upload_and_synchronize_seconds": 0.002524374984204769,
+        "dice_per_lane": 16,
+        "explicit_host_inspection_and_verification_seconds": 0.009626834013033658,
+        "gpu_warm_dispatch_and_synchronize_seconds": 0.01364608298172243,
+        "gpu_warm_seconds_per_invocation": 0.0006823041490861215,
+        "host_json_encoding_seconds": 0.00274791699484922,
+        "host_tensor_packing_seconds": 0.03340879100142047,
+        "lanes": 256,
+        "native_call_including_parse_and_output_seconds": 0.040614666999317706,
+        "native_rules_over_gpu_warm_ratio": 2.708619099671824,
+        "native_rules_seconds": 0.036962041,
+        "native_rules_seconds_per_invocation": 0.0018481020500000001,
+        "native_timing_scope": "Actual native RandomStreams::roll and effectiveResults, initial snapshots parsed once outside rules timer; each repeat starts from those snapshots",
+        "parity": {
+          "all_lanes_bit_exact": true,
+          "complete_outcome_sha256": "9d00adec3a87195b192d9b2ef12510f5c16659c65e1b9ee521042da89d15f479",
+          "first_lane": {
+            "effective": [
+              7,
+              8,
+              6,
+              7,
+              7,
+              7,
+              8,
+              12,
+              4,
+              10,
+              4,
+              5,
+              5,
+              8,
+              11,
+              2
+            ],
+            "faces": [
+              [
+                8
+              ],
+              [
+                1,
+                8
+              ],
+              [
+                5
+              ],
+              [
+                8
+              ],
+              [
+                7
+              ],
+              [
+                6
+              ],
+              [
+                9
+              ],
+              [
+                12
+              ],
+              [
+                3
+              ],
+              [
+                2,
+                11
+              ],
+              [
+                4
+              ],
+              [
+                4
+              ],
+              [
+                6
+              ],
+              [
+                8
+              ],
+              [
+                10
+              ],
+              [
+                3
+              ]
+            ],
+            "random": {
+              "active": "actual",
+              "actual": "2298681937012504954",
+              "search": "18446744073709551615",
+              "tape_position": "0",
+              "test_tape": [],
+              "training": "9223372036854775808"
+            }
+          },
+          "forced_zero_draw_rejection_lanes": [
+            0,
+            1,
+            2
+          ],
+          "lanes_checked": 256,
+          "last_lane": {
+            "effective": [
+              10,
+              6,
+              11,
+              5,
+              3,
+              7,
+              5,
+              8,
+              13,
+              2,
+              8,
+              6,
+              5,
+              8,
+              6,
+              10
+            ],
+            "faces": [
+              [
+                11
+              ],
+              [
+                6
+              ],
+              [
+                10
+              ],
+              [
+                2,
+                2,
+                6
+              ],
+              [
+                3
+              ],
+              [
+                6
+              ],
+              [
+                6
+              ],
+              [
+                8
+              ],
+              [
+                12
+              ],
+              [
+                3
+              ],
+              [
+                8
+              ],
+              [
+                5
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                8
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                11
+              ]
+            ],
+            "random": {
+              "active": "actual",
+              "actual": "11218757560044659096",
+              "search": "11506289781816782818",
+              "tape_position": "0",
+              "test_tape": [],
+              "training": "7305019457899725992"
+            }
+          },
+          "sampled_faces_per_invocation": 5924,
+          "splitmix_draws_per_invocation_including_rejections": 4199,
+          "tape_lanes": 36
+        },
+        "repeats": 20,
+        "shader_compile_included_in_cold": false,
+        "warm_timing_scope": "Same complete immutable snapshots each repeat, one full sampler dispatch and synchronization per repeat; excludes packing/upload/inspection",
+        "workload_sha256": "27e2fe71b04dd703df0359848b511b0e2f4eb90e5e2f4d03f4f3087562fef120"
+      },
+      {
+        "cold_dispatch_and_synchronize_seconds": 0.0025433750124648213,
+        "device_memory": {
+          "driver_bytes": 8863744,
+          "live_tensor_bytes": 6538240
+        },
+        "device_upload_and_synchronize_seconds": 0.004519959009485319,
+        "dice_per_lane": 16,
+        "explicit_host_inspection_and_verification_seconds": 0.1412757079815492,
+        "gpu_warm_dispatch_and_synchronize_seconds": 0.025000124995131046,
+        "gpu_warm_seconds_per_invocation": 0.0012500062497565524,
+        "host_json_encoding_seconds": 0.04407858397462405,
+        "host_tensor_packing_seconds": 0.5885464169841725,
+        "lanes": 4096,
+        "native_call_including_parse_and_output_seconds": 0.6790121670055669,
+        "native_rules_over_gpu_warm_ratio": 24.724344703091756,
+        "native_rules_seconds": 0.618111708,
+        "native_rules_seconds_per_invocation": 0.0309055854,
+        "native_timing_scope": "Actual native RandomStreams::roll and effectiveResults, initial snapshots parsed once outside rules timer; each repeat starts from those snapshots",
+        "parity": {
+          "all_lanes_bit_exact": true,
+          "complete_outcome_sha256": "9904155a96481a856aa6589397c96dc72550c47e7bdf371a9cae2d54a42bd5c3",
+          "first_lane": {
+            "effective": [
+              7,
+              8,
+              6,
+              7,
+              7,
+              7,
+              8,
+              12,
+              4,
+              10,
+              4,
+              5,
+              5,
+              8,
+              11,
+              2
+            ],
+            "faces": [
+              [
+                8
+              ],
+              [
+                1,
+                8
+              ],
+              [
+                5
+              ],
+              [
+                8
+              ],
+              [
+                7
+              ],
+              [
+                6
+              ],
+              [
+                9
+              ],
+              [
+                12
+              ],
+              [
+                3
+              ],
+              [
+                2,
+                11
+              ],
+              [
+                4
+              ],
+              [
+                4
+              ],
+              [
+                6
+              ],
+              [
+                8
+              ],
+              [
+                10
+              ],
+              [
+                3
+              ]
+            ],
+            "random": {
+              "active": "actual",
+              "actual": "2298681937012504954",
+              "search": "18446744073709551615",
+              "tape_position": "0",
+              "test_tape": [],
+              "training": "9223372036854775808"
+            }
+          },
+          "forced_zero_draw_rejection_lanes": [
+            0,
+            1,
+            2
+          ],
+          "lanes_checked": 4096,
+          "last_lane": {
+            "effective": [
+              4,
+              4,
+              10,
+              4,
+              5,
+              12,
+              7,
+              3,
+              12,
+              4,
+              9,
+              8,
+              9,
+              10,
+              9,
+              5
+            ],
+            "faces": [
+              [
+                5
+              ],
+              [
+                4
+              ],
+              [
+                1,
+                9
+              ],
+              [
+                5
+              ],
+              [
+                5
+              ],
+              [
+                11
+              ],
+              [
+                8
+              ],
+              [
+                3
+              ],
+              [
+                1,
+                11
+              ],
+              [
+                5
+              ],
+              [
+                2,
+                9
+              ],
+              [
+                2,
+                7
+              ],
+              [
+                10
+              ],
+              [
+                10
+              ],
+              [
+                8
+              ],
+              [
+                6
+              ]
+            ],
+            "random": {
+              "active": "actual",
+              "actual": "17848575106646981205",
+              "search": "10995520981953782497",
+              "tape_position": "0",
+              "test_tape": [],
+              "training": "5548290445904063300"
+            }
+          },
+          "sampled_faces_per_invocation": 95069,
+          "splitmix_draws_per_invocation_including_rejections": 66992,
+          "tape_lanes": 585
+        },
+        "repeats": 20,
+        "shader_compile_included_in_cold": false,
+        "warm_timing_scope": "Same complete immutable snapshots each repeat, one full sampler dispatch and synchronization per repeat; excludes packing/upload/inspection",
+        "workload_sha256": "57e8710c2f34f58cd9bf40aa2ed7b5e7a397e40a9aa6f7ff498930dcd48a9fd7"
+      }
+    ]
+  },
+  "schema": "campaign-metal-state-foundation-evidence-v1",
+  "state_fork": {
+    "config": {
+      "batch_sizes": [
+        1,
+        4,
+        16,
+        64,
+        256
+      ],
+      "cpu_budget": 12,
+      "devices": [
+        "cpu",
+        "mps"
+      ],
+      "memory_bytes": 8000000000,
+      "repeats": 5,
+      "seconds": 180,
+      "seed": 1951,
+      "threads": 2,
+      "warmups": 1
+    },
+    "devices": {
+      "cpu": {
+        "cases": [
+          {
+            "cold_native_clone_loop_seconds": 3.19159880746156e-05,
+            "cold_reset_seconds": 3.7500285543501377e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.002982875012094155,
+            "dynamic_upload_seconds": 0.008354749996215105,
+            "host_inspection_and_native_restore_seconds": 0.015608417015755549,
+            "lanes": 1,
+            "native_capture_seconds": 0.0008854999905452132,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              3.0291004804894328e-05,
+              2.72089964710176e-05,
+              2.783298259600997e-05,
+              2.4542008759453893e-05,
+              3.3499993151053786e-05
+            ],
+            "native_context_seconds": 0.005361165996873751,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+                "lengths": "790cf3f37e628bb8c83eb8e9cbd58cf18d9e7b2c62a4c62d109a3ca20020f903",
+                "records": "caf47d504d0be1f8c11d0c57eb35824e984ccb9515f9f16eabc81bbc398341f1",
+                "sections": "1a9c76b0c5c9ed0d7ce2900c2efadc9bc714a85134f92c3cc9dfa5f5742d9c09",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 1
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.001299499999731779,
+            "tensor_fork_seconds": [
+              3.541700425557792e-05,
+              3.137500607408583e-05,
+              3.770901821553707e-05,
+              0.00015495799016207457,
+              5.924998549744487e-05
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 9.35420102905482e-05,
+            "cold_reset_seconds": 2.9199873097240925e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.00019787499331869185,
+            "dynamic_upload_seconds": 0.008354749996215105,
+            "host_inspection_and_native_restore_seconds": 0.02196120799635537,
+            "lanes": 4,
+            "native_capture_seconds": 0.0008854999905452132,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.00011737499153241515,
+              9.508299990557134e-05,
+              0.00013345899060368538,
+              0.00010408399975858629,
+              0.00011233400437049568
+            ],
+            "native_context_seconds": 0.005361165996873751,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                2,
+                3
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "lengths": "d6282e903c942f1ed1f50393082b35bc6af94e38fcbd021088b3fcd1a2eb7e24",
+                "records": "763a60e12590915889c492636c3d4f64ab1d627711e58715a5abbd4b6f0614e2",
+                "sections": "c07afdc71336319b295deda54a6feb769dfa2befca131d1da23320f996b51a36",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 4
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.001299499999731779,
+            "tensor_fork_seconds": [
+              9.38749872148037e-05,
+              0.0001214170188177377,
+              9.466698975302279e-05,
+              9.345897706225514e-05,
+              9.645899990573525e-05
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0003414170059841126,
+            "cold_reset_seconds": 2.0899460650980473e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0004083749954588711,
+            "dynamic_upload_seconds": 0.008354749996215105,
+            "host_inspection_and_native_restore_seconds": 0.022058709000702947,
+            "lanes": 16,
+            "native_capture_seconds": 0.0008854999905452132,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.00034149998100474477,
+              0.0003370420017745346,
+              0.00041199999395757914,
+              0.00048525002785027027,
+              0.0004351670213509351
+            ],
+            "native_context_seconds": 0.005361165996873751,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                8,
+                15
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+                "lengths": "b69c9a17939241fe8feccae37f1911966000b5d0ba005bb5daa78cd82e8c9aaa",
+                "records": "e56604539c40876c88306a96539034964439e2ddeb2f3f080f5e7f8d2413e5a4",
+                "sections": "60ad817f5c1e75e2b860e5499d1ed587c2b7c9fcfa92c3cfeae84a239223e4fd",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 16
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.001299499999731779,
+            "tensor_fork_seconds": [
+              0.0003080409951508045,
+              0.0003481660096440464,
+              0.00032237498089671135,
+              0.00045441699330694973,
+              0.00037670801975764334
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0017107500170823187,
+            "cold_reset_seconds": 2.92027834802866e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0010507089900784194,
+            "dynamic_upload_seconds": 0.008354749996215105,
+            "host_inspection_and_native_restore_seconds": 0.023424542014254257,
+            "lanes": 64,
+            "native_capture_seconds": 0.0008854999905452132,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.0015579999890178442,
+              0.0016380829911213368,
+              0.0017343749932479113,
+              0.0014059999957680702,
+              0.0016308329941239208
+            ],
+            "native_context_seconds": 0.005361165996873751,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                32,
+                63
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+                "lengths": "9102e88c22478259f4785bfb71d7f049cb2557cdf65626894100ccb9caa3c2c5",
+                "records": "325955acb1eadfbd4075588d2182ce40c39cabe4fb15a7b83a5e72a88b1d7bfd",
+                "sections": "af38094a83c766b03137219388102bdef8371c7c47f2129bfc52bceb187e6544",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 64
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.001299499999731779,
+            "tensor_fork_seconds": [
+              0.0010878339817281812,
+              0.0008837920031510293,
+              0.0011458329972811043,
+              0.0010739589924924076,
+              0.0008880830137059093
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.005595082999207079,
+            "cold_reset_seconds": 2.9199873097240925e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.003580165997846052,
+            "dynamic_upload_seconds": 0.008354749996215105,
+            "host_inspection_and_native_restore_seconds": 0.04254408398992382,
+            "lanes": 256,
+            "native_capture_seconds": 0.0008854999905452132,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.005337499984307215,
+              0.0054018749797251076,
+              0.005419041990535334,
+              0.0053135410125833005,
+              0.0054949170153122395
+            ],
+            "native_context_seconds": 0.005361165996873751,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                128,
+                255
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+                "lengths": "3d6974eb57e29c3a7b5705e9024e1bfb3719352461031f644107f80364fae42c",
+                "records": "e4da903ac02d850da71177dce7b7830afe6794168c1179564a9a098d9333dd64",
+                "sections": "992a58993c53aca375b75a8285c97423b66fcd44a281e22ddc4f11833a8a0751",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 256
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.001299499999731779,
+            "tensor_fork_seconds": [
+              0.0030687499966006726,
+              0.0030296250188257545,
+              0.0031313330109696835,
+              0.0028416670102160424,
+              0.003206708002835512
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 4.358298610895872e-05,
+            "cold_reset_seconds": 6.250047590583563e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0002389579894952476,
+            "dynamic_upload_seconds": 0.00018808298045769334,
+            "host_inspection_and_native_restore_seconds": 0.008956250007031485,
+            "lanes": 1,
+            "native_capture_seconds": 0.001193042000522837,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              2.6958005037158728e-05,
+              2.3667002096772194e-05,
+              2.2292020730674267e-05,
+              2.1875021047890186e-05,
+              2.1584011847153306e-05
+            ],
+            "native_context_seconds": 0.004267667012754828,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+                "lengths": "28e50dd3e775d1797be2c8c2e0abdf02f8b971f97cee27a82b256b637e38b40e",
+                "records": "bfdb8c468d333468109371ae762d4ef17f92fbcdcaa11a766e9f3f815aad593a",
+                "sections": "9b20431851215ffcf270145b6c14fc49d8de2fd9f835e4fc2c85424807077822",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 1
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00030124999466352165,
+            "tensor_fork_seconds": [
+              3.3666990930214524e-05,
+              2.7375004719942808e-05,
+              2.55830236710608e-05,
+              3.120899782516062e-05,
+              3.5999983083456755e-05
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00016420800238847733,
+            "cold_reset_seconds": 5.829788278788328e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0002915410150308162,
+            "dynamic_upload_seconds": 0.00018808298045769334,
+            "host_inspection_and_native_restore_seconds": 0.021356375014875084,
+            "lanes": 4,
+            "native_capture_seconds": 0.001193042000522837,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.00012145901564508677,
+              0.00017145898891612887,
+              0.00012845901073887944,
+              0.00011433300096541643,
+              0.00014525000005960464
+            ],
+            "native_context_seconds": 0.004267667012754828,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                2,
+                3
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "lengths": "43ddb5e6d51b9e74e250ed89e252ed5b506e1197a8caba95ad3fb6e0b8f7be69",
+                "records": "672b7bc25ca4f7f0e6f242acd7ac39219c7d4909a81c7876848e1ede0850319a",
+                "sections": "676d3ffd2ea1041b05ad7153e9806c5350c176c98f8884a7fef5a46b9b808bc0",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 4
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00030124999466352165,
+            "tensor_fork_seconds": [
+              0.00023616600083187222,
+              0.0002294579753652215,
+              0.00010204201680608094,
+              0.00013516601757146418,
+              0.00013708299957215786
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00042816600762307644,
+            "cold_reset_seconds": 3.7497375160455704e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0003632080042734742,
+            "dynamic_upload_seconds": 0.00018808298045769334,
+            "host_inspection_and_native_restore_seconds": 0.022243332990910858,
+            "lanes": 16,
+            "native_capture_seconds": 0.001193042000522837,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.0005792920128442347,
+              0.00039233401184901595,
+              0.0003954170097131282,
+              0.0005814580072183162,
+              0.0005745830130763352
+            ],
+            "native_context_seconds": 0.004267667012754828,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                8,
+                15
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+                "lengths": "2361696d2a42774e02e6d7fb5e5db636d72e43b72550d798d67b92252882def9",
+                "records": "01f6ae7aa4b7c31ba13fb517cf27c0bdf5fc3008c42116cba7f61ec09391e00f",
+                "sections": "81d6284238d7d703003760dee3ade6042ce6b39a9d93c5df74a2ffc536febbff",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 16
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00030124999466352165,
+            "tensor_fork_seconds": [
+              0.0003328750026412308,
+              0.0002756670000962913,
+              0.0002234579878859222,
+              0.00029141700360924006,
+              0.00041445798706263304
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.002261958987219259,
+            "cold_reset_seconds": 4.169996827840805e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0007574160117655993,
+            "dynamic_upload_seconds": 0.00018808298045769334,
+            "host_inspection_and_native_restore_seconds": 0.027118541998788714,
+            "lanes": 64,
+            "native_capture_seconds": 0.001193042000522837,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.0020247089851181954,
+              0.0020726670045405626,
+              0.0021143330086488277,
+              0.002026709000347182,
+              0.0019102499936707318
+            ],
+            "native_context_seconds": 0.004267667012754828,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                32,
+                63
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+                "lengths": "5992a625ba5114276425feb6709b07f3b2312b2aafeaec7248881ed15eea7202",
+                "records": "9d4c4413575589848337de1d7871d718a055a32892efefd74a53e57240cad551",
+                "sections": "b17688f999747e5812fa0047539b7efcb5bf0f30107efaf8f04ac5ba4dc21c38",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 64
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00030124999466352165,
+            "tensor_fork_seconds": [
+              0.0006829590129200369,
+              0.000737000023946166,
+              0.0007119580113794655,
+              0.0007299160060938448,
+              0.0006333749915938824
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.006759084004443139,
+            "cold_reset_seconds": 1.66997779160738e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0038651249778922647,
+            "dynamic_upload_seconds": 0.00018808298045769334,
+            "host_inspection_and_native_restore_seconds": 0.04254104199935682,
+            "lanes": 256,
+            "native_capture_seconds": 0.001193042000522837,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.0069607910118065774,
+              0.0066412500164005905,
+              0.006725666986312717,
+              0.007294583978364244,
+              0.006733624992193654
+            ],
+            "native_context_seconds": 0.004267667012754828,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                128,
+                255
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+                "lengths": "8c33a8c1eb7c16ab15dd5e56342eba7f46576283e532694946b2a2e71736964b",
+                "records": "a7808fe6670db127a3dfeff76e7efab81858def7b9dd130294cb5560fb4e626c",
+                "sections": "18f65909df17325df4b38ceeb173cf51a0486c0337c6c71ef8492f15e461eec0",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 256
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00030124999466352165,
+            "tensor_fork_seconds": [
+              0.0035052080056630075,
+              0.0035679159918799996,
+              0.003699083987157792,
+              0.004021625005407259,
+              0.0036642909981310368
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00013000000035390258,
+            "cold_reset_seconds": 4.5902561396360397e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.00025775001267902553,
+            "dynamic_upload_seconds": 0.0005223329935688525,
+            "host_inspection_and_native_restore_seconds": 0.01190737501019612,
+            "lanes": 1,
+            "native_capture_seconds": 0.0014586250181309879,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.00010608299635350704,
+              0.00010120801744051278,
+              0.00012720798258669674,
+              0.00010699999984353781,
+              0.00010341600864194334
+            ],
+            "native_context_seconds": 0.004941332997987047,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+                "lengths": "6d33f64530e9ca0123c256409752e91708669ee9418c0de220f1e6c2c25d0057",
+                "records": "e78e41cd169fb3a925473f844930e4b3672cf47215dcf11d8057c27b999299f0",
+                "sections": "6145e3afca01e5aef85036d1ed2f57a0b71ecccc86393c2ee9eef208b5a07503",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 1
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00023633299861103296,
+            "tensor_fork_seconds": [
+              7.245902088470757e-05,
+              8.975001401267946e-05,
+              9.733298793435097e-05,
+              7.145799463614821e-05,
+              5.9375015553086996e-05
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0005807919951621443,
+            "cold_reset_seconds": 5.00003807246685e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0003216250042896718,
+            "dynamic_upload_seconds": 0.0005223329935688525,
+            "host_inspection_and_native_restore_seconds": 0.026876124989939854,
+            "lanes": 4,
+            "native_capture_seconds": 0.0014586250181309879,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.0004612909979186952,
+              0.000359041994670406,
+              0.0004700829740613699,
+              0.0005165830079931766,
+              0.00048066701856441796
+            ],
+            "native_context_seconds": 0.004941332997987047,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                2,
+                3
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "lengths": "21214e88b4739195e31d1d676eec9e748172b23b13d768762a22b2851ed927ba",
+                "records": "e1382ca340a1698148edae42e529c5d681f843568660e9a67d150537416c6d23",
+                "sections": "99b53943d30e5a3a9c08968d2f3d5e76eae9a9975ce94fb4df1118a9ea1e5fe7",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 4
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00023633299861103296,
+            "tensor_fork_seconds": [
+              0.0002712499990593642,
+              0.00015375000657513738,
+              0.0002130000211764127,
+              0.00023029098520055413,
+              0.0002601669984869659
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0018026669858954847,
+            "cold_reset_seconds": 3.6660057958215475e-06,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0008582080190535635,
+            "dynamic_upload_seconds": 0.0005223329935688525,
+            "host_inspection_and_native_restore_seconds": 0.02956399999675341,
+            "lanes": 16,
+            "native_capture_seconds": 0.0014586250181309879,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.0017647079948801547,
+              0.0017381250218022615,
+              0.0016856669972185045,
+              0.0018339999951422215,
+              0.0016249170002993196
+            ],
+            "native_context_seconds": 0.004941332997987047,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                8,
+                15
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+                "lengths": "5c914560af6b8a1e1e19b512c00b51a3a6c7337919d3fb51df8cac1ce024976d",
+                "records": "94202395b455ba761e0b008a4674b7a0cc45b3a59676f24d8fb9839d94796d88",
+                "sections": "cf02dbc0d8248dc54e41a34c635a6cd65c34350e9b6366b5ba81cbab87ccdc84",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 16
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00023633299861103296,
+            "tensor_fork_seconds": [
+              0.0008304580114781857,
+              0.0007860840123612434,
+              0.0007592079928144813,
+              0.0007779590087011456,
+              0.0006940419843886048
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.006239165988517925,
+            "cold_reset_seconds": 2.0899460650980473e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0032580420083831996,
+            "dynamic_upload_seconds": 0.0005223329935688525,
+            "host_inspection_and_native_restore_seconds": 0.04157329199369997,
+            "lanes": 64,
+            "native_capture_seconds": 0.0014586250181309879,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.006598582986043766,
+              0.006397541990736499,
+              0.006808040983742103,
+              0.006136416021035984,
+              0.006942875013919547
+            ],
+            "native_context_seconds": 0.004941332997987047,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                32,
+                63
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+                "lengths": "627d24fd4e9fef64d6e7acf296b06130a929dd00190c04abc7e7e90c81be8fae",
+                "records": "0d3654fc05c113a84dae0761815261451dc8af6e7ecaefc9d282c8ea82f8bd19",
+                "sections": "b81f9d88a7e3204145820c9c4bd12ca5471271b62f497fdf6051273b7edc53d5",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 64
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00023633299861103296,
+            "tensor_fork_seconds": [
+              0.0033186660148203373,
+              0.0030981669842731208,
+              0.0033796249772422016,
+              0.0030397920054383576,
+              0.0028292079805396497
+            ],
+            "timed_native_clone_witnesses_exact": true
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.02590762500767596,
+            "cold_reset_seconds": 2.0800507627427578e-07,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.01859758299542591,
+            "dynamic_upload_seconds": 0.0005223329935688525,
+            "host_inspection_and_native_restore_seconds": 0.08297029198729433,
+            "lanes": 256,
+            "native_capture_seconds": 0.0014586250181309879,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.027413792005972937,
+              0.025817416986683384,
+              0.02588579201255925,
+              0.025980667007388547,
+              0.02542670801631175
+            ],
+            "native_context_seconds": 0.004941332997987047,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                128,
+                255
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+                "lengths": "1baada04bbe4a3cc32df8039881395389d0e04e1e23eefda06c7b60932952e0a",
+                "records": "17218eb5392680002efbf829aa7b612b5393fe4273d072556f9da54e6044508f",
+                "sections": "5d0e4a94b2fae78d58c1c54236a366072ae874e10ccc2b15c46ce36d7b36e6b3",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 256
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.00023633299861103296,
+            "tensor_fork_seconds": [
+              0.012569541984703392,
+              0.012093249999452382,
+              0.012420708022546023,
+              0.012967665999894962,
+              0.01204400000278838
+            ],
+            "timed_native_clone_witnesses_exact": true
+          }
+        ],
+        "config": {
+          "batch_sizes": [
+            1,
+            4,
+            16,
+            64,
+            256
+          ],
+          "cpu_budget": 12,
+          "devices": [
+            "cpu",
+            "mps"
+          ],
+          "memory_bytes": 8000000000,
+          "repeats": 5,
+          "seconds": 180,
+          "seed": 1951,
+          "threads": 2,
+          "warmups": 1
+        },
+        "device": "cpu",
+        "device_memory": {},
+        "device_runtime": null,
+        "elapsed_worker_seconds": 19.57175758300582,
+        "guard": {
+          "cpu_budget": 12,
+          "diagnostic": null,
+          "elapsed_seconds": 20.266798458003905,
+          "margin_bytes": 1000000000,
+          "memory_bytes": 8000000000,
+          "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+          "mps_allocator_reserved_bytes": 0,
+          "sampled_peak_charged_bytes": 967229440,
+          "shared_deadline_monotonic": 208398.969275291
+        },
+        "native_baseline": "Python call loop [raw_env.clone() for each lane]; includes Python/native boundary overhead",
+        "population": "Replicas of one real frozen raw Engine position per case; every history and random field retained",
+        "preparation_completed_three_round_games": 1,
+        "preparation_scope": "One fresh completed scripted game supplies fixtures; excluded from fork timing",
+        "preparation_seconds": 12.645142916997429,
+        "provenance": {
+          "backend_source_sha256": {
+            "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+            "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+            "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+            "studies/campaign/backends/device_state.py": "ec681e766df715814394fcbc33cba6b1285927922827d2e7a61956b56c41b430",
+            "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+            "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+            "studies/campaign/backends/metal_validation.py": "312eab4918f96d823a47d5c7d96aa6418582a20f810bb020ab3df1b6a76e8786",
+            "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+            "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+            "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+            "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde"
+          },
+          "branch": "codex/gpu-selfplay",
+          "commit": "519ae61b1520dd87f4390a56722a423bdc38abfb",
+          "dirty": "",
+          "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+          "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+          "native_sha256": "d9339d06dc446ba4b3602cc3c402a0d06f4c2d4fd46705c9b4ccdf9e1d4d2987",
+          "runtime_source_sha256": {
+            "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+            "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+            "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+            "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+            "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+            "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+            "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+            "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+            "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+            "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+            "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+            "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+            "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+            "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+            "include/game/device_state.hpp": "1561a788e00e7c6e881ca8feaa01f5a793a85522c659de511b5e04c7400ead08",
+            "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+            "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+            "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+            "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+            "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+            "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+            "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+            "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+            "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+            "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+            "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+            "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+            "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+            "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+            "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+            "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+            "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+            "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+            "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+            "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+            "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+            "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+            "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+            "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+            "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+            "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+            "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+            "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+            "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+            "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+            "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+            "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+            "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+            "src/device_state.cpp": "2630247f895df5584bdd04bbdddcc2416fe9667e2edb6ccf902a93180dfb420b",
+            "src/economy.cpp": "321dab0141e648dc048050fa53303d903e55b6b447d8b8b65bd0cb6bc195d351",
+            "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+            "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+            "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+            "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+            "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+            "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+            "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+            "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+            "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+            "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+            "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+            "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+            "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+            "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+            "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+            "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+            "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+            "src/python_bindings.cpp": "1e17f7d13c1069566603459b1ca044928b52d6521f124820dfc5cf2e44334976",
+            "src/python_device_state.inc": "01635a8fb63417ea5722fb04212917ae28d9afdc00b8d2bf91e52ba149fef05b",
+            "src/python_income_ledger.inc": "b485878c515457497e32fa1e6270cd618c990643ba7d9005ef0560c2f5d01b32",
+            "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+            "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+            "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+            "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+            "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+            "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+            "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+            "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+            "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+            "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+            "studies/campaign/backends/device_state.py": "ec681e766df715814394fcbc33cba6b1285927922827d2e7a61956b56c41b430",
+            "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+            "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+            "studies/campaign/backends/metal_validation.py": "312eab4918f96d823a47d5c7d96aa6418582a20f810bb020ab3df1b6a76e8786",
+            "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+            "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+            "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+            "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+            "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+            "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+            "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+            "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+            "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+            "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+            "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+            "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+            "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+            "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+            "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+            "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+            "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+            "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+            "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+            "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+            "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+          },
+          "state_harness_sha256": "e5d1ac85ad277ec03e4a54ae9ec19672bea13ba504666c6cee6b75f17f259091",
+          "supervisor_source_sha256": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+        },
+        "schema": "campaign-device-state-fork-benchmark-v1",
+        "scope": "Guarded native-clone versus resident CPU/MPS state-fork measurements.\n\nThese are complete privileged Engine snapshots, including history and all RNG.\nThe native baseline is a Python loop calling raw CampaignEnv.clone; tensor forks\nare batched gathers from an already resident snapshot. Initial capture/upload,\ncold/warm fork latency and explicit host inspection are separate measurements.\nThis component benchmark does not measure full GPU gameplay, MCTS or learning.\n",
+        "software": {
+          "interop_threads": 1,
+          "mps_fallback_env": "0",
+          "mps_fast_math_env": "0",
+          "python": "3.13.5",
+          "threads": 2,
+          "torch": "2.14.0"
+        },
+        "sources_unchanged": true,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 3,
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+            "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": false,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "tensor_path": "Resident batched DeviceStateBatch.fork; no native clone, state JSON or host inspection in fork timing",
+        "workload_sha256": "1997e2bcc302e51e5e53630d50c83b659bdac72073b5a866355312c7a53579c8"
+      },
+      "mps": {
+        "cases": [
+          {
+            "cold_native_clone_loop_seconds": 6.412499351426959e-05,
+            "cold_reset_seconds": 0.001342500007012859,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.06620354199549183,
+            "dynamic_upload_seconds": 0.0397356660105288,
+            "host_inspection_and_native_restore_seconds": 0.01721304201055318,
+            "lanes": 1,
+            "native_capture_seconds": 0.0010024999792221934,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              2.8166978154331446e-05,
+              2.3916014470160007e-05,
+              8.31669894978404e-05,
+              2.7709000278264284e-05,
+              2.616702113300562e-05
+            ],
+            "native_context_seconds": 0.004744000005302951,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+                "lengths": "790cf3f37e628bb8c83eb8e9cbd58cf18d9e7b2c62a4c62d109a3ca20020f903",
+                "records": "caf47d504d0be1f8c11d0c57eb35824e984ccb9515f9f16eabc81bbc398341f1",
+                "sections": "1a9c76b0c5c9ed0d7ce2900c2efadc9bc714a85134f92c3cc9dfa5f5742d9c09",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 1
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.2729048749897629,
+            "tensor_fork_seconds": [
+              0.0006928340008016676,
+              0.0006494169938378036,
+              0.0007594159978907555,
+              0.000643915991531685,
+              0.0005734580045100302
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 0.04266750106817315
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00011133300722576678,
+            "cold_reset_seconds": 0.0020404999959282577,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.009411083010490984,
+            "dynamic_upload_seconds": 0.0397356660105288,
+            "host_inspection_and_native_restore_seconds": 0.030535333004081622,
+            "lanes": 4,
+            "native_capture_seconds": 0.0010024999792221934,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.00011366599937900901,
+              0.00010833298438228667,
+              0.00010579099762253463,
+              9.874999523162842e-05,
+              9.579199831932783e-05
+            ],
+            "native_context_seconds": 0.004744000005302951,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                2,
+                3
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "lengths": "d6282e903c942f1ed1f50393082b35bc6af94e38fcbd021088b3fcd1a2eb7e24",
+                "records": "763a60e12590915889c492636c3d4f64ab1d627711e58715a5abbd4b6f0614e2",
+                "sections": "c07afdc71336319b295deda54a6feb769dfa2befca131d1da23320f996b51a36",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 4
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.2729048749897629,
+            "tensor_fork_seconds": [
+              0.0002815420157276094,
+              0.0002676250005606562,
+              0.0006138340104371309,
+              0.0007131249876692891,
+              0.0003209999995306134
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 0.329566971268626
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00045525000314228237,
+            "cold_reset_seconds": 0.0032150839979294688,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006996915995841846,
+            "dynamic_upload_seconds": 0.0397356660105288,
+            "host_inspection_and_native_restore_seconds": 0.03241587500087917,
+            "lanes": 16,
+            "native_capture_seconds": 0.0010024999792221934,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.00038466599653474987,
+              0.0003411250072531402,
+              0.00041395798325538635,
+              0.0003387079923413694,
+              0.0003333750064484775
+            ],
+            "native_context_seconds": 0.004744000005302951,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                8,
+                15
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+                "lengths": "b69c9a17939241fe8feccae37f1911966000b5d0ba005bb5daa78cd82e8c9aaa",
+                "records": "e56604539c40876c88306a96539034964439e2ddeb2f3f080f5e7f8d2413e5a4",
+                "sections": "60ad817f5c1e75e2b860e5499d1ed587c2b7c9fcfa92c3cfeae84a239223e4fd",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 16
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.2729048749897629,
+            "tensor_fork_seconds": [
+              0.00036545901093631983,
+              0.00031224999111145735,
+              0.0003760000108741224,
+              0.0003014579997397959,
+              0.0002905000001192093
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 1.0924740335104637
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0017099999822676182,
+            "cold_reset_seconds": 0.0029447079868987203,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006274582992773503,
+            "dynamic_upload_seconds": 0.0397356660105288,
+            "host_inspection_and_native_restore_seconds": 0.03776041601668112,
+            "lanes": 64,
+            "native_capture_seconds": 0.0010024999792221934,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.0017306660010945052,
+              0.0016774999967310578,
+              0.0016882919881027192,
+              0.00174862498533912,
+              0.0017270420212298632
+            ],
+            "native_context_seconds": 0.004744000005302951,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                32,
+                63
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+                "lengths": "9102e88c22478259f4785bfb71d7f049cb2557cdf65626894100ccb9caa3c2c5",
+                "records": "325955acb1eadfbd4075588d2182ce40c39cabe4fb15a7b83a5e72a88b1d7bfd",
+                "sections": "af38094a83c766b03137219388102bdef8371c7c47f2129bfc52bceb187e6544",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 64
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.2729048749897629,
+            "tensor_fork_seconds": [
+              0.0004339170118328184,
+              0.00038608399336226285,
+              0.00046233300236053765,
+              0.0004882090142928064,
+              0.0004022079810965806
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 3.980120562535737
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.006180500000482425,
+            "cold_reset_seconds": 0.003522790997521952,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.16618437500437722,
+            "dynamic_upload_seconds": 0.0397356660105288,
+            "host_inspection_and_native_restore_seconds": 0.06303716599359177,
+            "lanes": 256,
+            "native_capture_seconds": 0.0010024999792221934,
+            "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+            "native_clone_loop_seconds": [
+              0.0059484159864950925,
+              0.006146166997496039,
+              0.006090415990911424,
+              0.0059716250107157975,
+              0.00613245798740536
+            ],
+            "native_context_seconds": 0.004744000005302951,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                128,
+                255
+              ],
+              "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46"
+            },
+            "position": "opening",
+            "resident_evidence": {
+              "actual_records_per_lane": 3150,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "017c03d45e8ceb88e45000cca1505af9507b5c51e133b4222920d08a2d8bfeac",
+                "dynamic_string_offsets": "d6aa476bf60b343154618b229486981b7c2ed9ff97604bf876edfe506bf420d8",
+                "errors": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+                "lengths": "3d6974eb57e29c3a7b5705e9024e1bfb3719352461031f644107f80364fae42c",
+                "records": "e4da903ac02d850da71177dce7b7830afe6794168c1179564a9a098d9333dd64",
+                "sections": "992a58993c53aca375b75a8285c97423b66fcd44a281e22ddc4f11833a8a0751",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3150,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 256
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.2729048749897629,
+            "tensor_fork_seconds": [
+              0.001225540996529162,
+              0.001152874989202246,
+              0.0012494160037022084,
+              0.0012102920154575258,
+              0.0008395840122830123
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 5.032187202035757
+          },
+          {
+            "cold_native_clone_loop_seconds": 5.0291011575609446e-05,
+            "cold_reset_seconds": 0.013815540994983166,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006762334000086412,
+            "dynamic_upload_seconds": 0.0038943330000620335,
+            "host_inspection_and_native_restore_seconds": 0.011658333998639137,
+            "lanes": 1,
+            "native_capture_seconds": 0.0009497499850112945,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              5.4625008488073945e-05,
+              3.458300489000976e-05,
+              3.2334006391465664e-05,
+              3.037499845959246e-05,
+              4.225000157020986e-05
+            ],
+            "native_context_seconds": 0.004868417017860338,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+                "lengths": "28e50dd3e775d1797be2c8c2e0abdf02f8b971f97cee27a82b256b637e38b40e",
+                "records": "bfdb8c468d333468109371ae762d4ef17f92fbcdcaa11a766e9f3f815aad593a",
+                "sections": "9b20431851215ffcf270145b6c14fc49d8de2fd9f835e4fc2c85424807077822",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 1
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.004926582972984761,
+            "tensor_fork_seconds": [
+              0.00036408298183232546,
+              0.00029949998133815825,
+              0.00028758301050402224,
+              0.00026541700935922563,
+              0.0003446670016273856
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 0.11546913871411203
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00014254101552069187,
+            "cold_reset_seconds": 0.0021457500115502626,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.0066853329772129655,
+            "dynamic_upload_seconds": 0.0038943330000620335,
+            "host_inspection_and_native_restore_seconds": 0.029367250012001023,
+            "lanes": 4,
+            "native_capture_seconds": 0.0009497499850112945,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.00011916598305106163,
+              0.00011733401333913207,
+              0.00011570900096558034,
+              0.00010879099136218429,
+              0.00010637499508447945
+            ],
+            "native_context_seconds": 0.004868417017860338,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                2,
+                3
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "lengths": "43ddb5e6d51b9e74e250ed89e252ed5b506e1197a8caba95ad3fb6e0b8f7be69",
+                "records": "672b7bc25ca4f7f0e6f242acd7ac39219c7d4909a81c7876848e1ede0850319a",
+                "sections": "676d3ffd2ea1041b05ad7153e9806c5350c176c98f8884a7fef5a46b9b808bc0",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 4
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.004926582972984761,
+            "tensor_fork_seconds": [
+              0.00033033298677764833,
+              0.00028408400248736143,
+              0.00033029200858436525,
+              0.00028387497877702117,
+              0.00028466698131524026
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 0.4064714510652859
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0004776249988935888,
+            "cold_reset_seconds": 0.0031647910072933882,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006018042011419311,
+            "dynamic_upload_seconds": 0.0038943330000620335,
+            "host_inspection_and_native_restore_seconds": 0.031479832978220657,
+            "lanes": 16,
+            "native_capture_seconds": 0.0009497499850112945,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.0005804160027764738,
+              0.000519374996656552,
+              0.00042716701864264905,
+              0.00048804099787957966,
+              0.0004599579842761159
+            ],
+            "native_context_seconds": 0.004868417017860338,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                8,
+                15
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+                "lengths": "2361696d2a42774e02e6d7fb5e5db636d72e43b72550d798d67b92252882def9",
+                "records": "01f6ae7aa4b7c31ba13fb517cf27c0bdf5fc3008c42116cba7f61ec09391e00f",
+                "sections": "81d6284238d7d703003760dee3ade6042ce6b39a9d93c5df74a2ffc536febbff",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 16
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.004926582972984761,
+            "tensor_fork_seconds": [
+              0.0007163330155890435,
+              0.00035766701330430806,
+              0.00030995800625532866,
+              0.0003023330064024776,
+              0.0003338330134283751
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 1.461931499427004
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.002000167005462572,
+            "cold_reset_seconds": 0.0036624589993152767,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006859749992145225,
+            "dynamic_upload_seconds": 0.0038943330000620335,
+            "host_inspection_and_native_restore_seconds": 0.03746699998737313,
+            "lanes": 64,
+            "native_capture_seconds": 0.0009497499850112945,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.00207516600494273,
+              0.002200332994107157,
+              0.002133125002728775,
+              0.0021967500215396285,
+              0.00202470799558796
+            ],
+            "native_context_seconds": 0.004868417017860338,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                32,
+                63
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+                "lengths": "5992a625ba5114276425feb6709b07f3b2312b2aafeaec7248881ed15eea7202",
+                "records": "9d4c4413575589848337de1d7871d718a055a32892efefd74a53e57240cad551",
+                "sections": "b17688f999747e5812fa0047539b7efcb5bf0f30107efaf8f04ac5ba4dc21c38",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 64
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.004926582972984761,
+            "tensor_fork_seconds": [
+              0.0009215839963871986,
+              0.0009251669980585575,
+              0.0009782080014701933,
+              0.0009231659932993352,
+              0.0010664160072337836
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 2.3056648228969374
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.007744542002910748,
+            "cold_reset_seconds": 0.002934958989499137,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.033911333011928946,
+            "dynamic_upload_seconds": 0.0038943330000620335,
+            "host_inspection_and_native_restore_seconds": 0.05674245799309574,
+            "lanes": 256,
+            "native_capture_seconds": 0.0009497499850112945,
+            "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+            "native_clone_loop_seconds": [
+              0.007671708008274436,
+              0.007329375017434359,
+              0.007210084004327655,
+              0.006726124993292615,
+              0.006870249984785914
+            ],
+            "native_context_seconds": 0.004868417017860338,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                128,
+                255
+              ],
+              "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd"
+            },
+            "position": "first_chance",
+            "resident_evidence": {
+              "actual_records_per_lane": 3519,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "a7920bc906ed9be2997f753d7d4b2eb21af70e0310923291a7be94708f77e37c",
+                "dynamic_string_offsets": "0007a583b4dbf727b1f9d10dd1742b386707d3c751345c5b7c3868cd1e2f6b9d",
+                "errors": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+                "lengths": "8c33a8c1eb7c16ab15dd5e56342eba7f46576283e532694946b2a2e71736964b",
+                "records": "a7808fe6670db127a3dfeff76e7efab81858def7b9dd130294cb5560fb4e626c",
+                "sections": "18f65909df17325df4b38ceeb173cf51a0486c0337c6c71ef8492f15e461eec0",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 3519,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 256
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.004926582972984761,
+            "tensor_fork_seconds": [
+              0.0012237500050105155,
+              0.0013867499947082251,
+              0.0008695000142324716,
+              0.0012824170116800815,
+              0.001200208003865555
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 5.891794872160756
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.00012054099352099001,
+            "cold_reset_seconds": 0.013533334014937282,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.007325083017349243,
+            "dynamic_upload_seconds": 0.004750207997858524,
+            "host_inspection_and_native_restore_seconds": 0.014517375006107613,
+            "lanes": 1,
+            "native_capture_seconds": 0.001518749981187284,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.00010579201625660062,
+              0.00010833301348611712,
+              0.00010104099055752158,
+              0.00010429200483486056,
+              0.00010391700197942555
+            ],
+            "native_context_seconds": 0.004461499978788197,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+                "lengths": "6d33f64530e9ca0123c256409752e91708669ee9418c0de220f1e6c2c25d0057",
+                "records": "e78e41cd169fb3a925473f844930e4b3672cf47215dcf11d8057c27b999299f0",
+                "sections": "6145e3afca01e5aef85036d1ed2f57a0b71ecccc86393c2ee9eef208b5a07503",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 1
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.0046102500054985285,
+            "tensor_fork_seconds": [
+              0.00033708297996781766,
+              0.00034970801789313555,
+              0.00029691599775105715,
+              0.00043820799328386784,
+              0.0003095410065725446
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 0.30939564152665805
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0005446249851956964,
+            "cold_reset_seconds": 0.0017944579885806888,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006655124976532534,
+            "dynamic_upload_seconds": 0.004750207997858524,
+            "host_inspection_and_native_restore_seconds": 0.03463833298883401,
+            "lanes": 4,
+            "native_capture_seconds": 0.001518749981187284,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.0005682079936377704,
+              0.0004087919951416552,
+              0.0005269579996820539,
+              0.00040420799632556736,
+              0.0004388339875731617
+            ],
+            "native_context_seconds": 0.004461499978788197,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                2,
+                3
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+                "lengths": "21214e88b4739195e31d1d676eec9e748172b23b13d768762a22b2851ed927ba",
+                "records": "e1382ca340a1698148edae42e529c5d681f843568660e9a67d150537416c6d23",
+                "sections": "99b53943d30e5a3a9c08968d2f3d5e76eae9a9975ce94fb4df1118a9ea1e5fe7",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 4
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.0046102500054985285,
+            "tensor_fork_seconds": [
+              0.0004384579951874912,
+              0.0004137920041102916,
+              0.0003679160145111382,
+              0.0004342499887570739,
+              0.0003453749814070761
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 1.0605182874828956
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0019436250149738044,
+            "cold_reset_seconds": 0.0029409170092549175,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.006774416979169473,
+            "dynamic_upload_seconds": 0.004750207997858524,
+            "host_inspection_and_native_restore_seconds": 0.04017575000762008,
+            "lanes": 16,
+            "native_capture_seconds": 0.001518749981187284,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.0019998330099042505,
+              0.0021890419884584844,
+              0.0017694580019451678,
+              0.0018046670011244714,
+              0.001990291988477111
+            ],
+            "native_context_seconds": 0.004461499978788197,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                8,
+                15
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+                "lengths": "5c914560af6b8a1e1e19b512c00b51a3a6c7337919d3fb51df8cac1ce024976d",
+                "records": "94202395b455ba761e0b008a4674b7a0cc45b3a59676f24d8fb9839d94796d88",
+                "sections": "cf02dbc0d8248dc54e41a34c635a6cd65c34350e9b6366b5ba81cbab87ccdc84",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 16
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.0046102500054985285,
+            "tensor_fork_seconds": [
+              0.0004813330015167594,
+              0.000516166997840628,
+              0.0007986249984242022,
+              0.0004537499917205423,
+              0.0008476250222884119
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 3.8559070936411057
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.0071157079946715385,
+            "cold_reset_seconds": 0.0034301670093555003,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.03468808298930526,
+            "dynamic_upload_seconds": 0.004750207997858524,
+            "host_inspection_and_native_restore_seconds": 0.053062915976624936,
+            "lanes": 64,
+            "native_capture_seconds": 0.001518749981187284,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.007304999977350235,
+              0.007074291992466897,
+              0.00681250001071021,
+              0.0070372080081142485,
+              0.007371792016783729
+            ],
+            "native_context_seconds": 0.004461499978788197,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                32,
+                63
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+                "lengths": "627d24fd4e9fef64d6e7acf296b06130a929dd00190c04abc7e7e90c81be8fae",
+                "records": "0d3654fc05c113a84dae0761815261451dc8af6e7ecaefc9d282c8ea82f8bd19",
+                "sections": "b81f9d88a7e3204145820c9c4bd12ca5471271b62f497fdf6051273b7edc53d5",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 64
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.0046102500054985285,
+            "tensor_fork_seconds": [
+              0.0011396660120226443,
+              0.0011577080003917217,
+              0.0011128329788334668,
+              0.0011657080031000078,
+              0.001111292018322274
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 6.207337867268377
+          },
+          {
+            "cold_native_clone_loop_seconds": 0.025973959011025727,
+            "cold_reset_seconds": 0.0161087499873247,
+            "cold_scope": "Supported public MPS cache reset; OS and process initialization are excluded",
+            "cold_tensor_fork_seconds": 0.12053975000162609,
+            "dynamic_upload_seconds": 0.004750207997858524,
+            "host_inspection_and_native_restore_seconds": 0.11424104101024568,
+            "lanes": 256,
+            "native_capture_seconds": 0.001518749981187284,
+            "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+            "native_clone_loop_seconds": [
+              0.026367834012489766,
+              0.025374417018610984,
+              0.02553620800608769,
+              0.025820999988354743,
+              0.026557292003417388
+            ],
+            "native_context_seconds": 0.004461499978788197,
+            "native_witnesses": {
+              "full_native_state_and_all_rng_exact": true,
+              "lanes": [
+                0,
+                128,
+                255
+              ],
+              "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+            },
+            "position": "round2_japan_combat_movement",
+            "resident_evidence": {
+              "actual_records_per_lane": 9318,
+              "buffer_sha256": {
+                "dynamic_string_bytes": "cb8f3ceb40d9b0886ce9213543598597a2375de5bbcd1f275164f8236802da13",
+                "dynamic_string_offsets": "fd36eab3bba6a13add7c0ee31ed1b9d9ab18b29b44ec44bcf2734939e118605c",
+                "errors": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+                "lengths": "1baada04bbe4a3cc32df8039881395389d0e04e1e23eefda06c7b60932952e0a",
+                "records": "17218eb5392680002efbf829aa7b612b5393fe4273d072556f9da54e6044508f",
+                "sections": "5d0e4a94b2fae78d58c1c54236a366072ae874e10ccc2b15c46ce36d7b36e6b3",
+                "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+                "static_string_bytes": "1494893f5c63cd597d2bf4dd358d7046bb34fe3e5bb276eabacd1d1d49cc99fa",
+                "static_string_offsets": "3f3a81fd8fe0125c9a46534caf744bd5896e10711e34170ccc37e4ab40458380"
+              },
+              "exact": true,
+              "inspection_chunk_budget_bytes": 32000000,
+              "record_capacity": 9318,
+              "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+              "verified_lanes": 256
+            },
+            "seed": 1951,
+            "setup_population": "One source snapshot, reused by all repeated-source forks",
+            "static_upload_seconds": 0.0046102500054985285,
+            "tensor_fork_seconds": [
+              0.0027165000210516155,
+              0.002650249982252717,
+              0.002364166983170435,
+              0.0026576249802019447,
+              0.0018075419939123094
+            ],
+            "timed_native_clone_witnesses_exact": true,
+            "warm_native_over_gpu_ratio": 9.74285450854219
+          }
+        ],
+        "config": {
+          "batch_sizes": [
+            1,
+            4,
+            16,
+            64,
+            256
+          ],
+          "cpu_budget": 12,
+          "devices": [
+            "cpu",
+            "mps"
+          ],
+          "memory_bytes": 8000000000,
+          "repeats": 5,
+          "seconds": 180,
+          "seed": 1951,
+          "threads": 2,
+          "warmups": 1
+        },
+        "device": "mps",
+        "device_memory": {
+          "driver_bytes": 1116160000,
+          "live_bytes": 0
+        },
+        "device_runtime": {
+          "checkpoint_scope": "Derived process-local cache state; counters reset on fresh construction and pending count resets after restore",
+          "clear_every_actor_forwards": 32,
+          "clear_seconds": 0.07653870794456452,
+          "clears": 16,
+          "device": "mps",
+          "pending_actor_forwards": 5,
+          "resets": 16,
+          "schema": "campaign-mps-graph-cache-policy-v1",
+          "torch": "2.14.0",
+          "total_actor_forwards": 75
+        },
+        "elapsed_worker_seconds": 20.52693508300581,
+        "guard": {
+          "cpu_budget": 12,
+          "diagnostic": null,
+          "elapsed_seconds": 21.411938667006325,
+          "margin_bytes": 1000000000,
+          "memory_bytes": 8000000000,
+          "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+          "mps_allocator_reserved_bytes": 3000000000,
+          "sampled_peak_charged_bytes": 5142635640,
+          "shared_deadline_monotonic": 208398.969275291
+        },
+        "native_baseline": "Python call loop [raw_env.clone() for each lane]; includes Python/native boundary overhead",
+        "population": "Replicas of one real frozen raw Engine position per case; every history and random field retained",
+        "preparation_completed_three_round_games": 1,
+        "preparation_scope": "One fresh completed scripted game supplies fixtures; excluded from fork timing",
+        "preparation_seconds": 12.726628750009695,
+        "provenance": {
+          "backend_source_sha256": {
+            "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+            "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+            "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+            "studies/campaign/backends/device_state.py": "ec681e766df715814394fcbc33cba6b1285927922827d2e7a61956b56c41b430",
+            "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+            "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+            "studies/campaign/backends/metal_validation.py": "312eab4918f96d823a47d5c7d96aa6418582a20f810bb020ab3df1b6a76e8786",
+            "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+            "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+            "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+            "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde"
+          },
+          "branch": "codex/gpu-selfplay",
+          "commit": "519ae61b1520dd87f4390a56722a423bdc38abfb",
+          "dirty": "",
+          "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+          "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+          "native_sha256": "d9339d06dc446ba4b3602cc3c402a0d06f4c2d4fd46705c9b4ccdf9e1d4d2987",
+          "runtime_source_sha256": {
+            "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+            "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+            "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+            "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+            "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+            "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+            "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+            "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+            "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+            "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+            "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+            "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+            "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+            "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+            "include/game/device_state.hpp": "1561a788e00e7c6e881ca8feaa01f5a793a85522c659de511b5e04c7400ead08",
+            "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+            "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+            "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+            "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+            "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+            "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+            "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+            "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+            "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+            "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+            "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+            "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+            "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+            "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+            "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+            "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+            "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+            "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+            "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+            "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+            "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+            "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+            "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+            "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+            "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+            "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+            "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+            "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+            "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+            "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+            "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+            "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+            "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+            "src/device_state.cpp": "2630247f895df5584bdd04bbdddcc2416fe9667e2edb6ccf902a93180dfb420b",
+            "src/economy.cpp": "321dab0141e648dc048050fa53303d903e55b6b447d8b8b65bd0cb6bc195d351",
+            "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+            "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+            "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+            "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+            "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+            "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+            "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+            "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+            "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+            "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+            "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+            "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+            "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+            "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+            "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+            "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+            "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+            "src/python_bindings.cpp": "1e17f7d13c1069566603459b1ca044928b52d6521f124820dfc5cf2e44334976",
+            "src/python_device_state.inc": "01635a8fb63417ea5722fb04212917ae28d9afdc00b8d2bf91e52ba149fef05b",
+            "src/python_income_ledger.inc": "b485878c515457497e32fa1e6270cd618c990643ba7d9005ef0560c2f5d01b32",
+            "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+            "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+            "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+            "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+            "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+            "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+            "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+            "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+            "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+            "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+            "studies/campaign/backends/device_state.py": "ec681e766df715814394fcbc33cba6b1285927922827d2e7a61956b56c41b430",
+            "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+            "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+            "studies/campaign/backends/metal_validation.py": "312eab4918f96d823a47d5c7d96aa6418582a20f810bb020ab3df1b6a76e8786",
+            "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+            "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+            "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+            "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+            "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+            "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+            "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+            "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+            "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+            "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+            "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+            "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+            "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+            "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+            "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+            "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+            "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+            "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+            "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+            "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+            "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+          },
+          "state_harness_sha256": "e5d1ac85ad277ec03e4a54ae9ec19672bea13ba504666c6cee6b75f17f259091",
+          "supervisor_source_sha256": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+        },
+        "schema": "campaign-device-state-fork-benchmark-v1",
+        "scope": "Guarded native-clone versus resident CPU/MPS state-fork measurements.\n\nThese are complete privileged Engine snapshots, including history and all RNG.\nThe native baseline is a Python loop calling raw CampaignEnv.clone; tensor forks\nare batched gathers from an already resident snapshot. Initial capture/upload,\ncold/warm fork latency and explicit host inspection are separate measurements.\nThis component benchmark does not measure full GPU gameplay, MCTS or learning.\n",
+        "software": {
+          "interop_threads": 1,
+          "mps_fallback_env": "0",
+          "mps_fast_math_env": "0",
+          "python": "3.13.5",
+          "threads": 2,
+          "torch": "2.14.0"
+        },
+        "sources_unchanged": true,
+        "status": "completed",
+        "task": {
+          "calendar_rounds": 3,
+          "compatibility": {
+            "actions": "campaign-orders-v1",
+            "curriculum": "regional-horizon-curriculum-v1",
+            "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+            "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+            "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+          },
+          "full_target_game": false,
+          "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+          "setup": "unchanged approved 99-piece,37-node July1936 setup",
+          "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+          "version": "regional-horizon-curriculum-v1"
+        },
+        "tensor_path": "Resident batched DeviceStateBatch.fork; no native clone, state JSON or host inspection in fork timing",
+        "workload_sha256": "1997e2bcc302e51e5e53630d50c83b659bdac72073b5a866355312c7a53579c8"
+      }
+    },
+    "elapsed_total_seconds": 41.68477358401287,
+    "matched_complete_states_and_rng": true,
+    "schema": "campaign-device-state-fork-benchmark-v1",
+    "scope": "Full-state fork component only. Python raw.clone loop versus resident batched gather; not full GPU gameplay, search or learning throughput.",
+    "status": "completed"
+  },
+  "validation": {
+    "gpu_checks_scope": "Across overlapping54-check and23-check invocations;58distinctchecks.",
+    "gpu_focused_distinct_checks_passed": 58,
+    "native_ctest_passed": 27,
+    "native_ctest_seconds": 20.17,
+    "original_cpu_runtime_checks": 58,
+    "original_passed": 49,
+    "original_seconds": 27.0,
+    "original_unsupported_mps_skips": 9,
+    "previous_failure": "Original2.11MPSint64index_selectroundedlargewordbits;twoGPUstatecasesfailedbeforethecapabilitygate. CPUcasespassed;fixedGPUfeaturegateandregressionsadded."
+  }
+}
