@@ -32,7 +32,9 @@ int prepaidRepair(const State& s, const Id& target, const Id& owner,
     return damage;
 }
 
-int railPrice(const State& s, const RailState& rail) {
+}  // namespace
+
+int railAssetPrice(const State& s, const RailState& rail) {
     const std::set<Id> harsh{"desert", "jungle", "marsh", "mountain", "tundra", "tundra_ice"};
     const auto approach = borderApproach(s, rail.endpointA, rail.endpointB);
     const auto reverse = borderApproach(s, rail.endpointB, rail.endpointA);
@@ -43,10 +45,10 @@ int railPrice(const State& s, const RailState& rail) {
     return 2;
 }
 
-void requireObjective(const State& s) {
-    if (!s.definition->catalog || !s.definition->rules.find("scenario_contract"))
+void validateWealthDefinition(const Definition& definition) {
+    if (!definition.catalog || !definition.rules.find("scenario_contract"))
         throw std::runtime_error("Wealth objective requires the approved scenario contract and catalog");
-    const auto& objective = s.definition->rules.require("scenario_contract").require("wealth");
+    const auto& objective = definition.rules.require("scenario_contract").require("wealth");
     if (objective.require("comparison").asString() != "own_wealth_minus_combined_other_two_sides")
         throw std::runtime_error("Unsupported campaign objective");
     const auto& weights = objective.require("weights");
@@ -57,14 +59,12 @@ void requireObjective(const State& s) {
         weights.require("paid_construction_value").asNumber() != 0.1)
         throw std::runtime_error("Unsupported campaign wealth weights");
 }
-}  // namespace
-
 double WealthComponents::total() const {
     return incomeRate + 0.1 * (units + infrastructure + treasury + paidConstruction);
 }
 
 std::array<WealthComponents, 3> allianceWealth(const State& s) {
-    requireObjective(s);
+    validateWealthDefinition(*s.definition);
     std::array<WealthComponents, 3> values{};
     for (const auto& [nation, n] : s.nations) if (const auto i = recipient(s, nation)) {
         values[*i].incomeRate += evaluateIncome(s, nation).total;
@@ -99,7 +99,7 @@ std::array<WealthComponents, 3> allianceWealth(const State& s) {
             const int paid = owner ? prepaidRepair(s, id, *owner, endpoint) : 0;
             remainingCost += std::max(0, damage - paid);
         }
-        const double half = 0.5 * (railPrice(s, rail) - remainingCost);
+        const double half = 0.5 * (railAssetPrice(s, rail) - remainingCost);
         for (const auto& endpoint : {rail.endpointA, rail.endpointB})
             if (const auto i = recipient(s, s.territories.at(endpoint).possessor))
                 values[*i].infrastructure += half;

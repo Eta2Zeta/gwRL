@@ -37,16 +37,18 @@ kernel void sample_packed_chance(
     device const long* sections [[buffer(2)]], device const uchar* prefix_bytes [[buffer(3)]],
     device const long* prefix_offsets [[buffer(4)]], device const uchar* suffix_bytes [[buffer(5)]],
     device const long* suffix_offsets [[buffer(6)]], device const long* source_errors [[buffer(7)]],
-    device int* faces [[buffer(8)]], device int* counts [[buffer(9)]],
-    device int* effective [[buffer(10)]], device long* dice_counts [[buffer(11)]],
-    device ulong* next_streams [[buffer(12)]], device ulong* next_positions [[buffer(13)]],
-    device int* errors [[buffer(14)]], device long* required [[buffer(15)]],
-    device const long* dimensions [[buffer(16)]], uint lane [[thread_position_in_grid]]) {
+    device const long* suffix_usage [[buffer(8)]],
+    device int* faces [[buffer(9)]], device int* counts [[buffer(10)]],
+    device int* effective [[buffer(11)]], device long* dice_counts [[buffer(12)]],
+    device ulong* next_streams [[buffer(13)]], device ulong* next_positions [[buffer(14)]],
+    device int* errors [[buffer(15)]], device long* required [[buffer(16)]],
+    device const long* dimensions [[buffer(17)]], uint lane [[thread_position_in_grid]]) {
     const long B=dimensions[0], C=dimensions[1], S=dimensions[2], D=dimensions[3], R=dimensions[4];
     if (long(lane)>=B) return;
-    PackedStateView v={records+ulong(lane)*ulong(C)*5,lengths[lane],C,
+    bool valid=source_errors[lane]==0 && lengths[lane]>0 && lengths[lane]<=C;
+    PackedStateView v=make_packed_state_view(records+ulong(lane)*ulong(C)*5,lengths[lane],C,
         prefix_bytes,prefix_offsets,dimensions[5],dimensions[7],
-        suffix_bytes,suffix_offsets,dimensions[6],dimensions[8]};
+        suffix_bytes,suffix_offsets,dimensions[6],dimensions[8],suffix_usage,valid);
     for (long die=0;die<D;++die) {
         const ulong i=ulong(lane)*ulong(D)+ulong(die);counts[i]=0;effective[i]=0;
         for(long roll=0;roll<R;++roll)faces[i*ulong(R)+ulong(roll)]=0;
@@ -54,7 +56,6 @@ kernel void sample_packed_chance(
     dice_counts[lane]=0;required[ulong(lane)*2]=0;required[ulong(lane)*2+1]=0;
     next_positions[lane]=0;
     for(int s=0;s<3;++s)next_streams[ulong(lane)*3+ulong(s)]=0;
-    bool valid=source_errors[lane]==0 && v.length>0 && v.length<=C;
     const ulong base=ulong(lane)*ulong(S);
     ulong original[3]={0,0,0};
     if(valid)for(int s=0;s<3;++s)
@@ -177,7 +178,7 @@ def sample_packed_chance(state, *, dice_capacity, roll_capacity):
         raise ValueError("Dice/roll capacities must be nonnegative representable allocations")
     B,C=state.records.shape[:2];D,R=dice_capacity,roll_capacity
     values=(state.records,state.lengths,state.sections,state.context.string_bytes,
-            state.context.string_offsets,state.string_bytes,state.string_offsets,state.errors)
+            state.context.string_offsets,state.string_bytes,state.string_offsets,state.errors,state.suffix_usage)
     if any(not value.is_contiguous() for value in values):
         raise ValueError("Packed sampling requires contiguous resident buffers")
     faces=torch.empty((B,D,R),dtype=torch.int32,device=state.device)

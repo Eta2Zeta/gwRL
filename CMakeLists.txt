@@ -22,6 +22,7 @@ add_library(gw_engine STATIC
     src/income_batch.cpp
     src/device_state.cpp
     src/income_ledger_batch.cpp
+    src/wealth_context.cpp
     src/economy_lendlease.cpp
     src/land_combat.cpp
     src/air.cpp

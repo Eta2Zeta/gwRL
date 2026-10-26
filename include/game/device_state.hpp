@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace game::campaign {
-inline constexpr const char* deviceStateSchema = "campaign-device-state-v1";
+inline constexpr const char* deviceStateSchema = "campaign-device-state-v2";
 inline constexpr std::size_t deviceStateColumns = 5;
 using DeviceRecord = std::array<std::int64_t, deviceStateColumns>;
 

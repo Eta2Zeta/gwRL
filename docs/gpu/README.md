@@ -263,6 +263,22 @@ returns an uncommitted outcome/next-RNG pair. `resident_state_income.py` reads a
 updates the complete packed income ledger at its placement/accounting seam. It
 does not apply placement, political hooks, phase advancement or action history.
 
+Wire version 2 adds resident actual string/byte counts, separate from allocated
+capacity. `device_strings.py` appends exact byte strings with deterministic
+deduplication, copy-on-write pools, explicit capacity/overflow errors and optional
+UTF8 validation. Integer prefix scans retain offsets above 2^24 exactly. Unused
+pool storage and IDs are privileged transport data, never neural features.
+
+The specialized search clone gathers state and replaces the final RNG record in
+one element-parallel Metal dispatch; the tested generic composition remains
+selectable as `implementation="reference"` for matched measurements.
+`resident_wealth.py` calculates full asset/income components on device, including
+native-order binary64 component rounding represented with integer half units.
+Its rational twentieths are separately labeled; explicit host inspection applies
+the original double-valued total/gap expression and is the native-value oracle.
+`content_digest_metal.py` provides exact native SHA-256 action identity bytes
+without decoding or normalizing strings on CPU.
+
 Further engine ports must retain complete state, legal menus, pending choices,
 interrupt ownership and chance distributions on device, using this CPU reference
 and explicit outcomes for conformance. A kernel-level speedup alone does not

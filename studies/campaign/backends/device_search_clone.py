@@ -60,8 +60,8 @@ class DeviceSearchRoots:
             raise ValueError("Search roots changed during bound snapshot capture")
         return cls(state, scheduler)
 
-    def clone_for_search(self, seeds: Tensor, lanes: Tensor | None = None) -> DeviceSearchCloneResult:
-        return clone_for_search(self.state, seeds, lanes, scheduler=self.scheduler)
+    def clone_for_search(self, seeds: Tensor, lanes: Tensor | None = None, *, implementation="fused") -> DeviceSearchCloneResult:
+        return clone_for_search(self.state, seeds, lanes, scheduler=self.scheduler, implementation=implementation)
 
 
 SOURCE = RANDOM_SOURCE + r"""
@@ -147,7 +147,118 @@ kernel void build_search_random_record(
 }
 """
 
+# A workgroup owns one destination. It validates/seeds once, then copies whole
+# records in parallel. RandomStreams is the final Engine child, so clearing its
+# tape changes no State/history position or bit and needs no general tree edit.
+FUSED_SOURCE = SOURCE + r"""
+inline long fused_source_error(device const long* source, long length, long capacity,
+                               device const long* indexes, device const long* dims,
+                               thread long& root) {
+    if(length<2||length>capacity)return 1;
+    long positions[7];
+    for(int field=0;field<7;++field){
+        positions[field]=indexes[dims[3+field]];
+        if(positions[field]<0||positions[field]>=length)return 2;
+    }
+    root=positions[0];
+    const long state=indexes[0];
+    if(state!=1||source[0]!=10||source[1]!=2||source[2]||source[3]||source[4]!=length)return 1;
+    device const long* state_header=source+5;
+    if(state_header[0]!=10||state_header[1]!=19||state_header[2]||state_header[3]||state_header[4]!=root)return 1;
+    device const long* header=source+ulong(root)*5;
+    const long cursor=positions[6], tape=positions[5];
+    if(header[0]!=10||header[1]!=6||header[2]||header[3]||header[4]!=length||cursor+1!=length||
+       positions[1]!=root+1||positions[2]!=root+2||positions[3]!=root+3||positions[4]!=root+4||tape!=root+5)return 2;
+    for(int field=1;field<=3;++field)
+        if(!clone_scalar(source+ulong(positions[field])*5,3,positions[field]+1))return 2;
+    if(!clone_scalar(source+ulong(cursor)*5,3,cursor+1))return 2;
+    device const long* active=source+ulong(positions[4])*5;
+    if(active[0]!=5||active[2]||active[3]||active[4]!=positions[4]+1||
+       (active[1]!=dims[10]&&active[1]!=dims[11]&&active[1]!=dims[12]))return 2;
+    device const long* sequence=source+ulong(tape)*5;
+    const long count=sequence[1];
+    if(sequence[0]!=6||count<0||count>length-tape-1||sequence[2]||sequence[3]||
+       sequence[4]!=tape+1+count||cursor!=sequence[4])return 2;
+    device const long* counter=source+ulong(cursor)*5;
+    if((ulong(counter[2])|(ulong(counter[3])<<32))>ulong(count))return 2;
+    for(long entry=0;entry<count;++entry){
+        const long index=tape+1+entry;
+        device const long* face=source+ulong(index)*5;
+        if(!clone_scalar(face,2,index+1)||face[2]<=0||face[2]>2147483647||face[3])return 2;
+    }
+    return 0;
+}
+
+kernel void fused_search_clone(
+ device const long* records [[buffer(0)]],device const long* lengths [[buffer(1)]],
+ device const long* sections [[buffer(2)]],device const long* inherited_errors [[buffer(3)]],
+ device const ulong* seeds [[buffer(4)]],device const long* lanes [[buffer(5)]],
+ device const long* scheduler_errors [[buffer(6)]],device long* output [[buffer(7)]],
+ device long* output_lengths [[buffer(8)]],device long* output_sections [[buffer(9)]],
+ device long* state_errors [[buffer(10)]],device long* errors [[buffer(11)]],
+ device bool* accepted [[buffer(12)]],device const long* dims [[buffer(13)]],
+ uint3 group [[threadgroup_position_in_grid]],uint tid [[thread_index_in_threadgroup]],
+ uint3 group_size [[threads_per_threadgroup]]) {
+    const long lane=long(group.x), capacity=dims[1], fields=dims[2];
+    if(lane>=dims[13])return;
+    threadgroup long source_lane, root, total, error, inherited;
+    threadgroup bool source_valid;
+    threadgroup long random[35];
+    if(tid==0){
+        source_lane=lanes[lane];source_valid=source_lane>=0&&source_lane<dims[0];
+        error=0;inherited=0;root=0;total=0;
+        for(int word=0;word<35;++word)random[word]=0;
+        if(!source_valid)error|=1;
+        else {
+            inherited=inherited_errors[source_lane];total=lengths[source_lane];
+            if(inherited)error|=1;
+            if(!error){
+                long found=0;
+                error|=fused_source_error(records+ulong(source_lane)*ulong(capacity)*5,total,capacity,
+                    sections+ulong(source_lane)*ulong(fields),dims,found);
+                root=found;
+            }
+        }
+        if(dims[14])error|=scheduler_errors[lane]?8:0;
+        if(!error){
+            device const long* source=records+ulong(source_lane)*ulong(capacity)*5;
+            ulong seed=seeds[lane];(void)next_random(seed);const ulong search=next_random(seed);
+            total=root+7;
+            random[0]=10;random[1]=6;random[4]=root+7;
+            for(int field=0;field<3;++field){
+                const int row=(field+1)*5;random[row]=3;random[row+4]=root+field+2;
+                if(field==1){random[row+2]=long(search&0xffffffffUL);random[row+3]=long(search>>32);}
+                else {const long index=root+field+1;random[row+2]=source[ulong(index)*5+2];random[row+3]=source[ulong(index)*5+3];}
+            }
+            random[20]=5;random[21]=dims[11];random[24]=root+5;
+            random[25]=6;random[29]=root+6;random[30]=3;random[34]=root+7;
+        }
+        output_lengths[lane]=source_valid?total:0;
+        state_errors[lane]=inherited|(error?1:0);errors[lane]=error;accepted[lane]=error==0;
+    }
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    device long* dest=output+ulong(lane)*ulong(capacity)*5;
+    for(ulong word=tid;word<ulong(capacity)*5;word+=group_size.x){
+        long value=0;
+        if(source_valid){
+            device const long* source=records+ulong(source_lane)*ulong(capacity)*5;
+            if(error)value=source[word];
+            else if(word==4)value=total;
+            else if(word<ulong(root)*5)value=source[word];
+            else if(word<ulong(root+7)*5)value=random[word-ulong(root)*5];
+        }
+        dest[word]=value;
+    }
+    for(long field=tid;field<fields;field+=group_size.x){
+        long value=source_valid?sections[ulong(source_lane)*ulong(fields)+ulong(field)]:0;
+        if(!error&&field==dims[9])value=root+6;
+        output_sections[ulong(lane)*ulong(fields)+ulong(field)]=value;
+    }
+}
+"""
+
 _library = None
+_fused_library = None
 _lock = threading.Lock()
 
 
@@ -183,8 +294,38 @@ def _random_blocks(state, seeds):
     return blocks, errors
 
 
+def _fused_clone(state, seeds, lanes, scheduled):
+    global _fused_library
+    count, capacity = lanes.shape[0], state.records.shape[1]
+    invalid_scheduler = scheduler_decisions(scheduled).errors if scheduled is not None else None
+    if _fused_library is None:
+        with _lock:
+            if _fused_library is None:
+                _fused_library = torch.mps.compile_shader(FUSED_SOURCE)
+    columns = tuple(SECTION_NAMES.index(name) for name in
+        ("random", "random.actual", "random.search", "random.training", "random.active", "random.test_tape", "random.tape_position"))
+    dimensions = (state.lane_count, capacity, len(SECTION_NAMES), *columns,
+                  *state.context.random_stream_ids, count, int(scheduled is not None))
+    records = torch.empty((count, capacity, 5), dtype=torch.int64, device=state.device)
+    lengths = torch.empty(count, dtype=torch.int64, device=state.device)
+    sections = torch.empty((count, len(SECTION_NAMES)), dtype=torch.int64, device=state.device)
+    state_errors, errors = torch.empty_like(lengths), torch.empty_like(lengths)
+    accepted = torch.empty(count, dtype=torch.bool, device=state.device)
+    tensors = (state.records, state.lengths, state.sections, state.errors, seeds, lanes,
+        invalid_scheduler if invalid_scheduler is not None else _dummy(), records, lengths, sections,
+        state_errors, errors, accepted, _dimensions(dimensions))
+    if any(not value.is_contiguous() for value in tensors):
+        raise ValueError("Fused clone buffers must be contiguous; prepare strided selections explicitly on device")
+    kernel = _fused_library.fused_search_clone
+    group_size = min(256, kernel.max_threads_per_threadgroup)
+    kernel(*(value if value.numel() else _dummy() for value in tensors),
+           threads=count * group_size, group_size=group_size)
+    result = replace(state, records=records, lengths=lengths, sections=sections, errors=state_errors)
+    return DeviceSearchCloneResult(result, scheduled, errors, accepted)
+
+
 def clone_for_search(state: DeviceStateBatch, seeds: Tensor, lanes: Tensor | None = None, *,
-                     scheduler: DeviceSchedulerBatch | None = None) -> DeviceSearchCloneResult:
+                     scheduler: DeviceSchedulerBatch | None = None, implementation="fused") -> DeviceSearchCloneResult:
     """Fork roots and replace RandomStreams once, without reading device values.
 
     Seeds are int64 *bit storage* for the entire uint64 seed domain. Each seed
@@ -193,6 +334,8 @@ def clone_for_search(state: DeviceStateBatch, seeds: Tensor, lanes: Tensor | Non
     supplying scheduler separately, it must belong to these same source roots;
     DeviceSearchRoots.capture provides the normal bound capture path.
     """
+    if implementation not in {"fused", "reference"}:
+        raise ValueError("Search clone implementation must be explicit fused or reference")
     state._metadata()
     if state.device.type != "mps":
         raise ValueError("Resident search cloning requires Apple MPS; select the CPU backend explicitly")
@@ -209,10 +352,15 @@ def clone_for_search(state: DeviceStateBatch, seeds: Tensor, lanes: Tensor | Non
         raise OverflowError("Search-clone grid is not representable; no destination lanes are truncated")
     if scheduler is not None and (scheduler.lane_count != state.lane_count or scheduler.device != state.device):
         raise ValueError("Source state and scheduler must have identical lane counts and device")
-    forked = state.fork(lanes)
     scheduled = scheduler.fork(lanes) if scheduler is not None else None
     if not lanes.shape[0]:
+        forked = state.fork(lanes)
         return DeviceSearchCloneResult(forked, scheduled, forked.errors.clone(), forked.errors == 0)
+    if not state.lane_count:
+        raise ValueError("Cannot clone nonempty search roots from an empty source batch")
+    if implementation == "fused":
+        return _fused_clone(state, seeds, lanes, scheduled)
+    forked = state.fork(lanes)
     blocks, errors = _random_blocks(forked, seeds)
     if scheduled is not None:
         invalid_scheduler = scheduler_decisions(scheduled).errors != 0

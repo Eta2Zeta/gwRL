@@ -30,7 +30,17 @@ def _probe():
         torch.mps.synchronize()
         uploaded_cpu, actual_cpu = uploaded.cpu(), actual.cpu()
         upload_exact, gather_exact = torch.equal(values, uploaded_cpu), torch.equal(expected, actual_cpu)
-        return {**report, "supported": upload_exact and gather_exact,
+        scan_values = torch.tensor([2**24-1, 2, 2**31, 2**31-1], dtype=torch.int64)
+        scan_expected = scan_values.cumsum(0)
+        try:
+            scan_actual = scan_values.to("mps").cumsum(0).cpu()
+            scan = {"cumsum_exact": torch.equal(scan_expected, scan_actual),
+                    "cumsum_expected": scan_expected.tolist(), "cumsum_actual": scan_actual.tolist()}
+        except (RuntimeError, TypeError, NotImplementedError) as error:
+            scan = {"cumsum_exact": False, "cumsum_error": str(error)}
+        # State gather support does not depend on an unused prefix primitive:
+        # the string interner has an exact Metal scan and its own wide regression.
+        return {**report, **scan, "supported": upload_exact and gather_exact,
                 "reason": "exact" if upload_exact and gather_exact else "MPS int64 upload/index_select changes integer payload bits",
                 "upload_exact": upload_exact, "index_select_exact": gather_exact,
                 "expected": expected.tolist(), "actual": actual_cpu.tolist()}

@@ -33,10 +33,12 @@ SCHEMA = "campaign-connected-search-clone-benchmark-v1"
 class SearchCloneConfig(StateConfig):
     devices: tuple[str, ...] = ("mps",)
     batch_sizes: tuple[int, ...] = (1, 4, 64, 256)
+    implementation: str = "fused"
 
     def __post_init__(self):
         super().__post_init__()
         require(self.devices == ("mps",), "Connected search clone currently requires explicit Apple MPS; no CPU tensor fallback")
+        require(self.implementation in {"fused", "reference"}, "Connected clone implementation must be fused or reference")
 
 
 def provenance():
@@ -129,7 +131,9 @@ def worker(config, device, progress, deadline):
         "population": "Replicas of real raw Engine snapshots; complete state/history/RNG retained; explicit full-width uint64 seeds",
         "provenance_scope": "Compiled native binary and current source/tool hashes are pinned separately. Dirty worktree paths are recorded; no claim is made that every worktree file is linked into that native binary.",
         "native_baseline": "Python call loop raw.clone_for_search(seed); Python/native boundary and native copied-state construction included",
-        "gpu_path": "Resident DeviceStateBatch.fork + exact seed Metal kernel + RandomStreams subtree editor; no gameplay/search algorithm"}
+        "gpu_path": ("One fused Metal dispatch: parallel snapshot fork + exact search seed + final RandomStreams rewrite" if
+                     config.implementation == "fused" else
+                     "Resident DeviceStateBatch.fork + exact seed Metal kernel + general RandomStreams subtree editor")}
 
     def persist():
         report["elapsed_worker_seconds"] = time.perf_counter() - started
@@ -160,7 +164,8 @@ def worker(config, device, progress, deadline):
         captured, capture_seconds = timed(lambda: gwrl_cpp.capture_device_states(native_context, [raw]))
         source, upload_seconds = timed(lambda: DeviceStateBatch.from_native(captured, context=context), gpu=True)
         initial_seeds = torch.zeros(1, dtype=torch.int64, device=device)
-        initialized, initialization_seconds = timed(lambda: clone_for_search(source, initial_seeds), gpu=True)
+        initialized, initialization_seconds = timed(lambda: clone_for_search(source, initial_seeds,
+            implementation=config.implementation), gpu=True)
         require(initialized.errors.cpu().tolist() == [0], "Connected kernel initialization failed")
         del initialized, initial_seeds
         for size in config.batch_sizes:
@@ -173,7 +178,8 @@ def worker(config, device, progress, deadline):
                 torch.zeros(size, dtype=torch.int64, device=device)), gpu=True)
             before = time.perf_counter(); policy.reset(); reset_seconds = time.perf_counter() - before
             clones, native_cold = timed(lambda: [raw.clone_for_search(seed) for seed in values])
-            result, gpu_cold = timed(lambda: clone_for_search(source, seeds, lanes), gpu=True)
+            result, gpu_cold = timed(lambda: clone_for_search(source, seeds, lanes,
+                implementation=config.implementation), gpu=True)
             del clones, result
             case = {"position": fixture["label"], "lanes": size,
                 "native_checkpoint_sha256": hashlib.sha256(serialized.encode()).hexdigest(),
@@ -190,11 +196,13 @@ def worker(config, device, progress, deadline):
                 "scheduler": "Raw Engine component only; wrapper metadata conformance is covered by focused tests"}
             for _ in range(config.warmups):
                 temporary, _ = timed(lambda: [raw.clone_for_search(seed) for seed in values]); del temporary
-                temporary, _ = timed(lambda: clone_for_search(source, seeds, lanes), gpu=True); del temporary
+                temporary, _ = timed(lambda: clone_for_search(source, seeds, lanes,
+                    implementation=config.implementation), gpu=True); del temporary
             for repetition in range(config.repeats):
                 clones, elapsed = timed(lambda: [raw.clone_for_search(seed) for seed in values])
                 case["native_clone_loop_seconds"].append(elapsed)
-                result, elapsed = timed(lambda: clone_for_search(source, seeds, lanes), gpu=True)
+                result, elapsed = timed(lambda: clone_for_search(source, seeds, lanes,
+                    implementation=config.implementation), gpu=True)
                 case["gpu_connected_clone_seconds"].append(elapsed)
                 if repetition != config.repeats - 1:
                     del clones, result
@@ -243,6 +251,7 @@ def main(argv=None):
     parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--seconds", type=float, default=180)
     parser.add_argument("--memory-bytes", type=int, default=8_000_000_000)
+    parser.add_argument("--implementation", choices=("fused", "reference"), default="fused")
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", choices=("mps",), help=argparse.SUPPRESS)
     parser.add_argument("--_deadline", type=float, help=argparse.SUPPRESS)
@@ -253,7 +262,7 @@ def main(argv=None):
         worker(SearchCloneConfig(**value), args._device, args.output, args._deadline)
         return 0
     config = SearchCloneConfig(batch_sizes=tuple(args.batch_sizes), repeats=args.repeats,
-                              seconds=args.seconds, memory_bytes=args.memory_bytes)
+                              seconds=args.seconds, memory_bytes=args.memory_bytes, implementation=args.implementation)
     return 0 if run(config, args.output)["status"] == "completed" else 2
 
 

@@ -1,6 +1,7 @@
 """Full native cloneForSearch conformance, including all unsigned seed bits."""
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 import unittest
 from unittest.mock import patch
@@ -142,6 +143,35 @@ class CampaignDeviceSearchCloneTests(unittest.TestCase):
         self.assertTrue(torch.equal(source.records, before))
         with self.assertRaises(ValueError):
             rejected.state.to_native()
+        for root in (0, 1, int(source.section("random").cpu()[0])):
+            malformed = source.snapshot()
+            malformed.records[0, root, 1] += 1
+            rejected = clone_for_search(malformed, seed_tensor((3,)))
+            self.assertEqual(rejected.accepted.cpu().tolist(), [False])
+            self.assertTrue(torch.equal(rejected.state.records, malformed.records))
+        # A forged one-node Engine2 header cannot contain its State child.
+        # Reject before reading record1, even when the section array claims it.
+        sections = torch.zeros_like(source.sections)
+        sections[0, 0] = 1
+        tiny = replace(source, records=torch.tensor([[[10, 2, 0, 0, 1]]], dtype=torch.int64, device="mps"),
+                       lengths=torch.ones_like(source.lengths), sections=sections)
+        rejected = clone_for_search(tiny, seed_tensor((3,)))
+        self.assertEqual(rejected.accepted.cpu().tolist(), [False])
+        self.assertTrue(torch.equal(rejected.state.records, tiny.records))
+
+    def test_fused_and_general_composition_match_every_buffer_for_mixed_roots(self):
+        source = DeviceStateBatch.capture([real_states()[0], rich_fixture()], device="mps")
+        lanes = torch.tensor([1, 0, 1, 0], dtype=torch.int64, device="mps")
+        seeds = seed_tensor((0, 2**64 - 1, 2**63, 1951))
+        fast = clone_for_search(source, seeds, lanes, implementation="fused")
+        oracle = clone_for_search(source, seeds, lanes, implementation="reference")
+        for field in ("records", "lengths", "sections", "errors"):
+            self.assertTrue(torch.equal(getattr(fast.state, field), getattr(oracle.state, field)), field)
+        self.assertTrue(torch.equal(fast.errors, oracle.errors))
+        self.assertTrue(torch.equal(fast.accepted, oracle.accepted))
+        self.assertIs(fast.state.string_bytes, source.string_bytes)
+        self.assertIs(fast.state.string_offsets, source.string_offsets)
+        self.assertIs(fast.state.context, source.context)
 
     def test_empty_destinations_and_strict_seed_layout(self):
         state = DeviceStateBatch.capture([real_states()[0]], device="mps")

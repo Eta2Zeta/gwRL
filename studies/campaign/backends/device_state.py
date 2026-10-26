@@ -12,7 +12,7 @@ from typing import Any, Sequence
 
 import torch
 
-SCHEMA = "campaign-device-state-v1"
+SCHEMA = "campaign-device-state-v2"
 SECTION_NAMES = (
     "state", "random", "state.nations", "state.territories", "state.units",
     "state.facilities", "state.rails", "state.construction", "state.repairs",
@@ -76,6 +76,7 @@ class DeviceStateBatch:
     string_bytes: Any  # uint8 dynamic suffix shared immutably by forks.
     string_offsets: Any
     errors: Any        # int64 [lane]; invalid device selection is explicit.
+    suffix_usage: Any = None  # int64 [2]: actual strings/bytes, independent of capacity.
 
     @classmethod
     def from_native(cls, native, *, device=None, context=None):
@@ -104,7 +105,8 @@ class DeviceStateBatch:
             torch.tensor(native.section_array(), dtype=torch.int64, device=target),
             torch.tensor(native.string_bytes(), dtype=torch.uint8, device=target),
             torch.tensor(native.string_offsets(), dtype=torch.int64, device=target),
-            torch.zeros(lanes, dtype=torch.int64, device=target))
+            torch.zeros(lanes, dtype=torch.int64, device=target),
+            torch.tensor([native.string_offsets().shape[0]-1, native.string_bytes().shape[0]], dtype=torch.int64, device=target))
         result._metadata()
         return result
 
@@ -128,13 +130,16 @@ class DeviceStateBatch:
         return self.records.shape[0]
 
     def _metadata(self):
+        if not isinstance(self.suffix_usage, torch.Tensor):
+            raise ValueError("Missing v2 resident suffix_usage counters; recapture the complete state, do not retag old buffers")
         lanes = self.records.shape[0]
-        values = (self.records, self.lengths, self.sections, self.string_offsets, self.errors)
-        if (any(value.device != self.device or value.dtype != torch.int64 for value in values) or
+        values = (self.records, self.lengths, self.sections, self.string_offsets, self.errors, self.suffix_usage)
+        if (any(not isinstance(value, torch.Tensor) or value.device != self.device or value.dtype != torch.int64 for value in values) or
                 self.string_bytes.device != self.device or self.string_bytes.dtype != torch.uint8 or
                 self.records.ndim != 3 or self.records.shape[2] != 5 or
                 self.lengths.shape != (lanes,) or self.sections.shape != (lanes, len(SECTION_NAMES)) or
-                self.errors.shape != (lanes,) or self.string_bytes.ndim != 1 or self.string_offsets.ndim != 1):
+                self.errors.shape != (lanes,) or self.string_bytes.ndim != 1 or self.string_offsets.ndim != 1 or
+                self.string_offsets.numel() < 1 or self.suffix_usage.shape != (2,) or not self.suffix_usage.is_contiguous()):
             raise ValueError("Device state metadata/shape/device mismatch")
 
     def section(self, name):
@@ -167,12 +172,12 @@ class DeviceStateBatch:
         errors = self.errors.index_select(0, safe) | (~valid).to(torch.int64)
         return type(self)(self.context, torch.where(valid.view(-1, 1, 1), records, 0),
             torch.where(valid, lengths, 0), torch.where(valid.view(-1, 1), sections, 0),
-            self.string_bytes, self.string_offsets, errors)
+            self.string_bytes, self.string_offsets, errors, self.suffix_usage)
 
     def snapshot(self):
         self._metadata()
         return type(self)(self.context, self.records.clone(), self.lengths.clone(), self.sections.clone(),
-                         self.string_bytes, self.string_offsets, self.errors.clone())
+                         self.string_bytes, self.string_offsets, self.errors.clone(), self.suffix_usage)
 
     def to_native(self):
         """Explicit privileged host boundary; validate and decode every field."""
@@ -189,8 +194,11 @@ class DeviceStateBatch:
         pieces = [data[lane, :length].copy() for lane, length in enumerate(lengths)]
         flat = np.concatenate(pieces, axis=0) if pieces else np.empty((0, 5), dtype=np.int64)
         offsets = np.asarray([0, *np.cumsum(lengths, dtype=np.int64)], dtype=np.int64)
+        count, used_bytes = self.suffix_usage.detach().cpu().tolist()
+        if not 0 <= count < self.string_offsets.numel() or not 0 <= used_bytes <= self.string_bytes.numel():
+            raise ValueError("Device string usage exceeds allocated buffers; no truncation")
         return gwrl_cpp.device_state_batch_from_packed(self.context.native, flat, offsets,
-            self.string_bytes.detach().cpu().numpy(), self.string_offsets.detach().cpu().numpy(),
+            self.string_bytes.detach().cpu().numpy()[:used_bytes], self.string_offsets.detach().cpu().numpy()[:count+1],
             self.context.wire_context_fingerprint)
 
     def restore_envs(self):

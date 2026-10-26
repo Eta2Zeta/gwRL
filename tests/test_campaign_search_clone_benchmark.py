@@ -19,7 +19,8 @@ class CampaignSearchCloneBenchmarkTests(unittest.TestCase):
         self.assertEqual(seed_values(256, 1951), seed_values(256, 1951))
         self.assertEqual(len(seed_values(256, 1951)), 256)
         for changes in ({"devices": ("cpu",)}, {"devices": ("cpu", "mps")},
-                        {"seconds": 181}, {"threads": 3}, {"repeats": 0}, {"memory_bytes": 8_000_000_001}):
+                        {"seconds": 181}, {"threads": 3}, {"repeats": 0}, {"memory_bytes": 8_000_000_001},
+                        {"implementation": "unknown"}):
             with self.subTest(changes=changes), self.assertRaises(ValueError):
                 replace(config, **changes)
 

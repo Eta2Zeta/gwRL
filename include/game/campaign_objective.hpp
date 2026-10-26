@@ -17,6 +17,10 @@ struct WealthComponents {
     double total() const;
 };
 
+// Shared static authority for native and resident-device wealth contexts.
+void validateWealthDefinition(const Definition&);
+int railAssetPrice(const State&, const RailState&);
+
 // The approved M0 objective, in original IPP-like units. This is an evaluation
 // of the current position, not an intermediate reward or a collection event.
 std::array<WealthComponents, 3> allianceWealth(const State&);

@@ -87,15 +87,16 @@ kernel void extract_resident_income(
     device long* territories [[buffer(8)]],device long* nations [[buffer(9)]],
     device long* ledger [[buffer(10)]],device long* clock [[buffer(11)]],
     device long* phases [[buffer(12)]],device long* roots [[buffer(13)]],
-    device long* errors [[buffer(14)]],device const long* dims [[buffer(15)]],
+    device long* errors [[buffer(14)]],device const long* usage [[buffer(15)]],device const long* dims [[buffer(16)]],
     uint lane [[thread_position_in_grid]]) {
     const long B=dims[0],C=dims[1],N=dims[2],T=dims[3];
     if(long(lane)>=B)return;
-    PackedStateView v{records+ulong(lane)*ulong(C)*5,lengths[lane],C,
-        prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7]};
+    bool valid=true;
+    PackedStateView v=make_packed_state_view(records+ulong(lane)*ulong(C)*5,lengths[lane],C,
+        prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7],usage,valid);
     PackedStateView def{definition,dims[8],dims[8],prefix_bytes,prefix_offsets,dims[4],dims[5],
         suffix_bytes,suffix_offsets,0,0};
-    bool valid=v.length>0&&v.length<=C;
+    valid=valid&&v.length>0&&v.length<=C;
     for(long t=0;t<T;++t){const ulong out=(ulong(lane)*T+t)*4;
         territories[out]=0;territories[out+1]=-1;territories[out+2]=territories[out+3]=0;}
     for(long n=0;n<N;++n){const ulong out=(ulong(lane)*N+n)*6;
@@ -176,12 +177,13 @@ kernel void write_resident_income(
     device const long* components [[buffer(8)]],device const long* clock [[buffer(9)]],
     device const long* selected [[buffer(10)]],device long* blocks [[buffer(11)]],
     device long* block_lengths [[buffer(12)]],device long* errors [[buffer(13)]],
-    device const long* dims [[buffer(14)]],uint lane [[thread_position_in_grid]]) {
+    device const long* usage [[buffer(14)]],device const long* dims [[buffer(15)]],uint lane [[thread_position_in_grid]]) {
     const long B=dims[0],C=dims[1],N=dims[2],T=dims[3],R=dims[9];
     if(long(lane)>=B)return;block_lengths[lane]=0;errors[lane]=0;if(!selected[lane])return;
-    PackedStateView v{records+ulong(lane)*ulong(C)*5,lengths[lane],C,
-        prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7]};
-    device long* out=blocks+ulong(lane)*ulong(R)*5;bool valid=true;
+    bool valid=true;
+    PackedStateView v=make_packed_state_view(records+ulong(lane)*ulong(C)*5,lengths[lane],C,
+        prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7],usage,valid);
+    device long* out=blocks+ulong(lane)*ulong(R)*5;
     const long state=state_child(v,0,0,valid);income_container(v,state,10,19,valid);
     income_scalar(out,0,10,19,0,R,valid);long cursor=1;
     for(long field=0;valid&&field<19;++field) {
@@ -276,7 +278,7 @@ class ResidentIncomeContext:
         from .device_state import _device
         _device(state.device)
         values = (state.records, state.lengths, state.context.records, state.context.string_bytes,
-                  state.context.string_offsets, state.string_bytes, state.string_offsets, self.ids)
+                  state.context.string_offsets, state.string_bytes, state.string_offsets, self.ids,state.suffix_usage)
         if any(not value.is_contiguous() for value in values):
             raise ValueError("Resident income requires contiguous state buffers; no hidden copy")
         N, T = len(self.ledger_context.nation_ids), len(self.ledger_context.income.territory_ids)
@@ -292,9 +294,9 @@ class ResidentIncomeContext:
         result = ResidentIncomeInputs(alloc(B,T,4),alloc(B,N,6),alloc(B,N,2),alloc(B,2),alloc(B),alloc(B),alloc(B))
         if B:
             # Explicit ordering matches the shared packed view's prefix/suffix.
-            records,lengths,definition,prefix,poffsets,suffix,soffsets,ids=values
+            records,lengths,definition,prefix,poffsets,suffix,soffsets,ids,usage=values
             args=(records,lengths,prefix,poffsets,suffix,soffsets,definition,ids,
-                  result.territories,result.nations,result.ledger,result.clock,result.phases,result.roots,result.errors,_dimensions(dims))
+                  result.territories,result.nations,result.ledger,result.clock,result.phases,result.roots,result.errors,usage,_dimensions(dims))
             _kernels().extract_resident_income(*(value if value.numel() else _dummy() for value in args),threads=B)
         return result
 
@@ -327,9 +329,9 @@ class ResidentIncomeContext:
         lengths=torch.zeros(B,dtype=torch.int64,device=state.device)
         write_errors=torch.zeros_like(lengths)
         if B:
-            records,source_lengths,_,prefix,poffsets,suffix,soffsets,ids=values
+            records,source_lengths,_,prefix,poffsets,suffix,soffsets,ids,usage=values
             args=(records,source_lengths,prefix,poffsets,suffix,soffsets,ids,proposal.ledger,proposal.components,proposal.clock,
-                  writing,blocks,lengths,write_errors,_dimensions(dims))
+                  writing,blocks,lengths,write_errors,usage,_dimensions(dims))
             _kernels().write_resident_income(*(value if value.numel() else _dummy() for value in args),threads=B)
         errors|=torch.where(selected,(write_errors!=0).to(torch.int64)*PACKED_OUTPUT,0)
         cohort_ok=~(errors!=0).any()

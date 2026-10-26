@@ -127,7 +127,7 @@ kernel void edit_subtrees(
  device long* stack_previous [[buffer(14)]],device const long* dims [[buffer(15)]],
  device const uchar* prefix_bytes [[buffer(16)]],device const long* prefix_offsets [[buffer(17)]],
  device const uchar* suffix_bytes [[buffer(18)]],device const long* suffix_offsets [[buffer(19)]],
- uint lane [[thread_position_in_grid]]) {
+ device const long* suffix_usage [[buffer(20)]],uint lane [[thread_position_in_grid]]) {
  long B=dims[0],C=dims[1],O=dims[2],R=dims[3];if(ulong(lane)>=ulong(B))return;
  long old_length=lengths[lane],root=roots[lane],n=block_lengths[lane],error=0;
  device const long* old=records+ulong(lane)*ulong(C)*5;
@@ -136,13 +136,14 @@ kernel void edit_subtrees(
  errors[lane]=0;required[lane]=old_length;output_lengths[lane]=old_length;
  for(long i=0;i<O*5;++i)dest[i]=i<C*5?old[i]:0;
  if(!selected[lane])return;
- PackedStateView before={old,old_length,C,prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7]};
- if(source_errors[lane]||old_length<=0||old_length>C)error|=1;
+ bool usage_valid=true;
+ PackedStateView before=make_packed_state_view(old,old_length,C,prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7],suffix_usage,usage_valid);
+ if(!usage_valid||source_errors[lane]||old_length<=0||old_length>C)error|=1;
  if(!error&&(!state_node(before,root)||old[root*5+4]<=root||old[root*5+4]>old_length))error|=2;
  if(n<=0||n>R)error|=4;
  long end=0,delta=0,total=old_length;
  if(!error){
-   PackedStateView replacement={block,n,R,prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7]};
+   PackedStateView replacement=before;replacement.records=block;replacement.length=n;replacement.capacity=R;
    if(!edit_tree(replacement,stack_ends+ulong(lane)*ulong(R),stack_remaining+ulong(lane)*ulong(R),stack_previous+ulong(lane)*ulong(R)*2))error|=4;
    if(!dims[8]&&block[0]!=old[root*5])error|=4;
    if((old[root*5]==10||old[root*5]==11)&&block[1]!=old[root*5+1])error|=4;
@@ -155,7 +156,7 @@ kernel void edit_subtrees(
      else {long source=i<root?i:i-delta;for(long col=0;col<5;++col)dest[i*5+col]=old[source*5+col];if(dest[i*5+4]>root)dest[i*5+4]+=delta;}
    }
    for(long i=total*5;i<O*5;++i)dest[i]=0;
-   PackedStateView after={dest,total,O,prefix_bytes,prefix_offsets,dims[4],dims[5],suffix_bytes,suffix_offsets,dims[6],dims[7]};
+   PackedStateView after=before;after.records=dest;after.length=total;after.capacity=O;
    if(!edit_sections(after,output_sections+ulong(lane)*27))error|=16;
    output_lengths[lane]=total;
  }
@@ -201,7 +202,9 @@ def _layout(state, roots, blocks, block_lengths, selected, capacity):
 
 def _strings(state):
     tables = []
-    for raw, offsets in ((state.context.string_bytes, state.context.string_offsets), (state.string_bytes, state.string_offsets)):
+    used_strings, used_bytes = state.suffix_usage.tolist()
+    for raw, offsets in ((state.context.string_bytes, state.context.string_offsets),
+                         (state.string_bytes[:used_bytes], state.string_offsets[:used_strings+1])):
         data, indices = bytes(raw.tolist()), offsets.tolist()
         tables.extend(data[a:b] for a, b in zip(indices, indices[1:]))
     return tables
@@ -265,7 +268,10 @@ def _host_sections(rows):
 
 
 def _cpu_candidate(state, roots, blocks, block_lengths, selected, capacity, allow_type_change):
-    strings, raw, patches = _strings(state), state.records.tolist(), blocks.tolist()
+    used_strings, used_bytes = state.suffix_usage.tolist()
+    valid_usage = (0 <= used_strings < state.string_offsets.numel() and 0 <= used_bytes <= state.string_bytes.numel() and
+                   state.string_offsets[0].item() == 0 and state.string_offsets[used_strings].item() == used_bytes)
+    strings, raw, patches = (_strings(state) if valid_usage else []), state.records.tolist(), blocks.tolist()
     lengths, indexes, sizes = state.lengths.tolist(), roots.tolist(), block_lengths.tolist()
     enabled, inherited = selected.tolist(), state.errors.tolist()
     output, sections, errors, required, next_lengths = [], [], [], [], []
@@ -273,7 +279,7 @@ def _cpu_candidate(state, roots, blocks, block_lengths, selected, capacity, allo
         original = [list(row) for row in source[:lengths[lane]]]
         rows, error, needed = original, 0, lengths[lane]
         if active:
-            if inherited[lane] or not 0 < lengths[lane] <= state.records.shape[1]: error |= EditError.SOURCE
+            if not valid_usage or inherited[lane] or not 0 < lengths[lane] <= state.records.shape[1]: error |= EditError.SOURCE
             if not error and not (0 <= start < len(original) and start < original[start][4] <= len(original)): error |= EditError.TARGET
             if not 0 < size <= blocks.shape[1]: error |= EditError.BLOCK
             if not error:
@@ -327,7 +333,7 @@ def replace_subtrees(state, roots, blocks, block_lengths, selected, *, capacity=
                 candidate, lengths, sections, errors, required, *scratch,
                 _dimensions((B, C, O, R, state.context.string_count, state.context.string_bytes.numel(),
                              state.string_offsets.numel()-1, state.string_bytes.numel(), int(allow_type_change))),
-                state.context.string_bytes, state.context.string_offsets, state.string_bytes, state.string_offsets)
+                state.context.string_bytes, state.context.string_offsets, state.string_bytes, state.string_offsets, state.suffix_usage)
             _library.edit_subtrees(*(value if value.numel() else _dummy() for value in tensors), threads=B)
     else:
         raise ValueError("Packed edits require explicit CPU reference or Apple MPS; no fallback")
@@ -337,5 +343,5 @@ def replace_subtrees(state, roots, blocks, block_lengths, selected, *, capacity=
     baseline = torch.cat((state.records, torch.zeros((B, O-C, 5), dtype=torch.int64, device=state.device)), dim=1) if O>C else state.records
     result = DeviceStateBatch(state.context, torch.where(accepted[:, None, None], candidate, baseline),
         torch.where(accepted, lengths, state.lengths), torch.where(accepted[:, None], sections, state.sections),
-        state.string_bytes, state.string_offsets, state.errors)
+        state.string_bytes, state.string_offsets, state.errors, state.suffix_usage)
     return DeviceEditResult(result, errors, required, accepted, committed)

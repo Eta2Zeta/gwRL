@@ -20,6 +20,25 @@ struct PackedStateView {
     long suffix_bytes_length;
 };
 
+// Allocated suffix shape is capacity. Actual live counts are resident values.
+// Invalid usage is flagged, never silently accepted as a truncated valid pool.
+inline PackedStateView make_packed_state_view(
+    device const long* records,long length,long capacity,
+    device const uchar* prefix_bytes,device const long* prefix_offsets,long prefix_count,long prefix_bytes_capacity,
+    device const uchar* suffix_bytes,device const long* suffix_offsets,long suffix_string_capacity,long suffix_bytes_capacity,
+    device const long* usage,thread bool& valid) {
+    const long strings=usage[0],bytes=usage[1];
+    const bool counts=suffix_string_capacity>=0&&suffix_bytes_capacity>=0&&strings>=0&&strings<=suffix_string_capacity&&
+                      bytes>=0&&bytes<=suffix_bytes_capacity&&prefix_count>=0&&prefix_bytes_capacity>=0;
+    valid=valid&&counts;
+    const long safe_strings=clamp(strings,0L,max(0L,suffix_string_capacity));
+    const long safe_bytes=clamp(bytes,0L,max(0L,suffix_bytes_capacity));
+    if(counts&&(suffix_offsets[0]!=0||suffix_offsets[safe_strings]!=safe_bytes||
+       prefix_offsets[0]!=0||prefix_offsets[prefix_count]!=prefix_bytes_capacity))valid=false;
+    return PackedStateView{records,length,capacity,prefix_bytes,prefix_offsets,prefix_count,prefix_bytes_capacity,
+                           suffix_bytes,suffix_offsets,safe_strings,safe_bytes};
+}
+
 inline bool state_node(thread const PackedStateView& view, long index) {
     return index >= 0 && index < view.length && index < view.capacity;
 }
