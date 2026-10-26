@@ -88,6 +88,7 @@ class RunConfig:
 
 def source_hashes() -> dict[str, str]:
     paths = [*sorted((ROOT / "studies/campaign").glob("*.py")),
+             *sorted((ROOT / "studies/campaign/backends").rglob("*.py")),
              ROOT / "studies/shared/campaign_adapter.py", ROOT / "studies/shared/multiplayer_mcts.py",
              ROOT / "studies/shared/immutable_json.py",
              *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp"))]

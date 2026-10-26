@@ -289,6 +289,32 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("resolve_chance", [](NativeCampaignEnv& self) {
             self.call([](CampaignEnv& env) { env.resolveChance(); });
         })
+        .def("chance_request", [](const NativeCampaignEnv& self) {
+            auto text = self.call([](const CampaignEnv& env) {
+                return game::campaign::canonicalJson(env.chanceRequest());
+            });
+            return py::module_::import("json").attr("loads")(text);
+        })
+        .def("apply_chance_outcome", [](NativeCampaignEnv& self, const std::string& expectedKey,
+                const py::object& faces) {
+            if (!py::isinstance<py::list>(faces) && !py::isinstance<py::tuple>(faces))
+                throw py::type_error("Chance faces must be nested integer lists or tuples");
+            game::campaign::ChanceOutcome outcome;
+            for (py::handle die : faces.cast<py::sequence>()) {
+                if (!py::isinstance<py::list>(die) && !py::isinstance<py::tuple>(die))
+                    throw py::type_error("Each die requires its complete integer face sequence");
+                std::vector<int> values;
+                for (py::handle face : py::reinterpret_borrow<py::sequence>(die)) {
+                    if (!PyLong_CheckExact(face.ptr()))
+                        throw py::type_error("Chance faces must be integers, not booleans or converted numbers");
+                    values.push_back(py::cast<int>(face));
+                }
+                outcome.faces.push_back(std::move(values));
+            }
+            self.call([&](CampaignEnv& env) {
+                env.applyChanceOutcome(expectedKey, outcome);
+            });
+        }, py::arg("expected_key"), py::arg("faces"))
         .def("returns", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.returns(); });
         })
