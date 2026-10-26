@@ -6,6 +6,9 @@ same repository. The existing C++ rules engine, scenario data and scalar CPU
 training path remain in place. This first step implements the shared interface,
 CPU wrapper and correctness/benchmark harness. **No GPU backend is implemented.**
 
+The [initial CPU conformance and timing evidence](cpu_foundation_2026_10_25.md)
+records the validated foundation and its measurement limits.
+
 ## Execution contract
 
 `studies/campaign/backends/protocol.py` defines independent game lanes and bulk
