@@ -1,0 +1,1404 @@
+{
+  "cases": [
+    {
+      "cold_gpu_query_seconds": 0.004548166994936764,
+      "cold_native_query_seconds": 0.0008153330127242953,
+      "cold_reset_seconds": 0.0019769580103456974,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.04678079200675711,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "eb3db1453c0dac39bee30c72831d2c6b32faf64b3132fc519e1dc25fc1fea05a",
+            "shape": [
+              1,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "eb3db1453c0dac39bee30c72831d2c6b32faf64b3132fc519e1dc25fc1fea05a",
+            "shape": [
+              1,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "c881c8e6d0e1734911273152f98bf4cd80e93f8eb4407b2340c965986325494f",
+            "shape": [
+              1,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "fb7558f70f409ee5e5dc3968a05da6d9e01c9af515ee5e8ee55ee3ed56b48e7b",
+            "shape": [
+              1,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "a16ba2754aef54cd0cec3bb0990fdd16c2c8f61272a6517556a49f99f7f1e35d",
+            "shape": [
+              1,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "20db1a6e62da58f3a955c3655fb6188ab1d09242618d4cc4cc9472466a2e1e0e",
+            "shape": [
+              1,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "8d8470c1009e046262d15da2648b58d01d1003e52c8f8abf220b5756b5fbbf0f",
+            "shape": [
+              1,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.0037621659866999835,
+        0.003032124979654327,
+        0.0027445839950814843,
+        0.002522374998079613,
+        0.0023735419963486493
+      ],
+      "host_inspection_seconds": 0.0059932910080533475,
+      "initial_gpu_kernel_setup_seconds": 1.8025865000090562,
+      "lanes": 1,
+      "native_capture_seconds": 0.00099908301490359,
+      "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+      "native_context_seconds": 0.013831791002303362,
+      "native_query_seconds": [
+        0.0006751660257577896,
+        0.0006443749880418181,
+        0.0006198330083861947,
+        0.0006053750112187117,
+        0.0006529999955091625
+      ],
+      "native_relation_context_seconds": 1.3290991773828864e-05,
+      "position": "opening",
+      "resident_population_seconds": 0.01694870801293291,
+      "rule_metadata_upload_seconds": 0.0009811659983824939,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.24571987500530668
+    },
+    {
+      "cold_gpu_query_seconds": 0.002935500000603497,
+      "cold_native_query_seconds": 0.0027881250134669244,
+      "cold_reset_seconds": 0.0014327500248327851,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.04678079200675711,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "87e73173911851df7ffc3c115b18ef03f5431aad77193fe47e6c14827fe8ac66",
+            "shape": [
+              4,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "87e73173911851df7ffc3c115b18ef03f5431aad77193fe47e6c14827fe8ac66",
+            "shape": [
+              4,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "0675954175ff71e6ce0c13f8f1282254cb85a540a35c19f25a31b6d1b1cb0476",
+            "shape": [
+              4,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "f18d819c542b122f96f71ef726c5ddeb8f0a35573bdfc1718cb4e9369ed608c2",
+            "shape": [
+              4,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "926ca8f5ac16a34217527b36473922e6f3fddc0a68cff983fcc8a4dd5a08dc0e",
+            "shape": [
+              4,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "96cc8a9b3a5fa8da0245742b38ae61f2e913c64ec08cff5efd5e2b0f7b1a6885",
+            "shape": [
+              4,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "6951275d1e63dea308eb13b4418264f6b8f3de6f1b838c1cc3091bdb79a3cc13",
+            "shape": [
+              4,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.002324165980098769,
+        0.002312292024726048,
+        0.0022695829975418746,
+        0.002326291985809803,
+        0.002471582993166521
+      ],
+      "host_inspection_seconds": 0.0012504170008469373,
+      "initial_gpu_kernel_setup_seconds": 1.8025865000090562,
+      "lanes": 4,
+      "native_capture_seconds": 0.00099908301490359,
+      "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+      "native_context_seconds": 0.013831791002303362,
+      "native_query_seconds": [
+        0.0026982499985024333,
+        0.00276529198163189,
+        0.0024709170102141798,
+        0.002439167001284659,
+        0.0026319999888073653
+      ],
+      "native_relation_context_seconds": 1.3290991773828864e-05,
+      "position": "opening",
+      "resident_population_seconds": 0.010237540991511196,
+      "rule_metadata_upload_seconds": 0.0009811659983824939,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.24571987500530668
+    },
+    {
+      "cold_gpu_query_seconds": 0.004540499998256564,
+      "cold_native_query_seconds": 0.043979749985737726,
+      "cold_reset_seconds": 0.0013813329860568047,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.04678079200675711,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "b333cd3229d1535c49129cf0e276c03d4216fdd2937b10842dfcd6d5335caa1a",
+            "shape": [
+              64,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "b333cd3229d1535c49129cf0e276c03d4216fdd2937b10842dfcd6d5335caa1a",
+            "shape": [
+              64,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "2e172814003333d9823d6ccada62c10fbf9467c699c69dc916f227732a340a75",
+            "shape": [
+              64,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "c573eebd93940aa1b8679bff992023369cdc406b59970dfaae0c6adfdb4125fa",
+            "shape": [
+              64,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "377106a22fb559125c364dd4f89609093b2d13a52cbb88efb114696dbd94198a",
+            "shape": [
+              64,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "d1ec19f973de5429df44a51779886e35a6ef49cddfb6bc4353fa4224b0ddf03c",
+            "shape": [
+              64,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "deae1be39b59b6b1439d4a744b55ffa0db5d2fe5c9966c996c4942415a8de118",
+            "shape": [
+              64,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.0037213749892544,
+        0.0037684999988414347,
+        0.003877290990203619,
+        0.003761416010092944,
+        0.003764125023735687
+      ],
+      "host_inspection_seconds": 0.002873624995118007,
+      "initial_gpu_kernel_setup_seconds": 1.8025865000090562,
+      "lanes": 64,
+      "native_capture_seconds": 0.00099908301490359,
+      "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+      "native_context_seconds": 0.013831791002303362,
+      "native_query_seconds": [
+        0.04417537502013147,
+        0.04406958300387487,
+        0.043249874986940995,
+        0.04315287500503473,
+        0.041845500003546476
+      ],
+      "native_relation_context_seconds": 1.3290991773828864e-05,
+      "position": "opening",
+      "resident_population_seconds": 0.0073444579902570695,
+      "rule_metadata_upload_seconds": 0.0009811659983824939,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.24571987500530668
+    },
+    {
+      "cold_gpu_query_seconds": 0.006530124985147268,
+      "cold_native_query_seconds": 0.16306729201460257,
+      "cold_reset_seconds": 0.001521708007203415,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.04678079200675711,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "00a1e44fb04804b9c38288fff903f24866058520a3d9d10b4dd2c843f09d1029",
+            "shape": [
+              256,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "00a1e44fb04804b9c38288fff903f24866058520a3d9d10b4dd2c843f09d1029",
+            "shape": [
+              256,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "b907b6664627a2495836edbc00137feb99735a12d93ea404e6c3607999cc022e",
+            "shape": [
+              256,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "483ae808bc724e475bf3ce0974001e8a9088353d63ec8a4cd5c0f576a53947f6",
+            "shape": [
+              256,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "e0dc10502b958a7deb90a3c97df288c98808dce09ef099efa70291b3f236a29c",
+            "shape": [
+              256,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "56dc12b323ae494ca6926e0f9d50b1dea77350025f20944de35ccf57c1720446",
+            "shape": [
+              256,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "bfc034bee26ddfce84b64db3d0a9c13823bf642b4e25af78c6146d630e0b34ee",
+            "shape": [
+              256,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.004613791999872774,
+        0.004431250010384247,
+        0.004742874996736646,
+        0.006227167003089562,
+        0.006460709002567455
+      ],
+      "host_inspection_seconds": 0.006038332998286933,
+      "initial_gpu_kernel_setup_seconds": 1.8025865000090562,
+      "lanes": 256,
+      "native_capture_seconds": 0.00099908301490359,
+      "native_checkpoint_sha256": "83ab74fd58862e5ac9daff9806885e99832524c01435c0c7c775003b6f8d6b46",
+      "native_context_seconds": 0.013831791002303362,
+      "native_query_seconds": [
+        0.15558529199915938,
+        0.16445354098686948,
+        0.17209604100207798,
+        0.1660777909855824,
+        0.16277841597911902
+      ],
+      "native_relation_context_seconds": 1.3290991773828864e-05,
+      "position": "opening",
+      "resident_population_seconds": 0.08378520800033584,
+      "rule_metadata_upload_seconds": 0.0009811659983824939,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.24571987500530668
+    },
+    {
+      "cold_gpu_query_seconds": 0.003923875017790124,
+      "cold_native_query_seconds": 0.0007282910228241235,
+      "cold_reset_seconds": 0.011798416991950944,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.0054391669982578605,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "eb3db1453c0dac39bee30c72831d2c6b32faf64b3132fc519e1dc25fc1fea05a",
+            "shape": [
+              1,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "eb3db1453c0dac39bee30c72831d2c6b32faf64b3132fc519e1dc25fc1fea05a",
+            "shape": [
+              1,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "a45095f328faf5e25a80bff386e58f34f24568dabe840635fec00c7c54113afd",
+            "shape": [
+              1,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "35b0956a69cbbec3b2ec55eb8f1965aa2778a922587aa89d800eda7383a36e14",
+            "shape": [
+              1,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "a16ba2754aef54cd0cec3bb0990fdd16c2c8f61272a6517556a49f99f7f1e35d",
+            "shape": [
+              1,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "fffc877fd1172ebe17544823e904994e76a6f4458b65232ba95b78cc1831d495",
+            "shape": [
+              1,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "8d8470c1009e046262d15da2648b58d01d1003e52c8f8abf220b5756b5fbbf0f",
+            "shape": [
+              1,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.002245625015348196,
+        0.0022258329845499247,
+        0.0021822079725097865,
+        0.002207500016083941,
+        0.002149332984117791
+      ],
+      "host_inspection_seconds": 0.001319958973908797,
+      "initial_gpu_kernel_setup_seconds": 0.005107709002913907,
+      "lanes": 1,
+      "native_capture_seconds": 0.0009455000108573586,
+      "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+      "native_context_seconds": 0.015834583988180384,
+      "native_query_seconds": [
+        0.0006958339945413172,
+        0.0007406669901683927,
+        0.0007072500011418015,
+        0.0007675829983782023,
+        0.0006912919925525784
+      ],
+      "native_relation_context_seconds": 1.1374999303370714e-05,
+      "position": "first_chance",
+      "resident_population_seconds": 0.0067622089991346,
+      "rule_metadata_upload_seconds": 0.0012417920224834234,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004711917019449174
+    },
+    {
+      "cold_gpu_query_seconds": 0.0031378749990835786,
+      "cold_native_query_seconds": 0.002793249994283542,
+      "cold_reset_seconds": 0.001328415994066745,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.0054391669982578605,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "87e73173911851df7ffc3c115b18ef03f5431aad77193fe47e6c14827fe8ac66",
+            "shape": [
+              4,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "87e73173911851df7ffc3c115b18ef03f5431aad77193fe47e6c14827fe8ac66",
+            "shape": [
+              4,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "fa99c86c96238631160bab05a690814ec72649f33dbae658fdee5eefa72c151c",
+            "shape": [
+              4,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "bee606dcc7ddff175bfcb7a36c40f25d319333743ae86e31240752d6a07e957e",
+            "shape": [
+              4,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "926ca8f5ac16a34217527b36473922e6f3fddc0a68cff983fcc8a4dd5a08dc0e",
+            "shape": [
+              4,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "9137ebd6037d30b2aba0a828a5ae373796c4e95bc91b35d0e877d89d2e916e80",
+            "shape": [
+              4,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "6951275d1e63dea308eb13b4418264f6b8f3de6f1b838c1cc3091bdb79a3cc13",
+            "shape": [
+              4,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.0022477079764939845,
+        0.002434416994219646,
+        0.002277250023325905,
+        0.002295999991474673,
+        0.0028045420185662806
+      ],
+      "host_inspection_seconds": 0.001292625005589798,
+      "initial_gpu_kernel_setup_seconds": 0.005107709002913907,
+      "lanes": 4,
+      "native_capture_seconds": 0.0009455000108573586,
+      "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+      "native_context_seconds": 0.015834583988180384,
+      "native_query_seconds": [
+        0.0025662080151960254,
+        0.002812666993122548,
+        0.002569834003224969,
+        0.002617917023599148,
+        0.002641250001033768
+      ],
+      "native_relation_context_seconds": 1.1374999303370714e-05,
+      "position": "first_chance",
+      "resident_population_seconds": 0.0072619590209797025,
+      "rule_metadata_upload_seconds": 0.0012417920224834234,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004711917019449174
+    },
+    {
+      "cold_gpu_query_seconds": 0.005544624989852309,
+      "cold_native_query_seconds": 0.042053624987602234,
+      "cold_reset_seconds": 0.0013458750036079437,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.0054391669982578605,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "b333cd3229d1535c49129cf0e276c03d4216fdd2937b10842dfcd6d5335caa1a",
+            "shape": [
+              64,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "b333cd3229d1535c49129cf0e276c03d4216fdd2937b10842dfcd6d5335caa1a",
+            "shape": [
+              64,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "c7425afc8d4322a6881f963c61692e141e528db23020d467563006a4926e55e5",
+            "shape": [
+              64,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "f6d1051d57b627a9ded1c8baaa465a6d457b5f273907ab72ef8d98795409d5af",
+            "shape": [
+              64,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "377106a22fb559125c364dd4f89609093b2d13a52cbb88efb114696dbd94198a",
+            "shape": [
+              64,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "22480ba467960ccd18ea4309e1f794a9ff99918dfebb023d77fba7e22716a823",
+            "shape": [
+              64,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "deae1be39b59b6b1439d4a744b55ffa0db5d2fe5c9966c996c4942415a8de118",
+            "shape": [
+              64,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.004081916995346546,
+        0.0045360839867498726,
+        0.004202375013846904,
+        0.004158750001806766,
+        0.004272666003089398
+      ],
+      "host_inspection_seconds": 0.005196875019464642,
+      "initial_gpu_kernel_setup_seconds": 0.005107709002913907,
+      "lanes": 64,
+      "native_capture_seconds": 0.0009455000108573586,
+      "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+      "native_context_seconds": 0.015834583988180384,
+      "native_query_seconds": [
+        0.041093582985922694,
+        0.03860316699137911,
+        0.03844808298163116,
+        0.038768625003285706,
+        0.038523291994351894
+      ],
+      "native_relation_context_seconds": 1.1374999303370714e-05,
+      "position": "first_chance",
+      "resident_population_seconds": 0.007391999999526888,
+      "rule_metadata_upload_seconds": 0.0012417920224834234,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004711917019449174
+    },
+    {
+      "cold_gpu_query_seconds": 0.00779362500179559,
+      "cold_native_query_seconds": 0.15698362499824725,
+      "cold_reset_seconds": 0.0012901249865535647,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.0054391669982578605,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "00a1e44fb04804b9c38288fff903f24866058520a3d9d10b4dd2c843f09d1029",
+            "shape": [
+              256,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "00a1e44fb04804b9c38288fff903f24866058520a3d9d10b4dd2c843f09d1029",
+            "shape": [
+              256,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "29cf8150d57c289494a889492d48e645d06ed3f1c94cd4c0cded4ad2de503104",
+            "shape": [
+              256,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "52a31ffcd725319bfa0aa6b8f3cc873ba15025e85926dd21ed0eb77262d1a58c",
+            "shape": [
+              256,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "e0dc10502b958a7deb90a3c97df288c98808dce09ef099efa70291b3f236a29c",
+            "shape": [
+              256,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "d05b2325841f39ddda9502ac02ec2c7bf17439832aa038c5f9d70f2bb478b04f",
+            "shape": [
+              256,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "bfc034bee26ddfce84b64db3d0a9c13823bf642b4e25af78c6146d630e0b34ee",
+            "shape": [
+              256,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.005347833008272573,
+        0.004750708001665771,
+        0.004932665993692353,
+        0.004566957999486476,
+        0.004684459010604769
+      ],
+      "host_inspection_seconds": 0.008341208013007417,
+      "initial_gpu_kernel_setup_seconds": 0.005107709002913907,
+      "lanes": 256,
+      "native_capture_seconds": 0.0009455000108573586,
+      "native_checkpoint_sha256": "f9d15ec998d9126510275fccd076197c550838bfedb27d78429c74550a6a09dd",
+      "native_context_seconds": 0.015834583988180384,
+      "native_query_seconds": [
+        0.17457437500706874,
+        0.16374887499841861,
+        0.15761616599047557,
+        0.15572691700072028,
+        0.15670170899829827
+      ],
+      "native_relation_context_seconds": 1.1374999303370714e-05,
+      "position": "first_chance",
+      "resident_population_seconds": 0.0315257920010481,
+      "rule_metadata_upload_seconds": 0.0012417920224834234,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004711917019449174
+    },
+    {
+      "cold_gpu_query_seconds": 0.002839166991179809,
+      "cold_native_query_seconds": 0.000697832991136238,
+      "cold_reset_seconds": 0.010950042022159323,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.006333625002298504,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "eb3db1453c0dac39bee30c72831d2c6b32faf64b3132fc519e1dc25fc1fea05a",
+            "shape": [
+              1,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "eb3db1453c0dac39bee30c72831d2c6b32faf64b3132fc519e1dc25fc1fea05a",
+            "shape": [
+              1,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "7d3f1fba31cc54c093d879b0c633b447c1076a70f7fcb67ffecf958c800f3538",
+            "shape": [
+              1,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "600f8d6b8985e477399cb75dc2c38b42d9380366d4ef15a2bb87cf833fe43072",
+            "shape": [
+              1,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "7c5821174dc18c0425c24dba3f1b04df899ee5273d0788c89faaab796f459f19",
+            "shape": [
+              1,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "e67d3317ec3da50273f1aa80767d3cff28eccb41492603438667c3375d7d2a46",
+            "shape": [
+              1,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "8d8470c1009e046262d15da2648b58d01d1003e52c8f8abf220b5756b5fbbf0f",
+            "shape": [
+              1,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.002562750014476478,
+        0.002496833010809496,
+        0.0025402919854968786,
+        0.0024962500028777868,
+        0.0025287500175181776
+      ],
+      "host_inspection_seconds": 0.001237167016370222,
+      "initial_gpu_kernel_setup_seconds": 0.005158834013855085,
+      "lanes": 1,
+      "native_capture_seconds": 0.001262125006178394,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.013983375014504418,
+      "native_query_seconds": [
+        0.0006228749989531934,
+        0.000608083006227389,
+        0.0006801670242566615,
+        0.0006004159804433584,
+        0.0005930830084253103
+      ],
+      "native_relation_context_seconds": 1.7416983610019088e-05,
+      "position": "round2_japan_combat_movement",
+      "resident_population_seconds": 0.007217833015602082,
+      "rule_metadata_upload_seconds": 0.0014000830124132335,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.00401112501276657
+    },
+    {
+      "cold_gpu_query_seconds": 0.0036541660083457828,
+      "cold_native_query_seconds": 0.002650207985425368,
+      "cold_reset_seconds": 0.0013488749973475933,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.006333625002298504,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "87e73173911851df7ffc3c115b18ef03f5431aad77193fe47e6c14827fe8ac66",
+            "shape": [
+              4,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "87e73173911851df7ffc3c115b18ef03f5431aad77193fe47e6c14827fe8ac66",
+            "shape": [
+              4,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "7bd3d11f691777b9b50ad3b461053a00eee5261c32882de69006fd72ee2aa433",
+            "shape": [
+              4,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "5145858fd4484103a1478c88df68a69963e643a06ed8d710ffbe8390427de3a8",
+            "shape": [
+              4,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "4a9eaf3cf16528037f4722c969e2e24301855609c631a6c82d3b39fa5b4396e7",
+            "shape": [
+              4,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "e7246abde136108afd07f2ed3654756dbf2da48d5989cb97ee1cf2a1ea7ea4ce",
+            "shape": [
+              4,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "6951275d1e63dea308eb13b4418264f6b8f3de6f1b838c1cc3091bdb79a3cc13",
+            "shape": [
+              4,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.0027045409951824695,
+        0.002623582986416295,
+        0.0026398329937364906,
+        0.0032005840039346367,
+        0.002604250010335818
+      ],
+      "host_inspection_seconds": 0.0012763749982696027,
+      "initial_gpu_kernel_setup_seconds": 0.005158834013855085,
+      "lanes": 4,
+      "native_capture_seconds": 0.001262125006178394,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.013983375014504418,
+      "native_query_seconds": [
+        0.002496291999705136,
+        0.002418916003080085,
+        0.0024596670118626207,
+        0.0024150829995051026,
+        0.0024290830187965184
+      ],
+      "native_relation_context_seconds": 1.7416983610019088e-05,
+      "position": "round2_japan_combat_movement",
+      "resident_population_seconds": 0.006977999990340322,
+      "rule_metadata_upload_seconds": 0.0014000830124132335,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.00401112501276657
+    },
+    {
+      "cold_gpu_query_seconds": 0.0047307920176535845,
+      "cold_native_query_seconds": 0.04074704201775603,
+      "cold_reset_seconds": 0.0013773750106338412,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.006333625002298504,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "b333cd3229d1535c49129cf0e276c03d4216fdd2937b10842dfcd6d5335caa1a",
+            "shape": [
+              64,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "b333cd3229d1535c49129cf0e276c03d4216fdd2937b10842dfcd6d5335caa1a",
+            "shape": [
+              64,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "d1226bb1fa5f531e749d41eb6276f590eab16b6e1283ed7a1bea9d8e4dae2a7a",
+            "shape": [
+              64,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "8a076aab9f4ecdc654350e59b4128ee38c5c6a0b70a18f7b5e568d25b650ff48",
+            "shape": [
+              64,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "0d4915ded96817b443f1104f59d8a5b4541f95b1d03ac6e7c88e65f5e2fab0cc",
+            "shape": [
+              64,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "920e19544efb17b2c219b32eb52bd8fe9a162cad5bb59c4583db7a9a72b9527c",
+            "shape": [
+              64,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "deae1be39b59b6b1439d4a744b55ffa0db5d2fe5c9966c996c4942415a8de118",
+            "shape": [
+              64,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.003934958018362522,
+        0.0034778330009430647,
+        0.0039261670026462525,
+        0.0040647909918334335,
+        0.003930417005904019
+      ],
+      "host_inspection_seconds": 0.004454582987818867,
+      "initial_gpu_kernel_setup_seconds": 0.005158834013855085,
+      "lanes": 64,
+      "native_capture_seconds": 0.001262125006178394,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.013983375014504418,
+      "native_query_seconds": [
+        0.04401070802123286,
+        0.04381054101395421,
+        0.0397822079830803,
+        0.04109120901557617,
+        0.03992445900803432
+      ],
+      "native_relation_context_seconds": 1.7416983610019088e-05,
+      "position": "round2_japan_combat_movement",
+      "resident_population_seconds": 0.03211066700168885,
+      "rule_metadata_upload_seconds": 0.0014000830124132335,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.00401112501276657
+    },
+    {
+      "cold_gpu_query_seconds": 0.006468082981882617,
+      "cold_native_query_seconds": 0.17127116600750014,
+      "cold_reset_seconds": 0.001337374997092411,
+      "cold_scope": "Public allocator/graph reset; compiled custom shaders and OS caches may remain",
+      "dynamic_upload_seconds": 0.006333625002298504,
+      "evidence": {
+        "all_query_arrays": {
+          "land_attack": {
+            "sha256": "00a1e44fb04804b9c38288fff903f24866058520a3d9d10b4dd2c843f09d1029",
+            "shape": [
+              256,
+              13,
+              13
+            ]
+          },
+          "land_attack_errors": {
+            "sha256": "00a1e44fb04804b9c38288fff903f24866058520a3d9d10b4dd2c843f09d1029",
+            "shape": [
+              256,
+              13,
+              13
+            ]
+          },
+          "nation_errors": {
+            "sha256": "85a0eb585276626153c1f48c3cfb93ed30929808d7624f978f514b6ba71c6e97",
+            "shape": [
+              256,
+              13,
+              3
+            ]
+          },
+          "nations": {
+            "sha256": "f60f696fa01c9261181c8fc28b4b1b26c910e050ca9abd732c9e325c5a2e4332",
+            "shape": [
+              256,
+              13,
+              3
+            ]
+          },
+          "pair_errors": {
+            "sha256": "92549b287e4d9b79b7bfae5f2da9e187a67f1ce3c85be18baf3523238ea1f1f5",
+            "shape": [
+              256,
+              13,
+              13,
+              7
+            ]
+          },
+          "pairs": {
+            "sha256": "f32d4d542be0accd1053088cac82114064bb559ba70addd6c6c67cf0c52be069",
+            "shape": [
+              256,
+              13,
+              13,
+              7
+            ]
+          },
+          "present": {
+            "sha256": "bfc034bee26ddfce84b64db3d0a9c13823bf642b4e25af78c6146d630e0b34ee",
+            "shape": [
+              256,
+              13
+            ]
+          }
+        },
+        "exact": true
+      },
+      "gpu_query_seconds": [
+        0.006446874991524965,
+        0.005634375003864989,
+        0.00614758298615925,
+        0.0067020000133197755,
+        0.007593583984998986
+      ],
+      "host_inspection_seconds": 0.0062630000174976885,
+      "initial_gpu_kernel_setup_seconds": 0.005158834013855085,
+      "lanes": 256,
+      "native_capture_seconds": 0.001262125006178394,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.013983375014504418,
+      "native_query_seconds": [
+        0.15800233397749253,
+        0.16056433398625813,
+        0.1669764579855837,
+        0.16356437499052845,
+        0.16903520800406113
+      ],
+      "native_relation_context_seconds": 1.7416983610019088e-05,
+      "position": "round2_japan_combat_movement",
+      "resident_population_seconds": 0.008155999996233732,
+      "rule_metadata_upload_seconds": 0.0014000830124132335,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.00401112501276657
+    }
+  ],
+  "config": {
+    "batch_sizes": [
+      1,
+      4,
+      64,
+      256
+    ],
+    "cpu_budget": 12,
+    "devices": [
+      "mps"
+    ],
+    "implementation": "parallel",
+    "memory_bytes": 8000000000,
+    "repeats": 5,
+    "seconds": 180,
+    "seed": 1951,
+    "threads": 2,
+    "warmups": 1
+  },
+  "device": "mps",
+  "device_memory": {
+    "driver_bytes": 1116749824,
+    "live_bytes": 6144
+  },
+  "device_runtime": {
+    "checkpoint_scope": "Derived process-local cache state; counters reset on fresh construction and pending count resets after restore",
+    "clear_every_actor_forwards": 32,
+    "clear_seconds": 0.03705825100769289,
+    "clears": 13,
+    "device": "mps",
+    "pending_actor_forwards": 5,
+    "resets": 13,
+    "schema": "campaign-mps-graph-cache-policy-v1",
+    "torch": "2.14.0",
+    "total_actor_forwards": 60
+  },
+  "elapsed_worker_seconds": 25.17634658300085,
+  "gpu_path": "Resident complete state -> shared relation matrices -> LandAttack declarations; allocation, both dispatches and synchronization included",
+  "guard": {
+    "cpu_budget": 12,
+    "diagnostic": null,
+    "elapsed_seconds": 26.201076500001363,
+    "margin_bytes": 1000000000,
+    "memory_bytes": 8000000000,
+    "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+    "mps_allocator_reserved_bytes": 3000000000,
+    "sampled_peak_charged_bytes": 4533298200,
+    "shared_deadline_monotonic": 216499.480650666
+  },
+  "matched_complete_queries": true,
+  "native_baseline": "One batched native oracle call computes all original predicates; result arrays/inspection outside timing",
+  "population": "Each case repeats one real complete snapshot; all relation pairs including dormant/playerless error results are queried",
+  "preparation_completed_three_round_games": 1,
+  "preparation_seconds": 12.632992583006853,
+  "provenance": {
+    "backend_source_sha256": {
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "72bf918ab8835a05b9cb78f61f011ca8a61ba35185fa3a995e13351a8023ec9a",
+      "studies/campaign/backends/content_digest_metal.py": "da74e9e62c9fdac3fdb158e48a55848e5d50c96aa5cf9b8cb949d928e40a4f64",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "490a3362fb894192aaecb026412b20133d82ab628addce9093523885af437de7",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_relations.py": "dbee67a9309d0865151c8b65d71b3e18ac1a65c868103e56a656d8236a4987b0",
+      "studies/campaign/backends/resident_routes.py": "c6491f34d756ff9b94dcf7408ee1d93fa90874a734929f33384be717970c81cb",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "969e7876a238a8e646262ec053f01996d1119985b716838b629f2da89713df74",
+      "studies/campaign/backends/resident_wealth.py": "042617e7d9e577980d387039dcd8a8c5b1c6638b3c2839ae9fd8059655614c6a",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde"
+    },
+    "branch": "codex/gpu-selfplay",
+    "commit": "ab131677995f11761972d46513c5bad33b8c60de",
+    "dirty": "?? studies/campaign/backends/resident_routes.py",
+    "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+    "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+    "native_sha256": "63f47fac14abec13de7c26956433cc79d338fe8b27b8deb6823bc873fe9b8312",
+    "query_harness_sha256": "1b6d9d41481769f634f28460b55bc5bd417cd2c52324c119caf0c7609255fccd",
+    "runtime_source_sha256": {
+      "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+      "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+      "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+      "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+      "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+      "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+      "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+      "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+      "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+      "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+      "include/game/campaign_objective.hpp": "49c20d313c421540b1827e335ac56b0d71080fe98f84686127fb1da2c541c2b1",
+      "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+      "include/game/catalog_stats_context.hpp": "2186ad8355ef849e2f4d58e4a7e905c98a50ee5e283f5bce1b10cf0882a69466",
+      "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+      "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+      "include/game/device_state.hpp": "f65d37f53c305ed31a3d963f15a7da99f87fecaddbdfb6df58edd29260ac6f1c",
+      "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+      "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+      "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+      "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+      "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+      "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+      "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+      "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+      "include/game/movement.hpp": "1923dca4e7bb871f1b82ba3af12f1a7eba5ad3cfddf55cee47719549b4fefb07",
+      "include/game/movement_context.hpp": "aaa5f819b01c5700b04b452aeefeceaf11903c78339304e5d468c20f5b6d2e60",
+      "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+      "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+      "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+      "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+      "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+      "include/game/relations_context.hpp": "ce6496ff656c9c07319142fdbbf0599d32a0ba721b3f850b79b76896d42b6d6e",
+      "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+      "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+      "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+      "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+      "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+      "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+      "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+      "include/game/wealth_context.hpp": "bcd1c19be4d4a8c7dc1e216d585ddac67ee79c3c6cb8063d9d99b85681de3ac0",
+      "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+      "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+      "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+      "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+      "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+      "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+      "src/campaign_objective.cpp": "89e41515cfb7c2b514a97b50b91ae927d1435bdd17bd6336ea353248d8bb7cd5",
+      "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+      "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+      "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+      "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+      "src/catalog_stats_context.cpp": "a9ac386bc250560f909a4dfd577f907af720bb008bb051c86d542ad9d70ec6b8",
+      "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+      "src/device_state.cpp": "7053ff45bf2b299364b3c7283586eed0faa14a8e0747ebe37240acb1c5ee1fc1",
+      "src/economy.cpp": "321dab0141e648dc048050fa53303d903e55b6b447d8b8b65bd0cb6bc195d351",
+      "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+      "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+      "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+      "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+      "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+      "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+      "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+      "src/movement.cpp": "3ec103333e213754c90626ecb4134b27f1db9155ff8f48b1770fe26ca9c81b95",
+      "src/movement_context.cpp": "ac4bc3906c822936a924398ec35ba973755df7f1a49e6219633065ff282acedb",
+      "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+      "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+      "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+      "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+      "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+      "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+      "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+      "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+      "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+      "src/python_action_ids.inc": "94d62ff5e013367f55707df8439c59070786bbd31f38afb29e042aca93b62181",
+      "src/python_bindings.cpp": "388ff582c57dc5083b8acd6045985d894857547cf03db73a61bd21d7ce52f351",
+      "src/python_canonical_json.inc": "3419166c8337e92baafac9bb6e51591fc42ecc12b1dcca3ea2381fbe5020adb0",
+      "src/python_catalog_stats.inc": "b2c8dfe0cc33f82cd0a1e598af248280d16061af5e80848a75953bb3baf590ab",
+      "src/python_content_digest.inc": "6b056d520ccb8b958bf66c45fe34d33d912846e41a6f0c1aa905defd8771be20",
+      "src/python_device_state.inc": "6a6d754afb473f41c528d8c58fc87af6bea595a4de8e480e1e3faf9d9d617491",
+      "src/python_event_append.inc": "9df1e309a22652c949316b7bc19156a538d9e06dbf44c886f980b591870fa6d6",
+      "src/python_income_ledger.inc": "ddc964a464c04b30cd6aab146a61097e38397996a29f9a76b05f6d1e30a4f44c",
+      "src/python_movement_context.inc": "8b7927e9b6d62c34d3abf767df8c5bbfac01800ca2be7dc7df71ef5e729a7b79",
+      "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+      "src/python_relations.inc": "382a7e320efdb46d708887249180575b6b37efc50c8420fefcb806f0ee9078b2",
+      "src/python_state_json.inc": "00958de32a9e787734c301a2f291577e3fa8a002778a36b7e7733cc3acbadbc5",
+      "src/python_wealth.inc": "8a6a5f15ebf02783ccf9d219347a1f3f86f91568ce85e63feceab5c1c411498e",
+      "src/relations_context.cpp": "f251d362fb84c8d58c48b19b96810627d3e58ec94953db26ca566b0f34ad995f",
+      "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+      "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+      "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+      "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+      "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+      "src/wealth_context.cpp": "9717259f68f9a295e6291269705f58d680de0e88fbd483ca169a04394942b7a4",
+      "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "72bf918ab8835a05b9cb78f61f011ca8a61ba35185fa3a995e13351a8023ec9a",
+      "studies/campaign/backends/content_digest_metal.py": "da74e9e62c9fdac3fdb158e48a55848e5d50c96aa5cf9b8cb949d928e40a4f64",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "490a3362fb894192aaecb026412b20133d82ab628addce9093523885af437de7",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_relations.py": "dbee67a9309d0865151c8b65d71b3e18ac1a65c868103e56a656d8236a4987b0",
+      "studies/campaign/backends/resident_routes.py": "c6491f34d756ff9b94dcf7408ee1d93fa90874a734929f33384be717970c81cb",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "969e7876a238a8e646262ec053f01996d1119985b716838b629f2da89713df74",
+      "studies/campaign/backends/resident_wealth.py": "042617e7d9e577980d387039dcd8a8c5b1c6638b3c2839ae9fd8059655614c6a",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+      "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+      "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+      "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+      "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+      "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+      "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+      "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+      "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+      "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+      "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+      "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+      "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+      "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+      "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+      "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+      "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+      "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+    },
+    "state_harness_sha256": "27cb95c0bf707328c3aeb0ba5dcb98b2c342153d69b8fd9ebe26b69540c8f54a",
+    "supervisor_source_sha256": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+  },
+  "schema": "campaign-resident-political-queries-benchmark-v1",
+  "scope": "Guarded exact native/Metal full political-query matrix comparison.\n\nThis is a resident rules-query component, not game transitions, MCTS or learning.\nBoth sides compute every native relation/player/movement-control/LandAttack\nquery on identical complete snapshots. Native oracle API is already batched;\nGPU extraction and shared relation preparation are included in warm timing.\n",
+  "software": {
+    "interop_threads": 1,
+    "python": "3.13.5",
+    "threads": 2,
+    "torch": "2.14.0"
+  },
+  "sources_unchanged": true,
+  "status": "completed",
+  "task": {
+    "calendar_rounds": 3,
+    "compatibility": {
+      "actions": "campaign-orders-v1",
+      "curriculum": "regional-horizon-curriculum-v1",
+      "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+      "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+      "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+    },
+    "full_target_game": false,
+    "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+    "setup": "unchanged approved 99-piece,37-node July1936 setup",
+    "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+    "version": "regional-horizon-curriculum-v1"
+  },
+  "workload_sha256": "1997e2bcc302e51e5e53630d50c83b659bdac72073b5a866355312c7a53579c8"
+}

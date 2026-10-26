@@ -327,7 +327,7 @@ class ResidentPoliticalRelations:
         fixed=tuple(int(x) for x in state_context.prefix_lookup_ids((*self.nation_ids,*self.player_ids)))
         self.ids=torch.tensor((*fixed,*special),dtype=torch.int64,device=state_context.device)
 
-    def compute(self,state,*,implementation="reference",group_size=None):
+    def compute(self,state,*,implementation="parallel",group_size=None):
         state._metadata();_device(state.device)
         if state.context.identity!=self.state_context.identity:raise ValueError("Relations packed wire context differs")
         if implementation not in {"reference","parallel"}:raise ValueError("Choose reference or parallel relations implementation")

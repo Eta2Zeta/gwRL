@@ -45,7 +45,7 @@ class ResidentRelationsTests(unittest.TestCase):
 
     def assert_native(self,envs):
         state,kernel,native=self.setup_batch(envs);before=[env.serialize() for env in envs]
-        oracle=gwrl_cpp.campaign_relations_oracle(native,envs);result=kernel.compute(state)
+        oracle=gwrl_cpp.campaign_relations_oracle(native,envs);result=kernel.compute(state,implementation="reference")
         self.assertIs(result.source,state)
         for actual,expected in ((result.pairs,oracle.pair_array()),(result.pair_errors,oracle.pair_error_array()),
                                 (result.nations,oracle.nation_array()),(result.nation_errors,oracle.nation_error_array()),
@@ -180,14 +180,14 @@ class ResidentRelationsTests(unittest.TestCase):
 
     def test_parallel_threadgroups_stride_over_all_factions_and_pairs(self):
         env=gwrl_cpp.CampaignEnv(str(SCENARIO),4);state,kernel,_=self.setup_batch([env,env.clone(),env.clone(),env.clone()])
-        reference=kernel.compute(state)
+        reference=kernel.compute(state,implementation="reference")
         # 7 threads intentionally underfills the faction axis: all loops must
         # stride to completion, including every one of N squared pairs.
         for size in (1,7,32,64,128):
             result=kernel.compute(state,implementation="parallel",group_size=size)
             for field in ("pairs","pair_errors","nations","nation_errors","present","metadata"):
                 self.assertTrue(torch.equal(getattr(reference,field),getattr(result,field)),(size,field))
-        for kwargs in ({"implementation":"unknown"},{"group_size":32},{"implementation":"parallel","group_size":0},
+        for kwargs in ({"implementation":"unknown"},{"implementation":"reference","group_size":32},{"implementation":"parallel","group_size":0},
                        {"implementation":"parallel","group_size":True}):
             with self.assertRaises(ValueError):kernel.compute(state,**kwargs)
 
@@ -203,7 +203,7 @@ class ResidentRelationsTests(unittest.TestCase):
         records=state.records.clone();records[0,nation,1]=13
         cases=[replace(state,records=records),replace(state,errors=torch.ones_like(state.errors))]
         for invalid in cases:
-            reference=kernel.compute(invalid);parallel=kernel.compute(invalid,implementation='parallel',group_size=7)
+            reference=kernel.compute(invalid,implementation='reference');parallel=kernel.compute(invalid,implementation='parallel',group_size=7)
             for field in ('pairs','pair_errors','nations','nation_errors','present','metadata'):
                 self.assertTrue(torch.equal(getattr(reference,field),getattr(parallel,field)),field)
 

@@ -17,6 +17,8 @@ The [connected search-clone comparison](metal_connected_clone_2026_10_26.md)
 records the exact generic and fused Metal paths, including their scope limits.
 The [resident political-query results](metal_political_queries_2026_10_26.md)
 compare the complete native and GPU permission matrices at several batch sizes.
+The [cooperative-query follow-up](metal_political_queries_parallel_2026_10_26.md)
+records the later parallel kernel and its remaining small-batch limits.
 
 ## Execution contract
 
@@ -94,8 +96,8 @@ with original lazy errors and explicit inventory capacity retries.
 wrappers from resident bytes and canonical parameter digests. It preserves the
 original family-specific digest lengths and action order; it does not generate
 or validate a legal menu. Political queries additionally expose a cooperative
-`implementation="parallel"` path alongside the unchanged reference default;
-matched timings determine whether that path should become the default.
+`implementation="parallel"` path, now selected by default after matched timings
+and exact native/reference comparisons. The reference remains explicitly selectable.
 
 `clone_for_search(seeds, lanes=...)` can fork one source lane repeatedly with
 independent search seeds, without consuming the source game's execution RNG.
