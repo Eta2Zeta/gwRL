@@ -1,0 +1,893 @@
+{
+  "benchmarks": {
+    "positions": {
+      "backend": {
+        "device": "cpu",
+        "execution": "sequential_reference",
+        "name": "cpu",
+        "native_batch_execution": false
+      },
+      "config": {
+        "backend": "cpu",
+        "buckets": 2048,
+        "cpu_budget": 3,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 8000000000,
+        "mode": "positions",
+        "repetitions": 1,
+        "seconds": 300.0,
+        "seeds": [
+          1951,
+          1952
+        ],
+        "warmups": 1
+      },
+      "frozen_positions": [
+        {
+          "decision": {
+            "action_count": 2,
+            "action_features_sha256": "532bac12c671b0b9bd77a973c7e891c61ec8ca0c3bb83fcef1826edefa873821",
+            "actor": "allies",
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "key": "d9ef1cc9b924bc049445322735b06bea4e1a3ac754a60b26c94f5a8aba4d4035",
+            "kind": "declaration_offer",
+            "ordered_action_ids_sha256": "ebe6f82e572517b74f4564fb2abfbcfefa094b4af447c4bcb46f1163e3724118",
+            "terminal": false
+          },
+          "label": "opening",
+          "seed": 1951,
+          "serialized_sha256": "67b14c4fbfd5497937ad52ee8a5f9285dac39b6eccaf1ca595c820dfeab2eb25"
+        },
+        {
+          "decision": {
+            "action_count": 0,
+            "action_features_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "actor": null,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "combat",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "key": "4db801b9ab4f3a2a8ea0486d9405ba6e43a801505fa0724308b0e09924a4a276",
+            "kind": "chance",
+            "ordered_action_ids_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "terminal": false
+          },
+          "label": "first_chance",
+          "seed": 1951,
+          "serialized_sha256": "54f71da960712b7e61e3e458140e45417fe0325684dedb283657a20b6f849aca"
+        },
+        {
+          "decision": {
+            "action_count": 295,
+            "action_features_sha256": "24c7e34a7f3395a6f6707f32b07a8d5e1721dae730af4c87a8881a172ec1153c",
+            "actor": "axis",
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "key": "20119e4395859e7f271c8faa501a6ea268b98f0139e5aa877a49e95c8105750c",
+            "kind": "combat_movement",
+            "ordered_action_ids_sha256": "76f3db2cd787f1662e84e5af993318efaeee422cd54a35f8767ecb8b74dbc557",
+            "terminal": false
+          },
+          "label": "japan_combat_movement",
+          "seed": 1951,
+          "serialized_sha256": "30d67fd120a44b557e864c6c669cc750e8c7ec60f0d2bdc15a1e32a00c3f2c84"
+        },
+        {
+          "decision": {
+            "action_count": 229,
+            "action_features_sha256": "4a6bb4ab427dc2acd1ced1f48045904b13f2129fb5c191a10d75cc38da1eaa2d",
+            "actor": "axis",
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "key": "39c5f6b4d9f95d1551c1df49c9384155a02f21555214da58de8bb3dc6c61aa7b",
+            "kind": "combat_movement",
+            "ordered_action_ids_sha256": "8c0a8e4482d1cdef85f67b8c2f0826cec16972ea6b0720deedf5669cfa68b12a",
+            "terminal": false
+          },
+          "label": "round2_japan_combat_movement",
+          "seed": 1951,
+          "serialized_sha256": "1c5042c3d9f1c1699faa80abbaecf4b8a34a1a90474e7f431aa072822cf92d10"
+        },
+        {
+          "decision": {
+            "action_count": 2,
+            "action_features_sha256": "532bac12c671b0b9bd77a973c7e891c61ec8ca0c3bb83fcef1826edefa873821",
+            "actor": "allies",
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "production",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "key": "d9ef1cc9b924bc049445322735b06bea4e1a3ac754a60b26c94f5a8aba4d4035",
+            "kind": "declaration_offer",
+            "ordered_action_ids_sha256": "ebe6f82e572517b74f4564fb2abfbcfefa094b4af447c4bcb46f1163e3724118",
+            "terminal": false
+          },
+          "label": "opening",
+          "seed": 1952,
+          "serialized_sha256": "6b79c12951e4b9aded51afdc5257b6145429285fdbc912841c2ee94aa53d3d65"
+        },
+        {
+          "decision": {
+            "action_count": 0,
+            "action_features_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "actor": null,
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 0,
+              "phase": "combat",
+              "player_turn_serial": "0",
+              "round_index": 0
+            },
+            "key": "4db801b9ab4f3a2a8ea0486d9405ba6e43a801505fa0724308b0e09924a4a276",
+            "kind": "chance",
+            "ordered_action_ids_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "terminal": false
+          },
+          "label": "first_chance",
+          "seed": 1952,
+          "serialized_sha256": "e98e60f19619980394a3bdd49ba829452a7b51719b9ef57fded6d9e679892343"
+        },
+        {
+          "decision": {
+            "action_count": 296,
+            "action_features_sha256": "3b2f65449f664d0b442ef8af22dcaaf9f26f0a192654df48419b15d05809ff16",
+            "actor": "axis",
+            "clock": {
+              "completed_rounds": 0,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "2",
+              "round_index": 0
+            },
+            "key": "b94f68a197e12dc8be5e95c9d5ca49bc4054e9898ee232fd34ffbf773067e722",
+            "kind": "combat_movement",
+            "ordered_action_ids_sha256": "35cf5aa5d7379f1703fd58fbb23ae84d51be2386607972f33d900ec5e872f123",
+            "terminal": false
+          },
+          "label": "japan_combat_movement",
+          "seed": 1952,
+          "serialized_sha256": "a89a8589d05efb4345c7fb0c3be4b39050e8ca8482510973ad7aa6dab76ebd77"
+        },
+        {
+          "decision": {
+            "action_count": 241,
+            "action_features_sha256": "4dbfd7cc4a4951f9fcd832ec4518f4707fa9f3109254e9b1a3d358399d5b460a",
+            "actor": "axis",
+            "clock": {
+              "completed_rounds": 1,
+              "income_collected": false,
+              "nation_index": 2,
+              "phase": "combat_movement",
+              "player_turn_serial": "6",
+              "round_index": 1
+            },
+            "key": "a34b2cc58cedc53a4a15ce9e98af591b5dbfe6bd6ed3d524c5b715f01c8a8b39",
+            "kind": "combat_movement",
+            "ordered_action_ids_sha256": "4a3ba9ff7dee66e9bab0055f3325f21ae43eeb1f32401312ec3ae73bb32ab29b",
+            "terminal": false
+          },
+          "label": "round2_japan_combat_movement",
+          "seed": 1952,
+          "serialized_sha256": "ecf6bc539383b342ec8645257e39266bd503e6414a4d59af034453381ac4dc32"
+        }
+      ],
+      "limits": [
+        "No GPU implementation, neural search, self-play or training is measured.",
+        "Explicit outcome replay preserves execution RNG; only that RNG field is excluded from public-state parity.",
+        "Numerical export is included only in positions mode. Scripted games measure rules/interface replay without neural input generation.",
+        "Whole-game throughput includes step witness auditing and Python driver overhead; final full-state verification and environment construction are timed separately.",
+        "Small defaults establish a benchmark scaffold, not training feasibility or strategic strength."
+      ],
+      "measurements": [
+        {
+          "parity": {
+            "fields": {
+              "complete_games": true,
+              "lanes": true
+            },
+            "matched": true
+          },
+          "plain_cpu": {
+            "audited_replay_wall_seconds": 0.6541952920088079,
+            "completed_rules_replay_games_per_hour": null,
+            "completed_three_round_games": 0,
+            "final_state_audit_seconds": 0.010729040979640558,
+            "host_audit_and_driver_seconds": 0.23256629199022427,
+            "lanes": [
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "fd1a44dacb5a2435afb38b7a178323636df6a56a63cb61eecd2fc520833f0d90"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "3d52440911ed391072ef17f95fe195cd6eb2440a849513b031b1c322f931d95b"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "ecca3aa776cb707bbe42e66f265708ae1ea2004efb952a950b4dccc84a02b45d"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "352f234b15dd21edb272e1855c1d49ce69abb80a5a738874de327730fe1477e8"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "5fdd652950bc700bf51711290364180eb216ec48f61557bb114e73eb2cca1fb7"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "c2c1415957b11d6ac134b1e51bd1f6e75f3ba7f8d20104fff2aa5295ed11d55e"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "9b2472eb1cdea19a5c3a64c36d75ed70d6a72da62610b34343d0e4e9c5999bd6"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "f5bb6a1077e8fef3350dfd63e5b4cb216c5ea07734b906cf0a889ea495a93623"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "fd1a44dacb5a2435afb38b7a178323636df6a56a63cb61eecd2fc520833f0d90"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "3d52440911ed391072ef17f95fe195cd6eb2440a849513b031b1c322f931d95b"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "ecca3aa776cb707bbe42e66f265708ae1ea2004efb952a950b4dccc84a02b45d"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "e1fef187b658e40aa6589a8794769cccaa3e03f681b2f33641de34b87f84874e"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "3bd52db708248736f6d3441821c439bce3fb213a0be35b595066fdfdf1fb7b39"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "5e168007691e5e48bb2ab2993371b285d94e1487a9c1416f934d3c9b9146ff96"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "d30d0964b8322deb385e8841cc62e8c28968c00478d47df9fc2b129934228e66"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "b6028cf1b2761590f759b8dcf9ccbf36e2ba9906496386dd63ab97fb62a711f5"
+              }
+            ],
+            "operations_seconds": {
+              "actions": 0.007663416996365413,
+              "chance": 0.0020301250042393804,
+              "decisions": 0.18005508300848305,
+              "numeric_export": 0.23188037500949576
+            },
+            "path": "plain_cpu",
+            "setup_seconds": 12.860286917013582
+          },
+          "repetition": 0,
+          "wrapped_cpu": {
+            "audited_replay_wall_seconds": 0.733856167003978,
+            "completed_rules_replay_games_per_hour": null,
+            "completed_three_round_games": 0,
+            "final_state_audit_seconds": 0.011343249992933124,
+            "host_audit_and_driver_seconds": 0.23684741603210568,
+            "lanes": [
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "fd1a44dacb5a2435afb38b7a178323636df6a56a63cb61eecd2fc520833f0d90"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "3d52440911ed391072ef17f95fe195cd6eb2440a849513b031b1c322f931d95b"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "ecca3aa776cb707bbe42e66f265708ae1ea2004efb952a950b4dccc84a02b45d"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "352f234b15dd21edb272e1855c1d49ce69abb80a5a738874de327730fe1477e8"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "5fdd652950bc700bf51711290364180eb216ec48f61557bb114e73eb2cca1fb7"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "c2c1415957b11d6ac134b1e51bd1f6e75f3ba7f8d20104fff2aa5295ed11d55e"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "9b2472eb1cdea19a5c3a64c36d75ed70d6a72da62610b34343d0e4e9c5999bd6"
+                ],
+                "seed": 1951,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "f5bb6a1077e8fef3350dfd63e5b4cb216c5ea07734b906cf0a889ea495a93623"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "fd1a44dacb5a2435afb38b7a178323636df6a56a63cb61eecd2fc520833f0d90"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "3d52440911ed391072ef17f95fe195cd6eb2440a849513b031b1c322f931d95b"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "ecca3aa776cb707bbe42e66f265708ae1ea2004efb952a950b4dccc84a02b45d"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "e1fef187b658e40aa6589a8794769cccaa3e03f681b2f33641de34b87f84874e"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "3bd52db708248736f6d3441821c439bce3fb213a0be35b595066fdfdf1fb7b39"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "5e168007691e5e48bb2ab2993371b285d94e1487a9c1416f934d3c9b9146ff96"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [
+                  "d30d0964b8322deb385e8841cc62e8c28968c00478d47df9fc2b129934228e66"
+                ],
+                "seed": 1952,
+                "steps": 1,
+                "terminal": false,
+                "trace_sha256": "b6028cf1b2761590f759b8dcf9ccbf36e2ba9906496386dd63ab97fb62a711f5"
+              }
+            ],
+            "operations_seconds": {
+              "actions": 0.007404542004223913,
+              "chance": 0.001701957982731983,
+              "decisions": 0.18032116699032485,
+              "numeric_export": 0.3075810839945916
+            },
+            "path": "wrapped_cpu",
+            "setup_seconds": 12.827775084006134
+          }
+        }
+      ],
+      "preparation_seconds": 24.23026279199985,
+      "provenance": {
+        "backend_source_sha256": {
+          "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+          "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+          "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4"
+        },
+        "branch": "codex/gpu-selfplay",
+        "commit": "a1f9c9d69915968f463f71452f546483fef479f7",
+        "dirty": "",
+        "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+        "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+        "native_sha256": "f27924cca2235c457932fa2dc3adb5a2968391c61b9b96fb861d22d7b63b96ae",
+        "runtime_source_sha256": {
+          "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+          "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+          "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+          "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+          "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+          "include/game/campaign.hpp": "b4d101547ec5056bfd1d3cae091a29357b571c90543fd749226a6856119e1e7c",
+          "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+          "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+          "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+          "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+          "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+          "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+          "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+          "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+          "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+          "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+          "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+          "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+          "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+          "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+          "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+          "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+          "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+          "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+          "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+          "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+          "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+          "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+          "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+          "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+          "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+          "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+          "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+          "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+          "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+          "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+          "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+          "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+          "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+          "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+          "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+          "src/campaign_state.cpp": "219c519484fbd6b8506f755e9f6a46eac86b24b727fb2cf295824198c2d76934",
+          "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+          "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+          "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+          "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+          "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+          "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+          "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+          "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+          "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+          "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+          "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+          "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+          "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+          "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+          "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+          "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+          "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+          "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+          "src/python_bindings.cpp": "2b5c22795947f95c9a63e77a1d03e4d2fbd5d6a7920c8ee3f99201983a622232",
+          "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+          "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+          "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+          "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+          "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+          "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+          "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+          "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+          "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+          "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+          "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+          "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+          "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+          "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+          "studies/campaign/learning.py": "f006353d27356cbe28e296ddf0ec4542bef007df189d8d0f5b1a3f88fe02235c",
+          "studies/campaign/model_export.py": "f351112d6cc102deb4f5df60f2b0c49a9c0566e1fabda12c64a2ad8bb5920165",
+          "studies/campaign/neural.py": "6da92834105cc260943dba36984c06d113e52733c71a239dc383717ee464620e",
+          "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+          "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+          "studies/campaign/run.py": "56094f43b0ae70d476d57daa41873a806aabc6024d89c32b1f589133f0930c64",
+          "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+          "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+          "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+          "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+          "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+        }
+      },
+      "raw_report": "studies/campaign/runs/backend-foundation-2026-10-25/positions.json",
+      "raw_report_sha256": "6701ca4b183288ef92805c94236b9ca0a40baa009d60c3c1614ad82e36ae8dad",
+      "source_and_native_unchanged": true,
+      "startup_seconds": 2.103616416978184,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timing_scope": "Rules replay only. Policy selection and sampled-dice preparation are outside measurement. Timed operations use actual backend calls; audited replay wall also includes disclosed host witness checks and driver overhead.",
+      "warmup_seconds": 27.03933029199834,
+      "watchdog": {
+        "cpu_budget": 3,
+        "elapsed_seconds": 80.87402325001312,
+        "memory_limit_bytes": 8000000000,
+        "memory_metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)",
+        "monitor_failure": null,
+        "reserved_processes": 3,
+        "sampled_peak_charged_bytes": 826589184,
+        "scope": "Supervisor, worker and all descendants including sampling overhead; sampled guard, not a kernel memory cap.",
+        "stop_threshold_bytes": 7000000000,
+        "worker_returncode": 0,
+        "worker_threads": 1
+      },
+      "workload_sha256": "7186e2b5349c9dd7d2ac810d78b9d66bcfd18ea7843b4786a162499c2e2d5348"
+    },
+    "scripted-games": {
+      "backend": {
+        "device": "cpu",
+        "execution": "sequential_reference",
+        "name": "cpu",
+        "native_batch_execution": false
+      },
+      "config": {
+        "backend": "cpu",
+        "buckets": 2048,
+        "cpu_budget": 3,
+        "max_state_visits": 20,
+        "max_transitions": 5000,
+        "memory_bytes": 8000000000,
+        "mode": "scripted_games",
+        "repetitions": 1,
+        "seconds": 300.0,
+        "seeds": [
+          1951,
+          1952
+        ],
+        "warmups": 1
+      },
+      "frozen_positions": [],
+      "limits": [
+        "No GPU implementation, neural search, self-play or training is measured.",
+        "Explicit outcome replay preserves execution RNG; only that RNG field is excluded from public-state parity.",
+        "Numerical export is included only in positions mode. Scripted games measure rules/interface replay without neural input generation.",
+        "Whole-game throughput includes step witness auditing and Python driver overhead; final full-state verification and environment construction are timed separately.",
+        "Small defaults establish a benchmark scaffold, not training feasibility or strategic strength."
+      ],
+      "measurements": [
+        {
+          "parity": {
+            "fields": {
+              "complete_games": true,
+              "lanes": true
+            },
+            "matched": true
+          },
+          "plain_cpu": {
+            "audited_replay_wall_seconds": 15.107252749992767,
+            "completed_rules_replay_games_per_hour": 476.5922778384341,
+            "completed_three_round_games": 2,
+            "final_state_audit_seconds": 0.035995125013869256,
+            "host_audit_and_driver_seconds": 4.336538971576374,
+            "lanes": [
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [],
+                "seed": 1951,
+                "steps": 687,
+                "terminal": true,
+                "trace_sha256": "b0980f3a250aa985aebaaa99abf9c2cfdbe182adbd0758b0f9d0b6b6c19a5bd0"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [],
+                "seed": 1952,
+                "steps": 663,
+                "terminal": true,
+                "trace_sha256": "b825cbc5c1e7ce0cc80cfec05b47b9228aec6a1ebb1ebe4782a7699142ab2b9a"
+              }
+            ],
+            "operations_seconds": {
+              "actions": 2.8259711610735394,
+              "chance": 0.30087654100498185,
+              "decisions": 7.643866076337872,
+              "numeric_export": 0.0
+            },
+            "path": "plain_cpu",
+            "setup_seconds": 3.1908821249962784
+          },
+          "repetition": 0,
+          "wrapped_cpu": {
+            "audited_replay_wall_seconds": 15.208781499997713,
+            "completed_rules_replay_games_per_hour": 473.41070683414597,
+            "completed_three_round_games": 2,
+            "final_state_audit_seconds": 0.03330500001902692,
+            "host_audit_and_driver_seconds": 4.354921311954968,
+            "lanes": [
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [],
+                "seed": 1951,
+                "steps": 687,
+                "terminal": true,
+                "trace_sha256": "b0980f3a250aa985aebaaa99abf9c2cfdbe182adbd0758b0f9d0b6b6c19a5bd0"
+              },
+              {
+                "execution_rng_unchanged": true,
+                "numeric_input_sha256": [],
+                "seed": 1952,
+                "steps": 663,
+                "terminal": true,
+                "trace_sha256": "b825cbc5c1e7ce0cc80cfec05b47b9228aec6a1ebb1ebe4782a7699142ab2b9a"
+              }
+            ],
+            "operations_seconds": {
+              "actions": 2.8164051255735103,
+              "chance": 0.2979567451402545,
+              "decisions": 7.73949831732898,
+              "numeric_export": 0.0
+            },
+            "path": "wrapped_cpu",
+            "setup_seconds": 3.2195856670150533
+          }
+        }
+      ],
+      "preparation_seconds": 24.247901833994547,
+      "provenance": {
+        "backend_source_sha256": {
+          "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+          "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+          "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4"
+        },
+        "branch": "codex/gpu-selfplay",
+        "commit": "a1f9c9d69915968f463f71452f546483fef479f7",
+        "dirty": "",
+        "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+        "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+        "native_sha256": "f27924cca2235c457932fa2dc3adb5a2968391c61b9b96fb861d22d7b63b96ae",
+        "runtime_source_sha256": {
+          "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+          "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+          "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+          "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+          "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+          "include/game/campaign.hpp": "b4d101547ec5056bfd1d3cae091a29357b571c90543fd749226a6856119e1e7c",
+          "include/game/campaign_actions.hpp": "7d7bd2a817ba03c6e3678b19c174d526a2fd395c594441fed108f5a69b65bb6e",
+          "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+          "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+          "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+          "include/game/campaign_objective.hpp": "d6c739f94d4bc86be37606a7d9ecc8b575fd1aec305b2be58d252cf811b3e439",
+          "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+          "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+          "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+          "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+          "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+          "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+          "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+          "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+          "include/game/movement.hpp": "b50aff9a1ad3a86299ff472a427250efe388850401057672ccd3be3ca09be718",
+          "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+          "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+          "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+          "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+          "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+          "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+          "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+          "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+          "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+          "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+          "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+          "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+          "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+          "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+          "src/campaign_actions.cpp": "3cc2d0089455c00c1768bc67e8db6e24b5ffb681ccc3753aecc1ae88e5559685",
+          "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+          "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+          "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+          "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
+          "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+          "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+          "src/campaign_state.cpp": "219c519484fbd6b8506f755e9f6a46eac86b24b727fb2cf295824198c2d76934",
+          "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+          "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+          "src/economy.cpp": "6a3e4493ef43f3e99c28c0a98096df75e5bbcb728e61264e8873876e0ea05108",
+          "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+          "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+          "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+          "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+          "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+          "src/movement.cpp": "d7ad1d8aefd3dd032a8310f61f8a4481d6f23c4170bd8e13a37bfa14d7c4b520",
+          "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+          "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+          "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+          "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+          "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+          "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+          "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+          "src/politics_influence.cpp": "5f5944f93e3cd833e6c5690635e800326d06cd707e449ff4a8218dcd4a52a0d1",
+          "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+          "src/python_bindings.cpp": "2b5c22795947f95c9a63e77a1d03e4d2fbd5d6a7920c8ee3f99201983a622232",
+          "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+          "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+          "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+          "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+          "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+          "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+          "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+          "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+          "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+          "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+          "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+          "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+          "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+          "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+          "studies/campaign/learning.py": "f006353d27356cbe28e296ddf0ec4542bef007df189d8d0f5b1a3f88fe02235c",
+          "studies/campaign/model_export.py": "f351112d6cc102deb4f5df60f2b0c49a9c0566e1fabda12c64a2ad8bb5920165",
+          "studies/campaign/neural.py": "6da92834105cc260943dba36984c06d113e52733c71a239dc383717ee464620e",
+          "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+          "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+          "studies/campaign/run.py": "56094f43b0ae70d476d57daa41873a806aabc6024d89c32b1f589133f0930c64",
+          "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+          "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+          "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+          "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+          "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+        }
+      },
+      "raw_report": "studies/campaign/runs/backend-foundation-2026-10-25/scripted-games.json",
+      "raw_report_sha256": "83d56bb60bd214f1c9b812138a7eade48aa2e25e613b95e736d7075988e03d3c",
+      "source_and_native_unchanged": true,
+      "startup_seconds": 2.111103874980472,
+      "status": "completed",
+      "task": {
+        "calendar_rounds": 3,
+        "compatibility": {
+          "actions": "campaign-orders-v1",
+          "curriculum": "regional-horizon-curriculum-v1",
+          "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+          "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+        },
+        "full_target_game": false,
+        "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+        "setup": "unchanged approved 99-piece,37-node July1936 setup",
+        "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+        "version": "regional-horizon-curriculum-v1"
+      },
+      "timing_scope": "Rules replay only. Policy selection and sampled-dice preparation are outside measurement. Timed operations use actual backend calls; audited replay wall also includes disclosed host witness checks and driver overhead.",
+      "warmup_seconds": 36.696817916003056,
+      "watchdog": {
+        "cpu_budget": 3,
+        "elapsed_seconds": 100.31044870900223,
+        "memory_limit_bytes": 8000000000,
+        "memory_metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)",
+        "monitor_failure": null,
+        "reserved_processes": 3,
+        "sampled_peak_charged_bytes": 600965120,
+        "scope": "Supervisor, worker and all descendants including sampling overhead; sampled guard, not a kernel memory cap.",
+        "stop_threshold_bytes": 7000000000,
+        "worker_returncode": 0,
+        "worker_threads": 1
+      },
+      "workload_sha256": "7186e2b5349c9dd7d2ac810d78b9d66bcfd18ea7843b4786a162499c2e2d5348"
+    }
+  },
+  "branch": "codex/gpu-selfplay",
+  "cpu_reference_commit": "d1c672954d8e1bb24ca43cd98c0199f4daac81f7",
+  "existing_cpu_training_default_changed": false,
+  "gpu_implemented": false,
+  "implementation_commit": "a1f9c9d69915968f463f71452f546483fef479f7",
+  "limits": [
+    "Ordered action IDs in the curated fixed-position summary are represented by their full-list SHA-256 and count; raw hashed benchmark artifacts retain every ID.",
+    "No GPU backend, neural acceleration, neural self-play or playing-strength result is claimed.",
+    "Two distinct three-round scripted workloads, one measured replay per path, one warmup; no variance estimates.",
+    "Both measured paths use recorded actions and explicit faces. Policy/dice preparation and per-run environment setup are separate.",
+    "Audited replay wall includes disclosed host witness/driver work; it is not a pure rules kernel or a training throughput measurement.",
+    "The CPU facade dispatches lanes sequentially; it does not accelerate or replace current scalar CPU training.",
+    "Existing frozen training artifacts are not modified or automatically migrated."
+  ],
+  "sampled_cpu_before_after": {
+    "after_native": "f27924cca2235c457932fa2dc3adb5a2968391c61b9b96fb861d22d7b63b96ae",
+    "before_native": "6b6718f2cc8d9e1ac77265b4b700935d554f38e5fd970417891199f04f461303",
+    "games": [
+      {
+        "returns": [
+          26.0,
+          -26.60000000000001,
+          -96.00000000000001
+        ],
+        "seed": 1951,
+        "serialized_sha256": "04a4de85a321e2cbc60ef77599fc75e700e357854b893c22bb82aa52d5ed6f45",
+        "steps": 687,
+        "trace_sha256": "16bbe3f7ec491404d51028a7642c871c59a8382ac6f5c9852b009893be445118"
+      },
+      {
+        "returns": [
+          30.700000000000003,
+          -34.50000000000001,
+          -90.30000000000001
+        ],
+        "seed": 1952,
+        "serialized_sha256": "58c191578407e1e0c209456c5f5306768d55471e03e2352e9ce4dbe0d04eb31f",
+        "steps": 663,
+        "trace_sha256": "274ba28e64fcf985d709c43ead6a3ee4864fc66afc57d84ffcca90e795c1c998"
+      },
+      {
+        "returns": [
+          27.099999999999994,
+          -39.900000000000006,
+          -86.10000000000001
+        ],
+        "seed": 1953,
+        "serialized_sha256": "741213d38cafd6e3cd3e1e062082bc6586f933b4881bc0de30cb1c2d0410cbc2",
+        "steps": 713,
+        "trace_sha256": "0b037be7f8448c9dba0fc8455da41d6de82764d48484352f0105d2757da3d6d2"
+      },
+      {
+        "returns": [
+          22.80000000000001,
+          -41.99999999999999,
+          -75.39999999999999
+        ],
+        "seed": 1954,
+        "serialized_sha256": "488ad763ebd5696bcef38ed348652f8cc53950f35de0779da671b5d205dc18c1",
+        "steps": 674,
+        "trace_sha256": "14d3a866dac1557a2827995b4db28ba980f533e2e92e5e92d5799b01f5e745d2"
+      }
+    ],
+    "matched": true,
+    "scope": "Four complete sampled three-round games; exact action/chance event, final state/history/RNG and return fingerprints. Trace-generation timings are excluded because they were not isolated performance comparisons.",
+    "transitions": 2737
+  },
+  "schema": "campaign-backend-foundation-evidence-v1",
+  "verification": {
+    "broad_python_guard": {
+      "cpu_budget": 12,
+      "ended_epoch": 1792979597.457412,
+      "memory_limit_bytes": 26000000000,
+      "memory_metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)",
+      "peak_memory_bytes": 1729560576,
+      "pid": 5886,
+      "returncode": 0,
+      "started_epoch": 1792979243.7826061,
+      "status": "completed",
+      "wall_limit_seconds": 900
+    },
+    "broad_python_seconds": 352.646,
+    "broad_python_tests_passed": 496,
+    "cpp_suites_passed": 26,
+    "final_targeted_python_seconds": 52.77,
+    "final_targeted_python_tests_passed": 25,
+    "scope": "Broad suite plus final backend parity/harness cases after RNG-audit and stale-chance-key hardening. Counts overlap and are not additive."
+  }
+}
