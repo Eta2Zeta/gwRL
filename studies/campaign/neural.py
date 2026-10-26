@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import inspect
 import math
+import os
 import threading
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -21,6 +22,68 @@ from .features import (EXTERNAL_REFERENCE, NODE_TYPES, NUMERIC_DIM, RELATIONS, S
                        Graph, action_factors, cached_action, cached_context, cached_observation, canonical, context_source_key, make_input)
 
 NUMERIC_SCHEMA = "campaign-numeric-input-v1"
+
+
+def _require_no_mps_fallback() -> None:
+    if os.environ.get("PYTORCH_ENABLE_MPS_FALLBACK", "0") not in {"", "0"}:
+        raise ValueError("MPS execution requires PYTORCH_ENABLE_MPS_FALLBACK=0; CPU fallback is not allowed")
+
+
+def resolve_neural_device(device: str | torch.device = "cpu") -> torch.device:
+    """Validate an explicit target without choosing a different available device."""
+    if not isinstance(device, (str, torch.device)):
+        raise ValueError("Neural device must be cpu, mps or cuda[:index]")
+    try:
+        target = torch.device(device)
+    except (RuntimeError, ValueError) as error:
+        raise ValueError("Neural device must be cpu, mps or cuda[:index]") from error
+    if target.type == "cpu":
+        if target.index not in (None, 0):
+            raise ValueError("CPU neural execution has no indexed accelerator")
+        return torch.device("cpu")
+    if target.type == "mps":
+        if target.index not in (None, 0) or not torch.backends.mps.is_available():
+            raise ValueError("The requested MPS neural device is unavailable")
+        _require_no_mps_fallback()
+        return torch.device("mps")
+    if target.type == "cuda":
+        if not torch.cuda.is_available():
+            raise ValueError("The requested CUDA neural device is unavailable")
+        index = torch.cuda.current_device() if target.index is None else target.index
+        if not 0 <= index < torch.cuda.device_count():
+            raise ValueError("The requested CUDA neural device index is unavailable")
+        return torch.device("cuda", index)
+    raise ValueError("Neural device must be cpu, mps or cuda[:index]")
+
+
+def synchronize_neural_device(device: str | torch.device = "cpu") -> None:
+    """Wait for queued accelerator work at explicit timing/checkpoint boundaries."""
+    target = resolve_neural_device(device)
+    if target.type == "mps":
+        torch.mps.synchronize()
+    elif target.type == "cuda":
+        torch.cuda.synchronize(target)
+
+
+def neural_device_memory(device: str | torch.device = "cpu") -> dict[str, Any]:
+    """Allocator diagnostics, additional to the experiment's process-tree guard.
+
+    MPS driver allocation includes cached/workspace allocations beyond live
+    tensors. Its recommended maximum is a hardware recommendation, not the
+    user's memory allowance. CPU memory remains measured by the outer guard.
+    """
+    target = resolve_neural_device(device)
+    result: dict[str, Any] = {"device": str(target), "allocated_bytes": None,
+                              "driver_allocated_bytes": None, "reserved_bytes": None,
+                              "recommended_max_bytes": None}
+    if target.type == "mps":
+        result.update(allocated_bytes=int(torch.mps.current_allocated_memory()),
+                      driver_allocated_bytes=int(torch.mps.driver_allocated_memory()),
+                      recommended_max_bytes=int(torch.mps.recommended_max_memory()))
+    elif target.type == "cuda":
+        result.update(allocated_bytes=int(torch.cuda.memory_allocated(target)),
+                      reserved_bytes=int(torch.cuda.memory_reserved(target)))
+    return result
 
 
 @dataclass(frozen=True)
@@ -432,19 +495,24 @@ class CampaignPolicyValueNet(nn.Module):
     Actions read their own complete parameters plus referenced state/registry
     entities. All actual legal actions are scored; padded actions never exist.
     """
-    def __init__(self, config: CampaignModelConfig) -> None:
+    def __init__(self, config: CampaignModelConfig, *, device: str | torch.device = "cpu") -> None:
         super().__init__()
+        target = resolve_neural_device(device)
         self.config = config
         dim = config.hidden_dim
-        self.encoder = _GraphEncoder(config)
-        self.state_encoder = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.LayerNorm(dim))
-        self.policy_head = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
-        self.factor_heads = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
-                                         for _ in range(4))
-        self.value_head = nn.Sequential(nn.Linear(dim, dim), nn.GELU(), nn.Linear(dim, 3))
+        # Identical CPU initialization keeps matched CPU/GPU experiments on the
+        # same initial parameters and consumes the same CPU RNG sequence.
+        with torch.device("cpu"):
+            self.encoder = _GraphEncoder(config)
+            self.state_encoder = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.LayerNorm(dim))
+            self.policy_head = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
+            self.factor_heads = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
+                                             for _ in range(4))
+            self.value_head = nn.Sequential(nn.Linear(dim, dim), nn.GELU(), nn.Linear(dim, 3))
         self._static_contexts = _SourceCache(64 * 1024 * 1024, 8)
         self._static_signature: tuple | None = None
         self.register_load_state_dict_post_hook(_clear_static_after_load)
+        self.to(target)
 
     def clear_inference_cache(self) -> None:
         self._static_contexts.clear()
@@ -506,6 +574,9 @@ class CampaignPolicyValueNet(nn.Module):
 
     def forward_batch(self, inputs: Sequence[dict[str, Any]], *,
                       model_version: str | None = None) -> tuple[list[Tensor], Tensor]:
+        if self.value_head[-1].weight.device.type == "mps":
+            # Also covers callers using the normal PyTorch model.to('mps') API.
+            _require_no_mps_fallback()
         if not inputs:
             return [], self.value_head[-1].weight.new_empty((0, 3))
         contexts, context_rows, context_lookup = [], [], {}
@@ -578,6 +649,33 @@ class CampaignPolicyValueNet(nn.Module):
 
     def forward(self, inputs: Sequence[dict[str, Any]]) -> tuple[list[Tensor], Tensor]:
         return self.forward_batch(inputs)
+
+
+def clear_neural_caches(models: Sequence[CampaignPolicyValueNet] = (), *,
+                        device: str | torch.device | None = None, release_allocator: bool = False) -> None:
+    """Explicit cold-benchmark cleanup; never called automatically per decision.
+
+    Clear source/device tensors and supplied models' learned inference caches.
+    Live caller references, model weights and optimizer state remain allocated.
+    """
+    global _GRAPH_TENSOR_BYTES
+    if release_allocator and device is None:
+        raise ValueError("Allocator release requires an explicit neural device")
+    target = resolve_neural_device(device) if device is not None else None
+    with _GRAPH_TENSOR_LOCK:
+        _GRAPH_TENSORS.clear()
+        _GRAPH_TENSOR_BYTES = 0
+    for cache in (_REFERENCE_INDICES, _REFERENCE_METADATA, _ENCODER_LAYOUTS, _ACTION_FACTORS, _FACTOR_LAYOUTS):
+        cache.clear()
+    for model in models:
+        model.clear_inference_cache()
+    if release_allocator:
+        synchronize_neural_device(target)
+        if target.type == "mps":
+            torch.mps.empty_cache()
+        elif target.type == "cuda":
+            with torch.cuda.device(target):
+                torch.cuda.empty_cache()
 
 
 class NeuralEvaluator:

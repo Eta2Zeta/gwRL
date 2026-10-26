@@ -270,6 +270,7 @@ Action actionFromJson(const json::Value& value);
 json::Value outcomeJson(const ChanceOutcome& outcome);
 ChanceOutcome outcomeFromJson(const json::Value& value);
 json::Value chanceRequestJson(const ChanceRequest& request);
+ChanceRequest chanceRequestFromJson(const json::Value& value);
 
 struct RandomStreams {
     std::uint64_t actual {1};

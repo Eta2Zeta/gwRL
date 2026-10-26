@@ -15,6 +15,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <chrono>
 
 namespace py = pybind11;
 
@@ -155,6 +156,41 @@ std::string describeAction(const game::Action& action) {
 
 PYBIND11_MODULE(gwrl_cpp, module) {
     module.doc() = "C++ training environment bindings for gwRL";
+
+    module.def("campaign_effective_results_probe", [](const std::vector<std::string>& requestJson,
+            const std::vector<std::string>& outcomeJson, const py::object& repetitions) {
+        if (!PyLong_CheckExact(repetitions.ptr())) throw py::type_error("Probe repetitions must be an integer");
+        const auto count = py::cast<std::int64_t>(repetitions);
+        if (count < 1 || count > 1000000) throw py::value_error("Probe repetitions must be in [1, 1000000]");
+        if (requestJson.size() != outcomeJson.size()) throw py::value_error("Probe lane counts differ");
+        std::vector<std::vector<int>> results(requestJson.size());
+        double preparationSeconds = 0, rulesSeconds = 0;
+        {
+            py::gil_scoped_release release;
+            const auto preparation = std::chrono::steady_clock::now();
+            std::vector<game::campaign::ChanceRequest> requests;
+            std::vector<game::campaign::ChanceOutcome> outcomes;
+            requests.reserve(requestJson.size()); outcomes.reserve(outcomeJson.size());
+            for (std::size_t lane = 0; lane < requestJson.size(); ++lane) {
+                requests.push_back(game::campaign::chanceRequestFromJson(game::json::parse(requestJson[lane])));
+                outcomes.push_back(game::campaign::outcomeFromJson(game::json::parse(outcomeJson[lane])));
+            }
+            preparationSeconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - preparation).count();
+            const auto started = std::chrono::steady_clock::now();
+            for (std::int64_t repetition = 0; repetition < count; ++repetition)
+                for (std::size_t lane = 0; lane < requests.size(); ++lane)
+                    results[lane] = game::campaign::effectiveResults(requests[lane], outcomes[lane]);
+            rulesSeconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count();
+        }
+        py::dict report;
+        report["results"] = results;
+        report["preparation_seconds"] = preparationSeconds;
+        report["rules_seconds"] = rulesSeconds;
+        report["repetitions"] = count;
+        report["lanes"] = requestJson.size();
+        return report;
+    }, py::arg("request_jsons"), py::arg("outcome_jsons"), py::arg("repetitions") = py::int_(1),
+       "Benchmark/conformance probe only: parse once, time the authoritative native dice primitive without Python lane calls.");
 
     module.def("compile_campaign_graph", &game::neural::compileCampaignGraph,
                py::arg("value"), py::arg("buckets"), py::arg("lexical_ids"),

@@ -191,6 +191,7 @@ Action actionFromJson(const V& v) { Action a; a.id=v.require("id").asString();a.
 V outcomeJson(const ChanceOutcome& o) { A a; for(const auto& faces:o.faces)a.push_back(ints(faces)); return V(O{{"faces",V(std::move(a))}}); }
 ChanceOutcome outcomeFromJson(const V& v) { ChanceOutcome o; for(const auto& faces:v.require("faces").asArray())o.faces.push_back(readInts(faces)); return o; }
 V chanceRequestJson(const ChanceRequest& request) { return chanceJson(request); }
+ChanceRequest chanceRequestFromJson(const V& value) { return readChance(value); }
 State State::clone() const { return *this; }
 Id State::currentNation() const { require(definition!=nullptr,"State has no definition"); require(clock.nationIndex>=0&&static_cast<std::size_t>(clock.nationIndex)<definition->turnOrder.size(),"Invalid national turn cursor");return definition->turnOrder[clock.nationIndex]; }
 std::optional<Id> State::decisionPlayer() const { if(terminal||chance)return std::nullopt; const auto nation=decisions.empty()?currentNation():decisions.back().nation; require(nations.contains(nation),"Decision nation is unknown");return politicalPlayer(*this,nation); }

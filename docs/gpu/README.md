@@ -3,8 +3,9 @@
 GPU development starts on `codex/gpu-selfplay`, from CPU reference commit
 `d1c672954d8e1bb24ca43cd98c0199f4daac81f7`. Both implementations will live in the
 same repository. The existing C++ rules engine, scenario data and scalar CPU
-training path remain in place. This first step implements the shared interface,
-CPU wrapper and correctness/benchmark harness. **No GPU backend is implemented.**
+training path remain in place. The shared interface, CPU wrapper and rules-replay
+harness are joined by optional GPU neural execution and a first exact tensor
+rules primitive. **A full GPU campaign transition engine is not implemented.**
 
 The [initial CPU conformance and timing evidence](cpu_foundation_2026_10_25.md)
 records the validated foundation and its measurement limits.
@@ -39,7 +40,7 @@ decisions = backend.decision_batch()
 rows = backend.inspect_decisions(decisions)  # Explicit host inspection
 ```
 
-CPU is the only registered backend. Selecting `gpu` raises an explicit error.
+CPU is the only registered campaign transition backend. Selecting `gpu` raises an explicit error.
 The CPU path imports no optional GPU framework. Future neural-device selection
 is separate from engine-backend selection. Neither menus nor state are truncated
 to arbitrary fixed capacities.
@@ -102,18 +103,65 @@ tree using the larger of RSS and macOS physical footprint where available.
 
 These are **audited rules-replay benchmarks**, not neural self-play, training,
 playing strength or GPU measurements. They are an initial conformance baseline.
-Future GPU work must also measure device transfers/synchronization, compilation,
-larger batch sizes and complete self-play under matched models and search budgets.
+GPU measurements separately include device transfers/synchronization, cold
+preparation, larger batch sizes and complete self-play under matched models and search budgets.
 Component speedups will remain separate from complete-game training throughput.
 
-## Next additions
+## GPU neural execution
 
-1. Measure GPU neural evaluation separately with the CPU engine retained.
-2. Add a GPU backend behind this contract, including device execution of pending
-   choices and interrupts; avoid a Python round trip for each individual lane.
-3. Run common conformance fixtures with explicit outcomes before speed comparisons.
-4. Extend the harness to real batched search and complete learning, recording
-   engine, search and neural-device choices independently.
+`CampaignPolicyValueNet(config, device="mps")` executes the unchanged network on
+the Apple GPU. `device="cuda"` or `"cuda:0"` selects an available NVIDIA/PyTorch
+CUDA device; CUDA execution cannot be verified on the development Mac. The
+default is `"cpu"`. All devices initialize their weights on CPU first, consuming
+the same CPU random sequence, then move those weights. Menus, model dimensions,
+precision, search budgets and game horizons are unchanged. Unavailable devices
+and enabled MPS CPU fallback are errors; no device is silently substituted.
+
+The training CLI accepts `--neural-device mps`; the saved configuration pins
+that choice for recovery. Full recovery includes optimizer moments, frozen
+policies, unfinished games and GPU random state. A CPU-storage round trip
+restores optimizer moments to the model device. Changing devices is not an exact
+learning resume. Weight-only exports are CPU tensors and can be evaluated on an
+explicit different device with `evaluate --neural-device cpu`. Fully validating
+a legacy recovery archive still requires its original device, even if its
+policies are subsequently moved for evaluation.
+
+Rules, interrupt scheduling and tree traversal remain on CPU in this hybrid
+path. The neural evaluator batches each actor's network separately and returns
+its policy/value outputs to CPU search. CPU/MPS float32 results require numerical
+tolerances; matching initial weights and seeds alone do not guarantee identical
+search choices near ties. Tests compare forward outputs, gradients, Adam updates,
+actor routing, frozen-policy caches and real recovery behavior.
+
+`tools/benchmark_campaign_devices.py` compares matched CPU/MPS neural inference
+and completed hybrid self-play. Its reports distinguish preparation, cold and
+warm execution, numerical differences, actual inference batch sizes, synchronized
+network time and the remaining search/rules time. Fresh identical current
+weights are used, with no relabeling of historical learned checkpoints.
+
+## First tensor rules component
+
+`studies/campaign/backends/tensor_rules.py` implements the native dice
+`effectiveResults` contract with integer tensors on CPU/MPS/CUDA. It validates
+complete explicit face paths, conditional rerolls, ranges/counts and modified
+result overflow. Device error masks remain on device until explicitly inspected.
+Padding follows the actual batch maxima and counts; no die, reroll or lane is
+silently truncated. Packing and host inspection are explicit separate operations.
+
+This primitive samples no randomness and does not mutate a game. Full native
+chance handlers still commit casualties, retreats, political effects and pending
+decisions on CPU. The primitive is tested against authoritative native C++ and
+bit-exact CPU/MPS output; it is not inserted into the CPU trainer merely to count
+a GPU call. A separately named native benchmark probe times the existing C++
+primitive after parsing, allowing an honest component comparison.
+
+## Remaining transition work
+
+Further engine ports must retain complete state, legal menus, pending choices,
+interrupt ownership and chance distributions on device, using this CPU reference
+and explicit outcomes for conformance. A kernel-level speedup alone does not
+establish a complete-game speedup. Device search also needs to avoid a host trip
+for every lane and every tree step.
 
 The CPU implementation remains the default, reference and fallback as GPU support
 is added. Share scenario/catalog data and conformance fixtures rather than keeping
