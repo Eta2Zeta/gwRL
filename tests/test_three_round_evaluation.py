@@ -8,10 +8,13 @@ import unittest
 from contextlib import ExitStack
 from dataclasses import asdict
 from pathlib import Path
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
+
+import torch
 
 from test_campaign_evaluation import CountingEvaluator, EvaluationEnv
-from tools.evaluate_three_round_campaign import main, paired_comparison, summarize
+from tools.evaluate_three_round_campaign import execution_runtime, main, paired_comparison, summarize
 from studies.campaign.evaluation import evaluate
 from studies.campaign.run import RunConfig
 
@@ -33,7 +36,8 @@ class ThreeRoundEvaluationTests(unittest.TestCase):
         self.loaded = {"config": asdict(RunConfig(calendar_rounds=3)),
                                   "training_environment_seeds": [1936, 1937],
                                   "runtime_source_sha256": {"fixture": "frozen"},
-                       "models": {}, "generation": 0, "source_schema": "campaign-evaluation-models-v1"}
+                       "models": {player: torch.nn.Linear(1, 1) for player in ("axis", "allies", "comintern")},
+                       "generation": 0, "source_schema": "campaign-evaluation-models-v1"}
         self.versions = {"axis": "initial-axis", "allies": "initial-allies", "comintern": "initial-comintern"}
         self.stack = ExitStack()
         self.stack.enter_context(patch("torch.set_num_interop_threads"))
@@ -42,7 +46,8 @@ class ThreeRoundEvaluationTests(unittest.TestCase):
             side_effect=lambda _path: {**self.loaded, "model_versions": self.versions}))
         self.stack.enter_context(patch("studies.campaign.curriculum.make_env", side_effect=lambda seed, **kw: ExpansionEnv(seed)))
         self.stack.enter_context(patch("studies.campaign.curriculum.task_manifest", return_value={"calendar_rounds": 3}))
-        self.stack.enter_context(patch("studies.campaign.neural.NeuralEvaluator", side_effect=lambda *args, **kw: CountingEvaluator()))
+        self.policy_factory = self.stack.enter_context(patch("studies.campaign.device_runtime.runtime_policy_for_device", return_value=None))
+        self.evaluator_factory = self.stack.enter_context(patch("studies.campaign.neural.NeuralEvaluator", side_effect=lambda *args, **kw: CountingEvaluator()))
 
     def tearDown(self):
         self.stack.close()
@@ -101,6 +106,50 @@ class ThreeRoundEvaluationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "overlap training"):
             main(self.arguments())
         self.assertFalse(self.output.exists())
+
+    def test_actual_model_device_selects_one_persistent_policy_for_all_games(self):
+        class Model:
+            def parameters(self):
+                return iter((SimpleNamespace(device=torch.device("mps"), dtype=torch.float32),))
+        self.loaded["models"] = {player: Model() for player in self.versions}
+        # Config deliberately remains CPU: placement must come from the model.
+        policy = Mock()
+        self.policy_factory.return_value = policy
+        self.assertEqual(main(self.arguments()), 0)
+        self.policy_factory.assert_called_once_with("mps")
+        self.evaluator_factory.assert_called_once()
+        self.assertIs(self.evaluator_factory.call_args.kwargs["runtime_policy"], policy)
+        plan = json.loads((self.output / "plan.json").read_text())
+        runtime = plan["evaluation"]["execution_runtime"]
+        self.assertEqual(runtime["neural_device"], "mps")
+        self.assertEqual(runtime["torch_version"], str(torch.__version__))
+        self.assertEqual(set(runtime["model_devices"].values()), {"mps"})
+
+    def test_changed_device_or_torch_runtime_cannot_reuse_or_pair_results(self):
+        self.assertEqual(main(self.arguments()), 0)
+        first = (self.output / "network_only-1009.json").read_bytes()
+        runtime = execution_runtime(self.loaded["models"])
+        for index, (field, value) in enumerate((("neural_device", "mps"), ("torch_version", "different-torch"))):
+            changed = {**runtime, field: value}
+            with self.subTest(field=field), patch("tools.evaluate_three_round_campaign.execution_runtime", return_value=changed):
+                with self.assertRaisesRegex(ValueError, "execution runtime"):
+                    main(self.arguments())
+                with self.assertRaisesRegex(ValueError, "execution runtime"):
+                    main([*self.arguments(self.directory / f"different-runtime-{index}"), "--compare-to", str(self.output)])
+            self.assertEqual((self.output / "network_only-1009.json").read_bytes(), first)
+
+    def test_legacy_runtime_unknown_plans_are_explicitly_rejected_and_preserved(self):
+        self.assertEqual(main(self.arguments()), 0)
+        path = self.output / "plan.json"
+        old = json.loads(path.read_text())
+        del old["evaluation"]["execution_runtime"]
+        path.write_text(json.dumps(old))
+        original = path.read_bytes()
+        with self.assertRaisesRegex(ValueError, "Legacy.*execution runtime identity"):
+            main(self.arguments())
+        with self.assertRaisesRegex(ValueError, "Legacy.*execution runtime identity"):
+            main([*self.arguments(self.directory / "legacy-pair"), "--compare-to", str(self.output)])
+        self.assertEqual(path.read_bytes(), original)
 
     def test_unfinished_pair_has_no_delta_or_summary_terminal_metric(self):
         result = evaluate(ExpansionEnv, CountingEvaluator(), target_player="axis", seeds=[1009],

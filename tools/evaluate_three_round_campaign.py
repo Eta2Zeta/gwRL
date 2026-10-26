@@ -8,14 +8,19 @@ Example (trusted local model export or legacy recovery checkpoint)::
         --output-dir studies/campaign/runs/three-round/evaluation-initial
 
 Reissue exactly the same command after interruption. Completed seed/mode files
-are atomic and reused; an interrupted game is rerun deterministically from its
-seed. Training and active self-play resume from their separate runner checkpoint.
+are atomic and reused; an interrupted game restarts from its seed under the same
+execution contract. Accelerator floating-point nondeterminism still applies.
+Training and active self-play resume from their separate runner checkpoint.
+Plans predating execution-runtime identity are preserved but cannot be resumed
+or paired by this helper; rerun them in a fresh directory rather than guessing
+their historical device, numerical settings or PyTorch version.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import os
 import signal
 import sys
 import time
@@ -41,6 +46,45 @@ def digest(path: Path) -> str:
 def fingerprint(value: Any) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
                                      allow_nan=False).encode()).hexdigest()
+
+
+def execution_runtime(models: dict) -> dict:
+    """Record actual model placement and numerical settings, without GPU work."""
+    import torch
+    from studies.shared.multiplayer_mcts import PLAYERS
+    devices, dtypes = {}, {}
+    for player in PLAYERS:
+        parameters = tuple(models[player].parameters())
+        if not parameters:
+            raise ValueError("Evaluation actor model has no parameters")
+        placed = {str(parameter.device) for parameter in parameters}
+        if len(placed) != 1:
+            raise ValueError("Evaluation actor parameters span multiple neural devices")
+        devices[player] = placed.pop()
+        dtypes[player] = sorted({str(parameter.dtype) for parameter in parameters})
+    if len(set(devices.values())) != 1:
+        raise ValueError("Evaluation actor models must share one neural device")
+    device = next(iter(devices.values()))
+    target = torch.device(device)
+    result = {"schema": "campaign-evaluation-execution-runtime-v1", "rules_device": "cpu",
+              "search_device": "cpu", "neural_device": device, "model_devices": devices,
+              "parameter_dtypes": dtypes, "torch_version": str(torch.__version__),
+              "intraop_threads": torch.get_num_threads(), "interop_threads": torch.get_num_interop_threads(),
+              "float32_matmul_precision": torch.get_float32_matmul_precision()}
+    if target.type == "mps":
+        result["mps_environment"] = {
+            "cpu_fallback_enabled": os.environ.get("PYTORCH_ENABLE_MPS_FALLBACK", "0") not in {"", "0"},
+            "fast_math_enabled": os.environ.get("PYTORCH_MPS_FAST_MATH", "0") not in {"", "0"},
+            # PyTorch's preference checks presence: '=0' also enables it.
+            "prefer_metal_env_present": "PYTORCH_MPS_PREFER_METAL" in os.environ}
+    elif target.type == "cuda":
+        result["cuda_matmul_allow_tf32"] = bool(torch.backends.cuda.matmul.allow_tf32)
+    return result
+
+
+def _require_execution_runtime(plan: dict, label: str) -> None:
+    if not isinstance(plan.get("evaluation", {}).get("execution_runtime"), dict):
+        raise ValueError(f"Legacy {label} lacks execution runtime identity; rerun the evaluation in a fresh directory. Existing results are preserved")
 
 
 def summarize(records: list[dict]) -> dict:
@@ -109,6 +153,7 @@ def main(argv=None) -> int:
     from studies.campaign.neural import NeuralEvaluator
     from studies.campaign.run import RunConfig, _json
     from studies.campaign.model_export import load_evaluation_models
+    from studies.campaign.device_runtime import runtime_policy_for_device
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -144,13 +189,16 @@ def main(argv=None) -> int:
     # setting; exports never do. Evaluation remains deliberately one thread.
     torch.set_num_threads(1)
     versions = loaded["model_versions"]
-    evaluator = NeuralEvaluator(loaded["models"], version=fingerprint(versions))
+    execution = execution_runtime(loaded["models"])
+    runtime_policy = runtime_policy_for_device(execution["neural_device"])
+    evaluator = NeuralEvaluator(loaded["models"], version=fingerprint(versions), runtime_policy=runtime_policy)
     evaluation_contract = {"task": task_manifest(template), "seeds": seeds, "modes": modes,
         "target": "axis", "opponent": scripted_policy("balanced").version,
         "simulations": args.simulations, "max_depth": args.max_depth,
         "max_transitions": args.max_transitions, "max_state_visits": args.max_state_visits,
         "root_noise": False, "network_selection": "maximum prior, action-key tie break",
-        "territorial_scope": "authoritative KMT Chinese Home Country, Japan possession only"}
+        "territorial_scope": "authoritative KMT Chinese Home Country, Japan possession only",
+        "execution_runtime": execution}
     contract = {"schema": SCHEMA, "evaluation": evaluation_contract,
         "checkpoint_sha256": digest(args.checkpoint), "model_versions": versions,
         "runtime_source_sha256": loaded["runtime_source_sha256"],
@@ -160,8 +208,10 @@ def main(argv=None) -> int:
     output.mkdir(parents=True, exist_ok=True)
     plan_path = output / "plan.json"
     if plan_path.exists():
-        if json.loads(plan_path.read_text()) != contract:
-            raise ValueError("Existing evaluation belongs to different weights, sources, seeds or settings")
+        saved_plan = json.loads(plan_path.read_text())
+        _require_execution_runtime(saved_plan, "evaluation plan")
+        if saved_plan != contract:
+            raise ValueError("Existing evaluation belongs to different weights, sources, seeds, settings or execution runtime")
     else:
         if any(output.iterdir()):
             raise ValueError("Choose an empty evaluation directory or resume its matching plan")
@@ -170,8 +220,9 @@ def main(argv=None) -> int:
     previous = []
     if args.compare_to:
         old_plan = json.loads((args.compare_to / "plan.json").read_text())
+        _require_execution_runtime(old_plan, "initial comparison plan")
         if old_plan["schema"] != SCHEMA or old_plan["evaluation"] != evaluation_contract:
-            raise ValueError("Paired evaluation requires identical task, opponents, seeds and budgets")
+            raise ValueError("Paired evaluation requires identical task, opponents, seeds, budgets and execution runtime")
         old_sha = fingerprint(old_plan)
         for mode in modes:
             for seed in seeds:
