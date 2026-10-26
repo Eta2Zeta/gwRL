@@ -1,10 +1,10 @@
 """Resident packed State -> income accounting -> packed State on Apple GPU.
 
-Only the accounting seam applyIncomeLedger is implemented. The caller must have
-completed placement/repairs and reached its placement-phase call point. No phase,
-political, surrender, history or RNG transition is invented here. Original maps
-are retained in the packed source for atomic rollback; successful accounting
-overwrites the income-component maps exactly as refreshIncome does.
+refreshIncome updates rates in every phase, without collecting any cash. The
+separate applyIncomeLedger accounting seam requires the caller to have completed
+placement/repairs and reached its placement-phase call point. No phase, political,
+surrender, history or RNG transition is invented here. Original maps are retained
+in the packed source for atomic rollback; successful refresh overwrites them.
 """
 from __future__ import annotations
 
@@ -213,7 +213,7 @@ kernel void write_resident_income(
                         income_finish(out,target,cursor,R,valid);
                     } else {
                         cursor=income_copy(v,source,out,cursor,R,valid);
-                        if(f==4){bool present=false;const long cash=state_optional(v,source,present,valid);
+                        if(f==4&&!dims[10]){bool present=false;const long cash=state_optional(v,source,present,valid);
                             if(present)income_scalar(out,start+cash-source,2,0,as_type<ulong>(ledger[(ulong(lane)*N+n)*2]),R,valid);}
                         if(f==6)income_scalar(out,start,1,ledger[(ulong(lane)*N+n)*2+1],0,R,valid);
                     }
@@ -224,7 +224,7 @@ kernel void write_resident_income(
             income_finish(out,map_out,cursor,R,valid);
         } else {
             const long start=cursor;cursor=income_copy(v,original,out,cursor,R,valid);
-            if(field==7){const long flag=state_child(v,original,5,valid);
+            if(field==7&&!dims[10]){const long flag=state_child(v,original,5,valid);
                 income_scalar(out,start+flag-original,1,clock[ulong(lane)*2+1],0,R,valid);}
         }
     }
@@ -269,7 +269,7 @@ class ResidentIncomeContext:
                  "territorial", "china_control_bonus", "major", "city_ipp_lost", "city_damage")
         self.ids = torch.tensor(state_context.prefix_lookup_ids(names), dtype=torch.int64, device=state_context.device)
 
-    def _layout(self, state):
+    def _layout(self, state, *, refresh=False):
         if not isinstance(state, DeviceStateBatch) or state.context.identity != self.state_context.identity:
             raise ValueError("Resident income state/wire context differs")
         state._metadata()
@@ -284,7 +284,7 @@ class ResidentIncomeContext:
         N, T = len(self.ledger_context.nation_ids), len(self.ledger_context.income.territory_ids)
         dims = (state.lane_count, state.records.shape[1], N, T, state.context.string_count,
                 state.context.string_bytes.shape[0], state.string_offsets.shape[0]-1, state.string_bytes.shape[0],
-                state.context.records.shape[0], state.records.shape[1]+4*N)
+                state.context.records.shape[0], state.records.shape[1]+4*N, int(refresh))
         return values, dims
 
     def extract(self, state):
@@ -300,19 +300,71 @@ class ResidentIncomeContext:
             _kernels().extract_resident_income(*(value if value.numel() else _dummy() for value in args),threads=B)
         return result
 
+    def _selection(self, state, selected):
+        B = state.lane_count
+        if selected is None:
+            selected = torch.ones(B, dtype=torch.bool, device=state.device)
+        if not isinstance(selected,torch.Tensor) or selected.dtype!=torch.bool or selected.device!=state.device or selected.shape!=(B,):
+            raise ValueError("Resident income selection must be a complete device bool vector")
+        return selected
+
+    def _commit(self, state, inputs, values, dims, ledger, components, clock, selected, errors, *, capacity=None):
+        """One shared complete-State writer; refresh copies cash/clock literally."""
+        from .device_state_edits import replace_subtrees
+        B,C,N,T=dims[:4]
+        errors=torch.where(selected,errors,0)
+        cohort_ok=~(errors!=0).any()
+        writing=(selected&cohort_ok).to(torch.int64)
+        blocks=torch.zeros((B,dims[9],5),dtype=torch.int64,device=state.device)
+        lengths=torch.zeros(B,dtype=torch.int64,device=state.device)
+        write_errors=torch.zeros_like(lengths)
+        if B:
+            records,source_lengths,_,prefix,poffsets,suffix,soffsets,ids,usage=values
+            args=(records,source_lengths,prefix,poffsets,suffix,soffsets,ids,ledger,components,clock,
+                  writing,blocks,lengths,write_errors,usage,_dimensions(dims))
+            _kernels().write_resident_income(*(value if value.numel() else _dummy() for value in args),threads=B)
+        errors|=torch.where(selected,(write_errors!=0).to(torch.int64)*PACKED_OUTPUT,0)
+        cohort_ok=~(errors!=0).any()
+        edited=replace_subtrees(state,inputs.roots,blocks,lengths,selected&cohort_ok,
+                                capacity=dims[9] if capacity is None else capacity)
+        errors|=edited.errors
+        return ResidentIncomeResult(edited.state,errors,edited.accepted,edited.required_capacity)
+
+    def refresh(self, state, selected=None, *, capacity=None):
+        """Atomically refresh every present nation's income in any phase.
+
+        This is exactly refreshIncome: replace incomeComponents, set incomeKnown
+        true, and retain treasury, complete clock, history and every RNG bit.
+        There is no collection-overflow or current-nation eligibility condition.
+        A failure in any selected lane rolls back the entire selected cohort.
+        Returned capacity defaults to the original allocation, so repeated
+        refreshes cannot accumulate padding. If it is insufficient, inspect the
+        required sizes or retry with old_capacity+4*nation_count using metadata
+        only; no field or legal choice is truncated.
+        """
+        values,dims=self._layout(state,refresh=True)
+        selected=self._selection(state,selected)
+        inputs=self.extract(state)
+        result=self.ledger_context.income.compute(inputs.territories,inputs.nations)
+        present=inputs.nations[:,:,0].bool()
+        income=result.income
+        errors=((inputs.errors!=0)|(state.errors!=0)).to(torch.int64)*PACKED_INPUT
+        errors|=((income[:,:,0]!=0)&present).any(1).to(torch.int64)*ACCOUNTING_INPUT
+        mask=income[:,:,1]
+        components=torch.stack(((mask&1)!=0,income[:,:,3],(mask&2)!=0,income[:,:,4]),2).to(torch.int64)
+        ledger=torch.stack((inputs.ledger[:,:,0],torch.ones_like(inputs.ledger[:,:,1])),2)
+        return self._commit(state,inputs,values,dims,ledger,components,inputs.clock,selected,errors,
+                            capacity=state.records.shape[1] if capacity is None else capacity)
+
     def apply(self, state, selected=None):
         """Atomically apply only the accounting seam to selected placement lanes.
 
         Selection and errors remain resident; the selected cohort is all-or-none.
         Failed lanes retain the entire original State, history and all RNG bits.
         """
-        from .device_state_edits import replace_subtrees
         values,dims=self._layout(state)
         B,C,N,T=dims[:4]
-        if selected is None:
-            selected=torch.ones(B,dtype=torch.bool,device=state.device)
-        if not isinstance(selected,torch.Tensor) or selected.dtype!=torch.bool or selected.device!=state.device or selected.shape!=(B,):
-            raise ValueError("Resident income selection must be a complete device bool vector")
+        selected=self._selection(state,selected)
         inputs=self.extract(state)
         # Prior component values are write-only at successful refreshIncome;
         # on error, the original packed State is retained without reading or
@@ -322,19 +374,4 @@ class ResidentIncomeContext:
         errors=((inputs.errors!=0)|(state.errors!=0)).to(torch.int64)*PACKED_INPUT
         errors|=(proposal.error!=0).to(torch.int64)*ACCOUNTING_INPUT
         errors|=(inputs.phases!=4).to(torch.int64)*WRONG_PHASE
-        errors=torch.where(selected,errors,0)
-        cohort_ok=~(errors!=0).any()
-        writing=(selected&cohort_ok).to(torch.int64)
-        blocks=torch.zeros((B,dims[9],5),dtype=torch.int64,device=state.device)
-        lengths=torch.zeros(B,dtype=torch.int64,device=state.device)
-        write_errors=torch.zeros_like(lengths)
-        if B:
-            records,source_lengths,_,prefix,poffsets,suffix,soffsets,ids,usage=values
-            args=(records,source_lengths,prefix,poffsets,suffix,soffsets,ids,proposal.ledger,proposal.components,proposal.clock,
-                  writing,blocks,lengths,write_errors,usage,_dimensions(dims))
-            _kernels().write_resident_income(*(value if value.numel() else _dummy() for value in args),threads=B)
-        errors|=torch.where(selected,(write_errors!=0).to(torch.int64)*PACKED_OUTPUT,0)
-        cohort_ok=~(errors!=0).any()
-        edited=replace_subtrees(state,inputs.roots,blocks,lengths,selected&cohort_ok,capacity=dims[9])
-        errors|=edited.errors
-        return ResidentIncomeResult(edited.state,errors,edited.accepted,edited.required_capacity)
+        return self._commit(state,inputs,values,dims,proposal.ledger,proposal.components,proposal.clock,selected,errors)

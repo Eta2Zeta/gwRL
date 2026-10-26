@@ -1,4 +1,11 @@
 // Included inside python_bindings.cpp's anonymous namespace, after incomeArray.
+// Diagnostic only: production refresh uses the resident state/income kernel.
+// Each successful lane calls the original refreshIncome once on a cloned State;
+// serialization is an explicit oracle/export boundary, never a training path.
+struct IncomeRefreshOracle {
+    std::vector<std::string> states;
+    std::vector<std::int64_t> errors;
+};
 struct IncomeLedgerNativeAccess {
     using Context=game::campaign::IncomeContext;
     using Batch=game::campaign::IncomeLedgerBatch;
@@ -14,6 +21,23 @@ struct IncomeLedgerNativeAccess {
             out.capture(row,envs[row]->env_.engine().state());
         }
         return out;
+    }
+    static IncomeRefreshOracle refresh(const std::vector<NativeCampaignEnv*>& envs) {
+        const auto owners = pinNativeEnvironments(envs);
+        py::gil_scoped_release release;
+        IncomeRefreshOracle result;
+        result.states.reserve(envs.size());result.errors.reserve(envs.size());
+        for(const auto* env:envs) {
+            std::lock_guard lock(env->mutex_);
+            const auto& original=env->env_.engine().state();
+            auto next=original.clone();std::int64_t error=0;
+            try {game::campaign::refreshIncome(next);}
+            catch(const std::out_of_range&) {error=1;}
+            catch(const std::exception&) {error=2;}
+            result.states.push_back((error?original:next).serialize());
+            result.errors.push_back(error);
+        }
+        return result;
     }
 };
 
@@ -31,4 +55,8 @@ void bindIncomeLedger(py::module_& module) {
         .def("error_array",[](const O& o){return incomeArray(o,o.errors,{static_cast<py::ssize_t>(o.errors.size())});});
     module.def("capture_campaign_income_ledger",&IncomeLedgerNativeAccess::captureAs<B>);
     module.def("campaign_income_ledger_oracle",&IncomeLedgerNativeAccess::captureAs<O>);
+    py::class_<IncomeRefreshOracle>(module,"CampaignIncomeRefreshOracle")
+        .def_property_readonly("state_jsons",[](const IncomeRefreshOracle& result){return result.states;})
+        .def("error_array",[](const IncomeRefreshOracle& result){return incomeArray(result,result.errors,{static_cast<py::ssize_t>(result.errors.size())});});
+    module.def("campaign_refresh_income_oracle",&IncomeLedgerNativeAccess::refresh);
 }

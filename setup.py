@@ -29,6 +29,7 @@ ext_modules = [
             "src/income_ledger_batch.cpp",
             "src/wealth_context.cpp",
             "src/relations_context.cpp",
+            "src/movement_context.cpp",
             "src/economy_lendlease.cpp",
             "src/land_combat.cpp",
             "src/air.cpp",

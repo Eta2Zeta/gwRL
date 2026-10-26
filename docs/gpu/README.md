@@ -69,8 +69,18 @@ conversion. Native ingress prepares an immutable cache of arbitrary binary64
 number spellings once. New exact int32 values are recognized bitwise and formatted
 on device; an uncached noninteger is an explicit error, never rounded or sent to
 a CPU fallback. Digest errors include serialization failures, so unusable output
-cannot silently become an action identity. Full typed State serialization and
-event-state hashing are the next connected unit.
+cannot silently become an action identity. `resident_state_json.py` now projects
+every typed State field into the same native bytes and computes both the State
+and outer Engine planning keys on device. History and RNG are excluded from those
+keys exactly as on CPU; neither operation retains historical State copies.
+
+`ResidentIncomeContext.refresh` now updates income components in every phase
+without collecting cash or changing the clock, history or RNG. Its returned
+allocation stays fixed by default; insufficient capacity is an explicit retry,
+so frequent refreshes do not accumulate padding. Placement accounting remains
+a separate operation. These helpers do not advance phases or apply political
+hooks. The static movement context and original route oracle prepare full map,
+terrain, rail, crossing and unit-class data once for the resident route port.
 
 `clone_for_search(seeds, lanes=...)` can fork one source lane repeatedly with
 independent search seeds, without consuming the source game's execution RNG.
