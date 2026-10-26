@@ -26,6 +26,7 @@ import torch
 
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
+from .device_runtime import runtime_policy_for_device
 from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .model_export import load_evaluation_models, save_model_export, validate_model_export
@@ -115,6 +116,7 @@ def _json(path: Path, value):
 
 def _learner(config: RunConfig, template):
     device = resolve_neural_device(config.neural_device)
+    runtime_policy = runtime_policy_for_device(device)
     torch.set_num_threads(config.threads)
     random.seed(config.seed)
     np.random.seed(config.seed % (2 ** 32))
@@ -125,7 +127,8 @@ def _learner(config: RunConfig, template):
     learning = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
         replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed)
-    return CampaignLearner(models, model_config, learning, compatibility=compatibility(template))
+    return CampaignLearner(models, model_config, learning, compatibility=compatibility(template),
+                           runtime_policy=runtime_policy)
 
 
 def _save(path: Path, learner: CampaignLearner, runner: dict, *, backup_current=True):
@@ -301,7 +304,9 @@ def train(args) -> int:
                              "graph_compiler": graph_compiler_backend()},
                 "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
                               "conservative_thread_budget": config.threads + config.parallel_envs + 1,
-                              "interop_threads": torch.get_num_interop_threads()},
+                              "interop_threads": torch.get_num_interop_threads(),
+                              "device_runtime": learner._device_runtime.stats()
+                                  if learner._device_runtime is not None else None},
                 "elapsed_seconds_this_invocation": time.perf_counter() - started,
                 "timings_seconds_this_invocation": dict(timings),
                 "collection_transitions_per_second_this_invocation":
@@ -428,7 +433,9 @@ def evaluate_command(args) -> int:
     template = make_env(config.seed, calendar_rounds=config.calendar_rounds)
     versions = loaded["model_versions"]
     version = hashlib.sha256(json.dumps(versions, sort_keys=True).encode()).hexdigest()
-    evaluator = NeuralEvaluator(loaded["models"], version=version)
+    evaluation_device = next(loaded["models"][PLAYERS[0]].parameters()).device
+    device_runtime = runtime_policy_for_device(evaluation_device)
+    evaluator = NeuralEvaluator(loaded["models"], version=version, runtime_policy=device_runtime)
     seeds = [int(value) for value in args.seeds.split(",")]
     targets = PLAYERS if args.target == "all" else (args.target,)
     separation = validate_heldout_seeds({player: seeds for player in PLAYERS},
@@ -447,6 +454,7 @@ def evaluate_command(args) -> int:
         report["results"].append(result)
         print(json.dumps({"target": player, "terminal_games": result["terminal_games"],
                           "truncated_games": result["truncated_games"]}), flush=True)
+    report["execution"]["device_runtime"] = device_runtime.stats() if device_runtime else None
     _json(args.output, report)
     print(json.dumps({"output": str(args.output)}), flush=True)
     return 0
@@ -462,7 +470,7 @@ def profile_command(args) -> int:
     loaded = None
     versions = learner.model_versions()
     version = hashlib.sha256(json.dumps(versions, sort_keys=True).encode()).hexdigest()
-    evaluator = NeuralEvaluator(learner.models, version=version)
+    evaluator = NeuralEvaluator(learner.models, version=version, runtime_policy=learner._device_runtime)
     envs = learner.parallel_envs or [template]
     report = profile(envs, evaluator, repeats=args.repeats)
     report.update(task=task_manifest(template), model_versions=versions,

@@ -1,0 +1,5 @@
+# Optional isolated Apple GPU environment. The CPU reference environment stays
+# independent. PyTorch 2.13 introduced public MPSGraph compilation-cache cleanup;
+# 2.14.0 is the release tested for this backend. No fast-math/fallback is enabled.
+torch==2.14.0
+numpy==2.4.3

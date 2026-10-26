@@ -109,6 +109,29 @@ Component speedups will remain separate from complete-game training throughput.
 
 ## GPU neural execution
 
+Long Apple GPU runs require PyTorch 2.13 or newer; the tested optional environment
+pins 2.14.0. Keep it separate from the existing CPU environment:
+
+```sh
+.venv/bin/python -m venv tmp/gpu-mps-env
+tmp/gpu-mps-env/bin/python -m pip install -r requirements-gpu-mps.txt
+```
+
+The native extension is shared and contains no Torch dependency. Build it with
+the usual repository instructions. Use `tmp/gpu-mps-env/bin/python` for long MPS
+commands; `.venv/bin/python` remains the CPU reference. Existing frozen training
+experiments and their environment are not migrated.
+
+Our varied-position probe reproduced native cache growth under 2.11 even after
+clearing tensors and Python caches. PyTorch 2.13 added compilation-graph release
+to public `torch.mps.empty_cache()` ([release notes](https://github.com/pytorch/pytorch/releases/tag/v2.13.0)).
+The MPS runtime policy clears at completed inference/update boundaries, normally
+every 32 actor forwards, without resetting weights, optimizer state, examples,
+games or RNG. A learner shares one policy across successive evaluators. Its
+resource counters are derived process state and reset their pending count after
+restore; they are not learning checkpoint data. CPU and CUDA use no MPS policy.
+Fast math and CPU fallback are rejected for long MPS execution.
+
 `CampaignPolicyValueNet(config, device="mps")` executes the unchanged network on
 the Apple GPU. `device="cuda"` or `"cuda:0"` selects an available NVIDIA/PyTorch
 CUDA device; CUDA execution cannot be verified on the development Mac. The

@@ -148,6 +148,7 @@ class TimedEvaluator:
 
 def setup_models(config, device):
     import torch
+    from studies.campaign.device_runtime import runtime_policy_for_device
     from studies.shared.multiplayer_mcts import PLAYERS
     from studies.campaign.neural import (CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator,
         neural_device_memory, resolve_neural_device, synchronize_neural_device)
@@ -157,6 +158,7 @@ def setup_models(config, device):
         memory = neural_device_memory(target)
         allocator = mps_allocator_limit(config.memory_bytes, memory["recommended_max_bytes"])
         torch.mps.set_per_process_memory_fraction(allocator["per_process_fraction"])
+    runtime_policy = runtime_policy_for_device(target)
     torch.set_num_threads(config.threads)
     if torch.get_num_interop_threads() != 1:
         torch.set_num_interop_threads(1)
@@ -177,7 +179,7 @@ def setup_models(config, device):
     require(all(parameter.device.type == device for model in models.values() for parameter in model.parameters()),
             "A model parameter is on a different device; fallback is forbidden")
     weights = model_digest(models)
-    base = NeuralEvaluator(models, version=weights)
+    base = NeuralEvaluator(models, version=weights, runtime_policy=runtime_policy)
     evaluator = TimedEvaluator(base, target, synchronize_neural_device)
     return models, evaluator, stats, {"config": asdict(model_config), "weights_sha256": weights,
         "initialization": "fresh CPU-initialized current weights, same model seed; no learned checkpoint imported",
@@ -388,11 +390,19 @@ def worker(config, device, progress):
             report["result"] = result
         report["elapsed_worker_seconds"] = time.perf_counter() - started
         report["device_memory"] = neural_device_memory(device)
+        policy = evaluator.inner.runtime_policy
+        report["device_runtime"] = policy.stats() if policy is not None else None
+        report["forward"] = {**forward_stats, "batch_sizes": dict(forward_stats["batch_sizes"])}
+        report["evaluator"] = {"synchronized_seconds": evaluator.seconds, "calls": evaluator.calls,
+                               "requests": evaluator.requests, "batch_sizes": dict(evaluator.batch_sizes)}
         atomic_json(progress, report)
     models, evaluator, forward_stats, metadata = setup_models(config, device)
     report.update(model=metadata, startup_seconds=time.perf_counter() - started, status="running",
                   software={"python": sys.version.split()[0], "torch": torch.__version__,
                             "mps_fallback_env": os.environ.get("PYTORCH_ENABLE_MPS_FALLBACK"),
+                            "mps_environment": {name: os.environ.get(name) for name in (
+                                "PYTORCH_ENABLE_MPS_FALLBACK", "PYTORCH_MPS_FAST_MATH", "PYTORCH_MPS_PREFER_METAL",
+                                "PYTORCH_MPS_HIGH_WATERMARK_RATIO", "PYTORCH_MPS_LOW_WATERMARK_RATIO")},
                             "cpu_threads": torch.get_num_threads(), "interop_threads": torch.get_num_interop_threads()})
     persist()
     if config.mode == "inference":
@@ -440,7 +450,9 @@ def supervise_device(config, device, output, seconds):
         atomic_json(settings, {**asdict(config), "seconds": seconds})
         environment = {**os.environ, "PYTHONHASHSEED": "0", "OPENBLAS_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1",
             "PYTORCH_ENABLE_MPS_FALLBACK": "0",
+            "PYTORCH_MPS_FAST_MATH": "0",
             **{name: str(config.threads) for name in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS")}}
+        environment.pop("PYTORCH_MPS_PREFER_METAL", None)
         with (directory / "stderr").open("w") as stderr, (directory / "stdout").open("w") as stdout:
             process = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--_worker", str(settings),
                 "--_device", device, "--output", str(progress)], cwd=ROOT, env=environment,

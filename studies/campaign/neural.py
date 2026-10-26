@@ -795,6 +795,36 @@ def clear_neural_caches(models: Sequence[CampaignPolicyValueNet] = (), *,
                 torch.cuda.empty_cache()
 
 
+def _gpu_evaluation_outputs(logits: Sequence[Tensor], values: Tensor, counts: Sequence[int],
+                            value_scale: float) -> tuple[list[list[float]], list[tuple[float, float, float]]]:
+    """Validate accelerator rows, then cross the host boundary twice per actor.
+
+    Keep each row's original softmax operation and every legal action. Packing
+    only consolidates finite checking and device-to-host copies; no padding,
+    truncation, policy normalization or owner/chance routing changes.
+    """
+    if values.shape != (len(counts), 3) or len(logits) != len(counts):
+        raise ValueError("Neural model returned an invalid batch shape")
+    for scores, count in zip(logits, counts, strict=True):
+        if scores.shape != (count,) or scores.device != values.device:
+            raise ValueError("Neural policy must contain one device-local logit per legal action")
+    if not counts:
+        return [], []
+    packed_scores = logits[0] if len(logits) == 1 else torch.cat(tuple(logits))
+    if packed_scores.numel() and not torch.isfinite(packed_scores).all():
+        raise ValueError("Neural policy must contain one finite logit per legal action")
+    row_probabilities = [scores.softmax(0) if scores.numel() else scores for scores in logits]
+    packed_probabilities = (row_probabilities[0] if len(row_probabilities) == 1
+                            else torch.cat(row_probabilities))
+    host_probabilities = packed_probabilities.cpu().tolist()
+    host_values = [vector(row) for row in (values * value_scale).cpu().tolist()]
+    probabilities, offset = [], 0
+    for count in counts:
+        probabilities.append(host_probabilities[offset:offset + count])
+        offset += count
+    return probabilities, host_values
+
+
 class NeuralEvaluator:
     """Route each entitled actor to its model, retaining raw vector returns.
 
@@ -802,12 +832,13 @@ class NeuralEvaluator:
     three models' raw value vectors and emits no policy. This is a bootstrap
     convention, not a chance action or a peek at the execution random stream.
     """
-    def __init__(self, models: Mapping[str, CampaignPolicyValueNet], version: str) -> None:
+    def __init__(self, models: Mapping[str, CampaignPolicyValueNet], version: str, *, runtime_policy: Any = None) -> None:
         if set(models) != set(PLAYERS):
             raise ValueError("Provide one campaign model for Axis, Allies and Comintern")
         if not isinstance(version, str) or not version:
             raise ValueError("Neural evaluator needs a nonempty version")
         self.models, self.version = dict(models), version
+        self.runtime_policy = runtime_policy
         self._versioned_forward: dict[str, bool] = {}
         for player, model in self.models.items():
             try:
@@ -868,6 +899,7 @@ class NeuralEvaluator:
             model = self.models[player]
             training = model.training
             model.eval()
+            completed_mps_forward = False
             try:
                 with torch.inference_mode():
                     batch = [item for _, item in groups[player]]
@@ -877,6 +909,17 @@ class NeuralEvaluator:
                         logits, values = model.forward_batch(batch)
                     if values.shape != (len(groups[player]), 3) or len(logits) != len(groups[player]):
                         raise ValueError("Neural model returned an invalid batch shape")
+                    if values.device.type != "cpu":
+                        counts = [len(item["packed_graph"]["actions"]) if item["schema"] == NUMERIC_SCHEMA
+                                  else len(item["actions"]) for _, item in groups[player]]
+                        host_priors, host_values = _gpu_evaluation_outputs(logits, values, counts, model.config.value_scale)
+                        for index, (row, _) in enumerate(groups[player]):
+                            if row in chance_values:
+                                chance_values[row].append(host_values[index])
+                            else:
+                                results[row] = Evaluation(host_priors[index], host_values[index])
+                        completed_mps_forward = values.device.type == "mps"
+                        continue  # The existing finally still restores model.train(training).
                     for index, (row, item) in enumerate(groups[player]):
                         scores = logits[index]
                         count = len(item["packed_graph"]["actions"]) if item["schema"] == NUMERIC_SCHEMA else len(item["actions"])
@@ -889,6 +932,8 @@ class NeuralEvaluator:
                             results[row] = Evaluation(scores.softmax(0).tolist() if scores.numel() else [], raw)
             finally:
                 model.train(training)
+                if completed_mps_forward and self.runtime_policy is not None:
+                    self.runtime_policy.completed(1)
         for row, predictions in chance_values.items():
             results[row] = Evaluation([], vector([sum(value[i] for value in predictions) / len(PLAYERS) for i in range(3)]))
         if any(result is None for result in results):

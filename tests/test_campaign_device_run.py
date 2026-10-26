@@ -8,12 +8,14 @@ from dataclasses import asdict, replace
 from pathlib import Path
 
 import torch
+from unittest.mock import patch
 
 from studies.campaign.learning import CampaignLearner, LearningConfig
 from studies.campaign.model_export import load_evaluation_models, save_model_export
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
 from studies.campaign.run import RunConfig, _config, _learner, source_hashes
 from studies.campaign.curriculum import make_env, task_manifest
+from studies.campaign.device_runtime import mps_graph_cache_supported
 from studies.shared.multiplayer_mcts import PLAYERS
 from tests.test_campaign_learning import LearningToyEnv
 
@@ -37,7 +39,14 @@ class DeviceRunTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Resume configuration differs: neural_device"):
             _config(SimpleNamespace(neural_device="mps"), asdict(RunConfig()))
 
-    @unittest.skipUnless(torch.backends.mps.is_available(), "Apple GPU unavailable")
+    def test_long_gpu_runner_rejects_unsupported_runtime_before_allocating_models(self):
+        with patch("studies.campaign.run.resolve_neural_device", return_value=torch.device("mps")), \
+             patch("studies.campaign.device_runtime.torch.__version__", "2.12.0"), \
+             patch("studies.campaign.run.CampaignPolicyValueNet", side_effect=AssertionError("No model allocation")):
+            with self.assertRaisesRegex(ValueError, "2.13"):
+                _learner(RunConfig(neural_device="mps"), None)
+
+    @unittest.skipUnless(torch.backends.mps.is_available() and mps_graph_cache_supported(), "Long GPU runtime unavailable")
     def test_actual_cpu_gpu_runner_initialization_has_identical_weights(self):
         config = RunConfig(hidden_dim=8, token_buckets=128, threads=1)
         template = make_env(config.seed, calendar_rounds=1)
@@ -50,7 +59,7 @@ class DeviceRunTests(unittest.TestCase):
                 self.assertEqual(gpu.models[player].state_dict()[name].device.type, "mps")
                 self.assertTrue(torch.equal(tensor, gpu.models[player].state_dict()[name].cpu()))
 
-    @unittest.skipUnless(torch.backends.mps.is_available(), "Apple GPU unavailable")
+    @unittest.skipUnless(torch.backends.mps.is_available() and mps_graph_cache_supported(), "Long GPU runtime unavailable")
     def test_actual_gpu_adam_and_unfinished_rollout_survive_cpu_storage_roundtrip(self):
         config = CampaignModelConfig(hidden_dim=8, message_layers=1, token_buckets=128)
         learning = LearningConfig(simulations=2, max_depth=3, batch_size=4, epochs=1,
@@ -63,6 +72,8 @@ class DeviceRunTests(unittest.TestCase):
         original = learner()
         original.run_batch_many(LearningToyEnv, 5, parallel_envs=2)
         original.begin_batch_many([LearningToyEnv(51), LearningToyEnv(52)])
+        first_evaluator = original._evaluator()
+        self.assertIs(first_evaluator.runtime_policy, original._evaluator().runtime_policy)
         original.collect_many(1)
         self.assertTrue(any(original.parallel_pending))
         checkpoint = original.checkpoint()
@@ -72,6 +83,8 @@ class DeviceRunTests(unittest.TestCase):
         loaded = torch.load(storage, map_location="cpu", weights_only=False)
         recovered = learner()
         recovered.restore(loaded, env_template=LearningToyEnv())
+        self.assertEqual(recovered._device_runtime.pending_actor_forwards, 0)
+        self.assertGreaterEqual(recovered._device_runtime.resets, 2)
         self.assertEqual(original.model_versions(), recovered.model_versions())
         self.assertEqual([e.serialize() for e in original.parallel_envs],
                          [e.serialize() for e in recovered.parallel_envs])
@@ -100,7 +113,7 @@ class DeviceRunTests(unittest.TestCase):
                 torch.testing.assert_close(tensor.cpu(), recovered.models[player].state_dict()[name].cpu(),
                                            atol=2e-6, rtol=2e-5)
 
-    @unittest.skipUnless(torch.backends.mps.is_available(), "Apple GPU unavailable")
+    @unittest.skipUnless(torch.backends.mps.is_available() and mps_graph_cache_supported(), "Long GPU runtime unavailable")
     def test_gpu_export_can_evaluate_on_cpu_without_migrating_training(self):
         config = RunConfig(hidden_dim=8, token_buckets=128, neural_device="mps", threads=1)
         env = make_env(config.seed, calendar_rounds=1)
