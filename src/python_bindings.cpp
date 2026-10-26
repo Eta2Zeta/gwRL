@@ -3,11 +3,14 @@
 #include "game/japan_training_env.hpp"
 #include "game/mdp.hpp"
 #include "game/campaign_env.hpp"
+#include "game/income_batch.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 #include "game/numeric_graph.hpp"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <limits>
 #include <pybind11/stl.h>
 
 #include <stdexcept>
@@ -26,6 +29,7 @@ namespace {
 // Always release the GIL BEFORE waiting for this mutex. The reverse order could
 // deadlock with a native operation that is returning to Python. Owned native
 // results are prepared under the mutex, which is released before GIL reacquire.
+struct IncomeNativeAccess;
 class NativeCampaignEnv {
   public:
     explicit NativeCampaignEnv(game::campaign::CampaignEnv env) : env_(std::move(env)) {}
@@ -43,9 +47,103 @@ class NativeCampaignEnv {
     }
 
   private:
+    friend struct IncomeNativeAccess;
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
 };
+
+struct IncomeNativeAccess {
+    using Context=game::campaign::IncomeContext;
+    using Batch=game::campaign::IncomeBatch;
+    using Oracle=game::campaign::IncomeOracleBatch;
+    static std::shared_ptr<Context> context(const NativeCampaignEnv& env) {
+        return env.call([](const auto& value){return std::make_shared<Context>(*value.engine().state().definition);});
+    }
+    static Batch capture(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs) {
+        py::gil_scoped_release release;
+        Batch out(context,envs.size());
+        for(std::size_t row=0;row<envs.size();++row) {
+            if(!envs[row])throw std::invalid_argument("Null income lane");
+            std::lock_guard lock(envs[row]->mutex_);
+            out.capture(row,envs[row]->env_.engine().state());
+        }
+        return out;
+    }
+    static Oracle oracle(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs) {
+        py::gil_scoped_release release;
+        Oracle out(context,envs.size());
+        for(std::size_t row=0;row<envs.size();++row) {
+            if(!envs[row])throw std::invalid_argument("Null income lane");
+            std::lock_guard lock(envs[row]->mutex_);
+            out.capture(row,envs[row]->env_.engine().state());
+        }
+        return out;
+    }
+    static py::dict benchmark(const std::vector<NativeCampaignEnv*>& envs,std::size_t repeats) {
+        if(!repeats)throw std::invalid_argument("Positive income repetitions required");
+        std::uint64_t calls=0,checksum=0;double seconds=0;
+        {
+            py::gil_scoped_release release;
+            const auto before=std::chrono::steady_clock::now();
+            for(std::size_t repeat=0;repeat<repeats;++repeat)for(const auto* env:envs) {
+                if(!env)throw std::invalid_argument("Null income lane");
+                std::lock_guard lock(env->mutex_);
+                const auto& state=env->env_.engine().state();
+                for(const auto& [id,_]:state.nations) {
+                    const auto value=game::campaign::evaluateIncome(state,id);
+                    checksum=checksum*131+static_cast<std::uint64_t>(value.total)+value.collectable;
+                    ++calls;
+                }
+            }
+            seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-before).count();
+        }
+        py::dict result;result["calls"]=calls;result["checksum"]=checksum;result["seconds"]=seconds;
+        return result;
+    }
+};
+
+// Read-only NumPy views own their native object. All shape/size arithmetic is
+// representability-checked; there is no gameplay/entity/batch truncation cap.
+template<class Owner>
+py::array incomeArray(const Owner& object,const std::vector<std::int64_t>& data,
+                      std::vector<py::ssize_t> shape) {
+    std::vector<py::ssize_t> strides(shape.size());
+    py::ssize_t stride=sizeof(std::int64_t);
+    for(std::size_t i=shape.size();i--;) {
+        strides[i]=stride;
+        if(shape[i]<0 || (shape[i] && stride>std::numeric_limits<py::ssize_t>::max()/shape[i]))
+            throw std::overflow_error("Income buffer dimension overflow");
+        stride*=shape[i];
+    }
+    auto result=py::array(py::dtype::of<std::int64_t>(),shape,strides,data.data(),
+                          py::cast(&object,py::return_value_policy::reference));
+    result.attr("setflags")(py::arg("write")=false);
+    return result;
+}
+
+// Call bindIncome(module) after the existing CampaignEnv class registration.
+void bindIncome(py::module_& module) {
+    using C=IncomeNativeAccess::Context;using B=IncomeNativeAccess::Batch;using O=IncomeNativeAccess::Oracle;
+    py::class_<C,std::shared_ptr<C>>(module,"CampaignIncomeContext")
+        .def_property_readonly("definition_fingerprint",[](const C& c){return c.definitionFingerprint;})
+        .def_property_readonly("territory_ids",[](const C& c){return c.territories;})
+        .def_property_readonly("nation_ids",[](const C& c){return c.nations;})
+        .def_property_readonly("int_minimum",[](const C& c){return c.intMinimum;})
+        .def_property_readonly("int_maximum",[](const C& c){return c.intMaximum;})
+        .def("territory_array",[](const C& c){return incomeArray(c,c.territoryStatic,{static_cast<py::ssize_t>(c.territories.size()),3});})
+        .def("nation_array",[](const C& c){return incomeArray(c,c.nationStatic,{static_cast<py::ssize_t>(c.nations.size()),2});});
+    py::class_<B>(module,"CampaignIncomeBatch")
+        .def_property_readonly("context",[](const B& b){return std::const_pointer_cast<C>(b.context);})
+        .def("territory_array",[](const B& b){return incomeArray(b,b.territoryState,{static_cast<py::ssize_t>(b.rows),static_cast<py::ssize_t>(b.context->territories.size()),4});})
+        .def("nation_array",[](const B& b){return incomeArray(b,b.nationState,{static_cast<py::ssize_t>(b.rows),static_cast<py::ssize_t>(b.context->nations.size()),6});});
+    py::class_<O>(module,"CampaignIncomeOracleBatch")
+        .def("income_array",[](const O& o){return incomeArray(o,o.income,{static_cast<py::ssize_t>(o.rows),static_cast<py::ssize_t>(o.context->nations.size()),6});})
+        .def("effective_array",[](const O& o){return incomeArray(o,o.effective,{static_cast<py::ssize_t>(o.rows),static_cast<py::ssize_t>(o.context->territories.size()),2});});
+    module.def("campaign_income_context",&IncomeNativeAccess::context);
+    module.def("capture_campaign_income",&IncomeNativeAccess::capture);
+    module.def("campaign_income_oracle",&IncomeNativeAccess::oracle);
+    module.def("benchmark_campaign_income_oracle",&IncomeNativeAccess::benchmark);
+}
 
 using CampaignEnv = game::campaign::CampaignEnv;
 
@@ -400,6 +498,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         });
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
     module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;
+    bindIncome(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)

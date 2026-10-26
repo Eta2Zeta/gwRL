@@ -24,6 +24,7 @@ ext_modules = [
             "src/catalog.cpp",
             "src/movement.cpp",
             "src/economy.cpp",
+            "src/income_batch.cpp",
             "src/economy_lendlease.cpp",
             "src/land_combat.cpp",
             "src/air.cpp",

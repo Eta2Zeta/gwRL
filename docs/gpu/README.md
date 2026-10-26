@@ -199,6 +199,28 @@ small shape buffers, and requires contiguous MPS input. Portable CPU/CUDA/MPS
 tensor execution remains the default. The benchmark compares both implementations
 and reports Metal compilation/first-call costs separately from resident execution.
 
+## State-backed income calculation
+
+`backends/income_kernel.py` also ports the complete territorial-IPP and income
+calculation to integer tensors. `gwrl_cpp.capture_campaign_income(...)` exports
+two contiguous native buffers with a shared, immutable indexed context; no
+game-state JSON or per-field Python parsing is involved. The context transfers
+once, and changing ownership, city damage, treasury presence, power status,
+surrender and capital control transfer in bulk. National identities remain
+distinct, including Mongolia and Dadao.
+
+Tests cover zero versus absent treasury, empty versus populated component maps,
+capital loss, the six exact Japan bonus zones, signed division, lazy errors,
+read-only capture and full state/RNG preservation. Native signed-int overflow is
+reported explicitly rather than assigned a wrapping rule. Low-level tensor
+computation consumes the native int32 input domain represented in int64 buffers;
+it does not promise arithmetic on arbitrary fabricated int64 extremes.
+
+The income benchmark separates existing C++ calculation, native capture,
+upload, resident calculation and inspection. This component calculates income;
+collecting treasury, advancing phases and other transitions remain in the CPU
+engine.
+
 ## Remaining transition work
 
 Further engine ports must retain complete state, legal menus, pending choices,
