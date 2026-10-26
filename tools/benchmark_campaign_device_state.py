@@ -276,8 +276,11 @@ def worker(config, device, progress, deadline):
     return report
 
 
-def supervise(config, device, output, *, deadline):
+def supervise(config, device, output, *, deadline, worker_script=None):
     from tools.supervise_campaign_training import aggregate_rss, memory_metric, monitor_error_details
+    script = Path(__file__).resolve() if worker_script is None else Path(worker_script).resolve()
+    require(script.parent == (ROOT / "tools").resolve() and script.suffix == ".py" and script.is_file(),
+            "Benchmark worker script must be an existing Python tool directly inside this repository's tools directory")
     started, peak, stopped, diagnostic = time.monotonic(), 0, None, None
     reserve = MPS_RESERVE if device == "mps" else 0
     if started >= deadline:
@@ -292,7 +295,7 @@ def supervise(config, device, output, *, deadline):
             "PYTORCH_ENABLE_MPS_FALLBACK": "0", "PYTORCH_MPS_FAST_MATH": "0",
             **{field: str(config.threads) for field in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS")}}
         with (directory / "stderr").open("w") as stderr, (directory / "stdout").open("w") as stdout:
-            process = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--_worker", str(settings),
+            process = subprocess.Popen([sys.executable, str(script), "--_worker", str(settings),
                 "--_device", device, "--_deadline", str(deadline), "--output", str(progress)],
                 cwd=ROOT, env=environment, stdout=stdout, stderr=stderr, start_new_session=True)
             try:
