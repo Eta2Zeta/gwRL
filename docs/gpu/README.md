@@ -15,6 +15,8 @@ The [Apple state/sampling foundation results](metal_state_2026_10_26.md) record
 the next complete-state and exact-RNG component measurements.
 The [connected search-clone comparison](metal_connected_clone_2026_10_26.md)
 records the exact generic and fused Metal paths, including their scope limits.
+The [resident political-query results](metal_political_queries_2026_10_26.md)
+compare the complete native and GPU permission matrices at several batch sizes.
 
 ## Execution contract
 
