@@ -13,6 +13,8 @@ The [GPU implementation and measured results](gpu_backend_2026_10_26_results.md)
 separate completed self-play, neural updates and exact rules-component timings.
 The [Apple state/sampling foundation results](metal_state_2026_10_26.md) record
 the next complete-state and exact-RNG component measurements.
+The [connected search-clone comparison](metal_connected_clone_2026_10_26.md)
+records the exact generic and fused Metal paths, including their scope limits.
 
 ## Execution contract
 
