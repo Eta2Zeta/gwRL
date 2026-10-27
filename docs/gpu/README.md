@@ -34,6 +34,8 @@ The [recruitment Engine transactions](resident_recruitment_transactions_2026_10_
 connect action, chance, history and RNG while documenting the unported naval hook.
 The [complete-step smoke measurements](metal_recruitment_smoke_2026_10_26.md)
 expose identity/bookkeeping overhead and introduce parallel CPU diagnostic probes.
+The [identity substage profile](metal_identity_profile_2026_10_26.md) separates
+the measured State formatting and hashing costs inside those complete operations.
 
 ## Execution contract
 
@@ -126,7 +128,10 @@ Action records, including split militia pairs, ship work and facility repairs.
 They preserve original eligibility/threshold/zone distinctions and do not add an
 influence-garrison condition. Menu/parameter/string capacities are explicit and
 retryable; default menu allocation depends on geography rather than accumulated
-State/history padding. These queries do not yet apply recruitment outcomes.
+State/history padding. Separate recruitment-start and sampled-roll transactions
+now connect rule effects, income refresh, exact Event/RNG and atomic publication.
+Execution of recruitment placement, ship-work and repair choices remains separate;
+the transaction report identifies the unported naval-completion hook explicitly.
 
 Audit-event append now commits generic payloads, the native State hash and string
 interning under one rollback flag. It preserves all history and raw binary64

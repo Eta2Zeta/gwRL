@@ -10,7 +10,7 @@ import gwrl_cpp
 import numpy as np
 
 from tools.benchmark_campaign_resident_recruitment_chance import (
-    ChanceConfig,FAMILIES,PROFILE_STAGES,SCHEMA,canonical_native,finalize,lanes,require_exact,templates,
+    ChanceConfig,FAMILIES,PROFILE_STAGES,SCHEMA,canonical_native,finalize,gpu_selection,lanes,require_exact,templates,
 )
 
 SCENARIO=Path(__file__).resolve().parents[1]/"game_content/scenarios/japan_china_1936"
@@ -109,7 +109,9 @@ class RecruitmentChanceNativeBenchmarkTests(unittest.TestCase):
                 "source_unchanged":True,"repeated_outputs_exact":True,"seconds":[.1],"input_clone_seconds":[.01],
                 "verification_seconds":[.02],"pool_startup_seconds":.01,"output_engine_keys":["a"*64]}
         report={"schema":SCHEMA,"status":"completed","sources_unchanged":True,"native_pool":{"workers":2,"startup_seconds":.01},
+            "gpu_selection":gpu_selection(config),
             "cases":[{"family":family,"lanes":1,"source_unchanged":True,"full_state_history_rng_and_keys_exact":True,
+                "certified_source_hits":0,"certified_source_misses":0,
                 "gpu_seconds":[.1],"gpu_stage_profile_seconds":[dict.fromkeys(PROFILE_STAGES,.01)],
                 "native":{"serial":native(1),"pool":native(2)}} for family in FAMILIES]}
         self.assertTrue(finalize(copy.deepcopy(report),config)["matched_complete_transitions"])
@@ -117,11 +119,25 @@ class RecruitmentChanceNativeBenchmarkTests(unittest.TestCase):
         self.assertTrue(finalize(json.loads(json.dumps(report,sort_keys=True)),config)["matched_complete_transitions"])
         for mutate in (lambda r:r["cases"].pop(),lambda r:r["cases"][0]["gpu_seconds"].__setitem__(0,float("nan")),
                        lambda r:r["cases"][0]["native"]["pool"].update(workers=1),lambda r:r.pop("native_pool"),
+                       lambda r:r["gpu_selection"].update(formatter="parallel_units"),
+                       lambda r:r["cases"][0].update(certified_source_hits=1),
                        lambda r:r["cases"][0].update(source_unchanged=False),
                        lambda r:r["cases"][0]["native"]["serial"].update(repeated_outputs_exact=False)):
             bad=copy.deepcopy(report);mutate(bad);self.assertFalse(finalize(bad,config)["matched_complete_transitions"])
         for kwargs in ({"native_workers":11},{"native_workers":True},{"profile_repeats":0}):
             with self.assertRaises(ValueError):ChanceConfig(**kwargs)
+
+    def test_explicit_optimization_choices_preserve_default_and_reuse_evidence(self):
+        baseline=ChanceConfig()
+        self.assertEqual(gpu_selection(baseline),dict(formatter="reference",digest_implementation="reference",
+            digest_group_size=None,reuse_certified_source=False))
+        for kwargs in ({"formatter":"auto"},{"digest_implementation":"unknown"},{"digest_group_size":True},
+                       {"digest_group_size":0},{"digest_group_size":1.5},{"reuse_certified_source":1}):
+            with self.assertRaises(ValueError):ChanceConfig(**kwargs)
+        chosen=ChanceConfig(formatter="parallel_units",digest_implementation="unrolled",digest_group_size=32,
+            reuse_certified_source=True)
+        self.assertEqual(gpu_selection(chosen),dict(formatter="parallel_units",digest_implementation="unrolled",
+            digest_group_size=32,reuse_certified_source=True))
 
 
 if __name__=="__main__":unittest.main()

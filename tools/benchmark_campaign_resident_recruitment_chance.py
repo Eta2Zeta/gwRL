@@ -23,7 +23,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tools.benchmark_campaign_device_state import StateConfig,atomic_json,require,supervise
 
-SCHEMA="campaign-complete-recruitment-chance-benchmark-v1"
+SCHEMA="campaign-complete-recruitment-chance-benchmark-v2"
 FAMILIES=("small_success","small_failure","wide_success","infrastructure_success")
 STREAMS=("actual","search","training")
 PROFILE_STAGES=("preflight","sample","effects","income","reset","forward_capability","forward",
@@ -36,6 +36,10 @@ class ChanceConfig(StateConfig):
     batch_sizes: tuple[int,...] = (1,4,16,64)
     native_workers: int = 10
     profile_repeats: int = 1
+    formatter: str = "reference"
+    digest_implementation: str = "reference"
+    digest_group_size: int | None = None
+    reuse_certified_source: bool = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -43,6 +47,16 @@ class ChanceConfig(StateConfig):
         require(type(self.native_workers) is int and 1<=self.native_workers<=10 and
                 self.native_workers+self.threads<=self.cpu_budget,"Native pool plus reserved tensor threads must fit twelve cores")
         require(type(self.profile_repeats) is int and self.profile_repeats>0,"Profile repeats must be positive")
+        require(self.formatter in {"reference","parallel_units"},"Choose an explicit supported State formatter")
+        require(self.digest_implementation in {"reference","unrolled"},"Choose an explicit supported digest kernel")
+        require(self.digest_group_size is None or type(self.digest_group_size) is int and self.digest_group_size>0,
+                "Digest group size must be a positive integer or default")
+        require(type(self.reuse_certified_source) is bool,"Certified source reuse must be explicit bool")
+
+
+def gpu_selection(config):
+    return {name:getattr(config,name) for name in
+        ("formatter","digest_implementation","digest_group_size","reuse_certified_source")}
 
 
 def provenance():
@@ -169,6 +183,7 @@ def worker(config,device,output,deadline):
     from studies.campaign.backends.resident_state_income import ResidentIncomeContext
     from studies.campaign.backends.canonical_json_metal import CanonicalJsonContext
     from studies.campaign.backends.resident_state_json import ResidentStateJson
+    from studies.campaign.backends.resident_state_json_parallel import ParallelUnitStateJson
     from studies.campaign.backends.content_digest_metal import inspect_digests
     from studies.campaign.backends.resident_recruitment_chance import ResidentRecruitmentChance,RecruitmentChanceCapacities
     require(device=="mps","No CPU fallback")
@@ -180,6 +195,8 @@ def worker(config,device,output,deadline):
     report={"schema":SCHEMA,"status":"running","config":asdict(config),"provenance":source_provenance,"cases":[],
         "fixture_scope":"Valid restored controlled-minor positions issue the original legal recruitment_roll Action; not a sampled full campaign distribution",
         "scope":"Complete supported recruitment chance transition only; not full-game, MCTS, learning or strategic strength",
+        "gpu_selection":gpu_selection(config),
+        "certified_reuse_scope":"Repeated immutable source with a precomputed expected identity; no chronological-game or changed-source cache claim",
         "native_pool":{"workers":config.native_workers,"startup_seconds":pool.startup_seconds if pool else 0.},
         "gpu_profile_scope":"Separate synchronized stage diagnostics; synchronization changes overlap and is not end-to-end throughput"}
     def persist():atomic_json(output,report)
@@ -192,9 +209,12 @@ def worker(config,device,output,deadline):
             captured=gwrl_cpp.capture_device_states(context.native,envs);before=DeviceStateBatch.from_native(captured,context=context)
             relations=ResidentPoliticalRelations(context,gwrl_cpp.campaign_relations_context(envs[0]))
             recruitment=ResidentRecruitment(relations,gwrl_cpp.campaign_recruitment_context(envs[0]))
-            formatter=ResidentStateJson(CanonicalJsonContext(captured,context))
+            formatter_type=ResidentStateJson if config.formatter=="reference" else ParallelUnitStateJson
+            formatter=formatter_type(CanonicalJsonContext(captured,context),
+                digest_implementation=config.digest_implementation,digest_group_size=config.digest_group_size)
             handler=ResidentRecruitmentChance(context,ResidentRecruitmentEffects(recruitment),
-                ResidentIncomeContext(context,gwrl_cpp.campaign_income_context(envs[0])),formatter)
+                ResidentIncomeContext(context,gwrl_cpp.campaign_income_context(envs[0])),formatter,
+                reuse_certified_source=config.reuse_certified_source)
             maximum=prepared[family]["choices"];C=before.records.shape[1];N=len(relations.nation_ids)
             cap=C+7+14*maximum+4*N+64;choices=B*maximum
             caps=RecruitmentChanceCapacities(cap,cap,choices,512,
@@ -240,6 +260,12 @@ def worker(config,device,output,deadline):
                 require(result.committed.item(),"Profiled operation failed")
                 require_exact(result.state.to_native(),expected_output);case["gpu_stage_profile_seconds"].append(stages)
             case["output_record_sha256"]=expected_output[3]
+            registry=getattr(formatter,"_source_identity_certificates",None)
+            case["certified_source_hits"]=registry.hits if registry is not None else 0
+            case["certified_source_misses"]=registry.misses if registry is not None else 0
+            expected_hits=config.warmups+config.repeats+config.profile_repeats if config.reuse_certified_source else 0
+            require(case["certified_source_hits"]==expected_hits and case["certified_source_misses"]==0,
+                    "Benchmark did not exercise the declared source identity reuse policy")
             case["source_unchanged"]=resident_digest(before)==source_digest
             require(case["source_unchanged"],"GPU mutated source records/pool/RNG")
             case["full_state_history_rng_and_keys_exact"]=True
@@ -269,6 +295,8 @@ def finalize(report,config):
         B=row.get("lanes");native=row.get("native",{})
         profiles=row.get("gpu_stage_profile_seconds",[])
         return row.get("full_state_history_rng_and_keys_exact") is True and row.get("source_unchanged") is True and \
+            row.get("certified_source_hits")== (config.warmups+config.repeats+config.profile_repeats if config.reuse_certified_source else 0) and \
+            row.get("certified_source_misses")==0 and \
             durations(row.get("gpu_seconds"),config.repeats) and \
             len(profiles)==config.profile_repeats and all(isinstance(p,dict) and set(p)==set(PROFILE_STAGES) and
                 durations(list(p.values()),len(PROFILE_STAGES)) for p in profiles) and \
@@ -277,6 +305,7 @@ def finalize(report,config):
                 native_valid(native.get("pool"),config.native_workers,B))
     expected={(family,B) for family in FAMILIES for B in config.batch_sizes};cases=report.get("cases",[])
     valid=report.get("schema")==SCHEMA and report.get("status")=="completed" and report.get("sources_unchanged") is True and len(cases)==len(expected)
+    valid=valid and report.get("gpu_selection")==gpu_selection(config)
     valid=valid and {(row.get("family"),row.get("lanes")) for row in cases}==expected
     valid=valid and all(case_valid(row) for row in cases)
     pool=report.get("native_pool",{})
@@ -292,6 +321,10 @@ def main(argv=None):
     parser.add_argument("--batch-sizes",nargs="+",type=int,default=(1,4,16,64))
     parser.add_argument("--repeats",type=int,default=3);parser.add_argument("--profile-repeats",type=int,default=1)
     parser.add_argument("--native-workers",type=int,default=10);parser.add_argument("--seconds",type=float,default=180)
+    parser.add_argument("--formatter",choices=("reference","parallel_units"),default="reference")
+    parser.add_argument("--digest-implementation",choices=("reference","unrolled"),default="reference")
+    parser.add_argument("--digest-group-size",type=int)
+    parser.add_argument("--reuse-certified-source",action="store_true")
     parser.add_argument("--_worker",type=Path,help=argparse.SUPPRESS);parser.add_argument("--_device",help=argparse.SUPPRESS)
     parser.add_argument("--_deadline",type=float,help=argparse.SUPPRESS)
     args=parser.parse_args(argv)
@@ -299,7 +332,9 @@ def main(argv=None):
         settings=json.loads(args._worker.read_text());settings["devices"]=tuple(settings["devices"]);settings["batch_sizes"]=tuple(settings["batch_sizes"])
         worker(ChanceConfig(**settings),args._device,args.output,args._deadline);return 0
     config=ChanceConfig(batch_sizes=tuple(args.batch_sizes),repeats=args.repeats,profile_repeats=args.profile_repeats,
-                        native_workers=args.native_workers,seconds=args.seconds)
+        native_workers=args.native_workers,seconds=args.seconds,formatter=args.formatter,
+        digest_implementation=args.digest_implementation,digest_group_size=args.digest_group_size,
+        reuse_certified_source=args.reuse_certified_source)
     require(not args.output.exists(),"Choose a fresh evidence path")
     result=supervise(config,"mps",args.output,deadline=time.monotonic()+config.seconds,worker_script=Path(__file__))
     result=finalize(result,config);atomic_json(args.output,result)
