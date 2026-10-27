@@ -1,0 +1,2537 @@
+{
+  "candidate_scope": "All movement-controlled units on retained land; every simple one/two-hop directed geometry or constructed-rail path x five modes + ordinary wrong-phase queries, all co-located tow pairs, and every complete legal-menu movement_route path; no arbitrary candidate cap",
+  "cases": [
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.5447934159892611,
+      "cold_gpu_prepared_query_seconds": 0.00038800001493655145,
+      "cold_native_query_seconds": 0.000486542,
+      "cold_native_wrapper_wall_seconds": 0.0006427079788409173,
+      "cold_reset_seconds": 0.002564708993304521,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.06852858400088735,
+      "dynamic_upload_seconds": 0.04615287500200793,
+      "evidence": {
+        "allowed_queries": 39,
+        "complete_native_results_sha256": "b68b7c035b4d855cb255bd85081cf66473b47433a0caf66eba0b0e3422ed7d5f",
+        "disallowed_queries": 909,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          },
+          "ordinary": {
+            "allowed": 39,
+            "exceptions": 0,
+            "queries": 316
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 72,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 32,
+          "Insufficient movement points": 33,
+          "Narrow crossing requires its own movement mode": 4,
+          "No movement remaining": 123,
+          "Noncombat movement phase required": 149,
+          "Only Marines attack; infantry-class units may noncombat cross": 2,
+          "Ordinary land movement requires a land unit": 36,
+          "Strategic rail is noncombat movement": 316,
+          "Terrain ends movement immediately": 34,
+          "Unit is not eligible to blitz": 108,
+          "allowed": 39
+        },
+        "verified_queries": 948
+      },
+      "gpu_prepare_query_seconds": [
+        0.003718249994562939,
+        0.0035998749954160303,
+        0.0035787920060101897,
+        0.003607582999393344,
+        0.0035968330048490316
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0003575420123524964,
+        0.0002933340147137642,
+        0.00026666600024327636,
+        0.0002981669967994094,
+        0.0002985419996548444
+      ],
+      "host_candidate_preparation_seconds": 0.03671379198203795,
+      "host_inspection_seconds": 0.03441354198730551,
+      "independent_gpu_preparation_seconds": 0.007390707993181422,
+      "lanes": 1,
+      "movement_context_seconds": 0.014866375015117228,
+      "movement_metadata_upload_seconds": 0.005160625005373731,
+      "native_capture_seconds": 0.0010530409927014261,
+      "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1",
+      "native_context_seconds": 0.014047333999769762,
+      "native_query_seconds": [
+        0.000439041,
+        0.000415125,
+        0.000414709,
+        0.000396833,
+        0.000399083
+      ],
+      "native_request_construction_seconds": 0.0005623750039376318,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0
+        ],
+        "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0005630420055240393,
+        0.0005253749841358513,
+        0.0005459999956656247,
+        0.0005017080111429095,
+        0.0005012499750591815
+      ],
+      "one_lane_pack_and_upload_seconds": 0.006817542016506195,
+      "one_lane_requests_sha256": "796523d950902c0774c623dcfe5e9c6f0f57f38bc2d72f57a61074b1ad128da2",
+      "position": "japan_round1_combat_movement",
+      "queries": 948,
+      "queries_per_lane": 948,
+      "request_sha256": "43fe58b2b9942636760955f6e4bdb13915f34e2df97e007d936361545bf2ff85",
+      "resident_population_seconds": 0.019048624992137775,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "15ead49aa1e74505c9bdf8e4e3356ff2f8a6f451e1f18ebca2d989f488485899",
+          "dynamic_string_offsets": "3d72454857dc15cb54db841239744f22ea5116e8715b8aadea6c12c52cf90679",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "7405894505edb262a5fc6a5c90d28ced8b8b8801b47141930666868e0ea6da8c",
+          "records": "10c2c972d73873853791448b2c35fd87a5f672085ceb8f9732ffbd45493493c7",
+          "sections": "000dc793527e83eb4aab4934d8d26170238037ebba997960c310a6b0fb54f099",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.2594902499986347
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.006307415984338149,
+      "cold_gpu_prepared_query_seconds": 0.0003692910249810666,
+      "cold_native_query_seconds": 0.001850042,
+      "cold_native_wrapper_wall_seconds": 0.002338458987651393,
+      "cold_reset_seconds": 0.003399250010261312,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.044553874991834164,
+      "dynamic_upload_seconds": 0.04615287500200793,
+      "evidence": {
+        "allowed_queries": 156,
+        "complete_native_results_sha256": "e1ce4663943bde2528c070dd205607f76eb5bf96ad42650799b5c00b831d73dc",
+        "disallowed_queries": 3636,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          },
+          "ordinary": {
+            "allowed": 156,
+            "exceptions": 0,
+            "queries": 1264
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 288,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 128,
+          "Insufficient movement points": 132,
+          "Narrow crossing requires its own movement mode": 16,
+          "No movement remaining": 492,
+          "Noncombat movement phase required": 596,
+          "Only Marines attack; infantry-class units may noncombat cross": 8,
+          "Ordinary land movement requires a land unit": 144,
+          "Strategic rail is noncombat movement": 1264,
+          "Terrain ends movement immediately": 136,
+          "Unit is not eligible to blitz": 432,
+          "allowed": 156
+        },
+        "verified_queries": 3792
+      },
+      "gpu_prepare_query_seconds": [
+        0.0036930829810444266,
+        0.003725583024788648,
+        0.0037238750082906336,
+        0.004001708002761006,
+        0.0037857500137761235
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0002918749814853072,
+        0.0002847909927368164,
+        0.0002732090069912374,
+        0.0002959999837912619,
+        0.00030087499180808663
+      ],
+      "host_candidate_preparation_seconds": 0.03671379198203795,
+      "host_inspection_seconds": 0.07410845800768584,
+      "independent_gpu_preparation_seconds": 0.004086083004949614,
+      "lanes": 4,
+      "movement_context_seconds": 0.014866375015117228,
+      "movement_metadata_upload_seconds": 0.005160625005373731,
+      "native_capture_seconds": 0.0010530409927014261,
+      "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1",
+      "native_context_seconds": 0.014047333999769762,
+      "native_query_seconds": [
+        0.001819583,
+        0.001862166,
+        0.001811375,
+        0.001825375,
+        0.001795833
+      ],
+      "native_request_construction_seconds": 0.001991082972381264,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          2,
+          3
+        ],
+        "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1"
+      },
+      "native_wrapper_wall_seconds": [
+        0.002243040973553434,
+        0.0023505419958382845,
+        0.002299749990925193,
+        0.002307540999026969,
+        0.0022472499986179173
+      ],
+      "one_lane_pack_and_upload_seconds": 0.006817542016506195,
+      "one_lane_requests_sha256": "796523d950902c0774c623dcfe5e9c6f0f57f38bc2d72f57a61074b1ad128da2",
+      "position": "japan_round1_combat_movement",
+      "queries": 3792,
+      "queries_per_lane": 948,
+      "request_sha256": "5fcf23e0e85d5029e529bf75890153180e418b25d15ae4827ee7b0b0c708da8d",
+      "resident_population_seconds": 0.010221459000604227,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "15ead49aa1e74505c9bdf8e4e3356ff2f8a6f451e1f18ebca2d989f488485899",
+          "dynamic_string_offsets": "3d72454857dc15cb54db841239744f22ea5116e8715b8aadea6c12c52cf90679",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "e3433911f48e7f9179255bb8a4654a1236ba4c75163ce034603d92639477927d",
+          "records": "8221f0e78617a350b59361600d76036c54ab9a61f4e3089f28c72c6c23292fac",
+          "sections": "903e3e245db26f470742acdcf02c24f94862ea781fa61cdc41381b1fe21aa1f3",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.2594902499986347
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.007050167012494057,
+      "cold_gpu_prepared_query_seconds": 0.00034445797791704535,
+      "cold_native_query_seconds": 0.00748125,
+      "cold_native_wrapper_wall_seconds": 0.009750957979122177,
+      "cold_reset_seconds": 0.0037482919869944453,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.04150179200223647,
+      "dynamic_upload_seconds": 0.04615287500200793,
+      "evidence": {
+        "allowed_queries": 624,
+        "complete_native_results_sha256": "bd542cacb3cf81b4fd7ff034b3bffa258ce82d78978769f6d3c7fee3560107af",
+        "disallowed_queries": 14544,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          },
+          "ordinary": {
+            "allowed": 624,
+            "exceptions": 0,
+            "queries": 5056
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 1152,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 512,
+          "Insufficient movement points": 528,
+          "Narrow crossing requires its own movement mode": 64,
+          "No movement remaining": 1968,
+          "Noncombat movement phase required": 2384,
+          "Only Marines attack; infantry-class units may noncombat cross": 32,
+          "Ordinary land movement requires a land unit": 576,
+          "Strategic rail is noncombat movement": 5056,
+          "Terrain ends movement immediately": 544,
+          "Unit is not eligible to blitz": 1728,
+          "allowed": 624
+        },
+        "verified_queries": 15168
+      },
+      "gpu_prepare_query_seconds": [
+        0.004743666009744629,
+        0.004728041007183492,
+        0.004598333005560562,
+        0.004594666010234505,
+        0.004790416016476229
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0003267079882789403,
+        0.0002980000281240791,
+        0.0003062089963350445,
+        0.0003827500040642917,
+        0.00040874999831430614
+      ],
+      "host_candidate_preparation_seconds": 0.03671379198203795,
+      "host_inspection_seconds": 0.19845191700733267,
+      "independent_gpu_preparation_seconds": 0.003894459019647911,
+      "lanes": 16,
+      "movement_context_seconds": 0.014866375015117228,
+      "movement_metadata_upload_seconds": 0.005160625005373731,
+      "native_capture_seconds": 0.0010530409927014261,
+      "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1",
+      "native_context_seconds": 0.014047333999769762,
+      "native_query_seconds": [
+        0.007319375,
+        0.007383833,
+        0.0065915,
+        0.007096833,
+        0.0067225
+      ],
+      "native_request_construction_seconds": 0.007802457985235378,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          8,
+          15
+        ],
+        "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1"
+      },
+      "native_wrapper_wall_seconds": [
+        0.009341084019979462,
+        0.009544583008391783,
+        0.008658791019115597,
+        0.009372417000122368,
+        0.00909704199875705
+      ],
+      "one_lane_pack_and_upload_seconds": 0.006817542016506195,
+      "one_lane_requests_sha256": "796523d950902c0774c623dcfe5e9c6f0f57f38bc2d72f57a61074b1ad128da2",
+      "position": "japan_round1_combat_movement",
+      "queries": 15168,
+      "queries_per_lane": 948,
+      "request_sha256": "27b2d4eb0da8a83d2a4acdfd2f439720773b9d1c80f80da93595c036132a0a51",
+      "resident_population_seconds": 0.007207416987512261,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "15ead49aa1e74505c9bdf8e4e3356ff2f8a6f451e1f18ebca2d989f488485899",
+          "dynamic_string_offsets": "3d72454857dc15cb54db841239744f22ea5116e8715b8aadea6c12c52cf90679",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "586b44c699c5026fc139c017fc544f8f391a7d584d092c97b8babb0693696217",
+          "records": "ef8d8b9748d9e2534b22f759c59c349130bce6150a230e9bccd19e3b3f3d1087",
+          "sections": "e2435b3d5de35d6512c56f22c63fb055632fed130723774cdca2c45c8a7c05bc",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.2594902499986347
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.008850582991726696,
+      "cold_gpu_prepared_query_seconds": 0.1122355000115931,
+      "cold_native_query_seconds": 0.026499625,
+      "cold_native_wrapper_wall_seconds": 0.03330791599000804,
+      "cold_reset_seconds": 0.0031649169977754354,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.03758950001792982,
+      "dynamic_upload_seconds": 0.04615287500200793,
+      "evidence": {
+        "allowed_queries": 2496,
+        "complete_native_results_sha256": "10906ffac43fe758862413df7336267ac02d71a417307fc9426ccf4202a38993",
+        "disallowed_queries": 58176,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          },
+          "ordinary": {
+            "allowed": 2496,
+            "exceptions": 0,
+            "queries": 20224
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 4608,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 2048,
+          "Insufficient movement points": 2112,
+          "Narrow crossing requires its own movement mode": 256,
+          "No movement remaining": 7872,
+          "Noncombat movement phase required": 9536,
+          "Only Marines attack; infantry-class units may noncombat cross": 128,
+          "Ordinary land movement requires a land unit": 2304,
+          "Strategic rail is noncombat movement": 20224,
+          "Terrain ends movement immediately": 2176,
+          "Unit is not eligible to blitz": 6912,
+          "allowed": 2496
+        },
+        "verified_queries": 60672
+      },
+      "gpu_prepare_query_seconds": [
+        0.006152667017886415,
+        0.006125333020463586,
+        0.006116250006016344,
+        0.006144999992102385,
+        0.006272667000303045
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0005437499785330147,
+        0.0010043329966720194,
+        0.0005872079927939922,
+        0.0005363750096876174,
+        0.000571540993405506
+      ],
+      "host_candidate_preparation_seconds": 0.03671379198203795,
+      "host_inspection_seconds": 1.3090147920011077,
+      "independent_gpu_preparation_seconds": 0.005798666999908164,
+      "lanes": 64,
+      "movement_context_seconds": 0.014866375015117228,
+      "movement_metadata_upload_seconds": 0.005160625005373731,
+      "native_capture_seconds": 0.0010530409927014261,
+      "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1",
+      "native_context_seconds": 0.014047333999769762,
+      "native_query_seconds": [
+        0.028991083,
+        0.027436708,
+        0.029473291,
+        0.027722666,
+        0.029271417
+      ],
+      "native_request_construction_seconds": 0.031299457972636446,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          32,
+          63
+        ],
+        "native_checkpoint_sha256": "428e7e8b4031deb1b86f6dc40531ebc90db56042e6cb92d6551f49c8ea6b3cf1"
+      },
+      "native_wrapper_wall_seconds": [
+        0.03727462500683032,
+        0.035544542013667524,
+        0.03818316699471325,
+        0.03658116699079983,
+        0.03765349998138845
+      ],
+      "one_lane_pack_and_upload_seconds": 0.006817542016506195,
+      "one_lane_requests_sha256": "796523d950902c0774c623dcfe5e9c6f0f57f38bc2d72f57a61074b1ad128da2",
+      "position": "japan_round1_combat_movement",
+      "queries": 60672,
+      "queries_per_lane": 948,
+      "request_sha256": "67efd343bd063dbc002e677128d464d43c999ea65aabe1b280808fb389d53492",
+      "resident_population_seconds": 0.007651125022675842,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "15ead49aa1e74505c9bdf8e4e3356ff2f8a6f451e1f18ebca2d989f488485899",
+          "dynamic_string_offsets": "3d72454857dc15cb54db841239744f22ea5116e8715b8aadea6c12c52cf90679",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "6bd4a54c7dc957382ff6e50cb418a2fb725a19b4ca81ee740b2a56e58d9457e4",
+          "records": "15c208e57573e978ff7db6cafa5c47e761b167fe0ae56732a4fa8dee01073369",
+          "sections": "9141c38c5083405a541986353f7cb31109df306d935b7d393d34e4822dc27b93",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.2594902499986347
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.008462375000817701,
+      "cold_gpu_prepared_query_seconds": 0.0003062910109292716,
+      "cold_native_query_seconds": 0.000163875,
+      "cold_native_wrapper_wall_seconds": 0.0003673749743029475,
+      "cold_reset_seconds": 0.015166208002483472,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004802749986993149,
+      "dynamic_upload_seconds": 0.005281999998260289,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "3e4ff02f918cc98d40778ae9801eb11e16e442a6a04fe2dee2a9443e6c9cecb7",
+        "disallowed_queries": 738,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 246
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 103,
+          "Militia must start and end in its Home Country": 42,
+          "No movement remaining": 63,
+          "Ordinary land movement requires a land unit": 80,
+          "Unit already moved this turn": 204,
+          "Unit combat moved this turn": 246
+        },
+        "verified_queries": 738
+      },
+      "gpu_prepare_query_seconds": [
+        0.0032850840070750564,
+        0.0034187080163974315,
+        0.0034747500030789524,
+        0.0034043340128846467,
+        0.003237375000026077
+      ],
+      "gpu_prepared_query_seconds": [
+        0.00029741699108853936,
+        0.00028249999741092324,
+        0.00029054199694655836,
+        0.0002596250269562006,
+        0.00025733301299624145
+      ],
+      "host_candidate_preparation_seconds": 0.0113294170005247,
+      "host_inspection_seconds": 0.030062791978707537,
+      "independent_gpu_preparation_seconds": 0.003752749995328486,
+      "lanes": 1,
+      "movement_context_seconds": 0.015455415996257216,
+      "movement_metadata_upload_seconds": 0.0022287920000962913,
+      "native_capture_seconds": 0.0012993749987799674,
+      "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc",
+      "native_context_seconds": 0.01502349998918362,
+      "native_query_seconds": [
+        0.0001765,
+        0.000164417,
+        0.000165042,
+        0.000181958,
+        0.000167958
+      ],
+      "native_request_construction_seconds": 0.00041924999095499516,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0
+        ],
+        "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0002619579900056124,
+        0.0002662080223672092,
+        0.000268208998022601,
+        0.00026862500817514956,
+        0.00028991600265726447
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004769083025166765,
+      "one_lane_requests_sha256": "e5685dabacefc71997de37eef03a335471fffe096711223f99a20c6b4d263d96",
+      "position": "japan_round1_non_combat_movement",
+      "queries": 738,
+      "queries_per_lane": 738,
+      "request_sha256": "0deefb1c1fbc3e82eb1cc90193eac57bad8f0276d62fb11068fa1cc110fb9423",
+      "resident_population_seconds": 0.007698583998717368,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "8e3b4d9460db0d156040d0645fd0dda37ce35b71e175d93ff5c06fe347986ca8",
+          "dynamic_string_offsets": "699bc0d4a1d0a86a151de23d472d91781b017527718bd08c8b938e2157a0b779",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "a061fc35306a6ec6a124ef6bb6d8a2cc94de1f653fc01a1d1211ce419aba24b5",
+          "records": "ad529b34ef032550afdac9a706d5a22e17c759ab008a47ca7e960906874bb53f",
+          "sections": "3c84e94c13fcb742699634f18dd03518015b0be324f89380b2582c3cf7ea43e0",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004666958993766457
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.004673707997426391,
+      "cold_gpu_prepared_query_seconds": 0.00028045798535458744,
+      "cold_native_query_seconds": 0.000713458,
+      "cold_native_wrapper_wall_seconds": 0.0011100000119768083,
+      "cold_reset_seconds": 0.003093042003456503,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004753167013404891,
+      "dynamic_upload_seconds": 0.005281999998260289,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "787d078a8df04d0ee75f32df02d57f4e648db5df7f9fb5d797ad34cfa098bc6b",
+        "disallowed_queries": 2952,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 984
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 412,
+          "Militia must start and end in its Home Country": 168,
+          "No movement remaining": 252,
+          "Ordinary land movement requires a land unit": 320,
+          "Unit already moved this turn": 816,
+          "Unit combat moved this turn": 984
+        },
+        "verified_queries": 2952
+      },
+      "gpu_prepare_query_seconds": [
+        0.0037410420191008598,
+        0.0034320830018259585,
+        0.003473791992291808,
+        0.0034749589976854622,
+        0.0033534579852130264
+      ],
+      "gpu_prepared_query_seconds": [
+        0.00034262501867488027,
+        0.00027833302738144994,
+        0.00028737500542774796,
+        0.00027299998328089714,
+        0.0002719160111155361
+      ],
+      "host_candidate_preparation_seconds": 0.0113294170005247,
+      "host_inspection_seconds": 0.06530524999834597,
+      "independent_gpu_preparation_seconds": 0.003248833992984146,
+      "lanes": 4,
+      "movement_context_seconds": 0.015455415996257216,
+      "movement_metadata_upload_seconds": 0.0022287920000962913,
+      "native_capture_seconds": 0.0012993749987799674,
+      "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc",
+      "native_context_seconds": 0.01502349998918362,
+      "native_query_seconds": [
+        0.000695375,
+        0.0006585,
+        0.000777625,
+        0.000741625,
+        0.00064675
+      ],
+      "native_request_construction_seconds": 0.0015262500091921538,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          2,
+          3
+        ],
+        "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0011174590035807341,
+        0.0010849999962374568,
+        0.0011595000105444342,
+        0.0011120830022264272,
+        0.0009736250212881714
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004769083025166765,
+      "one_lane_requests_sha256": "e5685dabacefc71997de37eef03a335471fffe096711223f99a20c6b4d263d96",
+      "position": "japan_round1_non_combat_movement",
+      "queries": 2952,
+      "queries_per_lane": 738,
+      "request_sha256": "4febd944347cd93cfb0e3077dd1fb9b18589719427a3924a46cefaeef2e1904f",
+      "resident_population_seconds": 0.007831499999156222,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "8e3b4d9460db0d156040d0645fd0dda37ce35b71e175d93ff5c06fe347986ca8",
+          "dynamic_string_offsets": "699bc0d4a1d0a86a151de23d472d91781b017527718bd08c8b938e2157a0b779",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "2d96faf6a3f37f0b54280322352d23f23c8032ea38184b36ce1fc2373d5aa624",
+          "records": "e15cb45631b56b7d9d8b46a96fc436d46b27688b700e102f7ac1db0019792580",
+          "sections": "9ae0458b42b105604db168bb083a4f04707e4cc6158cd485b782436e0060d8d9",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004666958993766457
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.0055231250007636845,
+      "cold_gpu_prepared_query_seconds": 0.00029358299798332155,
+      "cold_native_query_seconds": 0.002889958,
+      "cold_native_wrapper_wall_seconds": 0.0044575000065378845,
+      "cold_reset_seconds": 0.0035107920120935887,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.0041668750054668635,
+      "dynamic_upload_seconds": 0.005281999998260289,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "b5b0aba97f7d5ad757a31ddc0c83aa22ccd63ee683eb3e730fa06c502ad8b6c5",
+        "disallowed_queries": 11808,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 3936
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 1648,
+          "Militia must start and end in its Home Country": 672,
+          "No movement remaining": 1008,
+          "Ordinary land movement requires a land unit": 1280,
+          "Unit already moved this turn": 3264,
+          "Unit combat moved this turn": 3936
+        },
+        "verified_queries": 11808
+      },
+      "gpu_prepare_query_seconds": [
+        0.0038470419822260737,
+        0.004254166007740423,
+        0.004397000011522323,
+        0.004320832988014445,
+        0.0037784589803777635
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0002925420121755451,
+        0.00031633302569389343,
+        0.00028649999876506627,
+        0.000330832990584895,
+        0.00029299999005161226
+      ],
+      "host_candidate_preparation_seconds": 0.0113294170005247,
+      "host_inspection_seconds": 0.16098345900536515,
+      "independent_gpu_preparation_seconds": 0.003426374983973801,
+      "lanes": 16,
+      "movement_context_seconds": 0.015455415996257216,
+      "movement_metadata_upload_seconds": 0.0022287920000962913,
+      "native_capture_seconds": 0.0012993749987799674,
+      "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc",
+      "native_context_seconds": 0.01502349998918362,
+      "native_query_seconds": [
+        0.002675208,
+        0.002502583,
+        0.0025555,
+        0.00263425,
+        0.002619667
+      ],
+      "native_request_construction_seconds": 0.005470083007821813,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          8,
+          15
+        ],
+        "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc"
+      },
+      "native_wrapper_wall_seconds": [
+        0.004264916991814971,
+        0.004413500020746142,
+        0.004309457988711074,
+        0.003958999994210899,
+        0.004154458991251886
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004769083025166765,
+      "one_lane_requests_sha256": "e5685dabacefc71997de37eef03a335471fffe096711223f99a20c6b4d263d96",
+      "position": "japan_round1_non_combat_movement",
+      "queries": 11808,
+      "queries_per_lane": 738,
+      "request_sha256": "3464d4d22f7f9c942feb6aa2f01b3c7b917b4dddc732207f8d2262396a09f3a6",
+      "resident_population_seconds": 0.007184957998106256,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "8e3b4d9460db0d156040d0645fd0dda37ce35b71e175d93ff5c06fe347986ca8",
+          "dynamic_string_offsets": "699bc0d4a1d0a86a151de23d472d91781b017527718bd08c8b938e2157a0b779",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "d7ee8b1786f26c0df8c7faa49dc2c7688f8ff10aa7104ed36cae05efa863ce44",
+          "records": "7775a3b76b5fd2d3c38521cd51f5f7286a5a1d20994e258ff8a8de2898922b23",
+          "sections": "f82c00cd32036261a28c8691d90c01f7da57e4ed0dadd4e2aa77966eb3d29b6a",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004666958993766457
+    },
+    {
+      "clock": {
+        "completed_rounds": 0,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "2",
+        "round_index": 0
+      },
+      "cold_gpu_prepare_query_seconds": 0.008860083995386958,
+      "cold_gpu_prepared_query_seconds": 0.00045504100853577256,
+      "cold_native_query_seconds": 0.01040275,
+      "cold_native_wrapper_wall_seconds": 0.017096833005780354,
+      "cold_reset_seconds": 0.003114374994765967,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.005042332981247455,
+      "dynamic_upload_seconds": 0.005281999998260289,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "aa235665bb29ffe43045e81b8b4ee12576d39cd9a6588240d84de5cdf1d32dd3",
+        "disallowed_queries": 47232,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 15744
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 6592,
+          "Militia must start and end in its Home Country": 2688,
+          "No movement remaining": 4032,
+          "Ordinary land movement requires a land unit": 5120,
+          "Unit already moved this turn": 13056,
+          "Unit combat moved this turn": 15744
+        },
+        "verified_queries": 47232
+      },
+      "gpu_prepare_query_seconds": [
+        0.005188958020880818,
+        0.0051680830074474216,
+        0.005240250000497326,
+        0.005194334022235125,
+        0.005195625009946525
+      ],
+      "gpu_prepared_query_seconds": [
+        0.00048020799295045435,
+        0.000693874986609444,
+        0.0009120419854298234,
+        0.00047233400982804596,
+        0.0004780000017490238
+      ],
+      "host_candidate_preparation_seconds": 0.0113294170005247,
+      "host_inspection_seconds": 0.8082005839969497,
+      "independent_gpu_preparation_seconds": 0.004767916980199516,
+      "lanes": 64,
+      "movement_context_seconds": 0.015455415996257216,
+      "movement_metadata_upload_seconds": 0.0022287920000962913,
+      "native_capture_seconds": 0.0012993749987799674,
+      "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc",
+      "native_context_seconds": 0.01502349998918362,
+      "native_query_seconds": [
+        0.01155775,
+        0.011187833,
+        0.011394834,
+        0.0105335,
+        0.011412709
+      ],
+      "native_request_construction_seconds": 0.022805083979619667,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          32,
+          63
+        ],
+        "native_checkpoint_sha256": "815c196235676cfba41050fbf9e53369df5f8db747dbfb5be75f493f6da9a1bc"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0179305000056047,
+        0.018050749989924952,
+        0.01801045797765255,
+        0.01652533301967196,
+        0.017495791020337492
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004769083025166765,
+      "one_lane_requests_sha256": "e5685dabacefc71997de37eef03a335471fffe096711223f99a20c6b4d263d96",
+      "position": "japan_round1_non_combat_movement",
+      "queries": 47232,
+      "queries_per_lane": 738,
+      "request_sha256": "823aa8b3c7893a6a4c70f901ad29b0f4384877776cdee8443e77a4c0aaa5e076",
+      "resident_population_seconds": 0.032165874989004806,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "8e3b4d9460db0d156040d0645fd0dda37ce35b71e175d93ff5c06fe347986ca8",
+          "dynamic_string_offsets": "699bc0d4a1d0a86a151de23d472d91781b017527718bd08c8b938e2157a0b779",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "6a80acae59e8fd45a8756b6338e1ea3c031bdccb6a9c9fb5f2c79ab691c14a11",
+          "records": "2498246137531d1f33c5418f541fd3b2fdda26a4205e76d4a41785bec04da93a",
+          "sections": "15a78a3ebda4dcf9eea8a29ab22049a36d267b7e29a6a9e92cd65b56166c70fa",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004666958993766457
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.007354499975917861,
+      "cold_gpu_prepared_query_seconds": 0.00031537501490674913,
+      "cold_native_query_seconds": 0.000332083,
+      "cold_native_wrapper_wall_seconds": 0.0004494579916354269,
+      "cold_reset_seconds": 0.01363733399193734,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004733000008855015,
+      "dynamic_upload_seconds": 0.005207332986174151,
+      "evidence": {
+        "allowed_queries": 20,
+        "complete_native_results_sha256": "67f7548b092040c6147226d24617e876fc6db5bec8e11b0e3b1cd9911ca43679",
+        "disallowed_queries": 754,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          },
+          "ordinary": {
+            "allowed": 20,
+            "exceptions": 0,
+            "queries": 258
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 52,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 60,
+          "Insufficient movement points": 32,
+          "No movement remaining": 63,
+          "Noncombat movement phase required": 106,
+          "Ordinary land movement requires a land unit": 92,
+          "Strategic rail is noncombat movement": 258,
+          "Terrain ends movement immediately": 6,
+          "Unit is not eligible to blitz": 85,
+          "allowed": 20
+        },
+        "verified_queries": 774
+      },
+      "gpu_prepare_query_seconds": [
+        0.0032270420051645488,
+        0.003202374995453283,
+        0.0033208329987246543,
+        0.003374166990397498,
+        0.0033787919965106994
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0003006249899044633,
+        0.0002676250005606562,
+        0.00029650001670233905,
+        0.0003204160020686686,
+        0.000295000005280599
+      ],
+      "host_candidate_preparation_seconds": 0.058500542014371604,
+      "host_inspection_seconds": 0.028985666984226555,
+      "independent_gpu_preparation_seconds": 0.0030992499960120767,
+      "lanes": 1,
+      "movement_context_seconds": 0.014324791001854464,
+      "movement_metadata_upload_seconds": 0.0033361249952577055,
+      "native_capture_seconds": 0.0013582919782493263,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.014719625003635883,
+      "native_query_seconds": [
+        0.000358125,
+        0.000314333,
+        0.000309,
+        0.000327083,
+        0.000334209
+      ],
+      "native_request_construction_seconds": 0.00042875000508502126,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0
+        ],
+        "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+      },
+      "native_wrapper_wall_seconds": [
+        0.00046608399134129286,
+        0.00041533299372531474,
+        0.0005137079861015081,
+        0.0004562920075841248,
+        0.000450249994173646
+      ],
+      "one_lane_pack_and_upload_seconds": 0.0048147089837584645,
+      "one_lane_requests_sha256": "9b0b9f29c3029e607b7a3edbf764b6be49ec33b8f95b180d1c116fb3af867c38",
+      "position": "japan_round2_combat_movement",
+      "queries": 774,
+      "queries_per_lane": 774,
+      "request_sha256": "dd3e57a6e2f601f039555216d94ce0eb63cda21df2ac6bc47a42a1be89715570",
+      "resident_population_seconds": 0.006772459018975496,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "59ab108d6172a8a5fe700b72ea4aafcb178b8081a249ab19cc949c129daa7ea1",
+          "dynamic_string_offsets": "31e579c378b06ac1e15eaaa57e403693272cfebce84c54d1caba7716c1b52b70",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "6d33f64530e9ca0123c256409752e91708669ee9418c0de220f1e6c2c25d0057",
+          "records": "996f6add89a225529aaadc31cfe1a7d599c68ad26437d253ac8217d70f5c8403",
+          "sections": "6145e3afca01e5aef85036d1ed2f57a0b71ecccc86393c2ee9eef208b5a07503",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.005328458995791152
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.005010541994124651,
+      "cold_gpu_prepared_query_seconds": 0.0003136669984087348,
+      "cold_native_query_seconds": 0.001190459,
+      "cold_native_wrapper_wall_seconds": 0.0015117089787963778,
+      "cold_reset_seconds": 0.003394125000340864,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004913457989459857,
+      "dynamic_upload_seconds": 0.005207332986174151,
+      "evidence": {
+        "allowed_queries": 80,
+        "complete_native_results_sha256": "d490cf08482d5a5f1e38674a96f3f018d38fe371722e1023364a3ed4cf447308",
+        "disallowed_queries": 3016,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          },
+          "ordinary": {
+            "allowed": 80,
+            "exceptions": 0,
+            "queries": 1032
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 208,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 240,
+          "Insufficient movement points": 128,
+          "No movement remaining": 252,
+          "Noncombat movement phase required": 424,
+          "Ordinary land movement requires a land unit": 368,
+          "Strategic rail is noncombat movement": 1032,
+          "Terrain ends movement immediately": 24,
+          "Unit is not eligible to blitz": 340,
+          "allowed": 80
+        },
+        "verified_queries": 3096
+      },
+      "gpu_prepare_query_seconds": [
+        0.0036299999919719994,
+        0.003417333005927503,
+        0.0033349590084981173,
+        0.0033508340129628778,
+        0.003346749988850206
+      ],
+      "gpu_prepared_query_seconds": [
+        0.00028737500542774796,
+        0.0002919169783126563,
+        0.0002712499990593642,
+        0.00029495800845324993,
+        0.0003128340176772326
+      ],
+      "host_candidate_preparation_seconds": 0.058500542014371604,
+      "host_inspection_seconds": 0.06514204200357199,
+      "independent_gpu_preparation_seconds": 0.0032039579818956554,
+      "lanes": 4,
+      "movement_context_seconds": 0.014324791001854464,
+      "movement_metadata_upload_seconds": 0.0033361249952577055,
+      "native_capture_seconds": 0.0013582919782493263,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.014719625003635883,
+      "native_query_seconds": [
+        0.001251417,
+        0.0012465,
+        0.001192834,
+        0.001163125,
+        0.001185916
+      ],
+      "native_request_construction_seconds": 0.0016022079798858613,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          2,
+          3
+        ],
+        "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0016112089797388762,
+        0.0016800840094219893,
+        0.001577707997057587,
+        0.0015178750036284328,
+        0.0014910839963704348
+      ],
+      "one_lane_pack_and_upload_seconds": 0.0048147089837584645,
+      "one_lane_requests_sha256": "9b0b9f29c3029e607b7a3edbf764b6be49ec33b8f95b180d1c116fb3af867c38",
+      "position": "japan_round2_combat_movement",
+      "queries": 3096,
+      "queries_per_lane": 774,
+      "request_sha256": "f5bc1a02bda269e1d9555d7f4aa2b83f6de2824dac2e1f5ddf37bb1fd1b8845a",
+      "resident_population_seconds": 0.007828999980119988,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "59ab108d6172a8a5fe700b72ea4aafcb178b8081a249ab19cc949c129daa7ea1",
+          "dynamic_string_offsets": "31e579c378b06ac1e15eaaa57e403693272cfebce84c54d1caba7716c1b52b70",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "21214e88b4739195e31d1d676eec9e748172b23b13d768762a22b2851ed927ba",
+          "records": "cfa1a033f6dcb036bd6c8e6f3a5af20994e111c795395fa16b56632158dbc8b1",
+          "sections": "99b53943d30e5a3a9c08968d2f3d5e76eae9a9975ce94fb4df1118a9ea1e5fe7",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.005328458995791152
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.0056317090056836605,
+      "cold_gpu_prepared_query_seconds": 0.0003165419911965728,
+      "cold_native_query_seconds": 0.005924666,
+      "cold_native_wrapper_wall_seconds": 0.007519584003603086,
+      "cold_reset_seconds": 0.0033405419962946326,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004727166990051046,
+      "dynamic_upload_seconds": 0.005207332986174151,
+      "evidence": {
+        "allowed_queries": 320,
+        "complete_native_results_sha256": "64bdfb37ff92e9fd31cb06277396675521b2d59b31cdd607d8e442e6a487f069",
+        "disallowed_queries": 12064,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          },
+          "ordinary": {
+            "allowed": 320,
+            "exceptions": 0,
+            "queries": 4128
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 832,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 960,
+          "Insufficient movement points": 512,
+          "No movement remaining": 1008,
+          "Noncombat movement phase required": 1696,
+          "Ordinary land movement requires a land unit": 1472,
+          "Strategic rail is noncombat movement": 4128,
+          "Terrain ends movement immediately": 96,
+          "Unit is not eligible to blitz": 1360,
+          "allowed": 320
+        },
+        "verified_queries": 12384
+      },
+      "gpu_prepare_query_seconds": [
+        0.00408062498900108,
+        0.0041096669738180935,
+        0.004322209017118439,
+        0.004115959018236026,
+        0.004128791013499722
+      ],
+      "gpu_prepared_query_seconds": [
+        0.00028787500923499465,
+        0.00028450001263991,
+        0.00032812499557621777,
+        0.0003001660224981606,
+        0.0003432079975027591
+      ],
+      "host_candidate_preparation_seconds": 0.058500542014371604,
+      "host_inspection_seconds": 0.17648029199335724,
+      "independent_gpu_preparation_seconds": 0.0034187909914180636,
+      "lanes": 16,
+      "movement_context_seconds": 0.014324791001854464,
+      "movement_metadata_upload_seconds": 0.0033361249952577055,
+      "native_capture_seconds": 0.0013582919782493263,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.014719625003635883,
+      "native_query_seconds": [
+        0.005439584,
+        0.005781625,
+        0.005388833,
+        0.005391625,
+        0.005427209
+      ],
+      "native_request_construction_seconds": 0.0062086249818094075,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          8,
+          15
+        ],
+        "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0069767499808222055,
+        0.0075522080005612224,
+        0.007031292014289647,
+        0.006972750008571893,
+        0.007179292006185278
+      ],
+      "one_lane_pack_and_upload_seconds": 0.0048147089837584645,
+      "one_lane_requests_sha256": "9b0b9f29c3029e607b7a3edbf764b6be49ec33b8f95b180d1c116fb3af867c38",
+      "position": "japan_round2_combat_movement",
+      "queries": 12384,
+      "queries_per_lane": 774,
+      "request_sha256": "1c05a84f026a50c2e99ad9b5a7646de60af2deea33d44c09a854bd760e098274",
+      "resident_population_seconds": 0.007143833005102351,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "59ab108d6172a8a5fe700b72ea4aafcb178b8081a249ab19cc949c129daa7ea1",
+          "dynamic_string_offsets": "31e579c378b06ac1e15eaaa57e403693272cfebce84c54d1caba7716c1b52b70",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "5c914560af6b8a1e1e19b512c00b51a3a6c7337919d3fb51df8cac1ce024976d",
+          "records": "c81a1ead31d74cde2643ee44f770a18af6c0cd5ef566003bcfada0e860e78efa",
+          "sections": "cf02dbc0d8248dc54e41a34c635a6cd65c34350e9b6366b5ba81cbab87ccdc84",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.005328458995791152
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.007172207988332957,
+      "cold_gpu_prepared_query_seconds": 0.0005033750203438103,
+      "cold_native_query_seconds": 0.021980416,
+      "cold_native_wrapper_wall_seconds": 0.028606457985006273,
+      "cold_reset_seconds": 0.0035824170045088977,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.00549787501222454,
+      "dynamic_upload_seconds": 0.005207332986174151,
+      "evidence": {
+        "allowed_queries": 1280,
+        "complete_native_results_sha256": "83ed51015d7cdb8511257dd238da556142dbd48e8f397c614f08492078c0e8b5",
+        "disallowed_queries": 48256,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          },
+          "ordinary": {
+            "allowed": 1280,
+            "exceptions": 0,
+            "queries": 16512
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 3328,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 3840,
+          "Insufficient movement points": 2048,
+          "No movement remaining": 4032,
+          "Noncombat movement phase required": 6784,
+          "Ordinary land movement requires a land unit": 5888,
+          "Strategic rail is noncombat movement": 16512,
+          "Terrain ends movement immediately": 384,
+          "Unit is not eligible to blitz": 5440,
+          "allowed": 1280
+        },
+        "verified_queries": 49536
+      },
+      "gpu_prepare_query_seconds": [
+        0.005332125001586974,
+        0.005214832985075191,
+        0.005211459007114172,
+        0.005208417016547173,
+        0.005201125022722408
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0004965830012224615,
+        0.00047695799730718136,
+        0.0005166250048205256,
+        0.0005147079937160015,
+        0.0005068329919595271
+      ],
+      "host_candidate_preparation_seconds": 0.058500542014371604,
+      "host_inspection_seconds": 0.8916327909973916,
+      "independent_gpu_preparation_seconds": 0.004283209011191502,
+      "lanes": 64,
+      "movement_context_seconds": 0.014324791001854464,
+      "movement_metadata_upload_seconds": 0.0033361249952577055,
+      "native_capture_seconds": 0.0013582919782493263,
+      "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50",
+      "native_context_seconds": 0.014719625003635883,
+      "native_query_seconds": [
+        0.020146208,
+        0.021237334,
+        0.020766625,
+        0.021133084,
+        0.0202225
+      ],
+      "native_request_construction_seconds": 0.02474516601068899,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          32,
+          63
+        ],
+        "native_checkpoint_sha256": "25ef1c0de6ab1fbf764c62751445356f5df7ebaf446062b9b5f9cf2e73616e50"
+      },
+      "native_wrapper_wall_seconds": [
+        0.02575516700744629,
+        0.027084583009127527,
+        0.026876333984546363,
+        0.027529458981007338,
+        0.026098208996700123
+      ],
+      "one_lane_pack_and_upload_seconds": 0.0048147089837584645,
+      "one_lane_requests_sha256": "9b0b9f29c3029e607b7a3edbf764b6be49ec33b8f95b180d1c116fb3af867c38",
+      "position": "japan_round2_combat_movement",
+      "queries": 49536,
+      "queries_per_lane": 774,
+      "request_sha256": "9b0a167d5bc5b329046419b9c1970db64a9671857639e862ff297052e663bdf3",
+      "resident_population_seconds": 0.03383258398389444,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "59ab108d6172a8a5fe700b72ea4aafcb178b8081a249ab19cc949c129daa7ea1",
+          "dynamic_string_offsets": "31e579c378b06ac1e15eaaa57e403693272cfebce84c54d1caba7716c1b52b70",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "627d24fd4e9fef64d6e7acf296b06130a929dd00190c04abc7e7e90c81be8fae",
+          "records": "673afc90aa48ae78a0968f159abbbec2f243f3013e843b997fffae30f86c7679",
+          "sections": "b81f9d88a7e3204145820c9c4bd12ca5471271b62f497fdf6051273b7edc53d5",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.005328458995791152
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.0077046249934937805,
+      "cold_gpu_prepared_query_seconds": 0.0002925829903688282,
+      "cold_native_query_seconds": 0.000179083,
+      "cold_native_wrapper_wall_seconds": 0.0002819170185830444,
+      "cold_reset_seconds": 0.013067624997347593,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004993624985218048,
+      "dynamic_upload_seconds": 0.00491095898905769,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "d1c31b00840ba69ca6c89bfa0ad3c6ca72b1a28cc937eb2c5f74b534268365f3",
+        "disallowed_queries": 642,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 214
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 87,
+          "Militia must start and end in its Home Country": 42,
+          "No movement remaining": 63,
+          "Ordinary land movement requires a land unit": 80,
+          "Unit already moved this turn": 172,
+          "Unit combat moved this turn": 198
+        },
+        "verified_queries": 642
+      },
+      "gpu_prepare_query_seconds": [
+        0.0031023330229800195,
+        0.003101375012192875,
+        0.0031244580168277025,
+        0.0032408749975729734,
+        0.003159166022669524
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0002632079995237291,
+        0.0002624999906402081,
+        0.0002700840122997761,
+        0.00025850001838989556,
+        0.00025099999038502574
+      ],
+      "host_candidate_preparation_seconds": 0.012503999983891845,
+      "host_inspection_seconds": 0.030941874982090667,
+      "independent_gpu_preparation_seconds": 0.0033963329915422946,
+      "lanes": 1,
+      "movement_context_seconds": 0.015257042017765343,
+      "movement_metadata_upload_seconds": 0.003185249981470406,
+      "native_capture_seconds": 0.0017538329993840307,
+      "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db",
+      "native_context_seconds": 0.015344333980465308,
+      "native_query_seconds": [
+        0.000135667,
+        0.000140542,
+        0.0001635,
+        0.000162375,
+        0.000159708
+      ],
+      "native_request_construction_seconds": 0.00037445800262503326,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0
+        ],
+        "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db"
+      },
+      "native_wrapper_wall_seconds": [
+        0.00024608400417491794,
+        0.0002271670091431588,
+        0.0002462910197209567,
+        0.00023812500876374543,
+        0.0002565000031609088
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004527582990704104,
+      "one_lane_requests_sha256": "0b3382a7362e9061fca233055da5fae2903ac9cc2ed23a81ff667fbcbc54d141",
+      "position": "japan_round2_non_combat_movement",
+      "queries": 642,
+      "queries_per_lane": 642,
+      "request_sha256": "6783cf34542e2febf481ce9768cfc02564e73e0cf3d1aebcb4c97d8edb2561e2",
+      "resident_population_seconds": 0.007068832986988127,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "6ce52e04ad1a7de694e6c181782eee80a2f11121683930b82780e43d10aba862",
+          "dynamic_string_offsets": "50b4ba8b989e3542791c9e74092433e7ddfe884dfab0a10010b101ef0c1f54b6",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "9bde5f116d4d66d5ccf1fe10cd67acb33c2bb1a3d2c11987b31f38aa6b009c11",
+          "records": "babbbb7a924ef72162a9f9c92a155f9d5a42b7fb9199d503daf15965c28c1226",
+          "sections": "a067ba5d94d498b21b337751d9089b7ec1a68e782c199da2fa1834d8046f2c87",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004400749981869012
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.005032166984165087,
+      "cold_gpu_prepared_query_seconds": 0.0003129999968223274,
+      "cold_native_query_seconds": 0.000631291,
+      "cold_native_wrapper_wall_seconds": 0.001021417003357783,
+      "cold_reset_seconds": 0.003220000013243407,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.004669082991313189,
+      "dynamic_upload_seconds": 0.00491095898905769,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "4236b42004e88558eac4824b2d9e09aa949d80a2a9f7ec5d5127240738febda5",
+        "disallowed_queries": 2568,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 856
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 348,
+          "Militia must start and end in its Home Country": 168,
+          "No movement remaining": 252,
+          "Ordinary land movement requires a land unit": 320,
+          "Unit already moved this turn": 688,
+          "Unit combat moved this turn": 792
+        },
+        "verified_queries": 2568
+      },
+      "gpu_prepare_query_seconds": [
+        0.0031940000189933926,
+        0.003196958015905693,
+        0.0034046250220853835,
+        0.0032757500011939555,
+        0.0031745419837534428
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0002611669769976288,
+        0.0002739999908953905,
+        0.00029808300314471126,
+        0.00026775000151246786,
+        0.0002682080084923655
+      ],
+      "host_candidate_preparation_seconds": 0.012503999983891845,
+      "host_inspection_seconds": 0.06367133298772387,
+      "independent_gpu_preparation_seconds": 0.0030737089982721955,
+      "lanes": 4,
+      "movement_context_seconds": 0.015257042017765343,
+      "movement_metadata_upload_seconds": 0.003185249981470406,
+      "native_capture_seconds": 0.0017538329993840307,
+      "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db",
+      "native_context_seconds": 0.015344333980465308,
+      "native_query_seconds": [
+        0.000588167,
+        0.000563291,
+        0.000613959,
+        0.000573,
+        0.000618125
+      ],
+      "native_request_construction_seconds": 0.0014557079994119704,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          2,
+          3
+        ],
+        "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0008710000256542116,
+        0.0008903339912649244,
+        0.0009025839972309768,
+        0.0008946250018198043,
+        0.0009134159772656858
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004527582990704104,
+      "one_lane_requests_sha256": "0b3382a7362e9061fca233055da5fae2903ac9cc2ed23a81ff667fbcbc54d141",
+      "position": "japan_round2_non_combat_movement",
+      "queries": 2568,
+      "queries_per_lane": 642,
+      "request_sha256": "6821b901fc61fab768a096426549d17436c39e08cc4b35ff11592c474b40aec9",
+      "resident_population_seconds": 0.006644707988016307,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "6ce52e04ad1a7de694e6c181782eee80a2f11121683930b82780e43d10aba862",
+          "dynamic_string_offsets": "50b4ba8b989e3542791c9e74092433e7ddfe884dfab0a10010b101ef0c1f54b6",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "cffb46250114c4d4cf0c56b55835539efec2082e42a3facd4bce87dca8161ab0",
+          "records": "37b8a4a1cfe7535a200b7817c09c58dbcc452b3b89b9a542f223c97b01f75ea2",
+          "sections": "63b02504347473d4b5648fb4593033180f66328c4f2b7830d147b1a1c3a2e4f6",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004400749981869012
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.0057092079950962216,
+      "cold_gpu_prepared_query_seconds": 0.0003049160004593432,
+      "cold_native_query_seconds": 0.00221175,
+      "cold_native_wrapper_wall_seconds": 0.0036400829849299043,
+      "cold_reset_seconds": 0.003522457991493866,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.005220291001023725,
+      "dynamic_upload_seconds": 0.00491095898905769,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "92c2df40ae250ee6df46ad4591140c09368d6f0d7c4bd6b33381cb3f7d228e1d",
+        "disallowed_queries": 10272,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 3424
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 1392,
+          "Militia must start and end in its Home Country": 672,
+          "No movement remaining": 1008,
+          "Ordinary land movement requires a land unit": 1280,
+          "Unit already moved this turn": 2752,
+          "Unit combat moved this turn": 3168
+        },
+        "verified_queries": 10272
+      },
+      "gpu_prepare_query_seconds": [
+        0.0040872500103432685,
+        0.0038521249953191727,
+        0.004090082977199927,
+        0.0041154579957947135,
+        0.004046083020512015
+      ],
+      "gpu_prepared_query_seconds": [
+        0.000335542019456625,
+        0.00033883401192724705,
+        0.00029766702209599316,
+        0.0002977499971166253,
+        0.0002858749940060079
+      ],
+      "host_candidate_preparation_seconds": 0.012503999983891845,
+      "host_inspection_seconds": 0.14699166698846966,
+      "independent_gpu_preparation_seconds": 0.0034371660149190575,
+      "lanes": 16,
+      "movement_context_seconds": 0.015257042017765343,
+      "movement_metadata_upload_seconds": 0.003185249981470406,
+      "native_capture_seconds": 0.0017538329993840307,
+      "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db",
+      "native_context_seconds": 0.015344333980465308,
+      "native_query_seconds": [
+        0.002278375,
+        0.002342459,
+        0.002172708,
+        0.0022385,
+        0.002133708
+      ],
+      "native_request_construction_seconds": 0.005619666015263647,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          8,
+          15
+        ],
+        "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db"
+      },
+      "native_wrapper_wall_seconds": [
+        0.0036051669740118086,
+        0.0036737080081366003,
+        0.0035012919979635626,
+        0.0033887079916894436,
+        0.0034172500018030405
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004527582990704104,
+      "one_lane_requests_sha256": "0b3382a7362e9061fca233055da5fae2903ac9cc2ed23a81ff667fbcbc54d141",
+      "position": "japan_round2_non_combat_movement",
+      "queries": 10272,
+      "queries_per_lane": 642,
+      "request_sha256": "5c3f0793deff96c46325f6db759ca2d3ef0a657bae11024a6e56a0d801c649b2",
+      "resident_population_seconds": 0.007196040998678654,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "6ce52e04ad1a7de694e6c181782eee80a2f11121683930b82780e43d10aba862",
+          "dynamic_string_offsets": "50b4ba8b989e3542791c9e74092433e7ddfe884dfab0a10010b101ef0c1f54b6",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "15dbccafe3238b8db959358dd37c632dc1c3ef72632ff29272c2fd526aa341e5",
+          "records": "9b99afe67234ec19beccafec6ab1d6b97947058956570af9e77214efafd95a48",
+          "sections": "89b0628154ec78c8f2f16de4dbcd4dbb6641451686d9d9c46cc5c4b5d439b339",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004400749981869012
+    },
+    {
+      "clock": {
+        "completed_rounds": 1,
+        "income_collected": false,
+        "nation_index": 2,
+        "phase": "non_combat_movement",
+        "player_turn_serial": "6",
+        "round_index": 1
+      },
+      "cold_gpu_prepare_query_seconds": 0.007164792012190446,
+      "cold_gpu_prepared_query_seconds": 0.0004692499933298677,
+      "cold_native_query_seconds": 0.00886975,
+      "cold_native_wrapper_wall_seconds": 0.014055291976546869,
+      "cold_reset_seconds": 0.003278832999058068,
+      "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
+      "device_request_replication_seconds": 0.005818583973450586,
+      "dynamic_upload_seconds": 0.00491095898905769,
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "82277e29d84c0358467f2ed1de33abb3456716191fe23f4268243dfa91f5f580",
+        "disallowed_queries": 41088,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 13696
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 5568,
+          "Militia must start and end in its Home Country": 2688,
+          "No movement remaining": 4032,
+          "Ordinary land movement requires a land unit": 5120,
+          "Unit already moved this turn": 11008,
+          "Unit combat moved this turn": 12672
+        },
+        "verified_queries": 41088
+      },
+      "gpu_prepare_query_seconds": [
+        0.005245791980996728,
+        0.00552141698426567,
+        0.0053193329949863255,
+        0.005518291000043973,
+        0.005270333000225946
+      ],
+      "gpu_prepared_query_seconds": [
+        0.0004968329740222543,
+        0.00048149999929592013,
+        0.0005347919941414148,
+        0.0004587090224958956,
+        0.0005737500032410026
+      ],
+      "host_candidate_preparation_seconds": 0.012503999983891845,
+      "host_inspection_seconds": 0.797874874988338,
+      "independent_gpu_preparation_seconds": 0.004925249988446012,
+      "lanes": 64,
+      "movement_context_seconds": 0.015257042017765343,
+      "movement_metadata_upload_seconds": 0.003185249981470406,
+      "native_capture_seconds": 0.0017538329993840307,
+      "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db",
+      "native_context_seconds": 0.015344333980465308,
+      "native_query_seconds": [
+        0.008755208,
+        0.008821042,
+        0.008704959,
+        0.009174625,
+        0.009783042
+      ],
+      "native_request_construction_seconds": 0.021259625005768612,
+      "native_source_witnesses": {
+        "full_native_state_and_all_rng_exact": true,
+        "lanes": [
+          0,
+          32,
+          63
+        ],
+        "native_checkpoint_sha256": "b86f4071140c7a5897d3ce9419d1f9c7766908e06c7b607724466c2c892927db"
+      },
+      "native_wrapper_wall_seconds": [
+        0.014148459013085812,
+        0.014717292011482641,
+        0.014251040993258357,
+        0.014853665983537212,
+        0.015323750005336478
+      ],
+      "one_lane_pack_and_upload_seconds": 0.004527582990704104,
+      "one_lane_requests_sha256": "0b3382a7362e9061fca233055da5fae2903ac9cc2ed23a81ff667fbcbc54d141",
+      "position": "japan_round2_non_combat_movement",
+      "queries": 41088,
+      "queries_per_lane": 642,
+      "request_sha256": "485609eb9919cfa13d1c5c60f8ab3fe7ed2bd0870bd5bacf96c6b08657409751",
+      "resident_population_seconds": 0.03447241699905135,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "6ce52e04ad1a7de694e6c181782eee80a2f11121683930b82780e43d10aba862",
+          "dynamic_string_offsets": "50b4ba8b989e3542791c9e74092433e7ddfe884dfab0a10010b101ef0c1f54b6",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "acf3fde98140f4f462c6fef31330e6dacdef3ccf910d410df34a71d6a3989c90",
+          "records": "18ffedefc308f0e3e02a45ed4021e2ab12513459054aa94116213cc079785739",
+          "sections": "5a6504791eeaf43030e7391404ca6e339df949a600e386fa9c04ee8f3e67a220",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "462376f7a5bb54bab105c7ec8a787b85feb22ae4d41c5f2a40bc3d491a9b0b6d",
+          "static_string_offsets": "fd9133db0877e2de9e38bd8fd1f603ea6fa846164f5c7951f7f0c77a653b497b"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      },
+      "seed": 1951,
+      "source_unchanged": true,
+      "static_upload_seconds": 0.004400749981869012
+    }
+  ],
+  "config": {
+    "batch_sizes": [
+      1,
+      4,
+      16,
+      64
+    ],
+    "cpu_budget": 12,
+    "devices": [
+      "mps"
+    ],
+    "memory_bytes": 8000000000,
+    "repeats": 5,
+    "seconds": 180.0,
+    "seed": 1951,
+    "threads": 2,
+    "warmups": 1
+  },
+  "coverage": {
+    "japan_round1_combat_movement": {
+      "allowed_queries_per_lane": 39,
+      "disallowed_queries_per_lane": 909
+    },
+    "japan_round1_non_combat_movement": {
+      "allowed_queries_per_lane": 0,
+      "disallowed_queries_per_lane": 738
+    },
+    "japan_round2_combat_movement": {
+      "allowed_queries_per_lane": 20,
+      "disallowed_queries_per_lane": 754
+    },
+    "japan_round2_non_combat_movement": {
+      "allowed_queries_per_lane": 0,
+      "disallowed_queries_per_lane": 642
+    }
+  },
+  "device": "mps",
+  "device_memory": {
+    "driver_bytes": 1127170048,
+    "live_bytes": 12288
+  },
+  "device_runtime": {
+    "checkpoint_scope": "Derived process-local cache state; counters reset on fresh construction and pending count resets after restore",
+    "clear_every_actor_forwards": 32,
+    "clear_seconds": 0.08474370898329653,
+    "clears": 17,
+    "device": "mps",
+    "pending_actor_forwards": 5,
+    "resets": 17,
+    "schema": "campaign-mps-graph-cache-policy-v1",
+    "torch": "2.14.0",
+    "total_actor_forwards": 80
+  },
+  "elapsed_worker_seconds": 28.358102208992932,
+  "gpu_paths": [
+    "New immutable view over unchanged resident buffers: shared politics/declarations/index preparation + path query",
+    "Supplied source-bound preparation: path query allocation/dispatch/synchronization only"
+  ],
+  "guard": {
+    "cpu_budget": 12,
+    "diagnostic": null,
+    "elapsed_seconds": 29.297300792008173,
+    "margin_bytes": 1000000000,
+    "memory_bytes": 8000000000,
+    "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+    "mps_allocator_reserved_bytes": 3000000000,
+    "sampled_peak_charged_bytes": 4928333208,
+    "shared_deadline_monotonic": 218961.007106916
+  },
+  "limitations": [
+    "Replicated states exercise batched query parallelism, not varied simultaneous games.",
+    "Native timing is a sequential component baseline, not a twelve-core parallel route service.",
+    "Geometric paths include illegal candidates; report allowed/rejection distributions before interpreting speed.",
+    "Path validation does not enumerate all game actions or commit movements, and does not measure search or learning."
+  ],
+  "matched_complete_route_queries_and_sources": true,
+  "native_baseline": "Sequential original validateRoute on one native thread, prebuilt requests, strong owners/unique locks/pointers/output-vector allocation before native timer; complete owned result construction inside timer; Python boxing outside",
+  "preparation_completed_three_round_games": 1,
+  "preparation_safety_limits": {
+    "max_state_visits": 20,
+    "max_transitions": 5000
+  },
+  "preparation_seconds": 12.497723040985875,
+  "preparation_selection": "campaign-active-baseline-v2:balanced; unchanged sampled_step; no neural model",
+  "provenance": {
+    "backend_source_sha256": {
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "66b83f20b5adcf3575deaa561d78eaab82e7d6fbabe0f317509ad54b241887a9",
+      "studies/campaign/backends/content_digest_metal.py": "da74e9e62c9fdac3fdb158e48a55848e5d50c96aa5cf9b8cb949d928e40a4f64",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "3383936937a3a0dd049f7d64ac9ddb2a1d25f378316e2db3c2505ae38fa559c3",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_chance_io.py": "30adf899875fb92425d60446dd9d0efd4a69da6752f7535d43ce2ba4a7bf4f74",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_events.py": "72a1406ce72c332578853a62dbf3b7318162f137cb6f8c2e335042da36303f20",
+      "studies/campaign/backends/resident_recruitment.py": "c7b0116bbc79b1b20a6655c99aa995072e3521f6a60635c876eb208c57cfd3e0",
+      "studies/campaign/backends/resident_recruitment_chance.py": "2704fa5ae6bc578d616326a39b35bdaa3fd735cf1ed2c5cab5775246c35bbd48",
+      "studies/campaign/backends/resident_relations.py": "096e3f058bf9cd935927e66f8708d68854d66a04220b7ce4556acef22040eea2",
+      "studies/campaign/backends/resident_routes.py": "fed1c34fb14c4b866a65bb855e2e776c6403f36c5818642966d72dc00011bd27",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "969e7876a238a8e646262ec053f01996d1119985b716838b629f2da89713df74",
+      "studies/campaign/backends/resident_training_reset.py": "54bab8b853c6e16f10f6a168dd982bf01a71f1b9be070930c09de86f7b70b72e",
+      "studies/campaign/backends/resident_wealth.py": "042617e7d9e577980d387039dcd8a8c5b1c6638b3c2839ae9fd8059655614c6a",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde"
+    },
+    "branch": "codex/gpu-selfplay",
+    "commit": "ad82f21bc8704e2c059b7f6798fb37dd2c5bd5a5",
+    "dirty": "M src/python_recruitment.inc\n M studies/campaign/backends/resident_recruitment.py\n?? studies/campaign/backends/resident_recruitment_chance.py",
+    "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+    "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+    "native_sha256": "66cbc977e5a2d0d25aff7a271a445f69c4a59f4abb387aab25764fb43a88bc3c",
+    "route_harness_sha256": "4f6220503bc96ec03db52f981e8161e4c7be2e7788c85d29dbee3dd6bd5d1871",
+    "route_native_boundary_sha256": "e7ab8904454d03b0b30868d7c738a9795d9456b933b36345d293c341d50a0a0d",
+    "route_native_probe_sha256": "9b3cf7c87b12b8538405e73402e3d695df463d52225a99634a38ba07d63c1ebd",
+    "runtime_source_sha256": {
+      "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+      "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+      "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+      "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+      "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+      "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+      "include/game/campaign_actions.hpp": "daa32274f29584ebaa968eb2a103a10234716bdf783359b2fa99abd073c21840",
+      "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+      "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+      "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+      "include/game/campaign_objective.hpp": "49c20d313c421540b1827e335ac56b0d71080fe98f84686127fb1da2c541c2b1",
+      "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+      "include/game/catalog_stats_context.hpp": "2186ad8355ef849e2f4d58e4a7e905c98a50ee5e283f5bce1b10cf0882a69466",
+      "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+      "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+      "include/game/device_state.hpp": "f65d37f53c305ed31a3d963f15a7da99f87fecaddbdfb6df58edd29260ac6f1c",
+      "include/game/economy.hpp": "fe09aad87e0118d13ee876c5e4a17d3824a4d00ecab5aab180cfa52daf62de1e",
+      "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+      "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+      "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+      "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+      "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+      "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+      "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+      "include/game/movement.hpp": "1923dca4e7bb871f1b82ba3af12f1a7eba5ad3cfddf55cee47719549b4fefb07",
+      "include/game/movement_context.hpp": "aaa5f819b01c5700b04b452aeefeceaf11903c78339304e5d468c20f5b6d2e60",
+      "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+      "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+      "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+      "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+      "include/game/politics.hpp": "6d2d90babc49f0b8aa05860ed02c73ae63f2a3498409cec481ba4a46e16434ab",
+      "include/game/recruitment_context.hpp": "2417a096bce8e99be37804033542a6adf74a2870e4373d983d96698195e4623a",
+      "include/game/relations_context.hpp": "ce6496ff656c9c07319142fdbbf0599d32a0ba721b3f850b79b76896d42b6d6e",
+      "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+      "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+      "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+      "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+      "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+      "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+      "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+      "include/game/wealth_context.hpp": "bcd1c19be4d4a8c7dc1e216d585ddac67ee79c3c6cb8063d9d99b85681de3ac0",
+      "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+      "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+      "src/campaign_actions.cpp": "65a92d7004e8e5f311322752eb19cb41f884cf9a3caffba71335ca17c47464ec",
+      "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+      "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+      "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+      "src/campaign_objective.cpp": "89e41515cfb7c2b514a97b50b91ae927d1435bdd17bd6336ea353248d8bb7cd5",
+      "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+      "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+      "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+      "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+      "src/catalog_stats_context.cpp": "a9ac386bc250560f909a4dfd577f907af720bb008bb051c86d542ad9d70ec6b8",
+      "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+      "src/device_state.cpp": "eb78a6b8a340c4992fa44c2bc0e3c052d6f2ed2ef795cd2b23b9f43e4be2d660",
+      "src/economy.cpp": "321dab0141e648dc048050fa53303d903e55b6b447d8b8b65bd0cb6bc195d351",
+      "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+      "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+      "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+      "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+      "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+      "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+      "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+      "src/movement.cpp": "3ec103333e213754c90626ecb4134b27f1db9155ff8f48b1770fe26ca9c81b95",
+      "src/movement_context.cpp": "ac4bc3906c822936a924398ec35ba973755df7f1a49e6219633065ff282acedb",
+      "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+      "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+      "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+      "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+      "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+      "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+      "src/politics.cpp": "cdb29cf8e0cd87986bb1f6c5fab4ccf7ab2c6c5e39608cc076978647303a3438",
+      "src/politics_influence.cpp": "501e3546277499d006d822bdb24e7f25969c48f49f4cefeb494eeaf704f4da25",
+      "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+      "src/python_action_ids.inc": "94d62ff5e013367f55707df8439c59070786bbd31f38afb29e042aca93b62181",
+      "src/python_bindings.cpp": "e7ab8904454d03b0b30868d7c738a9795d9456b933b36345d293c341d50a0a0d",
+      "src/python_canonical_json.inc": "3419166c8337e92baafac9bb6e51591fc42ecc12b1dcca3ea2381fbe5020adb0",
+      "src/python_catalog_stats.inc": "b2c8dfe0cc33f82cd0a1e598af248280d16061af5e80848a75953bb3baf590ab",
+      "src/python_content_digest.inc": "6b056d520ccb8b958bf66c45fe34d33d912846e41a6f0c1aa905defd8771be20",
+      "src/python_device_state.inc": "6a6d754afb473f41c528d8c58fc87af6bea595a4de8e480e1e3faf9d9d617491",
+      "src/python_event_append.inc": "9df1e309a22652c949316b7bc19156a538d9e06dbf44c886f980b591870fa6d6",
+      "src/python_income_ledger.inc": "ddc964a464c04b30cd6aab146a61097e38397996a29f9a76b05f6d1e30a4f44c",
+      "src/python_movement_context.inc": "9b3cf7c87b12b8538405e73402e3d695df463d52225a99634a38ba07d63c1ebd",
+      "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+      "src/python_recruitment.inc": "db6bce0883aeb6ffced4a47442d6a26467228b9d3cc96e852ea9b7181f1a6516",
+      "src/python_relations.inc": "382a7e320efdb46d708887249180575b6b37efc50c8420fefcb806f0ee9078b2",
+      "src/python_state_json.inc": "00958de32a9e787734c301a2f291577e3fa8a002778a36b7e7733cc3acbadbc5",
+      "src/python_training_reset.inc": "cce35d564a17b85ca096cd47ffd1733305937e76f6a6bfed3fb1bfe50856d908",
+      "src/python_wealth.inc": "8a6a5f15ebf02783ccf9d219347a1f3f86f91568ce85e63feceab5c1c411498e",
+      "src/recruitment_context.cpp": "b8bdc92658a486236e2c14b711e90f0aa8619ae59a872a5665adce1214d6919e",
+      "src/relations_context.cpp": "f251d362fb84c8d58c48b19b96810627d3e58ec94953db26ca566b0f34ad995f",
+      "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+      "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+      "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+      "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+      "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+      "src/wealth_context.cpp": "9717259f68f9a295e6291269705f58d680de0e88fbd483ca169a04394942b7a4",
+      "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "66b83f20b5adcf3575deaa561d78eaab82e7d6fbabe0f317509ad54b241887a9",
+      "studies/campaign/backends/content_digest_metal.py": "da74e9e62c9fdac3fdb158e48a55848e5d50c96aa5cf9b8cb949d928e40a4f64",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "3383936937a3a0dd049f7d64ac9ddb2a1d25f378316e2db3c2505ae38fa559c3",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_chance_io.py": "30adf899875fb92425d60446dd9d0efd4a69da6752f7535d43ce2ba4a7bf4f74",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_events.py": "72a1406ce72c332578853a62dbf3b7318162f137cb6f8c2e335042da36303f20",
+      "studies/campaign/backends/resident_recruitment.py": "c7b0116bbc79b1b20a6655c99aa995072e3521f6a60635c876eb208c57cfd3e0",
+      "studies/campaign/backends/resident_recruitment_chance.py": "2704fa5ae6bc578d616326a39b35bdaa3fd735cf1ed2c5cab5775246c35bbd48",
+      "studies/campaign/backends/resident_relations.py": "096e3f058bf9cd935927e66f8708d68854d66a04220b7ce4556acef22040eea2",
+      "studies/campaign/backends/resident_routes.py": "fed1c34fb14c4b866a65bb855e2e776c6403f36c5818642966d72dc00011bd27",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "969e7876a238a8e646262ec053f01996d1119985b716838b629f2da89713df74",
+      "studies/campaign/backends/resident_training_reset.py": "54bab8b853c6e16f10f6a168dd982bf01a71f1b9be070930c09de86f7b70b72e",
+      "studies/campaign/backends/resident_wealth.py": "042617e7d9e577980d387039dcd8a8c5b1c6638b3c2839ae9fd8059655614c6a",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+      "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+      "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+      "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+      "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+      "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+      "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+      "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+      "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+      "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+      "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+      "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+      "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+      "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+      "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+      "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+      "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+      "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+    },
+    "state_harness_sha256": "27cb95c0bf707328c3aeb0ba5dcb98b2c342153d69b8fd9ebe26b69540c8f54a",
+    "supervisor_source_sha256": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+  },
+  "schema": "campaign-resident-route-query-benchmark-v1",
+  "scope": "Guarded matched native/Metal supplied-path validation component benchmark.\n\nThe unchanged sampled balanced script must finish a genuine three-round game.\nFour complete Japan snapshots supply all current movement-controlled land units,\nall simple one/two-hop geometric paths, and every full movement-route menu path.\nEvery candidate is retained. Native validateRoute computes complete owned native\nresults under a native timer: Python boxing, unique mutex locking and inspection\nare excluded. GPU measurements separately cover fresh relation/index preparation\nplus queries, and queries reusing source-bound preparation. This is neither a\ncomplete legal-menu generator nor full gameplay, search or training throughput.\n",
+  "scripted_transitions": 687,
+  "software": {
+    "interop_threads": 1,
+    "python": "3.13.5",
+    "threads": 2,
+    "torch": "2.14.0"
+  },
+  "sources_unchanged": true,
+  "status": "completed",
+  "task": {
+    "calendar_rounds": 3,
+    "compatibility": {
+      "actions": "campaign-orders-v1",
+      "curriculum": "regional-horizon-curriculum-v1",
+      "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+      "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+      "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+    },
+    "full_target_game": false,
+    "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+    "setup": "unchanged approved 99-piece,37-node July1936 setup",
+    "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+    "version": "regional-horizon-curriculum-v1"
+  },
+  "terminal_checkpoint_sha256": "04a4de85a321e2cbc60ef77599fc75e700e357854b893c22bb82aa52d5ed6f45",
+  "workload_sha256": "e312871d467d75ecc4f9fc6c8d67cef187551b8ca5ec0eb30630358af9f8fc71"
+}

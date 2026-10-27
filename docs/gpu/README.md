@@ -19,6 +19,8 @@ The [resident political-query results](metal_political_queries_2026_10_26.md)
 compare the complete native and GPU permission matrices at several batch sizes.
 The [cooperative-query follow-up](metal_political_queries_parallel_2026_10_26.md)
 records the later parallel kernel and its remaining small-batch limits.
+The [supplied-route measurements](metal_routes_2026_10_26.md) include fresh
+preparation, reused views and the actual legal/rejected-path coverage.
 
 ## Execution contract
 
