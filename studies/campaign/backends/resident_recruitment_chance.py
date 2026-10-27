@@ -363,6 +363,31 @@ def _invalid_identities(identities,state,invalid):
         engine_keys=replace(identities.engine_keys,errors=identities.engine_keys.errors|invalid))
 
 
+def forward_training_decision(state,selected,capacities):
+    """Exact bounded screening hook; retained force selection is unsupported."""
+    B,C=state.records.shape[:2];K=capacities.block_capacity;dev=state.device
+    blocks=torch.empty((B,K,5),dtype=torch.int64,device=dev)
+    actual,counts,roots,errors,required=(torch.zeros(B,dtype=torch.int64,device=dev) for _ in range(5))
+    unsupported=torch.zeros(B,dtype=torch.bool,device=dev);screens=torch.zeros_like(unsupported)
+    _call(_kernels().recruitment_screen_forward,(state.records,state.lengths,state.sections,state.errors,
+        state.context.string_bytes,state.context.string_offsets,state.string_bytes,state.string_offsets,state.suffix_usage,
+        selected,blocks,actual,counts,roots,errors,unsupported,required,screens,
+        _dimensions((B,C,K,state.context.string_count,state.context.string_bytes.numel(),state.string_offsets.numel()-1,
+                     state.string_bytes.numel()))),B)
+    healthy=~(errors!=0).any()&~unsupported.any()
+    lanes=torch.arange(B,dtype=torch.int64,device=dev)
+    headers=state.records.reshape(-1,5).index_select(0,lanes*C+roots.clamp(0,max(C-1,0)))
+    remove=headers[:,1].contiguous()
+    build=build_sequence_splices(state,roots,torch.zeros_like(roots),remove,blocks,actual,counts,
+                                 selected&screens&healthy,capacity=K)
+    edited=commit_container_edits(build,capacity=capacities.state_capacity)
+    bad=(build.errors!=0)|(edited.edit_errors!=0)
+    capacity_bad=((build.errors&64)!=0)|((edited.edit_errors&8)!=0)
+    errors|=torch.where(bad,torch.where(capacity_bad,int(RecruitmentForwardError.CAPACITY),int(RecruitmentForwardError.PACKED)),0)
+    return _ForwardResult(edited.state,errors,unsupported,edited.required_state_capacity,
+        torch.maximum(required,build.required_capacity),~(errors!=0).any()&~unsupported.any()&edited.committed)
+
+
 class ResidentRecruitmentChance:
     def __init__(self,state_context,effects,income_context,state_json,*,reuse_certified_source=False,random_implementation=None):
         if type(reuse_certified_source) is not bool:raise TypeError("Certified source reuse must be an explicit bool")
@@ -402,28 +427,7 @@ class ResidentRecruitmentChance:
                 raise ValueError("Recruitment chance source buffers must remain contiguous")
 
     def _forward(self,state,selected,capacities):
-        """Exact bounded screening hook; retained force selection is unsupported."""
-        B,C=state.records.shape[:2];K=capacities.block_capacity;dev=state.device
-        blocks=torch.empty((B,K,5),dtype=torch.int64,device=dev)
-        actual,counts,roots,errors,required=(torch.zeros(B,dtype=torch.int64,device=dev) for _ in range(5))
-        unsupported=torch.zeros(B,dtype=torch.bool,device=dev);screens=torch.zeros_like(unsupported)
-        _call(_kernels().recruitment_screen_forward,(state.records,state.lengths,state.sections,state.errors,
-            state.context.string_bytes,state.context.string_offsets,state.string_bytes,state.string_offsets,state.suffix_usage,
-            selected,blocks,actual,counts,roots,errors,unsupported,required,screens,
-            _dimensions((B,C,K,state.context.string_count,state.context.string_bytes.numel(),state.string_offsets.numel()-1,
-                         state.string_bytes.numel()))),B)
-        healthy=~(errors!=0).any()&~unsupported.any()
-        lanes=torch.arange(B,dtype=torch.int64,device=dev)
-        headers=state.records.reshape(-1,5).index_select(0,lanes*C+roots.clamp(0,max(C-1,0)))
-        remove=headers[:,1].contiguous()
-        build=build_sequence_splices(state,roots,torch.zeros_like(roots),remove,blocks,actual,counts,
-                                     selected&screens&healthy,capacity=K)
-        edited=commit_container_edits(build,capacity=capacities.state_capacity)
-        bad=(build.errors!=0)|(edited.edit_errors!=0)
-        capacity_bad=((build.errors&64)!=0)|((edited.edit_errors&8)!=0)
-        errors|=torch.where(bad,torch.where(capacity_bad,int(RecruitmentForwardError.CAPACITY),int(RecruitmentForwardError.PACKED)),0)
-        return _ForwardResult(edited.state,errors,unsupported,edited.required_state_capacity,
-            torch.maximum(required,build.required_capacity),~(errors!=0).any()&~unsupported.any()&edited.committed)
+        return forward_training_decision(state,selected,capacities)
 
     def resolve(self,before,expected,*,capacities,selected=None,sampled=None,profile=None):
         """Resolve sampled recruitment only, retaining the original transaction on failure.

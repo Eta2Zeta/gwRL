@@ -75,6 +75,9 @@ simultaneous evolution and surrender effects.
 The [recruitment-choice checks](resident_recruitment_choices_2026_10_27.md) cover
 unit placement, free ship work and facility repairs using the cached current
 menu, followed by that complete internal political refresh.
+The [complete recruitment-choice actions](resident_recruitment_choice_actions_2026_10_27.md)
+connect those effects to native-equivalent income, checks and action logging,
+with explicit remaining capabilities and CPU regression evidence.
 
 ## Execution contract
 

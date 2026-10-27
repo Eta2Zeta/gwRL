@@ -216,6 +216,7 @@ using CampaignEnv = game::campaign::CampaignEnv;
 #include "python_chinese_truce.inc"
 #include "python_political_facts.inc"
 #include "python_recruitment_choice.inc"
+#include "python_recruitment_choice_action.inc"
 
 // Immutable owning views outlive an environment mutation without copying its
 // state tree. Only small scheduler fields overlay the complete native document.
@@ -592,6 +593,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     bindChineseTruce(module);
     bindPoliticalFacts(module);
     bindRecruitmentChoice(module);
+    bindRecruitmentChoiceAction(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)
