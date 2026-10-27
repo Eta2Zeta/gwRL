@@ -21,6 +21,11 @@ The [cooperative-query follow-up](metal_political_queries_parallel_2026_10_26.md
 records the later parallel kernel and its remaining small-batch limits.
 The [supplied-route measurements](metal_routes_2026_10_26.md) include fresh
 preparation, reused views and the actual legal/rejected-path coverage.
+The [combined-preparation comparison](metal_route_preparation_2026_10_26.md)
+records the later one-dispatch implementation and its small-batch limits.
+The separate [income-rate correction](income_refresh_correction_2026_10_26.md)
+versions a CPU correctness fix discovered while connecting GPU chance effects;
+it is not counted as an optimization or applied to historical checkpoints.
 
 ## Execution contract
 
