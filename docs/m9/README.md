@@ -1,5 +1,7 @@
 # M9: naval, carrier and amphibious operations
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 **Status: implemented and source exit verified, 23 October 2026.** RCL-014 now
 follows the developer clarification supplied by the user: an evacuating fleet
 defends and the enemy fleet already at sea attacks, even during a third nation's
@@ -41,7 +43,7 @@ inactive under the frozen campaign profile.
 
 Current targeted coverage: **21 naval-movement groups, 17 naval-combat groups,
 and 27 naval-operations groups**, with shared land-combat and air-integration
-checks. The [source exit record](source_exit_2026_10_23.json) records the source
+checks. The [source exit record](../archive/milestones/m9/source_exit_2026_10_23.json) records the source
 findings, test commands and evidence hashes before the RCL-014 role correction;
 its provisional-role statements are historical. The
 [checkpoint record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m9/checkpoint_2026_10_22.json)
@@ -49,10 +51,10 @@ preserves the earlier 22 October partial checkpoint.
 
 Four durable traces verify complete sequences and exact replay:
 
-- [Clear Japan-to-China voyage and landing](evidence/combined_clear_2026_10_23.json).
-- [Contested screening followed by reinforcement and landing](evidence/combined_contested_2026_10_23.json).
-- [Failed screening and retreat with linked cargo](evidence/combined_retreat_2026_10_23.json).
-- [One combined overland/amphibious battle with an overland-only retreat](evidence/combined_overland_amphibious_2026_10_23.json).
+- [Clear Japan-to-China voyage and landing](../archive/milestones/m9/evidence/combined_clear_2026_10_23.json).
+- [Contested screening followed by reinforcement and landing](../archive/milestones/m9/evidence/combined_contested_2026_10_23.json).
+- [Failed screening and retreat with linked cargo](../archive/milestones/m9/evidence/combined_retreat_2026_10_23.json).
+- [One combined overland/amphibious battle with an overland-only retreat](../archive/milestones/m9/evidence/combined_overland_amphibious_2026_10_23.json).
 
 The last trace resolves shore fire before the merged land battle. Separate
 ordinary land battles remain available; a same-nation attack on the assault's

@@ -74,7 +74,7 @@ historical snapshots. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds en
   records the specification freeze and verified artifacts.
 - [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): rules ledger, national
   audits, purchase-price tables, approved decisions and completed verification.
-- [M9 naval exit](/Users/home/Desktop/gwRL/docs/m9/source_exit_2026_10_23.json):
+- [M9 naval exit](../../../docs/archive/milestones/m9/source_exit_2026_10_23.json):
   reviewed sources and four combined voyage/landing/retreat traces.
 - [M10 integration evidence](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m10/integration_evidence_2026_10_23.json):
   two complete campaign replays and the source-linked runtime ledger.

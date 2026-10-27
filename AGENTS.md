@@ -51,6 +51,19 @@
   the best learning method or that this campaign can train to useful strength on
   the available hardware; keep those claims subject to measured evaluation.
 
+## Documentation
+
+- Keep `docs/README.md` as the current project guide, with the root README
+  pointing to it. Update existing architecture, workflow and performance guides
+  instead of appending experiment history to current instructions.
+- Keep dated reports and curated JSON evidence together in `docs/archive/`, with
+  provenance and preservation hashes. Routine validation belongs in the commit;
+  create a report when an experiment or decision needs durable evidence.
+- Preserve active scenario/catalog data, rule clarifications and coverage inputs
+  at their established paths unless their consumers change with them. Follow the
+  retention conventions in `docs/development.md` and run
+  `./.venv/bin/python tools/check_documentation.py` after documentation changes.
+
 ## References
 
 For STEM questions, especially mathematics and physics, first look for references

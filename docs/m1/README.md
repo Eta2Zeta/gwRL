@@ -1,5 +1,7 @@
 # M1: world-to-theatre bridge
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 Status: **complete and verified on 21 October 2026**. All **119 repository Python
 tests pass**, including **52 bridge, geographic-feature and faction tests**.
 

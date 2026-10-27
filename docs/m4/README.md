@@ -1,5 +1,7 @@
 # M4: politics, warlords and national turns
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 Status: **complete and verified on 21 October 2026**. All ten CTest suites and
 all 128 Python tests pass. The three political suites cover 34 fixture groups.
 No M4 user decision remains open.

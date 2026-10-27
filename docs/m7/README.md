@@ -1,5 +1,7 @@
 # M7: authoritative land combat
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 **Status: land-battle layer implemented; truce combat reconciled and RCL-012
 closed on 22 October 2026.**
 

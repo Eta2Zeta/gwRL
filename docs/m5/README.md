@@ -1,5 +1,7 @@
 # M5: movement and shared logistics
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 M5 implements land movement and the reusable logistics queries needed by economy,
 air operations and the later naval module. Movement decisions carry a stable unit
 ID and an explicit route. The engine retains the turn origin, each traversed zone,

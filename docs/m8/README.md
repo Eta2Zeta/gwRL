@@ -1,5 +1,7 @@
 # M8: air operations, bombing and defensive reactions
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 **Status: complete, 22 October 2026.** RCL-013 is adopted: Advanced Artillery
 city bombardment uses attrition's starting-adjacency and no-movement conditions,
 while retaining its separate 1D6 city damage.

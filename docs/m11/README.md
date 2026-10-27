@@ -1,5 +1,7 @@
 # M11: multi-agent environment and stochastic vector search
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 **Status: correctness exit complete, 23 October 2026.** The adapter, wealth and
 search checks pass alongside M10's two full campaign replays. Search correctness
 on small exact fixtures does not establish full campaign playing strength.
@@ -45,7 +47,7 @@ asset's current owner. Intermediate returns are zero.
 
 ## Verification and use
 
-The [search verification](search_verification.json) records 16 exact-oracle,
+The [search verification](../archive/milestones/m11/search_verification.json) records 16 exact-oracle,
 stochastic, reaction, action-order, cache, RNG and interrupt-scheduler tests with
 stated budgets and tolerances. Additional C++ and Python binding checks exercise
 the actual 99-piece campaign and wealth accounting. The

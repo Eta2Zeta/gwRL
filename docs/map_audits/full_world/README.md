@@ -158,7 +158,7 @@ conditional bonus belongs in the rules profile.
 | [input_manifest.json](data/input_manifest.json) | Source and production-file hashes |
 | [rebuild_check.json](data/rebuild_check.json) | Both existing generators reproduce the current files byte-for-byte when redirected to temporary output |
 | [validation_report.json](data/validation_report.json) | Final coverage, reference, reciprocal-proposal and source-preservation checks |
-| [evidence/](evidence/) | Original-map diagnostic crops supporting the regional reports |
+| `evidence/` (local images) | Original-map diagnostic crops supporting the regional reports; ignored by Git and absent from a clean clone |
 
 The glossary comparison tables and regional expected-node files are also in
 `data/`. They record express source requirements, not default values for every

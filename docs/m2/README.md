@@ -1,5 +1,7 @@
 # M2: shared engine state and execution foundation
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 Status: **complete and verified on 21 October 2026**. All six CTest suites and
 all 119 repository Python tests pass. No user decision remains for M2.
 
@@ -106,7 +108,7 @@ its public action execution rejects choices absent from its legal-action list.
 The existing Python API and encoder shapes are preserved during migration.
 
 See the [verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m2/verification.json)
-and [benchmark results](/Users/home/Desktop/gwRL/docs/m2/benchmark.json).
+and [benchmark results](../archive/milestones/m2/benchmark.json).
 The historical M0/M1 records remain intact; this implementation does not change
 the approved scenario data. M3 adds the executable unit/facility catalog, and
 subsequent milestones implement the game-rule modules on this foundation.

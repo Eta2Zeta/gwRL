@@ -1,12 +1,14 @@
 # M10: completed campaign integration
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 **Status: complete for the frozen 37-node campaign, 23 October 2026.** Two games
 start from the unchanged approved July 1936 setup and finish all 44 national
 turns through July 1941. Their 2,847 transitions pass replay, resource/identity
 checks and structural/domain invariants after every transition. This certifies
 the selected campaign; it does not claim global-map support or a trained agent.
 
-The [integration evidence report](/Users/home/Desktop/gwRL/docs/m10/integration_evidence_2026_10_23.md)
+The [integration evidence report](../archive/milestones/m10/integration_evidence_2026_10_23.md)
 and [machine-readable summary](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m10/integration_evidence_2026_10_23.json)
 record policy seeds, source hashes, terminal wealth and verification limits.
 

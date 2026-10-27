@@ -1,5 +1,7 @@
 # M3: unit, facility and technology catalog
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 Status: **complete and verified on 21 October 2026**. All seven CTest suites and
 all 128 repository Python tests pass. No M3 user decision remains.
 

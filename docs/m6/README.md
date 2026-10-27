@@ -1,5 +1,7 @@
 # M6 — economy, production, construction and research
 
+> Completed milestone reference. Test counts, timings and next steps below describe this delivery. Use the [project guide](../README.md) for current status and instructions.
+
 Implemented on 2026-10-22. The milestone's accounting and production gate is covered by fourteen behavioral fixture groups in `tests/economy_tests.cpp`; the root milestone verification record captures the final integrated checks. M0–M4 frozen records are preserved.
 
 The implementation uses `include/game/economy.hpp`, `src/economy.cpp` and `src/economy_lendlease.cpp`, backed by `game_content/rules/gw36_economy_v43.json`. The source profile contains 22 rules and six sources. Catalog national rows remain the authority for prices, dates, technologies and purchase limits. M5 supplies typed supply routes, held-since-start checks, blockades, facility coasts and the special final-recipient lend-lease route.

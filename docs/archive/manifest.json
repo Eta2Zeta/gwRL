@@ -1,0 +1,666 @@
+{
+  "schema_version": 1,
+  "source_commit": "fecf8ddba8eaa16673864c3a3203f69608f10c25",
+  "entries": [
+    {
+      "original_path": "docs/gpu/README.md",
+      "archive_path": "docs/archive/gpu/overview_before_consolidation_2026_10_27.md",
+      "sha256": "79588b908b42ccf755778e9fe3833a555e108c9710b762f3a34b6167c68ed02e",
+      "bytes": 27331
+    },
+    {
+      "original_path": "docs/gpu/canonical_integer_width_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/canonical_integer_width_2026_10_27.md",
+      "sha256": "c0b184d9c3a10779b52d044b4095a3a3b65ac87f93c1e1f7d11c10d5dfeb77cd",
+      "bytes": 1181
+    },
+    {
+      "original_path": "docs/gpu/cpu_foundation_2026_10_25.json",
+      "archive_path": "docs/archive/gpu/cpu_foundation_2026_10_25.json",
+      "sha256": "80d7dc3100e14ed210bf540bd92c93fc89c415a766382bd1b78188d4827dc579",
+      "bytes": 49437
+    },
+    {
+      "original_path": "docs/gpu/cpu_foundation_2026_10_25.md",
+      "archive_path": "docs/archive/gpu/cpu_foundation_2026_10_25.md",
+      "sha256": "bc68883ad07961f15d55e0d3e75addc83bde757560fa48ab9789c5b5eb9b5045",
+      "bytes": 3938
+    },
+    {
+      "original_path": "docs/gpu/gpu_backend_2026_10_26_results.json",
+      "archive_path": "docs/archive/gpu/gpu_backend_2026_10_26_results.json",
+      "sha256": "377079a92e7ba66a26efba695773995793e21dee637090516aee6b94e053b367",
+      "bytes": 226512
+    },
+    {
+      "original_path": "docs/gpu/gpu_backend_2026_10_26_results.md",
+      "archive_path": "docs/archive/gpu/gpu_backend_2026_10_26_results.md",
+      "sha256": "0ab5519bacb27f8f3921854a884a2263001a439c67aa35d488f0b35ce03ea83e",
+      "bytes": 10113
+    },
+    {
+      "original_path": "docs/gpu/income_refresh_correction_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/income_refresh_correction_2026_10_26.md",
+      "sha256": "094d0ec54c9b1858f171c21c245246012eba6afec667e5745b27441d16deeac3",
+      "bytes": 2292
+    },
+    {
+      "original_path": "docs/gpu/metal_connected_clone_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_connected_clone_2026_10_26.json",
+      "sha256": "4323624ca466f38446d648d062e004a8833382b8286fd60d10507625fe5bcb23",
+      "bytes": 167606
+    },
+    {
+      "original_path": "docs/gpu/metal_connected_clone_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_connected_clone_2026_10_26.md",
+      "sha256": "b1de13b4f840b80c6e0c6f940874c665f5a1639450b076092672009bf929e6bf",
+      "bytes": 5780
+    },
+    {
+      "original_path": "docs/gpu/metal_container_factorial_2026_10_27.json",
+      "archive_path": "docs/archive/gpu/metal_container_factorial_2026_10_27.json",
+      "sha256": "5d5646e66c8a9a098a6f21f9cc3fcda5461b251b2b32e2604065d73f5aa75c61",
+      "bytes": 80711
+    },
+    {
+      "original_path": "docs/gpu/metal_container_factorial_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/metal_container_factorial_2026_10_27.md",
+      "sha256": "dfe59c32a3692b3a284a5268c03c598c5bf80dae74841220e7b60d88b2587409",
+      "bytes": 4627
+    },
+    {
+      "original_path": "docs/gpu/metal_editor_copy_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_editor_copy_2026_10_26.json",
+      "sha256": "48f3ae2023978eaa85c61a7e3c07ca86100dd3cbf700e98f9755f7ebd40ff941",
+      "bytes": 59982
+    },
+    {
+      "original_path": "docs/gpu/metal_editor_copy_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_editor_copy_2026_10_26.md",
+      "sha256": "8a400a4d4871400fd29a6877a3fd7473ce38b790ce96be06093ef09d1c41707e",
+      "bytes": 5538
+    },
+    {
+      "original_path": "docs/gpu/metal_field_json_experiment_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_field_json_experiment_2026_10_26.json",
+      "sha256": "23daf14517a3ebc843e5c6a21f842d3079715686017eeb8de0dd99ad82030e8b",
+      "bytes": 49128
+    },
+    {
+      "original_path": "docs/gpu/metal_field_json_experiment_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_field_json_experiment_2026_10_26.md",
+      "sha256": "a45437f58ca08aed5c4c63d0c550c3ac42066c3d0555fa62db5fc371ce128431",
+      "bytes": 3748
+    },
+    {
+      "original_path": "docs/gpu/metal_identity_optimizations_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_identity_optimizations_2026_10_26.json",
+      "sha256": "03d899051bac18c43b4cc6bfc68cf86bb807b616f97691605a139d93c80162f3",
+      "bytes": 57948
+    },
+    {
+      "original_path": "docs/gpu/metal_identity_optimizations_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_identity_optimizations_2026_10_26.md",
+      "sha256": "d6f74fcfecab487bdf0af68f2ccd1e9cc4036112805849745541a61565ec3f67",
+      "bytes": 5001
+    },
+    {
+      "original_path": "docs/gpu/metal_identity_profile_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_identity_profile_2026_10_26.json",
+      "sha256": "92810a571628aac79852b279f962bf9f68509abde087e0b2340149c9cb819bc7",
+      "bytes": 53996
+    },
+    {
+      "original_path": "docs/gpu/metal_identity_profile_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_identity_profile_2026_10_26.md",
+      "sha256": "4aa033bb1f2ee620a6329649b59155bd2b7f4cb14fa760aeb40a88f001a3c0ff",
+      "bytes": 1959
+    },
+    {
+      "original_path": "docs/gpu/metal_income_refresh_profile_2026_10_27.json",
+      "archive_path": "docs/archive/gpu/metal_income_refresh_profile_2026_10_27.json",
+      "sha256": "395b106d954f19d2d79edb462bd9de7dcce755da6bbf6fa7f19f47a121db7b70",
+      "bytes": 79037
+    },
+    {
+      "original_path": "docs/gpu/metal_income_refresh_profile_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/metal_income_refresh_profile_2026_10_27.md",
+      "sha256": "702c4ac63952c4b7b50783ac17cc482c11e8ab87a3f4f3cc54804c284722eff4",
+      "bytes": 3121
+    },
+    {
+      "original_path": "docs/gpu/metal_indexed_preparation_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_indexed_preparation_2026_10_26.json",
+      "sha256": "25477d4a80afd62a2d63ce82f401fc703427919134613618ee4ad7d0a5b05a02",
+      "bytes": 90597
+    },
+    {
+      "original_path": "docs/gpu/metal_indexed_preparation_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_indexed_preparation_2026_10_26.md",
+      "sha256": "35c44ce1ac3fe4fd0f837d0c489177930fdb8fd0320cb899de545b242130e914",
+      "bytes": 4146
+    },
+    {
+      "original_path": "docs/gpu/metal_integer_width_measurement_2026_10_27.json",
+      "archive_path": "docs/archive/gpu/metal_integer_width_measurement_2026_10_27.json",
+      "sha256": "50c181e49e1373ab9012fe0d4af1f2ebd833d9df4707527b0493dd93baf5310e",
+      "bytes": 151522
+    },
+    {
+      "original_path": "docs/gpu/metal_integer_width_measurement_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/metal_integer_width_measurement_2026_10_27.md",
+      "sha256": "3c84fdb8ea585af0b00737d9001e68d388417c65188231327540d24c200fd7c1",
+      "bytes": 4535
+    },
+    {
+      "original_path": "docs/gpu/metal_political_queries_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_political_queries_2026_10_26.json",
+      "sha256": "ca0eacde3a6acfcd10c5bc1d1683b2dcdf9870eb828923cc533d61501d741082",
+      "bytes": 57253
+    },
+    {
+      "original_path": "docs/gpu/metal_political_queries_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_political_queries_2026_10_26.md",
+      "sha256": "1fed4e30965ad29d9145cc8beca9bcaf22dcaf1a4a91494f7647f692ecbf0a26",
+      "bytes": 4812
+    },
+    {
+      "original_path": "docs/gpu/metal_political_queries_parallel_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_political_queries_parallel_2026_10_26.json",
+      "sha256": "66e4b7b5933a2c700c465d0956be31c2bdff951e73e94f0607f58e648eaf0721",
+      "bytes": 58339
+    },
+    {
+      "original_path": "docs/gpu/metal_political_queries_parallel_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_political_queries_parallel_2026_10_26.md",
+      "sha256": "57c0d6f0483852e3d52c66e795ba17f1af9f1d36aeeca46283d7af73201c6b37",
+      "bytes": 4025
+    },
+    {
+      "original_path": "docs/gpu/metal_recruitment_scaling_2026_10_27.json",
+      "archive_path": "docs/archive/gpu/metal_recruitment_scaling_2026_10_27.json",
+      "sha256": "44827cd20ec86957226a05a5099b9125eb47c955d4f806560bcdbc2a71c5bd1e",
+      "bytes": 67654
+    },
+    {
+      "original_path": "docs/gpu/metal_recruitment_scaling_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/metal_recruitment_scaling_2026_10_27.md",
+      "sha256": "d0f1cafd8ed423de0472356496111a3dc515f205fefce640c90c2b45d08d5059",
+      "bytes": 3568
+    },
+    {
+      "original_path": "docs/gpu/metal_recruitment_smoke_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_recruitment_smoke_2026_10_26.json",
+      "sha256": "8ec5bbcb0684d9c24093497103b51d969bcd20a664eb3a86419cf1d3ae49d3af",
+      "bytes": 41014
+    },
+    {
+      "original_path": "docs/gpu/metal_recruitment_smoke_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_recruitment_smoke_2026_10_26.md",
+      "sha256": "c3dea8e42e755a27723fe90f1a60cff9b4f0c6465cbcdfa22814f38c8d7fb6a8",
+      "bytes": 3138
+    },
+    {
+      "original_path": "docs/gpu/metal_recruitment_step_optimizations_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_recruitment_step_optimizations_2026_10_26.json",
+      "sha256": "d3ba74448ccb1f066654b50207a33ed89f3b0eae20d559d9d928c5dafa6e4455",
+      "bytes": 56261
+    },
+    {
+      "original_path": "docs/gpu/metal_recruitment_step_optimizations_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_recruitment_step_optimizations_2026_10_26.md",
+      "sha256": "7bf27fb89d340ea2ae1ef3435654d69068d8534612f32e8e58a65c1fcbcdaa71",
+      "bytes": 4420
+    },
+    {
+      "original_path": "docs/gpu/metal_replacement_validation_measurement_2026_10_27.json",
+      "archive_path": "docs/archive/gpu/metal_replacement_validation_measurement_2026_10_27.json",
+      "sha256": "14e895bd3bccfa50ae57b30c9cbb60f1e6ccac9da419541a217531d84c89b4de",
+      "bytes": 121691
+    },
+    {
+      "original_path": "docs/gpu/metal_replacement_validation_measurement_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/metal_replacement_validation_measurement_2026_10_27.md",
+      "sha256": "34d6f72aee643bff1efb0c0be756babbe10104dc99d991e0cdb000f7076854b5",
+      "bytes": 4851
+    },
+    {
+      "original_path": "docs/gpu/metal_rng_copy_2026_10_27.json",
+      "archive_path": "docs/archive/gpu/metal_rng_copy_2026_10_27.json",
+      "sha256": "5093c7d6a39f3be16e9719f759449be74fec080a89e1f0c49bfd317da3f89ecc",
+      "bytes": 78905
+    },
+    {
+      "original_path": "docs/gpu/metal_rng_copy_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/metal_rng_copy_2026_10_27.md",
+      "sha256": "b3cc1dfad79c3462a79d5376b6be5e81590a9f591be757c98a98f04e6665a4d5",
+      "bytes": 3222
+    },
+    {
+      "original_path": "docs/gpu/metal_route_preparation_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_route_preparation_2026_10_26.json",
+      "sha256": "7bad89d68a69a4cb56384cf717fbbcf57b5be36b7dc434e10f86e1262ce79af6",
+      "bytes": 115520
+    },
+    {
+      "original_path": "docs/gpu/metal_route_preparation_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_route_preparation_2026_10_26.md",
+      "sha256": "8161944050bc35aca7573ae1469e62fd919a338aac4778225576a0a4edf4d562",
+      "bytes": 4635
+    },
+    {
+      "original_path": "docs/gpu/metal_routes_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_routes_2026_10_26.json",
+      "sha256": "ed3f09dca1afb6ce56da88104c61da3cfa6aca507a2a520ebc99b7fedc5e333d",
+      "bytes": 117290
+    },
+    {
+      "original_path": "docs/gpu/metal_routes_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_routes_2026_10_26.md",
+      "sha256": "7fe7160f293a09904d91cd13dcb198630a621addd3399a84c3fde12622e4c665",
+      "bytes": 7072
+    },
+    {
+      "original_path": "docs/gpu/metal_score_arithmetic_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_score_arithmetic_2026_10_26.md",
+      "sha256": "fb4f6252ff1c69e86b4e03c0351eb21fc884d24d8fa1df0770d6a25675f33e9f",
+      "bytes": 2739
+    },
+    {
+      "original_path": "docs/gpu/metal_state_2026_10_26.json",
+      "archive_path": "docs/archive/gpu/metal_state_2026_10_26.json",
+      "sha256": "f9223faa72fe26fe81808c99b54a29f8a3d721cf8877e27ea9f8a6799d4e1fe7",
+      "bytes": 159985
+    },
+    {
+      "original_path": "docs/gpu/metal_state_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/metal_state_2026_10_26.md",
+      "sha256": "77a454611e3dc6d545cdb666d686f6448336199257459618497e29626adac30b",
+      "bytes": 4621
+    },
+    {
+      "original_path": "docs/gpu/native_worker_diagnostic_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/native_worker_diagnostic_2026_10_27.md",
+      "sha256": "0a1e7d7770e3206c3bf3b824598e525fd5efe0cbe9d1404ea90d8256d61f5ec2",
+      "bytes": 1516
+    },
+    {
+      "original_path": "docs/gpu/resident_chance_random_copy_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_chance_random_copy_2026_10_27.md",
+      "sha256": "821107ee8723201e2e7d14b3f4437811e306cac18765bf70c4680e1e452133de",
+      "bytes": 2334
+    },
+    {
+      "original_path": "docs/gpu/resident_political_facts_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_political_facts_2026_10_27.md",
+      "sha256": "decd2eaed6ccddd65b316922393107970ba27e7fcc48eadbf93093bbffa005f1",
+      "bytes": 2367
+    },
+    {
+      "original_path": "docs/gpu/resident_political_queues_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_political_queues_2026_10_27.md",
+      "sha256": "f8ef9c9cb1d9443a3b1aaa461a109c2a183463ade27484fda8384c7fcd575343",
+      "bytes": 2364
+    },
+    {
+      "original_path": "docs/gpu/resident_political_refresh_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_political_refresh_2026_10_27.md",
+      "sha256": "47a25888d1e9e72d69549c98bc90d1722b135fd75862a5e3b3b9516ddad61908",
+      "bytes": 2508
+    },
+    {
+      "original_path": "docs/gpu/resident_political_surrender_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/resident_political_surrender_2026_10_26.md",
+      "sha256": "5748ffe71b8485516410419d58a16c4aed5925583a9d6823cb75547e48ecb695",
+      "bytes": 1801
+    },
+    {
+      "original_path": "docs/gpu/resident_political_unit_effects_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/resident_political_unit_effects_2026_10_26.md",
+      "sha256": "2ce9dccbb7e629ecd06a04f6200b933c49f70dd89c32fdf9024422d81d26e742",
+      "bytes": 2758
+    },
+    {
+      "original_path": "docs/gpu/resident_recruitment_choice_actions_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_recruitment_choice_actions_2026_10_27.md",
+      "sha256": "7c7cdb5614ee972c0326bf370531c7679afa2945ca948aafa71390d358c2aaf5",
+      "bytes": 3643
+    },
+    {
+      "original_path": "docs/gpu/resident_recruitment_choices_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_recruitment_choices_2026_10_27.md",
+      "sha256": "da81fc458d73b1fc7b151df4afa910792fa673b47927bad83a7255aa0a99cbbf",
+      "bytes": 2460
+    },
+    {
+      "original_path": "docs/gpu/resident_recruitment_transactions_2026_10_26.md",
+      "archive_path": "docs/archive/gpu/resident_recruitment_transactions_2026_10_26.md",
+      "sha256": "8629f9aa30d6daa62533d6251700c3e6459c58f783a820edf05e4791b96d3f46",
+      "bytes": 4113
+    },
+    {
+      "original_path": "docs/gpu/resident_replacement_validation_2026_10_27.md",
+      "archive_path": "docs/archive/gpu/resident_replacement_validation_2026_10_27.md",
+      "sha256": "ab05a35d0c7e5a4c9f8adc67a9fff3e55492f9d6620890755e84c9a75ea331b1",
+      "bytes": 1737
+    },
+    {
+      "original_path": "docs/m10/integration_evidence_2026_10_23.md",
+      "archive_path": "docs/archive/milestones/m10/integration_evidence_2026_10_23.md",
+      "sha256": "d76efe37d7df5fed435398cc57b7d44ccdeac7ad2940ce682e8de70ce0ed1f09",
+      "bytes": 5562
+    },
+    {
+      "original_path": "docs/m11/search_verification.json",
+      "archive_path": "docs/archive/milestones/m11/search_verification.json",
+      "sha256": "383c84398f4e23a5bef32e00d1c6834ab37fdf081311a3bd0fe6a6ddb4b17ca9",
+      "bytes": 4576
+    },
+    {
+      "original_path": "docs/m12/README.md",
+      "archive_path": "docs/archive/milestones/m12/overview_2026_10_23.md",
+      "sha256": "c669b3e50897d65efc584908b5371f0b60f4a1e8d2530a589bc1ed1fb2b1fdf0",
+      "bytes": 5827
+    },
+    {
+      "original_path": "docs/m12/default_model_profile_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/default_model_profile_2026_10_23.json",
+      "sha256": "09eaef2de59d6b6848607516f6702088da957beba2c7bfd3f6a62dd04b3f28bb",
+      "bytes": 18623
+    },
+    {
+      "original_path": "docs/m12/evaluation_smoke_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/evaluation_smoke_2026_10_23.json",
+      "sha256": "d95b16c07dd8eb468c491e38e4286137ed14c24abf2e2ea1d2072910f579d218",
+      "bytes": 51042
+    },
+    {
+      "original_path": "docs/m12/foundation_verification_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/foundation_verification_2026_10_23.json",
+      "sha256": "bd660b2639c42d4a7ad4c6133da7778d33b6f2a60405c6686229dca37810d03f",
+      "bytes": 2053
+    },
+    {
+      "original_path": "docs/m12/learning_verification_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/learning_verification_2026_10_23.json",
+      "sha256": "d731335146af4be5475202d5c1cd6ed23155c7c394f04cfe2edc5db45a419743",
+      "bytes": 1267
+    },
+    {
+      "original_path": "docs/m12/operation_profile_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/operation_profile_2026_10_23.json",
+      "sha256": "08dd78e734b120ec7e3c0c6f1176df755b7593fe92543608d52985fcf202dd76",
+      "bytes": 3986
+    },
+    {
+      "original_path": "docs/m12/operations_verification_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/operations_verification_2026_10_23.json",
+      "sha256": "0f95ce3b273d326d2721bb1e2a81385cd1f5c3a1e25be70989d62558197b4e76",
+      "bytes": 12198
+    },
+    {
+      "original_path": "docs/m12/scripted_control_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m12/scripted_control_2026_10_23.json",
+      "sha256": "94267a2ef45fae6adb91c430f2e3c7d91b77340927c47d1869dae59daf93bd41",
+      "bytes": 19443
+    },
+    {
+      "original_path": "docs/m2/benchmark.json",
+      "archive_path": "docs/archive/milestones/m2/benchmark.json",
+      "sha256": "11756f485b576545344e361cf0245dff59aee3e21ec37f06a06573eee5b1ab85",
+      "bytes": 678
+    },
+    {
+      "original_path": "docs/m9/evidence/combined_clear_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m9/evidence/combined_clear_2026_10_23.json",
+      "sha256": "d1665bdf546194b693a5f3c2e7a0b391f5eab90bd0ec5684a88eccb65f946463",
+      "bytes": 32381
+    },
+    {
+      "original_path": "docs/m9/evidence/combined_contested_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m9/evidence/combined_contested_2026_10_23.json",
+      "sha256": "beeb5905140f193963a8380e4defd1eed761b36b787f4811a0b84cdbd8ae6ee7",
+      "bytes": 34819
+    },
+    {
+      "original_path": "docs/m9/evidence/combined_overland_amphibious_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m9/evidence/combined_overland_amphibious_2026_10_23.json",
+      "sha256": "481a64340b572dd89d73fed27ecbe547facc7205eb713b8c8ce3c22ce9b472e4",
+      "bytes": 29770
+    },
+    {
+      "original_path": "docs/m9/evidence/combined_retreat_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m9/evidence/combined_retreat_2026_10_23.json",
+      "sha256": "a0f4575301aa74b7654b4b5e551af3eaad9c5e7dc3cd738061a16c1efdbc374f",
+      "bytes": 31439
+    },
+    {
+      "original_path": "docs/m9/source_exit_2026_10_23.json",
+      "archive_path": "docs/archive/milestones/m9/source_exit_2026_10_23.json",
+      "sha256": "4ef1c5d738fbb989f862bf439f43924461ca486f5e77ee217f9f08771f1c455a",
+      "bytes": 23727
+    },
+    {
+      "original_path": "docs/plans/japan_china_full_rules_plan.md",
+      "archive_path": "docs/archive/planning/japan_china_full_rules_plan_2026_10_23.md",
+      "sha256": "066b633706c920faff066a37283f566562afa214f3fb9bbc5f6a548183315ddd",
+      "bytes": 73286
+    },
+    {
+      "original_path": "docs/stage_a/README.md",
+      "archive_path": "docs/archive/stage_a/overview_2026_10_25.md",
+      "sha256": "f5ae1f2e782050d85873922f59ff5fce300470be75d5f1b3357c708fee6f2394",
+      "bytes": 14738
+    },
+    {
+      "original_path": "docs/stage_a/action_interface_2026_10_24.json",
+      "archive_path": "docs/archive/stage_a/action_interface_2026_10_24.json",
+      "sha256": "16c0c29267150d82841f0fa4df05caddff41ce2038871883d3b8dbe13ad7c8be",
+      "bytes": 119586
+    },
+    {
+      "original_path": "docs/stage_a/action_interface_2026_10_24.md",
+      "archive_path": "docs/archive/stage_a/action_interface_2026_10_24.md",
+      "sha256": "97cace57002b87a57bcb2501aee61af2b39e91368b93de79d2348c9827cdbd63",
+      "bytes": 9929
+    },
+    {
+      "original_path": "docs/stage_a/checkpoint_pilot_2026_10_25.json",
+      "archive_path": "docs/archive/stage_a/checkpoint_pilot_2026_10_25.json",
+      "sha256": "5177d2824299b26e7a487da4137e7fa91f9ace5b9c70879b6de9fb17b6def39e",
+      "bytes": 22093
+    },
+    {
+      "original_path": "docs/stage_a/checkpoint_pilot_2026_10_25.md",
+      "archive_path": "docs/archive/stage_a/checkpoint_pilot_2026_10_25.md",
+      "sha256": "3066b117ec055889b47b8351fc4c96a7ff1a24db1981f87c462e912d08f4e8fe",
+      "bytes": 6971
+    },
+    {
+      "original_path": "docs/stage_a/comparison_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/comparison_2026_10_23.json",
+      "sha256": "123280996aa2c4b0fcb0d9b30e2aaf723f20f7002a8276cb5d5b088f19a162aa",
+      "bytes": 15318
+    },
+    {
+      "original_path": "docs/stage_a/decision_reuse_2026_10_24.json",
+      "archive_path": "docs/archive/stage_a/decision_reuse_2026_10_24.json",
+      "sha256": "7a212a5a9aad5882945fbf743144e3984a4e9e314f643234b30c658e19a3aeec",
+      "bytes": 88370
+    },
+    {
+      "original_path": "docs/stage_a/decision_reuse_2026_10_24.md",
+      "archive_path": "docs/archive/stage_a/decision_reuse_2026_10_24.md",
+      "sha256": "a7aca9d9bd575e70592ecfcc4cbf6954fd21a80023b50719172b97e73bcf13f1",
+      "bytes": 8266
+    },
+    {
+      "original_path": "docs/stage_a/evaluation_final_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/evaluation_final_2026_10_23.json",
+      "sha256": "f6ad59374b04b997df77798e8bfce535797b57d48e14b6749c1fb76bbbbd329f",
+      "bytes": 66066
+    },
+    {
+      "original_path": "docs/stage_a/evaluation_guard_migration_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/evaluation_guard_migration_2026_10_23.json",
+      "sha256": "c95c1182a5a0a1a7fd93f43e7c2109010a9487ebb0e55664ecc00f41a0580f1c",
+      "bytes": 2172
+    },
+    {
+      "original_path": "docs/stage_a/evaluation_initial_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/evaluation_initial_2026_10_23.json",
+      "sha256": "0ee51cc6e8d67307190b02b1824bde88aff3d5db552b97a81e1c14bbc3ad56aa",
+      "bytes": 65216
+    },
+    {
+      "original_path": "docs/stage_a/native_concurrency_2026_10_25.json",
+      "archive_path": "docs/archive/stage_a/native_concurrency_2026_10_25.json",
+      "sha256": "297d130afa4da3aa5e052ae5304d832cef0ab09876bea691b686c277316fe145",
+      "bytes": 45374
+    },
+    {
+      "original_path": "docs/stage_a/native_concurrency_2026_10_25.md",
+      "archive_path": "docs/archive/stage_a/native_concurrency_2026_10_25.md",
+      "sha256": "8f70cb9f55e7a59a9072da3b0a174307353cfe74b3dbce91acc94b4377a73aef",
+      "bytes": 7965
+    },
+    {
+      "original_path": "docs/stage_a/neural_input_2026_10_24.json",
+      "archive_path": "docs/archive/stage_a/neural_input_2026_10_24.json",
+      "sha256": "022f50bf4635fdabef3e5b9bf476d566082ac112c25fbe107ecf87b4e39ad619",
+      "bytes": 59410
+    },
+    {
+      "original_path": "docs/stage_a/neural_input_2026_10_24.md",
+      "archive_path": "docs/archive/stage_a/neural_input_2026_10_24.md",
+      "sha256": "165c21e7651f4ca180a47cc9655ddc7edf13dd0601b630bb9ef7da695170ccaa",
+      "bytes": 8234
+    },
+    {
+      "original_path": "docs/stage_a/numeric_input_plan_2026_10_25.md",
+      "archive_path": "docs/archive/stage_a/numeric_input_plan_2026_10_25.md",
+      "sha256": "a7201503cccba117bdea9875f4d6a388164ccecba9877ab73edc74946dd94e21",
+      "bytes": 1857
+    },
+    {
+      "original_path": "docs/stage_a/numeric_training_input_2026_10_25.json",
+      "archive_path": "docs/archive/stage_a/numeric_training_input_2026_10_25.json",
+      "sha256": "9a2c676a3f2c5f9ba2b4e74237980b5ea212621f51080ba9dfa19792cf4fa096",
+      "bytes": 45577
+    },
+    {
+      "original_path": "docs/stage_a/numeric_training_input_2026_10_25.md",
+      "archive_path": "docs/archive/stage_a/numeric_training_input_2026_10_25.md",
+      "sha256": "338043bec19df9ca72aeabf06b17e4b3534474dbc47d6a0df1541d7b8123c92b",
+      "bytes": 6511
+    },
+    {
+      "original_path": "docs/stage_a/performance_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/performance_2026_10_23.json",
+      "sha256": "07c82a15c82780b9ee0f0eaaeec158bdd52191ee3b82f832e9645d54b8126b24",
+      "bytes": 5620
+    },
+    {
+      "original_path": "docs/stage_a/position_profile_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/position_profile_2026_10_23.json",
+      "sha256": "21c6a701e6da9249a53f5b2bd458d19b47af1df3894ae5305780e59828719b7c",
+      "bytes": 30924
+    },
+    {
+      "original_path": "docs/stage_a/preflight_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/preflight_2026_10_23.json",
+      "sha256": "9259aa75bf1f40365890c062608d978c38aab93e3773d56410bdcea68050ca79",
+      "bytes": 10409
+    },
+    {
+      "original_path": "docs/stage_a/scaling_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/scaling_2026_10_23.json",
+      "sha256": "9d44110cb6dd17bbb122776b8c3d112d000d8641fe100dda34695268549235dc",
+      "bytes": 129077
+    },
+    {
+      "original_path": "docs/stage_a/scaling_2026_10_23.md",
+      "archive_path": "docs/archive/stage_a/scaling_2026_10_23.md",
+      "sha256": "3a8fe7b05db6ec0f8b6de55b456827e977bdcbef3681a21e2bf71a86ba966315",
+      "bytes": 10838
+    },
+    {
+      "original_path": "docs/stage_a/sixty_more_2026_10_25.md",
+      "archive_path": "docs/archive/stage_a/sixty_more_2026_10_25.md",
+      "sha256": "ac44aab3af0c0d08634696ff1d9f61d5a281eb0babe899a42a72d3d1c2be8c67",
+      "bytes": 5808
+    },
+    {
+      "original_path": "docs/stage_a/sixty_more_2026_10_25_launch.json",
+      "archive_path": "docs/archive/stage_a/sixty_more_2026_10_25_launch.json",
+      "sha256": "325b2691e0f076eb6efc3866e27c2d960ec25982242b0f1f5c7de79de8295fdd",
+      "bytes": 10176
+    },
+    {
+      "original_path": "docs/stage_a/sixty_more_2026_10_25_results.json",
+      "archive_path": "docs/archive/stage_a/sixty_more_2026_10_25_results.json",
+      "sha256": "1f2a2841a9ee591ba27cb81035a6345f2604da53771e3ea1fc369c410ac45380",
+      "bytes": 57138
+    },
+    {
+      "original_path": "docs/stage_a/sixty_more_2026_10_25_results.md",
+      "archive_path": "docs/archive/stage_a/sixty_more_2026_10_25_results.md",
+      "sha256": "41ba36d44565504c23e475660108af897109ca4cfb3e49d912bf1de700384c8a",
+      "bytes": 6511
+    },
+    {
+      "original_path": "docs/stage_a/three_round_2026_10_24.md",
+      "archive_path": "docs/archive/stage_a/three_round_2026_10_24.md",
+      "sha256": "0766e0a9a507347c8511338e72536d1a7ce0372f12194dacf91d362d7b70774f",
+      "bytes": 12384
+    },
+    {
+      "original_path": "docs/stage_a/three_round_2026_10_24_launch.json",
+      "archive_path": "docs/archive/stage_a/three_round_2026_10_24_launch.json",
+      "sha256": "e40d5b427e2848bf2b4d8acdb4c392bc46da156eabfc827d37ab8eb8d0359c47",
+      "bytes": 4191
+    },
+    {
+      "original_path": "docs/stage_a/three_round_2026_10_25_interruption.json",
+      "archive_path": "docs/archive/stage_a/three_round_2026_10_25_interruption.json",
+      "sha256": "422cb0b1b0c0d65793e7d18988ae52935a53472fce3693c5ae5ec8e0501abf19",
+      "bytes": 6800
+    },
+    {
+      "original_path": "docs/stage_a/three_round_2026_10_25_relaunch.json",
+      "archive_path": "docs/archive/stage_a/three_round_2026_10_25_relaunch.json",
+      "sha256": "596bc0af5b24b9900469ab5901436b780b89a0699a503570539e0c10bfa9629d",
+      "bytes": 4601
+    },
+    {
+      "original_path": "docs/stage_a/three_round_2026_10_25_results.json",
+      "archive_path": "docs/archive/stage_a/three_round_2026_10_25_results.json",
+      "sha256": "c9ad971f39c2777c6f38b3231206e641621a3b1f822e322c9a296de63807031e",
+      "bytes": 69643
+    },
+    {
+      "original_path": "docs/stage_a/three_round_2026_10_25_results.md",
+      "archive_path": "docs/archive/stage_a/three_round_2026_10_25_results.md",
+      "sha256": "caab6f895f261c15ca7d38f8c86f78dac7c6dfba851e2f615570ff3a03c6ac57",
+      "bytes": 6451
+    },
+    {
+      "original_path": "docs/stage_a/training_2026_10_23.json",
+      "archive_path": "docs/archive/stage_a/training_2026_10_23.json",
+      "sha256": "8d812996c3833bdad3e261961c976141099c98bc9271e16706318657178af7d8",
+      "bytes": 47072
+    },
+    {
+      "original_path": "studies/README.md",
+      "archive_path": "docs/archive/studies/organization_before_consolidation_2026_10_27.md",
+      "sha256": "4f7ce0cba5cacef944daf08056d658fc9369dcf79a31adc35e6f7d49403fce03",
+      "bytes": 4875
+    },
+    {
+      "original_path": "studies/campaign/README.md",
+      "archive_path": "docs/archive/stage_a/workflow_before_consolidation_2026_10_27.md",
+      "sha256": "2c367f9eb62244a989e405af5c0722d6d959075c0121ae4310ab006a9f24535b",
+      "bytes": 15753
+    }
+  ]
+}
