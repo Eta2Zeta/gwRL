@@ -80,6 +80,21 @@ inline ulong state_json_integer_bits(long value,thread bool& valid) {
     return (negative?0x8000000000000000UL:0UL)|(ulong(exponent+1023)<<52)|fraction;
 }
 
+// Exact json::Value::asInt domain test, including either signed zero. A false
+// result never returns a rounded, saturated or float32-converted alternative.
+inline bool state_json_integer_value(ulong bits,thread long& value) {
+    const ulong absolute=bits&0x7fffffffffffffffUL;
+    if(!absolute){value=0;return true;}
+    const int exponent=int((absolute>>52)&2047)-1023;
+    if(exponent<0||exponent>31)return false;
+    const ulong significand=(absolute&0xfffffffffffffUL)|0x10000000000000UL;
+    const int shift=52-exponent;
+    if(significand&((1UL<<shift)-1))return false;
+    const ulong magnitude=significand>>shift;const bool negative=(bits>>63)!=0;
+    if(magnitude>(negative?2147483648UL:2147483647UL))return false;
+    value=negative?-long(magnitude):long(magnitude);return true;
+}
+
 inline ulong state_unsigned_value(thread const PackedStateView& view, long index, thread bool& valid) {
     return state_raw_bits(view, index, 3, valid);
 }

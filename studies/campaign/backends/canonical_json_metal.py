@@ -96,16 +96,7 @@ inline void canonical_integer(thread CanonicalWriter& w,long value) {
     while(n)canonical_put(w,uchar(digits[--n]));
 }
 inline bool canonical_number_integer(ulong bits,thread long& value) {
-    const ulong absolute=bits&0x7fffffffffffffffUL;
-    if(!absolute){value=0;return true;}
-    const int exponent=int((absolute>>52)&2047)-1023;
-    if(exponent<0||exponent>31)return false;
-    const ulong significand=(absolute&0xfffffffffffffUL)|0x10000000000000UL;
-    const int shift=52-exponent;
-    if(significand&((1UL<<shift)-1))return false;
-    const ulong magnitude=significand>>shift;const bool negative=(bits>>63)!=0;
-    if(magnitude>ulong(negative?2147483648UL:2147483647UL))return false;
-    value=negative?-long(magnitude):long(magnitude);return true;
+    return state_json_integer_value(bits,value);
 }
 inline void canonical_number(thread CanonicalWriter& w,ulong bits) {
     if(((bits>>52)&2047)==2047){w.error|=1;return;}
