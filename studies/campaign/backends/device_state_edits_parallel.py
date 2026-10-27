@@ -1,8 +1,9 @@
 """Parallel arena copy for the exact existing subtree replacement contract.
 
-Validation and section discovery keep the original serial per-lane predicates.
-Only the full-arena copy/relocation is distributed over independent records.
-The caller retains the original cohort publication and rollback operations.
+The reference-container policy keeps serial replacement grammar validation;
+the parallel-container policy recomputes the equivalent per-node predicate.
+Section discovery and all plan checks keep their original behavior, while arena
+copy/relocation is distributed over records. Cohort publication is unchanged.
 """
 import threading
 
@@ -71,6 +72,25 @@ kernel void parallel_edit_sections(device const long* output[[buffer(0)]],device
  if(!valid||!edit_sections(after,sections+ulong(lane)*27))errors[lane]|=16;
 }
 '''
+
+# Preserve the original plan as a selectable reference. The second plan changes
+# only its grammar predicate and adds one read-only bool input. Bounds, lazy
+# consultation, combined error bits and required-size calculation stay in place.
+_PLAN_BEGIN = "kernel void parallel_edit_plan("
+_PLAN_END = "kernel void parallel_edit_copy("
+_plan = SOURCE[SOURCE.index(_PLAN_BEGIN):SOURCE.index(_PLAN_END)]
+_predicate = "edit_tree(replacement,stack_ends+ulong(lane)*R,stack_remaining+ulong(lane)*R,stack_previous+ulong(lane)*R*2)"
+_signature = "device const long* suffix_usage[[buffer(19)]],uint lane[[thread_position_in_grid]]){"
+if _plan.count(_predicate) != 1 or _plan.count(_signature) != 1:
+    raise RuntimeError("Audited parallel replacement plan changed")
+_validated_plan = _plan.replace(_PLAN_BEGIN, "kernel void parallel_edit_plan_validated(", 1)
+_validated_plan = _validated_plan.replace(_signature,
+    "device const long* suffix_usage[[buffer(19)]],device const bool* replacement_valid[[buffer(20)]],uint lane[[thread_position_in_grid]]){", 1)
+_validated_plan = _validated_plan.replace(_predicate, "replacement_valid[lane]", 1)
+if any(name in _validated_plan.split("){", 1)[1] for name in ("stack_ends", "stack_remaining", "stack_previous")):
+    raise RuntimeError("Validated replacement plan still uses scratch stacks")
+SOURCE += _validated_plan
+
 _lock=threading.Lock()
 _library=None
 
@@ -91,14 +111,25 @@ def _candidate(state,roots,blocks,block_lengths,selected,layout,allow_type_chang
     errors=torch.zeros_like(state.errors);required=torch.empty_like(state.lengths)
     if B:
         library=_kernels();plans=torch.empty((B,4),dtype=torch.int64,device=state.device)
-        scratch=[torch.empty((B,max(1,R)*factor),dtype=torch.int64,device=state.device) for factor in (1,1,2)]
+        validated=getattr(state.context,"container_implementation","reference")=="parallel"
+        if validated:
+            from .device_state_edits_validated import validate_replacement
+            checked=validate_replacement(state,blocks,block_lengths,selected)
+            # Generated plan body has no stack references; validities remain
+            # resident until its original replacement-grammar branch.
+            scratch=(_dummy(),)*3
+            plan_kernel=library.parallel_edit_plan_validated
+        else:
+            scratch=[torch.empty((B,max(1,R)*factor),dtype=torch.int64,device=state.device) for factor in (1,1,2)]
+            plan_kernel=library.parallel_edit_plan
         dims=_dimensions((B,C,O,R,state.context.string_count,state.context.string_bytes.numel(),
             state.string_offsets.numel()-1,state.string_bytes.numel(),int(allow_type_change)))
         pools=(state.context.string_bytes,state.context.string_offsets,state.string_bytes,state.string_offsets,state.suffix_usage)
         def call(kernel,args,count):
             if count:kernel(*(value if value.numel() else _dummy() for value in args),threads=count)
-        call(library.parallel_edit_plan,(state.records,state.lengths,state.errors,roots,blocks,block_lengths,selected,
-            lengths,errors,required,plans,*scratch,dims,*pools),B)
+        plan_args=(state.records,state.lengths,state.errors,roots,blocks,block_lengths,selected,
+            lengths,errors,required,plans,*scratch,dims,*pools)
+        call(plan_kernel,(*plan_args,checked.valid) if validated else plan_args,B)
         call(library.parallel_edit_copy,(state.records,blocks,selected,plans,errors,candidate,dims),B*O)
         call(library.parallel_edit_sections,(candidate,lengths,selected,errors,sections,dims,*pools),B)
     return candidate,lengths,sections,errors,required
