@@ -45,6 +45,8 @@ The [complete-step comparison](metal_recruitment_step_optimizations_2026_10_26.m
 records both identity gains and the remaining losses against a parallel CPU.
 The [political unit effects](resident_political_unit_effects_2026_10_26.md) cover
 movement refresh, cargo removal and creation with direct raw native oracles.
+The [surrender effects](resident_political_surrender_2026_10_26.md) retain complete
+controller, cargo, naval-queue and objective-award behavior.
 
 ## Execution contract
 

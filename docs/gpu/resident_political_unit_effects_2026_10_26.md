@@ -17,7 +17,7 @@ backend. Their native oracle calls the original C++ helpers on clones.
   complete cohort state/pool are retained on errors or insufficient allocation.
 
 Nine movement, ten removal and eight creation cases passed. Coverage includes
-all selected owners/streams, deep cargo chains, cycles at the explicit diagnostic
+selected owners, every RNG word, deep cargo chains, cycles at the explicit diagnostic
 boundary, collisions, unknown Catalog types, flag precedence, zero crossings,
 every allocation retry, no-host-read traps and empty/unselected inputs. The
 removal export also passed eleven shared transport round-trip cases. All 27
@@ -36,7 +36,7 @@ must retain their old runtime/context or be freshly captured from a validated
 State. They cannot be retagged. CPU saved-game values, rules identities and model
 inputs are unchanged. Historical training checkpoints were not migrated.
 
-The native objective-bonus/surrender probes are prepared for the next resident
-port. Objective awards are completed construction projects, not immediate unit
-creation. Neither this report nor those probes claim a completed GPU surrender
-or political-refresh implementation.
+The separate [surrender effect report](resident_political_surrender_2026_10_26.md)
+covers the completed internal surrender/bonus port. Objective awards are completed
+construction projects, not immediate unit creation. Full Engine surrender and
+political refresh remain separate work.
