@@ -68,6 +68,9 @@ the full dice-commit contract while distributing its complete arena copy.
 The [complete internal political refresh](resident_political_refresh_2026_10_27.md)
 connects those political helpers in the original single-pass order, including
 simultaneous evolution and surrender effects.
+The [recruitment-choice checks](resident_recruitment_choices_2026_10_27.md) cover
+unit placement, free ship work and facility repairs using the cached current
+menu, followed by that complete internal political refresh.
 
 ## Execution contract
 

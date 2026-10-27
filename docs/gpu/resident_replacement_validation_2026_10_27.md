@@ -21,6 +21,6 @@ tree-validator cases. They compare rich, deep, random and malformed replacements
 lazy bad offsets/usage, zero capacities and batches, selected masks, raw padding,
 all errors/required sizes and complete native action/chance transactions. Source
 words remain unchanged and hot-path host reads are trapped. The suite took
-40.674 s (41.617 s guarded), peaking at 4,781,289,472 charged bytes including a
+40.674 s (41.617 s guarded), peaking at 4,781,188,264 charged bytes including a
 3 GB MPS reservation, with two CPU threads. These are correctness results; a
 matched whole-operation benchmark is still required before claiming a gain.
