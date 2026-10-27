@@ -26,6 +26,8 @@ bool chineseHomeCountry(const State&, const Id& zone);
 bool decentralizedProduction(const State&, const Id& nation);
 Id politicalPlayer(const State&, const Id& nation);
 void addPoliticalUnit(State&, const Id& nation, const Id& type, const Id& zone, int count = 1);
+// Refresh only this owner's existing units, preserving used movement exactly.
+void refreshPoliticalUnitMovement(State&, const Id& owner);
 void removePoliticalUnits(State&, const std::set<Id>& units);
 void incorporateNation(State&, const Id& minor, const Id& recipient);
 void ensureDadao(State&);

@@ -184,6 +184,9 @@ void queueDeclarationPriority(State& s,const Id& actor,const Id& target) {
 }
 
 bool isWarlord(const Id& nation) {return nation.rfind("warlord_",0)==0;}
+void refreshPoliticalUnitMovement(State& s,const Id& owner) {
+    for(auto& [id,unit]:s.units)if(unit.owner==owner)refreshUnitMovement(s,unit);
+}
 Id originalNation(const State& s,const Id& zone) {
     const auto* index=s.definition->rules.find("faction_index");
     if(index)return index->require("land_original_owners").require(zone).require("original_faction_id").asString();
@@ -342,7 +345,7 @@ void refreshPoliticalState(State& s) {
         n.gameFlags["evolved_turn_serial"]=static_cast<int>(s.clock.playerTurnSerial);
         n.gameFlags["evolved_during_own_turn"]=s.currentNation()==nation;
         n.gameFlags["objective_evolution"]=1;
-        for(auto& [id,u]:s.units)if(u.owner==nation)refreshUnitMovement(s,u);
+        refreshPoliticalUnitMovement(s,nation);
         if(s.politics.chineseTruce)terminateChineseTruce(s,nation,true);
         chooseEvolution(s,nation);
     }
