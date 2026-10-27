@@ -266,13 +266,14 @@ def inspect_canonical_json(result):
     return tuple(bytes(row[:length]) for row,length in zip(data,lengths,strict=True))
 
 
-def canonical_json_digests(result):
+def canonical_json_digests(result,*,implementation='reference',group_size=None):
     """Hash exact written ranges; serialization errors propagate to identities."""
     from dataclasses import replace
     from .content_digest_metal import RangedMessageBatch,content_digests_metal
     Q,C=result.data.shape
     starts=torch.arange(Q,dtype=torch.int64,device=result.data.device)*C
     ranges=torch.stack((starts,starts+result.lengths),dim=1)
-    hashed=content_digests_metal(RangedMessageBatch(result.data.flatten(),ranges,result.count))
+    hashed=content_digests_metal(RangedMessageBatch(result.data.flatten(),ranges,result.count),
+                               implementation=implementation,group_size=group_size)
     return replace(hashed,errors=hashed.errors|result.errors,
                    batch_error=hashed.batch_error|result.batch_error)

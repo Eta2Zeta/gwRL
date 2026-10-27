@@ -64,7 +64,9 @@ class IdentityStageProfiler:
             synchronize=torch.mps.synchronize
         if digest is None:
             from studies.campaign.backends.canonical_json_metal import canonical_json_digests
-            digest=canonical_json_digests
+            def digest(result):
+                return canonical_json_digests(result,implementation=delegate.digest_implementation,
+                                             group_size=delegate.digest_group_size)
         self.delegate=delegate;self.synchronize=synchronize;self.clock=clock or time.perf_counter
         self.digest=digest;self._calls=None
 

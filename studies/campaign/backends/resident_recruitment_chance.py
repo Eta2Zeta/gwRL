@@ -364,7 +364,9 @@ def _invalid_identities(identities,state,invalid):
 
 
 class ResidentRecruitmentChance:
-    def __init__(self,state_context,effects,income_context,state_json):
+    def __init__(self,state_context,effects,income_context,state_json,*,reuse_certified_source=False):
+        if type(reuse_certified_source) is not bool:raise TypeError("Certified source reuse must be an explicit bool")
+        self.reuse_certified_source=reuse_certified_source
         if _device(state_context.device).type!="mps":
             raise ValueError("Recruitment chance requires explicit Apple GPU execution; no CPU fallback")
         components=set(state_context.rules_id.split("+"))
@@ -463,7 +465,9 @@ class ResidentRecruitmentChance:
             before.context.string_bytes,before.context.string_offsets,before.string_bytes,before.string_offsets,before.suffix_usage,
             selected,capability,handled,_dimensions((B,C,before.context.string_count,before.context.string_bytes.numel(),
                 before.string_offsets.numel()-1,before.string_bytes.numel()))),B)
-        checked=self.state_json.identities(before,byte_capacity=capacities.json_byte_capacity)
+        from .resident_identity_certificates import source_identity_check
+        checked=source_identity_check(self.state_json,before,expected,byte_capacity=capacities.json_byte_capacity,
+                                      reuse=self.reuse_certified_source)
         bad_hash=(checked.engine_keys.errors!=0)|(checked.engine_keys.batch_error!=0).any()|(checked.engine_keys.count!=B).any()
         bad_hash|=(expected.engine_keys.errors!=0)|(expected.engine_keys.batch_error!=0).any()|(expected.engine_keys.count!=B).any()
         mismatch=(checked.engine_keys.hex_bytes!=expected.engine_keys.hex_bytes).any(1)

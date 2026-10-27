@@ -256,7 +256,12 @@ class StateIdentityBatch:
 
 
 class ResidentStateJson:
-    def __init__(self,number_context):
+    def __init__(self,number_context,*,digest_implementation='reference',digest_group_size=None):
+        if type(digest_implementation) is not str or digest_implementation not in {'reference','unrolled'}:
+            raise ValueError('Digest implementation must be reference or unrolled')
+        if digest_group_size is not None and (type(digest_group_size) is not int or digest_group_size<=0):
+            raise ValueError('Digest group size must be None or a positive integer')
+        self.digest_implementation=digest_implementation;self.digest_group_size=digest_group_size
         self.number_context=number_context;self.state_context=number_context.state_context
         if _device(self.state_context.device).type!='mps':raise ValueError('State JSON requires explicit Apple GPU execution')
         self.fingerprint=int(self.state_context.prefix_lookup_ids((self.state_context.definition_fingerprint,))[0])
@@ -312,5 +317,9 @@ class ResidentStateJson:
 
     def identities(self,state,*,byte_capacity):
         encoded=self.serialize(state,byte_capacity=byte_capacity)
-        state_keys=canonical_json_digests(encoded);outer=self.outer_engine_json(state_keys)
-        return StateIdentityBatch(state,encoded,state_keys,outer,canonical_json_digests(outer))
+        state_keys=canonical_json_digests(encoded,implementation=self.digest_implementation,group_size=self.digest_group_size)
+        outer=self.outer_engine_json(state_keys)
+        result=StateIdentityBatch(state,encoded,state_keys,outer,canonical_json_digests(
+            outer,implementation=self.digest_implementation,group_size=self.digest_group_size))
+        from .resident_identity_certificates import _certify_authoritative
+        return _certify_authoritative(self,result,byte_capacity=byte_capacity)
