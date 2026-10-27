@@ -26,6 +26,8 @@ records the later one-dispatch implementation and its small-batch limits.
 The separate [income-rate correction](income_refresh_correction_2026_10_26.md)
 versions a CPU correctness fix discovered while connecting GPU chance effects;
 it is not counted as an optimization or applied to historical checkpoints.
+The [terminal-score arithmetic checks](metal_score_arithmetic_2026_10_26.md)
+cover native binary64 score bits and once-rounded training targets on Metal.
 
 ## Execution contract
 

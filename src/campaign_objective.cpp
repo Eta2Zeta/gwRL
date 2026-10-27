@@ -4,6 +4,7 @@
 #include "game/movement.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 #include <stdexcept>
 
@@ -60,7 +61,9 @@ void validateWealthDefinition(const Definition& definition) {
         throw std::runtime_error("Unsupported campaign wealth weights");
 }
 double WealthComponents::total() const {
-    return incomeRate + 0.1 * (units + infrastructure + treasury + paidConstruction);
+    // Codify the fused operation already emitted by the Apple CPU build. This
+    // also makes the rounding contract explicit for other compilers/backends.
+    return std::fma(0.1, units + infrastructure + treasury + paidConstruction, incomeRate);
 }
 
 std::array<WealthComponents, 3> allianceWealth(const State& s) {

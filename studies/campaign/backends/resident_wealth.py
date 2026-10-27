@@ -2,12 +2,13 @@
 
 Components are stored as exact twice-native-component integers. Each component
 addition emulates binary64 nearest-even rounding, including very large totals.
-Device totals/gaps are explicitly RATIONAL twentieths, not native-double terminal
-targets. Only inspect() evaluates the original native double expression/order.
-No float32 terminal-target equivalence or full GPU campaign backend is claimed.
+Legacy rational totals remain explicitly named. scores() computes exact native
+binary64 totals/gaps and once-rounded float32 terminal targets entirely on Metal.
+The original native fused multiply-add and component ordering are retained.
 """
 from dataclasses import dataclass
 from functools import lru_cache
+import math
 import threading
 
 import torch
@@ -307,11 +308,18 @@ class ResidentWealthContext:
         return ResidentWealthResult(components,totals,gaps,torch.where(terminal[:,None].bool(),gaps,0),errors,
                                    terminal_errors,terminal,state.context.identity)
 
+    def scores(self,result):
+        """Native score bits and float32 terminal targets, without a host read."""
+        if result.context_identity!=self.state_context.identity:raise ValueError("Wealth result wire context differs")
+        from .resident_wealth_scores import native_wealth_scores
+        return native_wealth_scores(result.components_twice,result.errors,result.terminal_errors,result.terminal,
+                                   context_identity=result.context_identity)
+
     def inspect(self,result,kind="wealth"):
         """Explicit native-double-compatible host output boundary.
 
-        Python float is binary64. Parenthesization deliberately matches C++;
-        Python's compensated sum() is not used. Device rational totals are not
+        Python float is binary64. math.fma deliberately matches the fused native
+        total; Python's compensated sum() is not used. Rational totals are not
         substituted for native-double terminal rewards.
         """
         if result.context_identity!=self.state_context.identity:raise ValueError("Wealth result wire context differs")
@@ -326,7 +334,7 @@ class ResidentWealthContext:
             if error==4:raise OverflowError("Outside native int arithmetic or resident int64 component representation")
             if kind=="terminal" and not terminal[lane]:rows.append((0.,0.,0.));continue
             values=[[float(value)/2 for value in actor] for actor in components[lane]]
-            totals=[x[0]+.1*(((x[1]+x[2])+x[3])+x[4]) for x in values]
+            totals=[math.fma(.1,((x[1]+x[2])+x[3])+x[4],x[0]) for x in values]
             combined=(totals[0]+totals[1])+totals[2]
             if kind in {"gaps","terminal"}:rows.append(tuple(2*value-combined for value in totals))
             else:rows.append({player:{**dict(zip(COMPONENTS,values[index],strict=True)),"wealth":totals[index]}

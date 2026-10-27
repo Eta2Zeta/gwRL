@@ -45,4 +45,24 @@ void bindWealth(py::module_& module) {
         for(const auto& row:rows){double value=0;for(auto twice:row)value+=static_cast<double>(twice)*0.5;output.push_back(value);}
         return output;
     });
+    module.def("campaign_wealth_scores_probe",[](const std::vector<std::vector<std::int64_t>>& rows,const std::vector<bool>& terminal){
+        if(rows.size()!=terminal.size())throw std::invalid_argument("Wealth score probe terminal count differs");
+        std::vector<std::vector<std::uint64_t>> wealth,gaps,returns;
+        std::vector<std::vector<std::uint32_t>> targets;
+        for(std::size_t lane=0;lane<rows.size();++lane){
+            if(rows[lane].size()!=15)throw std::invalid_argument("Wealth score probe requires three five-component rows");
+            std::array<double,3> values;
+            for(std::size_t player=0;player<3;++player){const auto* x=rows[lane].data()+player*5;
+                values[player]=game::campaign::WealthComponents{static_cast<double>(x[0])*.5,static_cast<double>(x[1])*.5,
+                    static_cast<double>(x[2])*.5,static_cast<double>(x[3])*.5,static_cast<double>(x[4])*.5}.total();}
+            const double sum=(values[0]+values[1])+values[2];
+            std::vector<std::uint64_t> w,g,r;std::vector<std::uint32_t> t;
+            for(const double value:values){const double gap=2*value-sum,result=terminal[lane]?gap:0.0;
+                w.push_back(std::bit_cast<std::uint64_t>(value));g.push_back(std::bit_cast<std::uint64_t>(gap));
+                r.push_back(std::bit_cast<std::uint64_t>(result));t.push_back(std::bit_cast<std::uint32_t>(static_cast<float>(result)));}
+            wealth.push_back(std::move(w));gaps.push_back(std::move(g));returns.push_back(std::move(r));targets.push_back(std::move(t));
+        }
+        py::dict result;result["wealth_bits"]=wealth;result["gap_bits"]=gaps;result["terminal_bits"]=returns;
+        result["terminal_float32_bits"]=targets;return result;
+    });
 }
