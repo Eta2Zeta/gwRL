@@ -125,6 +125,33 @@ class FusedPreparationBoundaryTests(_BoundedMPS,_PreparedAssertions,unittest.Tes
         foreign=copy.copy(state.context);foreign.wire_context_fingerprint+="-foreign"
         with self.assertRaises(ValueError):routes.prepare(replace(state,context=foreign),implementation="fused")
 
+    def test_injected_services_reject_foreign_wire_device_and_native_definition(self):
+        state,routes=self.setup()
+        for field,value in (("wire_context_fingerprint",state.context.wire_context_fingerprint+"-foreign"),("device",torch.device("cpu"))):
+            context=copy.copy(state.context);setattr(context,field,value)
+            service=copy.copy(routes.relations_context);service.state_context=context
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,"Injected political service"):
+                ResidentRoutes(state.context,routes.native_context,relations_context=service,preparation_implementation="fused")
+        from studies.campaign.curriculum import make_env
+        other=make_env(1951,calendar_rounds=11).raw
+        service=copy.copy(routes.relations_context);service.native_context=gwrl_cpp.campaign_relations_context(other)
+        with self.assertRaisesRegex(ValueError,"Injected political service"):
+            ResidentRoutes(state.context,routes.native_context,relations_context=service,preparation_implementation="fused")
+        matching=ResidentRoutes(state.context,routes.native_context,relations_context=routes.relations_context,preparation_implementation="fused")
+        self.assertIs(matching.relations_context,routes.relations_context)
+
+    def test_fused_preparer_cannot_rebind_to_foreign_static_route_context(self):
+        state,routes=self.setup();preparer=FusedRoutePreparation(routes)
+        other=ResidentRoutes(state.context,routes.native_context)
+        with self.assertRaisesRegex(ValueError,"different static route context"):preparer.prepare(other,state)
+        service=routes.relations_context;foreign=copy.copy(state.context);foreign.wire_context_fingerprint+="-foreign"
+        previous=service.state_context
+        try:
+            service.state_context=foreign
+            with self.assertRaisesRegex(ValueError,"exact wire context/device"):preparer.prepare(routes,state)
+        finally:service.state_context=previous
+        self.prepared_equal(preparer.prepare(routes,state),routes.prepare(state,implementation="reference"))
+
     def test_fused_hot_path_has_one_allocation_no_host_reads_or_reference_dispatch(self):
         state,routes=self.setup();expected=routes.prepare(state,implementation="reference")
         routes.prepare(state,implementation="fused");torch.mps.synchronize()

@@ -572,9 +572,16 @@ class ResidentRoutes:
             ("militia","cavalry","motorized_infantry","marine","artillery","advanced_artillery","anti_aircraft_artillery"))
         self._terrain_special=tuple(self.terrains.index(name) if name in self.terrains else -1 for name in ("mountain","impassable"))
         self.relations_context=relations_context or ResidentPoliticalRelations(state_context,native_context.relations_context)
+        service_context=self.relations_context.state_context
+        if (service_context.identity!=state_context.identity or service_context.device!=state_context.device or
+            self.relations_context.native_context.definition_fingerprint!=state_context.definition_fingerprint):
+            raise ValueError("Injected political service requires the exact route wire context/device/definition")
         if self.relations_context.nation_ids!=self.nations or self.relations_context.player_ids!=self.players:
             raise ValueError("Route and political axes must be identical")
         self.declaration_context=ResidentLandAttackDeclarations(self.relations_context)
+        if (self.declaration_context.state_context.identity!=state_context.identity or
+            self.declaration_context.state_context.device!=state_context.device):
+            raise ValueError("Declaration service requires the exact route wire context/device")
         methods=("node_array","edge_array","node_terrain_array","border_terrain_array","river_bank_array","crossing_sea_array",
             "bank_unknown_array","crossing_missing_array","home_array","class_array","fort_array","fort_error_array","capacity_array",
             "crossing_counter_array","crossing_counter_error_array","rail_counter_array","counter_offsets")

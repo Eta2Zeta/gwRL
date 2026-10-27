@@ -127,6 +127,7 @@ class FusedRoutePreparation:
     """Immutable device metadata; no source, model or game-position cache."""
     def __init__(self,routes):
         self.state_context=routes.state_context
+        self.services=(routes.relations_context,routes.declaration_context)
         declaration=routes.declaration_context
         self.parts=(routes.data,routes.offsets,routes.relations_context.ids,
                     declaration.geography,declaration.home,declaration.warlords)
@@ -140,6 +141,15 @@ class FusedRoutePreparation:
         state._metadata()
         if state.context.identity!=self.state_context.identity or state.device!=self.state_context.device:
             raise ValueError("Fused route preparation requires its exact wire context/device")
+        services=(routes.relations_context,routes.declaration_context)
+        if (routes.state_context.identity!=self.state_context.identity or routes.state_context.device!=self.state_context.device or
+            any(service.state_context.identity!=self.state_context.identity or service.state_context.device!=self.state_context.device
+                for service in services)):
+            raise ValueError("Fused route service requires its exact wire context/device")
+        parts=(routes.data,routes.offsets,routes.relations_context.ids,
+               routes.declaration_context.geography,routes.declaration_context.home,routes.declaration_context.warlords)
+        if any(a is not b for a,b in zip(services,self.services,strict=True)) or any(a is not b for a,b in zip(parts,self.parts,strict=True)):
+            raise ValueError("Fused route preparation belongs to a different static route context")
         if group_size is not None and (type(group_size) is not int or group_size<=0):
             raise ValueError("Fused route group size must be a positive integer")
         route_dims=routes._dims(state)
