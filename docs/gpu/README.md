@@ -38,6 +38,8 @@ The [identity substage profile](metal_identity_profile_2026_10_26.md) separates
 the measured State formatting and hashing costs inside those complete operations.
 The [exact identity optimization measurements](metal_identity_optimizations_2026_10_26.md)
 compare parallel unit formatting and scalar SHA kernels, including group sizing.
+The [whole-field formatting experiment](metal_field_json_experiment_2026_10_26.md)
+records a later correct alternative that did not demonstrate an additional gain.
 
 ## Execution contract
 
