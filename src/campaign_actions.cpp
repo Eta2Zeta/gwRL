@@ -239,6 +239,8 @@ std::set<Id> keys(const V& object) {
 
 }  // namespace
 
+void resetTrainingActionState(State& state) { reset(state); }
+
 std::shared_ptr<const Rules> trainingCampaignRules() {
     return std::make_shared<TrainingRules>(campaignRules());
 }

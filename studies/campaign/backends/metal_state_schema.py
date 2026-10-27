@@ -68,6 +68,18 @@ inline long state_signed_value(thread const PackedStateView& view, long index, t
     return as_type<long>(state_raw_bits(view, index, 2, valid));
 }
 
+// Native json::Value stores all rule-generated int32 values as exact doubles.
+// Encode their IEEE payload with integer arithmetic; MPS has no float64 type.
+inline ulong state_json_integer_bits(long value,thread bool& valid) {
+    if(value<(-2147483647L-1L)||value>2147483647L){valid=false;return 0;}
+    if(!value)return 0;
+    const bool negative=value<0;const ulong magnitude=negative?ulong(-value):ulong(value);
+    ulong leading=magnitude;int exponent=0;
+    while(leading>1){leading>>=1;++exponent;}
+    const ulong fraction=(magnitude-(1UL<<exponent))<<(52-exponent);
+    return (negative?0x8000000000000000UL:0UL)|(ulong(exponent+1023)<<52)|fraction;
+}
+
 inline ulong state_unsigned_value(thread const PackedStateView& view, long index, thread bool& valid) {
     return state_raw_bits(view, index, 3, valid);
 }

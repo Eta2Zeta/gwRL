@@ -1,4 +1,10 @@
 // Read-only definition preparation and independent original validateRoute API.
+// Timed results stay in a native vector until an explicit inspection boundary.
+struct MovementNativeProbe {
+    std::vector<game::campaign::MovementOracleResult> values;
+    double seconds {0};
+    std::uint64_t calls {0};
+};
 struct MovementNativeAccess {
     using Context=game::campaign::MovementContext;
     using Query=game::campaign::MovementQuery;
@@ -22,6 +28,9 @@ struct MovementNativeAccess {
                 catch(const std::exception& e){result.exception=2;result.message=e.what();}
                 return result;}));
         }
+        return inspect(results);
+    }
+    static py::list inspect(const std::vector<Result>& results){
         py::list output;
         for(const auto& row:results){const auto& r=row.result;py::dict approach;
             approach["from"]=r.approach.from;approach["to"]=r.approach.to;
@@ -31,6 +40,43 @@ struct MovementNativeAccess {
             value["exhausts_movement"]=r.exhaustsMovement;value["regions"]=r.regions;value["approach"]=approach;
             value["exception"]=row.exception;value["message"]=row.message;output.append(value);
         }return output;
+    }
+    static MovementNativeProbe benchmark(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs,
+                                         const std::vector<Query>& queries,std::size_t repeats){
+        if(!context||!repeats)throw std::invalid_argument("Native route probe requires a context and positive repetitions");
+        if(queries.size()&&repeats>std::numeric_limits<std::uint64_t>::max()/queries.size())
+            throw std::overflow_error("Native route query-count overflow; no queries truncated");
+        const auto owners=pinNativeEnvironments(envs);
+        for(const auto& query:queries)if(query.lane<0||static_cast<std::uint64_t>(query.lane)>=envs.size())
+            throw py::value_error("Native route probe lane outside batch");
+        MovementNativeProbe output;output.values.resize(queries.size());
+        std::vector<NativeCampaignEnv*> unique=envs;
+        std::sort(unique.begin(),unique.end(),std::less<NativeCampaignEnv*>{});
+        unique.erase(std::unique(unique.begin(),unique.end()),unique.end());
+        {
+            py::gil_scoped_release release;
+            std::vector<std::unique_lock<std::mutex>> locks;locks.reserve(unique.size());
+            for(auto* env:unique)locks.emplace_back(env->mutex_);
+            std::vector<const game::campaign::State*> states;states.reserve(envs.size());
+            for(const auto* env:envs){const auto& state=env->env_.engine().state();
+                if(state.definition->fingerprint!=context->definition->fingerprint)
+                    throw std::invalid_argument("Native route probe definition mismatch");
+                states.push_back(&state);}
+            // Python conversion, owner pinning, input checks, pointer capture,
+            // unique mutex acquisition and vector storage allocation are outside
+            // this timer. Each original predicate's result/sets/strings are
+            // constructed and retained inside it, without a Python dictionary.
+            const auto before=std::chrono::steady_clock::now();
+            for(std::size_t repeat=0;repeat<repeats;++repeat)for(std::size_t i=0;i<queries.size();++i){
+                Result result;
+                try{result.result=game::campaign::validateRoute(*states[queries[i].lane],queries[i].request);}
+                catch(const std::out_of_range& e){result.exception=1;result.message=e.what();}
+                catch(const std::exception& e){result.exception=2;result.message=e.what();}
+                output.values[i]=std::move(result);
+            }
+            output.seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-before).count();
+        }
+        output.calls=static_cast<std::uint64_t>(queries.size())*repeats;return output;
     }
 };
 void bindMovementContext(py::module_& module){
@@ -69,6 +115,13 @@ void bindMovementContext(py::module_& module){
                         const std::string& mode,bool combat,const std::optional<std::string>& towed){
             Q result;result.lane=lane;result.request={unit,path,game::campaign::parseMovementMode(mode),combat,towed};return result;}),
              py::arg("lane"),py::arg("unit"),py::arg("path"),py::arg("mode")="ordinary",py::arg("combat")=false,py::arg("towed")=py::none());
+    py::class_<MovementNativeProbe>(module,"CampaignMovementProbe")
+        .def_property_readonly("seconds",[](const MovementNativeProbe& p){return p.seconds;})
+        .def_property_readonly("calls",[](const MovementNativeProbe& p){return p.calls;})
+        .def_property_readonly("query_count",[](const MovementNativeProbe& p){return p.values.size();})
+        .def("inspect",[](const MovementNativeProbe& p){return MovementNativeAccess::inspect(p.values);});
+    module.def("benchmark_campaign_route_oracle",&MovementNativeAccess::benchmark,
+               py::arg("context"),py::arg("envs"),py::arg("queries"),py::arg("repeats")=1);
     module.def("campaign_movement_context",&MovementNativeAccess::context);
     module.def("campaign_route_oracle",&MovementNativeAccess::oracle);
 }

@@ -1,5 +1,6 @@
 #include "game/politics.hpp"
 #include "game/catalog.hpp"
+#include "game/recruitment_context.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -225,6 +226,22 @@ void applyRecruitmentChoice(State& state, const Action& action) {
     refreshPoliticalState(state);
 }
 } // namespace
+
+RecruitmentQueryOracle recruitmentQueryOracle(const State& state,const Id& minor) {
+    RecruitmentQueryOracle result;result.quietPlacement=quietPlacement(state);
+    const auto query=[&](std::size_t index,auto function) {
+        try{function();}catch(const std::out_of_range& e){result.errors[index]=1;result.messages[index]=e.what();}
+        catch(const std::exception& e){result.errors[index]=2;result.messages[index]=e.what();}
+    };
+    query(0,[&]{result.available=recruitmentAvailable(state,minor);});
+    query(1,[&]{result.threshold=recruitmentThreshold(state,minor);});
+    query(2,[&]{result.zones=recruitmentZones(state,minor);});
+    query(3,[&]{result.choices=recruitmentChoices(state,minor);});
+    query(4,[&]{for(const auto& action:influenceActions(state))
+        if(action.kind=="recruitment_roll"&&action.parameters.require("beneficiary").asString()==minor)
+            result.rolls.push_back(action);});
+    return result;
+}
 
 std::vector<Action> influenceActions(const State& state) {
     std::vector<Action> actions;

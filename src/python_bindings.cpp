@@ -10,6 +10,7 @@
 #include "game/relations_context.hpp"
 #include "game/movement_context.hpp"
 #include "game/catalog_stats_context.hpp"
+#include "game/recruitment_context.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 #include "game/numeric_graph.hpp"
@@ -19,6 +20,8 @@
 #include <limits>
 #include <pybind11/stl.h>
 
+#include <algorithm>
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <memory>
@@ -65,6 +68,8 @@ class NativeCampaignEnv {
     friend struct RelationsNativeAccess;
     friend struct StateJsonNativeAccess;
     friend struct CatalogStatsNativeAccess;
+    friend struct RecruitmentNativeAccess;
+    friend struct MovementNativeAccess;
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
 };
@@ -191,6 +196,8 @@ using CampaignEnv = game::campaign::CampaignEnv;
 #include "python_action_ids.inc"
 #include "python_catalog_stats.inc"
 #include "python_event_append.inc"
+#include "python_training_reset.inc"
+#include "python_recruitment.inc"
 
 // Immutable owning views outlive an environment mutation without copying its
 // state tree. Only small scheduler fields overlay the complete native document.
@@ -556,6 +563,8 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     bindActionIds(module);
     bindCatalogStats(module);
     bindEventAppendProbe(module);
+    bindTrainingResetProbe(module);
+    bindRecruitment(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)

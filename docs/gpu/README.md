@@ -99,6 +99,34 @@ or validate a legal menu. Political queries additionally expose a cooperative
 `implementation="parallel"` path, now selected by default after matched timings
 and exact native/reference comparisons. The reference remains explicitly selectable.
 
+The read-only resident route service now covers ordinary movement, blitz,
+strategic rail/river, narrow crossings and towing. It retains every RouteResult
+field and native failure order. Static map/catalog data is prepared once, and
+unchanged-source indexes and political results can be reused across candidate
+paths. Route validation is separate from enumerating a legal menu and executing
+its movement, capture, battle and political effects.
+
+Resident recruitment services produce the native ordered choices and full
+Action records, including split militia pairs, ship work and facility repairs.
+They preserve original eligibility/threshold/zone distinctions and do not add an
+influence-garrison condition. Menu/parameter/string capacities are explicit and
+retryable; default menu allocation depends on geography rather than accumulated
+State/history padding. These queries do not yet apply recruitment outcomes.
+
+Audit-event append now commits generic payloads, the native State hash and string
+interning under one rollback flag. It preserves all history and raw binary64
+payload bits, including negative zero, without retaining historical State copies.
+Chance I/O builds the exact full face/reroll payload and installs sampled streams
+only if the original random subtree is still unchanged. Native chance parity
+tests currently supply rule effects on CPU, then compare GPU payload/history/RNG;
+they are not a complete GPU chance-handler claim. The separate training-order
+reset hook clears only its original public metadata, with fixed allocation and
+explicit capacity retry.
+
+Adding fixed handler strings changes the checked wire-context fingerprint.
+Existing raw arenas cannot be retagged. CPU saved-game values and rule identities
+are unchanged, and these privileged intern IDs remain excluded from model inputs.
+
 `clone_for_search(seeds, lanes=...)` can fork one source lane repeatedly with
 independent search seeds, without consuming the source game's execution RNG.
 Repeated source lanes are allowed for this read-only operation; mutating batches

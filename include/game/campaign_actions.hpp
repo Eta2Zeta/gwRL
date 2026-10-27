@@ -13,5 +13,7 @@ std::shared_ptr<const Rules> trainingCampaignRules();
 // Restored interface metadata is complete observable source state. Reject
 // unknown versions or malformed records before committing a restored engine.
 void validateTrainingActionState(const State&);
+// Exact existing reset operation, shared with the resident hook oracle.
+void resetTrainingActionState(State&);
 
 }  // namespace game::campaign
