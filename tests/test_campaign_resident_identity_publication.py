@@ -163,5 +163,32 @@ class ResidentIdentityPublicationTests(unittest.TestCase):
         self.assertIsInstance(check,_PublishedSourceCheck);self.compare(reference,actual)
         helper.assert_native(setup,actual,[good,bad],[True,False])
 
+    def test_reviewed_field_formatter_unrolled_source_publication_and_fragment_config_tamper(self):
+        from studies.campaign.backends.resident_state_json_fields import ParallelFieldStateJson
+        envs=[chance_tests.pending_fixture(training=True,face=1),chance_tests.pending_fixture(training=True,face=12,active="search")]
+        before,handler,caps,expected=self.setup(envs);reference=handler.resolve(before,expected,capacities=caps)
+        formatter=ParallelFieldStateJson(handler.state_json.number_context,fragment_group_size=1,
+            digest_implementation="unrolled",digest_group_size=1)
+        key=formatter.identities(before,byte_capacity=caps.json_byte_capacity)
+        certificate_tests.ResidentIdentityCertificateTests().same(key,expected)
+        self.assertIs(source_identity_check(formatter,before,key,byte_capacity=262144,reuse=True),key)
+        handler.state_json=formatter;handler.reuse_certified_source=True
+        actual=handler.resolve(before,key,capacities=caps);self.compare(reference,actual)
+        chance_tests.ResidentRecruitmentChanceTests().assert_native(before,actual,envs)
+        private=self.proof(formatter,actual)
+        with patch.object(torch.Tensor,"cpu",side_effect=AssertionError("Host transfer")), \
+             patch.object(torch.Tensor,"item",side_effect=AssertionError("Host scalar")), \
+             patch.object(torch.Tensor,"__bool__",side_effect=AssertionError("Host bool")), \
+             patch("studies.campaign.backends.resident_state_json_fields._kernels",side_effect=AssertionError("Redundant JSON")):
+            self.assertIs(source_identity_check(formatter,actual.state,actual.identities,byte_capacity=262144,reuse=True),private)
+        formatter.fragment_group_size=4
+        fallback=source_identity_check(formatter,actual.state,actual.identities,byte_capacity=262144,reuse=True)
+        self.assertNotIsInstance(fallback,_PublishedSourceCheck)
+        certificate_tests.ResidentIdentityCertificateTests().same(fallback,formatter.identities(actual.state,byte_capacity=262144))
+        class Unknown(ParallelFieldStateJson):pass
+        foreign=Unknown(formatter.number_context,digest_implementation="unrolled",digest_group_size=1)
+        manual=foreign.identities(before,byte_capacity=262144)
+        self.assertIsNot(source_identity_check(foreign,before,manual,byte_capacity=262144,reuse=True),manual)
+
 
 if __name__=="__main__":unittest.main()

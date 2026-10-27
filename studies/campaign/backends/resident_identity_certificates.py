@@ -77,12 +77,17 @@ class _TensorStamp:
 
 def _snapshot(formatter,result):
     from .resident_state_json import ResidentStateJson,StateIdentityBatch
-    # Only the two independently reviewed concrete implementations may issue.
+    # Only independently reviewed concrete implementations may issue.
     approved=type(formatter) is ResidentStateJson
     if not approved:
         try:
             from .resident_state_json_parallel import ParallelUnitStateJson
             approved=type(formatter) is ParallelUnitStateJson
+        except ImportError:pass
+    if not approved:
+        try:
+            from .resident_state_json_fields import ParallelFieldStateJson
+            approved=type(formatter) is ParallelFieldStateJson
         except ImportError:pass
     if not approved or type(result) is not StateIdentityBatch:
         raise ValueError("Foreign formatter or identity")
@@ -94,6 +99,7 @@ def _snapshot(formatter,result):
         context.identity,context.string_count,context.device,context.random_stream_ids,
         native.schema,native.definition_fingerprint,native.rules_id,native.wire_context_fingerprint,native.string_count,
         formatter.fingerprint,formatter.rules_literal,formatter.digest_implementation,formatter.digest_group_size,
+        getattr(formatter,"fragment_group_size",None),
         _method(formatter,"serialize"),_method(formatter,"outer_engine_json"),_method(formatter,"identities"))
     tensors=[getattr(source,name) for name in _SOURCE_FIELDS]
     tensors.extend(getattr(context,name) for name in _CONTEXT_FIELDS)
