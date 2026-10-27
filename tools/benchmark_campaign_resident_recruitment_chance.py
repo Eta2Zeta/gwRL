@@ -23,7 +23,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tools.benchmark_campaign_device_state import StateConfig,atomic_json,require,supervise
 
-SCHEMA="campaign-complete-recruitment-chance-benchmark-v4"
+SCHEMA="campaign-complete-recruitment-chance-benchmark-v5"
 FAMILIES=("small_success","small_failure","wide_success","infrastructure_success")
 STREAMS=("actual","search","training")
 PROFILE_STAGES=("preflight","sample","effects","income","reset","forward_capability","forward",
@@ -42,6 +42,7 @@ class ChanceConfig(StateConfig):
     reuse_certified_source: bool = False
     field_group_size: int = 1
     editor_implementation: str = "reference"
+    container_implementation: str = "reference"
 
     def __post_init__(self):
         super().__post_init__()
@@ -57,11 +58,14 @@ class ChanceConfig(StateConfig):
         require(type(self.field_group_size) is int and self.field_group_size>0,"Field group size must be a positive integer")
         require(type(self.editor_implementation) is str and self.editor_implementation in {"reference","parallel"},
                 "Choose an explicit supported State editor")
+        require(type(self.container_implementation) is str and self.container_implementation in {"reference","parallel"},
+                "Choose an explicit supported container builder")
 
 
 def gpu_selection(config):
     return {name:getattr(config,name) for name in
-        ("formatter","digest_implementation","digest_group_size","reuse_certified_source","field_group_size","editor_implementation")}
+        ("formatter","digest_implementation","digest_group_size","reuse_certified_source","field_group_size",
+         "editor_implementation","container_implementation")}
 
 
 def provenance():
@@ -211,7 +215,8 @@ def worker(config,device,output,deadline):
         for B in config.batch_sizes:
             require(time.monotonic()<deadline,"Shared deadline exhausted")
             setup=time.perf_counter();envs,evidence=lanes(prepared[family],B,config.seed,deadline)
-            context=DeviceStateContext(gwrl_cpp.device_state_context(envs[0]),"mps",editor_implementation=config.editor_implementation)
+            context=DeviceStateContext(gwrl_cpp.device_state_context(envs[0]),"mps",editor_implementation=config.editor_implementation,
+                container_implementation=config.container_implementation)
             captured=gwrl_cpp.capture_device_states(context.native,envs);before=DeviceStateBatch.from_native(captured,context=context)
             relations=ResidentPoliticalRelations(context,gwrl_cpp.campaign_relations_context(envs[0]))
             recruitment=ResidentRecruitment(relations,gwrl_cpp.campaign_recruitment_context(envs[0]))
@@ -335,6 +340,7 @@ def main(argv=None):
     parser.add_argument("--digest-group-size",type=int)
     parser.add_argument("--reuse-certified-source",action="store_true")
     parser.add_argument("--editor-implementation",choices=("reference","parallel"),default="reference")
+    parser.add_argument("--container-implementation",choices=("reference","parallel"),default="reference")
     parser.add_argument("--_worker",type=Path,help=argparse.SUPPRESS);parser.add_argument("--_device",help=argparse.SUPPRESS)
     parser.add_argument("--_deadline",type=float,help=argparse.SUPPRESS)
     args=parser.parse_args(argv)
@@ -345,7 +351,7 @@ def main(argv=None):
         native_workers=args.native_workers,seconds=args.seconds,formatter=args.formatter,
         digest_implementation=args.digest_implementation,digest_group_size=args.digest_group_size,
         reuse_certified_source=args.reuse_certified_source,field_group_size=args.field_group_size,
-        editor_implementation=args.editor_implementation)
+        editor_implementation=args.editor_implementation,container_implementation=args.container_implementation)
     require(not args.output.exists(),"Choose a fresh evidence path")
     result=supervise(config,"mps",args.output,deadline=time.monotonic()+config.seconds,worker_script=Path(__file__))
     result=finalize(result,config);atomic_json(args.output,result)

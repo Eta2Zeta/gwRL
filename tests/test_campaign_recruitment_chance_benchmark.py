@@ -130,18 +130,21 @@ class RecruitmentChanceNativeBenchmarkTests(unittest.TestCase):
     def test_explicit_optimization_choices_preserve_default_and_reuse_evidence(self):
         baseline=ChanceConfig()
         self.assertEqual(gpu_selection(baseline),dict(formatter="reference",digest_implementation="reference",
-            digest_group_size=None,reuse_certified_source=False,field_group_size=1,editor_implementation="reference"))
+            digest_group_size=None,reuse_certified_source=False,field_group_size=1,editor_implementation="reference",
+            container_implementation="reference"))
         for kwargs in ({"formatter":"auto"},{"digest_implementation":"unknown"},{"digest_group_size":True},
                        {"digest_group_size":0},{"digest_group_size":1.5},{"reuse_certified_source":1},
                        {"field_group_size":0},{"field_group_size":True},{"editor_implementation":"auto"},
-                       {"editor_implementation":True}):
+                       {"editor_implementation":True},{"container_implementation":"auto"},{"container_implementation":[]}):
             with self.assertRaises(ValueError):ChanceConfig(**kwargs)
         chosen=ChanceConfig(formatter="parallel_units",digest_implementation="unrolled",digest_group_size=32,
             reuse_certified_source=True)
         self.assertEqual(gpu_selection(chosen),dict(formatter="parallel_units",digest_implementation="unrolled",
-            digest_group_size=32,reuse_certified_source=True,field_group_size=1,editor_implementation="reference"))
+            digest_group_size=32,reuse_certified_source=True,field_group_size=1,editor_implementation="reference",
+            container_implementation="reference"))
         self.assertEqual(ChanceConfig(formatter="parallel_fields",field_group_size=4).field_group_size,4)
         self.assertEqual(ChanceConfig(editor_implementation="parallel").editor_implementation,"parallel")
+        self.assertEqual(ChanceConfig(container_implementation="parallel").container_implementation,"parallel")
 
 
 if __name__=="__main__":unittest.main()

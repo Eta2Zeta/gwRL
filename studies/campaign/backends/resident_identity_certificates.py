@@ -96,7 +96,8 @@ def _snapshot(formatter,result):
         raise ValueError("Foreign source/number context")
     native=context.native
     metadata=(id(source),id(context),id(native),id(numbers),type(formatter),
-        context.identity,context.string_count,context.device,context.random_stream_ids,context.editor_implementation,
+        context.identity,context.string_count,context.device,context.random_stream_ids,
+        getattr(context,"editor_implementation","reference"),getattr(context,"container_implementation","reference"),
         native.schema,native.definition_fingerprint,native.rules_id,native.wire_context_fingerprint,native.string_count,
         formatter.fingerprint,formatter.rules_literal,formatter.digest_implementation,formatter.digest_group_size,
         getattr(formatter,"fragment_group_size",None),

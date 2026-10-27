@@ -101,6 +101,13 @@ class ResidentIdentityCertificateTests(unittest.TestCase):
             actual=self.check(formatter,before,expected)
             self.assertIsNot(actual,expected);self.same(actual,expected)
         finally:before.context._editor_implementation=old
+        expected=formatter.identities(before,byte_capacity=caps.json_byte_capacity)
+        old=before.context._container_implementation
+        try:
+            before.context._container_implementation="parallel"
+            actual=self.check(formatter,before,expected)
+            self.assertIsNot(actual,expected);self.same(actual,expected)
+        finally:before.context._container_implementation=old
 
     def test_all_public_output_buffers_and_nested_replacements_are_stamped(self):
         before,handler,caps,_=self.setup();formatter=handler.state_json
