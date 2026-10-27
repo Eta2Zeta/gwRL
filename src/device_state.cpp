@@ -253,7 +253,8 @@ DeviceStateContext::DeviceStateContext(const Engine& engine):definition(engine.s
     for(const auto* text:{"actual","search","training","territorial","china_control_bonus","major","city_ipp_lost","city_damage",
             "action","interrupt","chance","outcome","faces","request_id","beneficiary","zone","zones","project","facility","recruitment_roll",
             "recruitment_place_infantry","recruitment_place_militia","recruitment_advance_ship","recruitment_repair_facility",
-            "recruitment_choice","politics_sequence","schema","visited_configurations","declined_rail_requests",trainingActionSchema})pool.intern(text);
+            "recruitment_choice","politics_sequence","schema","visited_configurations","declined_rail_requests",trainingActionSchema,
+            "recruitment_attempted"})pool.intern(text);
     stringIds=pool.index;
     flattenStrings(strings,stringBytes,stringOffsets);
     wireContextFingerprint=wireFingerprint(*this);
