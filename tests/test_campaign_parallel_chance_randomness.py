@@ -49,6 +49,23 @@ class ParallelChanceRandomnessTests(original.ResidentChanceIOTests):
             with self.assertRaisesRegex(ValueError, "implementation"):
                 install_sampled_randomness(before, before, sampled, implementation=invalid)
 
+    def test_complete_handler_can_isolate_random_copy_without_changing_other_policies(self):
+        from studies.campaign.backends.resident_recruitment_chance import ResidentRecruitmentChance
+        from tests import test_campaign_resident_recruitment_chance as chance_tests
+        from tests.test_campaign_resident_identity_certificates import ResidentIdentityCertificateTests
+        helper = chance_tests.ResidentRecruitmentChanceTests()
+        envs = [chance_tests.pending_fixture(face=face) for face in (1, 12)]
+        before, original, capacities, key = helper.setup(envs)
+        handlers = [ResidentRecruitmentChance(before.context, original.effects, original.income,
+                    original.state_json, random_implementation=policy) for policy in ("reference", "parallel")]
+        results = [handler.resolve(before, key, capacities=capacities) for handler in handlers]
+        ResidentIdentityCertificateTests()._same_result(*results)
+        helper.assert_native(before, results[1], envs)
+        for invalid in ("auto", [], True):
+            with self.assertRaisesRegex(ValueError, "RNG installation"):
+                ResidentRecruitmentChance(before.context, original.effects, original.income,
+                    original.state_json, random_implementation=invalid)
+
 
 if __name__ == "__main__":
     unittest.main()

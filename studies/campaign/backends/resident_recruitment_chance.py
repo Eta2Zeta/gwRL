@@ -364,8 +364,11 @@ def _invalid_identities(identities,state,invalid):
 
 
 class ResidentRecruitmentChance:
-    def __init__(self,state_context,effects,income_context,state_json,*,reuse_certified_source=False):
+    def __init__(self,state_context,effects,income_context,state_json,*,reuse_certified_source=False,random_implementation=None):
         if type(reuse_certified_source) is not bool:raise TypeError("Certified source reuse must be an explicit bool")
+        if random_implementation is not None and (type(random_implementation) is not str or random_implementation not in {"reference","parallel"}):
+            raise ValueError("Recruitment chance RNG installation must use reference, parallel or the context default")
+        self.random_implementation=random_implementation
         self.reuse_certified_source=reuse_certified_source
         if _device(state_context.device).type!="mps":
             raise ValueError("Recruitment chance requires explicit Apple GPU execution; no CPU fallback")
@@ -524,7 +527,7 @@ class ResidentRecruitmentChance:
             string_capacity=capacities.string_capacity,byte_capacity=capacities.byte_capacity)
         required.update(event_state=event.required_state_capacity,event_block=event.required_block_capacity,event_strings=event.required_string_usage)
         active=stage("event",RecruitmentChanceError.EVENT,event.errors,active,event.committed)
-        random=install_sampled_randomness(before,event.state,sampled,active)
+        random=install_sampled_randomness(before,event.state,sampled,active,implementation=self.random_implementation)
         active=stage("random",RecruitmentChanceError.RANDOM,random.errors,active,random.committed)
         committed=~(errors!=0).any();candidate=random.state
         baseline=self.reserve(before,capacities)

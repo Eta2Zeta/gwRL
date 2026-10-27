@@ -120,6 +120,7 @@ class RecruitmentChanceNativeBenchmarkTests(unittest.TestCase):
         for mutate in (lambda r:r["cases"].pop(),lambda r:r["cases"][0]["gpu_seconds"].__setitem__(0,float("nan")),
                        lambda r:r["cases"][0]["native"]["pool"].update(workers=1),lambda r:r.pop("native_pool"),
                        lambda r:r["gpu_selection"].update(formatter="parallel_units"),
+                       lambda r:r["gpu_selection"].update(random_implementation="parallel"),
                        lambda r:r["cases"][0].update(certified_source_hits=1),
                        lambda r:r["cases"][0].update(source_unchanged=False),
                        lambda r:r["cases"][0]["native"]["serial"].update(repeated_outputs_exact=False)):
@@ -131,20 +132,23 @@ class RecruitmentChanceNativeBenchmarkTests(unittest.TestCase):
         baseline=ChanceConfig()
         self.assertEqual(gpu_selection(baseline),dict(formatter="reference",digest_implementation="reference",
             digest_group_size=None,reuse_certified_source=False,field_group_size=1,editor_implementation="reference",
-            container_implementation="reference"))
+            container_implementation="reference",random_implementation=None))
         for kwargs in ({"formatter":"auto"},{"digest_implementation":"unknown"},{"digest_group_size":True},
                        {"digest_group_size":0},{"digest_group_size":1.5},{"reuse_certified_source":1},
                        {"field_group_size":0},{"field_group_size":True},{"editor_implementation":"auto"},
-                       {"editor_implementation":True},{"container_implementation":"auto"},{"container_implementation":[]}):
+                       {"editor_implementation":True},{"container_implementation":"auto"},{"container_implementation":[]},
+                       {"random_implementation":"auto"},{"random_implementation":[]},{"random_implementation":True}):
             with self.assertRaises(ValueError):ChanceConfig(**kwargs)
         chosen=ChanceConfig(formatter="parallel_units",digest_implementation="unrolled",digest_group_size=32,
             reuse_certified_source=True)
         self.assertEqual(gpu_selection(chosen),dict(formatter="parallel_units",digest_implementation="unrolled",
             digest_group_size=32,reuse_certified_source=True,field_group_size=1,editor_implementation="reference",
-            container_implementation="reference"))
+            container_implementation="reference",random_implementation=None))
         self.assertEqual(ChanceConfig(formatter="parallel_fields",field_group_size=4).field_group_size,4)
         self.assertEqual(ChanceConfig(editor_implementation="parallel").editor_implementation,"parallel")
         self.assertEqual(ChanceConfig(container_implementation="parallel").container_implementation,"parallel")
+        self.assertEqual(ChanceConfig(random_implementation="parallel").random_implementation,"parallel")
+        self.assertEqual(ChanceConfig(random_implementation="reference").random_implementation,"reference")
 
 
 if __name__=="__main__":unittest.main()

@@ -23,7 +23,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tools.benchmark_campaign_device_state import StateConfig,atomic_json,require,supervise
 
-SCHEMA="campaign-complete-recruitment-chance-benchmark-v5"
+SCHEMA="campaign-complete-recruitment-chance-benchmark-v6"
 FAMILIES=("small_success","small_failure","wide_success","infrastructure_success")
 STREAMS=("actual","search","training")
 PROFILE_STAGES=("preflight","sample","effects","income","reset","forward_capability","forward",
@@ -43,6 +43,7 @@ class ChanceConfig(StateConfig):
     field_group_size: int = 1
     editor_implementation: str = "reference"
     container_implementation: str = "reference"
+    random_implementation: str | None = None
 
     def __post_init__(self):
         super().__post_init__()
@@ -60,12 +61,14 @@ class ChanceConfig(StateConfig):
                 "Choose an explicit supported State editor")
         require(type(self.container_implementation) is str and self.container_implementation in {"reference","parallel"},
                 "Choose an explicit supported container builder")
+        require(self.random_implementation is None or type(self.random_implementation) is str and self.random_implementation in {"reference","parallel"},
+                "Choose an explicit supported RNG installer or the context default")
 
 
 def gpu_selection(config):
     return {name:getattr(config,name) for name in
         ("formatter","digest_implementation","digest_group_size","reuse_certified_source","field_group_size",
-         "editor_implementation","container_implementation")}
+         "editor_implementation","container_implementation","random_implementation")}
 
 
 def provenance():
@@ -227,7 +230,7 @@ def worker(config,device,output,deadline):
                 digest_implementation=config.digest_implementation,digest_group_size=config.digest_group_size,**field_options)
             handler=ResidentRecruitmentChance(context,ResidentRecruitmentEffects(recruitment),
                 ResidentIncomeContext(context,gwrl_cpp.campaign_income_context(envs[0])),formatter,
-                reuse_certified_source=config.reuse_certified_source)
+                reuse_certified_source=config.reuse_certified_source,random_implementation=config.random_implementation)
             maximum=prepared[family]["choices"];C=before.records.shape[1];N=len(relations.nation_ids)
             cap=C+7+14*maximum+4*N+64;choices=B*maximum
             caps=RecruitmentChanceCapacities(cap,cap,choices,512,
@@ -341,6 +344,7 @@ def main(argv=None):
     parser.add_argument("--reuse-certified-source",action="store_true")
     parser.add_argument("--editor-implementation",choices=("reference","parallel"),default="reference")
     parser.add_argument("--container-implementation",choices=("reference","parallel"),default="reference")
+    parser.add_argument("--random-implementation",choices=("reference","parallel"),default=None)
     parser.add_argument("--_worker",type=Path,help=argparse.SUPPRESS);parser.add_argument("--_device",help=argparse.SUPPRESS)
     parser.add_argument("--_deadline",type=float,help=argparse.SUPPRESS)
     args=parser.parse_args(argv)
@@ -351,7 +355,8 @@ def main(argv=None):
         native_workers=args.native_workers,seconds=args.seconds,formatter=args.formatter,
         digest_implementation=args.digest_implementation,digest_group_size=args.digest_group_size,
         reuse_certified_source=args.reuse_certified_source,field_group_size=args.field_group_size,
-        editor_implementation=args.editor_implementation,container_implementation=args.container_implementation)
+        editor_implementation=args.editor_implementation,container_implementation=args.container_implementation,
+        random_implementation=args.random_implementation)
     require(not args.output.exists(),"Choose a fresh evidence path")
     result=supervise(config,"mps",args.output,deadline=time.monotonic()+config.seconds,worker_script=Path(__file__))
     result=finalize(result,config);atomic_json(args.output,result)

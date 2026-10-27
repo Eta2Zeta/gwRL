@@ -23,3 +23,12 @@ gold, capacity failures and the existing unsupported naval hook rollback. Those
 checks took 79.094 s (80.073 s guarded), peaking at 3,787,939,328 charged bytes.
 Each job used two CPU threads; these concurrent correctness timings are not
 throughput evidence. No speed claim is made before a separate matched benchmark.
+
+The complete recruitment handler now accepts an independent explicit RNG-copy
+policy, with `None` retaining the context default. Benchmark schema v6 records
+that selection and rejects mismatched reports. A separate full-handler case
+matched both policies against each other and native state/history/RNG while all
+other policies stayed identical; option/finalizer checks also passed. This lets a
+future timing isolate this copy from the earlier editor/container changes within
+one frozen runtime. The first test command used two incorrect harness class
+names; those two checks were rerun successfully under their actual class name.
