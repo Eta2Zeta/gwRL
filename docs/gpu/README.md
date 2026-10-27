@@ -28,6 +28,8 @@ versions a CPU correctness fix discovered while connecting GPU chance effects;
 it is not counted as an optimization or applied to historical checkpoints.
 The [terminal-score arithmetic checks](metal_score_arithmetic_2026_10_26.md)
 cover native binary64 score bits and once-rounded training targets on Metal.
+The [indexed-preparation measurements](metal_indexed_preparation_2026_10_26.md)
+record the later parallel presence/declaration path and its remaining limits.
 
 ## Execution contract
 

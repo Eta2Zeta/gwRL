@@ -1,0 +1,2085 @@
+{
+  "artifacts": {
+    "routes-indexed-fused.json": {
+      "guard": {
+        "cpu_budget": 12,
+        "diagnostic": null,
+        "elapsed_seconds": 28.67742720802198,
+        "margin_bytes": 1000000000,
+        "memory_bytes": 8000000000,
+        "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+        "mps_allocator_reserved_bytes": 3000000000,
+        "sampled_peak_charged_bytes": 4935345488,
+        "shared_deadline_monotonic": 222515.284303833
+      },
+      "path": "studies/campaign/runs/gpu-backend-2026-10-26/routes-indexed-fused.json",
+      "sha256": "825649e035604acb2d3353be9d3088f570766ab9cd4cd17cb4f45fddb658a5f4",
+      "stable": true
+    },
+    "routes-indexed-parallel.json": {
+      "guard": {
+        "cpu_budget": 12,
+        "diagnostic": null,
+        "elapsed_seconds": 28.504461957985768,
+        "margin_bytes": 1000000000,
+        "memory_bytes": 8000000000,
+        "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+        "mps_allocator_reserved_bytes": 3000000000,
+        "sampled_peak_charged_bytes": 4935296408,
+        "shared_deadline_monotonic": 222581.242662541
+      },
+      "path": "studies/campaign/runs/gpu-backend-2026-10-26/routes-indexed-parallel.json",
+      "sha256": "4b25d4ff20d689efc1e2ee195fa44ef4a7821caedb0bdd3a5c3d48286224b0ec",
+      "stable": true
+    },
+    "routes-indexed-reference.json": {
+      "guard": {
+        "cpu_budget": 12,
+        "diagnostic": null,
+        "elapsed_seconds": 28.9251771249983,
+        "margin_bytes": 1000000000,
+        "memory_bytes": 8000000000,
+        "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+        "mps_allocator_reserved_bytes": 3000000000,
+        "sampled_peak_charged_bytes": 4932363600,
+        "shared_deadline_monotonic": 222408.240184166
+      },
+      "path": "studies/campaign/runs/gpu-backend-2026-10-26/routes-indexed-reference.json",
+      "sha256": "cfe24d720b142bcb7020fc76176781c8830b83e784702687445d347558f005a8",
+      "stable": true
+    }
+  },
+  "cases": [
+    {
+      "cpu_seconds": [
+        0.000488667,
+        0.000467334,
+        0.000417292,
+        0.000459083,
+        0.000444708
+      ],
+      "evidence": {
+        "allowed_queries": 39,
+        "complete_native_results_sha256": "b68b7c035b4d855cb255bd85081cf66473b47433a0caf66eba0b0e3422ed7d5f",
+        "disallowed_queries": 909,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          },
+          "ordinary": {
+            "allowed": 39,
+            "exceptions": 0,
+            "queries": 316
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 158
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 72,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 32,
+          "Insufficient movement points": 33,
+          "Narrow crossing requires its own movement mode": 4,
+          "No movement remaining": 123,
+          "Noncombat movement phase required": 149,
+          "Only Marines attack; infantry-class units may noncombat cross": 2,
+          "Ordinary land movement requires a land unit": 36,
+          "Strategic rail is noncombat movement": 316,
+          "Terrain ends movement immediately": 34,
+          "Unit is not eligible to blitz": 108,
+          "allowed": 39
+        },
+        "verified_queries": 948
+      },
+      "gpu_fused_seconds": [
+        0.0036535830004140735,
+        0.003620041999965906,
+        0.00367220799671486,
+        0.0037296249938663095,
+        0.0037199170037638396
+      ],
+      "gpu_indexed_seconds": [
+        0.0034401669981889427,
+        0.0030051250068936497,
+        0.0022855830029584467,
+        0.0021859160042367876,
+        0.00217500000144355
+      ],
+      "gpu_reference_seconds": [
+        0.0036987919884268194,
+        0.003673208993859589,
+        0.0035587919992394745,
+        0.003537041979143396,
+        0.00352716600173153
+      ],
+      "indexed_reused_seconds": [
+        0.00044383297790773213,
+        0.00041912501910701394,
+        0.00031508298707194626,
+        0.0003120829933322966,
+        0.0002947920002043247
+      ],
+      "lanes": 1,
+      "position": "japan_round1_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4374,
+        "allocated_sid_slots": 4374,
+        "nonunit_active_sids": 4276,
+        "territory_entries": 31,
+        "unit_entries": 98,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 948,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "dfe969de96b1271a6c2961cdec469c9db5c1354032fcac9f96fda8d6b0316c95",
+          "dynamic_string_offsets": "4213f2db58dbaf052d55c1b24f95c8a0717eaf7bf01b793cfe565b5b100c23b9",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "7405894505edb262a5fc6a5c90d28ced8b8b8801b47141930666868e0ea6da8c",
+          "records": "cc1f524035fffdf742c6ca17c35887bd96d5102b0f2ef4d88e8e12b2cfc95dcb",
+          "sections": "000dc793527e83eb4aab4934d8d26170238037ebba997960c310a6b0fb54f099",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.001612084,
+        0.001609167,
+        0.001653917,
+        0.001760459,
+        0.001748333
+      ],
+      "evidence": {
+        "allowed_queries": 156,
+        "complete_native_results_sha256": "e1ce4663943bde2528c070dd205607f76eb5bf96ad42650799b5c00b831d73dc",
+        "disallowed_queries": 3636,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          },
+          "ordinary": {
+            "allowed": 156,
+            "exceptions": 0,
+            "queries": 1264
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 632
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 288,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 128,
+          "Insufficient movement points": 132,
+          "Narrow crossing requires its own movement mode": 16,
+          "No movement remaining": 492,
+          "Noncombat movement phase required": 596,
+          "Only Marines attack; infantry-class units may noncombat cross": 8,
+          "Ordinary land movement requires a land unit": 144,
+          "Strategic rail is noncombat movement": 1264,
+          "Terrain ends movement immediately": 136,
+          "Unit is not eligible to blitz": 432,
+          "allowed": 156
+        },
+        "verified_queries": 3792
+      },
+      "gpu_fused_seconds": [
+        0.0037557090108748525,
+        0.0036441660195123404,
+        0.0037764579756185412,
+        0.003685709001729265,
+        0.0036897909885738045
+      ],
+      "gpu_indexed_seconds": [
+        0.0018528749933466315,
+        0.0018679589848034084,
+        0.0018964170012623072,
+        0.0018479999853298068,
+        0.0018480000144336373
+      ],
+      "gpu_reference_seconds": [
+        0.0037595419853460044,
+        0.003783083986490965,
+        0.0038509999867528677,
+        0.0036965000035706908,
+        0.0037172499869484454
+      ],
+      "indexed_reused_seconds": [
+        0.0002690000110305846,
+        0.00029200001154094934,
+        0.00031316702370531857,
+        0.00028329098131507635,
+        0.00030183399212546647
+      ],
+      "lanes": 4,
+      "position": "japan_round1_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4374,
+        "allocated_sid_slots": 4374,
+        "nonunit_active_sids": 4276,
+        "territory_entries": 31,
+        "unit_entries": 98,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 948,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "dfe969de96b1271a6c2961cdec469c9db5c1354032fcac9f96fda8d6b0316c95",
+          "dynamic_string_offsets": "4213f2db58dbaf052d55c1b24f95c8a0717eaf7bf01b793cfe565b5b100c23b9",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "e3433911f48e7f9179255bb8a4654a1236ba4c75163ce034603d92639477927d",
+          "records": "7cc4a10fbbb0fe14a5a88bb46d32362fa6c2b2905dd1b9371d8aaeb5faacc7ac",
+          "sections": "903e3e245db26f470742acdcf02c24f94862ea781fa61cdc41381b1fe21aa1f3",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.007453625,
+        0.007523833,
+        0.007303833,
+        0.00747725,
+        0.007334541
+      ],
+      "evidence": {
+        "allowed_queries": 624,
+        "complete_native_results_sha256": "bd542cacb3cf81b4fd7ff034b3bffa258ce82d78978769f6d3c7fee3560107af",
+        "disallowed_queries": 14544,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          },
+          "ordinary": {
+            "allowed": 624,
+            "exceptions": 0,
+            "queries": 5056
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2528
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 1152,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 512,
+          "Insufficient movement points": 528,
+          "Narrow crossing requires its own movement mode": 64,
+          "No movement remaining": 1968,
+          "Noncombat movement phase required": 2384,
+          "Only Marines attack; infantry-class units may noncombat cross": 32,
+          "Ordinary land movement requires a land unit": 576,
+          "Strategic rail is noncombat movement": 5056,
+          "Terrain ends movement immediately": 544,
+          "Unit is not eligible to blitz": 1728,
+          "allowed": 624
+        },
+        "verified_queries": 15168
+      },
+      "gpu_fused_seconds": [
+        0.004345917026512325,
+        0.004225583019433543,
+        0.003857250005239621,
+        0.004136708012083545,
+        0.004171917011262849
+      ],
+      "gpu_indexed_seconds": [
+        0.002192125015426427,
+        0.002357042016228661,
+        0.002144957979908213,
+        0.0021226669778116047,
+        0.0021779160015285015
+      ],
+      "gpu_reference_seconds": [
+        0.004347041016444564,
+        0.004613083001459017,
+        0.0046743750281166285,
+        0.004646000015782192,
+        0.004163332981988788
+      ],
+      "indexed_reused_seconds": [
+        0.00029799999902024865,
+        0.0003257080097682774,
+        0.000306208006804809,
+        0.0003115830186288804,
+        0.00032616598764434457
+      ],
+      "lanes": 16,
+      "position": "japan_round1_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4374,
+        "allocated_sid_slots": 4374,
+        "nonunit_active_sids": 4276,
+        "territory_entries": 31,
+        "unit_entries": 98,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 948,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "dfe969de96b1271a6c2961cdec469c9db5c1354032fcac9f96fda8d6b0316c95",
+          "dynamic_string_offsets": "4213f2db58dbaf052d55c1b24f95c8a0717eaf7bf01b793cfe565b5b100c23b9",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "586b44c699c5026fc139c017fc544f8f391a7d584d092c97b8babb0693696217",
+          "records": "f1156476b32af6010075fa41afda6148e5c15795f584998660c4455adc0cdbdc",
+          "sections": "e2435b3d5de35d6512c56f22c63fb055632fed130723774cdca2c45c8a7c05bc",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.028680708,
+        0.026690917,
+        0.026756584,
+        0.026704875,
+        0.026031709
+      ],
+      "evidence": {
+        "allowed_queries": 2496,
+        "complete_native_results_sha256": "10906ffac43fe758862413df7336267ac02d71a417307fc9426ccf4202a38993",
+        "disallowed_queries": 58176,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          },
+          "ordinary": {
+            "allowed": 2496,
+            "exceptions": 0,
+            "queries": 20224
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 10112
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 4608,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 2048,
+          "Insufficient movement points": 2112,
+          "Narrow crossing requires its own movement mode": 256,
+          "No movement remaining": 7872,
+          "Noncombat movement phase required": 9536,
+          "Only Marines attack; infantry-class units may noncombat cross": 128,
+          "Ordinary land movement requires a land unit": 2304,
+          "Strategic rail is noncombat movement": 20224,
+          "Terrain ends movement immediately": 2176,
+          "Unit is not eligible to blitz": 6912,
+          "allowed": 2496
+        },
+        "verified_queries": 60672
+      },
+      "gpu_fused_seconds": [
+        0.004352667019702494,
+        0.004939250007737428,
+        0.005092165985843167,
+        0.004355750017566606,
+        0.00398924999171868
+      ],
+      "gpu_indexed_seconds": [
+        0.003783916006796062,
+        0.0036842499976046383,
+        0.003777374979108572,
+        0.00345054198987782,
+        0.00346400000853464
+      ],
+      "gpu_reference_seconds": [
+        0.006191124994074926,
+        0.006235957989702001,
+        0.006065958994440734,
+        0.006130458990810439,
+        0.006093042000429705
+      ],
+      "indexed_reused_seconds": [
+        0.0012679999927058816,
+        0.00095629200222902,
+        0.0011107080208603293,
+        0.0012439580168575048,
+        0.001282332988921553
+      ],
+      "lanes": 64,
+      "position": "japan_round1_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4374,
+        "allocated_sid_slots": 4374,
+        "nonunit_active_sids": 4276,
+        "territory_entries": 31,
+        "unit_entries": 98,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 948,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 4091,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "dfe969de96b1271a6c2961cdec469c9db5c1354032fcac9f96fda8d6b0316c95",
+          "dynamic_string_offsets": "4213f2db58dbaf052d55c1b24f95c8a0717eaf7bf01b793cfe565b5b100c23b9",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "6bd4a54c7dc957382ff6e50cb418a2fb725a19b4ca81ee740b2a56e58d9457e4",
+          "records": "011fe230ced8a5ec8e2e7ba190fb372e0cb429bbceb07cbb9e35a1d9abe7c75a",
+          "sections": "9141c38c5083405a541986353f7cb31109df306d935b7d393d34e4822dc27b93",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 4091,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.000194042,
+        0.000190959,
+        0.000167709,
+        0.000162166,
+        0.000217667
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "3e4ff02f918cc98d40778ae9801eb11e16e442a6a04fe2dee2a9443e6c9cecb7",
+        "disallowed_queries": 738,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 246
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 123
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 103,
+          "Militia must start and end in its Home Country": 42,
+          "No movement remaining": 63,
+          "Ordinary land movement requires a land unit": 80,
+          "Unit already moved this turn": 204,
+          "Unit combat moved this turn": 246
+        },
+        "verified_queries": 738
+      },
+      "gpu_fused_seconds": [
+        0.003331625019200146,
+        0.0033938330016098917,
+        0.003434292011661455,
+        0.0033264170051552355,
+        0.0033395829959772527
+      ],
+      "gpu_indexed_seconds": [
+        0.002532874990720302,
+        0.002021082997089252,
+        0.001947042008396238,
+        0.001956374995643273,
+        0.0018994169950019568
+      ],
+      "gpu_reference_seconds": [
+        0.003317750000860542,
+        0.0033215000003110617,
+        0.0032446660043206066,
+        0.003232542017940432,
+        0.0032399579940829426
+      ],
+      "indexed_reused_seconds": [
+        0.00031512498389929533,
+        0.0002901249972637743,
+        0.00027329198201186955,
+        0.00025099999038502574,
+        0.00023833400337025523
+      ],
+      "lanes": 1,
+      "position": "japan_round1_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4801,
+        "allocated_sid_slots": 4801,
+        "nonunit_active_sids": 4720,
+        "territory_entries": 31,
+        "unit_entries": 81,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 738,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "b49a18c029405111087f2f5e060e04f194546db24cb13706ccfea16ca063c544",
+          "dynamic_string_offsets": "9a03e96ce58d896df0c2aa9bb2db542f5494f9f48d36012c57b28fb9f49885b9",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "a061fc35306a6ec6a124ef6bb6d8a2cc94de1f653fc01a1d1211ce419aba24b5",
+          "records": "83afca77340e54aeef87880584ad3aa48ce4dfcc575a93b13f14cec73b452ce0",
+          "sections": "3c84e94c13fcb742699634f18dd03518015b0be324f89380b2582c3cf7ea43e0",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.0007645,
+        0.000638333,
+        0.000730708,
+        0.000649625,
+        0.000742417
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "787d078a8df04d0ee75f32df02d57f4e648db5df7f9fb5d797ad34cfa098bc6b",
+        "disallowed_queries": 2952,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 984
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 492
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 412,
+          "Militia must start and end in its Home Country": 168,
+          "No movement remaining": 252,
+          "Ordinary land movement requires a land unit": 320,
+          "Unit already moved this turn": 816,
+          "Unit combat moved this turn": 984
+        },
+        "verified_queries": 2952
+      },
+      "gpu_fused_seconds": [
+        0.0034028340014629066,
+        0.0033435420191381127,
+        0.0033362909744028,
+        0.003361959010362625,
+        0.0032990000036079437
+      ],
+      "gpu_indexed_seconds": [
+        0.0018766660068649799,
+        0.0018655410094652325,
+        0.0018715420155785978,
+        0.001826833002269268,
+        0.001888750004582107
+      ],
+      "gpu_reference_seconds": [
+        0.003673458006232977,
+        0.0033945840259548277,
+        0.0034675000060815364,
+        0.00346325000282377,
+        0.0034482080081943423
+      ],
+      "indexed_reused_seconds": [
+        0.00026983299176208675,
+        0.00024854199727997184,
+        0.00025108299450948834,
+        0.00025433299015276134,
+        0.0002800000074785203
+      ],
+      "lanes": 4,
+      "position": "japan_round1_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4801,
+        "allocated_sid_slots": 4801,
+        "nonunit_active_sids": 4720,
+        "territory_entries": 31,
+        "unit_entries": 81,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 738,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "b49a18c029405111087f2f5e060e04f194546db24cb13706ccfea16ca063c544",
+          "dynamic_string_offsets": "9a03e96ce58d896df0c2aa9bb2db542f5494f9f48d36012c57b28fb9f49885b9",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "2d96faf6a3f37f0b54280322352d23f23c8032ea38184b36ce1fc2373d5aa624",
+          "records": "e698231c618bbd46bfd6059388c55f3aba4bd4ca9c4f932ba133d365619f25db",
+          "sections": "9ae0458b42b105604db168bb083a4f04707e4cc6158cd485b782436e0060d8d9",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.002697375,
+        0.002666209,
+        0.002622792,
+        0.002518042,
+        0.002622625
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "b5b0aba97f7d5ad757a31ddc0c83aa22ccd63ee683eb3e730fa06c502ad8b6c5",
+        "disallowed_queries": 11808,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 3936
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1968
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 1648,
+          "Militia must start and end in its Home Country": 672,
+          "No movement remaining": 1008,
+          "Ordinary land movement requires a land unit": 1280,
+          "Unit already moved this turn": 3264,
+          "Unit combat moved this turn": 3936
+        },
+        "verified_queries": 11808
+      },
+      "gpu_fused_seconds": [
+        0.0038895000179763883,
+        0.0038864999951329082,
+        0.003840167017187923,
+        0.003783291991567239,
+        0.003403250011615455
+      ],
+      "gpu_indexed_seconds": [
+        0.0019626669818535447,
+        0.0024583339982200414,
+        0.002513916988391429,
+        0.0024354159832000732,
+        0.001995833998080343
+      ],
+      "gpu_reference_seconds": [
+        0.004143625003052875,
+        0.0038277090061455965,
+        0.004127457999857143,
+        0.004163334000622854,
+        0.0037981670175213367
+      ],
+      "indexed_reused_seconds": [
+        0.00029979198006913066,
+        0.000287041999399662,
+        0.00030783299007453024,
+        0.00031941698398441076,
+        0.0002894999925047159
+      ],
+      "lanes": 16,
+      "position": "japan_round1_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4801,
+        "allocated_sid_slots": 4801,
+        "nonunit_active_sids": 4720,
+        "territory_entries": 31,
+        "unit_entries": 81,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 738,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "b49a18c029405111087f2f5e060e04f194546db24cb13706ccfea16ca063c544",
+          "dynamic_string_offsets": "9a03e96ce58d896df0c2aa9bb2db542f5494f9f48d36012c57b28fb9f49885b9",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "d7ee8b1786f26c0df8c7faa49dc2c7688f8ff10aa7104ed36cae05efa863ce44",
+          "records": "6b1409edd502fbf08b37d0bc20786088287839fa186145baa19d4dae2ab146fc",
+          "sections": "f82c00cd32036261a28c8691d90c01f7da57e4ed0dadd4e2aa77966eb3d29b6a",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.0105405,
+        0.01124775,
+        0.010905416,
+        0.011404625,
+        0.012354584
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "aa235665bb29ffe43045e81b8b4ee12576d39cd9a6588240d84de5cdf1d32dd3",
+        "disallowed_queries": 47232,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 15744
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 7872
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 6592,
+          "Militia must start and end in its Home Country": 2688,
+          "No movement remaining": 4032,
+          "Ordinary land movement requires a land unit": 5120,
+          "Unit already moved this turn": 13056,
+          "Unit combat moved this turn": 15744
+        },
+        "verified_queries": 47232
+      },
+      "gpu_fused_seconds": [
+        0.004098082979908213,
+        0.003683582996018231,
+        0.004071875009685755,
+        0.004148875013925135,
+        0.0036808750010095537
+      ],
+      "gpu_indexed_seconds": [
+        0.0034037499863188714,
+        0.003357167006470263,
+        0.0035933750041294843,
+        0.0035097500076517463,
+        0.003847000014502555
+      ],
+      "gpu_reference_seconds": [
+        0.005311916989739984,
+        0.005265874991891906,
+        0.005296249990351498,
+        0.005107333010528237,
+        0.005424459028290585
+      ],
+      "indexed_reused_seconds": [
+        0.0005360420036595315,
+        0.0005433749756775796,
+        0.0009413750085514039,
+        0.0007214169891085476,
+        0.0009544579952489585
+      ],
+      "lanes": 64,
+      "position": "japan_round1_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 4801,
+        "allocated_sid_slots": 4801,
+        "nonunit_active_sids": 4720,
+        "territory_entries": 31,
+        "unit_entries": 81,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 738,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 7414,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "b49a18c029405111087f2f5e060e04f194546db24cb13706ccfea16ca063c544",
+          "dynamic_string_offsets": "9a03e96ce58d896df0c2aa9bb2db542f5494f9f48d36012c57b28fb9f49885b9",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "6a80acae59e8fd45a8756b6338e1ea3c031bdccb6a9c9fb5f2c79ab691c14a11",
+          "records": "93e363017b6b234630325f2306cbaf107578d4ea8706bcb09a6cab0fe8622c05",
+          "sections": "15a78a3ebda4dcf9eea8a29ab22049a36d267b7e29a6a9e92cd65b56166c70fa",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 7414,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.000481208,
+        0.000688291,
+        0.000500791,
+        0.000537084,
+        0.000360375
+      ],
+      "evidence": {
+        "allowed_queries": 20,
+        "complete_native_results_sha256": "67f7548b092040c6147226d24617e876fc6db5bec8e11b0e3b1cd9911ca43679",
+        "disallowed_queries": 754,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          },
+          "ordinary": {
+            "allowed": 20,
+            "exceptions": 0,
+            "queries": 258
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 129
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 52,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 60,
+          "Insufficient movement points": 32,
+          "No movement remaining": 63,
+          "Noncombat movement phase required": 106,
+          "Ordinary land movement requires a land unit": 92,
+          "Strategic rail is noncombat movement": 258,
+          "Terrain ends movement immediately": 6,
+          "Unit is not eligible to blitz": 85,
+          "allowed": 20
+        },
+        "verified_queries": 774
+      },
+      "gpu_fused_seconds": [
+        0.003265167004428804,
+        0.0032415410096291453,
+        0.0032483329996466637,
+        0.0032346670050174,
+        0.0032432079897262156
+      ],
+      "gpu_indexed_seconds": [
+        0.003426874987781048,
+        0.0030916249961592257,
+        0.003103458002442494,
+        0.0026304999773856252,
+        0.0025788340135477483
+      ],
+      "gpu_reference_seconds": [
+        0.003825833002338186,
+        0.003649666003184393,
+        0.0032313339761458337,
+        0.0032332909759134054,
+        0.003288999985670671
+      ],
+      "indexed_reused_seconds": [
+        0.0006917499995324761,
+        0.0006474159890785813,
+        0.0004576659994199872,
+        0.0003346250159665942,
+        0.0003008339845109731
+      ],
+      "lanes": 1,
+      "position": "japan_round2_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5040,
+        "allocated_sid_slots": 5040,
+        "nonunit_active_sids": 4962,
+        "territory_entries": 31,
+        "unit_entries": 78,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 774,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "707b39f930b15caa8aee7cf02692c45f4da020ae84f9395bba3cc63578d329cc",
+          "dynamic_string_offsets": "73fd43b0c84162e0d79230c88b6c21d5a7f859a27072d166394ec8ec2f2b8bea",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "6d33f64530e9ca0123c256409752e91708669ee9418c0de220f1e6c2c25d0057",
+          "records": "e9ddf518634d2e45e62f33b89f3efbec03954021814214832a99548460db1b7b",
+          "sections": "6145e3afca01e5aef85036d1ed2f57a0b71ecccc86393c2ee9eef208b5a07503",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.001225917,
+        0.001336542,
+        0.001305208,
+        0.001327625,
+        0.001285709
+      ],
+      "evidence": {
+        "allowed_queries": 80,
+        "complete_native_results_sha256": "d490cf08482d5a5f1e38674a96f3f018d38fe371722e1023364a3ed4cf447308",
+        "disallowed_queries": 3016,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          },
+          "ordinary": {
+            "allowed": 80,
+            "exceptions": 0,
+            "queries": 1032
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 516
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 208,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 240,
+          "Insufficient movement points": 128,
+          "No movement remaining": 252,
+          "Noncombat movement phase required": 424,
+          "Ordinary land movement requires a land unit": 368,
+          "Strategic rail is noncombat movement": 1032,
+          "Terrain ends movement immediately": 24,
+          "Unit is not eligible to blitz": 340,
+          "allowed": 80
+        },
+        "verified_queries": 3096
+      },
+      "gpu_fused_seconds": [
+        0.003262125013861805,
+        0.003295791015261784,
+        0.0031934170110616833,
+        0.003216832992620766,
+        0.0032172499923035502
+      ],
+      "gpu_indexed_seconds": [
+        0.001947249984368682,
+        0.0019287500181235373,
+        0.0020573750080075115,
+        0.0019915829761885107,
+        0.0019492909777909517
+      ],
+      "gpu_reference_seconds": [
+        0.0034787500044330955,
+        0.0034315420198254287,
+        0.0033732919837348163,
+        0.0033558339928276837,
+        0.003367625002283603
+      ],
+      "indexed_reused_seconds": [
+        0.0002837089996319264,
+        0.0003041250165551901,
+        0.00032966601429507136,
+        0.0002852920151781291,
+        0.0002786670229397714
+      ],
+      "lanes": 4,
+      "position": "japan_round2_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5040,
+        "allocated_sid_slots": 5040,
+        "nonunit_active_sids": 4962,
+        "territory_entries": 31,
+        "unit_entries": 78,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 774,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "707b39f930b15caa8aee7cf02692c45f4da020ae84f9395bba3cc63578d329cc",
+          "dynamic_string_offsets": "73fd43b0c84162e0d79230c88b6c21d5a7f859a27072d166394ec8ec2f2b8bea",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "21214e88b4739195e31d1d676eec9e748172b23b13d768762a22b2851ed927ba",
+          "records": "209deeaa2a70f41663b8f43f935742084828ae033b1929ff3145884e649f15c7",
+          "sections": "99b53943d30e5a3a9c08968d2f3d5e76eae9a9975ce94fb4df1118a9ea1e5fe7",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.004985292,
+        0.005124583,
+        0.005163292,
+        0.005509375,
+        0.005345792
+      ],
+      "evidence": {
+        "allowed_queries": 320,
+        "complete_native_results_sha256": "64bdfb37ff92e9fd31cb06277396675521b2d59b31cdd607d8e442e6a487f069",
+        "disallowed_queries": 12064,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          },
+          "ordinary": {
+            "allowed": 320,
+            "exceptions": 0,
+            "queries": 4128
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 2064
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 832,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 960,
+          "Insufficient movement points": 512,
+          "No movement remaining": 1008,
+          "Noncombat movement phase required": 1696,
+          "Ordinary land movement requires a land unit": 1472,
+          "Strategic rail is noncombat movement": 4128,
+          "Terrain ends movement immediately": 96,
+          "Unit is not eligible to blitz": 1360,
+          "allowed": 320
+        },
+        "verified_queries": 12384
+      },
+      "gpu_fused_seconds": [
+        0.0039406669966410846,
+        0.003381292015546933,
+        0.003983625007094815,
+        0.0038409169937949628,
+        0.003354707994731143
+      ],
+      "gpu_indexed_seconds": [
+        0.002522624999983236,
+        0.0024615000002086163,
+        0.002405208011623472,
+        0.0025940409977920353,
+        0.00261950001004152
+      ],
+      "gpu_reference_seconds": [
+        0.0037198750069364905,
+        0.0043525829969439656,
+        0.004252124985214323,
+        0.0037737920065410435,
+        0.004339750012150034
+      ],
+      "indexed_reused_seconds": [
+        0.00034662499092519283,
+        0.00027991700335405767,
+        0.00027225000667385757,
+        0.00035083299735561013,
+        0.00036216701846569777
+      ],
+      "lanes": 16,
+      "position": "japan_round2_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5040,
+        "allocated_sid_slots": 5040,
+        "nonunit_active_sids": 4962,
+        "territory_entries": 31,
+        "unit_entries": 78,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 774,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "707b39f930b15caa8aee7cf02692c45f4da020ae84f9395bba3cc63578d329cc",
+          "dynamic_string_offsets": "73fd43b0c84162e0d79230c88b6c21d5a7f859a27072d166394ec8ec2f2b8bea",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "5c914560af6b8a1e1e19b512c00b51a3a6c7337919d3fb51df8cac1ce024976d",
+          "records": "abc79a2a8f066c338180ed41db2393ffdb9d5798d9e6f6eed02e89ccdb6bf6db",
+          "sections": "cf02dbc0d8248dc54e41a34c635a6cd65c34350e9b6366b5ba81cbab87ccdc84",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.021819959,
+        0.020068,
+        0.020102541,
+        0.020345917,
+        0.020415125
+      ],
+      "evidence": {
+        "allowed_queries": 1280,
+        "complete_native_results_sha256": "83ed51015d7cdb8511257dd238da556142dbd48e8f397c614f08492078c0e8b5",
+        "disallowed_queries": 48256,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          },
+          "ordinary": {
+            "allowed": 1280,
+            "exceptions": 0,
+            "queries": 16512
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 8256
+          }
+        },
+        "outcomes": {
+          "Crossing must begin and end the unit's movement": 3328,
+          "Enemy land ends ordinary movement; resolve combat before blitzing": 3840,
+          "Insufficient movement points": 2048,
+          "No movement remaining": 4032,
+          "Noncombat movement phase required": 6784,
+          "Ordinary land movement requires a land unit": 5888,
+          "Strategic rail is noncombat movement": 16512,
+          "Terrain ends movement immediately": 384,
+          "Unit is not eligible to blitz": 5440,
+          "allowed": 1280
+        },
+        "verified_queries": 49536
+      },
+      "gpu_fused_seconds": [
+        0.004133291018661112,
+        0.0040861250017769635,
+        0.004127291991608217,
+        0.004095917014637962,
+        0.004161624994594604
+      ],
+      "gpu_indexed_seconds": [
+        0.0030184590141288936,
+        0.0032623750157654285,
+        0.0035927500284742564,
+        0.0039053750224411488,
+        0.0042044589936267585
+      ],
+      "gpu_reference_seconds": [
+        0.005089917016448453,
+        0.005215750017669052,
+        0.0047474159800913185,
+        0.005262208986096084,
+        0.005180666979867965
+      ],
+      "indexed_reused_seconds": [
+        0.000960292003583163,
+        0.0005851669993717223,
+        0.0009220830106642097,
+        0.0007842500053811818,
+        0.0010429160029161721
+      ],
+      "lanes": 64,
+      "position": "japan_round2_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5040,
+        "allocated_sid_slots": 5040,
+        "nonunit_active_sids": 4962,
+        "territory_entries": 31,
+        "unit_entries": 78,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 774,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 9318,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "707b39f930b15caa8aee7cf02692c45f4da020ae84f9395bba3cc63578d329cc",
+          "dynamic_string_offsets": "73fd43b0c84162e0d79230c88b6c21d5a7f859a27072d166394ec8ec2f2b8bea",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "627d24fd4e9fef64d6e7acf296b06130a929dd00190c04abc7e7e90c81be8fae",
+          "records": "caee060fb715e22cb2a335d9d5cddbf0fbadfc301a765cc9495ccb60d792f1eb",
+          "sections": "b81f9d88a7e3204145820c9c4bd12ca5471271b62f497fdf6051273b7edc53d5",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 9318,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.000134458,
+        0.000131667,
+        0.00013625,
+        0.0001365,
+        0.000149292
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "d1c31b00840ba69ca6c89bfa0ad3c6ca72b1a28cc937eb2c5f74b534268365f3",
+        "disallowed_queries": 642,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 214
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 107
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 87,
+          "Militia must start and end in its Home Country": 42,
+          "No movement remaining": 63,
+          "Ordinary land movement requires a land unit": 80,
+          "Unit already moved this turn": 172,
+          "Unit combat moved this turn": 198
+        },
+        "verified_queries": 642
+      },
+      "gpu_fused_seconds": [
+        0.0031383750028908253,
+        0.003134917002171278,
+        0.0030889579793438315,
+        0.0031591659935656935,
+        0.0031047090014908463
+      ],
+      "gpu_indexed_seconds": [
+        0.00200358300935477,
+        0.0018820409895852208,
+        0.001867375016445294,
+        0.0018830839835572988,
+        0.0018987079965882003
+      ],
+      "gpu_reference_seconds": [
+        0.003159457992296666,
+        0.003130124998278916,
+        0.003077750006923452,
+        0.0030933340021874756,
+        0.003219374979380518
+      ],
+      "indexed_reused_seconds": [
+        0.0002942080027423799,
+        0.0002610829833429307,
+        0.0002461250114720315,
+        0.00027395799406804144,
+        0.0003042090102098882
+      ],
+      "lanes": 1,
+      "position": "japan_round2_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5308,
+        "allocated_sid_slots": 5308,
+        "nonunit_active_sids": 5238,
+        "territory_entries": 31,
+        "unit_entries": 70,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 642,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "7e559a2198a248cf00f7b22911b9b81e885e0d0329ba36680196177746d77bb0",
+          "dynamic_string_offsets": "134861a89d3a9cb4d8a7473f47f213e96f9be00562b44abb0dde35a3226cc5c7",
+          "errors": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+          "lengths": "9bde5f116d4d66d5ccf1fe10cd67acb33c2bb1a3d2c11987b31f38aa6b009c11",
+          "records": "e9875a1237bdcfb4f9baef2dcd2880cf6b2e9ca130beadcee5a4eab228041bf4",
+          "sections": "a067ba5d94d498b21b337751d9089b7ec1a68e782c199da2fa1834d8046f2c87",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 1
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.000643208,
+        0.000617458,
+        0.000597291,
+        0.00055775,
+        0.000549459
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "4236b42004e88558eac4824b2d9e09aa949d80a2a9f7ec5d5127240738febda5",
+        "disallowed_queries": 2568,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 856
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 428
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 348,
+          "Militia must start and end in its Home Country": 168,
+          "No movement remaining": 252,
+          "Ordinary land movement requires a land unit": 320,
+          "Unit already moved this turn": 688,
+          "Unit combat moved this turn": 792
+        },
+        "verified_queries": 2568
+      },
+      "gpu_fused_seconds": [
+        0.0031291249906644225,
+        0.003063916024984792,
+        0.0031848750077188015,
+        0.003140957996947691,
+        0.0030808340234216303
+      ],
+      "gpu_indexed_seconds": [
+        0.0019625420100055635,
+        0.0019404999911785126,
+        0.0018964580085594207,
+        0.0018785420106723905,
+        0.0018866249884013087
+      ],
+      "gpu_reference_seconds": [
+        0.0032234169775620103,
+        0.0032003340020310134,
+        0.0032114589994307607,
+        0.0032447080011479557,
+        0.003228708024835214
+      ],
+      "indexed_reused_seconds": [
+        0.00026412500301375985,
+        0.0002671249967534095,
+        0.0002945000014733523,
+        0.00025599999935366213,
+        0.0002679169992916286
+      ],
+      "lanes": 4,
+      "position": "japan_round2_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5308,
+        "allocated_sid_slots": 5308,
+        "nonunit_active_sids": 5238,
+        "territory_entries": 31,
+        "unit_entries": 70,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 642,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "7e559a2198a248cf00f7b22911b9b81e885e0d0329ba36680196177746d77bb0",
+          "dynamic_string_offsets": "134861a89d3a9cb4d8a7473f47f213e96f9be00562b44abb0dde35a3226cc5c7",
+          "errors": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+          "lengths": "cffb46250114c4d4cf0c56b55835539efec2082e42a3facd4bce87dca8161ab0",
+          "records": "12b4976eac532c4d97323fef49516184b00d7f925fa0ebe5c31d6df07ff6514a",
+          "sections": "63b02504347473d4b5648fb4593033180f66328c4f2b7830d147b1a1c3a2e4f6",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 4
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.002118833,
+        0.002116708,
+        0.002197375,
+        0.002195,
+        0.002204292
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "92c2df40ae250ee6df46ad4591140c09368d6f0d7c4bd6b33381cb3f7d228e1d",
+        "disallowed_queries": 10272,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 3424
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 1712
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 1392,
+          "Militia must start and end in its Home Country": 672,
+          "No movement remaining": 1008,
+          "Ordinary land movement requires a land unit": 1280,
+          "Unit already moved this turn": 2752,
+          "Unit combat moved this turn": 3168
+        },
+        "verified_queries": 10272
+      },
+      "gpu_fused_seconds": [
+        0.0035456669866107404,
+        0.00323520801612176,
+        0.0036548750067595392,
+        0.0036770419974345714,
+        0.0036942499864380807
+      ],
+      "gpu_indexed_seconds": [
+        0.0025441250181756914,
+        0.002399374992819503,
+        0.0020567089959513396,
+        0.0026265420019626617,
+        0.002644666994456202
+      ],
+      "gpu_reference_seconds": [
+        0.00407987498329021,
+        0.003959791996749118,
+        0.0040503749914933,
+        0.004004457994597033,
+        0.004022207984235138
+      ],
+      "indexed_reused_seconds": [
+        0.00029379199258983135,
+        0.00032816699240356684,
+        0.00029220798751339316,
+        0.0003091250255238265,
+        0.00029408300179056823
+      ],
+      "lanes": 16,
+      "position": "japan_round2_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5308,
+        "allocated_sid_slots": 5308,
+        "nonunit_active_sids": 5238,
+        "territory_entries": 31,
+        "unit_entries": 70,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 642,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "7e559a2198a248cf00f7b22911b9b81e885e0d0329ba36680196177746d77bb0",
+          "dynamic_string_offsets": "134861a89d3a9cb4d8a7473f47f213e96f9be00562b44abb0dde35a3226cc5c7",
+          "errors": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+          "lengths": "15dbccafe3238b8db959358dd37c632dc1c3ef72632ff29272c2fd526aa341e5",
+          "records": "3560bc6a66c221d0e979a8a72d64d5f78de0cbf54a8b31e07bed292cf06e1338",
+          "sections": "89b0628154ec78c8f2f16de4dbcd4dbb6641451686d9d9c46cc5c4b5d439b339",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 16
+      }
+    },
+    {
+      "cpu_seconds": [
+        0.009978834,
+        0.010040584,
+        0.00941625,
+        0.010094667,
+        0.010084167
+      ],
+      "evidence": {
+        "allowed_queries": 0,
+        "complete_native_results_sha256": "82277e29d84c0358467f2ed1de33abb3456716191fe23f4268243dfa91f5f580",
+        "disallowed_queries": 41088,
+        "exact": true,
+        "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message",
+        "modes": {
+          "blitz": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          },
+          "narrow_crossing": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          },
+          "ordinary": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 13696
+          },
+          "strategic_rail": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          },
+          "strategic_river": {
+            "allowed": 0,
+            "exceptions": 0,
+            "queries": 6848
+          }
+        },
+        "outcomes": {
+          "Combat movement phase required": 5568,
+          "Militia must start and end in its Home Country": 2688,
+          "No movement remaining": 4032,
+          "Ordinary land movement requires a land unit": 5120,
+          "Unit already moved this turn": 11008,
+          "Unit combat moved this turn": 12672
+        },
+        "verified_queries": 41088
+      },
+      "gpu_fused_seconds": [
+        0.004125749983359128,
+        0.003842790989438072,
+        0.003550875000655651,
+        0.004191540996544063,
+        0.004218083980958909
+      ],
+      "gpu_indexed_seconds": [
+        0.003648915997473523,
+        0.0035161249979864806,
+        0.0034223330148961395,
+        0.0029943750123493373,
+        0.0028851669922005385
+      ],
+      "gpu_reference_seconds": [
+        0.0052324580028653145,
+        0.005254625022644177,
+        0.004812500003026798,
+        0.005314541020197794,
+        0.005244875006610528
+      ],
+      "indexed_reused_seconds": [
+        0.000979125004960224,
+        0.0006419999990612268,
+        0.0005078340182080865,
+        0.000521250010933727,
+        0.0005950000195298344
+      ],
+      "lanes": 64,
+      "position": "japan_round2_non_combat_movement",
+      "preparation_work_per_lane": {
+        "active_sid_slots": 5308,
+        "allocated_sid_slots": 5308,
+        "nonunit_active_sids": 5238,
+        "territory_entries": 31,
+        "unit_entries": 70,
+        "unused_sid_capacity": 0
+      },
+      "queries_per_lane": 642,
+      "resident_source_evidence": {
+        "actual_records_per_lane": 11785,
+        "buffer_sha256": {
+          "dynamic_string_bytes": "7e559a2198a248cf00f7b22911b9b81e885e0d0329ba36680196177746d77bb0",
+          "dynamic_string_offsets": "134861a89d3a9cb4d8a7473f47f213e96f9be00562b44abb0dde35a3226cc5c7",
+          "errors": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560",
+          "lengths": "acf3fde98140f4f462c6fef31330e6dacdef3ccf910d410df34a71d6a3989c90",
+          "records": "0a02bb6864795034f4e807a36f826017e4e33eaa944fe127f3bf40c2f5af92b0",
+          "sections": "5a6504791eeaf43030e7391404ca6e339df949a600e386fa9c04ee8f3e67a220",
+          "static_records": "e73eb73fdc5ad1f52d818580b44b8f0bd104d6dee1fee477bc7015276dd4dd87",
+          "static_string_bytes": "a1f28cb6329070cf24a35ae37c7372570b999fbfe33eedd76b432fa0186d72e2",
+          "static_string_offsets": "376f1474ac6eff2ff68aed940adbfa4ef057edbe1d9802367db54125b7b96788"
+        },
+        "exact": true,
+        "inspection_chunk_budget_bytes": 32000000,
+        "record_capacity": 11785,
+        "verification": "Every record bit, length, section, error and shared definition/string buffer equals the CPU clone reference",
+        "verified_lanes": 64
+      }
+    }
+  ],
+  "limitations": [
+    "Replicated states exercise batched query parallelism, not varied simultaneous games.",
+    "Native timing is a sequential component baseline, not a twelve-core parallel route service.",
+    "Geometric paths include illegal candidates; report allowed/rejection distributions before interpreting speed.",
+    "Path validation does not enumerate all game actions or commit movements, and does not measure search or learning.",
+    "All lanes within a batch replicate the same complete snapshot. Distinct per-lane histories require a separate mixed-pool measurement.",
+    "Component result only; no complete GPU game or learning-speed claim."
+  ],
+  "provenance": {
+    "backend_source_sha256": {
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "66b83f20b5adcf3575deaa561d78eaab82e7d6fbabe0f317509ad54b241887a9",
+      "studies/campaign/backends/content_digest_metal.py": "da74e9e62c9fdac3fdb158e48a55848e5d50c96aa5cf9b8cb949d928e40a4f64",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "3383936937a3a0dd049f7d64ac9ddb2a1d25f378316e2db3c2505ae38fa559c3",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_chance_io.py": "30adf899875fb92425d60446dd9d0efd4a69da6752f7535d43ce2ba4a7bf4f74",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_events.py": "72a1406ce72c332578853a62dbf3b7318162f137cb6f8c2e335042da36303f20",
+      "studies/campaign/backends/resident_recruitment.py": "c7b0116bbc79b1b20a6655c99aa995072e3521f6a60635c876eb208c57cfd3e0",
+      "studies/campaign/backends/resident_recruitment_chance.py": "acd09c075b2a77409f885ae1d287d1564559a69eee2f4a43d640b39698adc2e6",
+      "studies/campaign/backends/resident_recruitment_effects.py": "729f959ec5ae0ec41f579f8acddb5bfedbb289fce2648f1a2fb5e8737bda29b5",
+      "studies/campaign/backends/resident_recruitment_start.py": "27fbd4d5532b67511571e4904f9e778143798883a1bfba31c42cb970573f2202",
+      "studies/campaign/backends/resident_relations.py": "096e3f058bf9cd935927e66f8708d68854d66a04220b7ce4556acef22040eea2",
+      "studies/campaign/backends/resident_routes.py": "525e4207e125f35f5586516c36d015fb43544ba1a083f12fe02e6089ba58e428",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "969e7876a238a8e646262ec053f01996d1119985b716838b629f2da89713df74",
+      "studies/campaign/backends/resident_training_reset.py": "54bab8b853c6e16f10f6a168dd982bf01a71f1b9be070930c09de86f7b70b72e",
+      "studies/campaign/backends/resident_wealth.py": "e7a9621a4d3c1743f367dedaefb7ba3041f596f48875959a60dd17670f320999",
+      "studies/campaign/backends/resident_wealth_scores.py": "4bdd59306a549cadd8240182c73528651b199fcf5412da7a0db1aaf9c0ff34b8",
+      "studies/campaign/backends/route_preparation.py": "6f9aa8d1f456fec1389b78a548314a57315202df29c9e9df168f16e4b1f0cdfe",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde"
+    },
+    "branch": "codex/gpu-selfplay",
+    "commit": "79f54dc2629f49a5c07e76963cacfe0c1dbb5675",
+    "dirty": "?? studies/campaign/backends/resident_recruitment_chance.py\n?? tests/test_campaign_resident_recruitment_chance.py",
+    "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+    "native": "/Users/home/Desktop/gwRL/gwrl_cpp.cpython-313-darwin.so",
+    "native_sha256": "f05dd87deeaa6fc206206171506af15140d00935b1a3db2b8ee6d8fd040ca8b2",
+    "route_harness_sha256": "13fadef7f379a431c4bf7e580559e15e827b0d6321ff5f1676b9e841ccd29e2e",
+    "route_native_boundary_sha256": "e7ab8904454d03b0b30868d7c738a9795d9456b933b36345d293c341d50a0a0d",
+    "route_native_probe_sha256": "9b3cf7c87b12b8538405e73402e3d695df463d52225a99634a38ba07d63c1ebd",
+    "runtime_source_sha256": {
+      "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+      "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+      "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+      "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+      "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+      "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+      "include/game/campaign_actions.hpp": "daa32274f29584ebaa968eb2a103a10234716bdf783359b2fa99abd073c21840",
+      "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+      "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+      "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+      "include/game/campaign_objective.hpp": "49c20d313c421540b1827e335ac56b0d71080fe98f84686127fb1da2c541c2b1",
+      "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+      "include/game/catalog_stats_context.hpp": "2186ad8355ef849e2f4d58e4a7e905c98a50ee5e283f5bce1b10cf0882a69466",
+      "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+      "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+      "include/game/device_state.hpp": "f65d37f53c305ed31a3d963f15a7da99f87fecaddbdfb6df58edd29260ac6f1c",
+      "include/game/economy.hpp": "6f612abfb7df7ee977914002787e05e412adedf6208a327cfab3d1da1f0b767b",
+      "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+      "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+      "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+      "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+      "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+      "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+      "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+      "include/game/movement.hpp": "1923dca4e7bb871f1b82ba3af12f1a7eba5ad3cfddf55cee47719549b4fefb07",
+      "include/game/movement_context.hpp": "aaa5f819b01c5700b04b452aeefeceaf11903c78339304e5d468c20f5b6d2e60",
+      "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+      "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+      "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+      "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+      "include/game/politics.hpp": "168556207ab45369cf3ffc5fcce1ba8e47e2ad939c205835d984f31599dd105a",
+      "include/game/recruitment_context.hpp": "2417a096bce8e99be37804033542a6adf74a2870e4373d983d96698195e4623a",
+      "include/game/relations_context.hpp": "ce6496ff656c9c07319142fdbbf0599d32a0ba721b3f850b79b76896d42b6d6e",
+      "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+      "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+      "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+      "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+      "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+      "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+      "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+      "include/game/wealth_context.hpp": "bcd1c19be4d4a8c7dc1e216d585ddac67ee79c3c6cb8063d9d99b85681de3ac0",
+      "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+      "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+      "src/campaign_actions.cpp": "65a92d7004e8e5f311322752eb19cb41f884cf9a3caffba71335ca17c47464ec",
+      "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+      "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+      "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+      "src/campaign_objective.cpp": "c63343b0f080ea2c95884ad0758fa225db433ea9248883c04014f6e69c044b5e",
+      "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+      "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+      "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+      "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+      "src/catalog_stats_context.cpp": "a9ac386bc250560f909a4dfd577f907af720bb008bb051c86d542ad9d70ec6b8",
+      "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+      "src/device_state.cpp": "a36762c027096e8043ab77ecc2106c559905e9a302dfc351100fa1dea8d4f7b9",
+      "src/economy.cpp": "212bb64b6ca7cfe88f8874452162be6bce1e62e50d5ba7cb75621ccf93998867",
+      "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+      "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+      "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+      "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+      "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+      "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+      "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+      "src/movement.cpp": "3ec103333e213754c90626ecb4134b27f1db9155ff8f48b1770fe26ca9c81b95",
+      "src/movement_context.cpp": "ac4bc3906c822936a924398ec35ba973755df7f1a49e6219633065ff282acedb",
+      "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+      "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+      "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+      "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+      "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+      "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+      "src/politics.cpp": "3d04cb98a577c0e42fe9302d493a702b8e82bc13f9d8015fa7f06b1a904ca5eb",
+      "src/politics_influence.cpp": "501e3546277499d006d822bdb24e7f25969c48f49f4cefeb494eeaf704f4da25",
+      "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+      "src/python_action_ids.inc": "94d62ff5e013367f55707df8439c59070786bbd31f38afb29e042aca93b62181",
+      "src/python_bindings.cpp": "e7ab8904454d03b0b30868d7c738a9795d9456b933b36345d293c341d50a0a0d",
+      "src/python_canonical_json.inc": "3419166c8337e92baafac9bb6e51591fc42ecc12b1dcca3ea2381fbe5020adb0",
+      "src/python_catalog_stats.inc": "b2c8dfe0cc33f82cd0a1e598af248280d16061af5e80848a75953bb3baf590ab",
+      "src/python_content_digest.inc": "6b056d520ccb8b958bf66c45fe34d33d912846e41a6f0c1aa905defd8771be20",
+      "src/python_device_state.inc": "6a6d754afb473f41c528d8c58fc87af6bea595a4de8e480e1e3faf9d9d617491",
+      "src/python_event_append.inc": "9df1e309a22652c949316b7bc19156a538d9e06dbf44c886f980b591870fa6d6",
+      "src/python_income_ledger.inc": "ddc964a464c04b30cd6aab146a61097e38397996a29f9a76b05f6d1e30a4f44c",
+      "src/python_movement_context.inc": "9b3cf7c87b12b8538405e73402e3d695df463d52225a99634a38ba07d63c1ebd",
+      "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+      "src/python_recruitment.inc": "c9a1fe450d19626ef584bd2ee8ef655b752d3283a49eebb1e0ce09c70631f3b3",
+      "src/python_relations.inc": "382a7e320efdb46d708887249180575b6b37efc50c8420fefcb806f0ee9078b2",
+      "src/python_state_json.inc": "00958de32a9e787734c301a2f291577e3fa8a002778a36b7e7733cc3acbadbc5",
+      "src/python_training_reset.inc": "cce35d564a17b85ca096cd47ffd1733305937e76f6a6bfed3fb1bfe50856d908",
+      "src/python_wealth.inc": "49caa278713e6f09ce0bf532fc49c9e9763d0bc45415314cd36d5c304cb48fe1",
+      "src/recruitment_context.cpp": "b8bdc92658a486236e2c14b711e90f0aa8619ae59a872a5665adce1214d6919e",
+      "src/relations_context.cpp": "f251d362fb84c8d58c48b19b96810627d3e58ec94953db26ca566b0f34ad995f",
+      "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+      "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+      "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+      "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+      "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+      "src/wealth_context.cpp": "9717259f68f9a295e6291269705f58d680de0e88fbd483ca169a04394942b7a4",
+      "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "66b83f20b5adcf3575deaa561d78eaab82e7d6fbabe0f317509ad54b241887a9",
+      "studies/campaign/backends/content_digest_metal.py": "da74e9e62c9fdac3fdb158e48a55848e5d50c96aa5cf9b8cb949d928e40a4f64",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "3383936937a3a0dd049f7d64ac9ddb2a1d25f378316e2db3c2505ae38fa559c3",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_chance_io.py": "30adf899875fb92425d60446dd9d0efd4a69da6752f7535d43ce2ba4a7bf4f74",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_events.py": "72a1406ce72c332578853a62dbf3b7318162f137cb6f8c2e335042da36303f20",
+      "studies/campaign/backends/resident_recruitment.py": "c7b0116bbc79b1b20a6655c99aa995072e3521f6a60635c876eb208c57cfd3e0",
+      "studies/campaign/backends/resident_recruitment_chance.py": "acd09c075b2a77409f885ae1d287d1564559a69eee2f4a43d640b39698adc2e6",
+      "studies/campaign/backends/resident_recruitment_effects.py": "729f959ec5ae0ec41f579f8acddb5bfedbb289fce2648f1a2fb5e8737bda29b5",
+      "studies/campaign/backends/resident_recruitment_start.py": "27fbd4d5532b67511571e4904f9e778143798883a1bfba31c42cb970573f2202",
+      "studies/campaign/backends/resident_relations.py": "096e3f058bf9cd935927e66f8708d68854d66a04220b7ce4556acef22040eea2",
+      "studies/campaign/backends/resident_routes.py": "525e4207e125f35f5586516c36d015fb43544ba1a083f12fe02e6089ba58e428",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "969e7876a238a8e646262ec053f01996d1119985b716838b629f2da89713df74",
+      "studies/campaign/backends/resident_training_reset.py": "54bab8b853c6e16f10f6a168dd982bf01a71f1b9be070930c09de86f7b70b72e",
+      "studies/campaign/backends/resident_wealth.py": "e7a9621a4d3c1743f367dedaefb7ba3041f596f48875959a60dd17670f320999",
+      "studies/campaign/backends/resident_wealth_scores.py": "4bdd59306a549cadd8240182c73528651b199fcf5412da7a0db1aaf9c0ff34b8",
+      "studies/campaign/backends/route_preparation.py": "6f9aa8d1f456fec1389b78a548314a57315202df29c9e9df168f16e4b1f0cdfe",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+      "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+      "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+      "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+      "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+      "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+      "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+      "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+      "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+      "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+      "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+      "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+      "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+      "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+      "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+      "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+      "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+      "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+    },
+    "state_harness_sha256": "27cb95c0bf707328c3aeb0ba5dcb98b2c342153d69b8fd9ebe26b69540c8f54a",
+    "supervisor_source_sha256": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+  },
+  "schema": "campaign-indexed-route-preparation-report-v1",
+  "status": "matched",
+  "task": {
+    "calendar_rounds": 3,
+    "compatibility": {
+      "actions": "campaign-orders-v1",
+      "curriculum": "regional-horizon-curriculum-v1",
+      "rules": "c7219481c1c8b91f59fd49169a51ce0d89a9ddedd6e835dbd20c1d9e7585c050",
+      "scenario": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+      "schema": "campaign_entities_v1+campaign-interrupt-scheduler-v1"
+    },
+    "full_target_game": false,
+    "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+    "setup": "unchanged approved 99-piece,37-node July1936 setup",
+    "short_task_limit": "Horizon variants are curriculum tasks, not July1941 campaign results.",
+    "version": "regional-horizon-curriculum-v1"
+  },
+  "terminal_checkpoint_sha256": "b635869ac28d3c12984fcaaa410e5abc842d8994aa2274d373a0ae13501ae022",
+  "workload_sha256": "a790dcba03fcb5d4dfb28d5d17011ced651ad87138d27a04f9e5a33b696ee019"
+}
