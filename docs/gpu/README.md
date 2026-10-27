@@ -30,6 +30,8 @@ The [terminal-score arithmetic checks](metal_score_arithmetic_2026_10_26.md)
 cover native binary64 score bits and once-rounded training targets on Metal.
 The [indexed-preparation measurements](metal_indexed_preparation_2026_10_26.md)
 record the later parallel presence/declaration path and its remaining limits.
+The [recruitment Engine transactions](resident_recruitment_transactions_2026_10_26.md)
+connect action, chance, history and RNG while documenting the unported naval hook.
 
 ## Execution contract
 
