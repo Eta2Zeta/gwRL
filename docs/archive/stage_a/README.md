@@ -1,6 +1,6 @@
 # Stage A historical evidence
 
-Start with [current campaign learning status](../../stage_a/README.md) or the
+Start with [current campaign learning status](../../learning.md) or the
 [campaign workflow](../../../studies/campaign/README.md). These archived records
 describe the implementation and conclusions at their recorded dates. Statements
 such as “next” or “not yet implemented” are historical, not current instructions.
@@ -36,3 +36,5 @@ Compare matched workloads and their full settings. Component improvements and
 short pilots do not establish full-campaign throughput or playing strength.
 
 - [Campaign workflow before consolidation](workflow_before_consolidation_2026_10_27.md): original operational guide and performance chronology.
+
+- [Learning overview before topic consolidation](overview_before_topic_cleanup_2026_10_27.md)

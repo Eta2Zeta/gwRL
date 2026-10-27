@@ -10,13 +10,13 @@ The shared CPU engine implements the approved 37-zone China–Japan campaign,
 including politics, movement, production, land/air/naval combat and explicit
 player reactions and dice. M0–M12 implementation gates are complete for that
 regional scenario. This does not establish support for every rule of the global
-game; the [coverage ledger](m10/runtime_coverage_ledger.md) records the scope.
+game; the [coverage ledger](reference/runtime-coverage.md) records the scope.
 
 The learning pipeline runs three alliance networks, uses Monte Carlo tree search
 to choose actions, learns from self-play, and supports checkpoint recovery and
 held-out evaluation. The latest continued experiment reached **120 completed
 three-round games and 30 learning batches**. Useful Japanese offensive play has
-not been demonstrated. [Learning status](stage_a/README.md) explains the results,
+not been demonstrated. [Learning status](learning.md) explains the results,
 measured throughput and limits.
 
 Apple GPU work currently implements selected batched services and recruitment
@@ -30,7 +30,7 @@ end-to-end training speedup are still unfinished or unverified.
 | Your purpose | Read |
 | --- | --- |
 | Understand how the engine, search and learning fit together | [Architecture](architecture.md) |
-| Understand what learning has achieved and what remains | [Learning status and results](stage_a/README.md) |
+| Understand what learning has achieved and what remains | [Learning status and results](learning.md) |
 | Understand the Apple GPU implementation and measured gains | [GPU guide](gpu/README.md) |
 | Run training, recover a run or evaluate a model | [Campaign workflow](../studies/campaign/README.md) |
 | Build the code or run checks | [Development guide](development.md) |
@@ -54,5 +54,5 @@ completion and memory measurements first.
 Use the [archive index](archive/README.md) when investigating an experiment or
 past decision. Archived reports describe their original code, settings and paths;
 their old “next steps” are historical. Current commands and status belong in the
-guides above. Scenario data, rule clarifications and active coverage ledgers stay
-at their established paths because they support the implementation and checks.
+guides above. Scenario data and rule clarifications retain their fingerprints. Current coverage
+inputs and outputs live with the topic references, and their tools use those paths.

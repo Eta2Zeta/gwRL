@@ -1,7 +1,7 @@
 # Campaign workflow
 
 For project progress, start with the [project guide](../../docs/README.md).
-For achieved results and limits, read [learning status](../../docs/stage_a/README.md).
+For achieved results and limits, read [learning status](../../docs/learning.md).
 This page covers current operation; dated measurements live in the
 [Stage A archive](../../docs/archive/stage_a/README.md).
 

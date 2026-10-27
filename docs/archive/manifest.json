@@ -661,6 +661,216 @@
       "archive_path": "docs/archive/stage_a/workflow_before_consolidation_2026_10_27.md",
       "sha256": "2c367f9eb62244a989e405af5c0722d6d959075c0121ae4310ab006a9f24535b",
       "bytes": 15753
+    },
+    {
+      "original_path": "docs/m0/README.md",
+      "archive_path": "docs/archive/milestones/m0/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "271860570abff2fdc1d4ec4e156d61236c616367f9933cec53836f9ed4a3977b",
+      "bytes": 19021
+    },
+    {
+      "original_path": "docs/m0/asset_price_audit.md",
+      "archive_path": "docs/archive/milestones/m0/asset_price_audit.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "4dcd8a439ce1c9500dc1f668e380ba12b85174a3f3f5977e88b6a5a7aa19984a",
+      "bytes": 15419
+    },
+    {
+      "original_path": "docs/m0/china_minor_setup_audit.md",
+      "archive_path": "docs/archive/milestones/m0/china_minor_setup_audit.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "470c3fbcbd1582be2fc1da60cdb7814ed0541800754795cdc817c347748aa18d",
+      "bytes": 16747
+    },
+    {
+      "original_path": "docs/m0/convoy_audit.md",
+      "archive_path": "docs/archive/milestones/m0/convoy_audit.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "3ff3e3faaadb1368860ac3e81958ea8e23eea7069059aaef2f42ccb0ba09f99c",
+      "bytes": 4294
+    },
+    {
+      "original_path": "docs/m0/core_rules_ledger.md",
+      "archive_path": "docs/archive/milestones/m0/core_rules_ledger.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "60d3bb48dde159698d855796884895d087042137ebabdeaf4f3d8bdf5e10200e",
+      "bytes": 64373
+    },
+    {
+      "original_path": "docs/m0/japan_setup_audit.md",
+      "archive_path": "docs/archive/milestones/m0/japan_setup_audit.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "a2abd4d37212a83512c6bde6ef2c7bf687b3cd12de13b7d9241314ade65ce599",
+      "bytes": 15381
+    },
+    {
+      "original_path": "docs/m0/source_reconciliation.md",
+      "archive_path": "docs/archive/milestones/m0/source_reconciliation.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "53fa1dba34aa274b96dfea29fe7549a7a6a54a348a70c907b8f44dca7422deed",
+      "bytes": 9468
+    },
+    {
+      "original_path": "docs/m1/README.md",
+      "archive_path": "docs/archive/milestones/m1/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "943c6ef01f55325121c973b61b116d2746427474af436c0be0fb4a100528914a",
+      "bytes": 4877
+    },
+    {
+      "original_path": "docs/m10/README.md",
+      "archive_path": "docs/archive/milestones/m10/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "68789b56fdd15202447712ff5a060d04487ed6f8a6f233df02c9d91d560b9c75",
+      "bytes": 4709
+    },
+    {
+      "original_path": "docs/m10/runtime_coverage_ledger.json",
+      "archive_path": "docs/archive/milestones/m10/runtime_coverage_ledger.json",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "e7cf224f1e57ac18d4344ebda168271c4c811d5af4942b10ae76344a537f1778",
+      "bytes": 288498
+    },
+    {
+      "original_path": "docs/m10/runtime_coverage_ledger.md",
+      "archive_path": "docs/archive/milestones/m10/runtime_coverage_ledger.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "0863fa39cb09cf3e87d768b0c55468a2af47736e9fdf5c267c8a67593660b3da",
+      "bytes": 58505
+    },
+    {
+      "original_path": "docs/m11/README.md",
+      "archive_path": "docs/archive/milestones/m11/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "9910ff8e9a50d0c8a5a7136fe85d4b6f3486cb1e9f4ab0938fc6b61c447e5fc8",
+      "bytes": 4719
+    },
+    {
+      "original_path": "docs/m12/README.md",
+      "archive_path": "docs/archive/milestones/m12/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "51eaf67e297479f0356aa6a2e71d15b822509d29a126249b56806f114ff0dfc3",
+      "bytes": 1010
+    },
+    {
+      "original_path": "docs/m2/README.md",
+      "archive_path": "docs/archive/milestones/m2/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "c7138b0e22f42d6122c68324c84bf541c87ca271309d1637489e2884e44ef07e",
+      "bytes": 7243
+    },
+    {
+      "original_path": "docs/m3/README.md",
+      "archive_path": "docs/archive/milestones/m3/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "8c6242f6c50d196f0881949422314e0cbc52cc94f62d80182eeb5e2dcb41c84b",
+      "bytes": 5765
+    },
+    {
+      "original_path": "docs/m3/source_coverage.md",
+      "archive_path": "docs/archive/milestones/m3/source_coverage.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "cc53ab8d3cd8fee6ccbaa0c794cdbd25d690b3e6145aa9a9587f32e5129b8d18",
+      "bytes": 6507
+    },
+    {
+      "original_path": "docs/m4/README.md",
+      "archive_path": "docs/archive/milestones/m4/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "32b00f8a2d24ba1b634e481e9f96d60cc2889ff35434d9ebbd1c845c20f40202",
+      "bytes": 8908
+    },
+    {
+      "original_path": "docs/m4/source_coverage.md",
+      "archive_path": "docs/archive/milestones/m4/source_coverage.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "09b669ea5bd4384a20459e5d8cab2399694b73d4bdf6cfbb65eec4518a957bed",
+      "bytes": 11880
+    },
+    {
+      "original_path": "docs/m5/README.md",
+      "archive_path": "docs/archive/milestones/m5/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "96b9f801fe6bcad43bf74c78c5aa01b34dcc67dd0004501928f890247660eb9d",
+      "bytes": 4817
+    },
+    {
+      "original_path": "docs/m5/source_coverage.md",
+      "archive_path": "docs/archive/milestones/m5/source_coverage.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "1685606887fd53afb484b587bd73d868b6e8e9595cf30516934b056da2c555ac",
+      "bytes": 3399
+    },
+    {
+      "original_path": "docs/m6/README.md",
+      "archive_path": "docs/archive/milestones/m6/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "e16b380dd3a7090e7e65e9b14617ac0b4c96d5ecaee927b40a22451a66bd42d9",
+      "bytes": 7126
+    },
+    {
+      "original_path": "docs/m6/source_coverage.md",
+      "archive_path": "docs/archive/milestones/m6/source_coverage.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "0a0ae40eca15784cf0f60ece8fd541cf86d0b6c2597174708948a658f7722943",
+      "bytes": 3420
+    },
+    {
+      "original_path": "docs/m7/README.md",
+      "archive_path": "docs/archive/milestones/m7/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "21964d3369a536d23ebb497f1dde0e037520742840b93e45b1fc4b2d94d7f3d5",
+      "bytes": 7889
+    },
+    {
+      "original_path": "docs/m8/README.md",
+      "archive_path": "docs/archive/milestones/m8/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "69d1640ba85b75338bf712f2394f6469d6afe1c2701f047c3f4001dd1a6845c2",
+      "bytes": 2863
+    },
+    {
+      "original_path": "docs/m9/README.md",
+      "archive_path": "docs/archive/milestones/m9/overview.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "4c9cf9056ca9b5f7663c1e0076bcd246db55665a3bf6c8f1eed92101b90211a5",
+      "bytes": 4273
+    },
+    {
+      "original_path": "docs/m9/naval_geography.md",
+      "archive_path": "docs/archive/milestones/m9/naval_geography.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "e242971468098c3dbc9bec0f897f7f7c7197489c74304417c80f32e401348b51",
+      "bytes": 2135
+    },
+    {
+      "original_path": "docs/plans/japan_china_full_rules_plan.md",
+      "archive_path": "docs/archive/planning/campaign_contract_before_topic_cleanup_2026_10_27.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "b89ed1d3935f0840b71fa47fa333e234f7a28b5277c48c90619bd3a6342ae93e",
+      "bytes": 3980
+    },
+    {
+      "original_path": "docs/stage_a/README.md",
+      "archive_path": "docs/archive/stage_a/overview_before_topic_cleanup_2026_10_27.md",
+      "source_commit": "ae4c4565a4923e45d20b03a8335bd80d03912d4c",
+      "sha256": "0db973a134ae183bbdbf7e924a53f7dca136d0535ebe6902ac7bf518762ec31d",
+      "bytes": 4878
+    }
+  ],
+  "optional_local_assets": [
+    {
+      "original_path": "docs/m9/evidence/hainan_kwangtung_crossing.png",
+      "archive_path": "docs/archive/milestones/m9/evidence/hainan_kwangtung_crossing.png",
+      "sha256": "7752b89990aa7867f6ed21ff62e6dbecb40d787a022d478e2a81b626686101a3",
+      "bytes": 1455496
+    },
+    {
+      "original_path": "docs/m9/evidence/honshu_hokkaido_crossing.png",
+      "archive_path": "docs/archive/milestones/m9/evidence/honshu_hokkaido_crossing.png",
+      "sha256": "fad33d83e79c321903928dc3c27faf203d70de0fba9100946a9def4b7db0f652",
+      "bytes": 2536558
     }
   ]
 }

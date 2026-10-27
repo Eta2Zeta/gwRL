@@ -14,7 +14,7 @@ navigation and the maintained guides for current operation.
 | [Study organization](studies/README.md) | Historical trainer/result organization and retention record |
 
 The [preservation manifest](manifest.json) records each original path, archive
-path, byte count and SHA-256, anchored to the source Git commit. All registered
+path, byte count and SHA-256, anchored to the source Git commit (per entry when versions differ). All registered
 files were copied or moved byte-for-byte, including their original provenance.
 Historical prose links may name an old checkout or report location; they are
 preserved evidence rather than maintained navigation. The manifest maps relocated

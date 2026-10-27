@@ -1,4 +1,4 @@
-"""M0 transcription/contract checks, not tests of unimplemented game mechanics."""
+"""Approved scenario transcription/contract checks, separate from runtime rules."""
 
 from collections import Counter
 import hashlib
@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import re
 import unittest
+
+from tools.check_documentation import resolve_legacy_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,7 +83,7 @@ class M0SpecificationTests(unittest.TestCase):
             self.assertTrue((SCENARIO / "m0" / filename).is_file())
 
     def test_core_ledger_has_unique_traceable_fixture_ids(self):
-        ledger = (ROOT / "docs/m0/core_rules_ledger.md").read_text()
+        ledger = (ROOT / "docs/reference/rules-ledger.md").read_text()
         rows = re.findall(r"^\| (R\d{3}); (.+)$", ledger, flags=re.MULTILINE)
         fixture_ids = [row[0] for row in rows]
         self.assertTrue(fixture_ids)
@@ -405,7 +407,9 @@ class M0SpecificationTests(unittest.TestCase):
     def test_catalog_source_checks_trace_queue_values_without_claiming_runtime_implementation(self):
         checks = self.catalog_sources
         self.assertEqual(checks["status"], "source_reconciliation_only_not_executable_catalog")
-        self.assertTrue((ROOT / checks["review_document"]).is_file())
+        # Frozen source data retains its historical review path; the archive
+        # manifest locates the byte-preserved document without rewriting it.
+        self.assertTrue(resolve_legacy_document(ROOT, checks["review_document"]).is_file())
         source_ids = {source["id"] for source in checks["sources"]}
         self.assertEqual(len(source_ids), len(checks["sources"]))
         queues = {row["type"]: row for row in self.japan["starting_construction"]}

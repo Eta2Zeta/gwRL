@@ -92,7 +92,22 @@ memory; a small operation benchmark is not a whole-training result. Keep the
   output stay in ignored run/artifact directories. Moving a report does not make
   its local raw artifacts part of Git.
 - Use relative links inside repository documentation. Keep the front page short;
-  detailed milestone records are reached through the [reference index](reference.md).
+  maintained detail belongs in the topic [reference index](reference.md), and completed
+  milestones belong in the archive.
+
+## Reference regeneration and frozen sources
+
+`./.venv/bin/python tools/build_campaign_coverage.py` regenerates
+`docs/reference/runtime-coverage.{json,md}` from `rules-ledger.md`.
+Add `--check` to verify both outputs against current handlers and fixtures.
+The stable rule IDs and acceptance criteria retain their original meaning.
+
+Frozen rule/scenario JSON and the checksum-pinned clarification register keep
+original paths and bytes because they also affect model inputs and checkpoint
+compatibility. The archive manifest resolves historical document locations for
+reference tooling. The sole `docs/m0/README.md` compatibility pointer preserves the
+register's literal link; it contains no milestone report. Change such aliases only
+with their pinned consumers and explicit compatibility treatment.
 
 ## Version control
 

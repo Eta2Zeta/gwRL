@@ -22,7 +22,7 @@ REFERENCE_LINK = re.compile(r"^\s{0,3}\[[^\]\n]+\]:\s*(<[^>\n]+>|\S+)", re.MULTI
 HTML_LINK = re.compile(r"\b(?:href|src)\s*=\s*['\"]([^'\"]+)['\"]", re.IGNORECASE)
 FROZEN_CHECKOUT = re.compile(r"^/Users/home/\.codex/worktrees/[^/]+/gwRL(?:/|$)")
 PRIMARY_CHECKOUT = "/Users/home/Desktop/gwRL"
-IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp", ".tif", ".tiff", ".avif"}
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp", ".tif", ".tiff", ".heic", ".avif"}
 
 
 def prose_only(markdown: str) -> str:
@@ -123,6 +123,45 @@ def check_links(root: Path, documents: list[Path], *, require_local_assets: bool
     return checked, errors
 
 
+def _repository_path(root: Path, value: str) -> Path:
+    if not isinstance(value, str) or not value or Path(value).is_absolute() or ".." in Path(value).parts:
+        raise ValueError("expected a nonempty repository-relative path without '..'")
+    result = (root / value).resolve()
+    if not result.is_relative_to(root):
+        raise ValueError("path escapes the repository")
+    return result
+
+
+def _archive_path(root: Path, value: str) -> Path:
+    result = _repository_path(root, value)
+    if Path(value).parts[:2] != ("docs", "archive"):
+        raise ValueError("archive destination must stay inside docs/archive")
+    return result
+
+
+def resolve_legacy_document(root: Path, original_path: str) -> Path:
+    """Resolve a frozen document reference without rewriting its recorded JSON.
+
+    Current paths win. Relocated references use the last matching manifest entry,
+    so append order selects the newest archived version. Maintained Markdown links
+    do not use this compatibility helper and must name their current targets.
+    """
+    root = root.resolve()
+    current = _repository_path(root, original_path)
+    if current.exists():
+        return current
+    manifest = json.loads((root / "docs/archive/manifest.json").read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict) or not isinstance(manifest.get("entries"), list):
+        raise ValueError("archive manifest must contain an entries list")
+    for entry in reversed(manifest["entries"]):
+        if isinstance(entry, dict) and entry.get("original_path") == original_path:
+            archived = _archive_path(root, entry.get("archive_path"))
+            if archived.exists():
+                return archived
+            raise FileNotFoundError(f"Archived document is missing: {archived}")
+    raise FileNotFoundError(f"Document has no current or archived target: {original_path}")
+
+
 def check_manifest(root: Path, manifest_path: Path) -> tuple[int, list[str]]:
     root = root.resolve()
     errors = []
@@ -130,34 +169,54 @@ def check_manifest(root: Path, manifest_path: Path) -> tuple[int, list[str]]:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as error:
         return 0, [f"{manifest_path}: {error}"]
-    if manifest.get("schema_version") != 1:
+    if not isinstance(manifest, dict):
+        return 0, ["archive manifest: expected an object"]
+    if type(manifest.get("schema_version")) is not int or manifest["schema_version"] != 1:
         errors.append("archive manifest: expected schema_version 1")
-    if not re.fullmatch(r"[0-9a-f]{40}", str(manifest.get("source_commit", ""))):
+    if not isinstance(manifest.get("source_commit"), str) or not re.fullmatch(r"[0-9a-f]{40}", manifest["source_commit"]):
         errors.append("archive manifest: source_commit must be a full Git commit hash")
     entries = manifest.get("entries")
     if not isinstance(entries, list):
         return 0, errors + ["archive manifest: entries must be a list"]
+    optional = manifest.get("optional_local_assets", [])
+    if not isinstance(optional, list):
+        errors.append("archive manifest: optional_local_assets must be a list")
+        optional = []
     seen_original, seen_archive = set(), set()
-    for index, entry in enumerate(entries):
+    local_images = set()
+    records = [(f"entry {index}", entry, False) for index, entry in enumerate(entries)]
+    records += [(f"optional local asset {index}", entry, True) for index, entry in enumerate(optional)]
+    for label, entry, is_optional in records:
         if not isinstance(entry, dict):
-            errors.append(f"archive manifest entry {index}: expected an object")
+            errors.append(f"archive manifest {label}: expected an object")
             continue
         original, archived = entry.get("original_path"), entry.get("archive_path")
         digest, size = entry.get("sha256"), entry.get("bytes")
-        if not isinstance(original, str) or not isinstance(archived, str):
-            errors.append(f"archive manifest entry {index}: missing original/archive paths")
+        commit = entry.get("source_commit", manifest.get("source_commit"))
+        if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit):
+            errors.append(f"archive manifest {label}: source_commit must be a full Git commit hash")
             continue
-        if original in seen_original or archived in seen_archive:
-            errors.append(f"archive manifest entry {index}: duplicate path")
-        seen_original.add(original)
+        try:
+            _repository_path(root, original)
+            destination = _archive_path(root, archived)
+        except ValueError as error:
+            errors.append(f"archive manifest {label}: {error}")
+            continue
+        if (original, commit) in seen_original or archived in seen_archive:
+            errors.append(f"archive manifest {label}: duplicate original/version or archive path")
+        seen_original.add((original, commit))
         seen_archive.add(archived)
-        destination = (root / archived).resolve()
-        if not destination.is_relative_to(root) or not archived.startswith("docs/archive/"):
-            errors.append(f"{archived}: archive destination must stay inside docs/archive")
+        if is_optional and (Path(original).suffix.lower() not in IMAGE_SUFFIXES
+                            or destination.suffix.lower() not in IMAGE_SUFFIXES):
+            errors.append(f"{archived}: optional local assets must be images")
             continue
-        if not re.fullmatch(r"[0-9a-f]{64}", str(digest)) or type(size) is not int or size < 0:
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or type(size) is not int or size < 0:
             errors.append(f"{archived}: invalid SHA-256 or byte count")
             continue
+        if is_optional:
+            local_images.add(archived)
+            if not destination.exists():
+                continue
         try:
             data = destination.read_bytes()
         except OSError as error:
@@ -165,6 +224,16 @@ def check_manifest(root: Path, manifest_path: Path) -> tuple[int, list[str]]:
             continue
         if len(data) != size or hashlib.sha256(data).hexdigest() != digest:
             errors.append(f"{archived}: archived evidence differs from recorded bytes/SHA-256")
+    if local_images:
+        result = subprocess.run(
+            ["git", "check-ignore", "--stdin", "-z"], cwd=root,
+            input="\0".join(sorted(local_images)) + "\0", capture_output=True, text=True,
+        )
+        if result.returncode not in {0, 1}:
+            errors.append("archive manifest: could not verify Git ignore policy for optional local images")
+        else:
+            ignored = set(result.stdout.rstrip("\0").split("\0")) if result.stdout else set()
+            errors.extend(f"{path}: optional local image must be Git-ignored" for path in sorted(local_images - ignored))
     return len(entries), errors
 
 

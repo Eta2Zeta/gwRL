@@ -6,7 +6,7 @@ bundles retain their original engine behavior and feature schemas.
 
 | Study | Current workflow | Results |
 | --- | --- | --- |
-| Regional campaign | [Campaign workflow](campaign/README.md), `python -m studies.campaign.run` | [Current learning status](../docs/stage_a/README.md) |
+| Regional campaign | [Campaign workflow](campaign/README.md), `python -m studies.campaign.run` | [Current learning status](../docs/learning.md) |
 | Army composition | [Composition](composition/README.md), `python -m studies.composition.train` | [Preserved results](composition/results/README.md) |
 | Mini Japan, two turns | [Mini Japan](mini_japan_two_turn/README.md), `python -m studies.mini_japan_two_turn.train` | [Preserved results](mini_japan_two_turn/results/README.md) |
 

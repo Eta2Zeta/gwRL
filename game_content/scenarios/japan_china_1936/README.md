@@ -1,58 +1,21 @@
-# Closed Japan–China campaign map
+# Closed Japan–China campaign data
 
-Status: **map and campaign specification only**. No initial units, starting
-treasuries, construction queues, full-rules environment or new training run are
-created by this extractor. The separate `m0/` source audit now inventories the
-official setup and local cash. The **M0 specification was verified and frozen on
-21 October 2026**, with 106 repository tests passing. This is not a playable
-full-rules engine. Do not feed this map to the old six-zone setup loader
-as if their schemas and mechanics were interchangeable.
+These files define the approved 37-node regional scenario, its 99-piece July1936
+setup, national accounts and construction queues. The shared CPU engine loads
+this data into the complete regional campaign. The extractor itself only rebuilds
+the map projection; it does not launch a game or training.
 
-The [M2 foundation](/Users/home/Desktop/gwRL/docs/m2/README.md) now loads these
-setup files into shared C++ campaign state, including the 99 deployed pieces,
-22 facilities and two national queues. It supplies validated action execution,
-turn/reaction timing, randomness and replay. Gameplay rule modules remain later
-milestones. See its verification record for the six CTest suites and 119 passing
-Python tests; the M0 freeze result above remains historical.
+Read the [scenario contract](../../../docs/reference/scenario.md) for campaign
+boundaries and scoring, the [engine reference](../../../docs/reference/engine.md)
+for loading/state/replay, and the [project guide](../../../docs/README.md) for
+current progress. The [clarification register](../../rules/clarifications.md)
+records adopted interpretations. Short curricula use the same setup and rules
+with explicit shorter real endpoints; the full campaign retains eleven rounds.
 
-The [M3 catalog](/Users/home/Desktop/gwRL/docs/m3/README.md) now supplies shared
-unit, facility and technology definitions and every national chart row. Setup
-movement is known, and purchase eligibility remains separate from ownership or
-existence. Its seven CTest suites and 128 Python tests include the catalog
-acceptance checks; earlier milestone results above remain historical.
-
-The [M4 political layer](/Users/home/Desktop/gwRL/docs/m4/README.md) now handles
-warlords, influence/recruitment, truce/evolution, declaration timing and surrender.
-Mongolia and every warlord have source-backed Home Country membership. Dadao
-remains separate under direct Axis control if Japan surrenders, as approved by
-the user. Ten CTest suites and 128 Python tests pass; movement/logistics is next.
-The full campaign still needs its later gameplay and accounting modules.
-
-The [current M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) supersedes the
-inventory and scope below. Mongolia remains distinct under direct
-Comintern control and acts in the normal USSR turn position: CCP -> Mongolia ->
-Japan -> KMT, with no Soviet participant or account. The
-[shared rule register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
-adopts one result per whole warlord (RCL-003). RCL-004 is closed after the user
-reported on 17 October 2026 that the developers fixed the wording for the next
-version; no publication or version number has been independently checked. Its
-Comintern Brothers undamaged-railroad/placement requirement is unchanged and
-stays inactive without USSR.
-
-The [M5 movement/logistics](/Users/home/Desktop/gwRL/docs/m5/README.md) and
-[M6 economy/production](/Users/home/Desktop/gwRL/docs/m6/README.md) modules are
-complete as of 22 October, including regional routes, supply, actual income,
-staged construction, placement, repairs, research and RCL-010 Dadao aid.
-M7 land combat is complete, including shared-zone truce resolution under
-RCL-012. M8 air operations are complete, including adopted RCL-013 artillery city
-bombardment. M9 naval operations and M10 integration completed their gates on
-23 October, including two exact-replay full 44-turn campaign traces. M11 exposes
-the campaign API and tested stochastic vector search. RCL-014 now follows the
-developer clarification: evacuating ships defend and the fleet already at sea
-attacks. RCL-015 remains provisionally adopted pending developer clarification.
-These source profiles are
-fingerprinted with the scenario definition; earlier verification files remain
-historical snapshots. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds entity-graph models, batched self-play, exact resume and held-out evaluation. Its explicit short-horizon tasks preserve this approved setup; the full constructor retains eleven rounds. Bounded smoke runs do not establish playing strength.
+The `m0/` setup inventories and later verification directories retain their
+original filenames, source hashes and historical status labels. They are data and
+provenance consumed by the engine/checks, not the current documentation layout.
+Historical delivery reports are in the [milestone archive](../../../docs/archive/milestones/README.md).
 
 ## Files and rebuilding
 
@@ -69,11 +32,10 @@ historical snapshots. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds en
   cut Tokyo Line. Convoy play is excluded by campaign choice; this is reference
   evidence only. The global map preserves its convoy layer.
 - `m0/catalog_source_checks.json`: exact research thresholds, queue-payment
-  reconciliation and source provenance for later catalog implementation.
+  reconciliation and source provenance for catalog verification.
 - [Frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json):
   records the specification freeze and verified artifacts.
-- [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md): rules ledger, national
-  audits, purchase-price tables, approved decisions and completed verification.
+- [Scenario contract](../../../docs/reference/scenario.md): approved decisions, scoring and source-audit references.
 - [M9 naval exit](../../../docs/archive/milestones/m9/source_exit_2026_10_23.json):
   reviewed sources and four combined voyage/landing/retreat traces.
 - [M10 integration evidence](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m10/integration_evidence_2026_10_23.json):
@@ -142,53 +104,11 @@ such sea must be selected when both crossing endpoints are retained; otherwise
 the builder reports an error rather than silently changing the retained rule
 data. Both retained crossings here satisfy this dependency (P16 and P41).
 
-## Approved campaign specification
-
-- Start July 1936; score after the complete July 1941 round, 11 half-year rounds.
-- Three learning sides: Axis, Allies, Comintern. Preserve separate national
-  turns, accounts, political relations and rule-defined minor control.
-- Each side maximizes its wealth minus both other sides' wealth combined.
-  The initial weighting is `wealth = current income-per-turn rate + 0.1 × assets`.
-  Assets include units and infrastructure (including setup assets), treasury and
-  paid unfinished construction, all at the 0.1 asset weight.
-  The construction accounting policy is adopted: score cumulative already-paid
-  amounts until completion, then replace that entry with full completed catalog
-  value. Source reconciliation establishes 5 IPP already paid for each retained
-  ship: Heavy Cruiser #2 has 5 remaining; Fleet Carrier #3 has 10 remaining.
-  Damaged units and facilities are valued at purchase price minus repair price.
-- Starting pieces are only those in the official setup on included tiles;
-  excluded-tile pieces are not relocated into this theatre. Theatre-adjusted
-  starting cash is Japan 15, KMT 6 and CCP 2 IPP, using the smaller of
-  official starting cash and retained directly possessed territory IPP. This
-  formula is a documented scenario choice under the user's approval, not an
-  official alternate setup. Controlled/unaligned minors start with no cash.
-- Japan's P15 Fleet Carrier carries one Fighter and one Tactical Bomber; its
-  Light Carrier carries one Fighter. Torpedo Boat Destroyers score 5 IPP each
-  and Coastal Submarines 4; neither becomes purchasable. USA-triggered queue
-  carriers are excluded. Ordinary queued ships use eligible supplied shipyards,
-  with Major Shipyards required for the Fleet Carrier.
-- City labels have no extra asset price. Each undirected railway border counts
-  once and splits value equally between endpoint possessors. Same-alliance ends
-  aggregate to full value; an uncontrolled minor's share counts toward nobody.
-  This affects scoring only.
-- Controlled/aligned minor assets count toward the legally controlling side;
-  uncontrolled unaligned warlords count toward nobody. That does not create
-  income collection where the minor rules forbid it.
-- Convoys, interdiction and Kido Butai are disabled. Normal MAP, blockades and
-  independently applicable naval movement/combat remain. There are no FEC or
-  USSR accounts; Mongolia uses the USSR turn slot under direct Comintern control.
-- Outside routes/resources/events are absent. Rules missing their outside
-  prerequisites are inactive in this profile; no implicit aid or off-map income.
-- The two-round learning task remains a separate scenario using the same
-  progressively upgraded engine, not a preserved incomplete engine fork.
-
-These manifest fields are specifications copied as provenance, not code that
-implements calendars, factions or rewards. Tannu Tuva's unresolved political
-identity is deferred and does not block this scenario because its node and all
-incoming neighbor entries are excluded.
-
-See the [full implementation plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md)
-and [Japan/sea audit](/Users/home/Desktop/gwRL/docs/map_audits/japan_and_nearby_seas.md).
+Campaign timing, controllers, exclusions, wealth, setup-queue values and railway
+attribution are maintained in the [scenario contract](../../../docs/reference/scenario.md).
+The [Japan/sea audit](../../../docs/map_audits/japan_and_nearby_seas.md) records map
+source qualifications. The two-round study uses the same shared rules engine
+with separate benchmark configuration.
 
 ## Tests (no training)
 
@@ -199,5 +119,6 @@ and [Japan/sea audit](/Users/home/Desktop/gwRL/docs/map_audits/japan_and_nearby_
 Tests cover master-map expectations, facility-instance identity, malformed
 inputs, exact projection, boundary cuts, reciprocal infrastructure, directional
 differences, narrow-crossing dependencies, hashes and byte-for-byte regeneration.
-The full command passed **106 tests** for the 21 October 2026 M0 freeze; it does
-not establish that future full-rules combat/economy handlers are implemented.
+Current executable rule evidence is indexed in the
+[runtime coverage](../../../docs/reference/runtime-coverage.md); original test-run
+results remain in the milestone archive.

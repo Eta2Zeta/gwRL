@@ -59,7 +59,7 @@ not counts of independent defects or fully verified nodes.
 | Original board image | [gw36map.png](../../../game_content/maps/gw36map.png) |
 | Separate Home Country data | [gw36_nation_home_country.json](../../../game_content/maps/gw36_nation_home_country.json) |
 | Campaign map and selection | [map.json](../../../game_content/scenarios/japan_china_1936/map.json), [manifest.json](../../../game_content/scenarios/japan_china_1936/manifest.json) |
-| Campaign setup, rules and prior audits | [scenario directory](../../../game_content/scenarios/japan_china_1936/), [M0 documentation](../../m0/README.md) |
+| Campaign setup, rules and prior audits | [scenario directory](../../../game_content/scenarios/japan_china_1936/), [M0 documentation](../../reference/scenario.md) |
 
 ## Highest-impact findings
 

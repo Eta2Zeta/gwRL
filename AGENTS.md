@@ -56,6 +56,10 @@
 - Keep `docs/README.md` as the current project guide, with the root README
   pointing to it. Update existing architecture, workflow and performance guides
   instead of appending experiment history to current instructions.
+- Organize maintained technical detail by topic under `docs/reference/`.
+  Completed milestone reports belong in `docs/archive/milestones/`; the sole
+  `docs/m0/README.md` compatibility pointer preserves a checksum-pinned source
+  link and must not accumulate milestone content.
 - Keep dated reports and curated JSON evidence together in `docs/archive/`, with
   provenance and preservation hashes. Routine validation belongs in the commit;
   create a report when an experiment or decision needs durable evidence.

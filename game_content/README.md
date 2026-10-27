@@ -2,15 +2,12 @@
 
 This directory keeps source material and authored game data separate from engine and training code.
 
-Current implementation status (23 October 2026): M0–M12 implementation gates are complete,
-including naval source review, two full 44-turn campaign traces and the explicit
-multi-agent API/vector search. Reviewed rule profiles supplement the frozen M0
-map. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds the verified learning/resume/evaluation pipeline; the first [Stage A pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md) is complete, with broader playing strength still unestablished. RCL-012 is
-closed; RCL-013 is adopted. RCL-014 is closed following developer clarification:
-evacuating ships defend and the enemy fleet already at sea attacks. RCL-015
-remains provisionally adopted. Consult the shared
-clarification register for the developer-report list; user interpretations are
-not publisher-confirmed errata.
+For current progress, use the [project guide](../docs/README.md). The complete
+regional CPU engine, search and learning pipeline use the data here. The
+[scenario contract](../docs/reference/scenario.md) defines the closed campaign;
+[learning status](../docs/learning.md) records actual results and limitations.
+Rule interpretations belong in the shared clarification register; user rulings
+are distinguished from publisher-confirmed errata.
 
 ## Rule sources and discussion review
 
@@ -26,19 +23,19 @@ answered by the sources; their earlier records remain in
 
 ## Shared catalog
 
-`catalog/gw36_v43/` contains the source-linked M3 unit, facility, technology and
+`catalog/gw36_v43/` contains the source-linked unit, facility, technology and
 national build definitions used by the campaign engine. It covers every printed
 Japanese/Chinese build-chart row and preserves conditional abilities, surviving
 damage states and source-only unbuildable types. See the
-[M3 record](/Users/home/Desktop/gwRL/docs/m3/README.md) for queries and verification.
+[catalog reference](../docs/reference/catalog.md) for queries and verification.
 
 ## Political rules
 
-`rules/gw36_politics_v43.json` records the source-backed M4 political rules,
+`rules/gw36_politics_v43.json` records the source-backed political rules,
 explicit retained Home Country memberships, adopted clarifications and the
 closed-campaign Dadao controller ruling. The
-[M4 implementation record](/Users/home/Desktop/gwRL/docs/m4/README.md) describes
-the executable transitions and their boundaries with later rule modules.
+[politics reference](../docs/reference/politics.md) describes
+the executable transitions and their boundaries with other rule modules.
 
 ## Maps
 
@@ -203,19 +200,11 @@ fully audited sea zones. Existing outside-region warnings still apply.
 
 ## Scenarios
 
-- `japan_china_1936/` contains a closed 37-node map projection (31 land, 6 sea;
-  Tannu Tuva and Hong Kong excluded)
-  and campaign specification. See its [README](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/README.md)
-  for extraction commands, scope and limitations; it is not yet a playable setup.
-  Its `m0/` data adds source-audited official setup, theatre-adjusted accounts
-  and approved decisions, with 99 deployed pieces, 3 setup factories and 19 static
-  facilities. FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
-  The [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) links the rules
-  checklist, price tables, source reconciliation and the verified M0 specification
-  frozen on 21 October 2026 (106 repository tests passed). The
-  [M2 engine foundation](/Users/home/Desktop/gwRL/docs/m2/README.md) now loads the
-  setup into shared C++ state and supplies action validation, turn/reaction
-  timing, separate RNG streams and replay. Gameplay modules remain later work;
-  current verification passes six CTest suites and 119 Python tests.
+- `japan_china_1936/` contains the closed 37-node scenario, source-audited setup
+  and accounts used by the complete CPU campaign. Its [data guide](scenarios/japan_china_1936/README.md)
+  explains extraction, files and exclusions; the [scenario contract](../docs/reference/scenario.md)
+  defines approved choices. Historical `m0/`–`m11/` data/provenance filenames stay
+  stable because the engine and verification use them. Completed documentation
+  records are in the [archive](../docs/archive/milestones/README.md).
 - `china_simplified_setup.json` defines the six-zone China training environment.
 - `manual_battles/` contains deterministic battle fixtures used by the debug runner.

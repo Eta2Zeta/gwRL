@@ -42,7 +42,7 @@ Three policy/value networks represent Axis, Allies and Comintern. The policy
 scores the actual legal menu. Each value head predicts all three wealth-gap
 returns. The approved return is an alliance's wealth minus the other two
 alliances' combined wealth; intermediate rewards are zero. The
-[scenario contract](plans/japan_china_full_rules_plan.md) identifies the authoritative
+[scenario contract](reference/scenario.md) identifies the authoritative
 scoring definitions. This objective is not the official global victory condition.
 
 The stochastic [vector MCTS](../studies/shared/multiplayer_mcts.py) lets each
