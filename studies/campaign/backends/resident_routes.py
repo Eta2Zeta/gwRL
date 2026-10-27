@@ -559,9 +559,11 @@ def _dummy():return torch.zeros(1,dtype=torch.int64,device="mps")
 
 
 class ResidentRoutes:
-    def __init__(self,state_context,native_context,*,relations_context=None):
+    def __init__(self,state_context,native_context,*,relations_context=None,preparation_implementation="reference"):
         if _device(state_context.device).type!="mps":raise ValueError("Resident route execution requires explicit Apple MPS; no CPU fallback")
         if state_context.definition_fingerprint!=native_context.definition_fingerprint:raise ValueError("Route definition differs from resident state")
+        if preparation_implementation not in {"reference","fused"}:raise ValueError("Choose reference or fused route preparation")
+        self.preparation_implementation=preparation_implementation
         self.state_context,self.native_context=state_context,native_context
         self.zones=tuple(native_context.zones);self.nations=tuple(native_context.nations);self.players=tuple(native_context.players)
         self.unit_types=tuple(native_context.unit_types);self.terrains=tuple(native_context.terrains);self.regions=tuple(native_context.regions)
@@ -607,7 +609,7 @@ class ResidentRoutes:
         self.data=torch.cat(fields).to(state_context.device)
         self.offsets=torch.tensor(offsets,dtype=torch.int64,device=state_context.device)
         self.counter_bytes=torch.tensor(native_context.counter_bytes(),dtype=torch.uint8,device=state_context.device)
-        self._prepared=None
+        self._prepared=None;self._prepared_implementation=None;self._fused_preparation=None
 
     def _dims(self,state,Q=0,P=0):
         return (state.lane_count,state.records.shape[1],len(self.zones),len(self.nations),len(self.unit_types),len(self.terrains),
@@ -615,13 +617,23 @@ class ResidentRoutes:
             state.context.string_count,state.context.string_bytes.numel(),state.string_offsets.numel()-1,state.string_bytes.numel(),
             self.turn_count,*self._special,*self._terrain_special)
 
-    def prepare(self,state,*,relations=None,declarations=None):
+    def prepare(self,state,*,relations=None,declarations=None,implementation=None):
         state._metadata();_device(state.device)
+        implementation=self.preparation_implementation if implementation is None else implementation
+        if implementation not in {"reference","fused"}:raise ValueError("Choose reference or fused route preparation")
         if state.context.identity!=self.state_context.identity or state.device!=self.state_context.device:raise ValueError("Route wire context/device differs")
         current=self._prepared
-        if (current is not None and current.source is state and
+        if (current is not None and current.source is state and self._prepared_implementation==implementation and
             (relations is None or current.relations is relations) and (declarations is None or current.declarations is declarations)):
             return current
+        if implementation=="fused" and relations is None and declarations is None:
+            if self._fused_preparation is None:
+                from .route_preparation import FusedRoutePreparation
+                self._fused_preparation=FusedRoutePreparation(self)
+            result=self._fused_preparation.prepare(self,state)
+            self._prepared=result;self._prepared_implementation=implementation;return result
+        # Explicit caller-supplied tables are reused with their original exact
+        # source identities. This remains the audited GPU index-only path.
         relations=relations or self.relations_context.compute(state)
         if relations.source is not state:raise ValueError("Route relations belong to another complete state")
         declarations=declarations or self.declaration_context.compute(state,relations=relations)
@@ -633,7 +645,7 @@ class ResidentRoutes:
                 state.string_bytes,state.string_offsets,state.suffix_usage,state.errors,self.data,self.offsets,indexes,_dimensions(dims))
             if any(not value.is_contiguous() for value in args):raise ValueError("Route preparation buffers must be contiguous")
             _kernels().prepare_route_indexes(*(value if value.numel() else _dummy() for value in args),threads=B)
-        result=PreparedRoutes(state,relations,declarations,indexes);self._prepared=result;return result
+        result=PreparedRoutes(state,relations,declarations,indexes);self._prepared=result;self._prepared_implementation=implementation;return result
 
     def query(self,state,requests,*,prepared=None,relations=None,declarations=None):
         state._metadata();_device(state.device)

@@ -39,10 +39,12 @@ MODES = ("ordinary", "blitz", "strategic_rail", "strategic_river", "narrow_cross
 class RouteConfig(StateConfig):
     devices: tuple[str, ...] = ("mps",)
     batch_sizes: tuple[int, ...] = (1, 4, 16, 64)
+    preparation_implementation: str = "reference"
 
     def __post_init__(self):
         super().__post_init__()
         require(self.devices == ("mps",), "Routes require explicit Apple MPS; no CPU fallback")
+        require(self.preparation_implementation in {"reference", "fused"}, "Choose reference or fused route preparation")
 
 
 def provenance():
@@ -232,7 +234,7 @@ def worker(config, device, progress, deadline):
         capture, capture_seconds = timed(lambda: gwrl_cpp.capture_device_states(native_context, [raw]))
         source, upload_seconds = timed(lambda: DeviceStateBatch.from_native(capture, context=context), gpu=True)
         native_routes, movement_context_seconds = timed(lambda: gwrl_cpp.campaign_movement_context(raw))
-        kernel, movement_upload_seconds = timed(lambda: ResidentRoutes(context, native_routes), gpu=True)
+        kernel, movement_upload_seconds = timed(lambda: ResidentRoutes(context, native_routes, preparation_implementation=config.preparation_implementation), gpu=True)
         before = time.perf_counter()
         permission_oracle = gwrl_cpp.campaign_relations_oracle(native_routes.relations_context, [raw])
         permissions, permission_errors = permission_oracle.nation_array()[0, :, 2], permission_oracle.nation_error_array()[0, :, 2]
@@ -362,6 +364,7 @@ def main(argv=None):
     parser.add_argument("--batch-sizes", nargs="+", type=int, default=(1, 4, 16, 64))
     parser.add_argument("--repeats", type=int, default=5); parser.add_argument("--seconds", type=float, default=180)
     parser.add_argument("--memory-bytes", type=int, default=8_000_000_000)
+    parser.add_argument("--preparation-implementation", choices=("reference", "fused"), default="reference")
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", choices=("mps",), help=argparse.SUPPRESS)
     parser.add_argument("--_deadline", type=float, help=argparse.SUPPRESS)
@@ -370,7 +373,8 @@ def main(argv=None):
         settings = json.loads(args._worker.read_text()); settings["devices"] = tuple(settings["devices"])
         settings["batch_sizes"] = tuple(settings["batch_sizes"])
         worker(RouteConfig(**settings), args._device, args.output, args._deadline); return 0
-    config = RouteConfig(batch_sizes=tuple(args.batch_sizes), repeats=args.repeats, seconds=args.seconds, memory_bytes=args.memory_bytes)
+    config = RouteConfig(batch_sizes=tuple(args.batch_sizes), repeats=args.repeats, seconds=args.seconds, memory_bytes=args.memory_bytes,
+                         preparation_implementation=args.preparation_implementation)
     return 0 if run(config, args.output)["status"] == "completed" else 2
 
 

@@ -18,7 +18,7 @@ class ResidentRouteBenchmarkContractTests(unittest.TestCase):
         config = RouteConfig()
         self.assertEqual(config.batch_sizes, (1, 4, 16, 64))
         for changes in ({"devices": ("cpu",)}, {"devices": ("mps", "cpu")}, {"threads": 3},
-                        {"memory_bytes": 8_000_000_001}, {"seconds": 181}, {"batch_sizes": (4, 4)}, {"repeats": 0}):
+                        {"memory_bytes": 8_000_000_001}, {"seconds": 181}, {"batch_sizes": (4, 4)}, {"repeats": 0}, {"preparation_implementation": "unknown"}):
             with self.subTest(changes=changes), self.assertRaises(ValueError):
                 replace(config, **changes)
         self.assertEqual(fixture_label({"nation_index": 2, "round_index": 1}, "non_combat_movement"),
