@@ -306,7 +306,7 @@ def _cpu_candidate(state, roots, blocks, block_lengths, selected, capacity, allo
             torch.tensor(errors, dtype=torch.int64), torch.tensor(required, dtype=torch.int64))
 
 
-def replace_subtrees(state, roots, blocks, block_lengths, selected, *, capacity=None, allow_type_change=False):
+def replace_subtrees(state, roots, blocks, block_lengths, selected, *, capacity=None, allow_type_change=False, implementation=None):
     """Replace one complete subtree per selected lane, atomically as a cohort.
 
     A safe metadata-only retry capacity is old_capacity + block_capacity. This
@@ -317,8 +317,16 @@ def replace_subtrees(state, roots, blocks, block_lengths, selected, *, capacity=
     """
     B, C, O, R = _layout(state, roots, blocks, block_lengths, selected, capacity)
     if type(allow_type_change) is not bool: raise ValueError("Type-change permission must be explicit bool")
+    strategy=state.context.editor_implementation if implementation is None else implementation
+    if type(strategy) is not str or strategy not in {"reference","parallel"}:
+        raise ValueError("State editor implementation must be reference or parallel")
+    if strategy=="parallel" and state.device.type!="mps":
+        raise ValueError("Parallel resident editing requires explicit Apple GPU execution")
     if state.device.type == "cpu":
         candidate, lengths, sections, errors, required = _cpu_candidate(state, roots, blocks, block_lengths, selected, O, allow_type_change)
+    elif state.device.type == "mps" and strategy=="parallel":
+        from .device_state_edits_parallel import _candidate
+        candidate,lengths,sections,errors,required=_candidate(state,roots,blocks,block_lengths,selected,(B,C,O,R),allow_type_change)
     elif state.device.type == "mps":
         global _library
         candidate = torch.empty((B, O, 5), dtype=torch.int64, device=state.device)
