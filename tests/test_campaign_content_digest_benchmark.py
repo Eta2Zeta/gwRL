@@ -4,7 +4,7 @@ import hashlib
 import time
 import unittest
 
-from tools.benchmark_campaign_content_digests import DigestConfig, ROLES, SCHEMA, finalize, identity_messages
+from tools.benchmark_campaign_content_digests import DigestConfig, ROLES, SCHEMA, finalize, identity_messages, selected_messages
 
 
 class DigestBenchmarkTests(unittest.TestCase):
@@ -13,10 +13,12 @@ class DigestBenchmarkTests(unittest.TestCase):
         self.assertEqual(config.implementations, ("reference", "unrolled"))
         self.assertEqual(config.batch_sizes, (1, 4, 16, 64))
         self.assertEqual(config.group_sizes, (None, 1, 4, 32))
+        self.assertEqual(config.message_kinds, ("state",))
         for values in ({"implementations": ()}, {"implementations": ("unknown",)},
                        {"implementations": ("unrolled", "unrolled")}, {"group_sizes": ()},
                        {"group_sizes": (True,)}, {"group_sizes": (1.5,)}, {"group_sizes": (0,)},
-                       {"group_sizes": (None, None)}, {"families": ("unknown",)}, {"devices": ("cpu",)}):
+                       {"group_sizes": (None, None)}, {"families": ("unknown",)}, {"devices": ("cpu",)},
+                       {"message_kinds": ()}, {"message_kinds": ("state", "state")}, {"message_kinds": ("unknown",)}):
             with self.assertRaises(ValueError): DigestConfig(**values)
 
     def report(self):
@@ -52,6 +54,30 @@ class DigestBenchmarkTests(unittest.TestCase):
         config, report = self.report(); report["status"] = "memory_limit"
         self.assertFalse(finalize(report, config)["matched_native_hashlib_and_gpu_exact"])
         self.assertEqual(report["status"], "memory_limit")
+
+    def test_explicit_outer_selection_preserves_exact_bytes_and_default_state_cases(self):
+        rows = [{"family": "small_success", "role": "source_preflight", "message": b"state\x00\xff",
+                 "outer_engine_message": b"outer\x00\xff", "native_checkpoint_sha256": "3" * 64}]
+        original = copy.deepcopy(rows)
+        state_only = selected_messages(rows, ("state",))
+        self.assertEqual(len(state_only), 1); self.assertIs(state_only[0]["message"], rows[0]["message"])
+        both = selected_messages(rows, ("state", "outer_engine"))
+        self.assertEqual([row["message_kind"] for row in both], ["state", "outer_engine"])
+        self.assertIs(both[1]["message"], rows[0]["outer_engine_message"])
+        self.assertEqual(rows, original)
+        with self.assertRaisesRegex(ValueError, "message kinds"): selected_messages(rows, ("unknown",))
+
+    def test_both_message_kinds_require_the_complete_independent_grid(self):
+        original_config, report = self.report()
+        config = DigestConfig(batch_sizes=(1,), families=("small_success",), group_sizes=(None, 4), repeats=2,
+                              message_kinds=("state", "outer_engine"))
+        self.assertFalse(finalize(copy.deepcopy(report), config)["matched_native_hashlib_and_gpu_exact"])
+        expanded = copy.deepcopy(report)
+        expanded["cases"] += [{**copy.deepcopy(row), "message_kind": "outer_engine", "bytes_per_message": 112}
+                               for row in report["cases"]]
+        self.assertTrue(finalize(copy.deepcopy(expanded), config)["matched_native_hashlib_and_gpu_exact"])
+        expanded["cases"][-1]["message_kind"] = "state"
+        self.assertFalse(finalize(expanded, config)["matched_native_hashlib_and_gpu_exact"])
 
     def test_real_native_identity_fixture_roles_retain_full_state_and_engine_messages(self):
         config = DigestConfig(batch_sizes=(1,), families=("small_success", "infrastructure_success"))

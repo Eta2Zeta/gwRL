@@ -25,6 +25,7 @@ from tools.benchmark_campaign_resident_recruitment_chance import FAMILIES, lanes
 SCHEMA = "campaign-content-digest-compression-benchmark-v1"
 IMPLEMENTATIONS = ("reference", "unrolled")
 ROLES = ("source_preflight", "after_effects")
+MESSAGE_KINDS = ("state", "outer_engine")
 
 
 @dataclass(frozen=True)
@@ -35,12 +36,14 @@ class DigestConfig(StateConfig):
     families: tuple[str, ...] = FAMILIES
     implementations: tuple[str, ...] = IMPLEMENTATIONS
     group_sizes: tuple[int | None, ...] = (None, 1, 4, 32)
+    message_kinds: tuple[str, ...] = ("state",)
 
     def __post_init__(self):
         super().__post_init__()
         require(self.devices == ("mps",), "SHA diagnostics require explicit MPS")
         for values, allowed, label in ((self.families, FAMILIES, "families"),
-                                       (self.implementations, IMPLEMENTATIONS, "implementations")):
+                                       (self.implementations, IMPLEMENTATIONS, "implementations"),
+                                       (self.message_kinds, MESSAGE_KINDS, "message kinds")):
             require(values and len(set(values)) == len(values) and not set(values) - set(allowed),
                     f"Choose distinct supported digest {label}")
         require(self.group_sizes and all(value is None or type(value) is int and value > 0 for value in self.group_sizes)
@@ -90,6 +93,15 @@ def identity_messages(config, deadline):
     return result
 
 
+def selected_messages(fixtures, kinds):
+    """Select exact existing native messages without re-encoding or mutation."""
+    require(kinds and len(set(kinds)) == len(kinds) and not set(kinds) - set(MESSAGE_KINDS),
+            "Select distinct supported digest message kinds")
+    return [{**row, "message_kind": kind,
+             "message": row["message"] if kind == "state" else row["outer_engine_message"]}
+            for row in fixtures for kind in kinds]
+
+
 def worker(config, device, output, deadline):
     import gwrl_cpp
     import torch
@@ -123,9 +135,10 @@ def worker(config, device, output, deadline):
         require(tuple("".join(f"{word & 0xffffffff:08x}" for word in row) for row in words) == tuple(expected),
                 "Raw unsigned digest word bits changed")
 
-    persist(); prep = time.perf_counter(); messages = identity_messages(config, deadline)
+    persist(); prep = time.perf_counter()
+    messages = selected_messages(identity_messages(config, deadline), config.message_kinds)
     report["fixture_preparation_seconds"] = time.perf_counter() - prep
-    report["population"] = "Identical exact native State byte message replicated across all lanes per case, both source and native after-effects"
+    report["population"] = "Identical exact native State or outer Engine byte message replicated across all lanes per explicitly labeled case, both source and native after-effects"
     report["status"] = "running"; persist()
     for fixture in messages:
         for size in config.batch_sizes:
@@ -135,7 +148,7 @@ def worker(config, device, output, deadline):
             require(native_check["digests"] == expected, "Native/hashlib disagreement")
             batch, upload_seconds = timed(lambda: pack_messages(values, device="mps"))
             before = tuple(value.cpu().clone() for value in (batch.data, batch.offsets, batch.count))
-            case = {key: fixture[key] for key in ("family", "role", "native_checkpoint_sha256", "fixture", "draw_evidence")}
+            case = {key: fixture[key] for key in ("family", "role", "message_kind", "native_checkpoint_sha256", "fixture", "draw_evidence")}
             case.update(lanes=size, bytes_per_message=len(fixture["message"]), message_sha256=expected[0],
                         uploaded_bytes=batch.data.numel(), packing_upload_seconds=upload_seconds,
                         native_rule_seconds=[], native_wrapper_seconds=[], measurements=[])
@@ -172,7 +185,8 @@ def worker(config, device, output, deadline):
 
 
 def finalize(report, config):
-    expected = {(family, role, size) for family in config.families for role in ROLES for size in config.batch_sizes}
+    expected = {(family, role, kind, size) for family in config.families for role in ROLES
+                for kind in config.message_kinds for size in config.batch_sizes}
     grid = {(mode, group) for mode in config.implementations for group in config.group_sizes}
     cases = report.get("cases", [])
     def times(values): return len(values) == config.repeats and all(type(v) in (int, float) and math.isfinite(v) and v >= 0 for v in values)
@@ -184,7 +198,8 @@ def finalize(report, config):
                 len(rows) == len(grid) and {(row.get("implementation"), row.get("group_size")) for row in rows} == grid and
                 all(row.get("all_output_words_hex_counts_errors_exact") is True and times(row.get("warm_dispatch_seconds", [])) for row in rows))
     matched = (report.get("schema") == SCHEMA and report.get("status") == "completed" and report.get("sources_unchanged") is True and
-               len(cases) == len(expected) and {(case.get("family"), case.get("role"), case.get("lanes")) for case in cases} == expected and
+               len(cases) == len(expected) and {(case.get("family"), case.get("role"), case.get("message_kind", "state"),
+                                                case.get("lanes")) for case in cases} == expected and
                all(valid(case) for case in cases))
     report["matched_native_hashlib_and_gpu_exact"] = bool(matched)
     if report.get("status") == "completed" and not matched: report["status"] = "incomplete_or_mismatch"
@@ -197,6 +212,7 @@ def main(argv=None):
     parser.add_argument("--batch-sizes", type=int, nargs="+", default=(1, 4, 16, 64))
     parser.add_argument("--families", choices=FAMILIES, nargs="+", default=FAMILIES)
     parser.add_argument("--implementations", choices=IMPLEMENTATIONS, nargs="+", default=IMPLEMENTATIONS)
+    parser.add_argument("--message-kinds", choices=MESSAGE_KINDS, nargs="+", default=("state",))
     parser.add_argument("--group-sizes", nargs="+", default=("default", "1", "4", "32"))
     parser.add_argument("--repeats", type=int, default=3); parser.add_argument("--seconds", type=float, default=180)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
@@ -204,11 +220,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args._worker:
         values = json.loads(args._worker.read_text())
-        for name in ("devices", "batch_sizes", "families", "implementations", "group_sizes"): values[name] = tuple(values[name])
+        for name in ("devices", "batch_sizes", "families", "implementations", "group_sizes", "message_kinds"):
+            if name in values: values[name] = tuple(values[name])
         worker(DigestConfig(**values), args._device, args.output, args._deadline); return 0
     groups = tuple(None if value == "default" else int(value) for value in args.group_sizes)
     config = DigestConfig(batch_sizes=tuple(args.batch_sizes), families=tuple(args.families),
-        implementations=tuple(args.implementations), group_sizes=groups, repeats=args.repeats, seconds=args.seconds)
+        implementations=tuple(args.implementations), group_sizes=groups, message_kinds=tuple(args.message_kinds),
+        repeats=args.repeats, seconds=args.seconds)
     require(not args.output.exists(), "Choose a fresh evidence path")
     report = supervise(config, "mps", args.output, deadline=time.monotonic() + config.seconds, worker_script=Path(__file__))
     report = finalize(report, config); atomic_json(args.output, report)
