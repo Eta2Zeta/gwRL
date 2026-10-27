@@ -58,6 +58,8 @@ full-game and search performance.
 The [income subprofile](metal_income_refresh_profile_2026_10_27.md) identifies
 replacement validation as the next measured cost; the [RNG-copy comparison](metal_rng_copy_2026_10_27.md)
 separates its exact stage gain from whole-step timing variation.
+The [replacement-validation measurements](metal_replacement_validation_measurement_2026_10_27.md)
+record the subsequent exact editor change and its smaller whole-step gain.
 The [political queue and truce checks](resident_political_queues_2026_10_27.md)
 cover exact evolution choices, controlling-player lookup and mandatory battle
 queuing, without claiming complete political refresh or combat resolution.
