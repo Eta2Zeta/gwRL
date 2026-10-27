@@ -52,6 +52,10 @@ remaining builder costs from measured complete-step improvements and CPU losses.
 The [political queue and truce checks](resident_political_queues_2026_10_27.md)
 cover exact evolution choices, controlling-player lookup and mandatory battle
 queuing, without claiming complete political refresh or combat resolution.
+The [political facts checks](resident_political_facts_2026_10_27.md) cover possession
+IPP, civil flags, promotion, objectives and final alliances as separate seams.
+The [sampled-RNG copy checks](resident_chance_random_copy_2026_10_27.md) retain
+the full dice-commit contract while distributing its complete arena copy.
 
 ## Execution contract
 

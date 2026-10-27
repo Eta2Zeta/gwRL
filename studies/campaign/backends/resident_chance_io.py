@@ -276,7 +276,7 @@ def build_chance_payload(before, after, sampled, *, capacity):
     return ChancePayloadResult(EventPayloads(after,records,lengths,errors),required)
 
 
-def install_sampled_randomness(before, after, sampled, selected=None):
+def install_sampled_randomness(before, after, sampled, selected=None, *, implementation=None):
     """Commit sampled RNG only if every selected lane still has its original Random subtree.
 
     The three uint64 stream words and tape cursor are the only modified fields.
@@ -284,10 +284,17 @@ def install_sampled_randomness(before, after, sampled, selected=None):
     selected cohort to ``after``; neither input is mutated or resampled.
     """
     B,_,_ = _bind(before, after, sampled)
+    if implementation is None:
+        implementation = getattr(after.context, "editor_implementation", "reference")
+    if type(implementation) is not str or implementation not in {"reference", "parallel"}:
+        raise ValueError("Chance RNG installation needs an explicit reference or parallel implementation")
     if selected is None:
         selected = torch.ones(B, dtype=torch.bool, device=before.device)
     _tensor(selected, before, torch.bool, (B,))
-    candidate = torch.empty_like(after.records); errors = torch.zeros_like(after.errors)
+    # The rule checks and four RNG-word writes stay in the original kernel.
+    # Copy the complete arena with an element-parallel device copy when chosen.
+    candidate = after.records.clone() if implementation == "parallel" else torch.empty_like(after.records)
+    errors = torch.zeros_like(after.errors)
     if B:
         args = (before.records,before.lengths,before.sections,before.errors,
                 after.records,after.lengths,after.sections,after.errors,before.context.string_bytes,before.context.string_offsets,
@@ -296,7 +303,11 @@ def install_sampled_randomness(before, after, sampled, selected=None):
                 _dimensions((B,before.records.shape[1],after.records.shape[1],before.context.string_count,
                     before.context.string_bytes.numel(),before.string_offsets.numel()-1,before.string_bytes.numel(),
                     after.string_offsets.numel()-1,after.string_bytes.numel())))
-        _kernels().install_chance_randomness(*(value if value.numel() else _dummy() for value in args), threads=B)
+        if implementation == "parallel":
+            from .resident_chance_io_parallel import install
+            install(args, B)
+        else:
+            _kernels().install_chance_randomness(*(value if value.numel() else _dummy() for value in args), threads=B)
     committed = ~(errors != 0).any()
     state = DeviceStateBatch(after.context,torch.where(committed,candidate,after.records),after.lengths,after.sections,
             after.string_bytes,after.string_offsets,after.errors,after.suffix_usage)
