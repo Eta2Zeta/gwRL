@@ -23,7 +23,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tools.benchmark_campaign_device_state import StateConfig,atomic_json,require,supervise
 
-SCHEMA="campaign-complete-recruitment-chance-benchmark-v2"
+SCHEMA="campaign-complete-recruitment-chance-benchmark-v3"
 FAMILIES=("small_success","small_failure","wide_success","infrastructure_success")
 STREAMS=("actual","search","training")
 PROFILE_STAGES=("preflight","sample","effects","income","reset","forward_capability","forward",
@@ -40,6 +40,7 @@ class ChanceConfig(StateConfig):
     digest_implementation: str = "reference"
     digest_group_size: int | None = None
     reuse_certified_source: bool = False
+    field_group_size: int = 1
 
     def __post_init__(self):
         super().__post_init__()
@@ -47,16 +48,17 @@ class ChanceConfig(StateConfig):
         require(type(self.native_workers) is int and 1<=self.native_workers<=10 and
                 self.native_workers+self.threads<=self.cpu_budget,"Native pool plus reserved tensor threads must fit twelve cores")
         require(type(self.profile_repeats) is int and self.profile_repeats>0,"Profile repeats must be positive")
-        require(self.formatter in {"reference","parallel_units"},"Choose an explicit supported State formatter")
+        require(self.formatter in {"reference","parallel_units","parallel_fields"},"Choose an explicit supported State formatter")
         require(self.digest_implementation in {"reference","unrolled"},"Choose an explicit supported digest kernel")
         require(self.digest_group_size is None or type(self.digest_group_size) is int and self.digest_group_size>0,
                 "Digest group size must be a positive integer or default")
         require(type(self.reuse_certified_source) is bool,"Certified source reuse must be explicit bool")
+        require(type(self.field_group_size) is int and self.field_group_size>0,"Field group size must be a positive integer")
 
 
 def gpu_selection(config):
     return {name:getattr(config,name) for name in
-        ("formatter","digest_implementation","digest_group_size","reuse_certified_source")}
+        ("formatter","digest_implementation","digest_group_size","reuse_certified_source","field_group_size")}
 
 
 def provenance():
@@ -184,6 +186,7 @@ def worker(config,device,output,deadline):
     from studies.campaign.backends.canonical_json_metal import CanonicalJsonContext
     from studies.campaign.backends.resident_state_json import ResidentStateJson
     from studies.campaign.backends.resident_state_json_parallel import ParallelUnitStateJson
+    from studies.campaign.backends.resident_state_json_fields import ParallelFieldStateJson
     from studies.campaign.backends.content_digest_metal import inspect_digests
     from studies.campaign.backends.resident_recruitment_chance import ResidentRecruitmentChance,RecruitmentChanceCapacities
     require(device=="mps","No CPU fallback")
@@ -209,9 +212,11 @@ def worker(config,device,output,deadline):
             captured=gwrl_cpp.capture_device_states(context.native,envs);before=DeviceStateBatch.from_native(captured,context=context)
             relations=ResidentPoliticalRelations(context,gwrl_cpp.campaign_relations_context(envs[0]))
             recruitment=ResidentRecruitment(relations,gwrl_cpp.campaign_recruitment_context(envs[0]))
-            formatter_type=ResidentStateJson if config.formatter=="reference" else ParallelUnitStateJson
+            formatter_type={"reference":ResidentStateJson,"parallel_units":ParallelUnitStateJson,
+                "parallel_fields":ParallelFieldStateJson}[config.formatter]
+            field_options={"fragment_group_size":config.field_group_size} if config.formatter=="parallel_fields" else {}
             formatter=formatter_type(CanonicalJsonContext(captured,context),
-                digest_implementation=config.digest_implementation,digest_group_size=config.digest_group_size)
+                digest_implementation=config.digest_implementation,digest_group_size=config.digest_group_size,**field_options)
             handler=ResidentRecruitmentChance(context,ResidentRecruitmentEffects(recruitment),
                 ResidentIncomeContext(context,gwrl_cpp.campaign_income_context(envs[0])),formatter,
                 reuse_certified_source=config.reuse_certified_source)
@@ -321,7 +326,8 @@ def main(argv=None):
     parser.add_argument("--batch-sizes",nargs="+",type=int,default=(1,4,16,64))
     parser.add_argument("--repeats",type=int,default=3);parser.add_argument("--profile-repeats",type=int,default=1)
     parser.add_argument("--native-workers",type=int,default=10);parser.add_argument("--seconds",type=float,default=180)
-    parser.add_argument("--formatter",choices=("reference","parallel_units"),default="reference")
+    parser.add_argument("--formatter",choices=("reference","parallel_units","parallel_fields"),default="reference")
+    parser.add_argument("--field-group-size",type=int,default=1)
     parser.add_argument("--digest-implementation",choices=("reference","unrolled"),default="reference")
     parser.add_argument("--digest-group-size",type=int)
     parser.add_argument("--reuse-certified-source",action="store_true")
@@ -334,7 +340,7 @@ def main(argv=None):
     config=ChanceConfig(batch_sizes=tuple(args.batch_sizes),repeats=args.repeats,profile_repeats=args.profile_repeats,
         native_workers=args.native_workers,seconds=args.seconds,formatter=args.formatter,
         digest_implementation=args.digest_implementation,digest_group_size=args.digest_group_size,
-        reuse_certified_source=args.reuse_certified_source)
+        reuse_certified_source=args.reuse_certified_source,field_group_size=args.field_group_size)
     require(not args.output.exists(),"Choose a fresh evidence path")
     result=supervise(config,"mps",args.output,deadline=time.monotonic()+config.seconds,worker_script=Path(__file__))
     result=finalize(result,config);atomic_json(args.output,result)
