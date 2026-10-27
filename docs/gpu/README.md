@@ -56,6 +56,9 @@ The [political facts checks](resident_political_facts_2026_10_27.md) cover posse
 IPP, civil flags, promotion, objectives and final alliances as separate seams.
 The [sampled-RNG copy checks](resident_chance_random_copy_2026_10_27.md) retain
 the full dice-commit contract while distributing its complete arena copy.
+The [complete internal political refresh](resident_political_refresh_2026_10_27.md)
+connects those political helpers in the original single-pass order, including
+simultaneous evolution and surrender effects.
 
 ## Execution contract
 
