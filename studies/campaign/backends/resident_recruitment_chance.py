@@ -420,7 +420,7 @@ class ResidentRecruitmentChance:
         return _ForwardResult(edited.state,errors,unsupported,edited.required_state_capacity,
             torch.maximum(required,build.required_capacity),~(errors!=0).any()&~unsupported.any()&edited.committed)
 
-    def resolve(self,before,expected,*,capacities,selected=None,sampled=None):
+    def resolve(self,before,expected,*,capacities,selected=None,sampled=None,profile=None):
         """Resolve sampled recruitment only, retaining the original transaction on failure.
 
         expected is a source-bound StateIdentityBatch carrying the full Engine
@@ -429,6 +429,8 @@ class ResidentRecruitmentChance:
         Required capacities are per-stage device tensors. ``attempted`` tells
         which selected lanes reached each stage; later requirements after a
         failure describe the retained intermediate, not an invented success.
+        An explicit diagnostics callback receives stage names after submission.
+        Default execution adds no timers, fences or callback invocations.
         """
         self._context(before)
         if not isinstance(expected,StateIdentityBatch) or expected.source is not before:
@@ -436,6 +438,7 @@ class ResidentRecruitmentChance:
         if not isinstance(capacities,RecruitmentChanceCapacities):
             raise TypeError("Recruitment chance needs explicit fixed capacities")
         capacities.validate(before);B,C=before.records.shape[:2];dev=before.device
+        if profile is not None and not callable(profile):raise TypeError("Recruitment diagnostics callback must be callable")
         if selected is None:selected=torch.ones(B,dtype=torch.bool,device=dev)
         _tensor(selected,before,torch.bool,(B,))
         for keys in (expected.state_keys,expected.engine_keys):
@@ -452,6 +455,7 @@ class ResidentRecruitmentChance:
             failed=active&(details!=0)
             if committed is not None:failed|=active&~committed
             errors|=failed.to(torch.int64)*int(code)
+            if profile is not None:profile(name)
             return selected&~(errors!=0).any()
 
         capability=torch.zeros(B,dtype=torch.int64,device=dev);handled=torch.zeros(B,dtype=torch.bool,device=dev)
@@ -525,4 +529,5 @@ class ResidentRecruitmentChance:
             torch.where(committed,candidate.string_bytes,baseline.string_bytes),torch.where(committed,candidate.string_offsets,baseline.string_offsets),
             torch.where(committed,candidate.errors,before.errors),torch.where(committed,candidate.suffix_usage,before.suffix_usage))
         identities=_invalid_identities(event.identities,output,selected&~committed)
+        if profile is not None:profile("publish")
         return RecruitmentChanceResult(before,output,sampled,identities,errors,stage_errors,required,attempted,handled,selected&committed,committed)

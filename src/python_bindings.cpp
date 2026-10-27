@@ -29,6 +29,8 @@
 #include <utility>
 #include <chrono>
 #include <bit>
+#include <condition_variable>
+#include <thread>
 
 namespace py = pybind11;
 
@@ -189,6 +191,7 @@ using CampaignEnv = game::campaign::CampaignEnv;
 #include "python_random_metal.inc"
 #include "python_wealth.inc"
 #include "python_relations.inc"
+#include "python_diagnostic_pool.inc"
 #include "python_movement_context.inc"
 #include "python_content_digest.inc"
 #include "python_canonical_json.inc"
@@ -556,6 +559,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     bindRandomProbe(module);
     bindWealth(module);
     bindRelations(module);
+    bindDiagnosticPool(module);
     bindMovementContext(module);
     bindContentDigestProbe(module);
     bindCanonicalJson(module);

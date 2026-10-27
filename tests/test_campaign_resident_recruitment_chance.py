@@ -288,11 +288,18 @@ class ResidentRecruitmentChanceTests(unittest.TestCase):
              patch.object(torch.Tensor,"item",side_effect=AssertionError("Host scalar")), \
              patch.object(torch.Tensor,"numpy",side_effect=AssertionError("Host numpy")), \
              patch.object(torch.Tensor,"__bool__",side_effect=AssertionError("Host bool")), \
+             patch.object(torch.mps,"synchronize",side_effect=AssertionError("Default diagnostic fence")), \
              patch.object(json,"loads",side_effect=AssertionError("JSON parse")), \
              patch.object(json,"dumps",side_effect=AssertionError("JSON serialize")), \
              patch.object(gwrl_cpp,"campaign_recruitment_oracle",side_effect=AssertionError("CPU recruitment fallback")):
             result=handler.resolve(before,expected,capacities=caps)
         self.assert_native(before,result,envs)
+        trace=[]
+        traced=handler.resolve(before,expected,capacities=caps,profile=trace.append)
+        self.assert_native(before,traced,envs)
+        self.assertEqual(trace,["preflight","sample","effects","income","reset","forward_capability","forward",
+                                "clock","validation","identity","payload","event","random","publish"])
+        with self.assertRaises(TypeError):handler.resolve(before,expected,capacities=caps,profile=True)
 
     def test_explicit_reservation_reuses_allocations_empty_batch_and_shrink_rejection(self):
         envs=[pending_fixture(face=1)];before,handler,caps,expected=self.setup(envs)

@@ -4,6 +4,7 @@ struct MovementNativeProbe {
     std::vector<game::campaign::MovementOracleResult> values;
     double seconds {0};
     std::uint64_t calls {0};
+    std::size_t workerCount {1};
 };
 struct MovementNativeAccess {
     using Context=game::campaign::MovementContext;
@@ -42,7 +43,8 @@ struct MovementNativeAccess {
         }return output;
     }
     static MovementNativeProbe benchmark(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs,
-                                         const std::vector<Query>& queries,std::size_t repeats){
+                                         const std::vector<Query>& queries,std::size_t repeats,
+                                         const std::shared_ptr<NativeDiagnosticPool>& pool){
         if(!context||!repeats)throw std::invalid_argument("Native route probe requires a context and positive repetitions");
         if(queries.size()&&repeats>std::numeric_limits<std::uint64_t>::max()/queries.size())
             throw std::overflow_error("Native route query-count overflow; no queries truncated");
@@ -67,15 +69,19 @@ struct MovementNativeAccess {
             // this timer. Each original predicate's result/sets/strings are
             // constructed and retained inside it, without a Python dictionary.
             const auto before=std::chrono::steady_clock::now();
-            for(std::size_t repeat=0;repeat<repeats;++repeat)for(std::size_t i=0;i<queries.size();++i){
-                Result result;
-                try{result.result=game::campaign::validateRoute(*states[queries[i].lane],queries[i].request);}
-                catch(const std::out_of_range& e){result.exception=1;result.message=e.what();}
-                catch(const std::exception& e){result.exception=2;result.message=e.what();}
-                output.values[i]=std::move(result);
-            }
+            const auto work=[&](std::size_t worker,std::size_t count){
+                for(std::size_t repeat=0;repeat<repeats;++repeat)for(std::size_t i=worker;i<queries.size();i+=count){
+                    Result result;
+                    try{result.result=game::campaign::validateRoute(*states[queries[i].lane],queries[i].request);}
+                    catch(const std::out_of_range& e){result.exception=1;result.message=e.what();}
+                    catch(const std::exception& e){result.exception=2;result.message=e.what();}
+                    output.values[i]=std::move(result);
+                }
+            };
+            if(pool)pool->run(work);else work(0,1);
             output.seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-before).count();
         }
+        output.workerCount=pool?pool->workers():1;
         output.calls=static_cast<std::uint64_t>(queries.size())*repeats;return output;
     }
 };
@@ -118,10 +124,11 @@ void bindMovementContext(py::module_& module){
     py::class_<MovementNativeProbe>(module,"CampaignMovementProbe")
         .def_property_readonly("seconds",[](const MovementNativeProbe& p){return p.seconds;})
         .def_property_readonly("calls",[](const MovementNativeProbe& p){return p.calls;})
+        .def_property_readonly("worker_count",[](const MovementNativeProbe& p){return p.workerCount;})
         .def_property_readonly("query_count",[](const MovementNativeProbe& p){return p.values.size();})
         .def("inspect",[](const MovementNativeProbe& p){return MovementNativeAccess::inspect(p.values);});
     module.def("benchmark_campaign_route_oracle",&MovementNativeAccess::benchmark,
-               py::arg("context"),py::arg("envs"),py::arg("queries"),py::arg("repeats")=1);
+               py::arg("context"),py::arg("envs"),py::arg("queries"),py::arg("repeats")=1,py::arg("pool")=nullptr);
     module.def("campaign_movement_context",&MovementNativeAccess::context);
     module.def("campaign_route_oracle",&MovementNativeAccess::oracle);
 }

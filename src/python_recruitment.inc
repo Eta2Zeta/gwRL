@@ -89,6 +89,90 @@ struct RecruitmentNativeAccess {
             item["handled"]=static_cast<bool>(handled[lane]);output.append(item);}
         return output;
     }
+    static py::dict chanceBenchmark(std::shared_ptr<game::campaign::DeviceStateContext> context,
+            const std::vector<NativeCampaignEnv*>& envs,const std::vector<std::string>& expectedKeys,
+            std::size_t trials,std::shared_ptr<NativeDiagnosticPool> pool,bool profile) {
+        using namespace game::campaign;
+        if(!context||envs.empty()||envs.size()!=expectedKeys.size()||!trials||trials>1000000)
+            throw std::invalid_argument("Recruitment chance benchmark requires matching nonempty lanes/keys and positive bounded trials");
+        for(const auto& key:expectedKeys)
+            if(key.size()!=64||!std::all_of(key.begin(),key.end(),[](unsigned char c){return(c>='0'&&c<='9')||(c>='a'&&c<='f');}))
+                throw std::invalid_argument("Recruitment benchmark requires exact Engine SHA256 keys");
+        const auto owners=pinNativeEnvironments(envs);
+        std::vector<double> elapsed,cloneSeconds,verificationSeconds,guardSeconds,resolveSeconds,keySeconds;
+        std::vector<std::string> outputKeys(envs.size());
+        auto original=std::make_unique<DeviceStateBatch>(context);
+        auto output=std::make_unique<DeviceStateBatch>(context);
+        bool unchanged=true,repeatExact=true;
+        {
+            py::gil_scoped_release release;
+            std::vector<Engine> sources;sources.reserve(envs.size());
+            for(auto* env:envs){std::lock_guard lock(env->mutex_);
+                const auto& engine=env->env_.engine();
+                if(engine.rulesId()!=context->rulesId||engine.state().definition->fingerprint!=context->definitionFingerprint)
+                    throw std::invalid_argument("Recruitment benchmark source/context differs");
+                if(!engine.state().chance||engine.state().chance->purpose!="recruitment_roll")
+                    throw std::invalid_argument("Benchmark accepts pending recruitment chance only");
+                sources.push_back(engine.clone());original->append(engine);
+            }
+            // Real committed sources already cache State::planningKey. Prime it
+            // explicitly here; never manufacture a cold CPU baseline for MPS.
+            for(const auto& source:sources)(void)source.planningKey();
+            const auto equal=[](const DeviceStateBatch& a,const DeviceStateBatch& b){
+                return a.records==b.records&&a.laneOffsets==b.laneOffsets&&a.strings==b.strings&&
+                       a.stringBytes==b.stringBytes&&a.stringOffsets==b.stringOffsets&&a.sections==b.sections;
+            };
+            for(std::size_t trial=0;trial<trials;++trial){
+                const auto copyStarted=std::chrono::steady_clock::now();
+                std::vector<Engine> work;work.reserve(sources.size());
+                for(const auto& source:sources)work.push_back(source.clone());
+                cloneSeconds.push_back(std::chrono::duration<double>(std::chrono::steady_clock::now()-copyStarted).count());
+                std::vector<double> guard(envs.size()),resolve(envs.size()),key(envs.size());
+                const auto execute=[&](std::size_t worker,std::size_t workers){
+                    for(std::size_t lane=worker;lane<work.size();lane+=workers){
+                        if(profile){
+                            const auto a=std::chrono::steady_clock::now();
+                            if(work[lane].planningKey()!=expectedKeys[lane])throw std::runtime_error("Stale recruitment benchmark Engine key");
+                            const auto b=std::chrono::steady_clock::now();work[lane].resolveChance();
+                            const auto c=std::chrono::steady_clock::now();outputKeys[lane]=work[lane].planningKey();
+                            const auto d=std::chrono::steady_clock::now();
+                            guard[lane]=std::chrono::duration<double>(b-a).count();resolve[lane]=std::chrono::duration<double>(c-b).count();
+                            key[lane]=std::chrono::duration<double>(d-c).count();
+                        }else{
+                            if(work[lane].planningKey()!=expectedKeys[lane])throw std::runtime_error("Stale recruitment benchmark Engine key");
+                            work[lane].resolveChance();outputKeys[lane]=work[lane].planningKey();
+                        }
+                    }
+                };
+                const auto started=std::chrono::steady_clock::now();
+                if(pool)pool->run(execute);else execute(0,1);
+                elapsed.push_back(std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count());
+                if(profile){double a=0,b=0,c=0;for(std::size_t lane=0;lane<work.size();++lane){a+=guard[lane];b+=resolve[lane];c+=key[lane];}
+                    guardSeconds.push_back(a);resolveSeconds.push_back(b);keySeconds.push_back(c);}
+                // Lossless full State/history/RNG capture and Python boxing are
+                // outside the timed region. Keep one output, never all trials.
+                const auto checked=std::chrono::steady_clock::now();DeviceStateBatch current(context);
+                for(const auto& engine:work)current.append(engine);
+                if(trial&&!equal(*output,current))repeatExact=false;
+                *output=std::move(current);
+                verificationSeconds.push_back(std::chrono::duration<double>(std::chrono::steady_clock::now()-checked).count());
+            }
+            DeviceStateBatch after(context);
+            for(auto* env:envs){std::lock_guard lock(env->mutex_);after.append(env->env_.engine());}
+            unchanged=equal(*original,after);
+        }
+        py::dict result;result["schema"]="campaign-native-recruitment-chance-timing-v1";
+        result["batch_size"]=envs.size();result["trials"]=trials;result["workers"]=pool?pool->workers():1;
+        result["execution"]=pool?"persistent_native_pool":"serial_native";
+        result["pool_startup_seconds"]=pool?pool->startupSeconds():0.;result["profiled"]=profile;
+        result["seconds"]=elapsed;result["input_clone_seconds"]=cloneSeconds;result["verification_seconds"]=verificationSeconds;
+        result["guard_worker_seconds"]=guardSeconds;result["resolve_worker_seconds"]=resolveSeconds;result["output_key_worker_seconds"]=keySeconds;
+        result["source_unchanged"]=unchanged;result["repeated_outputs_exact"]=repeatExact;result["output_engine_keys"]=outputKeys;
+        result["original"]=py::cast(std::move(original));result["output"]=py::cast(std::move(output));
+        result["timed_scope"]="Warm cached Engine key guard, original Engine.resolveChance (including its internal clone/validation/history/RNG), output Engine key; native pool dispatch included";
+        result["excluded_scope"]="Owner/wrapper locks, GIL, input trial clones, full-output capture/verification, Python boxing and pool startup";
+        return result;
+    }
 };
 void bindRecruitment(py::module_& module) {
     using C=RecruitmentNativeAccess::Context;
@@ -109,4 +193,7 @@ void bindRecruitment(py::module_& module) {
     module.def("campaign_recruitment_oracle",&RecruitmentNativeAccess::oracle);
     module.def("campaign_recruitment_effects_oracle",&RecruitmentNativeAccess::effects);
     module.def("campaign_recruitment_start_oracle",&RecruitmentNativeAccess::start);
+    module.def("campaign_recruitment_chance_benchmark",&RecruitmentNativeAccess::chanceBenchmark,
+        py::arg("context"),py::arg("envs"),py::arg("expected_engine_keys"),py::arg("trials"),
+        py::arg("pool")=nullptr,py::arg("profile")=false);
 }

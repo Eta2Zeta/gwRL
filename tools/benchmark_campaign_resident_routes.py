@@ -41,6 +41,7 @@ class RouteConfig(StateConfig):
     batch_sizes: tuple[int, ...] = (1, 4, 16, 64)
     preparation_implementation: str = "reference"
     synthetic_history_strings_per_lane: int = 0
+    native_workers: int = 1
 
     def __post_init__(self):
         super().__post_init__()
@@ -48,6 +49,8 @@ class RouteConfig(StateConfig):
         require(self.preparation_implementation in {"reference", "fused", "fused_indexed"}, "Choose reference, fused or fused_indexed route preparation")
         require(type(self.synthetic_history_strings_per_lane) is int and self.synthetic_history_strings_per_lane>=0,
                 "Synthetic history size must be an explicit nonnegative integer; it is never silently capped")
+        require(type(self.native_workers) is int and 1<=self.native_workers<=10 and self.native_workers+2<=self.cpu_budget,
+                "Native diagnostic workers must be 1..10 with two coordinator cores inside the CPU budget")
 
 
 def provenance():
@@ -57,6 +60,27 @@ def provenance():
     value["route_native_probe_sha256"] = hashlib.sha256((ROOT / "src/python_movement_context.inc").read_bytes()).hexdigest()
     value["route_native_boundary_sha256"] = hashlib.sha256((ROOT / "src/python_bindings.cpp").read_bytes()).hexdigest()
     return value
+
+
+def native_probe_runner(config,native):
+    """Create at most one diagnostic pool, outside every query timer.
+
+    Default one keeps the original direct serial function. This does not modify
+    the production CPU backend or make complete games/search parallel.
+    """
+    if config.native_workers==1:
+        return native.benchmark_campaign_route_oracle,{"kind":"serial_direct","workers":1,
+            "startup_seconds":0.0,"constructor_wall_seconds":0.0,"reserved_coordinator_cores":2}
+    factory=getattr(native,"CampaignDiagnosticPool",None)
+    require(factory is not None,"Native diagnostic pool unavailable; rebuild the current extension; no serial fallback")
+    before=time.perf_counter();pool=factory(config.native_workers);wall=time.perf_counter()-before
+    require(pool.workers==config.native_workers,"Native diagnostic pool did not honor the explicit worker count")
+    require(math.isfinite(pool.startup_seconds) and pool.startup_seconds>=0,"Native diagnostic pool startup telemetry invalid")
+    def probe(context,envs,queries):
+        return native.benchmark_campaign_route_oracle(context,envs,queries,pool=pool)
+    return probe,{"kind":"persistent_diagnostic_pool","workers":pool.workers,"startup_seconds":pool.startup_seconds,
+        "constructor_wall_seconds":wall,"reserved_coordinator_cores":2,
+        "scope":"Optional native timing diagnostic; production CPU gameplay/search backend is unchanged"}
 
 
 def fixture_label(clock, kind):
@@ -271,8 +295,9 @@ def worker(config, device, progress, deadline):
     require(recommended > 0, "MPS allocator allowance unavailable")
     torch.mps.set_per_process_memory_fraction(min(3_000_000_000, recommended) / recommended)
     policy = runtime_policy_for_device("mps")
+    native_probe,native_pool=native_probe_runner(config,gwrl_cpp)
     report = {"schema": SCHEMA, "config": asdict(config), "device": device, "status": "preparing",
-              "provenance": provenance(), "cases": [], "scope": __doc__,
+              "provenance": provenance(), "cases": [], "scope": __doc__, "native_pool":native_pool,
               "software": {"torch": str(torch.__version__), "python": sys.version.split()[0],
                            "threads": torch.get_num_threads(), "interop_threads": torch.get_num_interop_threads()},
               "native_baseline": "Sequential original validateRoute on one native thread, prebuilt requests, strong owners/unique locks/pointers/output-vector allocation before native timer; complete owned result construction inside timer; Python boxing outside",
@@ -296,6 +321,9 @@ def worker(config, device, progress, deadline):
             torch.mps.synchronize()
         return value, time.perf_counter() - before
 
+    if config.native_workers>1:
+        report["native_baseline"]=f"Diagnostic persistent {config.native_workers}-worker original validateRoute pool; input/locks/startup/boxing outside predicate timer; actual complete results retained"
+        report["limitations"][1]="Parallel CPU measurement is an optional component diagnostic; the production CPU game/search backend has not been changed."
     if config.synthetic_history_strings_per_lane:
         report["limitations"][0]="Identical real boards with schema-valid synthetic lane-specific audit annotations; this is history-namespace stress, not distinct played games."
         report["synthetic_history_scope"]="Append-only annotations; all original history, full board/rule/schema fields, queries and random streams are retained."
@@ -386,12 +414,13 @@ def worker(config, device, progress, deadline):
                 fresh = replace(resident)
                 return kernel.query(fresh, requests)
             before = time.perf_counter(); policy.reset(); torch.mps.synchronize(); reset_seconds = time.perf_counter() - before
-            oracle, cold_native_wall = timed(lambda: gwrl_cpp.benchmark_campaign_route_oracle(native_routes, envs, native_queries))
+            oracle, cold_native_wall = timed(lambda: native_probe(native_routes, envs, native_queries))
             fresh, cold_fresh = timed(fresh_query, gpu=True)
             prepared, prepare_seconds = timed(lambda: kernel.prepare(resident), gpu=True)
             reused, cold_reused = timed(lambda: kernel.query(resident, requests, prepared=prepared), gpu=True)
             case = {"position": fixture["label"], "seed": fixture["seed"], "lanes": size,
                     "clock": snapshot["clock"], "queries_per_lane": len(rows), "queries": len(expanded),
+                    "native_worker_count":getattr(oracle,"worker_count",1),
                     "preparation_work_per_lane": {"unit_entries": len(snapshot["units"]), "territory_entries": len(snapshot["territories"]),
                         "active_sid_slots": case_active_sids, "allocated_sid_slots": kernel._dims(resident)[9],
                         "unused_sid_capacity": kernel._dims(resident)[9]-case_active_sids,
@@ -415,17 +444,18 @@ def worker(config, device, progress, deadline):
                 case["device_request_mode"]="Full request packing against the mixed shared suffix pool; outside query timing"
                 case["native_checkpoint_scope"]="Lane zero; every lane hash is retained in synthetic_history"
             for _ in range(config.warmups):
-                _, _ = timed(lambda: gwrl_cpp.benchmark_campaign_route_oracle(native_routes, envs, native_queries))
+                _, _ = timed(lambda: native_probe(native_routes, envs, native_queries))
                 _, _ = timed(fresh_query, gpu=True)
                 _, _ = timed(lambda: kernel.query(resident, requests, prepared=prepared), gpu=True)
             for _ in range(config.repeats):
-                oracle, elapsed = timed(lambda: gwrl_cpp.benchmark_campaign_route_oracle(native_routes, envs, native_queries))
+                oracle, elapsed = timed(lambda: native_probe(native_routes, envs, native_queries))
                 case["native_query_seconds"].append(oracle.seconds); case["native_wrapper_wall_seconds"].append(elapsed)
                 fresh, elapsed = timed(fresh_query, gpu=True); case["gpu_prepare_query_seconds"].append(elapsed)
                 reused, elapsed = timed(lambda: kernel.query(resident, requests, prepared=prepared), gpu=True)
                 case["gpu_prepared_query_seconds"].append(elapsed); policy.completed(1)
             before = time.perf_counter()
             require(oracle.calls == len(expanded) and oracle.query_count == len(expanded), "Native probe omitted a query")
+            require(getattr(oracle,"worker_count",1)==config.native_workers,"Native probe worker count differs from the explicit diagnostic setting")
             case["evidence"] = exact_results(oracle.inspect(), kernel.inspect(fresh), kernel.inspect(reused), expanded)
             if mixed_reference is not None:
                 case["resident_source_evidence"]=exact_mixed_resident(resident,mixed_reference)
@@ -468,6 +498,7 @@ def finalize(result, config):
         q = case.get("queries", 0)
         return (history_valid(case) and type(q) is int and q > 0 and type(case.get("queries_per_lane")) is int and case["queries_per_lane"] > 0 and
                 q == case["queries_per_lane"] * case.get("lanes", 0) and case.get("seed") == config.seed and
+                case.get("native_worker_count",1)==config.native_workers and
                 all(sha(case.get(field)) for field in ("request_sha256", "one_lane_requests_sha256", "native_checkpoint_sha256")) and
                 case.get("evidence", {}).get("exact") is True and case["evidence"].get("verified_queries") == q and
                 case.get("resident_source_evidence", {}).get("exact") is True and
@@ -476,7 +507,10 @@ def finalize(result, config):
                 case.get("source_unchanged") is True and all(
                     len(case.get(field, [])) == config.repeats and all(type(v) in (int, float) and math.isfinite(v) and v >= 0 for v in case[field])
                     for field in ("native_query_seconds", "native_wrapper_wall_seconds", "gpu_prepare_query_seconds", "gpu_prepared_query_seconds")))
-    exact = (result.get("status") == "completed" and result.get("sources_unchanged") is True and
+    pool=result.get("native_pool",{})
+    pool_valid=(config.native_workers==1 or (pool.get("kind")=="persistent_diagnostic_pool" and pool.get("workers")==config.native_workers and
+                type(pool.get("startup_seconds")) in (int,float) and math.isfinite(pool["startup_seconds"]) and pool["startup_seconds"]>=0))
+    exact = (pool_valid and result.get("status") == "completed" and result.get("sources_unchanged") is True and
              result.get("preparation_completed_three_round_games") == 1 and sha(result.get("workload_sha256")) and
              sha(result.get("terminal_checkpoint_sha256")) and
              len(cases) == len(expected) and {(row.get("position"), row.get("lanes")) for row in cases} == expected and
@@ -510,6 +544,7 @@ def main(argv=None):
     parser.add_argument("--memory-bytes", type=int, default=8_000_000_000)
     parser.add_argument("--preparation-implementation", choices=("reference", "fused", "fused_indexed"), default="reference")
     parser.add_argument("--synthetic-history-strings-per-lane", type=int, default=0)
+    parser.add_argument("--native-workers",type=int,default=1)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", choices=("mps",), help=argparse.SUPPRESS)
     parser.add_argument("--_deadline", type=float, help=argparse.SUPPRESS)
@@ -520,7 +555,7 @@ def main(argv=None):
         worker(RouteConfig(**settings), args._device, args.output, args._deadline); return 0
     config = RouteConfig(batch_sizes=tuple(args.batch_sizes), repeats=args.repeats, seconds=args.seconds, memory_bytes=args.memory_bytes,
                          preparation_implementation=args.preparation_implementation,
-                         synthetic_history_strings_per_lane=args.synthetic_history_strings_per_lane)
+                         synthetic_history_strings_per_lane=args.synthetic_history_strings_per_lane,native_workers=args.native_workers)
     return 0 if run(config, args.output)["status"] == "completed" else 2
 
 
