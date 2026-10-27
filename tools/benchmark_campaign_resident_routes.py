@@ -40,11 +40,14 @@ class RouteConfig(StateConfig):
     devices: tuple[str, ...] = ("mps",)
     batch_sizes: tuple[int, ...] = (1, 4, 16, 64)
     preparation_implementation: str = "reference"
+    synthetic_history_strings_per_lane: int = 0
 
     def __post_init__(self):
         super().__post_init__()
         require(self.devices == ("mps",), "Routes require explicit Apple MPS; no CPU fallback")
         require(self.preparation_implementation in {"reference", "fused", "fused_indexed"}, "Choose reference, fused or fused_indexed route preparation")
+        require(type(self.synthetic_history_strings_per_lane) is int and self.synthetic_history_strings_per_lane>=0,
+                "Synthetic history size must be an explicit nonnegative integer; it is never silently capped")
 
 
 def provenance():
@@ -177,6 +180,81 @@ def exact_results(oracle, fresh, reused, requests):
             "fields": "Every RouteResult field, full approach/terrain/region sets and native exception class/message"}
 
 
+def _pool_strings(data, offsets):
+    raw=bytes(data);bounds=list(offsets)
+    return {raw[a:b].decode("utf8") for a,b in zip(bounds,bounds[1:])}
+
+
+def synthetic_history_lane(raw,lane,count,namespace,*,forbidden_strings=()):
+    """Explicit setup only: clone a full state and append a marked audit annotation.
+
+    The annotation is schema-valid synthetic data, not a claim that a new game
+    action occurred. Original events, every board field and all RNG are retained.
+    """
+    require(type(lane) is int and lane>=0 and type(count) is int and count>=0 and
+            isinstance(namespace,str) and namespace,"Invalid synthetic history parameters")
+    original=raw.serialize();before=json.loads(original)
+    values=[f"__gwrl_synthetic_route_history__/{namespace}/lane-{lane:08d}/entry-{i:08d}" for i in range(count)]
+    require(not any(value in forbidden_strings for value in values),"Synthetic audit IDs overlap the original string pool")
+    document=json.loads(original)
+    if count:
+        document["state"]["history"].append({"kind":"synthetic_route_history_stress",
+            "after_state_key":raw.planning_key(),"payload":{"synthetic_benchmark_annotation":True,
+                "namespace":namespace,"lane":lane,"unique_strings":values}})
+    clone=raw.clone();clone.restore(json.dumps(document,allow_nan=False))
+    actual=json.loads(clone.serialize())
+    board=lambda value:{**value,"state":{key:child for key,child in value["state"].items() if key!="history"}}
+    require(board(actual)==board(before),"History annotation changed a board/schema/rule/RNG field")
+    require(actual["state"]["history"][:len(before["state"]["history"])]==before["state"]["history"],"Original audit history was not retained")
+    require(raw.serialize()==original,"Synthetic authoring mutated the original source")
+    return clone,{"state_without_history_sha256":digest({k:v for k,v in before["state"].items() if k!="history"}),
+                  "random_sha256":digest(before["random"]),"original_history_events":len(before["state"]["history"]),
+                  "added_history_events":int(count>0),"requested_unique_strings":count,
+                  "original_history_prefix_preserved":True,"boards_and_random_unchanged":True}
+
+
+def exact_mixed_resident(actual,reference,*,inspection_chunk_bytes=32_000_000):
+    """Every mixed lane equals an independent WHOLE-batch native CPU capture.
+
+    Whole-batch capture is essential: independently capturing a subset would
+    assign a different shared suffix namespace and is not a bit-level oracle.
+    """
+    import numpy as np
+    require(actual.context.identity==reference.context.identity and actual.lane_count==reference.lane_count,
+            "Mixed native/device source context or lane count differs")
+    require(type(inspection_chunk_bytes) is int and inspection_chunk_bytes>0,"Inspection chunk budget must be positive")
+    hashes={}
+    for field in ("records","lengths","sections","errors"):
+        left,right=getattr(actual,field),getattr(reference,field)
+        require(left.dtype==right.dtype and left.shape==right.shape,"Mixed source field layout differs: "+field)
+        h=hashlib.sha256();row_bytes=max(1,math.prod(left.shape[1:])*left.element_size())
+        chunk=max(1,inspection_chunk_bytes//row_bytes)
+        for start in range(0,actual.lane_count,chunk):
+            value=left[start:start+chunk].detach().cpu().numpy()
+            np.testing.assert_array_equal(value,right[start:start+chunk].detach().cpu().numpy());h.update(value.tobytes())
+        hashes[field]=h.hexdigest()
+    for label,owner,expected,fields in (("dynamic",actual,reference,("string_bytes","string_offsets","suffix_usage")),
+        ("static",actual.context,reference.context,("records","string_bytes","string_offsets"))):
+        for field in fields:
+            value=getattr(owner,field).detach().cpu().numpy();other=getattr(expected,field).detach().cpu().numpy()
+            np.testing.assert_array_equal(value,other);hashes[label+"_"+field]=hashlib.sha256(value.tobytes()).hexdigest()
+    require(not np.any(actual.errors.detach().cpu().numpy()),"Mixed source contains an invalid lane")
+    return {"exact":True,"verified_lanes":actual.lane_count,"buffer_sha256":hashes,
+            "inspection_chunk_budget_bytes":inspection_chunk_bytes,
+            "verification":"Every record/padding/section/error/shared string/usage/static-definition bit equals an independent full mixed native batch"}
+
+
+def mixed_native_witnesses(actual,serialized):
+    import torch
+    require(actual.lane_count==len(serialized) and serialized,"Every mixed lane needs its complete native source")
+    lanes=tuple(sorted({0,len(serialized)//2,len(serialized)-1}))
+    restored=actual.fork(torch.tensor(lanes,dtype=torch.int64,device=actual.device)).restore_envs()
+    require(all(raw.serialize()==serialized[lane] for raw,lane in zip(restored,lanes,strict=True)),
+            "Mixed native restore changed a state, original/synthetic history or any RNG stream")
+    return {"lanes":lanes,"full_native_state_and_all_rng_exact":True,
+            "native_checkpoint_sha256_by_witness":[hashlib.sha256(serialized[lane].encode()).hexdigest() for lane in lanes]}
+
+
 def worker(config, device, progress, deadline):
     import gc
     import gwrl_cpp
@@ -218,6 +296,9 @@ def worker(config, device, progress, deadline):
             torch.mps.synchronize()
         return value, time.perf_counter() - before
 
+    if config.synthetic_history_strings_per_lane:
+        report["limitations"][0]="Identical real boards with schema-valid synthetic lane-specific audit annotations; this is history-namespace stress, not distinct played games."
+        report["synthetic_history_scope"]="Append-only annotations; all original history, full board/rule/schema fields, queries and random streams are retained."
     persist(); before = time.perf_counter(); workload = prepare_workload(config, deadline)
     report.update(status="running", task=workload["task"], workload_sha256=digest(workload),
                   preparation_seconds=time.perf_counter() - before,
@@ -249,20 +330,56 @@ def worker(config, device, progress, deadline):
         host_request_seconds = time.perf_counter() - before
         reference = DeviceStateBatch.capture([raw.clone()], device="cpu")
         active_string_ids=source.context.string_count+int(source.suffix_usage.cpu().tolist()[0])
+        original_pool_strings=None
+        if config.synthetic_history_strings_per_lane:
+            original_pool_strings=_pool_strings(native_context.string_bytes(),native_context.string_offsets())|_pool_strings(capture.string_bytes(),capture.string_offsets())
         one, host_pack_upload_seconds = timed(lambda: kernel.pack_requests(source, rows), gpu=True)
         require(one.metadata.shape[0] == len(rows), "Host request packing truncated choices")
         for size in config.batch_sizes:
             lanes = torch.zeros(size, dtype=torch.int64, device="mps")
-            resident, populate_seconds = timed(lambda: source.fork(lanes), gpu=True)
+            mixed_reference=None;source_serialized=None;history_proof=None;history_setup={}
+            case_active_sids=active_string_ids;case_checkpoint=original
+            if config.synthetic_history_strings_per_lane:
+                before=time.perf_counter()
+                authored=[synthetic_history_lane(raw,lane,config.synthetic_history_strings_per_lane,fixture["label"],
+                    forbidden_strings=original_pool_strings) for lane in range(size)]
+                envs=[row[0] for row in authored];proofs=[row[1] for row in authored]
+                history_setup["annotation_authoring_seconds"]=time.perf_counter()-before
+                source_serialized=[item.serialize() for item in envs];case_checkpoint=source_serialized[0]
+                mixed_capture,elapsed=timed(lambda:gwrl_cpp.capture_device_states(native_context,envs))
+                history_setup["native_mixed_capture_seconds"]=elapsed
+                resident,elapsed=timed(lambda:DeviceStateBatch.from_native(mixed_capture,context=context),gpu=True)
+                history_setup["mixed_dynamic_upload_seconds"]=elapsed
+                populate_seconds=sum(history_setup[k] for k in ("native_mixed_capture_seconds","mixed_dynamic_upload_seconds"))
+                before=time.perf_counter()
+                mixed_reference=DeviceStateBatch.capture(envs,device="cpu",context=DeviceStateContext(native_context,"cpu"))
+                history_setup["independent_cpu_mixed_capture_seconds"]=time.perf_counter()-before
+                case_active_sids=resident.context.string_count+int(resident.suffix_usage.cpu().tolist()[0])
+                require(case_active_sids-active_string_ids>=size*config.synthetic_history_strings_per_lane,
+                        "Synthetic shared string namespace did not grow by every requested lane-unique ID")
+                require(len({row["state_without_history_sha256"] for row in proofs})==1 and len({row["random_sha256"] for row in proofs})==1,
+                        "Synthetic lanes no longer have identical boards and random states")
+                history_proof={"enabled":True,"schema_valid_synthetic_annotations":True,
+                    "strings_per_lane":config.synthetic_history_strings_per_lane,"added_events_per_lane":1,
+                    "distinct_synthetic_strings":size*config.synthetic_history_strings_per_lane,
+                    "original_history_prefix_preserved":all(row["original_history_prefix_preserved"] for row in proofs),
+                    "boards_and_random_unchanged":all(row["boards_and_random_unchanged"] for row in proofs),
+                    "state_without_history_sha256":proofs[0]["state_without_history_sha256"],"random_sha256":proofs[0]["random_sha256"],
+                    "base_native_checkpoint_sha256":hashlib.sha256(original.encode()).hexdigest(),
+                    "native_lane_checkpoint_sha256":[hashlib.sha256(value.encode()).hexdigest() for value in source_serialized],
+                    "active_global_sid_growth":case_active_sids-active_string_ids}
+            else:
+                resident, populate_seconds = timed(lambda: source.fork(lanes), gpu=True)
+                envs=[raw]*size
             expanded = [{**row, "lane": lane} for lane in range(size) for row in rows]
             native_queries, native_request_seconds = timed(lambda: [gwrl_cpp.CampaignMovementQuery(
                 row["lane"], row["unit"], row["path"], row["mode"], row["combat"], row.get("towed")) for row in expanded])
             def upload_requests():
+                if config.synthetic_history_strings_per_lane:return kernel.pack_requests(resident,expanded)
                 metadata = one.metadata.repeat(size, 1)
                 metadata[:, 0] = torch.arange(size, device="mps", dtype=torch.int64).repeat_interleave(len(rows))
                 return TensorRouteRequests(metadata, one.paths.repeat(size, 1))
             requests, request_replication_seconds = timed(upload_requests, gpu=True)
-            envs = [raw] * size
             def fresh_query():
                 # A new immutable source identity forces correct per-state
                 # preparation, without charging either side for a state copy.
@@ -276,11 +393,11 @@ def worker(config, device, progress, deadline):
             case = {"position": fixture["label"], "seed": fixture["seed"], "lanes": size,
                     "clock": snapshot["clock"], "queries_per_lane": len(rows), "queries": len(expanded),
                     "preparation_work_per_lane": {"unit_entries": len(snapshot["units"]), "territory_entries": len(snapshot["territories"]),
-                        "active_sid_slots": active_string_ids, "allocated_sid_slots": kernel._dims(resident)[9],
-                        "unused_sid_capacity": kernel._dims(resident)[9]-active_string_ids,
-                        "nonunit_active_sids": active_string_ids-len(snapshot["units"])},
+                        "active_sid_slots": case_active_sids, "allocated_sid_slots": kernel._dims(resident)[9],
+                        "unused_sid_capacity": kernel._dims(resident)[9]-case_active_sids,
+                        "nonunit_active_sids": case_active_sids-len(snapshot["units"])},
                     "request_sha256": digest(expanded), "one_lane_requests_sha256": digest(rows),
-                    "native_checkpoint_sha256": hashlib.sha256(original.encode()).hexdigest(),
+                    "native_checkpoint_sha256": hashlib.sha256(case_checkpoint.encode()).hexdigest(),
                     "native_context_seconds": context_seconds, "native_capture_seconds": capture_seconds,
                     "static_upload_seconds": static_upload_seconds, "dynamic_upload_seconds": upload_seconds,
                     "movement_context_seconds": movement_context_seconds, "movement_metadata_upload_seconds": movement_upload_seconds,
@@ -293,6 +410,10 @@ def worker(config, device, progress, deadline):
                     "cold_scope": "Public allocator/graph reset; first shader compilation included when not already compiled; process/OS caches may remain",
                     "native_query_seconds": [], "native_wrapper_wall_seconds": [],
                     "gpu_prepare_query_seconds": [], "gpu_prepared_query_seconds": []}
+            if history_proof is not None:
+                case["synthetic_history"]=history_proof;case["history_setup"]=history_setup
+                case["device_request_mode"]="Full request packing against the mixed shared suffix pool; outside query timing"
+                case["native_checkpoint_scope"]="Lane zero; every lane hash is retained in synthetic_history"
             for _ in range(config.warmups):
                 _, _ = timed(lambda: gwrl_cpp.benchmark_campaign_route_oracle(native_routes, envs, native_queries))
                 _, _ = timed(fresh_query, gpu=True)
@@ -306,13 +427,20 @@ def worker(config, device, progress, deadline):
             before = time.perf_counter()
             require(oracle.calls == len(expanded) and oracle.query_count == len(expanded), "Native probe omitted a query")
             case["evidence"] = exact_results(oracle.inspect(), kernel.inspect(fresh), kernel.inspect(reused), expanded)
-            case["resident_source_evidence"] = exact_resident(resident, reference)
-            require(torch.equal(resident.suffix_usage.cpu(), reference.suffix_usage), "Queries changed actual string-pool usage")
-            case["native_source_witnesses"] = native_witnesses(resident, original)
+            if mixed_reference is not None:
+                case["resident_source_evidence"]=exact_mixed_resident(resident,mixed_reference)
+                case["native_source_witnesses"]=mixed_native_witnesses(resident,source_serialized)
+                require(all(item.serialize()==value for item,value in zip(envs,source_serialized,strict=True)),
+                        "Queries mutated a complete mixed source/history/RNG")
+            else:
+                case["resident_source_evidence"] = exact_resident(resident, reference)
+                require(torch.equal(resident.suffix_usage.cpu(), reference.suffix_usage), "Queries changed actual string-pool usage")
+                case["native_source_witnesses"] = native_witnesses(resident, original)
             require(raw.serialize() == original, "Queries mutated complete source State/history/RNG")
             case["source_unchanged"] = True; case["host_inspection_seconds"] = time.perf_counter() - before
             report["cases"].append(case); persist()
             del resident, expanded, native_queries, requests, envs, oracle, prepared, fresh, reused, lanes
+            if mixed_reference is not None:del mixed_reference,mixed_capture,authored,proofs
             gc.collect()
         del raw, env, reference, source, capture, context, native_context, native_routes, kernel, one
         gc.collect()
@@ -325,9 +453,20 @@ def finalize(result, config):
     cases = result.get("cases", [])
     def sha(value):
         return isinstance(value, str) and len(value) == 64 and all(character in "0123456789abcdef" for character in value)
+    def history_valid(case):
+        if not config.synthetic_history_strings_per_lane:return True
+        row=case.get("synthetic_history",{});lanes=case.get("lanes",0);hashes=row.get("native_lane_checkpoint_sha256",[])
+        return (row.get("enabled") is True and row.get("schema_valid_synthetic_annotations") is True and
+                row.get("strings_per_lane")==config.synthetic_history_strings_per_lane and row.get("added_events_per_lane")==1 and
+                row.get("distinct_synthetic_strings")==lanes*config.synthetic_history_strings_per_lane and
+                row.get("active_global_sid_growth",0)>=lanes*config.synthetic_history_strings_per_lane and
+                row.get("original_history_prefix_preserved") is True and row.get("boards_and_random_unchanged") is True and
+                sha(row.get("state_without_history_sha256")) and sha(row.get("random_sha256")) and sha(row.get("base_native_checkpoint_sha256")) and
+                len(hashes)==lanes and len(set(hashes))==lanes and all(sha(value) for value in hashes) and
+                bool(hashes) and hashes[0]==case.get("native_checkpoint_sha256"))
     def valid(case):
         q = case.get("queries", 0)
-        return (type(q) is int and q > 0 and type(case.get("queries_per_lane")) is int and case["queries_per_lane"] > 0 and
+        return (history_valid(case) and type(q) is int and q > 0 and type(case.get("queries_per_lane")) is int and case["queries_per_lane"] > 0 and
                 q == case["queries_per_lane"] * case.get("lanes", 0) and case.get("seed") == config.seed and
                 all(sha(case.get(field)) for field in ("request_sha256", "one_lane_requests_sha256", "native_checkpoint_sha256")) and
                 case.get("evidence", {}).get("exact") is True and case["evidence"].get("verified_queries") == q and
@@ -370,6 +509,7 @@ def main(argv=None):
     parser.add_argument("--repeats", type=int, default=5); parser.add_argument("--seconds", type=float, default=180)
     parser.add_argument("--memory-bytes", type=int, default=8_000_000_000)
     parser.add_argument("--preparation-implementation", choices=("reference", "fused", "fused_indexed"), default="reference")
+    parser.add_argument("--synthetic-history-strings-per-lane", type=int, default=0)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", choices=("mps",), help=argparse.SUPPRESS)
     parser.add_argument("--_deadline", type=float, help=argparse.SUPPRESS)
@@ -379,7 +519,8 @@ def main(argv=None):
         settings["batch_sizes"] = tuple(settings["batch_sizes"])
         worker(RouteConfig(**settings), args._device, args.output, args._deadline); return 0
     config = RouteConfig(batch_sizes=tuple(args.batch_sizes), repeats=args.repeats, seconds=args.seconds, memory_bytes=args.memory_bytes,
-                         preparation_implementation=args.preparation_implementation)
+                         preparation_implementation=args.preparation_implementation,
+                         synthetic_history_strings_per_lane=args.synthetic_history_strings_per_lane)
     return 0 if run(config, args.output)["status"] == "completed" else 2
 
 
