@@ -532,6 +532,12 @@ class ResidentRecruitmentChance:
             torch.where(committed,candidate.lengths,before.lengths),torch.where(committed,candidate.sections,before.sections),
             torch.where(committed,candidate.string_bytes,baseline.string_bytes),torch.where(committed,candidate.string_offsets,baseline.string_offsets),
             torch.where(committed,candidate.errors,before.errors),torch.where(committed,candidate.suffix_usage,before.suffix_usage))
+        after_identity=identities
         identities=_invalid_identities(event.identities,output,selected&~committed)
+        if self.reuse_certified_source:
+            from .resident_identity_certificates import _certify_recruitment_chance_publication
+            _certify_recruitment_chance_publication(self.state_json,identities,before=before,before_expected=expected,
+                before_check=checked,after_identity=after_identity,event=event,random=random,committed=committed,
+                byte_capacity=capacities.json_byte_capacity)
         if profile is not None:profile("publish")
         return RecruitmentChanceResult(before,output,sampled,identities,errors,stage_errors,required,attempted,handled,selected&committed,committed)
