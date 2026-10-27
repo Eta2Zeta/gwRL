@@ -86,11 +86,12 @@ kernel void query_recruitment(
  device const long* home[[buffer(15)]],device const long* offshore[[buffer(16)]],device const long* offshore_steps[[buffer(17)]],
  device const long* naval[[buffer(18)]],device const uchar* prefix[[buffer(19)]],device const long* poffsets[[buffer(20)]],
  device const uchar* suffix[[buffer(21)]],device const long* soffsets[[buffer(22)]],device const long* usage[[buffer(23)]],
- device const long* dims[[buffer(24)]],uint q[[thread_position_in_grid]]){
+ device const long* dims[[buffer(24)]],device const bool* selected[[buffer(25)]],uint q[[thread_position_in_grid]]){
  const long Q=dims[0],B=dims[1],C=dims[2],N=dims[3],T=dims[5];if(long(q)>=Q)return;
  device long* out=output+ulong(q)*9;device long* err=errors+ulong(q)*5;
  for(long i=0;i<9;++i)out[i]=0;out[8]=-1;for(long i=0;i<5;++i)err[i]=0;
  for(long i=0;i<T;++i)zones[ulong(q)*T+i]=-1;
+ if(!selected[q])return;
  const long lane=requests[ulong(q)*2],minor=requests[ulong(q)*2+1];
  if(lane<0||lane>=B){for(long i=0;i<5;++i)err[i]=3;return;}
  bool valid=true;PackedStateView v=make_packed_state_view(records+ulong(lane)*C*5,lengths[lane],C,
@@ -324,7 +325,7 @@ class ResidentRecruitment:
         if any(x.device!=state.device or not x.is_contiguous() for x in buffers):raise ValueError("Recruitment input buffers must retain contiguous resident layouts")
         return dims
 
-    def query(self,state,requests,*,relations=None,rolls=False):
+    def query(self,state,requests,*,relations=None,rolls=False,selected=None):
         """Read raw Available/Threshold/Zones/Choices eligibility independently.
 
         rolls=True instead follows the legal recruitment-roll gates lazily:
@@ -334,6 +335,9 @@ class ResidentRecruitment:
         if type(rolls) is not bool:raise ValueError("Recruitment query mode must be explicit bool")
         if relations is None:relations=self.relations_context.compute(state)
         dims=self._layout(state,requests,relations,rolls);Q,B,C,N,P,T=dims[:6]
+        if selected is None:selected=torch.ones(Q,dtype=torch.bool,device=state.device)
+        if (not isinstance(selected,torch.Tensor) or selected.dtype!=torch.bool or selected.device!=state.device or
+                selected.shape!=(Q,) or not selected.is_contiguous()):raise ValueError("Recruitment query selection must be a contiguous resident bool[Q]")
         metadata=torch.zeros((Q,9),dtype=torch.int64,device=state.device)
         errors=torch.zeros((Q,5),dtype=torch.int64,device=state.device)
         zones=torch.full((Q,T),-1,dtype=torch.int64,device=state.device)
@@ -341,11 +345,11 @@ class ResidentRecruitment:
             args=(state.records,state.lengths,state.errors,requests,metadata,errors,zones,relations.metadata,relations.pairs,
                 relations.pair_errors,relations.nations,relations.nation_errors,self.relations_context.ids,state.context.records,
                 self.territory_tokens,self.home,self.offshore_tokens,self.offshore_steps,self.naval_tokens,
-                state.context.string_bytes,state.context.string_offsets,state.string_bytes,state.string_offsets,state.suffix_usage,_dimensions(dims))
+                state.context.string_bytes,state.context.string_offsets,state.string_bytes,state.string_offsets,state.suffix_usage,_dimensions(dims),selected)
             _call(_kernels().query_recruitment,args,Q)
         return RecruitmentQueries(state,requests,metadata,errors,zones,relations,rolls)
 
-    def choices(self,state,requests,*,relations=None,capacity=None,parameter_byte_capacity=512,string_capacity=None,byte_capacity=None):
+    def choices(self,state,requests,*,relations=None,capacity=None,parameter_byte_capacity=512,string_capacity=None,byte_capacity=None,selected=None):
         """Generate complete ordered choices in an explicit retryable arena.
 
         The default allocation covers geographic infantry/militia combinations,
@@ -353,7 +357,7 @@ class ResidentRecruitment:
         that exceed it return exact required_count with no partial menu. The
         eventual game pipeline should reserve a measured fixed arena explicitly.
         """
-        return self._menu(self.query(state,requests,relations=relations),capacity,parameter_byte_capacity,string_capacity,byte_capacity)
+        return self._menu(self.query(state,requests,relations=relations,selected=selected),capacity,parameter_byte_capacity,string_capacity,byte_capacity)
 
     def rolls(self,state,*,relations=None,capacity=None,parameter_byte_capacity=512,string_capacity=None,byte_capacity=None):
         B=state.lane_count;N=len(self.relations_context.nation_ids);dev=state.device

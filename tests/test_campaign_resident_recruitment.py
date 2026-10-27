@@ -227,5 +227,18 @@ class ResidentRecruitmentTests(unittest.TestCase):
         self.assertEqual(context.inspect(first),context.inspect(second))
         self.assertEqual(first.required_count.cpu().tolist(),[count]);self.assertEqual(second.required_count.cpu().tolist(),[count])
 
+    def test_unselected_raw_choice_does_not_evaluate_player_or_produce_lazy_errors(self):
+        env=gwrl_cpp.CampaignEnv(str(SCENARIO),53)
+        minor=next(name for name in json.loads(env.serialize())["state"]["nations"] if name.startswith("warlord_"))
+        state,context,native=self.setup([env]);requests=self.requests(state,[(0,"ccp"),(0,minor)])
+        raw=context.query(state,requests)
+        self.assertEqual(raw.errors[1,3].cpu().item(),2)
+        selected=torch.tensor([True,False],dtype=torch.bool,device="mps")
+        result=context.choices(state,requests,selected=selected,capacity=128,**context.reserve(state,capacity=128))
+        expected=gwrl_cpp.campaign_recruitment_oracle(native,[env],[(0,"ccp")])[0]["choices"]
+        self.assertEqual(context.inspect(result),tuple(action.encode() for action in expected))
+        self.assertEqual(result.queries.errors[1].cpu().tolist(),[0]*5)
+        self.assertEqual(result.queries.metadata[1,7].cpu().item(),0)
+
 
 if __name__=="__main__":unittest.main()

@@ -31,6 +31,36 @@ struct RecruitmentNativeAccess {
         }
         return output;
     }
+    static py::list effects(std::shared_ptr<Context> context,const std::vector<NativeCampaignEnv*>& envs,
+                            const std::vector<std::vector<std::vector<int>>>& faces) {
+        if(!context||faces.size()!=envs.size())throw std::invalid_argument("Recruitment effect oracle context/outcome batch differs");
+        const auto owners=pinNativeEnvironments(envs);
+        std::vector<std::string> states,messages;std::vector<int> errors;std::vector<bool> handled;
+        {
+            py::gil_scoped_release release;
+            for(std::size_t lane=0;lane<envs.size();++lane) {
+                std::lock_guard lock(envs[lane]->mutex_);const auto& original=envs[lane]->env_.engine().state();
+                if(!original.definition||original.definition->fingerprint!=context->definition->fingerprint)
+                    throw std::invalid_argument("Recruitment effect oracle definition differs");
+                auto next=original.clone();int error=0;std::string message;
+                const bool applies=next.chance&&next.chance->purpose=="recruitment_roll";
+                if(applies)try {
+                    const auto request=*next.chance;
+                    // Exact Engine pre-hook, then the unchanged original rule.
+                    next.chance.reset();
+                    (void)game::campaign::applyInfluenceChance(next,request,game::campaign::ChanceOutcome{faces[lane]});
+                }catch(const std::out_of_range& e){error=1;message=e.what();}
+                 catch(const std::exception& e){error=2;message=e.what();}
+                states.push_back((error?original:next).serialize());errors.push_back(error);
+                messages.push_back(message);handled.push_back(applies);
+            }
+        }
+        py::list output;
+        for(std::size_t lane=0;lane<envs.size();++lane){py::dict item;
+            item["state_json"]=states[lane];item["error"]=errors[lane];item["message"]=messages[lane];
+            item["handled"]=static_cast<bool>(handled[lane]);output.append(item);}
+        return output;
+    }
 };
 void bindRecruitment(py::module_& module) {
     using C=RecruitmentNativeAccess::Context;
@@ -49,4 +79,5 @@ void bindRecruitment(py::module_& module) {
         .def("offshore_step_array",[](const C& c){return incomeArray(c,c.offshoreSteps,{static_cast<py::ssize_t>(c.offshoreSteps.size()/3),3});});
     module.def("campaign_recruitment_context",&RecruitmentNativeAccess::context);
     module.def("campaign_recruitment_oracle",&RecruitmentNativeAccess::oracle);
+    module.def("campaign_recruitment_effects_oracle",&RecruitmentNativeAccess::effects);
 }
