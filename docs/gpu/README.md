@@ -47,6 +47,8 @@ The [political unit effects](resident_political_unit_effects_2026_10_26.md) cove
 movement refresh, cargo removal and creation with direct raw native oracles.
 The [surrender effects](resident_political_surrender_2026_10_26.md) retain complete
 controller, cargo, naval-queue and objective-award behavior.
+The [parallel arena-copy comparison](metal_editor_copy_2026_10_26.md) separates
+remaining builder costs from measured complete-step improvements and CPU losses.
 
 ## Execution contract
 
