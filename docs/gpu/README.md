@@ -60,6 +60,8 @@ replacement validation as the next measured cost; the [RNG-copy comparison](meta
 separates its exact stage gain from whole-step timing variation.
 The [replacement-validation measurements](metal_replacement_validation_measurement_2026_10_27.md)
 record the subsequent exact editor change and its smaller whole-step gain.
+The [integer-width comparison](metal_integer_width_measurement_2026_10_27.md)
+records a later correct change with no material speed benefit established.
 The [political queue and truce checks](resident_political_queues_2026_10_27.md)
 cover exact evolution choices, controlling-player lookup and mandatory battle
 queuing, without claiming complete political refresh or combat resolution.
