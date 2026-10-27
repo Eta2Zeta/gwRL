@@ -232,7 +232,8 @@ class CampaignDeviceStateTests(unittest.TestCase):
         context = gwrl_cpp.device_state_context(env)
         repeated = gwrl_cpp.device_state_context(env)
         self.assertEqual(context.wire_context_fingerprint, repeated.wire_context_fingerprint)
-        names = ("actual", "search", "training", "territorial", "china_control_bonus", "major", "city_ipp_lost", "city_damage")
+        names = ("actual", "search", "training", "territorial", "china_control_bonus", "major", "city_ipp_lost", "city_damage",
+                 "recruitment_attempted", "decision", "id", "kind", "nation", "parameters", "player")
         ids = context.prefix_lookup_ids(names)
         self.assertEqual(len(set(ids.tolist())), len(names))
         with self.assertRaises(IndexError): context.prefix_lookup_ids(("unknown_fixed_protocol_string",))
