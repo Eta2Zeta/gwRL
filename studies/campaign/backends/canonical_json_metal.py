@@ -89,7 +89,7 @@ inline void canonical_string(thread CanonicalWriter& w,long id) {
 inline void canonical_integer(thread CanonicalWriter& w,long value) {
     // Native JSON integer fields are int32 and therefore exactly binary64.
     if(value<INT_MIN||value>INT_MAX){w.error|=1;return;}
-    ulong magnitude=value<0?ulong(-value):ulong(value);
+    uint magnitude=value<0?uint(-value):uint(value);
     if(value<0)canonical_put(w,'-');
     char digits[10];int n=0;
     do{digits[n++]=char('0'+magnitude%10);magnitude/=10;}while(magnitude);
