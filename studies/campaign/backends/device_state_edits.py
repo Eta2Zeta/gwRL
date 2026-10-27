@@ -317,7 +317,7 @@ def replace_subtrees(state, roots, blocks, block_lengths, selected, *, capacity=
     """
     B, C, O, R = _layout(state, roots, blocks, block_lengths, selected, capacity)
     if type(allow_type_change) is not bool: raise ValueError("Type-change permission must be explicit bool")
-    strategy=state.context.editor_implementation if implementation is None else implementation
+    strategy=getattr(state.context,"editor_implementation","reference") if implementation is None else implementation
     if type(strategy) is not str or strategy not in {"reference","parallel"}:
         raise ValueError("State editor implementation must be reference or parallel")
     if strategy=="parallel" and state.device.type!="mps":

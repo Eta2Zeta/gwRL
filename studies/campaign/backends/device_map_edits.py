@@ -241,10 +241,21 @@ def _build(state, roots, controls, values, value_lengths, selected, kind, capaci
         lengths, errors, required = (torch.zeros_like(state.lengths) for _ in range(3))
         changed = torch.zeros_like(state.lengths)
         if B:
-            if _library is None:
-                with _lock:
-                    if _library is None:
-                        _library = torch.mps.compile_shader(SOURCE)
+            strategy=getattr(state.context,"container_implementation","reference")
+            if strategy=="parallel":
+                from .device_tree_validation import validate_source
+                from .device_map_edits_parallel import _kernels
+                checked=validate_source(state,selected)
+                if checked.source is not state or checked.valid.dtype!=torch.bool or checked.valid.shape!=(B,) or \
+                        checked.valid.device!=state.device or not checked.valid.is_contiguous():
+                    raise ValueError("Container source validation belongs to a different source or layout")
+                library=_kernels()
+            else:
+                if _library is None:
+                    with _lock:
+                        if _library is None:
+                            _library = torch.mps.compile_shader(SOURCE)
+                library=_library
             S = max(C, R, V, 1)
             scratch = [torch.empty((B, S*factor), dtype=torch.int64, device=state.device) for factor in (1, 1, 2)]
             tensors = (state.records, state.lengths, state.errors, controls, values, value_lengths, selected,
@@ -252,7 +263,8 @@ def _build(state, roots, controls, values, value_lengths, selected, kind, capaci
                 _dimensions((B, C, R, V, state.context.string_count, state.context.string_bytes.numel(),
                     state.string_offsets.numel()-1, state.string_bytes.numel(), kind)),
                 state.context.string_bytes, state.context.string_offsets, state.string_bytes, state.string_offsets, state.suffix_usage)
-            _library.build_containers(*(value if value.numel() else _dummy() for value in tensors), threads=B)
+            if strategy=="parallel":tensors=(*tensors,checked.valid)
+            library.build_containers(*(value if value.numel() else _dummy() for value in tensors), threads=B)
     else:
         raise ValueError("Container builders require explicit CPU or Apple MPS; no fallback")
     return ContainerBuildResult(state, roots, selected, blocks, lengths, errors, required, changed != 0)

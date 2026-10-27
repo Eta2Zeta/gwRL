@@ -41,13 +41,18 @@ def _device(device):
 
 class DeviceStateContext:
     """One immutable definition/catalog/string prefix shared by all forks."""
-    def __init__(self, native, device="cpu", *, editor_implementation="reference"):
+    def __init__(self, native, device="cpu", *, editor_implementation="reference",container_implementation="reference"):
         target = _device(device)
         if type(editor_implementation) is not str or editor_implementation not in {"reference","parallel"}:
             raise ValueError("State editor implementation must be reference or parallel")
         if editor_implementation=="parallel" and target.type!="mps":
             raise ValueError("Parallel resident editing requires explicit Apple GPU execution")
         self._editor_implementation=editor_implementation
+        if type(container_implementation) is not str or container_implementation not in {"reference","parallel"}:
+            raise ValueError("Container implementation must be reference or parallel")
+        if container_implementation=="parallel" and target.type!="mps":
+            raise ValueError("Parallel container building requires explicit Apple GPU execution")
+        self._container_implementation=container_implementation
         if native.schema != SCHEMA:
             raise ValueError("Unsupported native device state schema")
         self.native = native
@@ -71,6 +76,11 @@ class DeviceStateContext:
     def editor_implementation(self):
         """Execution strategy only; neither a rule nor a neural-input field."""
         return self._editor_implementation
+
+    @property
+    def container_implementation(self):
+        """Source validation/copy policy; the complete rules State is unchanged."""
+        return self._container_implementation
 
     def prefix_lookup_ids(self, names):
         """One-time host metadata lookup of exact fixed protocol spellings."""
