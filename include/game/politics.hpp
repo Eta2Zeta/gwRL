@@ -42,6 +42,8 @@ PoliticalPermission mayDeclareWar(const State&, const Id& actor, const Id& targe
 void declareWar(State&, const Id& actor, const Id& target, DeclarationMode);
 void recordLandAttack(State&, const Id& attacker, const Id& zone);
 void surrenderNation(State&, const Id& nation, const Id& attacker);
+// The surrender-time One China entitlement queues completed build projects.
+void queuePoliticalObjectiveBonus(State&);
 
 // Shared decision/chance helpers keep continuations explicit in State, so
 // checkpoints, planning keys and replay include all pending political work.

@@ -187,6 +187,7 @@ bool isWarlord(const Id& nation) {return nation.rfind("warlord_",0)==0;}
 void refreshPoliticalUnitMovement(State& s,const Id& owner) {
     for(auto& [id,unit]:s.units)if(unit.owner==owner)refreshUnitMovement(s,unit);
 }
+void queuePoliticalObjectiveBonus(State& s) { queueObjectiveBonus(s); }
 Id originalNation(const State& s,const Id& zone) {
     const auto* index=s.definition->rules.find("faction_index");
     if(index)return index->require("land_original_owners").require(zone).require("original_faction_id").asString();

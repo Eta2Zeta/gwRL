@@ -4,8 +4,9 @@ GPU development starts on `codex/gpu-selfplay`, from CPU reference commit
 `d1c672954d8e1bb24ca43cd98c0199f4daac81f7`. Both implementations will live in the
 same repository. The existing C++ rules engine, scenario data and scalar CPU
 training path remain in place. The shared interface, CPU wrapper and rules-replay
-harness are joined by optional GPU neural execution and a first exact tensor
-rules primitive. **A full GPU campaign transition engine is not implemented.**
+harness are joined by optional GPU neural execution, complete resident state/RNG
+transport and several exact rules components.
+**A full GPU campaign transition engine is not implemented.**
 
 The [initial CPU conformance and timing evidence](cpu_foundation_2026_10_25.md)
 records the validated foundation and its measurement limits.
@@ -40,6 +41,10 @@ The [exact identity optimization measurements](metal_identity_optimizations_2026
 compare parallel unit formatting and scalar SHA kernels, including group sizing.
 The [whole-field formatting experiment](metal_field_json_experiment_2026_10_26.md)
 records a later correct alternative that did not demonstrate an additional gain.
+The [complete-step comparison](metal_recruitment_step_optimizations_2026_10_26.md)
+records both identity gains and the remaining losses against a parallel CPU.
+The [political unit effects](resident_political_unit_effects_2026_10_26.md) cover
+movement refresh, cargo removal and creation with direct raw native oracles.
 
 ## Execution contract
 

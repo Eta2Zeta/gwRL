@@ -254,7 +254,11 @@ DeviceStateContext::DeviceStateContext(const Engine& engine):definition(engine.s
             "action","interrupt","chance","outcome","faces","request_id","beneficiary","zone","zones","project","facility","recruitment_roll",
             "recruitment_place_infantry","recruitment_place_militia","recruitment_advance_ship","recruitment_repair_facility",
             "recruitment_choice","politics_sequence","schema","visited_configurations","declined_rail_requests",trainingActionSchema,
-            "recruitment_attempted","decision","id","kind","nation","parameters","player"})pool.intern(text);
+            "recruitment_attempted","decision","id","kind","nation","parameters","player",
+            "placed_this_turn","surrendered","one_china_bonus_eligible_at_surrender","one_china_bonus_awarded",
+            "controller_unresolved","direct_axis_control_after_japan_surrender","politics_surrender_queues",
+            "one_china_award","completed","national_objective_award","ships","attacker","nation",
+            "cavalry","infantry","axis","politics_sequence"})pool.intern(text);
     stringIds=pool.index;
     flattenStrings(strings,stringBytes,stringOffsets);
     wireContextFingerprint=wireFingerprint(*this);
