@@ -500,8 +500,12 @@ void surrenderNation(State& s,const Id& nation,const Id& attacker) {
     queueObjectiveBonus(s);
 }
 
-PoliticsRules::PoliticsRules(std::shared_ptr<const Rules> gameplay):gameplay_(std::move(gameplay)) {}
-Id PoliticsRules::id() const {return "gw36_v43_m4_politics"+(gameplay_?"+"+gameplay_->id():"");}
+PoliticsRules::PoliticsRules(std::shared_ptr<const Rules> gameplay):gameplay_(std::move(gameplay)) {
+    // Resolve the immutable composition once. An old milestone label here used
+    // to miss the actual economy module, leaving rates stale after outer rules.
+    refreshIncomeAfterEffects_ = gameplay_ && ("+" + gameplay_->id() + "+").find("+" + Id(economyRulesId) + "+") != Id::npos;
+}
+Id PoliticsRules::id() const {return "gw36_v43_m4_politics_income_refresh_v1"+(gameplay_?"+"+gameplay_->id():"");}
 std::vector<Action> PoliticsRules::actions(const State& s) const {
     auto out=influenceActions(s);auto warlords=warlordActions(s);out.insert(out.end(),warlords.begin(),warlords.end());
     if(gameplay_) {auto more=gameplay_->actions(s);out.insert(out.end(),more.begin(),more.end());}
@@ -522,7 +526,7 @@ bool PoliticsRules::phaseComplete(const State& s) const {
     return !gameplay_||gameplay_->phaseComplete(s);
 }
 void PoliticsRules::apply(State& s,const Action& a) const {
-    applyImpl(s,a);if(gameplay_&&gameplay_->id().find("m6_economy")!=std::string::npos)refreshIncome(s);
+    applyImpl(s,a);if(refreshIncomeAfterEffects_)refreshIncome(s);
 }
 void PoliticsRules::applyImpl(State& s,const Action& a) const {
     if(a.kind=="politics_declare_war") {
@@ -582,7 +586,7 @@ void PoliticsRules::applyImpl(State& s,const Action& a) const {
     throw std::runtime_error("Unknown political action: "+a.kind);
 }
 void PoliticsRules::applyChance(State& s,const ChanceRequest& request,const ChanceOutcome& outcome) const {
-    applyChanceImpl(s,request,outcome);if(gameplay_&&gameplay_->id().find("m6_economy")!=std::string::npos)refreshIncome(s);
+    applyChanceImpl(s,request,outcome);if(refreshIncomeAfterEffects_)refreshIncome(s);
 }
 void PoliticsRules::applyChanceImpl(State& s,const ChanceRequest& request,const ChanceOutcome& outcome) const {
     if(request.purpose=="politics_surrender_queues") {

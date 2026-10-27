@@ -999,7 +999,7 @@ void finishEconomyPlacement(State &s) {
 
 EconomyRules::EconomyRules(std::shared_ptr<const Rules> gameplay) : gameplay_(std::move(gameplay)) {}
 Id EconomyRules::id() const {
-    return "gw36_economy_v43" + (gameplay_ ? "+" + gameplay_->id() : "");
+    return Id(economyRulesId) + (gameplay_ ? "+" + gameplay_->id() : "");
 }
 std::vector<Action> EconomyRules::actions(const State &s) const {
     auto out = economyActions(s);

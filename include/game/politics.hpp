@@ -85,6 +85,7 @@ class PoliticsRules final : public Rules {
     void applyImpl(State&, const Action&) const;
     void applyChanceImpl(State&, const ChanceRequest&, const ChanceOutcome&) const;
     std::shared_ptr<const Rules> gameplay_;
+    bool refreshIncomeAfterEffects_{false};
 };
 
 } // namespace game::campaign

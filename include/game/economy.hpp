@@ -4,6 +4,8 @@
 
 namespace game::campaign {
 
+inline constexpr char economyRulesId[] = "gw36_economy_v43";
+
 struct IncomeBreakdown {
     std::map<Id, int> components;
     int total{0};
