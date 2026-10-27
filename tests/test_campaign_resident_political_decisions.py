@@ -317,4 +317,3 @@ class ResidentPoliticalDecisionTests(unittest.TestCase):
         empty_payload=EventPayloads(empty,torch.empty((0,1,5),dtype=torch.int64,device="mps"),zero,zero)
         result=queue.enqueue(empty,zero,zero,empty_options,empty_payload,**queue.reserve(empty,empty_options,empty_payload,id_byte_capacity=0))
         self.assertTrue(result.committed.item());self.assertEqual(result.errors.numel(),0)
-
