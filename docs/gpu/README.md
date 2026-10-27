@@ -36,6 +36,8 @@ The [complete-step smoke measurements](metal_recruitment_smoke_2026_10_26.md)
 expose identity/bookkeeping overhead and introduce parallel CPU diagnostic probes.
 The [identity substage profile](metal_identity_profile_2026_10_26.md) separates
 the measured State formatting and hashing costs inside those complete operations.
+The [exact identity optimization measurements](metal_identity_optimizations_2026_10_26.md)
+compare parallel unit formatting and scalar SHA kernels, including group sizing.
 
 ## Execution contract
 

@@ -1,0 +1,1191 @@
+{
+  "aggregation": "Median of all24 warm samples across four families and both roles at each batch size/mode (three repetitions per case); fenced substages are separate diagnostic samples",
+  "decision": {
+    "digest_group_size": null,
+    "reason": "No consistent custom group benefit; long-message B64 default outperformed all tested explicit groups. Tiny outer-message differences are inconsistent."
+  },
+  "earlier_profile": {
+    "raw_path": "tmp/resident-identity-b1-profile-2026-10-26.json",
+    "raw_sha256": "92810a571628aac79852b279f962bf9f68509abde087e0b2340149c9cb819bc7",
+    "report": "docs/gpu/metal_identity_profile_2026_10_26.md",
+    "tracked_evidence": "docs/gpu/metal_identity_profile_2026_10_26.json"
+  },
+  "exactness": {
+    "all_hashlib_and_native_digest_words_hex_counts_errors": true,
+    "all_native_state_and_outer_bytes": true,
+    "all_output_metadata_and_padding": true,
+    "all_source_state_history_rng_buffers_unchanged": true,
+    "identity_cases": 32,
+    "identity_mode_rows": 128,
+    "no_fields_choices_or_message_bytes_dropped": true,
+    "sha_cases": 64,
+    "sha_mode_group_rows": 512,
+    "source_certificates_used": false
+  },
+  "fixtures": [
+    {
+      "engine_key": "c12e48d824a43179e982cfb3240b4a4bc708bb60d585b70508bd12ca47389842",
+      "family": "infrastructure_success",
+      "message_bytes": 61584,
+      "native_checkpoint_sha256": "c626e55fc38e50fc6af021e8f395e1465fcb8be3698ab51c13da70d6dac5f182",
+      "role": "after_effects",
+      "state_key": "9ae206e9bb95d097d92b89af43127c6083cd13feef267468ee8664b5c2a5dd13"
+    },
+    {
+      "engine_key": "e47d27c2b9f0b3a2a7ad470a380e36f523e7fab56cc563a3a08813ca5c25e277",
+      "family": "infrastructure_success",
+      "message_bytes": 59329,
+      "native_checkpoint_sha256": "dc05030a4e127b5a756f5b72e46e354ad537648840e196096e6a5509e74bd4a6",
+      "role": "source_preflight",
+      "state_key": "ce3104cb9cb1897303c217b0838246507a27df46603c2b7cb3da26f3347127cc"
+    },
+    {
+      "engine_key": "cb43f96a3c70533a40dc44fd1d21baa7f60fa6990855bdaba12b32da513be9ce",
+      "family": "small_failure",
+      "message_bytes": 58576,
+      "native_checkpoint_sha256": "853e3f28943c3dfd370eee89bcaab607e377711fb67461624502b08502d07680",
+      "role": "after_effects",
+      "state_key": "3b8087484ff5de26514cc3d19414d6cb721ada2886c9bf58147a4bb8dd3137d6"
+    },
+    {
+      "engine_key": "6383bd464ab5522b5df9f337feb8d65923c359f21c6574e439d25ce0c3514305",
+      "family": "small_failure",
+      "message_bytes": 58826,
+      "native_checkpoint_sha256": "6f55d87c9040c13df434aa0f06a1e8b70be4143ca4c5a64fd4d329e113df42dc",
+      "role": "source_preflight",
+      "state_key": "c82315a8c3381deecd98225b93560033f0d1151d35299056e69a62fb71444037"
+    },
+    {
+      "engine_key": "a2502cd4c2d7deca9e0920ce3ac8220cca29f537eeb68feb95bba5cc3cf5fe9b",
+      "family": "small_success",
+      "message_bytes": 59307,
+      "native_checkpoint_sha256": "862aa9e9d87f36cafbdf010f9edde4e437d03a5e2546b4753b4639c060a3888c",
+      "role": "after_effects",
+      "state_key": "bf058b65035786e4b9f0b12801b09b18c6c99ec12ca74b6be04bc16f69e1fec5"
+    },
+    {
+      "engine_key": "6383bd464ab5522b5df9f337feb8d65923c359f21c6574e439d25ce0c3514305",
+      "family": "small_success",
+      "message_bytes": 58826,
+      "native_checkpoint_sha256": "20dbcdbacfa49e984c70c6b65a01bb4f077695eb2a29631427fcc75c253eab30",
+      "role": "source_preflight",
+      "state_key": "c82315a8c3381deecd98225b93560033f0d1151d35299056e69a62fb71444037"
+    },
+    {
+      "engine_key": "ebf7dcd4ef6babb10836330d385bcb986abe18f1439c7f8cf851eabc58c55885",
+      "family": "wide_success",
+      "message_bytes": 60242,
+      "native_checkpoint_sha256": "9573388635ba59cc364f0d057a991472602074958398d0d66ef3d277fad91fe8",
+      "role": "after_effects",
+      "state_key": "d98dce34827c2ab6a0a4cf68b162a12fdc39ad3a458685d0acee202b6953e582"
+    },
+    {
+      "engine_key": "a65c55ca57b60e63e399aa30cdb29d0d6d5308615f082bf41f333862eb33aa63",
+      "family": "wide_success",
+      "message_bytes": 58846,
+      "native_checkpoint_sha256": "fa12c30006f3b7b7ca11bdac0f527de8580ce0e84bc232d4adb716bd22689762",
+      "role": "source_preflight",
+      "state_key": "b098b9c29f99636f712d7c199dd12e7bc5051d8d3ed97a63302fb276bc4fd671"
+    }
+  ],
+  "identity_summary": [
+    {
+      "digest": "reference",
+      "lanes": 1,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002681460027815774,
+        "outer_engine_json": 0.0002100415003951639,
+        "state_serialize": 0.009564562496962026,
+        "state_sha256": 0.013006604494876228
+      },
+      "median_pipeline_seconds": 0.022489874507300556,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 1,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.00025127101980615407,
+        "outer_engine_json": 0.00019800050358753651,
+        "state_serialize": 0.009548187488690019,
+        "state_sha256": 0.009030812492710538
+      },
+      "median_pipeline_seconds": 0.01834299998881761,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "reference",
+      "lanes": 1,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.000270187490968965,
+        "outer_engine_json": 0.00021735399786848575,
+        "state_serialize": 0.019723062505363487,
+        "state_sha256": 0.01302447950001806
+      },
+      "median_pipeline_seconds": 0.032706916506867856,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 1,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002668329980224371,
+        "outer_engine_json": 0.0002062290150206536,
+        "state_serialize": 0.019708813008037396,
+        "state_sha256": 0.008987666500615887
+      },
+      "median_pipeline_seconds": 0.02840691698656883,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "reference",
+      "lanes": 4,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.00028395898698363453,
+        "outer_engine_json": 0.00022677049855701625,
+        "state_serialize": 0.009787249990040436,
+        "state_sha256": 0.01305683350074105
+      },
+      "median_pipeline_seconds": 0.02271041650965344,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 4,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002574374957475811,
+        "outer_engine_json": 0.00020037501235492527,
+        "state_serialize": 0.0098123750067316,
+        "state_sha256": 0.009049354499438778
+      },
+      "median_pipeline_seconds": 0.018638312496477738,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "reference",
+      "lanes": 4,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0003011035150848329,
+        "outer_engine_json": 0.00024583299818914384,
+        "state_serialize": 0.020156437502009794,
+        "state_sha256": 0.01304099999833852
+      },
+      "median_pipeline_seconds": 0.03324162452190649,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 4,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002733330038608983,
+        "outer_engine_json": 0.0002174580004066229,
+        "state_serialize": 0.02010702100233175,
+        "state_sha256": 0.009037395502673462
+      },
+      "median_pipeline_seconds": 0.028995541506446898,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "reference",
+      "lanes": 16,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002698334865272045,
+        "outer_engine_json": 0.00021545799972955137,
+        "state_serialize": 0.010024000002886169,
+        "state_sha256": 0.01305720848904457
+      },
+      "median_pipeline_seconds": 0.02306943699659314,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 16,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002767710102489218,
+        "outer_engine_json": 0.0002142080047633499,
+        "state_serialize": 0.010034520993940532,
+        "state_sha256": 0.009088562495890073
+      },
+      "median_pipeline_seconds": 0.01889970849151723,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "reference",
+      "lanes": 16,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.000271854005404748,
+        "outer_engine_json": 0.00021874999220017344,
+        "state_serialize": 0.020931146005750634,
+        "state_sha256": 0.013119333001668565
+      },
+      "median_pipeline_seconds": 0.033923332986887544,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 16,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.00027285449323244393,
+        "outer_engine_json": 0.00020329150720499456,
+        "state_serialize": 0.020825062500080094,
+        "state_sha256": 0.009100499999476597
+      },
+      "median_pipeline_seconds": 0.02972256249631755,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "reference",
+      "lanes": 64,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.00028504150395747274,
+        "outer_engine_json": 0.00022439550957642496,
+        "state_serialize": 0.010345229005906731,
+        "state_sha256": 0.013098791998345405
+      },
+      "median_pipeline_seconds": 0.02346437498636078,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 64,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002653334813658148,
+        "outer_engine_json": 0.00021097900753375143,
+        "state_serialize": 0.010355187507229857,
+        "state_sha256": 0.009267145505873486
+      },
+      "median_pipeline_seconds": 0.019486541001242585,
+      "samples": 24,
+      "serializer": "parallel_units"
+    },
+    {
+      "digest": "reference",
+      "lanes": 64,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.0002894999925047159,
+        "outer_engine_json": 0.00022664599237032235,
+        "state_serialize": 0.022041457996238023,
+        "state_sha256": 0.013105624995660037
+      },
+      "median_pipeline_seconds": 0.03526247949048411,
+      "samples": 24,
+      "serializer": "reference"
+    },
+    {
+      "digest": "unrolled",
+      "lanes": 64,
+      "median_fenced_stage_seconds": {
+        "engine_sha256": 0.00026737499865703285,
+        "outer_engine_json": 0.00021197900059632957,
+        "state_serialize": 0.02199891700001899,
+        "state_sha256": 0.009274083000491373
+      },
+      "median_pipeline_seconds": 0.031160312486463226,
+      "samples": 24,
+      "serializer": "reference"
+    }
+  ],
+  "limits": [
+    "Replicated copies of each fixture per batch; no mixed-history workload.",
+    "State native identity excludes history/RNG by definition; complete packed source/history/RNG is preserved and verified unchanged.",
+    "Standalone SHA uses tightly packed MessageBatch bytes; identity SHA uses ranged slices of 262144-byte per-lane output slabs plus canonical range/error wrappers. Fenced stages and unfenced pipelines have different synchronization scope; keep the two runs separate.",
+    "Short outer Engine messages are 244 bytes; State messages 58576\u201361584bytes.",
+    "Original reference paths remain defaults; these are explicitly selected alternatives.",
+    "Unit entries are parallelized here; newer field-parallel JSON and complete recruitment transition measurements are separate work.",
+    "No full-game/search/training throughput or improved play follows from these component timings."
+  ],
+  "raw_artifacts": {
+    "identity_combinations": {
+      "cases": 32,
+      "config": {
+        "batch_sizes": [
+          1,
+          4,
+          16,
+          64
+        ],
+        "byte_capacity": 262144,
+        "cpu_budget": 12,
+        "devices": [
+          "mps"
+        ],
+        "digest_group_size": null,
+        "digests": [
+          "reference",
+          "unrolled"
+        ],
+        "families": [
+          "small_success",
+          "small_failure",
+          "wide_success",
+          "infrastructure_success"
+        ],
+        "memory_bytes": 8000000000,
+        "repeats": 3,
+        "seconds": 180.0,
+        "seed": 1951,
+        "serializers": [
+          "reference",
+          "parallel_units"
+        ],
+        "threads": 2,
+        "warmups": 1
+      },
+      "guard": {
+        "cpu_budget": 12,
+        "diagnostic": null,
+        "elapsed_seconds": 39.90774879200035,
+        "margin_bytes": 1000000000,
+        "memory_bytes": 8000000000,
+        "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+        "mps_allocator_reserved_bytes": 3000000000,
+        "sampled_peak_charged_bytes": 4614923432
+      },
+      "path": "studies/campaign/runs/gpu-backend-2026-10-26/identity-combinations.json",
+      "provenance_delta": {
+        "commit": "fc2053870716cdfc0acd0c885768924c6164c443",
+        "identity_harness_sources": {
+          "src/python_state_json.inc": "00958de32a9e787734c301a2f291577e3fa8a002778a36b7e7733cc3acbadbc5",
+          "studies/campaign/backends/canonical_json_metal.py": "fca96103208566330347a6a59148b818d7025f94de692acd749cf88226ee8849",
+          "studies/campaign/backends/content_digest_metal.py": "382c50cafaadfa30b79d5b4059d9d80ba4ea7e91037fc9bf50a6e445a416a10e",
+          "studies/campaign/backends/content_digest_unrolled.py": "e23d04388855475adfbd1b1374df5b3969633ebcca66144f95652d303e172725",
+          "studies/campaign/backends/resident_state_json.py": "cd0f8896a45e6c3133d9e38af48a16473e15ba8e059c9038a1e7444cafbe3b6d",
+          "studies/campaign/backends/resident_state_json_parallel.py": "7622083583e6533bc8c05c5b78361bd45aad175a2d412f7ce22b2b4431ef56b9",
+          "tools/benchmark_campaign_device_state.py": "27cb95c0bf707328c3aeb0ba5dcb98b2c342153d69b8fd9ebe26b69540c8f54a",
+          "tools/benchmark_campaign_resident_identities.py": "d86b79f0f0ddec1f51996790d7de7345a2564823de942840f88a10bf78ff15f2",
+          "tools/benchmark_campaign_resident_recruitment_chance.py": "cf7cbbeea453f026605014fc4baf2688dfa041ba45d71299ed64199da522eaaa",
+          "tools/supervise_campaign_training.py": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+        }
+      },
+      "runtime_manifest": {
+        "assets": 86,
+        "detached_head": true,
+        "git_clean": true,
+        "native": {
+          "path": "/Users/home/.codex/worktrees/metal-benchmark-runtime/gwRL/gwrl_cpp.cpython-313-darwin.so",
+          "sha256": "b061ab7322c65600122c2905967c0939ef4884468b9b84488dab64986a495af2",
+          "size_bytes": 4607328
+        },
+        "path": "tmp/metal-benchmark-runtime-fc20538/runtime-manifest.json",
+        "scenario_preflight": {
+          "all_runtime_source_checks": "passed_by_native_scenario_loader",
+          "calendar_rounds": 3,
+          "definition_fingerprint": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "initial_units": 99,
+          "rules_id": "campaign-orders-v1+gw36_v43_m4_politics_income_refresh_v1+gw36_v43_m5_movement+gw36_naval_v43:gw36_v43_m7_land_combat+gw36_v43_m8_air+gw36_economy_v43",
+          "seed": 1951,
+          "wire_context_fingerprint": "7406343f4c90c3b63a64bd188fd68dc4c975f0c0cf42889d9fce688786de5d9c"
+        },
+        "sha256": "f63e096f5d1f563e5ae07eef830f0cd6e14550e3a6b862432513ba08600ec2a5",
+        "source_commit": "fc2053870716cdfc0acd0c885768924c6164c443",
+        "tracked_files": 637,
+        "venv": {
+          "files": 17002,
+          "manifest": "/Users/home/Desktop/gwRL/tmp/metal-benchmark-runtime-fc20538/venv-files.json",
+          "manifest_sha256": "1a8156af2426ecd1ee0a2d5cbcbc5338792f7943c9e9e97b177e99b66e2118e7",
+          "numpy_version": "2.4.3",
+          "package_freeze": "/Users/home/Desktop/gwRL/tmp/metal-benchmark-runtime-fc20538/gpu-pip-freeze.txt",
+          "package_freeze_sha256": "22283ea8d762b12d575447d38f70220941f7cda4f4ed3e9668186dac77fe858d",
+          "python": "/Users/home/Desktop/gwRL/tmp/gpu-mps-env/bin/python",
+          "python_binary": "/opt/anaconda3/bin/python3.13",
+          "python_binary_sha256": "403e1dc26f580d349d701f9683fdc5dc359a9dea04793d647d076a240e6af68f",
+          "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+          "root": "/Users/home/Desktop/gwRL/tmp/gpu-mps-env",
+          "torch_version": "2.14.0"
+        }
+      },
+      "schema": "campaign-resident-identity-combinations-benchmark-v1",
+      "sha256": "d4a4458aa7420af6f438ed750a68240c8e08e888fda4e1386a744d3f115d880e",
+      "software": {
+        "interop_threads": 1,
+        "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+        "threads": 2,
+        "torch": "2.14.0"
+      },
+      "sources_unchanged": true,
+      "status": "completed",
+      "worker_elapsed_seconds": 39.223001958976965
+    },
+    "sha_groups": {
+      "cases": 64,
+      "config": {
+        "batch_sizes": [
+          1,
+          4,
+          16,
+          64
+        ],
+        "cpu_budget": 12,
+        "devices": [
+          "mps"
+        ],
+        "families": [
+          "small_success",
+          "small_failure",
+          "wide_success",
+          "infrastructure_success"
+        ],
+        "group_sizes": [
+          null,
+          1,
+          4,
+          32
+        ],
+        "implementations": [
+          "reference",
+          "unrolled"
+        ],
+        "memory_bytes": 8000000000,
+        "message_kinds": [
+          "state",
+          "outer_engine"
+        ],
+        "repeats": 3,
+        "seconds": 180.0,
+        "seed": 1951,
+        "threads": 2,
+        "warmups": 1
+      },
+      "guard": {
+        "cpu_budget": 12,
+        "diagnostic": null,
+        "elapsed_seconds": 25.165076334000332,
+        "margin_bytes": 1000000000,
+        "memory_bytes": 8000000000,
+        "metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages) plus full fixed MPS allocator reservation; conservative possible double counting",
+        "mps_allocator_reserved_bytes": 3000000000,
+        "sampled_peak_charged_bytes": 3523567104
+      },
+      "path": "studies/campaign/runs/gpu-backend-2026-10-26/sha256-unrolled-groups.json",
+      "provenance_delta": {
+        "commit": "805b4986da7dc100d28924885999059c0ee2d996",
+        "digest_sources": {
+          "src/python_content_digest.inc": "6b056d520ccb8b958bf66c45fe34d33d912846e41a6f0c1aa905defd8771be20",
+          "src/python_state_json.inc": "00958de32a9e787734c301a2f291577e3fa8a002778a36b7e7733cc3acbadbc5",
+          "studies/campaign/backends/content_digest_metal.py": "382c50cafaadfa30b79d5b4059d9d80ba4ea7e91037fc9bf50a6e445a416a10e",
+          "studies/campaign/backends/content_digest_unrolled.py": "e23d04388855475adfbd1b1374df5b3969633ebcca66144f95652d303e172725",
+          "tools/benchmark_campaign_content_digests.py": "9bed21a58d2568bc7ba39dfcc572b8907f7feb90c91194121372d4ae31d316f8",
+          "tools/benchmark_campaign_device_state.py": "27cb95c0bf707328c3aeb0ba5dcb98b2c342153d69b8fd9ebe26b69540c8f54a",
+          "tools/benchmark_campaign_resident_recruitment_chance.py": "cf7cbbeea453f026605014fc4baf2688dfa041ba45d71299ed64199da522eaaa",
+          "tools/supervise_campaign_training.py": "1630dbb74ce5d2764a0712b406aa3c7b7c0d8018a846bf6f454db22ca7ff0c51"
+        }
+      },
+      "runtime_manifest": {
+        "assets": 86,
+        "detached_head": true,
+        "git_clean": true,
+        "native": {
+          "path": "/Users/home/.codex/worktrees/metal-benchmark-runtime/gwRL/gwrl_cpp.cpython-313-darwin.so",
+          "sha256": "b061ab7322c65600122c2905967c0939ef4884468b9b84488dab64986a495af2",
+          "size_bytes": 4607328
+        },
+        "path": "tmp/metal-benchmark-runtime-805b498/runtime-manifest.json",
+        "scenario_preflight": {
+          "all_runtime_source_checks": "passed_by_native_scenario_loader",
+          "calendar_rounds": 3,
+          "definition_fingerprint": "986b4d2e150aa522777ed9773c18d6082f9d9f2e01b6899dd70230ab19e4d241",
+          "initial_units": 99,
+          "rules_id": "campaign-orders-v1+gw36_v43_m4_politics_income_refresh_v1+gw36_v43_m5_movement+gw36_naval_v43:gw36_v43_m7_land_combat+gw36_v43_m8_air+gw36_economy_v43",
+          "seed": 1951,
+          "wire_context_fingerprint": "7406343f4c90c3b63a64bd188fd68dc4c975f0c0cf42889d9fce688786de5d9c"
+        },
+        "sha256": "99dc409e1ce9dc5476aa95de8253a7ac5162973283ebe7a363064077fc23a90c",
+        "source_commit": "805b4986da7dc100d28924885999059c0ee2d996",
+        "tracked_files": 637,
+        "venv": {
+          "files": 17002,
+          "manifest": "/Users/home/Desktop/gwRL/tmp/metal-benchmark-runtime-805b498/venv-files.json",
+          "manifest_sha256": "1a8156af2426ecd1ee0a2d5cbcbc5338792f7943c9e9e97b177e99b66e2118e7",
+          "numpy_version": "2.4.3",
+          "package_freeze": "/Users/home/Desktop/gwRL/tmp/metal-benchmark-runtime-805b498/gpu-pip-freeze.txt",
+          "package_freeze_sha256": "22283ea8d762b12d575447d38f70220941f7cda4f4ed3e9668186dac77fe858d",
+          "python": "/Users/home/Desktop/gwRL/tmp/gpu-mps-env/bin/python",
+          "python_binary": "/opt/anaconda3/bin/python3.13",
+          "python_binary_sha256": "403e1dc26f580d349d701f9683fdc5dc359a9dea04793d647d076a240e6af68f",
+          "python_version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+          "root": "/Users/home/Desktop/gwRL/tmp/gpu-mps-env",
+          "torch_version": "2.14.0"
+        }
+      },
+      "schema": "campaign-content-digest-compression-benchmark-v1",
+      "sha256": "9bc84d717cf5501dcd87e6e6096c7e0618efc6c70d1fdd9f2a2ea2048f6a1884",
+      "software": {
+        "interop_threads": 1,
+        "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+        "threads": 2,
+        "torch": "2.14.0"
+      },
+      "sources_unchanged": true,
+      "status": "completed",
+      "worker_elapsed_seconds": 24.430985832994338
+    }
+  },
+  "same_complete_native_fixture_checkpoints_across_runs": true,
+  "schema": "campaign-metal-identity-optimization-summary-v1",
+  "scope": "Exact standalone State/Engine identities and SHA components only; no completed game, MCTS, learning or playing-strength measurement",
+  "sha_group_summary": [
+    {
+      "lanes": 1,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013033687500865199,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.012984791494091041,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.012972417011042126,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.012990896007977426,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.008968854002887383,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.008969645990873687,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.008954145989264362,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00894216648885049,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 0.000147229,
+      "message_kind": "state"
+    },
+    {
+      "lanes": 4,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013293500494910404,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013329353983863257,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013234312500571832,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013343333499506116,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.009676916495664045,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.009782104010810144,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.009766041490365751,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.009714874991914257,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 0.0005692914999999999,
+      "message_kind": "state"
+    },
+    {
+      "lanes": 16,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013956416994915344,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.014015812499565072,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.014007916513946839,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013966667000204325,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.011300583515549079,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.011197686995728873,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.011276167002506554,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.011228562987525947,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 0.0023344585,
+      "message_kind": "state"
+    },
+    {
+      "lanes": 64,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.013776208492345177,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.014681020998978056,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.01469414598250296,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.014677312516141683,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.011353145484463312,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.012037604014039971,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.012104792011086829,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.011926312014111318,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 0.009284042,
+      "message_kind": "state"
+    },
+    {
+      "lanes": 1,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019591700402088463,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.0001888745027827099,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019116650219075382,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019224949937779456,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018729199655354023,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018416650709696114,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018762498802971095,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018987501971423626,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 1.521e-06,
+      "message_kind": "outer_engine"
+    },
+    {
+      "lanes": 4,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.0001970209996215999,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00018958350119646639,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019191649334970862,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019052049901802093,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018693749734666198,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018481299048289657,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00017789550474844873,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00016858350136317313,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 5.0835e-06,
+      "message_kind": "outer_engine"
+    },
+    {
+      "lanes": 16,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.0001934169849846512,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00018806250591296703,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00018987501971423626,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00018733349861577153,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018383399583399296,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.000190041508176364,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.0001859379990492016,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.000181708499439992,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 1.9875000000000002e-05,
+      "message_kind": "outer_engine"
+    },
+    {
+      "lanes": 64,
+      "measurements": [
+        {
+          "group_size": null,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019185450219083577,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019116699695587158,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.0001883750082924962,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "reference",
+          "median_dispatch_seconds": 0.00019147899001836777,
+          "samples": 24
+        },
+        {
+          "group_size": null,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.0001823545026127249,
+          "samples": 24
+        },
+        {
+          "group_size": 1,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018483349413145334,
+          "samples": 24
+        },
+        {
+          "group_size": 4,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00018747900321613997,
+          "samples": 24
+        },
+        {
+          "group_size": 32,
+          "implementation": "unrolled",
+          "median_dispatch_seconds": 0.00019370850350242108,
+          "samples": 24
+        }
+      ],
+      "median_serial_native_rule_seconds": 7.7854e-05,
+      "message_kind": "outer_engine"
+    }
+  ],
+  "shared_provenance": {
+    "backend_source_sha256": {
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "fca96103208566330347a6a59148b818d7025f94de692acd749cf88226ee8849",
+      "studies/campaign/backends/content_digest_metal.py": "382c50cafaadfa30b79d5b4059d9d80ba4ea7e91037fc9bf50a6e445a416a10e",
+      "studies/campaign/backends/content_digest_unrolled.py": "e23d04388855475adfbd1b1374df5b3969633ebcca66144f95652d303e172725",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "3383936937a3a0dd049f7d64ac9ddb2a1d25f378316e2db3c2505ae38fa559c3",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_chance_io.py": "30adf899875fb92425d60446dd9d0efd4a69da6752f7535d43ce2ba4a7bf4f74",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_events.py": "72a1406ce72c332578853a62dbf3b7318162f137cb6f8c2e335042da36303f20",
+      "studies/campaign/backends/resident_identity_certificates.py": "bde6144fa3aa6c8d7c3131e302a8b8a81856048e743b9e86ff29165d561fbca9",
+      "studies/campaign/backends/resident_political_units.py": "e71cc158568a5bc599cca0e152e896bc2cdab57b294bdf58dd09d4b3b30de65a",
+      "studies/campaign/backends/resident_recruitment.py": "c7b0116bbc79b1b20a6655c99aa995072e3521f6a60635c876eb208c57cfd3e0",
+      "studies/campaign/backends/resident_recruitment_action.py": "03f0b87936799f16a86f0a0c21522da23d5ab590deef7495e55eb6d6507ea2ae",
+      "studies/campaign/backends/resident_recruitment_chance.py": "d4ba9c5127dc1226268e15adcd94a651b0b1e9fdbb9a3c31440999e15ca40efb",
+      "studies/campaign/backends/resident_recruitment_effects.py": "729f959ec5ae0ec41f579f8acddb5bfedbb289fce2648f1a2fb5e8737bda29b5",
+      "studies/campaign/backends/resident_recruitment_start.py": "27fbd4d5532b67511571e4904f9e778143798883a1bfba31c42cb970573f2202",
+      "studies/campaign/backends/resident_relations.py": "096e3f058bf9cd935927e66f8708d68854d66a04220b7ce4556acef22040eea2",
+      "studies/campaign/backends/resident_routes.py": "525e4207e125f35f5586516c36d015fb43544ba1a083f12fe02e6089ba58e428",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "cd0f8896a45e6c3133d9e38af48a16473e15ba8e059c9038a1e7444cafbe3b6d",
+      "studies/campaign/backends/resident_state_json_parallel.py": "7622083583e6533bc8c05c5b78361bd45aad175a2d412f7ce22b2b4431ef56b9",
+      "studies/campaign/backends/resident_training_reset.py": "54bab8b853c6e16f10f6a168dd982bf01a71f1b9be070930c09de86f7b70b72e",
+      "studies/campaign/backends/resident_wealth.py": "e7a9621a4d3c1743f367dedaefb7ba3041f596f48875959a60dd17670f320999",
+      "studies/campaign/backends/resident_wealth_scores.py": "4bdd59306a549cadd8240182c73528651b199fcf5412da7a0db1aaf9c0ff34b8",
+      "studies/campaign/backends/route_preparation.py": "6f9aa8d1f456fec1389b78a548314a57315202df29c9e9df168f16e4b1f0cdfe",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde"
+    },
+    "branch": "",
+    "dirty": "",
+    "harness_sha256": "9d463fe122d4d97c8ad535ae594f60b8d55de918f1ad04a994ccb2722de4dec2",
+    "native": "/Users/home/.codex/worktrees/metal-benchmark-runtime/gwRL/gwrl_cpp.cpython-313-darwin.so",
+    "native_sha256": "b061ab7322c65600122c2905967c0939ef4884468b9b84488dab64986a495af2",
+    "runtime_source_sha256": {
+      "include/game/action.hpp": "c24657e452613ee382a6e5b219b01224bd9c20b3d788191a464d03cbb7cd86b5",
+      "include/game/action_encoder.hpp": "f0fffc711966805f7bcbd864838658d1eff0a5d8817ac4e51baf766d234b5559",
+      "include/game/agent.hpp": "85729b1ae26deb22990cae224e47ee095cfe8498fd33ca83249062ff3f2b5652",
+      "include/game/air.hpp": "96ad89c3147e1fce8d992c3f88a37bd6469ee2c06b0cdde3aa8b53d32cedf120",
+      "include/game/battle_resolver.hpp": "93141d82c0909b1d7477fe040a59883e1fbb4cda711a56767dc776ff6d7ea940",
+      "include/game/campaign.hpp": "e0a48ed5b710c0e37a0180aa3b2fc49fa6ee17affcbb4b010651a66e877d4616",
+      "include/game/campaign_actions.hpp": "daa32274f29584ebaa968eb2a103a10234716bdf783359b2fa99abd073c21840",
+      "include/game/campaign_audit.hpp": "00b97c7e03a814672457611ea0566263d82d485394ada15f3f3c213a1e1ddd24",
+      "include/game/campaign_benchmarks.hpp": "2cf94335b0941337e3129fc661344ace1f6fa026841f10f3d530b21ab6dcc543",
+      "include/game/campaign_env.hpp": "2f71d3c7e8ee69bcecb02513555154b9e6a7cb3a6fc2ea96d03caee5087a464f",
+      "include/game/campaign_objective.hpp": "49c20d313c421540b1827e335ac56b0d71080fe98f84686127fb1da2c541c2b1",
+      "include/game/catalog.hpp": "8b1124cfe52f768df5b8b1a1cef27db6b85a412897219b3635ac1eb9191e460f",
+      "include/game/catalog_stats_context.hpp": "2186ad8355ef849e2f4d58e4a7e905c98a50ee5e283f5bce1b10cf0882a69466",
+      "include/game/composition_battle_env.hpp": "fbb0ffd33615ad69a24140a2206bd215abc29347515a9486ade93bc3ef3c5480",
+      "include/game/debug_tools.hpp": "41d2931c03f0ef28380efbeb9d7abe9d5c63c8a15537bd36b6cca603f92d92dd",
+      "include/game/device_state.hpp": "f65d37f53c305ed31a3d963f15a7da99f87fecaddbdfb6df58edd29260ac6f1c",
+      "include/game/economy.hpp": "6f612abfb7df7ee977914002787e05e412adedf6208a327cfab3d1da1f0b767b",
+      "include/game/game_state.hpp": "c7fac837ed55eb3fe82c7b214d5aaa2c4f076413b17ff9dabdaaeab2fb619a48",
+      "include/game/income_batch.hpp": "a9d4f57fbbbcbbbd084a906b291f96619b9f85e036ba52a01796774cabbda5cc",
+      "include/game/income_ledger.hpp": "5794657ed320d49ec0b004daccc795f55573d1685aa452de6fc9a3ef62af58d7",
+      "include/game/income_ledger_batch.hpp": "587614a885e3a7c9d24f7dc3ad03bb2bf810a3b4a5f97703f08816f0b268089c",
+      "include/game/japan_training_env.hpp": "7eee622cf58f310994c90944d32674df86a6d609cbf68d019e01e25bafa355d3",
+      "include/game/land_combat.hpp": "a57017957f122747deff7a02436517c96e336ef4674660bf28dca7a57331a6b1",
+      "include/game/mdp.hpp": "70b1f2af969072a5aab41f74723753d9cba70b3749120edda2abfb1e6f7522c9",
+      "include/game/movement.hpp": "1923dca4e7bb871f1b82ba3af12f1a7eba5ad3cfddf55cee47719549b4fefb07",
+      "include/game/movement_context.hpp": "aaa5f819b01c5700b04b452aeefeceaf11903c78339304e5d468c20f5b6d2e60",
+      "include/game/nation.hpp": "9a1adf69b942ec890b853555ae03ee46180bf97bc814a3645d99d0a181187957",
+      "include/game/naval.hpp": "d6a920ddcb6e5cbef5249a95e8227073217aff632e1070ee14d6731f2862def3",
+      "include/game/neural_graph.hpp": "dd3f68cf6cf523b13529d718bd8a7e0132721b897ed5f74937ad87a7af73b5ca",
+      "include/game/numeric_graph.hpp": "497b64a89fa3969085987861b77f1e6d866b01188ef730631029584615f4c453",
+      "include/game/politics.hpp": "7b47c040fc1a7567ec4f4a0263cf587957d1390f6a771b45ffcf0eeae3c54c79",
+      "include/game/recruitment_context.hpp": "2417a096bce8e99be37804033542a6adf74a2870e4373d983d96698195e4623a",
+      "include/game/relations_context.hpp": "ce6496ff656c9c07319142fdbbf0599d32a0ba721b3f850b79b76896d42b6d6e",
+      "include/game/setup_loader.hpp": "2eb660e3bbc0fc263d2d393d399c705eea12bc3d19b0be72d96e44f65bfe3915",
+      "include/game/simple_json.hpp": "eb5107dbcc68d5a6369a40a58576cebf1ff9ad56a2ed6d1e8cd546c318c6c615",
+      "include/game/simulator.hpp": "7dcf3aa85544d3168b529c2c45652f8b72e14f40bd91b1521e1cd8e54883c5b7",
+      "include/game/snapshot_writer.hpp": "8ab9a3d48c240bb5afec72aff6165f40668d428af1b3d2fc42d56f5c64b510f3",
+      "include/game/state_encoder.hpp": "c1ef9544e23f5500576a76c851118ba1bf7080b682c0ffc7b865cfdd98e5cd12",
+      "include/game/types.hpp": "43f1080fb55cf611b0b35f738a5a6d621188a8d3eb791d40fdee64ccd5639c93",
+      "include/game/unit.hpp": "9227e151a93b6a3864177db935ba5fdd2c38cc6281f8f08988892540d7f68bfa",
+      "include/game/wealth_context.hpp": "bcd1c19be4d4a8c7dc1e216d585ddac67ee79c3c6cb8063d9d99b85681de3ac0",
+      "src/action_encoder.cpp": "a12cbf8ef4c5550f80534769f981370e461bf6c10ed7a329d8a9d49233e95eb0",
+      "src/air.cpp": "3810a83ffac8eee687002b385f91b9d5568e178b979670c0f832a4a9d52ae36a",
+      "src/campaign_actions.cpp": "65a92d7004e8e5f311322752eb19cb41f884cf9a3caffba71335ca17c47464ec",
+      "src/campaign_audit.cpp": "62694cdb10827a786f24c92d3d6823bb8d7d66e992852ee73f8ac9327fadd0db",
+      "src/campaign_benchmarks.cpp": "1d6a1f3b1cc9b1a7192286e16964bc0025be28da57517581c10a20a799c00883",
+      "src/campaign_env.cpp": "ad4dbc5e148fa10554ec9bd72d2bcb1e0e2ea24ed9b910185f21c1f021a06c62",
+      "src/campaign_objective.cpp": "c63343b0f080ea2c95884ad0758fa225db433ea9248883c04014f6e69c044b5e",
+      "src/campaign_runtime.cpp": "7b03f2476235648d1ed20b8a3bcc4f5bbf37413aacbc417bf9e7174a7398162a",
+      "src/campaign_setup.cpp": "aecc6bd84b3ae85d1fffaa24ac8d55347e411beef9e2f1af5d067036944b89b5",
+      "src/campaign_state.cpp": "fed1345c9933adfbb686a1cf37dad67e2ec8edbc599c0f9552656b87b4037a42",
+      "src/catalog.cpp": "077a8e0a8c9ac761b39cffa42ba6df64a1a7a667a018ade0c15d12c89c287970",
+      "src/catalog_stats_context.cpp": "a9ac386bc250560f909a4dfd577f907af720bb008bb051c86d542ad9d70ec6b8",
+      "src/debug_tools.cpp": "dab8141430bd9ceba80ccf4de8266a77b8a9f223859be3d6de389ef6780a97ec",
+      "src/device_state.cpp": "4923b276a0565778945a2177f94b500c42d7a698b9b2c83b42471552b9071c8f",
+      "src/economy.cpp": "212bb64b6ca7cfe88f8874452162be6bce1e62e50d5ba7cb75621ccf93998867",
+      "src/economy_lendlease.cpp": "aa0acf913cae9dab4d72f8c1de0968c576c039789de1cc3c01c546ad01c7c502",
+      "src/game_state.cpp": "a7b9ae5065cf9a99dc278f9b6221d10e013e64f618497c1fff8085869f780041",
+      "src/income_batch.cpp": "a2daaf0eb55368e6edf9ede6daa26e4e91397f6492a5c8c27362e20168c8c9ad",
+      "src/income_ledger_batch.cpp": "25a17ad56b5ce379480951a613a12fa9e79a19a7db8a9d264f600b83b73ec953",
+      "src/japan_training_env.cpp": "734d2f585fdabc121c9c63f34c179159f152c5315d216b62df30296d731c5deb",
+      "src/land_combat.cpp": "29f17800c8afe6e72db900dad13a32e86f251dfafd4f0127274eeef1a6e5b6b3",
+      "src/main.cpp": "f2f7b829200da7be31f1747e399006b68717ff22c69bf2847740f655448e21c7",
+      "src/movement.cpp": "3ec103333e213754c90626ecb4134b27f1db9155ff8f48b1770fe26ca9c81b95",
+      "src/movement_context.cpp": "ac4bc3906c822936a924398ec35ba973755df7f1a49e6219633065ff282acedb",
+      "src/naval.cpp": "33cb59af49128fac9a41963e10696a07a1b179b656761986cee40da28b8fc1c0",
+      "src/naval_combat.cpp": "e6dfa08c2125c3bbd20c0bef03a79425798f084127e791dcf66d361282756d01",
+      "src/naval_movement.cpp": "719b0dd06f60d8af9df267bdac428bc788aed769adea8bc07e9f84461864dc9a",
+      "src/naval_operations.cpp": "79ee553941a94b268127affa972bedf05f812fcff8450acc373e45d48816ab86",
+      "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+      "src/numeric_graph.cpp": "c17724b1900ddd9fa3492759d42632c95d9f082e23e1e3d94c40e21364f196c3",
+      "src/politics.cpp": "cda13d2944e044234de9d65e6574d385a3c94141bf89ae7b55db3c963d0035a7",
+      "src/politics_influence.cpp": "501e3546277499d006d822bdb24e7f25969c48f49f4cefeb494eeaf704f4da25",
+      "src/politics_warlords.cpp": "cb868322928b795677f098397b23ae68baddd1630f740dae877d53882aa6db81",
+      "src/python_action_ids.inc": "94d62ff5e013367f55707df8439c59070786bbd31f38afb29e042aca93b62181",
+      "src/python_bindings.cpp": "a6994f4085ff7f64fc2808acf8d36db2efbef0bdd4995e8a55422d07eb4de26a",
+      "src/python_canonical_json.inc": "3419166c8337e92baafac9bb6e51591fc42ecc12b1dcca3ea2381fbe5020adb0",
+      "src/python_catalog_stats.inc": "b2c8dfe0cc33f82cd0a1e598af248280d16061af5e80848a75953bb3baf590ab",
+      "src/python_content_digest.inc": "6b056d520ccb8b958bf66c45fe34d33d912846e41a6f0c1aa905defd8771be20",
+      "src/python_device_state.inc": "6a6d754afb473f41c528d8c58fc87af6bea595a4de8e480e1e3faf9d9d617491",
+      "src/python_diagnostic_pool.inc": "127a56d46a78a03a7b8ef02366e3ed9631f989a9003dafa9a0e4d094c19f3bb2",
+      "src/python_event_append.inc": "9df1e309a22652c949316b7bc19156a538d9e06dbf44c886f980b591870fa6d6",
+      "src/python_income_ledger.inc": "ddc964a464c04b30cd6aab146a61097e38397996a29f9a76b05f6d1e30a4f44c",
+      "src/python_movement_context.inc": "29712e4475c326c417f24b714e252eae5601d492313ed1e58a174105db02656d",
+      "src/python_political_units.inc": "b5664e8b2eac4e396edbe8de0ba76e75f2e171bc3d8201b5795290633a013f1f",
+      "src/python_random_metal.inc": "35f8e66a09bd67312e6c6eca4bf384cc079e5b4f91418d6170650b323b4a337c",
+      "src/python_recruitment.inc": "4632e225d8cebe220ab067a8031c03818b55530a2a843923d2982f466c583d5c",
+      "src/python_relations.inc": "382a7e320efdb46d708887249180575b6b37efc50c8420fefcb806f0ee9078b2",
+      "src/python_state_json.inc": "00958de32a9e787734c301a2f291577e3fa8a002778a36b7e7733cc3acbadbc5",
+      "src/python_training_reset.inc": "cce35d564a17b85ca096cd47ffd1733305937e76f6a6bfed3fb1bfe50856d908",
+      "src/python_wealth.inc": "49caa278713e6f09ce0bf532fc49c9e9763d0bc45415314cd36d5c304cb48fe1",
+      "src/recruitment_context.cpp": "b8bdc92658a486236e2c14b711e90f0aa8619ae59a872a5665adce1214d6919e",
+      "src/relations_context.cpp": "f251d362fb84c8d58c48b19b96810627d3e58ec94953db26ca566b0f34ad995f",
+      "src/setup_loader.cpp": "c1c63362b120a3ac6e1d4a429e808697f7cbc4e747c16a8f298373fa32e49026",
+      "src/simple_json.cpp": "b0f7fe6f52e7f1b2a3b422194bc5238c391a1f759b79dbd93dcf514836915a41",
+      "src/simulator.cpp": "ececd4c58751dbe0716bdb093f00f5a04ac3aaeadab860f4f5c5c8e1bcdba0b9",
+      "src/snapshot_writer.cpp": "ef41e7022d4ad2f810a40286892102689cc5cf420fdf714c09796dd232b1d996",
+      "src/state_encoder.cpp": "b871aca81d2fdea835585fef4f2796b4767572ebc9d8aa2f9e51618cb8fb7b81",
+      "src/wealth_context.cpp": "9717259f68f9a295e6291269705f58d680de0e88fbd483ca169a04394942b7a4",
+      "studies/campaign/__init__.py": "e5fbee9a7eaee769a5bc2abf48c8b42f3e67e384f702bc8ff5015ff7f5f74af8",
+      "studies/campaign/backends/__init__.py": "82ed320d995bc2d50b6593dd1a06bfcab22355a3bc47e3ab0bb50093941e7710",
+      "studies/campaign/backends/canonical_json_metal.py": "fca96103208566330347a6a59148b818d7025f94de692acd749cf88226ee8849",
+      "studies/campaign/backends/content_digest_metal.py": "382c50cafaadfa30b79d5b4059d9d80ba4ea7e91037fc9bf50a6e445a416a10e",
+      "studies/campaign/backends/content_digest_unrolled.py": "e23d04388855475adfbd1b1374df5b3969633ebcca66144f95652d303e172725",
+      "studies/campaign/backends/cpu.py": "7f5a82b4b9ff9fa25d6ad3893d69aa5acaa1515f8f9b8f75c69892bb46eb7a21",
+      "studies/campaign/backends/device_map_edits.py": "55c185cdb7272633106b8a0c5121efe50782fd4e102f89e8d6ba6e4f259a99a8",
+      "studies/campaign/backends/device_scheduler.py": "70edd994b1286c1f170d252231743f447eca4afc102f6cc12018c9b5fa8af398",
+      "studies/campaign/backends/device_search_clone.py": "769d9b56ae927932e892c257b6686a589e43bc8feaa1ce84822cd45c55069bac",
+      "studies/campaign/backends/device_state.py": "7ddc4ad666b00ebfe7d8198fc464a3ae4d40e8c0e1bef58a3544b48d563526ef",
+      "studies/campaign/backends/device_state_edits.py": "c80ed4bdaf9d7ba82edaa97f2fec989145ea4d7d5449878a7208b10e1ffce8ef",
+      "studies/campaign/backends/device_strings.py": "9ca238f033d15cb80047099e1ea37596d9633f14b1f96fecd36965951a89b3a9",
+      "studies/campaign/backends/income_kernel.py": "3f303cf9b3bb13296d484e9d5e75156f79181ea7862de8432161a97b9bd40551",
+      "studies/campaign/backends/income_ledger.py": "3b0bda875cd9fc95f1dd7d8f51088803712a2f7febc835c77b10913593ae4e1b",
+      "studies/campaign/backends/metal_state_schema.py": "3383936937a3a0dd049f7d64ac9ddb2a1d25f378316e2db3c2505ae38fa559c3",
+      "studies/campaign/backends/metal_validation.py": "95dce865341e6f9c565264e90e5421ecf66d854c594a000d383393a43e6636c0",
+      "studies/campaign/backends/packed_chance_metal.py": "86628ea49bb03b8ffa7bfeedb133584c8ca5b535538eec1de28d8030a90b0b4e",
+      "studies/campaign/backends/protocol.py": "bac47eeae8c4f56c7585be0797be2bb2e894041a3bb0dbb2a3bec596ff8b4fd4",
+      "studies/campaign/backends/random_metal.py": "3355c46257b347dce7f18c7acf9f3a9d3dc1daaf844134750283ac91f41839d4",
+      "studies/campaign/backends/resident_action_ids.py": "1b9969823090e3796a5e4c88f6be0a780bc1a3de158bff1510ba5a9f435cc22f",
+      "studies/campaign/backends/resident_catalog_stats.py": "7a2306f677c5ab738e018890eedf1da3c5abc0c518d16753fb76f1476cafc4af",
+      "studies/campaign/backends/resident_chance_io.py": "30adf899875fb92425d60446dd9d0efd4a69da6752f7535d43ce2ba4a7bf4f74",
+      "studies/campaign/backends/resident_declarations.py": "7749ffc16c457facf26ab91160040527798ab6cd0c0872af10cc83b9a6265b0f",
+      "studies/campaign/backends/resident_events.py": "72a1406ce72c332578853a62dbf3b7318162f137cb6f8c2e335042da36303f20",
+      "studies/campaign/backends/resident_identity_certificates.py": "bde6144fa3aa6c8d7c3131e302a8b8a81856048e743b9e86ff29165d561fbca9",
+      "studies/campaign/backends/resident_political_units.py": "e71cc158568a5bc599cca0e152e896bc2cdab57b294bdf58dd09d4b3b30de65a",
+      "studies/campaign/backends/resident_recruitment.py": "c7b0116bbc79b1b20a6655c99aa995072e3521f6a60635c876eb208c57cfd3e0",
+      "studies/campaign/backends/resident_recruitment_action.py": "03f0b87936799f16a86f0a0c21522da23d5ab590deef7495e55eb6d6507ea2ae",
+      "studies/campaign/backends/resident_recruitment_chance.py": "d4ba9c5127dc1226268e15adcd94a651b0b1e9fdbb9a3c31440999e15ca40efb",
+      "studies/campaign/backends/resident_recruitment_effects.py": "729f959ec5ae0ec41f579f8acddb5bfedbb289fce2648f1a2fb5e8737bda29b5",
+      "studies/campaign/backends/resident_recruitment_start.py": "27fbd4d5532b67511571e4904f9e778143798883a1bfba31c42cb970573f2202",
+      "studies/campaign/backends/resident_relations.py": "096e3f058bf9cd935927e66f8708d68854d66a04220b7ce4556acef22040eea2",
+      "studies/campaign/backends/resident_routes.py": "525e4207e125f35f5586516c36d015fb43544ba1a083f12fe02e6089ba58e428",
+      "studies/campaign/backends/resident_state_income.py": "bcdfd3b30c27fd3f4e9bb7ec33264790e61b06c63e3799086b38553149635ebb",
+      "studies/campaign/backends/resident_state_json.py": "cd0f8896a45e6c3133d9e38af48a16473e15ba8e059c9038a1e7444cafbe3b6d",
+      "studies/campaign/backends/resident_state_json_parallel.py": "7622083583e6533bc8c05c5b78361bd45aad175a2d412f7ce22b2b4431ef56b9",
+      "studies/campaign/backends/resident_training_reset.py": "54bab8b853c6e16f10f6a168dd982bf01a71f1b9be070930c09de86f7b70b72e",
+      "studies/campaign/backends/resident_wealth.py": "e7a9621a4d3c1743f367dedaefb7ba3041f596f48875959a60dd17670f320999",
+      "studies/campaign/backends/resident_wealth_scores.py": "4bdd59306a549cadd8240182c73528651b199fcf5412da7a0db1aaf9c0ff34b8",
+      "studies/campaign/backends/route_preparation.py": "6f9aa8d1f456fec1389b78a548314a57315202df29c9e9df168f16e4b1f0cdfe",
+      "studies/campaign/backends/tensor_rules.py": "3e6185eb6210e50c6d9be4eceb32dd61e49ec905ec6c32eb6dbf7dc1866d97af",
+      "studies/campaign/backends/tensor_rules_metal.py": "443f0294a22e12403bf1797380118480e1c13bf14e4116d419ff85302d8c6cde",
+      "studies/campaign/baselines.py": "51d0f20a3a165c89e08515ce3e195a3efb579c41468674c80f509c3223135a02",
+      "studies/campaign/batching.py": "b31310a171cfa452df37e25dad83516841d9fa2b1746680356a7c22fe440841f",
+      "studies/campaign/curriculum.py": "835ccea7ee33240f2344c4b9e91e2ccdddc0b771115a9e89c1a308e93da1faa4",
+      "studies/campaign/device_runtime.py": "b6f2884e66bdef04398fcbd1dc507e28f45f03ec4c31c8c2141e1768d576baa1",
+      "studies/campaign/evaluation.py": "ecff10d181ef80cdd00a19374a3874082d3bbdd19fcc85fc6ee61763c850cae4",
+      "studies/campaign/features.py": "7cf8338be127f58e85d1239bee4e45bc53f79b85590f3a1be843cbeca2c5d90b",
+      "studies/campaign/learning.py": "b2abdf149df8c855f60c12ad28d3a341b9f722431dacadfae2474606d6015bf4",
+      "studies/campaign/model_export.py": "04c59002757cb2ea728cc02c08947bd99774491cde4b2e16d5c9dec28d2fe36b",
+      "studies/campaign/neural.py": "23255dd3603bb146b8ff97df1e7b4e8e2c477c91afe7c3acdfd1ab7c669fb1ae",
+      "studies/campaign/numeric_storage.py": "4afd8934f81f2dd3a0041d5e4ca51dcb7c109f56ba9e43e753dae9caff8f3f7f",
+      "studies/campaign/replay.py": "93f5dc7a46ee876d065fb6343319cda26d7761b7895cdf6bb1e2db68146b7d6e",
+      "studies/campaign/run.py": "96f6e0d40efe95d327f8b00f70a0db7f99e81f74f290261f69b96083dbfee41b",
+      "studies/campaign/scaling_benchmark.py": "be1659bf153340467b003365549bd5146ac53cbd83c426dfc40e4d0cc0f4703b",
+      "studies/campaign/viewer.py": "5eb07ad940054d0d402324457580e11005dd327d7274e74e034225a3d75ae454",
+      "studies/shared/campaign_adapter.py": "cdf43b4711db18172cbd266c150771d7dc389e6c917675a07ef71295d15ef4c3",
+      "studies/shared/immutable_json.py": "d9214627e7be0270f9a46e8a9b9de38cb01ac8d659262fca40faddad0b8faa77",
+      "studies/shared/multiplayer_mcts.py": "97e659ebfe37c0a3ed2d9756df40586d4cbc9866dba54038827595125065e685"
+    }
+  }
+}
