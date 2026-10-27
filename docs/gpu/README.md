@@ -52,6 +52,9 @@ remaining builder costs from measured complete-step improvements and CPU losses.
 The [combined copy/validation comparison](metal_container_factorial_2026_10_27.md)
 measures both improvements independently and together against serial and parallel
 native execution on complete supported recruitment steps.
+The [larger-batch comparison](metal_recruitment_scaling_2026_10_27.md) records the
+measured crossover at hundreds of simultaneous supported steps, separately from
+full-game and search performance.
 The [political queue and truce checks](resident_political_queues_2026_10_27.md)
 cover exact evolution choices, controlling-player lookup and mandatory battle
 queuing, without claiming complete political refresh or combat resolution.
