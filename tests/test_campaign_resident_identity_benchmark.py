@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from tools.benchmark_campaign_resident_identities import (
-    DIGESTS, SERIALIZERS, IdentityConfig, ROLES, SCHEMA, STAGES, check_identity, digest_json, finalize, fixtures, identities,
+    DEFAULT_SERIALIZERS, DIGESTS, SERIALIZERS, IdentityConfig, ROLES, SCHEMA, STAGES, check_identity, digest_json, finalize, fixtures, identities,
 )
 
 
@@ -14,12 +14,17 @@ class IdentityCombinationHarnessTests(unittest.TestCase):
     def test_configuration_keeps_all_requested_combinations_and_capacities(self):
         config = IdentityConfig()
         self.assertEqual(config.batch_sizes, (1, 4, 16, 64))
-        self.assertEqual(config.serializers, SERIALIZERS); self.assertEqual(config.digests, DIGESTS)
+        self.assertEqual(config.serializers, DEFAULT_SERIALIZERS); self.assertEqual(config.digests, DIGESTS)
+        self.assertEqual(config.field_group_size, 1)
+        explicit = IdentityConfig(serializers=SERIALIZERS, field_group_size=32)
+        self.assertEqual(explicit.serializers, ("reference", "parallel_units", "parallel_fields"))
+        self.assertEqual(explicit.field_group_size, 32)
         self.assertIsNone(config.digest_group_size)
         for values in ({"serializers": ()}, {"serializers": ("bad",)}, {"digests": ("reference", "reference")},
                        {"digests": ()}, {"families": ("bad",)}, {"digest_group_size": True},
                        {"digest_group_size": 1.5}, {"digest_group_size": 0}, {"byte_capacity": 0},
-                       {"byte_capacity": True}, {"devices": ("cpu",)}):
+                       {"byte_capacity": True}, {"devices": ("cpu",)}, {"field_group_size": True},
+                       {"field_group_size": 0}, {"field_group_size": 1.5}):
             with self.assertRaises(ValueError): IdentityConfig(**values)
 
     def test_pipeline_uses_exact_four_operations_and_only_explicit_stage_fences(self):
@@ -49,7 +54,7 @@ class IdentityCombinationHarnessTests(unittest.TestCase):
             "measurements": [{"serializer": serializer, "digest": digest,
                 "all_native_bytes_words_keys_counts_errors_and_padding_exact": True,
                 "warm_pipeline_seconds": [.01, .01], "fenced_substage_seconds": [dict.fromkeys(STAGES, .001)] * 2}
-                for serializer in SERIALIZERS for digest in DIGESTS]} for role in ROLES]
+                for serializer in config.serializers for digest in DIGESTS]} for role in ROLES]
         return config, {"schema": SCHEMA, "status": "completed", "sources_unchanged": True,
                         "source_identity_certificate_used": False, "cases": cases}
 
@@ -74,6 +79,19 @@ class IdentityCombinationHarnessTests(unittest.TestCase):
         self.assertTrue(finalize(copy.deepcopy(changed), config)["matched_complete_native_identity_pipeline"])
         changed["cases"][-1]["native_checkpoint_sha256"] = "4" * 64
         self.assertFalse(finalize(changed, config)["matched_complete_native_identity_pipeline"])
+        field_config = IdentityConfig(batch_sizes=(1,), families=("small_success",), repeats=2, serializers=SERIALIZERS)
+        fields = copy.deepcopy(report)
+        for row in fields["cases"]:
+            row["measurements"] += [{**copy.deepcopy(item), "serializer": "parallel_fields"}
+                                    for item in row["measurements"] if item["serializer"] == "parallel_units"]
+        fields["parallel_field_threadgroup_size"] = 1
+        self.assertTrue(finalize(copy.deepcopy(fields), field_config)["matched_complete_native_identity_pipeline"])
+        for mismatch in (None, 4, True, "1"):
+            bad = copy.deepcopy(fields); bad["parallel_field_threadgroup_size"] = mismatch
+            self.assertFalse(finalize(bad, field_config)["matched_complete_native_identity_pipeline"])
+        unused = copy.deepcopy(report); unused["parallel_field_threadgroup_size"] = 1
+        self.assertFalse(finalize(unused, IdentityConfig(batch_sizes=(1,), families=("small_success",), repeats=2))
+                         ["matched_complete_native_identity_pipeline"])
 
     def test_guard_failure_stays_failed(self):
         config, report = self.report(); report["status"] = "memory_limit"
@@ -116,14 +134,16 @@ class IdentityCombinationIntegrationTests(unittest.TestCase):
         from studies.campaign.backends.canonical_json_metal import CanonicalJsonContext
         from studies.campaign.backends.resident_state_json import ResidentStateJson
         from studies.campaign.backends.resident_state_json_parallel import ParallelUnitStateJson
-        config = IdentityConfig(batch_sizes=(2,), families=("small_success",), repeats=1)
+        from studies.campaign.backends.resident_state_json_fields import ParallelFieldStateJson
+        config = IdentityConfig(batch_sizes=(2,), families=("small_success",), repeats=1, serializers=SERIALIZERS, field_group_size=1)
         for row in fixtures(config, time.monotonic() + 30):
             raw = row["env"]; native = gwrl_cpp.capture_device_states(gwrl_cpp.device_state_context(raw), [raw, raw])
             context = DeviceStateContext(native.context, "mps")
             source = DeviceStateBatch.from_native(native, context=context); before = source.records.clone()
             numbers = CanonicalJsonContext(native, context)
             baseline = ResidentStateJson(numbers); expected = baseline.identities(source, byte_capacity=config.byte_capacity)
-            for formatter in (baseline, ParallelUnitStateJson(numbers)):
+            for formatter in (baseline, ParallelUnitStateJson(numbers),
+                              ParallelFieldStateJson(numbers, fragment_group_size=config.field_group_size)):
                 for implementation in DIGESTS:
                     with patch.object(torch.Tensor, "cpu", side_effect=AssertionError("Hot host read")), \
                          patch.object(torch.Tensor, "tolist", side_effect=AssertionError("Hot host list")), \

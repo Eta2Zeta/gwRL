@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Exact State/Engine identity pipeline comparisons, outside game transitions.
 
-Four explicit combinations compare the original/parallel-unit State serializer
-and original/unrolled SHA. Complete native State bytes and both keys remain the
+Explicit combinations compare original, parallel-unit or parallel-field State
+serializers and original/unrolled SHA. The default four combinations retain the
+original two serializers. Complete native State bytes and both keys remain the
 oracle. Capture/upload, inspection, JIT-first-call and fenced substages are
 reported separately. No source certificate, State cache or rule shortcut is used.
 """
@@ -24,7 +25,8 @@ from tools.benchmark_campaign_device_state import StateConfig, atomic_json, requ
 from tools.benchmark_campaign_resident_recruitment_chance import FAMILIES, lanes, resident_digest, templates
 
 SCHEMA = "campaign-resident-identity-combinations-benchmark-v1"
-SERIALIZERS = ("reference", "parallel_units")
+DEFAULT_SERIALIZERS = ("reference", "parallel_units")
+SERIALIZERS = (*DEFAULT_SERIALIZERS, "parallel_fields")
 DIGESTS = ("reference", "unrolled")
 ROLES = ("source_preflight", "after_effects")
 STAGES = ("state_serialize", "state_sha256", "outer_engine_json", "engine_sha256")
@@ -36,10 +38,11 @@ class IdentityConfig(StateConfig):
     batch_sizes: tuple[int, ...] = (1, 4, 16, 64)
     repeats: int = 3
     families: tuple[str, ...] = FAMILIES
-    serializers: tuple[str, ...] = SERIALIZERS
+    serializers: tuple[str, ...] = DEFAULT_SERIALIZERS
     digests: tuple[str, ...] = DIGESTS
     digest_group_size: int | None = None
     byte_capacity: int = 262144
+    field_group_size: int = 1
 
     def __post_init__(self):
         super().__post_init__()
@@ -50,6 +53,8 @@ class IdentityConfig(StateConfig):
                     f"Select distinct supported identity {label}")
         require(self.digest_group_size is None or type(self.digest_group_size) is int and self.digest_group_size > 0,
                 "Digest group size must be a positive integer or default")
+        require(type(self.field_group_size) is int and self.field_group_size > 0,
+                "Field fragment group size must be a positive integer")
         require(type(self.byte_capacity) is int and self.byte_capacity > 0, "Identity output capacity must be positive; insufficient buffers fail")
 
 
@@ -60,6 +65,7 @@ def provenance():
         "tools/benchmark_campaign_resident_identities.py", "tools/benchmark_campaign_device_state.py",
         "tools/benchmark_campaign_resident_recruitment_chance.py", "tools/supervise_campaign_training.py",
         "studies/campaign/backends/resident_state_json.py", "studies/campaign/backends/resident_state_json_parallel.py",
+        "studies/campaign/backends/resident_state_json_fields.py",
         "studies/campaign/backends/canonical_json_metal.py", "studies/campaign/backends/content_digest_metal.py",
         "studies/campaign/backends/content_digest_unrolled.py", "src/python_state_json.inc")}
     return value
@@ -159,7 +165,8 @@ def worker(config, device, output, deadline):
                      "interop_threads": torch.get_num_interop_threads()},
         "timing": "Unfenced four-operation pipeline with one final device fence; separately fenced substages are intrusive diagnostics",
         "population": "Same exact native source/after-effects State replicated across all lanes; complete history/RNG kept in source",
-        "parallel_unit_threadgroup_size": 32}
+        "parallel_unit_threadgroup_size": 32,
+        "parallel_field_threadgroup_size": config.field_group_size if "parallel_fields" in config.serializers else None}
     def guard(): require(time.monotonic() < deadline, "Shared identity benchmark deadline exhausted")
     def persist():
         report["elapsed_worker_seconds"] = time.perf_counter() - start
@@ -182,6 +189,9 @@ def worker(config, device, output, deadline):
             source, upload_seconds = timed(lambda: DeviceStateBatch.from_native(captured, context=context))
             numbers, number_seconds = timed(lambda: CanonicalJsonContext(captured, context))
             formatters = {"reference": ResidentStateJson(numbers), "parallel_units": ParallelUnitStateJson(numbers)}
+            if "parallel_fields" in config.serializers:
+                from studies.campaign.backends.resident_state_json_fields import FIELDS, ParallelFieldStateJson
+                formatters["parallel_fields"] = ParallelFieldStateJson(numbers, fragment_group_size=config.field_group_size)
             before = resident_digest(source)
             expected = ResidentStateJson.identities(formatters["reference"], source, byte_capacity=config.byte_capacity)
             torch.mps.synchronize()
@@ -198,6 +208,9 @@ def worker(config, device, output, deadline):
                 complete_setup_seconds=time.perf_counter() - setup, record_capacity=K, actual_units_per_lane=units,
                 parallel_unit_task_capacity_per_lane=U, allocated_unit_tasks=B * U, active_unit_tasks=sum(units),
                 full_stack_scratch_bytes=B * K * 5 * 8, unit_task_scratch_bytes=B * U * (4 * 8 + 4), measurements=[])
+            if "parallel_fields" in config.serializers:
+                case.update(parallel_field_task_capacity_per_lane=U + len(FIELDS),
+                            field_task_scratch_bytes=B * (U + len(FIELDS)) * (5 * 8 + 4))
             for serializer in config.serializers:
                 for digest in config.digests:
                     formatter = formatters[serializer]
@@ -240,6 +253,9 @@ def finalize(report, config):
     grid = {(serializer, digest) for serializer in config.serializers for digest in config.digests}
     population = {(family, role, B) for family in config.families for role in ROLES for B in config.batch_sizes}
     cases = report.get("cases", [])
+    reported_group = report.get("parallel_field_threadgroup_size")
+    field_group_valid = ((type(reported_group) is int and reported_group == config.field_group_size)
+                         if "parallel_fields" in config.serializers else reported_group is None)
     def finite(value): return type(value) in (int, float) and math.isfinite(value) and value >= 0
     def sha(value): return isinstance(value, str) and len(value) == 64 and not set(value) - set("0123456789abcdef")
     def valid(case):
@@ -252,7 +268,7 @@ def finalize(report, config):
                     len(row.get("warm_pipeline_seconds", [])) == config.repeats and all(finite(t) for t in row["warm_pipeline_seconds"]) and
                     len(row.get("fenced_substage_seconds", [])) == config.repeats and all(set(stage) == set(STAGES) and
                         all(finite(t) for t in stage.values()) for stage in row["fenced_substage_seconds"]) for row in rows))
-    exact = (report.get("schema") == SCHEMA and report.get("status") == "completed" and report.get("sources_unchanged") is True and
+    exact = (field_group_valid and report.get("schema") == SCHEMA and report.get("status") == "completed" and report.get("sources_unchanged") is True and
              report.get("source_identity_certificate_used") is False and len(cases) == len(population) and
              {(case.get("family"), case.get("role"), case.get("lanes")) for case in cases} == population and all(valid(case) for case in cases))
     if exact:
@@ -268,9 +284,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path); parser.add_argument("--batch-sizes", type=int, nargs="+", default=(1,4,16,64))
     parser.add_argument("--families", choices=FAMILIES, nargs="+", default=FAMILIES)
-    parser.add_argument("--serializers", choices=SERIALIZERS, nargs="+", default=SERIALIZERS)
+    parser.add_argument("--serializers", choices=SERIALIZERS, nargs="+", default=DEFAULT_SERIALIZERS)
     parser.add_argument("--digests", choices=DIGESTS, nargs="+", default=DIGESTS)
     parser.add_argument("--digest-group-size", type=int); parser.add_argument("--byte-capacity", type=int, default=262144)
+    parser.add_argument("--field-group-size", type=int, default=1)
     parser.add_argument("--repeats", type=int, default=3); parser.add_argument("--seconds", type=float, default=180)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS); parser.add_argument("--_device", help=argparse.SUPPRESS)
     parser.add_argument("--_deadline", type=float, help=argparse.SUPPRESS)
@@ -281,7 +298,7 @@ def main(argv=None):
         worker(IdentityConfig(**values), args._device, args.output, args._deadline); return 0
     config = IdentityConfig(batch_sizes=tuple(args.batch_sizes), families=tuple(args.families), serializers=tuple(args.serializers),
         digests=tuple(args.digests), digest_group_size=args.digest_group_size, byte_capacity=args.byte_capacity,
-        repeats=args.repeats, seconds=args.seconds)
+        field_group_size=args.field_group_size, repeats=args.repeats, seconds=args.seconds)
     require(not args.output.exists(), "Choose a fresh evidence path")
     report = supervise(config, "mps", args.output, deadline=time.monotonic() + config.seconds, worker_script=Path(__file__))
     report = finalize(report, config); atomic_json(args.output, report)
