@@ -120,6 +120,7 @@ kernel void content_digests(device const uchar* data [[buffer(0)]],
 """
 
 _library=None
+_unrolled_library=None
 _lock=threading.Lock()
 
 
@@ -131,9 +132,18 @@ def _dimensions(values):return torch.tensor(values,dtype=torch.int64,device='mps
 def _dummy():return torch.empty(1,dtype=torch.int64,device='mps')
 
 
-def content_digests_metal(batch):
-    """Hash all actual messages on device, including raw NUL/UTF8 byte values."""
-    global _library
+def content_digests_metal(batch, *, implementation='reference', group_size=None):
+    """Hash exact messages; alternate compression and group sizing are explicit.
+
+    Each thread always hashes one complete message. ``group_size`` controls how
+    those independent threads are scheduled, never the number of messages or
+    bytes hashed. The unchanged reference implementation remains the default.
+    """
+    global _library, _unrolled_library
+    if implementation not in {'reference','unrolled'}:
+        raise ValueError('Digest implementation must be reference or unrolled')
+    if group_size is not None and (type(group_size) is not int or group_size<=0):
+        raise ValueError('Digest group size must be a positive integer')
     device=batch.data.device
     if device.type!='mps':raise ValueError('Digest execution requires the explicit Apple GPU')
     if os.environ.get('PYTORCH_ENABLE_MPS_FALLBACK','0') not in {'','0'}:
@@ -152,12 +162,30 @@ def content_digests_metal(batch):
     hex_bytes=torch.empty((B,64),dtype=torch.uint8,device=device)
     errors=torch.empty(B,dtype=torch.int32,device=device)
     batch_error=torch.empty(1,dtype=torch.int32,device=device)
-    if _library is None:
-        with _lock:
-            if _library is None:_library=torch.mps.compile_shader(SOURCE)
+    if implementation=='reference':
+        if _library is None:
+            with _lock:
+                if _library is None:_library=torch.mps.compile_shader(SOURCE)
+        kernel=_library.content_digests
+    else:
+        if _unrolled_library is None:
+            with _lock:
+                if _unrolled_library is None:
+                    from .content_digest_unrolled import UNROLLED_SOURCE
+                    _unrolled_library=torch.mps.compile_shader(UNROLLED_SOURCE)
+        kernel=_unrolled_library.content_digests_unrolled
+    if group_size is not None and group_size>kernel.max_threads_per_threadgroup:
+        raise ValueError('Digest group size exceeds Metal kernel limit')
     args=(batch.data,offsets,batch.count,words,hex_bytes,errors,batch_error,
           _dimensions((B,batch.data.numel(),int(ranged))))
-    _library.content_digests(*(value if value.numel() else _dummy() for value in args),threads=max(B,1))
+    arguments=tuple(value if value.numel() else _dummy() for value in args)
+    if group_size is None:
+        kernel(*arguments,threads=max(B,1))
+    else:
+        threads=((max(B,1)+group_size-1)//group_size)*group_size
+        if threads>(1<<32)-1:
+            raise OverflowError('Digest thread grid exceeds representable capacity; no messages truncated')
+        kernel(*arguments,threads=threads,group_size=group_size)
     return DigestBatch(words,hex_bytes,errors,batch_error,batch.count)
 
 
