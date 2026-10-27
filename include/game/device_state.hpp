@@ -12,6 +12,10 @@ inline constexpr const char* deviceStateSchema = "campaign-device-state-v2";
 inline constexpr std::size_t deviceStateColumns = 5;
 using DeviceRecord = std::array<std::int64_t, deviceStateColumns>;
 
+// Explicit validated diagnostic State replacement retaining the source's Rules
+// and every private execution-RNG bit. No State JSON or raw-arena retagging.
+Engine restoreDiagnosticState(State state, const Engine& executionSource);
+
 enum class DeviceTag : std::int64_t {
     Null, Boolean, SignedInteger, UnsignedInteger, NumberBits, String,
     Sequence, Map, Set, Optional, Record, Pair, JsonArray, JsonObject

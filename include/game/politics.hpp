@@ -44,6 +44,8 @@ void recordLandAttack(State&, const Id& attacker, const Id& zone);
 void surrenderNation(State&, const Id& nation, const Id& attacker);
 // The surrender-time One China entitlement queues completed build projects.
 void queuePoliticalObjectiveBonus(State&);
+// Same evolution-choice helper used by refresh, exposed for raw diagnostics.
+void queuePoliticalEvolutionChoice(State&, const Id& nation);
 
 // Shared decision/chance helpers keep continuations explicit in State, so
 // checkpoints, planning keys and replay include all pending political work.

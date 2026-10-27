@@ -22,6 +22,10 @@ struct DeviceStateAccess {
         return result;
     }
 };
+Engine restoreDiagnosticState(State state, const Engine& executionSource) {
+    return DeviceStateAccess::restore(std::move(state),DeviceStateAccess::rules(executionSource),
+                                     DeviceStateAccess::random(executionSource));
+}
 namespace {
 using V = json::Value;
 void require(bool yes, const char* message) { if (!yes) throw std::invalid_argument(message); }
@@ -258,7 +262,10 @@ DeviceStateContext::DeviceStateContext(const Engine& engine):definition(engine.s
             "placed_this_turn","surrendered","one_china_bonus_eligible_at_surrender","one_china_bonus_awarded",
             "controller_unresolved","direct_axis_control_after_japan_surrender","politics_surrender_queues",
             "one_china_award","completed","national_objective_award","ships","attacker","nation",
-            "cavalry","infantry","axis","politics_sequence"})pool.intern(text);
+            "cavalry","infantry","axis","politics_sequence",
+            "politics_evolution","politics_choose_capital","factory","evolution_pending_ccp","evolution_pending_kmt",
+            "awaiting_combat_rules","chinese_truce_termination","truce_low_morale_eliminates","immediate_land_battles",
+            "round","origins","land_entry_origins","truce_breaker","combat_move","airborne_assault","amphibious_assault"})pool.intern(text);
     stringIds=pool.index;
     flattenStrings(strings,stringBytes,stringOffsets);
     wireContextFingerprint=wireFingerprint(*this);

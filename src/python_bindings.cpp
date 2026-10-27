@@ -74,6 +74,7 @@ class NativeCampaignEnv {
     friend struct PoliticalUnitsNativeAccess;
     friend struct PoliticalUnitRemovalNativeAccess;
     friend struct SurrenderNativeAccess;
+    friend struct ChineseTruceNativeAccess;
     friend struct MovementNativeAccess;
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
@@ -208,6 +209,8 @@ using CampaignEnv = game::campaign::CampaignEnv;
 #include "python_political_unit_removal.inc"
 #include "python_political_unit_creation.inc"
 #include "python_surrender.inc"
+#include "python_political_decisions.inc"
+#include "python_chinese_truce.inc"
 
 // Immutable owning views outlive an environment mutation without copying its
 // state tree. Only small scheduler fields overlay the complete native document.
@@ -580,6 +583,8 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     bindPoliticalUnitRemoval(module);
     bindPoliticalUnitCreation(module);
     bindSurrender(module);
+    bindPoliticalDecisions(module);
+    bindChineseTruce(module);
 
     py::class_<game::BenchmarkStepResult>(module, "StepResult")
         .def_readonly("acting_nation", &game::BenchmarkStepResult::actingNation)
