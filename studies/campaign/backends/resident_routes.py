@@ -562,7 +562,7 @@ class ResidentRoutes:
     def __init__(self,state_context,native_context,*,relations_context=None,preparation_implementation="reference"):
         if _device(state_context.device).type!="mps":raise ValueError("Resident route execution requires explicit Apple MPS; no CPU fallback")
         if state_context.definition_fingerprint!=native_context.definition_fingerprint:raise ValueError("Route definition differs from resident state")
-        if preparation_implementation not in {"reference","fused"}:raise ValueError("Choose reference or fused route preparation")
+        if preparation_implementation not in {"reference","fused","fused_indexed"}:raise ValueError("Choose reference, fused or fused_indexed route preparation")
         self.preparation_implementation=preparation_implementation
         self.state_context,self.native_context=state_context,native_context
         self.zones=tuple(native_context.zones);self.nations=tuple(native_context.nations);self.players=tuple(native_context.players)
@@ -627,17 +627,17 @@ class ResidentRoutes:
     def prepare(self,state,*,relations=None,declarations=None,implementation=None):
         state._metadata();_device(state.device)
         implementation=self.preparation_implementation if implementation is None else implementation
-        if implementation not in {"reference","fused"}:raise ValueError("Choose reference or fused route preparation")
+        if implementation not in {"reference","fused","fused_indexed"}:raise ValueError("Choose reference, fused or fused_indexed route preparation")
         if state.context.identity!=self.state_context.identity or state.device!=self.state_context.device:raise ValueError("Route wire context/device differs")
         current=self._prepared
         if (current is not None and current.source is state and self._prepared_implementation==implementation and
             (relations is None or current.relations is relations) and (declarations is None or current.declarations is declarations)):
             return current
-        if implementation=="fused" and relations is None and declarations is None:
+        if implementation in {"fused","fused_indexed"} and relations is None and declarations is None:
             if self._fused_preparation is None:
                 from .route_preparation import FusedRoutePreparation
                 self._fused_preparation=FusedRoutePreparation(self)
-            result=self._fused_preparation.prepare(self,state)
+            result=self._fused_preparation.prepare(self,state,implementation=implementation)
             self._prepared=result;self._prepared_implementation=implementation;return result
         # Explicit caller-supplied tables are reused with their original exact
         # source identities. This remains the audited GPU index-only path.

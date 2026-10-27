@@ -34,6 +34,7 @@ class _BoundedMPS:
 
 
 class _PreparedAssertions:
+    strategy="fused"
     def prepared_equal(self,a,b):
         self.assertIs(a.source,b.source)
         self.assertIs(a.relations.source,a.source)
@@ -53,7 +54,7 @@ class _PreparedAssertions:
         original=relations.compute
         def audited(source,*args,**kwargs):
             expected=original(source,*args,**kwargs)
-            fused=routes.prepare(source,implementation="fused")
+            fused=routes.prepare(source,implementation=self.strategy)
             declaration=routes.declaration_context.compute(source,expected)
             reference=routes.prepare(source,relations=expected,declarations=declaration,implementation="reference")
             self.prepared_equal(fused,reference)
@@ -64,10 +65,11 @@ class _PreparedAssertions:
 
 @unittest.skipUnless(EXACT_MPS,"Lossless Apple GPU runtime unavailable")
 class FusedRouteOracleTests(_BoundedMPS,route_oracles.CampaignResidentRoutesTests):
+    strategy="fused"
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.kernel=ResidentRoutes(cls.context,cls.native,preparation_implementation="fused")
+        cls.kernel=ResidentRoutes(cls.context,cls.native,preparation_implementation=cls.strategy)
 
 
 @unittest.skipUnless(EXACT_MPS,"Lossless Apple GPU runtime unavailable")
@@ -100,7 +102,7 @@ class FusedPreparationBoundaryTests(_BoundedMPS,_PreparedAssertions,unittest.Tes
         state,routes=self.setup();expected=routes.prepare(state,implementation="reference")
         preparer=FusedRoutePreparation(routes)
         for size in (1,7,128):
-            actual=preparer.prepare(routes,state,group_size=size);self.prepared_equal(actual,expected)
+            actual=preparer.prepare(routes,state,group_size=size,implementation=self.strategy);self.prepared_equal(actual,expected)
             values=([getattr(actual.relations,name) for name in RELATION_FIELDS]+
                     [getattr(actual.declarations,name) for name in DECLARATION_FIELDS]+[actual.indexes])
             self.assertEqual(len({value.untyped_storage().data_ptr() for value in values}),1)
@@ -108,22 +110,22 @@ class FusedPreparationBoundaryTests(_BoundedMPS,_PreparedAssertions,unittest.Tes
             self.assertTrue(all(left[1]<=right[0] for left,right in zip(spans,spans[1:])))
             self.assertTrue(all(value.is_contiguous() for value in values))
         for invalid in (0,True,1.5):
-            with self.assertRaises(ValueError):preparer.prepare(routes,state,group_size=invalid)
+            with self.assertRaises(ValueError):preparer.prepare(routes,state,group_size=invalid,implementation=self.strategy)
 
     def test_source_wire_binding_empty_batches_cache_selection_and_caller_reuse(self):
         state,routes=self.setup()
         reference=routes.prepare(state,implementation="reference")
-        fused=routes.prepare(state,implementation="fused")
+        fused=routes.prepare(state,implementation=self.strategy)
         self.assertIsNot(reference,fused);self.prepared_equal(fused,reference)
-        self.assertIs(routes.prepare(state,implementation="fused"),fused)
-        reused=routes.prepare(state,relations=reference.relations,declarations=reference.declarations,implementation="fused")
+        self.assertIs(routes.prepare(state,implementation=self.strategy),fused)
+        reused=routes.prepare(state,relations=reference.relations,declarations=reference.declarations,implementation=self.strategy)
         self.assertIs(reused.relations,reference.relations);self.assertIs(reused.declarations,reference.declarations)
-        with self.assertRaises(ValueError):routes.prepare(state.snapshot(),relations=reference.relations,implementation="fused")
+        with self.assertRaises(ValueError):routes.prepare(state.snapshot(),relations=reference.relations,implementation=self.strategy)
         with self.assertRaises(ValueError):routes.prepare(state,implementation="unknown")
         empty=DeviceStateBatch.capture([],context=state.context)
-        self.prepared_equal(routes.prepare(empty,implementation="fused"),routes.prepare(empty,implementation="reference"))
+        self.prepared_equal(routes.prepare(empty,implementation=self.strategy),routes.prepare(empty,implementation="reference"))
         foreign=copy.copy(state.context);foreign.wire_context_fingerprint+="-foreign"
-        with self.assertRaises(ValueError):routes.prepare(replace(state,context=foreign),implementation="fused")
+        with self.assertRaises(ValueError):routes.prepare(replace(state,context=foreign),implementation=self.strategy)
 
     def test_injected_services_reject_foreign_wire_device_and_native_definition(self):
         state,routes=self.setup()
@@ -131,30 +133,30 @@ class FusedPreparationBoundaryTests(_BoundedMPS,_PreparedAssertions,unittest.Tes
             context=copy.copy(state.context);setattr(context,field,value)
             service=copy.copy(routes.relations_context);service.state_context=context
             with self.subTest(field=field),self.assertRaisesRegex(ValueError,"Injected political service"):
-                ResidentRoutes(state.context,routes.native_context,relations_context=service,preparation_implementation="fused")
+                ResidentRoutes(state.context,routes.native_context,relations_context=service,preparation_implementation=self.strategy)
         from studies.campaign.curriculum import make_env
         other=make_env(1951,calendar_rounds=11).raw
         service=copy.copy(routes.relations_context);service.native_context=gwrl_cpp.campaign_relations_context(other)
         with self.assertRaisesRegex(ValueError,"Injected political service"):
-            ResidentRoutes(state.context,routes.native_context,relations_context=service,preparation_implementation="fused")
-        matching=ResidentRoutes(state.context,routes.native_context,relations_context=routes.relations_context,preparation_implementation="fused")
+            ResidentRoutes(state.context,routes.native_context,relations_context=service,preparation_implementation=self.strategy)
+        matching=ResidentRoutes(state.context,routes.native_context,relations_context=routes.relations_context,preparation_implementation=self.strategy)
         self.assertIs(matching.relations_context,routes.relations_context)
 
     def test_fused_preparer_cannot_rebind_to_foreign_static_route_context(self):
         state,routes=self.setup();preparer=FusedRoutePreparation(routes)
         other=ResidentRoutes(state.context,routes.native_context)
-        with self.assertRaisesRegex(ValueError,"different static route context"):preparer.prepare(other,state)
+        with self.assertRaisesRegex(ValueError,"different static route context"):preparer.prepare(other,state,implementation=self.strategy)
         service=routes.relations_context;foreign=copy.copy(state.context);foreign.wire_context_fingerprint+="-foreign"
         previous=service.state_context
         try:
             service.state_context=foreign
-            with self.assertRaisesRegex(ValueError,"exact wire context/device"):preparer.prepare(routes,state)
+            with self.assertRaisesRegex(ValueError,"exact wire context/device"):preparer.prepare(routes,state,implementation=self.strategy)
         finally:service.state_context=previous
-        self.prepared_equal(preparer.prepare(routes,state),routes.prepare(state,implementation="reference"))
+        self.prepared_equal(preparer.prepare(routes,state,implementation=self.strategy),routes.prepare(state,implementation="reference"))
 
     def test_fused_hot_path_has_one_allocation_no_host_reads_or_reference_dispatch(self):
         state,routes=self.setup();expected=routes.prepare(state,implementation="reference")
-        routes.prepare(state,implementation="fused");torch.mps.synchronize()
+        routes.prepare(state,implementation=self.strategy);torch.mps.synchronize()
         original_empty=torch.empty;calls=[]
         def allocate(*args,**kwargs):calls.append(args);return original_empty(*args,**kwargs)
         fail=AssertionError("Host read or reference preparation dispatch forbidden")
@@ -162,7 +164,7 @@ class FusedPreparationBoundaryTests(_BoundedMPS,_PreparedAssertions,unittest.Tes
              patch.object(torch.Tensor,"item",side_effect=fail),patch.object(torch.Tensor,"tolist",side_effect=fail),\
              patch.object(torch.Tensor,"__bool__",side_effect=fail),patch.object(routes.relations_context,"compute",side_effect=fail),\
              patch.object(routes.declaration_context,"compute",side_effect=fail):
-            actual=routes.prepare(replace(state),implementation="fused")
+            actual=routes.prepare(replace(state),implementation=self.strategy)
         self.assertEqual(len(calls),1,"One contiguous result allocation, without intermediate table allocations")
         reference=routes.prepare(actual.source,implementation="reference");self.prepared_equal(actual,reference)
 

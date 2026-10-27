@@ -44,7 +44,7 @@ class RouteConfig(StateConfig):
     def __post_init__(self):
         super().__post_init__()
         require(self.devices == ("mps",), "Routes require explicit Apple MPS; no CPU fallback")
-        require(self.preparation_implementation in {"reference", "fused"}, "Choose reference or fused route preparation")
+        require(self.preparation_implementation in {"reference", "fused", "fused_indexed"}, "Choose reference, fused or fused_indexed route preparation")
 
 
 def provenance():
@@ -248,6 +248,7 @@ def worker(config, device, progress, deadline):
                                   native_routes.edge_array(), controlled, menu)
         host_request_seconds = time.perf_counter() - before
         reference = DeviceStateBatch.capture([raw.clone()], device="cpu")
+        active_string_ids=source.context.string_count+int(source.suffix_usage.cpu().tolist()[0])
         one, host_pack_upload_seconds = timed(lambda: kernel.pack_requests(source, rows), gpu=True)
         require(one.metadata.shape[0] == len(rows), "Host request packing truncated choices")
         for size in config.batch_sizes:
@@ -274,6 +275,10 @@ def worker(config, device, progress, deadline):
             reused, cold_reused = timed(lambda: kernel.query(resident, requests, prepared=prepared), gpu=True)
             case = {"position": fixture["label"], "seed": fixture["seed"], "lanes": size,
                     "clock": snapshot["clock"], "queries_per_lane": len(rows), "queries": len(expanded),
+                    "preparation_work_per_lane": {"unit_entries": len(snapshot["units"]), "territory_entries": len(snapshot["territories"]),
+                        "active_sid_slots": active_string_ids, "allocated_sid_slots": kernel._dims(resident)[9],
+                        "unused_sid_capacity": kernel._dims(resident)[9]-active_string_ids,
+                        "nonunit_active_sids": active_string_ids-len(snapshot["units"])},
                     "request_sha256": digest(expanded), "one_lane_requests_sha256": digest(rows),
                     "native_checkpoint_sha256": hashlib.sha256(original.encode()).hexdigest(),
                     "native_context_seconds": context_seconds, "native_capture_seconds": capture_seconds,
@@ -364,7 +369,7 @@ def main(argv=None):
     parser.add_argument("--batch-sizes", nargs="+", type=int, default=(1, 4, 16, 64))
     parser.add_argument("--repeats", type=int, default=5); parser.add_argument("--seconds", type=float, default=180)
     parser.add_argument("--memory-bytes", type=int, default=8_000_000_000)
-    parser.add_argument("--preparation-implementation", choices=("reference", "fused"), default="reference")
+    parser.add_argument("--preparation-implementation", choices=("reference", "fused", "fused_indexed"), default="reference")
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", choices=("mps",), help=argparse.SUPPRESS)
     parser.add_argument("--_deadline", type=float, help=argparse.SUPPRESS)
