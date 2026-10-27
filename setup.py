@@ -32,6 +32,7 @@ ext_modules = [
             "src/movement_context.cpp",
             "src/catalog_stats_context.cpp",
             "src/recruitment_context.cpp",
+            "src/political_facts_context.cpp",
             "src/economy_lendlease.cpp",
             "src/land_combat.cpp",
             "src/air.cpp",

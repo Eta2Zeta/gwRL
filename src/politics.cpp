@@ -330,23 +330,46 @@ void requestPoliticalRoll(State& s,const Id& nation,const Id& kind,int sides,V p
 const V& pendingPolitical(const State& s,const Id& continuation) {return s.politics.pending.at(continuation);}
 void erasePoliticalContinuation(State& s,const Id& continuation) {s.politics.pending.erase(continuation);}
 
-void refreshPoliticalState(State& s) {
+void refreshPoliticalPossessionFlags(State& s) {
     for(auto& [id,n]:s.nations) {
         int total=0;for(const auto& zone:possessedLand(s,id))total+=effectiveTerritorialIpp(s,zone);
         n.gameFlags["possessed_land_ipp"]=total;
     }
+}
+void refreshPoliticalCivilWarFlag(State& s,const Id& nation) {
+    s.nations.at(nation).gameFlags["civil_war_eliminated"]=hasUnits(s,nation)?0:1;
+}
+bool markPoliticalEvolutionIfDue(State& s,const Id& nation) {
+    auto& n=s.nations.at(nation);
+    if(n.powerStatus=="major"||s.politics.surrendered.contains(nation))return false;
+    int total=0;for(const auto& zone:possessedLand(s,nation))total+=effectiveTerritorialIpp(s,zone);
+    if(total<13)return false;
+    n.powerStatus="major";
+    require(s.clock.playerTurnSerial<=static_cast<std::uint64_t>(std::numeric_limits<int>::max()),"Evolution turn counter overflow");
+    n.gameFlags["evolved_turn_serial"]=static_cast<int>(s.clock.playerTurnSerial);
+    n.gameFlags["evolved_during_own_turn"]=s.currentNation()==nation;
+    n.gameFlags["objective_evolution"]=1;
+    return true;
+}
+void refreshPoliticalOneChinaObjective(State& s) {
+    if(s.nations.contains("ccp")&&s.nations.contains("kmt")) {
+        bool objective=true;
+        for(const auto& zone:possessedLand(s,"kmt"))if(chineseHomeCountry(s,zone)&&zone!="land_hainan"&&zone!="land_formosa")objective=false;
+        s.nations.at("ccp").gameFlags["objective_one_china"]=objective;
+    }
+}
+void refreshPoliticalAllies(State& s) {
+    for(auto& [id,n]:s.nations)n.allies.clear();
+    for(auto& [id,n]:s.nations) {
+        for(const auto& [other,m]:s.nations)if(id!=other&&politicallyFriendly(s,id,other))n.allies.insert(other);
+    }
+}
+void refreshPoliticalState(State& s) {
+    refreshPoliticalPossessionFlags(s);
     for(const auto& nation:{"ccp","kmt"}) {
         if(!s.nations.contains(nation))continue;
-        auto& n=s.nations.at(nation);
-        n.gameFlags["civil_war_eliminated"]=hasUnits(s,nation)?0:1;
-        if(n.powerStatus=="major"||s.politics.surrendered.contains(nation))continue;
-        int total=0;for(const auto& zone:possessedLand(s,nation))total+=effectiveTerritorialIpp(s,zone);
-        if(total<13)continue;
-        n.powerStatus="major";
-        require(s.clock.playerTurnSerial<=static_cast<std::uint64_t>(std::numeric_limits<int>::max()),"Evolution turn counter overflow");
-        n.gameFlags["evolved_turn_serial"]=static_cast<int>(s.clock.playerTurnSerial);
-        n.gameFlags["evolved_during_own_turn"]=s.currentNation()==nation;
-        n.gameFlags["objective_evolution"]=1;
+        refreshPoliticalCivilWarFlag(s,nation);
+        if(!markPoliticalEvolutionIfDue(s,nation))continue;
         refreshPoliticalUnitMovement(s,nation);
         if(s.politics.chineseTruce)terminateChineseTruce(s,nation,true);
         chooseEvolution(s,nation);
@@ -355,16 +378,9 @@ void refreshPoliticalState(State& s) {
         const auto* invader=s.politics.pending.contains("last_conqueror_kmt")?&s.politics.pending.at("last_conqueror_kmt"):nullptr;
         surrenderNation(s,"kmt",invader?invader->asString():s.currentNation());
     }
-    if(s.nations.contains("ccp")&&s.nations.contains("kmt")) {
-        bool objective=true;
-        for(const auto& zone:possessedLand(s,"kmt"))if(chineseHomeCountry(s,zone)&&zone!="land_hainan"&&zone!="land_formosa")objective=false;
-        s.nations.at("ccp").gameFlags["objective_one_china"]=objective;
-    }
+    refreshPoliticalOneChinaObjective(s);
     queueObjectiveBonus(s);
-    for(auto& [id,n]:s.nations)n.allies.clear();
-    for(auto& [id,n]:s.nations) {
-        for(const auto& [other,m]:s.nations)if(id!=other&&politicallyFriendly(s,id,other))n.allies.insert(other);
-    }
+    refreshPoliticalAllies(s);
 }
 
 void changePossession(State& s,const Id& zone,const Id& recipient,PossessionCause cause,const std::optional<Id>& conqueror) {

@@ -265,7 +265,9 @@ DeviceStateContext::DeviceStateContext(const Engine& engine):definition(engine.s
             "cavalry","infantry","axis","politics_sequence",
             "politics_evolution","politics_choose_capital","factory","evolution_pending_ccp","evolution_pending_kmt",
             "awaiting_combat_rules","chinese_truce_termination","truce_low_morale_eliminates","immediate_land_battles",
-            "round","origins","land_entry_origins","truce_breaker","combat_move","airborne_assault","amphibious_assault"})pool.intern(text);
+            "round","origins","land_entry_origins","truce_breaker","combat_move","airborne_assault","amphibious_assault",
+            "possessed_land_ipp","civil_war_eliminated","objective_one_china","evolved_turn_serial","evolved_during_own_turn",
+            "objective_evolution","major","city_ipp_lost","city_damage"})pool.intern(text);
     stringIds=pool.index;
     flattenStrings(strings,stringBytes,stringOffsets);
     wireContextFingerprint=wireFingerprint(*this);

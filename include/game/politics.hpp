@@ -44,6 +44,12 @@ void recordLandAttack(State&, const Id& attacker, const Id& zone);
 void surrenderNation(State&, const Id& nation, const Id& attacker);
 // The surrender-time One China entitlement queues completed build projects.
 void queuePoliticalObjectiveBonus(State&);
+// Exact ordered refresh blocks; downstream hooks remain in refreshPoliticalState.
+void refreshPoliticalPossessionFlags(State&);
+void refreshPoliticalCivilWarFlag(State&, const Id& nation);
+bool markPoliticalEvolutionIfDue(State&, const Id& nation);
+void refreshPoliticalOneChinaObjective(State&);
+void refreshPoliticalAllies(State&);
 // Same evolution-choice helper used by refresh, exposed for raw diagnostics.
 void queuePoliticalEvolutionChoice(State&, const Id& nation);
 
