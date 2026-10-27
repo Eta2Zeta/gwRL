@@ -160,26 +160,32 @@ def _call(kernel, args, count, *, group_size=None):
         else:kernel(*arguments, threads=count, group_size=group_size)
 
 
+def _inputs(formatter, state, byte_capacity):
+    """Shared metadata-only contract for the two parallel serializers."""
+    state._metadata();_device(state.device)
+    if state.context is not formatter.state_context:raise ValueError("State JSON context must match the exact resident state context")
+    if type(byte_capacity) is not int or byte_capacity < 0:raise ValueError("State JSON byte capacity must be a nonnegative integer")
+    B,K = state.records.shape[:2];C = byte_capacity;context = formatter.number_context
+    if B > (1 << 32)-1 or B*max(K,C,1)*5 > (1 << 63)-1:raise OverflowError("State JSON allocation cannot be represented")
+    inputs = (state.records,state.lengths,state.errors,state.context.string_bytes,state.context.string_offsets,
+        state.string_bytes,state.string_offsets,state.suffix_usage,context.words,context.offsets,context.bytes)
+    if any(not value.is_contiguous() or value.device != state.device for value in inputs):
+        raise ValueError("State JSON inputs must remain resident and contiguous")
+    if (state.context.string_bytes.dtype != torch.uint8 or state.context.string_bytes.ndim != 1 or
+        state.context.string_offsets.dtype != torch.int64 or state.context.string_offsets.shape != (state.context.string_count+1,)):
+        raise ValueError("State JSON static string arena layout differs")
+    if (context.words.dtype != torch.int64 or context.words.ndim != 2 or context.words.shape[1] != 2 or
+        context.offsets.dtype != torch.int64 or context.offsets.shape != (context.words.shape[0]+1,) or
+        context.bytes.dtype != torch.uint8 or context.bytes.ndim != 1):
+        raise ValueError("State JSON number arena layout differs")
+    return B,K,C,context,inputs
+
+
 class ParallelUnitStateJson(ResidentStateJson):
     def serialize(self, state, *, byte_capacity):
         # Keep the original host-side contract. The kernels below change only
         # scheduling/output allocation; neither mutable state nor fields change.
-        state._metadata();_device(state.device)
-        if state.context is not self.state_context:raise ValueError("State JSON context must match the exact resident state context")
-        if type(byte_capacity) is not int or byte_capacity < 0:raise ValueError("State JSON byte capacity must be a nonnegative integer")
-        B,K = state.records.shape[:2];C = byte_capacity;context = self.number_context
-        if B > (1 << 32)-1 or B*max(K,C,1)*5 > (1 << 63)-1:raise OverflowError("State JSON allocation cannot be represented")
-        inputs = (state.records,state.lengths,state.errors,state.context.string_bytes,state.context.string_offsets,
-            state.string_bytes,state.string_offsets,state.suffix_usage,context.words,context.offsets,context.bytes)
-        if any(not value.is_contiguous() or value.device != state.device for value in inputs):
-            raise ValueError("State JSON inputs must remain resident and contiguous")
-        if (state.context.string_bytes.dtype != torch.uint8 or state.context.string_bytes.ndim != 1 or
-            state.context.string_offsets.dtype != torch.int64 or state.context.string_offsets.shape != (state.context.string_count+1,)):
-            raise ValueError("State JSON static string arena layout differs")
-        if (context.words.dtype != torch.int64 or context.words.ndim != 2 or context.words.shape[1] != 2 or
-            context.offsets.dtype != torch.int64 or context.offsets.shape != (context.words.shape[0]+1,) or
-            context.bytes.dtype != torch.uint8 or context.bytes.ndim != 1):
-            raise ValueError("State JSON number arena layout differs")
+        B,K,C,context,inputs = _inputs(self,state,byte_capacity)
         U = max(K//16,1)  # A map key plus UnitState14 needs at least16 records.
         if B*U > (1 << 32)-1:raise OverflowError("Unit JSON grid cannot be represented; no entries truncated")
         data = torch.zeros((B,C),dtype=torch.uint8,device=state.device)
