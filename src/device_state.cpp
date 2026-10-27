@@ -268,10 +268,18 @@ DeviceStateBatch::DeviceStateBatch(std::shared_ptr<const DeviceStateContext> c):
     require(context!=nullptr,"Absent device state context");
 }
 void DeviceStateBatch::append(const Engine& engine) {
+    appendFrame(engine.state(),engine);
+}
+void DeviceStateBatch::appendDiagnosticState(const State& state,const Engine& executionSource) {
+    appendFrame(state,executionSource);
+}
+void DeviceStateBatch::appendFrame(const State& state,const Engine& engine) {
     require(engine.rulesId()==context->rulesId&&engine.state().definition->fingerprint==context->definitionFingerprint,
             "Device state definition/rules mismatch");
+    require(state.definition&&state.definition->fingerprint==context->definitionFingerprint,
+            "Diagnostic device state definition mismatch");
     const auto start=records.size();Pool pool(context->strings,strings);Writer writer{records,pool};
-    writer.tuple(std::tie(engine.state(),DeviceStateAccess::random(engine)));
+    writer.tuple(std::tie(state,DeviceStateAccess::random(engine)));
     for(std::size_t i=start;i<records.size();++i)records[i][4]-=count(start);
     const auto length=records.size()-start;auto indexes=::game::campaign::sections(records.data()+start,length);
     sections.insert(sections.end(),indexes.begin(),indexes.end());laneOffsets.push_back(count(records.size()));

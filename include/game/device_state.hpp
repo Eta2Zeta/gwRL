@@ -44,6 +44,9 @@ struct DeviceStateBatch {
     std::size_t maxLaneRecords {0};
     explicit DeviceStateBatch(std::shared_ptr<const DeviceStateContext>);
     void append(const Engine&);
+    // Explicit diagnostic override: encode an original helper's typed State
+    // before outer validation, preserving this Engine's execution RNG verbatim.
+    void appendDiagnosticState(const State&, const Engine& executionSource);
     std::size_t rows() const { return laneOffsets.size() - 1; }
     Engine restore(std::size_t lane) const;
     void validate() const;
@@ -53,5 +56,7 @@ struct DeviceStateBatch {
         std::vector<std::uint8_t> bytes, std::vector<std::int64_t> stringOffsets,
         const std::string& expectedWireContextFingerprint);
     static const std::vector<std::string>& sectionNames();
+  private:
+    void appendFrame(const State&, const Engine& executionSource);
 };
 } // namespace game::campaign
