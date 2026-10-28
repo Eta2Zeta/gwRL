@@ -1,0 +1,841 @@
+{
+ "schema": "gwrl-move-generation-v1",
+ "date": "2026-10-28",
+ "workload": {
+  "games": 8,
+  "seeds": [
+   1951,
+   1952,
+   1953,
+   1954,
+   1955,
+   1956,
+   1957,
+   1958
+  ],
+  "calendar_rounds": 11,
+  "max_decisions": 3000,
+  "policy": "seeded uniform choice; end phase 5% more often",
+  "parallel_processes": 8,
+  "measured": "raw legal actions and interrupts per decision position"
+ },
+ "runs": {
+  "reference": {
+   "positions": 11161,
+   "menu_seconds": 184.68,
+   "ms_per_position": 16.547,
+   "by_decision_kind": {
+    "combat_movement": {
+     "positions": 3922,
+     "ms_each": 37.301
+    },
+    "non_combat_movement": {
+     "positions": 1910,
+     "ms_each": 17.53
+    },
+    "production": {
+     "positions": 1161,
+     "ms_each": 2.219
+    },
+    "combat": {
+     "positions": 1079,
+     "ms_each": 1.634
+    },
+    "place_units": {
+     "positions": 776,
+     "ms_each": 0.504
+    },
+    "naval_force_selection": {
+     "positions": 1579,
+     "ms_each": 0.098
+    },
+    "land_casualty": {
+     "positions": 281,
+     "ms_each": 0.034
+    },
+    "land_retreat_or_continue": {
+     "positions": 155,
+     "ms_each": 0.028
+    },
+    "naval_shore_selection": {
+     "positions": 88,
+     "ms_each": 0.036
+    },
+    "land_retreat_destination": {
+     "positions": 100,
+     "ms_each": 0.023
+    },
+    "recruitment_choice": {
+     "positions": 26,
+     "ms_each": 0.067
+    },
+    "air_landing": {
+     "positions": 18,
+     "ms_each": 0.037
+    },
+    "politics_evolution": {
+     "positions": 7,
+     "ms_each": 0.092
+    },
+    "economy_rail_permission": {
+     "positions": 7,
+     "ms_each": 0.083
+    },
+    "naval_strategic_pickup": {
+     "positions": 4,
+     "ms_each": 0.108
+    },
+    "politics_chinese_liberation": {
+     "positions": 13,
+     "ms_each": 0.025
+    },
+    "air_scramble": {
+     "positions": 2,
+     "ms_each": 0.106
+    },
+    "naval_shore_casualty": {
+     "positions": 8,
+     "ms_each": 0.023
+    },
+    "air_ground_or_defend": {
+     "positions": 9,
+     "ms_each": 0.019
+    },
+    "land_artillery_pairing": {
+     "positions": 4,
+     "ms_each": 0.025
+    },
+    "politics_declaration_priority": {
+     "positions": 11,
+     "ms_each": 0.008
+    },
+    "naval_casualty": {
+     "positions": 1,
+     "ms_each": 0.061
+    }
+   },
+   "games": [
+    {
+     "seed": 1951,
+     "positions": 1617,
+     "completed_rounds": 11,
+     "menu_seconds": 27.495,
+     "error": null,
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1952,
+     "positions": 1528,
+     "completed_rounds": 11,
+     "menu_seconds": 31.027,
+     "error": null,
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1953,
+     "positions": 1476,
+     "completed_rounds": 11,
+     "menu_seconds": 19.321,
+     "error": null,
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1954,
+     "positions": 1586,
+     "completed_rounds": 11,
+     "menu_seconds": 34.601,
+     "error": null,
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1955,
+     "positions": 561,
+     "completed_rounds": 3,
+     "menu_seconds": 4.655,
+     "error": "Landing beyond range",
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1956,
+     "positions": 1603,
+     "completed_rounds": 11,
+     "menu_seconds": 28.655,
+     "error": null,
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1957,
+     "positions": 1606,
+     "completed_rounds": 11,
+     "menu_seconds": 24.022,
+     "error": null,
+     "identical_to_reference": null
+    },
+    {
+     "seed": 1958,
+     "positions": 1184,
+     "completed_rounds": 11,
+     "menu_seconds": 14.907,
+     "error": null,
+     "identical_to_reference": null
+    }
+   ]
+  },
+  "round1": {
+   "positions": 11161,
+   "menu_seconds": 54.33,
+   "ms_per_position": 4.868,
+   "by_decision_kind": {
+    "combat_movement": {
+     "positions": 3922,
+     "ms_each": 9.663
+    },
+    "non_combat_movement": {
+     "positions": 1910,
+     "ms_each": 6.384
+    },
+    "combat": {
+     "positions": 1079,
+     "ms_each": 1.805
+    },
+    "production": {
+     "positions": 1161,
+     "ms_each": 1.525
+    },
+    "place_units": {
+     "positions": 776,
+     "ms_each": 0.397
+    },
+    "naval_force_selection": {
+     "positions": 1579,
+     "ms_each": 0.114
+    },
+    "land_casualty": {
+     "positions": 281,
+     "ms_each": 0.036
+    },
+    "land_retreat_or_continue": {
+     "positions": 155,
+     "ms_each": 0.036
+    },
+    "naval_shore_selection": {
+     "positions": 88,
+     "ms_each": 0.041
+    },
+    "land_retreat_destination": {
+     "positions": 100,
+     "ms_each": 0.023
+    },
+    "recruitment_choice": {
+     "positions": 26,
+     "ms_each": 0.072
+    },
+    "politics_evolution": {
+     "positions": 7,
+     "ms_each": 0.114
+    },
+    "air_landing": {
+     "positions": 18,
+     "ms_each": 0.039
+    },
+    "economy_rail_permission": {
+     "positions": 7,
+     "ms_each": 0.082
+    },
+    "naval_strategic_pickup": {
+     "positions": 4,
+     "ms_each": 0.11
+    },
+    "politics_chinese_liberation": {
+     "positions": 13,
+     "ms_each": 0.026
+    },
+    "naval_shore_casualty": {
+     "positions": 8,
+     "ms_each": 0.026
+    },
+    "air_ground_or_defend": {
+     "positions": 9,
+     "ms_each": 0.021
+    },
+    "air_scramble": {
+     "positions": 2,
+     "ms_each": 0.063
+    },
+    "politics_declaration_priority": {
+     "positions": 11,
+     "ms_each": 0.008
+    },
+    "naval_casualty": {
+     "positions": 1,
+     "ms_each": 0.077
+    },
+    "land_artillery_pairing": {
+     "positions": 4,
+     "ms_each": 0.018
+    }
+   },
+   "games": [
+    {
+     "seed": 1951,
+     "positions": 1617,
+     "completed_rounds": 11,
+     "menu_seconds": 7.167,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1952,
+     "positions": 1528,
+     "completed_rounds": 11,
+     "menu_seconds": 8.701,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1953,
+     "positions": 1476,
+     "completed_rounds": 11,
+     "menu_seconds": 6.899,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1954,
+     "positions": 1586,
+     "completed_rounds": 11,
+     "menu_seconds": 9.128,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1955,
+     "positions": 561,
+     "completed_rounds": 3,
+     "menu_seconds": 1.92,
+     "error": "Landing beyond range",
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1956,
+     "positions": 1603,
+     "completed_rounds": 11,
+     "menu_seconds": 7.801,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1957,
+     "positions": 1606,
+     "completed_rounds": 11,
+     "menu_seconds": 6.722,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1958,
+     "positions": 1184,
+     "completed_rounds": 11,
+     "menu_seconds": 5.989,
+     "error": null,
+     "identical_to_reference": true
+    }
+   ]
+  },
+  "round2": {
+   "positions": 11161,
+   "menu_seconds": 29.31,
+   "ms_per_position": 2.626,
+   "by_decision_kind": {
+    "combat_movement": {
+     "positions": 3922,
+     "ms_each": 5.653
+    },
+    "non_combat_movement": {
+     "positions": 1910,
+     "ms_each": 2.642
+    },
+    "production": {
+     "positions": 1161,
+     "ms_each": 1.259
+    },
+    "place_units": {
+     "positions": 776,
+     "ms_each": 0.34
+    },
+    "combat": {
+     "positions": 1079,
+     "ms_each": 0.188
+    },
+    "naval_force_selection": {
+     "positions": 1579,
+     "ms_each": 0.092
+    },
+    "land_casualty": {
+     "positions": 281,
+     "ms_each": 0.031
+    },
+    "land_retreat_or_continue": {
+     "positions": 155,
+     "ms_each": 0.024
+    },
+    "naval_shore_selection": {
+     "positions": 88,
+     "ms_each": 0.034
+    },
+    "land_retreat_destination": {
+     "positions": 100,
+     "ms_each": 0.02
+    },
+    "recruitment_choice": {
+     "positions": 26,
+     "ms_each": 0.063
+    },
+    "politics_evolution": {
+     "positions": 7,
+     "ms_each": 0.086
+    },
+    "economy_rail_permission": {
+     "positions": 7,
+     "ms_each": 0.082
+    },
+    "air_landing": {
+     "positions": 18,
+     "ms_each": 0.031
+    },
+    "naval_strategic_pickup": {
+     "positions": 4,
+     "ms_each": 0.074
+    },
+    "politics_chinese_liberation": {
+     "positions": 13,
+     "ms_each": 0.021
+    },
+    "naval_shore_casualty": {
+     "positions": 8,
+     "ms_each": 0.022
+    },
+    "air_ground_or_defend": {
+     "positions": 9,
+     "ms_each": 0.018
+    },
+    "air_scramble": {
+     "positions": 2,
+     "ms_each": 0.08
+    },
+    "politics_declaration_priority": {
+     "positions": 11,
+     "ms_each": 0.011
+    },
+    "naval_casualty": {
+     "positions": 1,
+     "ms_each": 0.081
+    },
+    "land_artillery_pairing": {
+     "positions": 4,
+     "ms_each": 0.016
+    }
+   },
+   "games": [
+    {
+     "seed": 1951,
+     "positions": 1617,
+     "completed_rounds": 11,
+     "menu_seconds": 4.075,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1952,
+     "positions": 1528,
+     "completed_rounds": 11,
+     "menu_seconds": 5.127,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1953,
+     "positions": 1476,
+     "completed_rounds": 11,
+     "menu_seconds": 3.525,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1954,
+     "positions": 1586,
+     "completed_rounds": 11,
+     "menu_seconds": 5.159,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1955,
+     "positions": 561,
+     "completed_rounds": 3,
+     "menu_seconds": 1.01,
+     "error": "Landing beyond range",
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1956,
+     "positions": 1603,
+     "completed_rounds": 11,
+     "menu_seconds": 4.127,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1957,
+     "positions": 1606,
+     "completed_rounds": 11,
+     "menu_seconds": 3.31,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1958,
+     "positions": 1184,
+     "completed_rounds": 11,
+     "menu_seconds": 2.981,
+     "error": null,
+     "identical_to_reference": true
+    }
+   ]
+  },
+  "round3": {
+   "positions": 11161,
+   "menu_seconds": 25.14,
+   "ms_per_position": 2.253,
+   "by_decision_kind": {
+    "combat_movement": {
+     "positions": 3922,
+     "ms_each": 4.69
+    },
+    "non_combat_movement": {
+     "positions": 1910,
+     "ms_each": 2.407
+    },
+    "production": {
+     "positions": 1161,
+     "ms_each": 1.304
+    },
+    "place_units": {
+     "positions": 776,
+     "ms_each": 0.346
+    },
+    "combat": {
+     "positions": 1079,
+     "ms_each": 0.191
+    },
+    "naval_force_selection": {
+     "positions": 1579,
+     "ms_each": 0.092
+    },
+    "land_casualty": {
+     "positions": 281,
+     "ms_each": 0.03
+    },
+    "land_retreat_or_continue": {
+     "positions": 155,
+     "ms_each": 0.023
+    },
+    "naval_shore_selection": {
+     "positions": 88,
+     "ms_each": 0.033
+    },
+    "land_retreat_destination": {
+     "positions": 100,
+     "ms_each": 0.019
+    },
+    "recruitment_choice": {
+     "positions": 26,
+     "ms_each": 0.064
+    },
+    "air_landing": {
+     "positions": 18,
+     "ms_each": 0.045
+    },
+    "economy_rail_permission": {
+     "positions": 7,
+     "ms_each": 0.091
+    },
+    "politics_evolution": {
+     "positions": 7,
+     "ms_each": 0.091
+    },
+    "naval_strategic_pickup": {
+     "positions": 4,
+     "ms_each": 0.109
+    },
+    "politics_chinese_liberation": {
+     "positions": 13,
+     "ms_each": 0.024
+    },
+    "naval_shore_casualty": {
+     "positions": 8,
+     "ms_each": 0.022
+    },
+    "air_scramble": {
+     "positions": 2,
+     "ms_each": 0.086
+    },
+    "air_ground_or_defend": {
+     "positions": 9,
+     "ms_each": 0.014
+    },
+    "politics_declaration_priority": {
+     "positions": 11,
+     "ms_each": 0.007
+    },
+    "naval_casualty": {
+     "positions": 1,
+     "ms_each": 0.07
+    },
+    "land_artillery_pairing": {
+     "positions": 4,
+     "ms_each": 0.015
+    }
+   },
+   "games": [
+    {
+     "seed": 1951,
+     "positions": 1617,
+     "completed_rounds": 11,
+     "menu_seconds": 3.375,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1952,
+     "positions": 1528,
+     "completed_rounds": 11,
+     "menu_seconds": 4.313,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1953,
+     "positions": 1476,
+     "completed_rounds": 11,
+     "menu_seconds": 3.056,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1954,
+     "positions": 1586,
+     "completed_rounds": 11,
+     "menu_seconds": 4.367,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1955,
+     "positions": 561,
+     "completed_rounds": 3,
+     "menu_seconds": 0.868,
+     "error": "Landing beyond range",
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1956,
+     "positions": 1603,
+     "completed_rounds": 11,
+     "menu_seconds": 3.651,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1957,
+     "positions": 1606,
+     "completed_rounds": 11,
+     "menu_seconds": 2.838,
+     "error": null,
+     "identical_to_reference": true
+    },
+    {
+     "seed": 1958,
+     "positions": 1184,
+     "completed_rounds": 11,
+     "menu_seconds": 2.677,
+     "error": null,
+     "identical_to_reference": true
+    }
+   ]
+  }
+ },
+ "identical_menus_every_round": true,
+ "rounds": {
+  "round1": "map table, per-position answers, shared event history, fewer probes, one combat path search per aircraft",
+  "round2": "loading pre-check, cached naval allowance, lazy deck capacity, direct state text, copy-free SHA-256, allocation-free require and current nation",
+  "round3": "catalog stats reading flags in place"
+ },
+ "rules_defect": {
+  "seed": 1955,
+  "position": 561,
+  "error": "Landing beyond range",
+  "decision": "air_landing after a naval battle",
+  "unit": "setup_japan_land_jap_tokyo_fighter_1",
+  "state": "maritime air patrol at sea_p14, map_range 1, movement_remaining 0",
+  "offered": [
+   "land_korea",
+   "japan_fleet_carrier_p15_setup_1"
+  ],
+  "cause": "offers use the patrol range (airLandingSpots); applying uses remaining movement (flightPaths)"
+ },
+ "profiles": {
+  "unchanged_selfplay_search_thread": {
+   "legal_actions": 0.3,
+   "engine_step": 0.138,
+   "planning_key": 0.089
+  },
+  "unchanged_menu_generation": {
+   "naval_order_completion": 0.525,
+   "position_copy_create": 0.258,
+   "position_copy_destroy": 0.267,
+   "history_copy_create": 0.186,
+   "history_copy_destroy": 0.189,
+   "landing_plan": 0.164,
+   "naval_allowance": 0.142,
+   "supply_tracing": 0.125,
+   "naval_operations": 0.117
+  },
+  "round3_menu_generation": {
+   "position_copy_create": 0.207,
+   "position_copy_destroy": 0.201,
+   "naval_operations": 0.269,
+   "naval_order_completion": 0.166,
+   "landing_plan": 0.135,
+   "landing_plan_preservation": 0.087
+  }
+ },
+ "selfplay": {
+  "config": {
+   "processes": 10,
+   "seeds": [
+    1951,
+    1952,
+    1953,
+    1954,
+    1955,
+    1956,
+    1957,
+    1958,
+    1959,
+    1960
+   ],
+   "simulations": 64,
+   "max_depth": 16,
+   "calendar_rounds": 3,
+   "hidden_dim": 64,
+   "message_layers": 2,
+   "token_buckets": 16384,
+   "search_evaluation": "per_search",
+   "threads": 1
+  },
+  "baseline_run": "worker_queue_2026_10_28 (same seeds, ten processes, unchanged engine)",
+  "identical_games": 10,
+  "games": 10,
+  "summed_game_seconds": {
+   "before": 8635.6,
+   "after": 6222.5
+  },
+  "per_game_speedup": 1.388,
+  "per_game": [
+   {
+    "seed": 1951,
+    "before_seconds": 774.8,
+    "after_seconds": 587.1,
+    "identical": true
+   },
+   {
+    "seed": 1952,
+    "before_seconds": 1043.3,
+    "after_seconds": 726.8,
+    "identical": true
+   },
+   {
+    "seed": 1953,
+    "before_seconds": 846.2,
+    "after_seconds": 613.1,
+    "identical": true
+   },
+   {
+    "seed": 1954,
+    "before_seconds": 717.1,
+    "after_seconds": 539.8,
+    "identical": true
+   },
+   {
+    "seed": 1955,
+    "before_seconds": 972.2,
+    "after_seconds": 678.1,
+    "identical": true
+   },
+   {
+    "seed": 1956,
+    "before_seconds": 852.7,
+    "after_seconds": 631.6,
+    "identical": true
+   },
+   {
+    "seed": 1957,
+    "before_seconds": 1049.3,
+    "after_seconds": 721.2,
+    "identical": true
+   },
+   {
+    "seed": 1958,
+    "before_seconds": 608.4,
+    "after_seconds": 482.2,
+    "identical": true
+   },
+   {
+    "seed": 1959,
+    "before_seconds": 975.1,
+    "after_seconds": 650.0,
+    "identical": true
+   },
+   {
+    "seed": 1960,
+    "before_seconds": 796.3,
+    "after_seconds": 592.8,
+    "identical": true
+   }
+  ],
+  "timing_seconds_same_seeds": {
+   "before": {
+    "search": 8576.0,
+    "search_outside_evaluator": 4668.3,
+    "synchronized_evaluator": 3907.7,
+    "synchronized_model_forward_including_tensor_preparation_and_transfers": 3281.7,
+    "evaluator_outside_forward": 626.0
+   },
+   "after": {
+    "search": 6166.9,
+    "search_outside_evaluator": 1791.0,
+    "synchronized_evaluator": 4375.9,
+    "synchronized_model_forward_including_tensor_preparation_and_transfers": 3703.6,
+    "evaluator_outside_forward": 672.3
+   }
+  },
+  "after_wall_seconds_ten_games": 726.9,
+  "after_complete_games_per_hour_ten_games": 49.52,
+  "peak_charged_bytes": {
+   "before_thirty_game_run": 10167929304,
+   "after_ten_game_run": 8485832912
+  }
+ },
+ "provenance": {
+  "code_commit": "980d29f70fe2a2079656da6f0d0dc7d29a417481",
+  "native_sha256": "ffc889be65549eeaafe8af1e27eaadb028c40eb13651b41607cf28853074c78f",
+  "sources_unchanged": true,
+  "reference_engine_commit": "615e41d",
+  "raw_artifacts": "studies/campaign/runs/move-generation-2026-10-28"
+ },
+ "tests": {
+  "cpp_programs_passed": 26,
+  "python": "553 of 554 passed; the deadline-guardian test timed out at 5 s under full-suite load and passes alone"
+ }
+}
