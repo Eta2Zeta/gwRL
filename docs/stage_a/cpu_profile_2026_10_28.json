@@ -1,0 +1,486 @@
+{
+  "baseline": {
+    "average_busy_cores_whole_process": 1.641,
+    "cohort_wall_seconds": 303.67815354204504,
+    "forward_batch_sizes": {
+      "1": 5719,
+      "2": 3284,
+      "3": 1324,
+      "4": 579
+    },
+    "games": [
+      {
+        "chance_events": 34,
+        "decisions": 318,
+        "seed": 1951,
+        "transitions": 352
+      },
+      {
+        "chance_events": 31,
+        "decisions": 264,
+        "seed": 1952,
+        "transitions": 295
+      },
+      {
+        "chance_events": 42,
+        "decisions": 215,
+        "seed": 1953,
+        "transitions": 257
+      },
+      {
+        "chance_events": 29,
+        "decisions": 304,
+        "seed": 1954,
+        "transitions": 333
+      }
+    ],
+    "matches_2026_10_26_reference_game_counts": true,
+    "max_rss_bytes": 1093255168,
+    "process_real_user_sys_seconds": [
+      311.82,
+      452.4,
+      59.44
+    ],
+    "reference_2026_10_26": {
+      "cohort_wall_seconds": 294.9511152920022,
+      "timing_seconds": {
+        "actual_rules_execution": 2.672349373839097,
+        "driver_audit_and_reporting": 3.880698453838704,
+        "evaluator_outside_forward": 31.54226632625796,
+        "search": 288.3980674643244,
+        "search_outside_evaluator": 187.15519322323962,
+        "synchronized_evaluator": 101.24287424108479,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 69.70060791482683
+      }
+    },
+    "timing_seconds": {
+      "actual_rules_execution": 2.8191300150356255,
+      "driver_audit_and_reporting": 4.005627240403555,
+      "evaluator_outside_forward": 32.61886756925378,
+      "search": 296.85339628660586,
+      "search_outside_evaluator": 191.0537812418188,
+      "synchronized_evaluator": 105.79961504478706,
+      "synchronized_model_forward_including_tensor_preparation_and_transfers": 73.18074747553328
+    }
+  },
+  "boundary_timers": {
+    "average_busy_cores": 1.4849716535435762,
+    "inference_requests": 18571,
+    "process_cpu_seconds": 469.777703,
+    "status": "completed",
+    "timers": {
+      "adapter._decision_cache": {
+        "calls": 373342,
+        "histogram_le_seconds": {
+          "0.001": 373338,
+          "0.005": 3,
+          "0.02": 1,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 0.0034832075748421946,
+        "seconds": 1.3004276824067347
+      },
+      "adapter._legal_actions": {
+        "calls": 72953,
+        "histogram_le_seconds": {
+          "0.001": 52530,
+          "0.005": 12200,
+          "0.02": 3632,
+          "0.05": 4148,
+          "0.1": 415,
+          "inf": 28
+        },
+        "mean_ms": 3.204960867390001,
+        "seconds": 233.81151015870273
+      },
+      "adapter.apply_action": {
+        "calls": 35677,
+        "histogram_le_seconds": {
+          "0.001": 1897,
+          "0.005": 28905,
+          "0.02": 3511,
+          "0.05": 1236,
+          "0.1": 127,
+          "inf": 1
+        },
+        "mean_ms": 3.845993262797096,
+        "seconds": 137.213501636812
+      },
+      "adapter.clone_for_search": {
+        "calls": 17616,
+        "histogram_le_seconds": {
+          "0.001": 17087,
+          "0.005": 524,
+          "0.02": 1,
+          "0.05": 1,
+          "0.1": 3,
+          "inf": 0
+        },
+        "mean_ms": 0.5266254074814919,
+        "seconds": 9.27703317819396
+      },
+      "adapter.neural_observation": {
+        "calls": 148,
+        "histogram_le_seconds": {
+          "0.001": 22,
+          "0.005": 83,
+          "0.02": 17,
+          "0.05": 21,
+          "0.1": 5,
+          "inf": 0
+        },
+        "mean_ms": 9.191357013470544,
+        "seconds": 1.3603208379936405
+      },
+      "adapter.numeric_input": {
+        "calls": 18575,
+        "histogram_le_seconds": {
+          "0.001": 1218,
+          "0.005": 17320,
+          "0.02": 33,
+          "0.05": 3,
+          "0.1": 1,
+          "inf": 0
+        },
+        "mean_ms": 1.6797687878147831,
+        "seconds": 31.201705233659595
+      },
+      "adapter.planning_key": {
+        "calls": 74381,
+        "histogram_le_seconds": {
+          "0.001": 74381,
+          "0.005": 0,
+          "0.02": 0,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 0.008349097540914086,
+        "seconds": 0.6210142241907306
+      },
+      "native.apply_action": {
+        "calls": 35330,
+        "histogram_le_seconds": {
+          "0.001": 3722,
+          "0.005": 29414,
+          "0.02": 2154,
+          "0.05": 4,
+          "0.1": 36,
+          "inf": 0
+        },
+        "mean_ms": 1.966099694693878,
+        "seconds": 69.46230221353471
+      },
+      "native.clone_for_search": {
+        "calls": 17616,
+        "histogram_le_seconds": {
+          "0.001": 17122,
+          "0.005": 489,
+          "0.02": 1,
+          "0.05": 1,
+          "0.1": 3,
+          "inf": 0
+        },
+        "mean_ms": 0.5098129022090861,
+        "seconds": 8.980864085315261
+      },
+      "native.legal_actions": {
+        "calls": 35311,
+        "histogram_le_seconds": {
+          "0.001": 14989,
+          "0.005": 12751,
+          "0.02": 3047,
+          "0.05": 4117,
+          "0.1": 381,
+          "inf": 26
+        },
+        "mean_ms": 6.438075173388925,
+        "seconds": 227.33487244753633
+      },
+      "native.legal_interrupts": {
+        "calls": 29024,
+        "histogram_le_seconds": {
+          "0.001": 29024,
+          "0.005": 0,
+          "0.02": 0,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 0.018733139271939547,
+        "seconds": 0.5437106342287734
+      },
+      "native.numeric_observation": {
+        "calls": 18571,
+        "histogram_le_seconds": {
+          "0.001": 12459,
+          "0.005": 6112,
+          "0.02": 0,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 0.9281161018300923,
+        "seconds": 17.236044127086643
+      },
+      "native.observation": {
+        "calls": 126,
+        "histogram_le_seconds": {
+          "0.001": 3,
+          "0.005": 84,
+          "0.02": 15,
+          "0.05": 21,
+          "0.1": 3,
+          "inf": 0
+        },
+        "mean_ms": 9.16043582967379,
+        "seconds": 1.1542149145388976
+      },
+      "native.planning_key": {
+        "calls": 524618,
+        "histogram_le_seconds": {
+          "0.001": 524615,
+          "0.005": 2,
+          "0.02": 1,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 0.0011237481533899552,
+        "seconds": 0.5895385087351315
+      },
+      "native.resolve_chance": {
+        "calls": 6096,
+        "histogram_le_seconds": {
+          "0.001": 1189,
+          "0.005": 4903,
+          "0.02": 4,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 1.298545192313879,
+        "seconds": 7.915931492345408
+      },
+      "worker.search_total": {
+        "calls": 1101,
+        "histogram_le_seconds": {
+          "0.001": 0,
+          "0.005": 0,
+          "0.02": 0,
+          "0.05": 2,
+          "0.1": 3,
+          "inf": 1096
+        },
+        "mean_ms": 914.0541604328832,
+        "seconds": 1006.3736306366045
+      },
+      "worker.wait_for_evaluation": {
+        "calls": 18571,
+        "histogram_le_seconds": {
+          "0.001": 0,
+          "0.005": 226,
+          "0.02": 5649,
+          "0.05": 8411,
+          "0.1": 3526,
+          "inf": 759
+        },
+        "mean_ms": 36.71590445669789,
+        "seconds": 681.8510616653366
+      }
+    },
+    "timing_seconds": {
+      "actual_rules_execution": 2.845079406746663,
+      "driver_audit_and_reporting": 4.005249714828096,
+      "evaluator_outside_forward": 33.18432011810364,
+      "search": 302.59747537842486,
+      "search_outside_evaluator": 193.88607790449169,
+      "synchronized_evaluator": 108.71139747393318,
+      "synchronized_model_forward_including_tensor_preparation_and_transfers": 75.52707735582953
+    },
+    "wall_seconds": 316.3546602919814
+  },
+  "date": "2026-10-28",
+  "native_samples": {
+    "apply": {
+      "inclusive_share_top_game_functions": {
+        "CampaignEnv::applyAction": 0.9045,
+        "Engine::Engine": 0.0317,
+        "Engine::step": 0.5148,
+        "NavalRules::apply": 0.1481,
+        "PoliticsRules::apply": 0.174,
+        "PoliticsRules::applyImpl": 0.1617,
+        "State::planningKey": 0.2266,
+        "State::toJson": 0.0517,
+        "applyNavalMovementAction": 0.148,
+        "contentDigest": 0.1092,
+        "forwardNavalOrderDecision": 0.0727,
+        "validateNavalRoute": 0.0341
+      },
+      "loop": {
+        "iterations": 20822,
+        "menu": 302,
+        "ms_per_iteration": 1.4407837863797905
+      },
+      "samples": 10983,
+      "self_time_share": {
+        "JSON building and lookup": 0.1134,
+        "SHA-256 state fingerprint": 0.1099,
+        "game rule code": 0.0529,
+        "memory allocation and freeing": 0.4762,
+        "memory copying and clearing": 0.0691,
+        "other": 0.021,
+        "std::map and std::set operations": 0.0756,
+        "string comparison": 0.0819
+      }
+    },
+    "legal": {
+      "inclusive_share_top_game_functions": {
+        "AirRules::actions": 0.1042,
+        "Engine::actionMenu": 0.969,
+        "Engine::legalActions": 0.9883,
+        "LandCombatRules::actions": 0.4618,
+        "MovementRules::actions": 0.7653,
+        "NavalRules::actions": 0.4621,
+        "PoliticsRules::actions": 0.7707,
+        "airLandingPlanAvailable": 0.0432,
+        "forwardNavalOrderActions": 0.125,
+        "navalMovementActions": 0.0546,
+        "navalOperationActions": 0.0918,
+        "validateNavalRoute": 0.0478
+      },
+      "loop": {
+        "iterations": 758,
+        "menu": 302,
+        "ms_per_iteration": 39.577836411609496
+      },
+      "samples": 10822,
+      "self_time_share": {
+        "JSON building and lookup": 0.0318,
+        "SHA-256 state fingerprint": 0.008,
+        "game rule code": 0.1483,
+        "memory allocation and freeing": 0.4872,
+        "memory copying and clearing": 0.0639,
+        "other": 0.0357,
+        "std::map and std::set operations": 0.0549,
+        "string comparison": 0.1703
+      }
+    }
+  },
+  "provenance": {
+    "branch": "gpu-keepers",
+    "commit": "76928512ab8fbb9d7d35ab6473dd301a4e78315b",
+    "cores": {
+      "efficiency": 4,
+      "performance": 10,
+      "total": 14
+    },
+    "device_harness_sha256": "f3315789b0b8d57bfd76e58b18594ea70eb7fed42b368cd440259a2dc681ff41",
+    "machine": "Apple M4 Max",
+    "native_sha256": "3c6f1c2a117b5ac81133b3cf2b53083987c2fc0851a76449c8baaf5ed196a925",
+    "python": "3.13.5",
+    "raw_artifacts": "studies/campaign/runs/cpu-profile-2026-10-28",
+    "scripts_sha256": {
+      "legal_loop.py": "b4d799ba8667efe425f8a1307cffbc4e070485c3c6de50bb3f91f40d22ec06d4",
+      "scale_native.py": "f62756815d3a2b26b59c38b8cc9955320775f2814dac0a49f05e6c0baabd022d",
+      "time_selfplay.py": "5b8a83ae8c6ee7d17c6bb6ae20da7266a6e0a37a2c52d6534527df8360b2bc5f"
+    },
+    "torch": "2.11.0"
+  },
+  "schema": "gwrl-cpu-selfplay-profile-v1",
+  "thread_scaling": [
+    {
+      "root_kind": "combat_movement",
+      "root_legal_actions": 302,
+      "root_player": "axis"
+    },
+    {
+      "single_thread_costs": {
+        "clone_for_search_ms": 0.13246250164229423,
+        "clone_plus_apply_ms": 0.9725437499582767,
+        "legal_actions_new_state_ms": 34.865497951977886,
+        "legal_actions_repeat_ms": 0.11635834816843271,
+        "planning_key_first_call_ms": 0.002410399611108005
+      }
+    },
+    {
+      "ops_per_second": 820.8,
+      "speedup": 1.0,
+      "threads": 1,
+      "variant": "clone_apply"
+    },
+    {
+      "ops_per_second": 1600.72,
+      "speedup": 1.95,
+      "threads": 2,
+      "variant": "clone_apply"
+    },
+    {
+      "ops_per_second": 2869.63,
+      "speedup": 3.5,
+      "threads": 4,
+      "variant": "clone_apply"
+    },
+    {
+      "ops_per_second": 3827.66,
+      "speedup": 4.66,
+      "threads": 8,
+      "variant": "clone_apply"
+    },
+    {
+      "ops_per_second": 3188.87,
+      "speedup": 3.89,
+      "threads": 10,
+      "variant": "clone_apply"
+    },
+    {
+      "ops_per_second": 26.52,
+      "speedup": 1.0,
+      "threads": 1,
+      "variant": "expand"
+    },
+    {
+      "ops_per_second": 54.05,
+      "speedup": 2.04,
+      "threads": 2,
+      "variant": "expand"
+    },
+    {
+      "ops_per_second": 107.7,
+      "speedup": 4.06,
+      "threads": 4,
+      "variant": "expand"
+    },
+    {
+      "ops_per_second": 203.11,
+      "speedup": 7.66,
+      "threads": 8,
+      "variant": "expand"
+    },
+    {
+      "ops_per_second": 248.23,
+      "speedup": 9.36,
+      "threads": 10,
+      "variant": "expand"
+    }
+  ],
+  "workload": {
+    "calendar_rounds": 3,
+    "depth_cap": 16,
+    "games": 4,
+    "hidden_dim": 16,
+    "message_layers": 1,
+    "seeds": [
+      1951,
+      1952,
+      1953,
+      1954
+    ],
+    "simulations": 16,
+    "token_buckets": 2048,
+    "torch_threads": 4,
+    "weights": "fresh, fixed, model seed 1951"
+  }
+}
