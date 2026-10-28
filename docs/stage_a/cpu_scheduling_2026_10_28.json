@@ -1,0 +1,585 @@
+{
+  "batch_cost_test": {
+    "ms_per_position": {
+      "threads_1": {
+        "batches_of_4": 4.21,
+        "single": 4.22
+      },
+      "threads_4": {
+        "batches_of_4": 4.17,
+        "single": 4.64
+      }
+    },
+    "positions": 48
+  },
+  "batch_makeup_test": {
+    "batches": 61,
+    "max_prior_difference": 8.940696716308594e-08,
+    "max_value_difference": 2.6702880859375e-05,
+    "positions": 36,
+    "row_comparisons": 404,
+    "rows_not_bitwise_equal_to_single": 374,
+    "torch_threads_tested": [
+      4,
+      1
+    ]
+  },
+  "date": "2026-10-28",
+  "equality": {
+    "batched_python_menu_cache_vs_baseline": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "batched_table_vs_baseline": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "per_search_a_vs_b": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "per_search_a_vs_baseline": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "per_search_eight_first_four_vs_four": [
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "provenance": {
+    "code_commit": "974ce825ff16c086d7142bb5fc8bfcfc0d9e8873",
+    "device_harness_sha256": "45198ddc2d2eaf40927b9d04e2f4202ce6477b3b615e21c579644e63bd230c9b",
+    "native_sha256": "6c2ddd58e14a1b82c34d32349364bd3b5328d7ff20a8f825c10a678aa652dca1",
+    "raw_artifacts": "studies/campaign/runs/cpu-scheduling-2026-10-28",
+    "scripts_sha256": {
+      "batch_cost.py": "fc238f31b973e913961d84bc0d268658ae4e38cfc40196ec5a54c7a184f785d3",
+      "batch_invariance.py": "5cc7f66dc4a2d03903c9e7479cb7d1e5561a0a00a195b849958b5d31e90a840c",
+      "time_selfplay.py": "48081c67f7f66cea1438ef66fdc0889672ff8a5cd257968a9a275583955dca69"
+    }
+  },
+  "python_menu_cache_diagnosis": {
+    "cache": {
+      "gc_seconds_by_generation": [
+        1.8477574709104374,
+        1.1990489140152931,
+        1.6906021238537505
+      ],
+      "native.apply_action": {
+        "calls": 35330,
+        "histogram_le_seconds": {
+          "0.001": 1757,
+          "0.005": 28943,
+          "0.02": 3255,
+          "0.05": 1255,
+          "0.1": 118,
+          "inf": 2
+        },
+        "mean_ms": 3.826096017685559,
+        "seconds": 135.1759723048308
+      },
+      "native.legal_actions": {
+        "calls": 12737,
+        "histogram_le_seconds": {
+          "0.001": 4728,
+          "0.005": 3390,
+          "0.02": 1655,
+          "0.05": 2624,
+          "0.1": 315,
+          "inf": 25
+        },
+        "mean_ms": 10.93648706829959,
+        "seconds": 139.29803578893188
+      },
+      "native.numeric_observation": {
+        "calls": 18571,
+        "histogram_le_seconds": {
+          "0.001": 8541,
+          "0.005": 9035,
+          "0.02": 454,
+          "0.05": 489,
+          "0.1": 47,
+          "inf": 5
+        },
+        "mean_ms": 2.391140869713866,
+        "seconds": 44.405877091456205
+      }
+    },
+    "nocache": {
+      "gc_seconds_by_generation": [
+        1.9029751684865914,
+        1.2182229123427533,
+        1.825968371995259
+      ],
+      "native.apply_action": {
+        "calls": 35330,
+        "histogram_le_seconds": {
+          "0.001": 2805,
+          "0.005": 30255,
+          "0.02": 2229,
+          "0.05": 5,
+          "0.1": 36,
+          "inf": 0
+        },
+        "mean_ms": 2.066797406098376,
+        "seconds": 73.01995235745562
+      },
+      "native.legal_actions": {
+        "calls": 35311,
+        "histogram_le_seconds": {
+          "0.001": 14968,
+          "0.005": 12709,
+          "0.02": 2885,
+          "0.05": 4278,
+          "0.1": 430,
+          "inf": 41
+        },
+        "mean_ms": 6.60595517586362,
+        "seconds": 233.2628832149203
+      },
+      "native.numeric_observation": {
+        "calls": 18571,
+        "histogram_le_seconds": {
+          "0.001": 10455,
+          "0.005": 8116,
+          "0.02": 0,
+          "0.05": 0,
+          "0.1": 0,
+          "inf": 0
+        },
+        "mean_ms": 0.9853760680474083,
+        "seconds": 18.29941895970842
+      }
+    }
+  },
+  "runs": {
+    "baseline_2026_10_28": {
+      "average_busy_cores": 1.641,
+      "cohort_wall_seconds": 303.67815354204504,
+      "commit": "7692851",
+      "complete_three_round_games_per_hour": 47.41862340784512,
+      "completed_games": 4,
+      "config": {
+        "seeds": [
+          1951,
+          1952,
+          1953,
+          1954
+        ],
+        "threads": 4
+      },
+      "decisions": 1101,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        }
+      ],
+      "status": "completed",
+      "timing_seconds": {
+        "actual_rules_execution": 2.8191300150356255,
+        "driver_audit_and_reporting": 4.005627240403555,
+        "evaluator_outside_forward": 32.61886756925378,
+        "search": 296.85339628660586,
+        "search_outside_evaluator": 191.0537812418188,
+        "synchronized_evaluator": 105.79961504478706,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 73.18074747553328
+      }
+    },
+    "batched_menu": {
+      "average_busy_cores": 1.596,
+      "cohort_wall_seconds": 309.29838350001955,
+      "commit": "295093e809157b3386d0078fc7bd929a125ced95",
+      "complete_three_round_games_per_hour": 46.55698434970673,
+      "completed_games": 4,
+      "config": {
+        "search_evaluation": "batched",
+        "seeds": [
+          1951,
+          1952,
+          1953,
+          1954
+        ],
+        "threads": 4
+      },
+      "decisions": 1101,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        }
+      ],
+      "max_rss_bytes": 1191018496,
+      "process_real_seconds": 316.95,
+      "status": "completed",
+      "timing_seconds": {
+        "actual_rules_execution": 2.739475821959786,
+        "driver_audit_and_reporting": 2.0107623444055207,
+        "evaluator_outside_forward": 58.30011215124978,
+        "search": 304.54814533365425,
+        "search_outside_evaluator": 174.0709085528506,
+        "synchronized_evaluator": 130.47723678080365,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 72.17712462955387
+      }
+    },
+    "batched_table": {
+      "average_busy_cores": 1.58,
+      "cohort_wall_seconds": 270.79863258398836,
+      "commit": "295093e809157b3386d0078fc7bd929a125ced95",
+      "complete_three_round_games_per_hour": 53.1760439947341,
+      "completed_games": 4,
+      "config": {
+        "search_evaluation": "batched",
+        "seeds": [
+          1951,
+          1952,
+          1953,
+          1954
+        ],
+        "threads": 4
+      },
+      "decisions": 1101,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        }
+      ],
+      "max_rss_bytes": 964558848,
+      "process_real_seconds": 278.66,
+      "status": "completed",
+      "timing_seconds": {
+        "actual_rules_execution": 2.992492365418002,
+        "driver_audit_and_reporting": 3.166844965191558,
+        "evaluator_outside_forward": 35.037399975117296,
+        "search": 264.6392952533788,
+        "search_outside_evaluator": 150.96009363775374,
+        "synchronized_evaluator": 113.67920161562506,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 78.64180164050777
+      }
+    },
+    "per_search_8": {
+      "average_busy_cores": 2.815,
+      "cohort_wall_seconds": 440.1946857079747,
+      "commit": "295093e809157b3386d0078fc7bd929a125ced95",
+      "complete_three_round_games_per_hour": 65.42559675312829,
+      "completed_games": 8,
+      "config": {
+        "search_evaluation": "per_search",
+        "seeds": [
+          1951,
+          1952,
+          1953,
+          1954,
+          1955,
+          1956,
+          1957,
+          1958
+        ],
+        "threads": 1
+      },
+      "decisions": 2063,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        },
+        {
+          "chance_events": 25,
+          "decisions": 195,
+          "final_state_and_rng_sha256": "b59f7bd128e3623c735d7cc55ebba95fed170bb05fc2e7679f75db976aaf74a6",
+          "seed": 1955,
+          "trace_sha256": "c6b2618cff4f4ac95d336f07a01e622b112ec5380e86505c5a79fa69c5d85584",
+          "transitions": 220
+        },
+        {
+          "chance_events": 36,
+          "decisions": 294,
+          "final_state_and_rng_sha256": "f6650bfebe6ae4428414ac3990b72250736066fa80b55674fa72cc244b695f68",
+          "seed": 1956,
+          "trace_sha256": "7fc8e29ce9aafd2a9f393cc3026ecf12ee7645e504e0ae659ccc3861898346d3",
+          "transitions": 330
+        },
+        {
+          "chance_events": 49,
+          "decisions": 268,
+          "final_state_and_rng_sha256": "d13678d859fd8ce54421cf278cf82be2efa811498cd82bef42369dd9a0537da1",
+          "seed": 1957,
+          "trace_sha256": "c9184b5c451f4d6a5dc54cd75f6e274c8462d2db57995cb2bb56fcdfc5a3f14f",
+          "transitions": 317
+        },
+        {
+          "chance_events": 36,
+          "decisions": 205,
+          "final_state_and_rng_sha256": "8b6be1fc80c8d3aff97bc7054106af58a9132a7c7b541b95b79254d3d83f46d7",
+          "seed": 1958,
+          "trace_sha256": "78b09a15e1d890b0de06429abbd05ec62f033a24eb8eaf5d1c762b1cd62007f7",
+          "transitions": 241
+        }
+      ],
+      "max_rss_bytes": 1298333696,
+      "process_real_seconds": 455.31,
+      "status": "completed",
+      "timing_seconds": {
+        "actual_rules_execution": 5.785474782285746,
+        "driver_audit_and_reporting": 6.457963582826778,
+        "evaluator_outside_forward": 120.54777790699154,
+        "search": 427.9512473428622,
+        "search_outside_evaluator": 0.0,
+        "synchronized_evaluator": 1413.2761683241115,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 1292.72839041712
+      }
+    },
+    "per_search_a": {
+      "average_busy_cores": 2.039,
+      "cohort_wall_seconds": 238.00079870800255,
+      "commit": "295093e809157b3386d0078fc7bd929a125ced95",
+      "complete_three_round_games_per_hour": 60.503998634336575,
+      "completed_games": 4,
+      "config": {
+        "search_evaluation": "per_search",
+        "seeds": [
+          1951,
+          1952,
+          1953,
+          1954
+        ],
+        "threads": 1
+      },
+      "decisions": 1101,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        }
+      ],
+      "max_rss_bytes": 1022640128,
+      "process_real_seconds": 246.13,
+      "status": "completed",
+      "timing_seconds": {
+        "actual_rules_execution": 3.0518392023514025,
+        "driver_audit_and_reporting": 3.149347848491743,
+        "evaluator_outside_forward": 50.32423464016756,
+        "search": 231.7996116571594,
+        "search_outside_evaluator": 0.0,
+        "synchronized_evaluator": 253.02271715772804,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 202.69848251756048
+      }
+    },
+    "per_search_b": {
+      "average_busy_cores": 2.025,
+      "cohort_wall_seconds": 247.09455137501936,
+      "commit": "295093e809157b3386d0078fc7bd929a125ced95",
+      "complete_three_round_games_per_hour": 58.277286649453025,
+      "completed_games": 4,
+      "config": {
+        "search_evaluation": "per_search",
+        "seeds": [
+          1951,
+          1952,
+          1953,
+          1954
+        ],
+        "threads": 1
+      },
+      "decisions": 1101,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        }
+      ],
+      "max_rss_bytes": 911179776,
+      "process_real_seconds": 255.34,
+      "status": "completed",
+      "timing_seconds": {
+        "actual_rules_execution": 3.1932011711178347,
+        "driver_audit_and_reporting": 3.295584505191073,
+        "evaluator_outside_forward": 52.73437892337097,
+        "search": 240.60576569871046,
+        "search_outside_evaluator": 0.0,
+        "synchronized_evaluator": 270.2438410433242,
+        "synchronized_model_forward_including_tensor_preparation_and_transfers": 217.50946211995324
+      }
+    }
+  },
+  "schema": "gwrl-cpu-scheduling-v1"
+}

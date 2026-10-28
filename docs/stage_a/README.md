@@ -221,6 +221,7 @@ state.
 - [Search/campaign scaling report](scaling_2026_10_23.md)
 - [Decision reuse and matched performance results](decision_reuse_2026_10_24.md)
 - [CPU self-play profile: idle cores, legal-move generation and engine allocation](cpu_profile_2026_10_28.md)
+- [CPU search scheduling and shared menus: 47.4 to 65.4 games per hour](cpu_scheduling_2026_10_28.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)
