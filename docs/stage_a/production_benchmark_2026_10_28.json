@@ -1,0 +1,309 @@
+{
+  "date": "2026-10-28",
+  "network_cost_per_position_ms": {
+    "cpu_one_thread": [
+      {
+        "batch": 1,
+        "buckets": 2048,
+        "device": "cpu",
+        "hidden": 16,
+        "layers": 1,
+        "ms_per_position": 5.04,
+        "parameters_per_alliance": 38152,
+        "threads": 1
+      },
+      {
+        "batch": 8,
+        "buckets": 2048,
+        "device": "cpu",
+        "hidden": 16,
+        "layers": 1,
+        "ms_per_position": 4.9,
+        "parameters_per_alliance": 38152,
+        "threads": 1
+      },
+      {
+        "batch": 32,
+        "buckets": 2048,
+        "device": "cpu",
+        "hidden": 16,
+        "layers": 1,
+        "ms_per_position": 4.83,
+        "parameters_per_alliance": 38152,
+        "threads": 1
+      },
+      {
+        "batch": 1,
+        "buckets": 16384,
+        "device": "cpu",
+        "hidden": 64,
+        "layers": 2,
+        "ms_per_position": 13.0,
+        "parameters_per_alliance": 1137928,
+        "threads": 1
+      },
+      {
+        "batch": 8,
+        "buckets": 16384,
+        "device": "cpu",
+        "hidden": 64,
+        "layers": 2,
+        "ms_per_position": 12.82,
+        "parameters_per_alliance": 1137928,
+        "threads": 1
+      },
+      {
+        "batch": 32,
+        "buckets": 16384,
+        "device": "cpu",
+        "hidden": 64,
+        "layers": 2,
+        "ms_per_position": 12.09,
+        "parameters_per_alliance": 1137928,
+        "threads": 1
+      },
+      {
+        "batch": 1,
+        "buckets": 16384,
+        "device": "cpu",
+        "hidden": 128,
+        "layers": 3,
+        "ms_per_position": 29.82,
+        "parameters_per_alliance": 2497544,
+        "threads": 1
+      },
+      {
+        "batch": 8,
+        "buckets": 16384,
+        "device": "cpu",
+        "hidden": 128,
+        "layers": 3,
+        "ms_per_position": 28.21,
+        "parameters_per_alliance": 2497544,
+        "threads": 1
+      },
+      {
+        "batch": 32,
+        "buckets": 16384,
+        "device": "cpu",
+        "hidden": 128,
+        "layers": 3,
+        "ms_per_position": 29.18,
+        "parameters_per_alliance": 2497544,
+        "threads": 1
+      }
+    ],
+    "mean_menu": 73.4,
+    "mps": [
+      {
+        "batch": 1,
+        "buckets": 2048,
+        "device": "mps",
+        "hidden": 16,
+        "layers": 1,
+        "ms_per_position": 11.05,
+        "parameters_per_alliance": 38152,
+        "threads": 1
+      },
+      {
+        "batch": 8,
+        "buckets": 2048,
+        "device": "mps",
+        "hidden": 16,
+        "layers": 1,
+        "ms_per_position": 5.51,
+        "parameters_per_alliance": 38152,
+        "threads": 1
+      },
+      {
+        "batch": 32,
+        "buckets": 2048,
+        "device": "mps",
+        "hidden": 16,
+        "layers": 1,
+        "ms_per_position": 4.69,
+        "parameters_per_alliance": 38152,
+        "threads": 1
+      },
+      {
+        "batch": 1,
+        "buckets": 16384,
+        "device": "mps",
+        "hidden": 64,
+        "layers": 2,
+        "ms_per_position": 12.0,
+        "parameters_per_alliance": 1137928,
+        "threads": 1
+      },
+      {
+        "batch": 8,
+        "buckets": 16384,
+        "device": "mps",
+        "hidden": 64,
+        "layers": 2,
+        "ms_per_position": 6.41,
+        "parameters_per_alliance": 1137928,
+        "threads": 1
+      },
+      {
+        "batch": 32,
+        "buckets": 16384,
+        "device": "mps",
+        "hidden": 64,
+        "layers": 2,
+        "ms_per_position": 5.49,
+        "parameters_per_alliance": 1137928,
+        "threads": 1
+      },
+      {
+        "batch": 1,
+        "buckets": 16384,
+        "device": "mps",
+        "hidden": 128,
+        "layers": 3,
+        "ms_per_position": 13.27,
+        "parameters_per_alliance": 2497544,
+        "threads": 1
+      },
+      {
+        "batch": 8,
+        "buckets": 16384,
+        "device": "mps",
+        "hidden": 128,
+        "layers": 3,
+        "ms_per_position": 7.85,
+        "parameters_per_alliance": 2497544,
+        "threads": 1
+      },
+      {
+        "batch": 32,
+        "buckets": 16384,
+        "device": "mps",
+        "hidden": 128,
+        "layers": 3,
+        "ms_per_position": 7.05,
+        "parameters_per_alliance": 2497544,
+        "threads": 1
+      }
+    ],
+    "positions": 64
+  },
+  "production_like_selfplay": {
+    "average_busy_cores": 6.682,
+    "cohort_wall_seconds": 900.2726242542267,
+    "complete_games_per_hour": 31.99030962855004,
+    "completed_games": 8,
+    "config": {
+      "calendar_rounds": 3,
+      "hidden_dim": 64,
+      "max_depth": 16,
+      "message_layers": 2,
+      "processes": 8,
+      "search_evaluation": "per_search",
+      "seeds": [
+        1951,
+        1952,
+        1953,
+        1954,
+        1955,
+        1956,
+        1957,
+        1958
+      ],
+      "simulations": 64,
+      "threads": 1,
+      "token_buckets": 16384
+    },
+    "evaluator_requests": 186939,
+    "games": [
+      {
+        "chance_events": 52,
+        "decisions": 352,
+        "seed": 1951,
+        "trace_sha256": "723e5811e5e65d148f406dce5dac9abff52ae26caf5373dacd32dadae0974f1f",
+        "transitions": 404
+      },
+      {
+        "chance_events": 51,
+        "decisions": 393,
+        "seed": 1952,
+        "trace_sha256": "218b95254825fccff7dbd13199be0e72a87ebadc51a004fc529c06416bd818e1",
+        "transitions": 444
+      },
+      {
+        "chance_events": 41,
+        "decisions": 353,
+        "seed": 1953,
+        "trace_sha256": "a17ad3b77101299d4cf2f06825d8b18e9404893d99db3d4eae0d0e3d045e4500",
+        "transitions": 394
+      },
+      {
+        "chance_events": 31,
+        "decisions": 327,
+        "seed": 1954,
+        "trace_sha256": "1c1305c4fdac3771d63b8b87afcdf9d8b9605b4d44aa72939e99ebe9073adbab",
+        "transitions": 358
+      },
+      {
+        "chance_events": 50,
+        "decisions": 403,
+        "seed": 1955,
+        "trace_sha256": "98ca048c6577b74e052b29693bed7d95a6b54226bd92ca993a03bb471ca12c74",
+        "transitions": 453
+      },
+      {
+        "chance_events": 50,
+        "decisions": 361,
+        "seed": 1956,
+        "trace_sha256": "3024a9995543bea30a3f6bf96e04d580ccfb91a8f8a04b7d11bbfd0308a2b900",
+        "transitions": 411
+      },
+      {
+        "chance_events": 53,
+        "decisions": 423,
+        "seed": 1957,
+        "trace_sha256": "ad8f9f0f9eb00741b853126c5aee6521a385b9efec9cc2079764fe56f3e78593",
+        "transitions": 476
+      },
+      {
+        "chance_events": 33,
+        "decisions": 286,
+        "seed": 1958,
+        "trace_sha256": "ebc70a3356cee2f8f9be5627634f6fce0554ddde6b69175baee3602abcb10877",
+        "transitions": 319
+      }
+    ],
+    "per_evaluated_position_ms": {
+      "engine_and_search": 17.436580725970494,
+      "network_including_preparation": 14.425730388643489
+    },
+    "process_wall_seconds": [
+      686.051040625025,
+      895.5020819589845,
+      747.5696238329983,
+      630.5712308330112,
+      846.1225644999649,
+      752.0422460410045,
+      900.2723522089655,
+      537.6529643749818
+    ],
+    "sampled_peak_charged_bytes": 7473645944,
+    "status": "completed",
+    "timing_seconds_summed_across_processes": {
+      "actual_rules_execution": 10.54468916147016,
+      "driver_audit_and_reporting": 28.930837758642156,
+      "evaluator_outside_forward": 438.3950758319115,
+      "search": 5956.3085774548235,
+      "search_outside_evaluator": 3259.5769643321983,
+      "synchronized_evaluator": 2696.7316131226253,
+      "synchronized_model_forward_including_tensor_preparation_and_transfers": 2258.3365372907137
+    }
+  },
+  "provenance": {
+    "code_commit": "a943a0d81e99bccd54bf5293992eed337a1270b2",
+    "native_sha256": "6c2ddd58e14a1b82c34d32349364bd3b5328d7ff20a8f825c10a678aa652dca1",
+    "network_script_sha256": "0d56163220d1970bb6e447a7ab922cbf71f1f49b7da818d0e08ac1d05993d298",
+    "raw_artifacts": "studies/campaign/runs/production-benchmark-2026-10-28"
+  },
+  "schema": "gwrl-production-benchmark-v1"
+}
