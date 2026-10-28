@@ -48,9 +48,10 @@ class FakeEvaluator:
 
 
 class CampaignDeviceBenchmarkTests(unittest.TestCase):
-    def test_configuration_preserves_search_budget_and_resource_allowance(self):
+    def test_configuration_validates_search_budget_horizon_and_resource_allowance(self):
         selfplay_values = {"mode": "selfplay", "devices": ("cpu",), "threads": 1, "search_evaluation": "per_search"}
-        for values in ({"devices": ("cpu", "auto")}, {"simulations": 4}, {"max_depth": 8},
+        self.assertEqual((Config(simulations=64, max_depth=24, calendar_rounds=11).simulations), 64)
+        for values in ({"devices": ("cpu", "auto")}, {"simulations": 0}, {"max_depth": 0}, {"calendar_rounds": 12},
                        {"threads": 10}, {"memory_bytes": 30_000_000_001}, {"batch_sizes": (1, 1)},
                        {"search_evaluation": "streamed"}, {**selfplay_values, "processes": 5},
                        {**selfplay_values, "processes": 2, "search_evaluation": "batched"},
@@ -152,13 +153,13 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         report = self.run_toy()
         self.assertEqual(report["status"], "completed")
         self.assertEqual(report["completed_games"], 1)
-        self.assertGreater(report["complete_three_round_games_per_hour"], 0)
+        self.assertGreater(report["complete_games_per_hour"], 0)
         self.assertEqual(report["games"][0]["clock"]["completed_rounds"], 3)
 
     def test_truncated_selfplay_has_no_completed_cohort_throughput_or_fake_returns(self):
         report = self.run_toy(steps=3, cap=1)
         self.assertEqual(report["status"], "truncated")
-        self.assertIsNone(report["complete_three_round_games_per_hour"])
+        self.assertIsNone(report["complete_games_per_hour"])
         self.assertIsNone(report["games"][0]["terminal_returns"])
         self.assertEqual(report["completed_games"], 0)
 

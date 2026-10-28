@@ -49,6 +49,7 @@ class Config:
     max_state_visits: int = 20
     search_evaluation: str = "batched"
     processes: int = 1
+    calendar_rounds: int = 3
     hidden_dim: int = 16
     message_layers: int = 1
     token_buckets: int = 2048
@@ -76,8 +77,8 @@ class Config:
                 raise ValueError(f"{name} must be a positive integer")
         if self.hidden_dim < 4 or self.token_buckets < 2:
             raise ValueError("Model dimensions violate the current model contract")
-        if self.simulations != 16 or self.max_depth != 16:
-            raise ValueError("This matched benchmark preserves 16 simulations and depth cap 16")
+        if type(self.calendar_rounds) is not int or not 1 <= self.calendar_rounds <= 11:
+            raise ValueError("Self-play horizon must be between one and eleven rounds")
         if self.search_evaluation not in {"batched", "per_search"}:
             raise ValueError("Search evaluation must be batched or per_search")
         if type(self.processes) is not int or not 1 <= self.processes <= len(self.seeds):
@@ -285,7 +286,7 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     from studies.shared.multiplayer_mcts import MctsConfig, action_key
     from tools.benchmark_campaign_backends import check_terminal
     before = time.perf_counter()
-    envs = [make_env(seed, calendar_rounds=3) for seed in config.seeds]
+    envs = [make_env(seed, calendar_rounds=config.calendar_rounds) for seed in config.seeds]
     search_rngs = [random.Random(seed ^ 0x9E3779B97F4A7C15) for seed in config.seeds]
     policy_rngs = [random.Random(seed ^ 0xD1B54A32D192ED03) for seed in config.seeds]
     visits = [Counter({env.planning_key(): 1}) for env in envs]
@@ -346,7 +347,7 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
         waves += 1
         for index, env in enumerate(envs):
             if env.is_terminal() and completed_at[index] is None:
-                check_terminal(env); completed_at[index] = time.perf_counter() - started
+                check_terminal(env, config.calendar_rounds); completed_at[index] = time.perf_counter() - started
         if waves % 10 == 0:
             result["progress"] = [{"seed": seed, **dict(count), "clock": env.observation()["state"]["clock"],
                                    "terminal": env.is_terminal()} for seed, env, count in zip(config.seeds, envs, counts)]
@@ -358,7 +359,7 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     result.update(status="completed" if complete else "truncated", stop_reason=stop_reason,
         started_at_epoch=started_epoch, ended_at_epoch=started_epoch + elapsed,
         completed_games=sum(env.is_terminal() for env in envs), cohort_wall_seconds=elapsed,
-        complete_three_round_games_per_hour=len(envs) * 3600 / elapsed if complete else None,
+        complete_games_per_hour=len(envs) * 3600 / elapsed if complete else None,
         search_simulations=config.simulations, search_depth_cap=config.max_depth,
         timing_seconds={**timings, "synchronized_evaluator": inference_seconds,
             "synchronized_model_forward_including_tensor_preparation_and_transfers": forward_seconds,
@@ -428,7 +429,7 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
         "selection": results[0]["selection"], "processes": config.processes, "process_groups": [list(group) for group in groups],
         "started_at_epoch": started, "ended_at_epoch": started + span,
         "completed_games": sum(game["terminal"] for game in games), "cohort_wall_seconds": span,
-        "complete_three_round_games_per_hour": len(games) * 3600 / span if complete else None,
+        "complete_games_per_hour": len(games) * 3600 / span if complete else None,
         "search_simulations": config.simulations, "search_depth_cap": config.max_depth,
         "timing_seconds_summed_across_processes": dict(timing),
         "inference_calls": sum(result["inference_calls"] for result in results),
@@ -443,8 +444,8 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
 
 def compare_selfplay(before, after):
     require(before["status"] == after["status"] == "completed", "Incomplete games cannot establish matched throughput")
-    require(before["task"] == after["task"] and before["search_simulations"] == after["search_simulations"] == 16 and
-            before["search_depth_cap"] == after["search_depth_cap"] == 16, "Self-play tasks or budgets differ")
+    require(before["task"] == after["task"] and before["search_simulations"] == after["search_simulations"] and
+            before["search_depth_cap"] == after["search_depth_cap"], "Self-play tasks or budgets differ")
     pairs = []
     require([game["seed"] for game in before["games"]] == [game["seed"] for game in after["games"]], "Game seeds differ")
     for left, right in zip(before["games"], after["games"]):
@@ -457,8 +458,8 @@ def compare_selfplay(before, after):
             "cpu_trace_events": len(left["trace"]), "mps_trace_events": len(right["trace"]),
             "identical_trace": left["trace"] == right["trace"],
             "identical_final_state_and_rng": left["final_state_and_rng_sha256"] == right["final_state_and_rng_sha256"]})
-    return {"cpu_complete_games_per_hour": before["complete_three_round_games_per_hour"],
-            "mps_complete_games_per_hour": after["complete_three_round_games_per_hour"], "pairs": pairs,
+    return {"cpu_complete_games_per_hour": before["complete_games_per_hour"],
+            "mps_complete_games_per_hour": after["complete_games_per_hour"], "pairs": pairs,
             "interpretation": "Equal weights/seeds/settings, but floating-point priors/value differences may change search, choices and later dice; throughput is not an exact matched action workload or a playing-strength comparison."}
 
 

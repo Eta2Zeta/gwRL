@@ -144,15 +144,15 @@ def descriptor(env, actions=None):
             "clock": env.observation()["state"]["clock"]}
 
 
-def check_terminal(env):
+def check_terminal(env, rounds=3):
     state = env.observation()["state"]
     clock = state["clock"]
-    require(env.is_terminal() and clock["completed_rounds"] == 3 and clock["round_index"] == 2 and
+    require(env.is_terminal() and clock["completed_rounds"] == rounds and clock["round_index"] == rounds - 1 and
             clock["nation_index"] == 3 and clock["phase"] == "place_units" and
-            clock["income_collected"] is True and clock["player_turn_serial"] == "12",
-            "Workload did not reach the genuine three-round terminal")
-    require(state["completed_turns"] == {"ccp": 3, "mongolia": 3, "japan": 3, "kmt": 3},
-            "Three-round terminal lacks all twelve completed national turns")
+            clock["income_collected"] is True and clock["player_turn_serial"] == str(4 * rounds),
+            f"Workload did not reach the genuine {rounds}-round terminal")
+    require(state["completed_turns"] == {"ccp": rounds, "mongolia": rounds, "japan": rounds, "kmt": rounds},
+            f"{rounds}-round terminal lacks all {4 * rounds} completed national turns")
 
 
 def sampled_step(env):
