@@ -1,0 +1,281 @@
+{
+ "schema": "gwrl-worker-queue-benchmark-v1",
+ "date": "2026-10-28",
+ "machine": {
+  "chip": "Apple M4 Max",
+  "performance_cores": 10,
+  "efficiency_cores": 4,
+  "performance_cores_per_shared_l2": 5,
+  "l2_bytes_per_cluster": 16777216
+ },
+ "config": {
+  "processes": 10,
+  "seeds": [
+   1951,
+   1952,
+   1953,
+   1954,
+   1955,
+   1956,
+   1957,
+   1958,
+   1959,
+   1960,
+   1961,
+   1962,
+   1963,
+   1964,
+   1965,
+   1966,
+   1967,
+   1968,
+   1969,
+   1970,
+   1971,
+   1972,
+   1973,
+   1974,
+   1975,
+   1976,
+   1977,
+   1978,
+   1979,
+   1980
+  ],
+  "simulations": 64,
+  "max_depth": 16,
+  "calendar_rounds": 3,
+  "hidden_dim": 64,
+  "message_layers": 2,
+  "token_buckets": 16384,
+  "search_evaluation": "per_search",
+  "threads": 1
+ },
+ "result": {
+  "completed_games": 30,
+  "cohort_wall_seconds": 3090.2,
+  "complete_games_per_hour": 34.95,
+  "process_utilization": 0.8653,
+  "mean_game_seconds": 891.3,
+  "peak_charged_memory_bytes_process_tree": 10167929304
+ },
+ "baseline": {
+  "processes": 8,
+  "games": 8,
+  "complete_games_per_hour": 31.99,
+  "cohort_wall_seconds": 900.3,
+  "process_utilization": 0.8325,
+  "peak_charged_memory_bytes_process_tree": 7473645944,
+  "mean_game_seconds_same_seeds": 749.5
+ },
+ "same_seed_comparison": {
+  "games": 8,
+  "identical": 8,
+  "mean_time_ratio_ten_vs_eight_processes": 1.1429,
+  "mean_game_seconds_ten_processes": 858.0
+ },
+ "games": [
+  {
+   "seed": 1951,
+   "seconds": 774.8,
+   "decisions": 352,
+   "trace_sha256": "723e5811e5e65d148f406dce5dac9abff52ae26caf5373dacd32dadae0974f1f",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 686.1
+  },
+  {
+   "seed": 1952,
+   "seconds": 1043.3,
+   "decisions": 393,
+   "trace_sha256": "218b95254825fccff7dbd13199be0e72a87ebadc51a004fc529c06416bd818e1",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 895.5
+  },
+  {
+   "seed": 1953,
+   "seconds": 846.2,
+   "decisions": 353,
+   "trace_sha256": "a17ad3b77101299d4cf2f06825d8b18e9404893d99db3d4eae0d0e3d045e4500",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 747.6
+  },
+  {
+   "seed": 1954,
+   "seconds": 717.1,
+   "decisions": 327,
+   "trace_sha256": "1c1305c4fdac3771d63b8b87afcdf9d8b9605b4d44aa72939e99ebe9073adbab",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 630.6
+  },
+  {
+   "seed": 1955,
+   "seconds": 972.2,
+   "decisions": 403,
+   "trace_sha256": "98ca048c6577b74e052b29693bed7d95a6b54226bd92ca993a03bb471ca12c74",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 846.1
+  },
+  {
+   "seed": 1956,
+   "seconds": 852.7,
+   "decisions": 361,
+   "trace_sha256": "3024a9995543bea30a3f6bf96e04d580ccfb91a8f8a04b7d11bbfd0308a2b900",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 752.0
+  },
+  {
+   "seed": 1957,
+   "seconds": 1049.3,
+   "decisions": 423,
+   "trace_sha256": "ad8f9f0f9eb00741b853126c5aee6521a385b9efec9cc2079764fe56f3e78593",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 900.3
+  },
+  {
+   "seed": 1958,
+   "seconds": 608.4,
+   "decisions": 286,
+   "trace_sha256": "ebc70a3356cee2f8f9be5627634f6fce0554ddde6b69175baee3602abcb10877",
+   "identical_to_eight_process_baseline": true,
+   "eight_process_seconds": 537.7
+  },
+  {
+   "seed": 1959,
+   "seconds": 975.1,
+   "decisions": 380,
+   "trace_sha256": "0ed6f4f7a9186291239cb5810c7c408908c7de3e89bfbf150a36b373526318f6"
+  },
+  {
+   "seed": 1960,
+   "seconds": 796.3,
+   "decisions": 336,
+   "trace_sha256": "d6e5ddb6511981cbba7bf01612a34b6d54a949688738e25db73905dcac2510f6"
+  },
+  {
+   "seed": 1961,
+   "seconds": 760.8,
+   "decisions": 338,
+   "trace_sha256": "1648f3b7f3ea1a941b9092dd3de37443a91ca87d12bc7bc4abefbfbc7591f21a"
+  },
+  {
+   "seed": 1962,
+   "seconds": 752.3,
+   "decisions": 299,
+   "trace_sha256": "de377b91a546a3433c5cabe68146aa1b4b5c7c8d14254626ced246eb9ffe243f"
+  },
+  {
+   "seed": 1963,
+   "seconds": 807.2,
+   "decisions": 360,
+   "trace_sha256": "d9741e598283794c8aa803d3025401f56c8a9a7c93c78213236c9ae7d9c74895"
+  },
+  {
+   "seed": 1964,
+   "seconds": 1277.1,
+   "decisions": 496,
+   "trace_sha256": "95629f4731e0fee73a5d29863eabdab59b6556ed01aa798f3f4f09424ea4cea5"
+  },
+  {
+   "seed": 1965,
+   "seconds": 1192.5,
+   "decisions": 414,
+   "trace_sha256": "df3f60a5f4c07f28227fcf2f9ca8c4a25153ddd1e0fce05eb84cf3d35283087b"
+  },
+  {
+   "seed": 1966,
+   "seconds": 945.9,
+   "decisions": 371,
+   "trace_sha256": "d2d2c48f331ff3a1d9d5af7ea6c1557ce176f98339eb2d46a87a4d860cbc9597"
+  },
+  {
+   "seed": 1967,
+   "seconds": 785.0,
+   "decisions": 367,
+   "trace_sha256": "0d2da84ac31fe6f39708a6547d5443316a5d8d6948889451987e3c15a9dcbf18"
+  },
+  {
+   "seed": 1968,
+   "seconds": 1141.2,
+   "decisions": 425,
+   "trace_sha256": "a5053c9e1f8b2b4c640339c2a6e3b80ff73d989ebeb22bca7b5506e708054485"
+  },
+  {
+   "seed": 1969,
+   "seconds": 1006.3,
+   "decisions": 388,
+   "trace_sha256": "af7264657fb8c3b0853ee58d1927cd9215d9764635fb705a318fae55918d22f9"
+  },
+  {
+   "seed": 1970,
+   "seconds": 1125.8,
+   "decisions": 419,
+   "trace_sha256": "c209590b24fa896228b79f3b66554dcb82e86fb784b6fecc36cf067e9efb9916"
+  },
+  {
+   "seed": 1971,
+   "seconds": 772.4,
+   "decisions": 303,
+   "trace_sha256": "c7426e00183045408ed1df5269bf410b3da8693f6a6713ac51ed652c5c62bf44"
+  },
+  {
+   "seed": 1972,
+   "seconds": 769.8,
+   "decisions": 330,
+   "trace_sha256": "8adf4a339b3d1b3551443408b0aacfd4b0b7fd68da8f8b44704940abac71b44e"
+  },
+  {
+   "seed": 1973,
+   "seconds": 936.5,
+   "decisions": 439,
+   "trace_sha256": "04d717572b80e71e1f1ea7ed89f4ccbeab04b76c2207c21e048a12b5c29acb66"
+  },
+  {
+   "seed": 1974,
+   "seconds": 848.5,
+   "decisions": 371,
+   "trace_sha256": "943e0b6b543f7141a5d103e6f925199ca2a822dd1520b85ae2c759b7daa8dc1f"
+  },
+  {
+   "seed": 1975,
+   "seconds": 1024.3,
+   "decisions": 395,
+   "trace_sha256": "21fb563a6ba2613e742653cb475e838780772be170f1f1f0ad5f60baf5953b99"
+  },
+  {
+   "seed": 1976,
+   "seconds": 643.2,
+   "decisions": 303,
+   "trace_sha256": "dcf52566014874e64e283261d45065882e6aa753dca2b5fad4cfc3e58ae4f74d"
+  },
+  {
+   "seed": 1977,
+   "seconds": 679.3,
+   "decisions": 329,
+   "trace_sha256": "11c3f6baebacbd78dce8bf3500fe74a1a329fdfe60a10519e6d6e5845c39d818"
+  },
+  {
+   "seed": 1978,
+   "seconds": 820.8,
+   "decisions": 424,
+   "trace_sha256": "fe292e5fd98884f0738313ff6bcf06efca49ff4e179589092d303546d51aeee0"
+  },
+  {
+   "seed": 1979,
+   "seconds": 969.1,
+   "decisions": 427,
+   "trace_sha256": "99e0e081cdbd9c240485c628122d54bf59be81cc1774cb5de2aea6f880de6794"
+  },
+  {
+   "seed": 1980,
+   "seconds": 845.2,
+   "decisions": 359,
+   "trace_sha256": "c79f146e46e40fdb76af1776cd7821a5d190ff2e864e4934028e6b49ce48eb29"
+  }
+ ],
+ "provenance": {
+  "code_commit": "615e41dbda738846eb88580a4a0e7b6bf3e327f1",
+  "native_sha256": "6c2ddd58e14a1b82c34d32349364bd3b5328d7ff20a8f825c10a678aa652dca1",
+  "sources_unchanged": true,
+  "raw_artifacts": "studies/campaign/runs/worker-queue-2026-10-28"
+ }
+}
