@@ -1,0 +1,464 @@
+{
+  "date": "2026-10-28",
+  "provenance": {
+    "code_commit": "f4168805f6ee4c9c816345e1f69e219a6967d279",
+    "device_harness_sha256": "4e0055406661e6fa0579d9771b28a7708eb37c2da9da00ec525dd257d3adb6d3",
+    "native_sha256": "6c2ddd58e14a1b82c34d32349364bd3b5328d7ff20a8f825c10a678aa652dca1",
+    "raw_artifacts": "studies/campaign/runs/cpu-processes-2026-10-28"
+  },
+  "references": {
+    "baseline_four_games_batched": {
+      "average_busy_cores": 1.641,
+      "cohort_wall_seconds": 303.7,
+      "games_per_hour": 47.4
+    },
+    "one_process_eight_games": {
+      "cohort_wall_seconds": 440.1946857079747,
+      "games_per_hour": 65.42559675312829,
+      "sampled_peak_charged_bytes": 1327316992
+    }
+  },
+  "runs": {
+    "p10": {
+      "average_busy_cores": 7.503,
+      "cohort_wall_seconds": 119.45304274559021,
+      "commit": "7c5ad6af8373bd42c41bbf6e2d7ff3c0c3b70632",
+      "complete_three_round_games_per_hour": 301.37365422053256,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        },
+        {
+          "chance_events": 25,
+          "decisions": 195,
+          "final_state_and_rng_sha256": "b59f7bd128e3623c735d7cc55ebba95fed170bb05fc2e7679f75db976aaf74a6",
+          "seed": 1955,
+          "trace_sha256": "c6b2618cff4f4ac95d336f07a01e622b112ec5380e86505c5a79fa69c5d85584",
+          "transitions": 220
+        },
+        {
+          "chance_events": 36,
+          "decisions": 294,
+          "final_state_and_rng_sha256": "f6650bfebe6ae4428414ac3990b72250736066fa80b55674fa72cc244b695f68",
+          "seed": 1956,
+          "trace_sha256": "7fc8e29ce9aafd2a9f393cc3026ecf12ee7645e504e0ae659ccc3861898346d3",
+          "transitions": 330
+        },
+        {
+          "chance_events": 49,
+          "decisions": 268,
+          "final_state_and_rng_sha256": "d13678d859fd8ce54421cf278cf82be2efa811498cd82bef42369dd9a0537da1",
+          "seed": 1957,
+          "trace_sha256": "c9184b5c451f4d6a5dc54cd75f6e274c8462d2db57995cb2bb56fcdfc5a3f14f",
+          "transitions": 317
+        },
+        {
+          "chance_events": 36,
+          "decisions": 205,
+          "final_state_and_rng_sha256": "8b6be1fc80c8d3aff97bc7054106af58a9132a7c7b541b95b79254d3d83f46d7",
+          "seed": 1958,
+          "trace_sha256": "78b09a15e1d890b0de06429abbd05ec62f033a24eb8eaf5d1c762b1cd62007f7",
+          "transitions": 241
+        },
+        {
+          "chance_events": 33,
+          "decisions": 288,
+          "final_state_and_rng_sha256": "3daafdbc4ab3e95ec0aae7502196e3e704ba126c854efaaa332825155d3d8797",
+          "seed": 1959,
+          "trace_sha256": "80c149dde8aeaebcbbb148ef0f6697d238739bed049f7370e259f6b813c2fc1f",
+          "transitions": 321
+        },
+        {
+          "chance_events": 42,
+          "decisions": 367,
+          "final_state_and_rng_sha256": "2bd3b4456dc33801203d3bbba2c3edfc3dafa39ff1b089375317c65c48135f62",
+          "seed": 1960,
+          "trace_sha256": "28c35338cb1266718487be6bcb44ffde10fabecd1be6c77478dd450988b8fd60",
+          "transitions": 409
+        }
+      ],
+      "games_identical_to_one_process": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "process_wall_seconds": [
+        95.22839845903218,
+        107.41346329200314,
+        66.43807041697437,
+        104.26705366600072,
+        61.37268541700905,
+        99.92079366696998,
+        83.11396287503885,
+        66.31756983400555,
+        90.08532179199392,
+        119.3961359160021
+      ],
+      "processes": 10,
+      "sampled_peak_charged_bytes": 7711000904,
+      "seeds": [
+        1951,
+        1952,
+        1953,
+        1954,
+        1955,
+        1956,
+        1957,
+        1958,
+        1959,
+        1960
+      ],
+      "status": "completed"
+    },
+    "p2": {
+      "average_busy_cores": 3.693,
+      "cohort_wall_seconds": 226.16441130638123,
+      "commit": "7c5ad6af8373bd42c41bbf6e2d7ff3c0c3b70632",
+      "complete_three_round_games_per_hour": 127.34098982967356,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        },
+        {
+          "chance_events": 25,
+          "decisions": 195,
+          "final_state_and_rng_sha256": "b59f7bd128e3623c735d7cc55ebba95fed170bb05fc2e7679f75db976aaf74a6",
+          "seed": 1955,
+          "trace_sha256": "c6b2618cff4f4ac95d336f07a01e622b112ec5380e86505c5a79fa69c5d85584",
+          "transitions": 220
+        },
+        {
+          "chance_events": 36,
+          "decisions": 294,
+          "final_state_and_rng_sha256": "f6650bfebe6ae4428414ac3990b72250736066fa80b55674fa72cc244b695f68",
+          "seed": 1956,
+          "trace_sha256": "7fc8e29ce9aafd2a9f393cc3026ecf12ee7645e504e0ae659ccc3861898346d3",
+          "transitions": 330
+        },
+        {
+          "chance_events": 49,
+          "decisions": 268,
+          "final_state_and_rng_sha256": "d13678d859fd8ce54421cf278cf82be2efa811498cd82bef42369dd9a0537da1",
+          "seed": 1957,
+          "trace_sha256": "c9184b5c451f4d6a5dc54cd75f6e274c8462d2db57995cb2bb56fcdfc5a3f14f",
+          "transitions": 317
+        },
+        {
+          "chance_events": 36,
+          "decisions": 205,
+          "final_state_and_rng_sha256": "8b6be1fc80c8d3aff97bc7054106af58a9132a7c7b541b95b79254d3d83f46d7",
+          "seed": 1958,
+          "trace_sha256": "78b09a15e1d890b0de06429abbd05ec62f033a24eb8eaf5d1c762b1cd62007f7",
+          "transitions": 241
+        }
+      ],
+      "games_identical_to_one_process": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "process_wall_seconds": [
+        193.66301012504846,
+        226.1603516250034
+      ],
+      "processes": 2,
+      "sampled_peak_charged_bytes": 2595766272,
+      "seeds": [
+        1951,
+        1952,
+        1953,
+        1954,
+        1955,
+        1956,
+        1957,
+        1958
+      ],
+      "status": "completed"
+    },
+    "p4": {
+      "average_busy_cores": 4.624,
+      "cohort_wall_seconds": 153.78696060180664,
+      "commit": "7c5ad6af8373bd42c41bbf6e2d7ff3c0c3b70632",
+      "complete_three_round_games_per_hour": 187.27205406296108,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        },
+        {
+          "chance_events": 25,
+          "decisions": 195,
+          "final_state_and_rng_sha256": "b59f7bd128e3623c735d7cc55ebba95fed170bb05fc2e7679f75db976aaf74a6",
+          "seed": 1955,
+          "trace_sha256": "c6b2618cff4f4ac95d336f07a01e622b112ec5380e86505c5a79fa69c5d85584",
+          "transitions": 220
+        },
+        {
+          "chance_events": 36,
+          "decisions": 294,
+          "final_state_and_rng_sha256": "f6650bfebe6ae4428414ac3990b72250736066fa80b55674fa72cc244b695f68",
+          "seed": 1956,
+          "trace_sha256": "7fc8e29ce9aafd2a9f393cc3026ecf12ee7645e504e0ae659ccc3861898346d3",
+          "transitions": 330
+        },
+        {
+          "chance_events": 49,
+          "decisions": 268,
+          "final_state_and_rng_sha256": "d13678d859fd8ce54421cf278cf82be2efa811498cd82bef42369dd9a0537da1",
+          "seed": 1957,
+          "trace_sha256": "c9184b5c451f4d6a5dc54cd75f6e274c8462d2db57995cb2bb56fcdfc5a3f14f",
+          "transitions": 317
+        },
+        {
+          "chance_events": 36,
+          "decisions": 205,
+          "final_state_and_rng_sha256": "8b6be1fc80c8d3aff97bc7054106af58a9132a7c7b541b95b79254d3d83f46d7",
+          "seed": 1958,
+          "trace_sha256": "78b09a15e1d890b0de06429abbd05ec62f033a24eb8eaf5d1c762b1cd62007f7",
+          "transitions": 241
+        }
+      ],
+      "games_identical_to_one_process": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "process_wall_seconds": [
+        126.22564474999672,
+        153.78356579097454,
+        114.58685420796974,
+        134.2979710419895
+      ],
+      "processes": 4,
+      "sampled_peak_charged_bytes": 4028039168,
+      "seeds": [
+        1951,
+        1952,
+        1953,
+        1954,
+        1955,
+        1956,
+        1957,
+        1958
+      ],
+      "status": "completed"
+    },
+    "p8": {
+      "average_busy_cores": 6.453,
+      "cohort_wall_seconds": 101.99463891983032,
+      "commit": "7c5ad6af8373bd42c41bbf6e2d7ff3c0c3b70632",
+      "complete_three_round_games_per_hour": 282.36778231684644,
+      "games": [
+        {
+          "chance_events": 34,
+          "decisions": 318,
+          "final_state_and_rng_sha256": "498b9d98da0090b5e186a2f20f64ae35a79c1aaff1c564ebdbfbc9ef221afae2",
+          "seed": 1951,
+          "trace_sha256": "2ae3682990b3fbd480786ae6d536c7438f2bc864b08f0a9817085b8828b8c0e5",
+          "transitions": 352
+        },
+        {
+          "chance_events": 31,
+          "decisions": 264,
+          "final_state_and_rng_sha256": "fb27331145e58e8fa894994e686875ca09363cd78df5ab99655cd87312a42faa",
+          "seed": 1952,
+          "trace_sha256": "63d5046c193cd1d270b6b5ebb2fab7f3d8a6b68476bba66b484e016f970dc6cf",
+          "transitions": 295
+        },
+        {
+          "chance_events": 42,
+          "decisions": 215,
+          "final_state_and_rng_sha256": "e23274c2441756b9fea4e80ff61614c83baceea39107a321b0ebabb1046db5e9",
+          "seed": 1953,
+          "trace_sha256": "bb8e2cc9a2e5f9a3b61a5bf3e7fa775d1a0e1abde1357bc9da57c2eb84c3ba56",
+          "transitions": 257
+        },
+        {
+          "chance_events": 29,
+          "decisions": 304,
+          "final_state_and_rng_sha256": "584f2d621e69547db21397ecd2bd6e59b25c68e297a6d6e2b0953ff72e39103b",
+          "seed": 1954,
+          "trace_sha256": "e52bac736261f3bf653d47f881226092ad995f0be5f7257887907b0993fdc9a0",
+          "transitions": 333
+        },
+        {
+          "chance_events": 25,
+          "decisions": 195,
+          "final_state_and_rng_sha256": "b59f7bd128e3623c735d7cc55ebba95fed170bb05fc2e7679f75db976aaf74a6",
+          "seed": 1955,
+          "trace_sha256": "c6b2618cff4f4ac95d336f07a01e622b112ec5380e86505c5a79fa69c5d85584",
+          "transitions": 220
+        },
+        {
+          "chance_events": 36,
+          "decisions": 294,
+          "final_state_and_rng_sha256": "f6650bfebe6ae4428414ac3990b72250736066fa80b55674fa72cc244b695f68",
+          "seed": 1956,
+          "trace_sha256": "7fc8e29ce9aafd2a9f393cc3026ecf12ee7645e504e0ae659ccc3861898346d3",
+          "transitions": 330
+        },
+        {
+          "chance_events": 49,
+          "decisions": 268,
+          "final_state_and_rng_sha256": "d13678d859fd8ce54421cf278cf82be2efa811498cd82bef42369dd9a0537da1",
+          "seed": 1957,
+          "trace_sha256": "c9184b5c451f4d6a5dc54cd75f6e274c8462d2db57995cb2bb56fcdfc5a3f14f",
+          "transitions": 317
+        },
+        {
+          "chance_events": 36,
+          "decisions": 205,
+          "final_state_and_rng_sha256": "8b6be1fc80c8d3aff97bc7054106af58a9132a7c7b541b95b79254d3d83f46d7",
+          "seed": 1958,
+          "trace_sha256": "78b09a15e1d890b0de06429abbd05ec62f033a24eb8eaf5d1c762b1cd62007f7",
+          "transitions": 241
+        }
+      ],
+      "games_identical_to_one_process": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "process_wall_seconds": [
+        89.98290125001222,
+        101.97049375000643,
+        62.271068208967336,
+        99.29809787496924,
+        57.239553041988984,
+        94.94904754095478,
+        79.00481654203031,
+        61.69527712499257
+      ],
+      "processes": 8,
+      "sampled_peak_charged_bytes": 5941168240,
+      "seeds": [
+        1951,
+        1952,
+        1953,
+        1954,
+        1955,
+        1956,
+        1957,
+        1958
+      ],
+      "status": "completed"
+    }
+  },
+  "schema": "gwrl-cpu-processes-v1",
+  "workload": {
+    "depth_cap": 16,
+    "hidden_dim": 16,
+    "message_layers": 1,
+    "search_evaluation": "per_search",
+    "simulations": 16,
+    "tensor_threads": 1,
+    "token_buckets": 2048,
+    "weights": "fresh, fixed, model seed 1951"
+  }
+}
