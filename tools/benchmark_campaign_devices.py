@@ -87,8 +87,8 @@ class Config:
             raise ValueError("Process-parallel self-play needs per-search evaluation and one tensor thread")
         roots = len(self.seeds) if self.mode == "selfplay" else 0
         # Game processes run tensors on their search threads: one busy core per
-        # game, plus this coordinator and its supervisor.
-        cores = roots + 2 if self.processes > 1 else self.threads + roots + 3
+        # process, plus this coordinator and its supervisor.
+        cores = self.processes + 2 if self.processes > 1 else self.threads + roots + 3
         if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(12, os.cpu_count() or 1) or cores > self.cpu_budget:
             raise ValueError("Tensor threads, search workers and coordinators must fit the 12-core allowance")
         if type(self.memory_bytes) is not int or not 2_000_000_000 < self.memory_bytes <= 30_000_000_000:
@@ -377,32 +377,36 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     return result
 
 
-def _selfplay_group(values, seeds, seconds):
+def _selfplay_group(values, seeds, deadline_epoch):
     """Play some of a cohort's games in a separate process with the same fresh weights."""
     config = Config(**{**values, "seeds": tuple(seeds), "processes": 1, "devices": ("cpu",)})
     models, evaluator, forward_stats, metadata = setup_models(config, "cpu")
+    seconds = max(1.0, deadline_epoch - time.time())
     result = selfplay(config, "cpu", models, evaluator, forward_stats, time.monotonic() + seconds,
                       lambda result=None: None)
-    return {"result": result, "weights_sha256": metadata["weights_sha256"],
+    return {"result": result, "weights_sha256": metadata["weights_sha256"], "process": os.getpid(),
             "forward": {**forward_stats, "batch_sizes": dict(forward_stats["batch_sizes"])},
             "evaluator": {"synchronized_seconds": evaluator.seconds, "calls": evaluator.calls,
                           "requests": evaluator.requests, "batch_sizes": dict(evaluator.batch_sizes)}}
 
 
 def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, executor=None):
-    """Split a cohort's games across processes, each with its own interpreter lock.
+    """Play a cohort's games from a queue on processes, each with its own interpreter lock.
 
-    Per-search games do not depend on which games share a process, so each game
-    matches its single-process result. Cohort wall time runs from the first
-    process's start to the last one's end; timings and counts are summed.
+    Each game is one task taken by whichever process is free, as in training, so
+    a long game leaves no process idle while games remain. Per-search games do
+    not depend on which process plays them, so each game matches its
+    single-process result. Cohort wall time runs from the first game's start to
+    the last one's end; timings and counts are summed.
     """
     import multiprocessing
     from concurrent.futures import ProcessPoolExecutor
-    groups = [config.seeds[index::config.processes] for index in range(config.processes)]
-    values, remaining = asdict(config), max(1.0, deadline - time.monotonic())
+    values = asdict(config)
+    # Queued games start late, so they share the cohort's absolute deadline.
+    deadline_epoch = time.time() + max(1.0, deadline - time.monotonic())
     pool = executor or ProcessPoolExecutor(max_workers=config.processes, mp_context=multiprocessing.get_context("spawn"))
     try:
-        futures = [pool.submit(run_group, values, group, remaining) for group in groups]
+        futures = [pool.submit(run_group, values, (seed,), deadline_epoch) for seed in config.seeds]
         parts = [future.result() for future in futures]
     finally:
         if executor is None:
@@ -414,6 +418,7 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
     complete = all(result["status"] == "completed" for result in results)
     started = min(result["started_at_epoch"] for result in results)
     span = max(result["ended_at_epoch"] for result in results) - started
+    busy = sum(result["ended_at_epoch"] - result["started_at_epoch"] for result in results)
     timing = Counter()
     for result in results:
         timing.update(result["timing_seconds"])
@@ -426,18 +431,20 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
                  "requests": sum(part["evaluator"]["requests"] for part in parts), "batch_sizes": merged("evaluator")}
     summary = {"task": results[0]["task"], "status": "completed" if complete else "truncated",
         "stop_reason": [result["stop_reason"] for result in results], "root_noise": True,
-        "selection": results[0]["selection"], "processes": config.processes, "process_groups": [list(group) for group in groups],
+        "selection": results[0]["selection"], "processes": config.processes,
         "started_at_epoch": started, "ended_at_epoch": started + span,
         "completed_games": sum(game["terminal"] for game in games), "cohort_wall_seconds": span,
         "complete_games_per_hour": len(games) * 3600 / span if complete else None,
+        "process_utilization": busy / (config.processes * span) if span > 0 else None,
         "search_simulations": config.simulations, "search_depth_cap": config.max_depth,
         "timing_seconds_summed_across_processes": dict(timing),
         "inference_calls": sum(result["inference_calls"] for result in results),
         "inference_requests": sum(result["inference_requests"] for result in results),
         "actual_inference_batch_sizes": dict(sum((Counter(result["actual_inference_batch_sizes"]) for result in results), Counter())),
-        "process_results": [{"seeds": list(group), "status": result["status"], "cohort_wall_seconds": result["cohort_wall_seconds"],
-                             "preparation_seconds": result["preparation_seconds"], "warmup_seconds": result["warmup_seconds"],
-                             "timing_seconds": result["timing_seconds"]} for group, result in zip(groups, results)],
+        "game_tasks": [{"seed": seed, "process": part["process"], "status": result["status"],
+                        "started_at_epoch": result["started_at_epoch"], "ended_at_epoch": result["ended_at_epoch"],
+                        "preparation_seconds": result["preparation_seconds"], "warmup_seconds": result["warmup_seconds"],
+                        "timing_seconds": result["timing_seconds"]} for seed, part, result in zip(config.seeds, parts, results)],
         "games": games}
     return summary, forward, evaluated
 

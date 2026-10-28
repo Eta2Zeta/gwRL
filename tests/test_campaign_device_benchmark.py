@@ -59,16 +59,19 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
                        {**selfplay_values, "processes": 11, "seeds": tuple(range(11))}):
             with self.subTest(values=values), self.assertRaises(ValueError): Config(**values)
         self.assertEqual(Config(**selfplay_values, processes=10, seeds=tuple(range(10))).processes, 10)
+        self.assertEqual(len(Config(**selfplay_values, processes=10, seeds=tuple(range(30))).seeds), 30)
 
     def test_parallel_selfplay_merges_games_in_seed_order_and_requires_identical_weights(self):
         class Immediate:
             def submit(self, function, *arguments):
                 future = Future(); future.set_result(function(*arguments)); return future
         calls = []
-        def run_group(values, seeds, seconds):
+        starts = {5: 100., 6: 101., 7: 110.}  # Seed 7 waits for the first free process.
+        def run_group(values, seeds, deadline_epoch):
             calls.append(tuple(seeds))
-            begin = 100. + seeds[0]
-            return {"weights_sha256": "w", "forward": {"seconds": 1., "calls": len(seeds), "batch_sizes": {1: len(seeds)}},
+            begin = starts[seeds[0]]
+            return {"weights_sha256": "w", "process": 40 + seeds[0] % 2,
+                    "forward": {"seconds": 1., "calls": len(seeds), "batch_sizes": {1: len(seeds)}},
                     "evaluator": {"synchronized_seconds": 2., "calls": len(seeds), "requests": len(seeds), "batch_sizes": {1: len(seeds)}},
                     "result": {"task": {"seed": seeds[0]}, "status": "completed", "stop_reason": None, "selection": "s",
                                "started_at_epoch": begin, "ended_at_epoch": begin + 10 * len(seeds), "cohort_wall_seconds": 10. * len(seeds),
@@ -78,11 +81,13 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         config = Config(mode="selfplay", devices=("cpu",), threads=1, search_evaluation="per_search", processes=2,
                         seeds=(5, 6, 7), seconds=60.)
         summary, forward, evaluated = parallel_selfplay(config, "w", float("inf"), run_group=run_group, executor=Immediate())
-        self.assertEqual(calls, [(5, 7), (6,)])
+        self.assertEqual(calls, [(5,), (6,), (7,)])
         self.assertEqual([game["seed"] for game in summary["games"]], [5, 6, 7])
+        self.assertEqual([task["process"] for task in summary["game_tasks"]], [41, 40, 41])
         self.assertEqual(summary["status"], "completed")
-        self.assertEqual(summary["cohort_wall_seconds"], 20.)  # 105 to 125, first start to last end
-        self.assertEqual(summary["timing_seconds_summed_across_processes"], {"search": 6.})
+        self.assertEqual(summary["cohort_wall_seconds"], 20.)  # 100 to 120, first start to last end
+        self.assertEqual(summary["process_utilization"], 30. / 40.)
+        self.assertEqual(summary["timing_seconds_summed_across_processes"], {"search": 9.})
         self.assertEqual((forward["calls"], evaluated["requests"]), (3, 3))
         self.assertEqual(summary["task"], {"seed": 5})
         with self.assertRaisesRegex(ValueError, "different fresh weights"):
@@ -94,7 +99,8 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         models, evaluator, forward_stats, metadata = setup_models(config, "cpu")
         summary, _, _ = parallel_selfplay(config, metadata["weights_sha256"], time.monotonic() + 240.)
         alone = selfplay(config, "cpu", models, evaluator, forward_stats, time.monotonic() + 240., lambda result=None: None)
-        self.assertEqual(summary["process_groups"], [[1951], [1952]])
+        self.assertEqual([task["seed"] for task in summary["game_tasks"]], [1951, 1952])
+        self.assertTrue(all(type(task["process"]) is int for task in summary["game_tasks"]))
         self.assertEqual([game["trace_sha256"] for game in summary["games"]], [game["trace_sha256"] for game in alone["games"]])
         self.assertEqual([game["final_state_and_rng_sha256"] for game in summary["games"]],
                          [game["final_state_and_rng_sha256"] for game in alone["games"]])
