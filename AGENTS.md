@@ -40,11 +40,17 @@
   Compare matched workloads, wall time, completed-game throughput and peak memory;
   evaluate learning strength under equal compute budgets. Do not infer training
   feasibility from a tiny smoke run or from CPU utilization alone.
-- Preserve every legal choice, rule/state field, dice distribution and exact
-  replay behavior when optimizing. Do not silently reduce search budgets, model
-  size or game horizons to report a speedup, or score unfinished games as terminal.
-  Distinguish algorithm changes from implementation optimizations and verify each
-  with appropriate correctness checks and before/after measurements.
+- Preserve every legal choice, game rule and dice distribution when optimizing.
+  Do not silently reduce search budgets, model size or game horizons to report a
+  speedup, or score unfinished games as terminal. Distinguish algorithm changes
+  from implementation optimizations and verify each with appropriate correctness
+  checks and before/after measurements.
+- All runs so far are experiments, not production. New methods need not
+  reproduce earlier runs, resume earlier checkpoints or keep superseded modes;
+  replace them rather than maintaining compatibility. Match game behavior (legal
+  choices and resulting states for the same position and dice), never internal
+  byte formats. Identical results are a cheap check for speed-only changes, not
+  a design constraint; a faster method may change float rounding or randomness.
 - Respect the current user allowance of at most 12 CPU cores and 30,000,000,000
   bytes of memory, including worker/coordinator overhead, until the user changes
   it. Efficient code does not by itself establish that AlphaZero-style search is
