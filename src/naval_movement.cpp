@@ -2,6 +2,7 @@
 #include "game/catalog.hpp"
 #include "game/naval.hpp"
 #include "game/politics.hpp"
+#include "game/position_facts.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -13,7 +14,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool ok, const std::string &why) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool ok, const Message &why) {
   if (!ok)
     throw std::runtime_error(why);
 }
@@ -32,18 +34,13 @@ bool has(const State &s, const UnitState &u, const Id &cls) {
 bool hostile(const State &s, const Id &n, const Id &other) {
   return n != other && s.nations.at(n).atWarWith.contains(other);
 }
-const V &node(const State &s, const Id &zone) {
-  return s.definition->geography.require("nodes").require(zone);
-}
 bool sea(const State &s, const Id &zone) {
-  const auto *n = s.definition->geography.require("nodes").find(zone);
+  const auto *n = findMapNode(s, zone);
   return n && n->require("type").asString() == "sea";
 }
 bool adjacent(const State &s, const Id &a, const Id &b) {
-  for (const auto &e : node(s, a).require("neighbors").asArray())
-    if (e.require("neighbor_id").asString() == b)
-      return !e.find("passable") || e.require("passable").asBool();
-  return false;
+  const auto *e = mapEdge(s, a, b);
+  return e && (!e->find("passable") || e->require("passable").asBool());
 }
 bool tech(const State &s, const Id &n, const Id &id) {
   return value(s.nations.at(n).technologyStages, id) == 4;
@@ -207,11 +204,10 @@ bool available(const State &s, const UnitState &u, bool combat) {
   return p.empty() ||
          (s.facilities.contains(p) && s.facilities.at(p).damage == 0);
 }
-int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
-              const Id &routeStart = {}) {
-  int total = s.definition->catalog
-                  ->stats(u.type, u.damage, catalogContext(s, u.owner, u.zone))
-                  .movement.value_or(0);
+int allowanceNow(const State &s, const UnitState &u, bool combat,
+                 const Id &target, const Id &routeStart) {
+  int total =
+      catalogStats(s, u.type, u.damage, u.owner, u.zone).movement.value_or(0);
   Id start = u.turnOrigin;
   if (!sea(s, start)) {
     for (const auto &[key, v] : u.turnFlags)
@@ -253,6 +249,21 @@ int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
     ++total;
   return std::max(0, total);
 }
+int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
+              const Id &routeStart = {}) {
+  // Route validation asks again for every route with the same unit, origin
+  // and destination. Reuse the answer only for this position's own unit.
+  const auto found = s.units.find(u.id);
+  auto *facts = found != s.units.end() && &found->second == &u
+                    ? positionFacts(s)
+                    : nullptr;
+  if (!facts)
+    return allowanceNow(s, u, combat, target, routeStart);
+  return facts->number(
+      PositionFacts::Fact::NavalAllowance,
+      u.id + '\n' + target + '\n' + routeStart + (combat ? "\nc" : "\nn"),
+      [&] { return allowanceNow(s, u, combat, target, routeStart); });
+}
 int spent(const State &s, const UnitState &u) {
   return value(u.turnFlags, "naval_movement_spent");
 }
@@ -277,16 +288,15 @@ bool anyEnemy(const State &s, const Id &n, const Id &z) {
 }
 bool passage(const State &s, const UnitState &u, const Id &from, const Id &to,
              bool strategic) {
-  for (const auto &e : node(s, from).require("neighbors").asArray())
-    if (e.require("neighbor_id").asString() == to) {
-      if (auto p = e.find("closed"); p && p->isBool() && p->asBool()) {
-        auto kind = e.find("canal_or_strait");
-        return !strategic && has(s, u, "submarine") && kind &&
-               kind->isString() && kind->asString() == "strait";
-      }
-      return !e.find("passable") || e.require("passable").asBool();
-    }
-  return false;
+  const auto *e = mapEdge(s, from, to);
+  if (!e)
+    return false;
+  if (auto p = e->find("closed"); p && p->isBool() && p->asBool()) {
+    auto kind = e->find("canal_or_strait");
+    return !strategic && has(s, u, "submarine") && kind && kind->isString() &&
+           kind->asString() == "strait";
+  }
+  return !e->find("passable") || e->require("passable").asBool();
 }
 void detachAircraft(State &s, const std::vector<Id> &fleet, const Id &seaZone) {
   for (const auto &ship : fleet) {
@@ -770,9 +780,7 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
         }
         if (path.size() > 8)
           return false;
-        for (const auto &edge :
-             node(s, path.back()).require("neighbors").asArray()) {
-          const auto next = edge.require("neighbor_id").asString();
+        for (const auto &next : mapNeighbors(s, path.back())) {
           if (!sea(s, next) ||
               std::find(path.begin(), path.end(), next) != path.end())
             continue;
@@ -808,9 +816,7 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
                           4 +
                           (tech(s, nation, "improved_logistics") ? 1 : 0)))
                     return false;
-                  for (const auto &e :
-                       node(s, path.back()).require("neighbors").asArray()) {
-                    const auto next = e.require("neighbor_id").asString();
+                  for (const auto &next : mapNeighbors(s, path.back())) {
                     if (!sea(s, next) ||
                         std::find(path.begin(), path.end(), next) != path.end())
                       continue;
@@ -1125,15 +1131,30 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
         if (!blockers(s, n, r.path[i]).empty())
           return fail("Enemy surface warship or MAP blocks noncombat movement");
   }
-  State probe = s.clone();
-  detachAircraft(probe, r.units, r.path.front());
-  for (const auto &id : r.units) {
-    auto &u = probe.units.at(id);
-    u.zone = r.path.back();
-    for (const auto &child : u.cargo)
-      probe.units.at(child).zone = u.zone;
-  }
-  if (!airLandingPlanAvailable(probe))
+  // The joint landing plan reads only aircraft and carriers. A force with no
+  // carrier, aircraft or aircraft cargo leaves all of them where they are.
+  const bool movesAircraft =
+      std::any_of(r.units.begin(), r.units.end(), [&](const Id &id) {
+        const auto &u = s.units.at(id);
+        return has(s, u, "carrier") || isAircraft(s, u) ||
+               std::any_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
+                 return isAircraft(s, s.units.at(c));
+               });
+      });
+  bool landingPlan;
+  if (movesAircraft) {
+    State probe = s.clone();
+    detachAircraft(probe, r.units, r.path.front());
+    for (const auto &id : r.units) {
+      auto &u = probe.units.at(id);
+      u.zone = r.path.back();
+      for (const auto &child : u.cargo)
+        probe.units.at(child).zone = u.zone;
+    }
+    landingPlan = airLandingPlanAvailable(probe);
+  } else
+    landingPlan = airLandingPlanAvailable(s);
+  if (!landingPlan)
     return fail(
         "Carrier movement leaves aircraft without a joint landing plan");
   RouteResult result;
@@ -1166,8 +1187,13 @@ std::vector<Action> navalMovementActions(const State &s) {
         out.push_back(
             action(s, u.owner, "naval_remove_raider", {{"unit", V(id)}}));
     }
+    // canLoad ends with navalCargoFits, which only transports and Japanese
+    // destroyers pass, so other ships need no per-unit loading test.
+    const bool carriesCargo =
+        (u.type == "destroyer" && u.owner == "japan") ||
+        has(s, u, "naval_transport");
     for (const auto &[cargo, c] : s.units) {
-      if (canLoad(s, id, cargo))
+      if (carriesCargo && canLoad(s, id, cargo))
         out.push_back(action(s, c.owner, "naval_load",
                              {{"transport", V(id)}, {"unit", V(cargo)}}));
       if (c.carriedBy == id)

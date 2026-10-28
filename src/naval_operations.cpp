@@ -14,7 +14,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool value, const std::string &message) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool value, const Message &message) {
   if (!value)
     throw std::runtime_error(message);
 }
@@ -32,13 +33,10 @@ bool sea(const State &s, const Id &zone) {
   return !s.territories.contains(zone);
 }
 const V &node(const State &s, const Id &id) {
-  return s.definition->geography.require("nodes").require(id);
+  return mapNode(s, id);
 }
 bool adjacent(const State &s, const Id &a, const Id &b) {
-  for (const auto &e : node(s, a).require("neighbors").asArray())
-    if (e.require("neighbor_id").asString() == b)
-      return true;
-  return false;
+  return mapEdge(s, a, b) != nullptr;
 }
 V ids(const std::vector<Id> &values) {
   A a;
@@ -106,8 +104,13 @@ bool unavailable(const UnitState &u) {
          flag(u.turnFlags, "placed_this_turn") ||
          flag(u.turnFlags, "repairing");
 }
-std::vector<Id> pathTo(const State &s, const Id &unit, const Id &target) {
+// Each target's first valid shortest combat flight, in breadth-first order
+// from the aircraft's zone. Enemy Fighters may occupy only a path's final zone,
+// its target, so paths into them are kept but never extended. One search finds
+// what a separate search per target would.
+std::map<Id, std::vector<Id>> combatPaths(const State &s, const Id &unit) {
   const auto &u = s.units.at(unit);
+  std::map<Id, std::vector<Id>> paths;
   std::deque<std::vector<Id>> q{{u.zone}};
   std::set<Id> visited;
   while (!q.empty()) {
@@ -116,19 +119,18 @@ std::vector<Id> pathTo(const State &s, const Id &unit, const Id &target) {
     const auto current = path.back();
     if (!visited.insert(current).second)
       continue;
-    if (current == target && validateFlight(s, unit, path, true, true).allowed)
-      return path;
+    if (validateFlight(s, unit, path, true, true).allowed)
+      paths.emplace(current, path);
     if (static_cast<int>(path.size()) > u.movementRemaining.value_or(0))
       continue;
-    for (const auto &e : node(s, current).require("neighbors").asArray()) {
-      const auto next = e.require("neighbor_id").asString();
+    for (const auto &next : mapNeighbors(s, current)) {
       auto candidate = path;
       candidate.push_back(next);
-      if (validateFlight(s, unit, candidate, true, next == target).allowed)
+      if (validateFlight(s, unit, candidate, true, true).allowed)
         q.push_back(std::move(candidate));
     }
   }
-  return {};
+  return paths;
 }
 void moveAircraft(State &s, const Id &id, const std::vector<Id> &path) {
   auto &u = s.units.at(id);
@@ -611,6 +613,7 @@ std::vector<Action> navalOperationActions(const State &s) {
       if (isAircraft(s, u) && !u.commitments.contains("combat") &&
           !u.commitments.contains("air_battle") &&
           !flag(u.turnFlags, "air_in_flight")) {
+        std::optional<std::map<Id, std::vector<Id>>> paths;
         for (const auto &[zone, n] :
              s.definition->geography.require("nodes").asObject()) {
           if (!sea(s, zone))
@@ -622,12 +625,13 @@ std::vector<Action> navalOperationActions(const State &s) {
                 ((ship(s, v) && !unitClass(s, v, "submarine")) ||
                  isAircraft(s, v)))
               enemy = true;
-          const auto path = pathTo(s, id, zone);
-          if (path.empty() || !landingAfter(s, id, path))
+          if (!paths)
+            paths = combatPaths(s, id);
+          const auto found = paths->find(zone);
+          if (found == paths->end() || !landingAfter(s, id, found->second))
             continue;
-          if (enemy && s.definition->catalog
-                           ->stats(u.type, u.damage, catalogContext(s, u.owner))
-                           .attack)
+          const auto &path = found->second;
+          if (enemy && catalogStats(s, u.type, u.damage, u.owner).attack)
             out.push_back(action(
                 s, s.currentNation(), "naval_air_attack",
                 {{"unit", V(id)}, {"path", ids(path)}, {"sea", V(zone)}}));

@@ -113,6 +113,9 @@ struct CatalogContext {
     std::map<Id, bool> flags;
     std::set<Id> disabledFlags;
     std::map<Id, int> purchases;
+    // Flag maps read in place after flags, in precedence order. Only
+    // catalogStats sets them, for a context it uses at once.
+    std::vector<const std::map<Id, int>*> flagSources;
 };
 
 struct Eligibility {
@@ -161,6 +164,10 @@ class Catalog {
 };
 
 CatalogContext catalogContext(const State& state, const Id& nation, const std::optional<Id>& zone = std::nullopt);
+// Catalog stats under catalogContext(state, nation, zone), reading the state's
+// flags in place instead of copying them into a context.
+CatalogStats catalogStats(const State& state, const Id& type, int damage, const Id& nation,
+                          const std::optional<Id>& zone = std::nullopt);
 void initializeCatalogState(State& state);
 int completedAssetValue(const Definition& definition, const Id& type);
 

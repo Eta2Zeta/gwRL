@@ -9,7 +9,8 @@
 namespace game::campaign {
 namespace {
 using V = json::Value;
-void require(bool ok, const std::string& message) { if (!ok) throw std::runtime_error(message); }
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool ok, const Message &message) { if (!ok) throw std::runtime_error(message); }
 std::optional<int> optionalInt(const V& v) { return v.isNull() ? std::nullopt : std::optional<int>(v.asInt()); }
 std::optional<Id> optionalId(const V& v) { return v.isNull() ? std::nullopt : std::optional<Id>(v.asString()); }
 std::vector<int> integers(const V& v) { std::vector<int> out; for (const auto& x:v.asArray()) out.push_back(x.asInt()); return out; }
@@ -21,7 +22,12 @@ int date(const std::string& s) {
     const int y=std::stoi(s.substr(0,4)),m=std::stoi(s.substr(5)); require(y>0 && m>=1 && m<=12,"Invalid catalog date"); return y*100+m;
 }
 std::optional<int> optionalDate(const V& v) { return v.isNull()?std::nullopt:std::optional<int>(date(v.asString())); }
-bool flag(const CatalogContext& c,const Id& id) { const auto i=c.flags.find(id); return !c.disabledFlags.contains(id) && i!=c.flags.end() && i->second; }
+bool flag(const CatalogContext& c,const Id& id) {
+    if(c.disabledFlags.contains(id)) return false;
+    if(const auto i=c.flags.find(id); i!=c.flags.end()) return i->second;
+    for(const auto* source:c.flagSources) if(const auto i=source->find(id); i!=source->end()) return i->second!=0;
+    return false;
+}
 bool flags(const CatalogContext& c,const V* list) { if(list) for(const auto& x:list->asArray()) if(!flag(c,x.asString())) return false; return true; }
 bool hasTechnologies(const CatalogContext& c,const std::set<Id>& list) { return std::includes(c.technologies.begin(),c.technologies.end(),list.begin(),list.end()); }
 std::vector<CatalogUpgrade> upgrades(const V& list) {
@@ -188,9 +194,12 @@ int Catalog::repairCapacity(const Id& type,int damage,const CatalogContext& c) c
 std::vector<std::string> Catalog::unresolvedFields() const {std::vector<std::string> out;for(const auto& [id,u]:units_)if(!u.unresolved.isNull()&&((u.unresolved.isArray()&&!u.unresolved.asArray().empty())||(!u.unresolved.isArray())))out.push_back(id+":"+canonicalJson(u.unresolved));for(const auto& [file,doc]:sourceData_.asObject())if(const auto* b=doc.find("blockers"))for(const auto& x:b->asArray())out.push_back(file+":"+canonicalJson(x));return out;}
 void Catalog::requireComplete() const {const auto missing=unresolvedFields();require(missing.empty(),"Catalog has unresolved source fields" );require(!units_.empty()&&!facilities_.empty()&&!technologies_.empty()&&!rows_.empty(),"Incomplete catalog documents");}
 
-CatalogContext catalogContext(const State& state,const Id& owner,const std::optional<Id>& zone) {
+namespace {
+// Later flag maps override earlier ones and the derived flags override all.
+CatalogContext buildContext(const State& state,const Id& owner,const std::optional<Id>& zone,bool copyFlags) {
     require(state.definition!=nullptr,"Catalog context requires definition");const auto& n=state.nations.at(owner);CatalogContext c;c.nation=owner;c.powerStatus=n.powerStatus;const auto [y,m]=state.calendarDate();c.year=y;c.month=m;for(const auto& [id,stage]:n.technologyStages)if(stage==4)c.technologies.insert(id);
-    for(const auto* list:{&state.flags,&n.gameFlags,&n.turnFlags})for(const auto& [id,v]:*list)c.flags[id]=v!=0;
+    if(copyFlags) for(const auto* list:{&state.flags,&n.gameFlags,&n.turnFlags})for(const auto& [id,v]:*list)c.flags[id]=v!=0;
+    else c.flagSources={&n.turnFlags,&n.gameFlags,&state.flags};
     c.flags["owner_is_major_power"]=n.powerStatus=="major";
     if(zone) {const auto& faction=state.definition->factions.at(owner);const bool home=faction.homeCountryKnown&&faction.homeCountry.contains(*zone);c.flags["movement_starts_in_owner_home_country"]=home;c.flags["movement_ends_in_owner_home_country"]=home;}
     if(!state.nations.contains("ussr"))c.disabledFlags.insert("ccp_soviet_rail_production");
@@ -199,6 +208,13 @@ CatalogContext catalogContext(const State& state,const Id& owner,const std::opti
     if(state.definition->scenarioId=="japan_china_1936_1941")c.disabledFlags.insert("kmt_burma_road");
     for(const auto& [key,value]:n.turnFlags)if(key.rfind("purchased:",0)==0)c.purchases[key.substr(10)]=value;
     return c;
+}
+}
+CatalogContext catalogContext(const State& state,const Id& owner,const std::optional<Id>& zone) {
+    return buildContext(state,owner,zone,true);
+}
+CatalogStats catalogStats(const State& state,const Id& type,int damage,const Id& owner,const std::optional<Id>& zone) {
+    return state.definition->catalog->stats(type,damage,buildContext(state,owner,zone,false));
 }
 void initializeCatalogState(State& state) {
     require(state.definition&&state.definition->catalog,"Campaign has no catalog");

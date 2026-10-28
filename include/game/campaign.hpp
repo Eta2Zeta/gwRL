@@ -2,8 +2,11 @@
 
 #include "game/simple_json.hpp"
 
+#include <compare>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <optional>
@@ -39,7 +42,16 @@ struct IndexedGeography {
     std::unordered_map<Id, std::size_t> nodeIndices;
     std::vector<std::vector<std::size_t>> adjacency;
     std::vector<std::vector<int>> hopDistances;  // -1 means unreachable.
+    // Per node, in nodeIds order, for rules that read the map inside move
+    // generation: a copy of its JSON, its source-order neighbor IDs and the
+    // first edge to each neighbor. Edges point into nodes, so never copy this.
+    std::vector<json::Value> nodes;
+    std::vector<std::vector<Id>> neighborIds;
+    std::vector<std::unordered_map<Id, const json::Value*>> edges;
 
+    IndexedGeography() = default;
+    IndexedGeography(const IndexedGeography&) = delete;
+    IndexedGeography& operator=(const IndexedGeography&) = delete;
     std::set<Id> withinHops(const Id& origin, int range) const;
 };
 
@@ -60,6 +72,30 @@ struct Definition {
 };
 
 std::shared_ptr<const Definition> freezeDefinition(Definition definition);
+
+struct State;
+// Map reads for rule hot paths. Each matches reading the definition's map JSON
+// directly, including its errors, and uses the frozen index when it has one.
+const json::Value& mapNode(const State&, const Id& zone);  // Throws if unknown.
+const json::Value* findMapNode(const State&, const Id& zone);
+// First edge from one node to a neighbor, or null; throws if from is unknown.
+const json::Value* mapEdge(const State&, const Id& from, const Id& to);
+// Source-order neighbor IDs, borrowed from the index or read from the JSON.
+class NeighborIds {
+  public:
+    static NeighborIds borrow(const std::vector<Id>& ids) { NeighborIds result; result.borrowed_ = &ids; return result; }
+    static NeighborIds own(std::vector<Id> ids) { NeighborIds result; result.owned_ = std::move(ids); return result; }
+    const std::vector<Id>& ids() const { return borrowed_ ? *borrowed_ : owned_; }
+    std::vector<Id>::const_iterator begin() const { return ids().begin(); }
+    std::vector<Id>::const_iterator end() const { return ids().end(); }
+    std::size_t size() const { return ids().size(); }
+
+  private:
+    NeighborIds() = default;
+    const std::vector<Id>* borrowed_ {nullptr};
+    std::vector<Id> owned_;
+};
+NeighborIds mapNeighbors(const State&, const Id& zone);  // Throws if unknown.
 
 struct NationState {
     std::optional<Id> controllerNation;
@@ -225,6 +261,57 @@ struct Event {
     std::string afterStateKey;
 };
 
+// An append-only audit log whose copies share the recorded events, so copying
+// a State for an engine step, search clone or rule probe does not copy history.
+class EventLog {
+    using Entries = std::vector<std::shared_ptr<const Event>>;
+
+  public:
+    class const_iterator {
+      public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = Event;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const Event*;
+        using reference = const Event&;
+        const_iterator() = default;
+        explicit const_iterator(Entries::const_iterator at) : at_(at) {}
+        reference operator*() const { return **at_; }
+        pointer operator->() const { return at_->get(); }
+        reference operator[](difference_type n) const { return *at_[n]; }
+        const_iterator& operator++() { ++at_; return *this; }
+        const_iterator operator++(int) { auto old = *this; ++at_; return old; }
+        const_iterator& operator--() { --at_; return *this; }
+        const_iterator operator--(int) { auto old = *this; --at_; return old; }
+        const_iterator& operator+=(difference_type n) { at_ += n; return *this; }
+        const_iterator& operator-=(difference_type n) { at_ -= n; return *this; }
+        friend const_iterator operator+(const_iterator i, difference_type n) { return i += n; }
+        friend const_iterator operator+(difference_type n, const_iterator i) { return i += n; }
+        friend const_iterator operator-(const_iterator i, difference_type n) { return i -= n; }
+        friend difference_type operator-(const const_iterator& a, const const_iterator& b) { return a.at_ - b.at_; }
+        friend bool operator==(const const_iterator& a, const const_iterator& b) { return a.at_ == b.at_; }
+        friend auto operator<=>(const const_iterator& a, const const_iterator& b) { return a.at_ <=> b.at_; }
+
+      private:
+        Entries::const_iterator at_;
+    };
+    using iterator = const_iterator;
+    using value_type = Event;
+
+    void push_back(Event event) { entries_.push_back(std::make_shared<const Event>(std::move(event))); }
+    void clear() { entries_.clear(); }
+    std::size_t size() const { return entries_.size(); }
+    bool empty() const { return entries_.empty(); }
+    const Event& operator[](std::size_t index) const { return *entries_[index]; }
+    const Event& back() const { return *entries_.back(); }
+    const_iterator begin() const { return const_iterator(entries_.begin()); }
+    const_iterator end() const { return const_iterator(entries_.end()); }
+    operator std::vector<Event>() const { return {begin(), end()}; }
+
+  private:
+    Entries entries_;
+};
+
 struct State {
     std::shared_ptr<const Definition> definition;
     std::map<Id, NationState> nations;
@@ -243,7 +330,7 @@ struct State {
     std::vector<Id> battleOrder;
     std::optional<ChanceRequest> chance;
     std::map<Id, int> flags;
-    std::vector<Event> history;
+    EventLog history;
     // Versioned AI action-construction state. Empty for the human/game API.
     // Public source data, included in observations, keys, clones and saves.
     json::Value actionInterface {json::Value::Object{}};
@@ -251,7 +338,7 @@ struct State {
 
     State clone() const;  // Value-copy mutable data; share immutable definition.
     void validate() const;
-    Id currentNation() const;
+    const Id& currentNation() const;
     std::optional<Id> decisionPlayer() const;
     std::pair<int, int> calendarDate() const;
     void captureTurnStart();

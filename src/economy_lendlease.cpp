@@ -10,7 +10,8 @@ namespace game::campaign {
 namespace {
 using V = json::Value;
 using O = V::Object;
-void require(bool c, const std::string &why) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool c, const Message &why) {
     if (!c)
         throw std::runtime_error(why);
 }

@@ -1,4 +1,5 @@
 #include "game/campaign.hpp"
+#include "game/position_facts.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -720,6 +721,50 @@ void reachedMenusAreSharedAcrossClonesAndBounded() {
     require(rules->actionCalls == beforeRevisit + 1, "The shared menu table retained unbounded old menus");
 }
 
+void eventLogCopiesShareEventsAndStayIndependent() {
+    EventLog log;
+    log.push_back(Event{"first", V(O{{"n", V(1.0)}}), "k1"});
+    log.push_back(Event{"second", V(O{}), "k2"});
+    auto copy = log;
+    copy.push_back(Event{"third", V(O{}), "k3"});
+    require(log.size() == 2 && copy.size() == 3 && &log[0] == &copy[0], "Copies must share recorded events");
+    require(log.back().kind == "second" && copy.back().kind == "third", "Appending to a copy changed the original");
+    const std::vector<Event> tail(copy.begin() + 1, copy.end());
+    require(tail.size() == 2 && tail.front().kind == "second" && tail.back().afterStateKey == "k3",
+            "Random-access iteration differs from the recorded order");
+    const std::vector<Event> all = copy;
+    require(all.size() == 3 && all.front().payload.require("n").asInt() == 1, "Conversion to events differs");
+    copy.clear();
+    require(copy.empty() && log.size() == 2, "Clearing a copy cleared the original");
+}
+
+void positionFactsAreScopedToOneUnchangedState() {
+    auto state = initialState();
+    auto other = state;
+    require(!positionFacts(state), "Facts exist without a scope");
+    int computed = 0;
+    const auto answer = [&] { ++computed; return true; };
+    {
+        const PositionScope scope(state);
+        auto* facts = positionFacts(state);
+        require(facts && !positionFacts(other), "Facts must belong to the exact State object");
+        facts->remember(PositionFacts::Fact::SeaBlockaded, "a", "b", answer);
+        facts->remember(PositionFacts::Fact::SeaBlockaded, "a", "b", answer);
+        facts->remember(PositionFacts::Fact::SeaBlockaded, "a", "c", answer);
+        facts->remember(PositionFacts::Fact::InSupply, "a", "b", answer);
+        require(computed == 3, "A remembered answer was recomputed or different keys were conflated");
+        {
+            const PositionScope reuse(state);
+            require(positionFacts(state) == facts, "A nested scope for the same State must reuse its facts");
+            const PositionScope probe(other);
+            require(positionFacts(other) && positionFacts(other) != facts && positionFacts(state) == facts,
+                    "Nested scopes must keep each State's own facts");
+        }
+        require(positionFacts(state) == facts && !positionFacts(other), "Closing nested scopes lost or leaked facts");
+    }
+    require(!positionFacts(state), "Facts outlived their scope");
+}
+
 }  // namespace
 
 int main() {
@@ -742,6 +787,8 @@ int main() {
         {"state key reuse and invalidation", runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys},
         {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
         {"reached menus shared across clones and bounded", reachedMenusAreSharedAcrossClonesAndBounded},
+        {"event log copies share events", eventLogCopiesShareEventsAndStayIndependent},
+        {"position facts scoped to one state", positionFactsAreScopedToOneUnchangedState},
     };
     for (const auto& [name, test] : tests) {
         try { test(); std::cout << "PASS " << name << '\n'; }

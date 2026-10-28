@@ -12,7 +12,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool ok, const std::string& message) { if (!ok) throw std::runtime_error(message); }
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool ok, const Message &message) { if (!ok) throw std::runtime_error(message); }
 V num(int n) { return V(static_cast<double>(n)); }
 bool marked(const std::map<Id, int>& flags, const Id& key) {
     auto it = flags.find(key); return it != flags.end() && it->second != 0;

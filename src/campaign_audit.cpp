@@ -37,7 +37,7 @@ V clockJson(const State&s) {
         {"serial",V(std::to_string(s.clock.playerTurnSerial))},{"nation",V(s.currentNation())},
         {"phase",V(toString(s.clock.phase))},{"terminal",V(s.terminal)}});
 }
-V eventsJson(const std::vector<Event>&events,std::size_t from) {
+V eventsJson(const EventLog&events,std::size_t from) {
     A out;
     for(std::size_t i=from;i<events.size();++i)
         out.emplace_back(O{{"kind",V(events[i].kind)}, {"payload",events[i].payload},

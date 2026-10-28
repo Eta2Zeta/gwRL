@@ -19,7 +19,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool ok, const std::string& message) { if (!ok) throw std::runtime_error(message); }
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool ok, const Message &message) { if (!ok) throw std::runtime_error(message); }
 V number(int v) { return V(static_cast<double>(v)); }
 V optionalId(const std::optional<Id>& v) { return v ? V(*v) : V(nullptr); }
 V optionalInt(const std::optional<int>& v) { return v ? number(*v) : V(nullptr); }
@@ -82,21 +83,28 @@ std::shared_ptr<const IndexedGeography> indexGeography(const V::Object& nodes) {
         index->nodeIds.push_back(id);
     }
     index->adjacency.resize(nodes.size());
+    index->nodes.reserve(nodes.size());
+    for(const auto& [id,node]:nodes) index->nodes.push_back(node);
+    index->neighborIds.resize(nodes.size());
+    index->edges.resize(nodes.size());
     for(const auto& [id,node]:nodes) {
         // Some catalog-free state fixtures deliberately omit physical edges.
         // Preserve their validation/late-error behavior rather than inventing
         // an empty map or imposing an additional definition requirement.
         const auto* neighbors=node.find("neighbors");
         if(!neighbors || !neighbors->isArray()) return nullptr;
-        auto& adjacent=index->adjacency[index->nodeIndices.at(id)];
+        const auto at=index->nodeIndices.at(id);
+        auto& adjacent=index->adjacency[at];
         adjacent.reserve(neighbors->asArray().size());
-        for(const auto& edge:neighbors->asArray()) {
+        for(const auto& edge:index->nodes[at].require("neighbors").asArray()) {
             if(!edge.isObject()) return nullptr;
             const auto* neighbor=edge.find("neighbor_id");
             if(!neighbor || !neighbor->isString()) return nullptr;
             const auto found=index->nodeIndices.find(neighbor->asString());
             if(found==index->nodeIndices.end()) return nullptr;
             adjacent.push_back(found->second);
+            index->neighborIds[at].push_back(neighbor->asString());
+            index->edges[at].emplace(neighbor->asString(),&edge);
         }
     }
     index->hopDistances.assign(nodes.size(),std::vector<int>(nodes.size(),-1));
@@ -139,6 +147,91 @@ V decisionJson(const Decision& d) { A options; for (const auto& a:d.options) opt
 Decision readDecision(const V& v) { Decision d; d.id=v.require("id").asString(); d.kind=v.require("kind").asString(); d.nation=v.require("nation").asString(); d.reaction=v.require("reaction").asBool(); d.continuation=v.require("continuation").asString(); for(const auto& a:v.require("options").asArray())d.options.push_back(actionFromJson(a)); return d; }
 V chanceJson(const ChanceRequest& c) { A dice; for(const auto& d:c.dice) { std::vector<int> faces(d.rerollFaces.begin(),d.rerollFaces.end()); dice.emplace_back(O{{"sides",number(d.sides)},{"modifier",number(d.modifier)},{"reroll_faces",ints(faces)},{"max_rerolls",number(d.maxRerolls)}}); } return V(O{{"id",V(c.id)},{"purpose",V(c.purpose)},{"nation",V(c.nation)},{"continuation",V(c.continuation)},{"dice",V(std::move(dice))}}); }
 ChanceRequest readChance(const V& v) { ChanceRequest c; c.id=v.require("id").asString(); c.purpose=v.require("purpose").asString(); c.nation=v.require("nation").asString(); c.continuation=v.require("continuation").asString(); for(const auto& x:v.require("dice").asArray()) { DieSpec d; d.sides=x.require("sides").asInt(); d.modifier=x.require("modifier").asInt(); d.maxRerolls=x.require("max_rerolls").asInt(); auto faces=readInts(x.require("reroll_faces")); d.rerollFaces={faces.begin(),faces.end()}; require(d.rerollFaces.size()==faces.size(),"Duplicate reroll face"); c.dice.push_back(std::move(d)); } return c; }
+
+// The canonical text of State::toJson without building the JSON tree first.
+// Objects list their keys in the sorted order canonicalJson gives a JSON
+// object; integers print as canonicalJson prints them as numbers.
+// An object's first key opens it; each later key follows a comma.
+void writeKey(std::string& out,const char* key,bool first=false) { out+=first?'{':','; out+='"'; out+=key; out+="\":"; }
+void writeInt(std::string& out,int value) { char buffer[16]; const auto end=std::to_chars(buffer,buffer+sizeof(buffer),value).ptr; out.append(buffer,end); }
+void writeBool(std::string& out,bool value) { out+=value?"true":"false"; }
+void writeOptionalId(std::string& out,const std::optional<Id>& value) { if(value)writeString(out,*value); else out+="null"; }
+void writeOptionalInt(std::string& out,const std::optional<int>& value) { if(value)writeInt(out,*value); else out+="null"; }
+template<class C> void writeStrings(std::string& out,const C& values) { out+='['; bool first=true; for(const auto& v:values) { if(!first)out+=','; first=false; writeString(out,v); } out+=']'; }
+void writeInts(std::string& out,const std::vector<int>& values) { out+='['; bool first=true; for(int v:values) { if(!first)out+=','; first=false; writeInt(out,v); } out+=']'; }
+void writeIntMap(std::string& out,const std::map<Id,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
+template<class M,class F> void writeEntries(std::string& out,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; write(v); } out+='}'; }
+void writeState(std::string& out,const State& s,bool includeHistory) {
+    require(s.definition!=nullptr,"State has no definition");
+    const bool interface=!s.actionInterface.asObject().empty();
+    if(interface) { writeKey(out,"action_interface",true); writeJson(out,s.actionInterface); }
+    writeKey(out,"battle_order",!interface); writeStrings(out,s.battleOrder);
+    writeKey(out,"battles"); writeEntries(out,s.battles,[&](const BattleState& x) {
+        writeKey(out,"attacker",true); writeString(out,x.attacker); writeKey(out,"attackers"); writeStrings(out,x.attackers);
+        writeKey(out,"data"); writeJson(out,x.data); writeKey(out,"defender"); writeString(out,x.defender);
+        writeKey(out,"defenders"); writeStrings(out,x.defenders); writeKey(out,"flags"); writeIntMap(out,x.flags);
+        writeKey(out,"id"); writeString(out,x.id); writeKey(out,"pending_hits"); writeIntMap(out,x.pendingHits);
+        writeKey(out,"stage"); writeString(out,x.stage); writeKey(out,"zone"); writeString(out,x.zone); out+='}'; });
+    writeKey(out,"chance"); if(s.chance)writeJson(out,chanceJson(*s.chance)); else out+="null";
+    writeKey(out,"clock"); writeKey(out,"completed_rounds",true); writeInt(out,s.clock.completedRounds);
+    writeKey(out,"income_collected"); writeBool(out,s.clock.incomeCollected); writeKey(out,"nation_index"); writeInt(out,s.clock.nationIndex);
+    writeKey(out,"phase"); writeString(out,toString(s.clock.phase)); writeKey(out,"player_turn_serial"); writeString(out,std::to_string(s.clock.playerTurnSerial));
+    writeKey(out,"round_index"); writeInt(out,s.clock.roundIndex); out+='}';
+    writeKey(out,"completed_turns"); writeIntMap(out,s.completedTurns);
+    writeKey(out,"construction"); writeEntries(out,s.construction,[&](const BuildProject& x) {
+        writeKey(out,"flags",true); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,x.owner);
+        writeKey(out,"paid_ipp"); writeInt(out,x.paidIpp); writeKey(out,"queue_position"); writeInt(out,x.queuePosition);
+        writeKey(out,"remaining_payments"); writeInts(out,x.remainingPayments); writeKey(out,"site"); writeOptionalId(out,x.site);
+        writeKey(out,"type"); writeString(out,x.type); out+='}'; });
+    writeKey(out,"decisions"); out+='['; for(std::size_t i=0;i<s.decisions.size();++i) { if(i)out+=','; writeJson(out,decisionJson(s.decisions[i])); } out+=']';
+    writeKey(out,"definition_fingerprint"); writeString(out,s.definition->fingerprint);
+    writeKey(out,"facilities"); writeEntries(out,s.facilities,[&](const FacilityState& x) {
+        writeKey(out,"damage",true); writeInt(out,x.damage); writeKey(out,"flags"); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id);
+        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,x.zone); out+='}'; });
+    writeKey(out,"flags"); writeIntMap(out,s.flags);
+    if(includeHistory) {
+        writeKey(out,"history"); out+='['; bool first=true;
+        for(const auto& e:s.history) {
+            if(!first)out+=','; first=false;
+            writeKey(out,"after_state_key",true); writeString(out,e.afterStateKey); writeKey(out,"kind"); writeString(out,e.kind);
+            writeKey(out,"payload"); writeJson(out,e.payload); out+='}';
+        }
+        out+=']';
+    }
+    writeKey(out,"nations"); writeEntries(out,s.nations,[&](const NationState& x) {
+        writeKey(out,"alliance",true); writeOptionalId(out,x.alliance); writeKey(out,"allies"); writeStrings(out,x.allies);
+        writeKey(out,"at_war_with"); writeStrings(out,x.atWarWith); writeKey(out,"controller_nation"); writeOptionalId(out,x.controllerNation);
+        writeKey(out,"game_flags"); writeIntMap(out,x.gameFlags); writeKey(out,"income_components"); writeIntMap(out,x.incomeComponents);
+        writeKey(out,"income_known"); writeBool(out,x.incomeKnown); writeKey(out,"player"); writeOptionalId(out,x.player);
+        writeKey(out,"power_status"); writeString(out,x.powerStatus); writeKey(out,"technology_stages"); writeIntMap(out,x.technologyStages);
+        writeKey(out,"treasury"); writeOptionalInt(out,x.treasury); writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); out+='}'; });
+    writeKey(out,"politics"); writeJson(out,politicsJson(s.politics));
+    writeKey(out,"rails"); writeEntries(out,s.rails,[&](const RailState& x) {
+        writeKey(out,"damage_by_endpoint",true); writeIntMap(out,x.damageByEndpoint); writeKey(out,"endpoint_a"); writeString(out,x.endpointA);
+        writeKey(out,"endpoint_b"); writeString(out,x.endpointB); writeKey(out,"id"); writeString(out,x.id); out+='}'; });
+    writeKey(out,"repairs"); writeEntries(out,s.repairs,[&](const RepairJob& x) {
+        writeKey(out,"endpoint",true); writeOptionalId(out,x.endpoint); writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,x.owner);
+        writeKey(out,"remaining_cost"); writeInt(out,x.remainingCost); writeKey(out,"remaining_damage"); writeInt(out,x.remainingDamage);
+        writeKey(out,"restricts_action"); writeBool(out,x.restrictsAction); writeKey(out,"target"); writeString(out,x.target); out+='}'; });
+    writeKey(out,"schema_version"); out+='1';
+    writeKey(out,"terminal"); writeBool(out,s.terminal);
+    writeKey(out,"territories"); writeEntries(out,s.territories,[&](const TerritoryState& x) {
+        writeKey(out,"flags",true); writeIntMap(out,x.flags); writeKey(out,"possessor"); writeOptionalId(out,x.possessor); out+='}'; });
+    writeKey(out,"turn_start"); writeKey(out,"possessions",true);
+    writeEntries(out,s.turnStart.possessions,[&](const std::optional<Id>& owner) { writeOptionalId(out,owner); });
+    writeKey(out,"units"); writeEntries(out,s.turnStart.units,[&](const std::pair<Id,Id>& entry) {
+        out+='['; writeString(out,entry.first); out+=','; writeString(out,entry.second); out+=']'; });
+    out+='}';
+    writeKey(out,"units"); writeEntries(out,s.units,[&](const UnitState& x) {
+        writeKey(out,"cargo",true); writeStrings(out,x.cargo); writeKey(out,"carried_by"); writeOptionalId(out,x.carriedBy);
+        writeKey(out,"commitments"); writeStrings(out,x.commitments); writeKey(out,"damage"); writeInt(out,x.damage);
+        writeKey(out,"game_flags"); writeIntMap(out,x.gameFlags); writeKey(out,"id"); writeString(out,x.id);
+        writeKey(out,"movement_allowance"); writeOptionalInt(out,x.movementAllowance); writeKey(out,"movement_remaining"); writeOptionalInt(out,x.movementRemaining);
+        writeKey(out,"owner"); writeString(out,x.owner); writeKey(out,"route"); writeStrings(out,x.route);
+        writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); writeKey(out,"turn_origin"); writeString(out,x.turnOrigin);
+        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,x.zone); out+='}'; });
+    out+='}';
+}
 }
 
 std::string toString(Phase phase) { switch(phase) { case Phase::Production:return "production"; case Phase::CombatMovement:return "combat_movement"; case Phase::Combat:return "combat"; case Phase::NonCombatMovement:return "non_combat_movement"; case Phase::PlaceUnits:return "place_units"; } throw std::runtime_error("Invalid campaign phase"); }
@@ -149,15 +242,25 @@ std::string canonicalJson(const V& value) { std::string result; writeJson(result
 std::string contentDigest(const std::string& value) {
     static constexpr std::array<std::uint32_t,64> k={0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2};
     std::array<std::uint32_t,8> h={0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19};
-    std::vector<unsigned char> data(value.begin(),value.end()); const auto bits=static_cast<std::uint64_t>(data.size())*8; data.push_back(0x80); while(data.size()%64!=56)data.push_back(0); for(int i=7;i>=0;--i)data.push_back(static_cast<unsigned char>(bits>>(8*i)));
     const auto rotr=[](std::uint32_t x,int n){return (x>>n)|(x<<(32-n));};
-    for(std::size_t offset=0;offset<data.size();offset+=64) {
-        std::array<std::uint32_t,64>w{}; for(int i=0;i<16;++i)for(int j=0;j<4;++j)w[i]=(w[i]<<8)|data[offset+4*i+j];
+    const auto compress=[&](const unsigned char* block) {
+        std::array<std::uint32_t,64>w; for(int i=0;i<16;++i)w[i]=(std::uint32_t(block[4*i])<<24)|(std::uint32_t(block[4*i+1])<<16)|(std::uint32_t(block[4*i+2])<<8)|block[4*i+3];
         for(int i=16;i<64;++i) { auto s0=rotr(w[i-15],7)^rotr(w[i-15],18)^(w[i-15]>>3); auto s1=rotr(w[i-2],17)^rotr(w[i-2],19)^(w[i-2]>>10); w[i]=w[i-16]+s0+w[i-7]+s1; }
         auto [a,b,c,d,e,f,g,z]=h; for(int i=0;i<64;++i) { auto s1=rotr(e,6)^rotr(e,11)^rotr(e,25); auto t1=z+s1+((e&f)^((~e)&g))+k[i]+w[i]; auto s0=rotr(a,2)^rotr(a,13)^rotr(a,22); auto t2=s0+((a&b)^(a&c)^(b&c)); z=g;g=f;f=e;e=d+t1;d=c;c=b;b=a;a=t1+t2; }
         h[0]+=a;h[1]+=b;h[2]+=c;h[3]+=d;h[4]+=e;h[5]+=f;h[6]+=g;h[7]+=z;
-    }
-    std::ostringstream out; out<<std::hex<<std::setfill('0'); for(auto x:h)out<<std::setw(8)<<x; return out.str();
+    };
+    // Whole blocks straight from the input, then the padded tail: the last
+    // bytes, 0x80, zeros and the big-endian bit length in one or two blocks.
+    const auto* bytes=reinterpret_cast<const unsigned char*>(value.data());
+    const std::size_t whole=value.size()/64*64, rest=value.size()-whole;
+    for(std::size_t offset=0;offset<whole;offset+=64)compress(bytes+offset);
+    std::array<unsigned char,128> tail{}; std::copy(bytes+whole,bytes+value.size(),tail.begin()); tail[rest]=0x80;
+    const std::size_t tailSize=rest<56?64:128; const auto bits=static_cast<std::uint64_t>(value.size())*8;
+    for(int i=0;i<8;++i)tail[tailSize-1-i]=static_cast<unsigned char>(bits>>(8*i));
+    for(std::size_t offset=0;offset<tailSize;offset+=64)compress(tail.data()+offset);
+    static constexpr char digits[]="0123456789abcdef"; std::string out(64,'0');
+    for(int i=0;i<8;++i)for(int j=0;j<8;++j)out[8*i+j]=digits[(h[i]>>(28-4*j))&0xf];
+    return out;
 }
 
 std::shared_ptr<const Definition> freezeDefinition(Definition d) {
@@ -186,13 +289,51 @@ std::set<Id> IndexedGeography::withinHops(const Id& origin,int range) const {
     return zones;
 }
 
+namespace {
+const IndexedGeography* geographyIndex(const State& s) { return s.definition->indexedGeography.get(); }
+const std::size_t* indexedNode(const IndexedGeography* index,const Id& zone) {
+    if(!index) return nullptr;
+    const auto found=index->nodeIndices.find(zone);
+    return found==index->nodeIndices.end()?nullptr:&found->second;
+}
+}
+
+const V& mapNode(const State& s,const Id& zone) {
+    const auto* index=geographyIndex(s);
+    if(const auto* at=indexedNode(index,zone)) return index->nodes[*at];
+    return s.definition->geography.require("nodes").require(zone);
+}
+const V* findMapNode(const State& s,const Id& zone) {
+    const auto* index=geographyIndex(s);
+    if(index) { const auto* at=indexedNode(index,zone); return at?&index->nodes[*at]:nullptr; }
+    return s.definition->geography.require("nodes").find(zone);
+}
+const V* mapEdge(const State& s,const Id& from,const Id& to) {
+    const auto* index=geographyIndex(s);
+    if(const auto* at=indexedNode(index,from)) {
+        const auto found=index->edges[*at].find(to);
+        return found==index->edges[*at].end()?nullptr:found->second;
+    }
+    for(const auto& edge:s.definition->geography.require("nodes").require(from).require("neighbors").asArray())
+        if(edge.require("neighbor_id").asString()==to) return &edge;
+    return nullptr;
+}
+NeighborIds mapNeighbors(const State& s,const Id& zone) {
+    const auto* index=geographyIndex(s);
+    if(const auto* at=indexedNode(index,zone)) return NeighborIds::borrow(index->neighborIds[*at]);
+    std::vector<Id> ids;
+    for(const auto& edge:s.definition->geography.require("nodes").require(zone).require("neighbors").asArray())
+        ids.push_back(edge.require("neighbor_id").asString());
+    return NeighborIds::own(std::move(ids));
+}
+
 V actionJson(const Action& a) { return V(O{{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}}); }
 Action actionFromJson(const V& v) { Action a; a.id=v.require("id").asString();a.kind=v.require("kind").asString();a.player=v.require("player").asString();a.nation=v.require("nation").asString();a.decision=readOptionalId(v.require("decision"));a.parameters=v.require("parameters"); return a; }
 V outcomeJson(const ChanceOutcome& o) { A a; for(const auto& faces:o.faces)a.push_back(ints(faces)); return V(O{{"faces",V(std::move(a))}}); }
 ChanceOutcome outcomeFromJson(const V& v) { ChanceOutcome o; for(const auto& faces:v.require("faces").asArray())o.faces.push_back(readInts(faces)); return o; }
 V chanceRequestJson(const ChanceRequest& request) { return chanceJson(request); }
 State State::clone() const { return *this; }
-Id State::currentNation() const { require(definition!=nullptr,"State has no definition"); require(clock.nationIndex>=0&&static_cast<std::size_t>(clock.nationIndex)<definition->turnOrder.size(),"Invalid national turn cursor");return definition->turnOrder[clock.nationIndex]; }
+const Id& State::currentNation() const { require(definition!=nullptr,"State has no definition"); require(clock.nationIndex>=0&&static_cast<std::size_t>(clock.nationIndex)<definition->turnOrder.size(),"Invalid national turn cursor");return definition->turnOrder[clock.nationIndex]; }
 std::optional<Id> State::decisionPlayer() const { if(terminal||chance)return std::nullopt; const auto nation=decisions.empty()?currentNation():decisions.back().nation; require(nations.contains(nation),"Decision nation is unknown");return politicalPlayer(*this,nation); }
 std::pair<int,int> State::calendarDate() const { require(definition!=nullptr,"State has no definition");const auto months=definition->startMonth-1+6*clock.roundIndex;return {definition->startYear+months/12,months%12+1}; }
 void State::captureTurnStart() { turnStart={};for(const auto& [id,t]:territories)turnStart.possessions.emplace(id,t.possessor);for(const auto& [id,u]:units)turnStart.units.emplace(id,std::pair{u.owner,u.zone}); }
@@ -234,8 +375,8 @@ State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     if(const auto* events=v.find("history"))for(const auto& x:events->asArray())s.history.push_back(Event{x.require("kind").asString(),x.require("payload"),x.require("after_state_key").asString()});
     s.validate();return s;
 }
-std::string State::serialize() const { validate();return canonicalJson(toJson()); }
-std::string State::planningKey() const { return contentDigest(canonicalJson(toJson(false))); }
+std::string State::serialize() const { validate();std::string out;out.reserve(1<<17);writeState(out,*this,true);return out; }
+std::string State::planningKey() const { std::string out;out.reserve(1<<16);writeState(out,*this,false);return contentDigest(out); }
 V State::observation() const { auto object=toJson(false).asObject();object.erase("definition_fingerprint");return V(std::move(object)); }
 
 void State::validate() const {

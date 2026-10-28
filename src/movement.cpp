@@ -3,6 +3,7 @@
 #include "game/land_combat.hpp"
 #include "game/naval.hpp"
 #include "game/politics.hpp"
+#include "game/position_facts.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -14,7 +15,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool c, const std::string &m) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool c, const Message &m) {
   if (!c)
     throw std::runtime_error(m);
 }
@@ -30,13 +32,10 @@ const V *profile(const State &s) {
   return s.definition->rules.find("movement_profile");
 }
 const V &node(const State &s, const Id &id) {
-  return s.definition->geography.require("nodes").require(id);
+  return mapNode(s, id);
 }
 const V *edge(const State &s, const Id &a, const Id &b) {
-  for (const auto &e : node(s, a).require("neighbors").asArray())
-    if (e.require("neighbor_id").asString() == b)
-      return &e;
-  return nullptr;
+  return mapEdge(s, a, b);
 }
 std::set<Id> terrains(const V *v) {
   std::set<Id> out;
@@ -57,6 +56,25 @@ bool hostile(const State &s, const Id &nation, const Id &other) {
 bool logisticsFriendly(const State &s, const Id &nation, const Id &owner) {
   return nation == owner || politicallyFriendly(s, nation, owner) ||
          controlledBy(s, owner, nation);
+}
+bool hostileFighterAt(const State &s, const Id &nation, const Id &zone) {
+  if (auto *facts = positionFacts(s))
+    return facts
+        ->zones(PositionFacts::Fact::HostileFighterClassZones, nation,
+                [&] {
+                  std::set<Id> zones;
+                  for (const auto &[id, u] : s.units)
+                    if (hostile(s, nation, u.owner) &&
+                        unitClass(s, u, "fighter"))
+                      zones.insert(u.zone);
+                  return zones;
+                })
+        .contains(zone);
+  for (const auto &[id, u] : s.units)
+    if (u.zone == zone && hostile(s, nation, u.owner) &&
+        unitClass(s, u, "fighter"))
+      return true;
+  return false;
 }
 bool restrictedTerrain(const std::set<Id> &t) {
   for (const auto &x :
@@ -273,12 +291,7 @@ bool aircraftFlightAccess(const State &s, const Id &nation, const Id &zone,
   if (!s.territories.contains(zone)) {
     if (node(s, zone).require("type").asString() != "sea")
       return false;
-    if (!combat)
-      for (const auto &[id, u] : s.units)
-        if (u.zone == zone && hostile(s, nation, u.owner) &&
-            unitClass(s, u, "fighter"))
-          return false;
-    return true;
+    return combat || !hostileFighterAt(s, nation, zone);
   }
   const auto owner = s.territories.at(zone).possessor;
   if (!owner)
@@ -288,12 +301,7 @@ bool aircraftFlightAccess(const State &s, const Id &nation, const Id &zone,
     return true;
   if (!hostile(s, nation, *owner))
     return false;
-  if (!combat)
-    for (const auto &[id, u] : s.units)
-      if (u.zone == zone && hostile(s, nation, u.owner) &&
-          unitClass(s, u, "fighter"))
-        return false;
-  return true;
+  return combat || !hostileFighterAt(s, nation, zone);
 }
 bool heldSinceTurnStart(const State &s, const Id &nation, const Id &zone,
                         bool allowFriendly) {
@@ -747,7 +755,8 @@ std::vector<Id> navalFacilitySeaZones(const State &s, const Id &id) {
             out.insert(e.require("neighbor_id").asString());
   return {out.begin(), out.end()};
 }
-bool seaBlockaded(const State &s, const Id &nation, const Id &sea) {
+namespace {
+bool blockadedNow(const State &s, const Id &nation, const Id &sea) {
   std::map<Id, int> count;
   for (const auto &[id, u] : s.units)
     if (u.zone == sea && unitClass(s, u, "surface_warship") &&
@@ -775,6 +784,13 @@ bool seaBlockaded(const State &s, const Id &nation, const Id &sea) {
         return true;
     }
   return false;
+}
+} // namespace
+bool seaBlockaded(const State &s, const Id &nation, const Id &sea) {
+  if (auto *facts = positionFacts(s))
+    return facts->remember(PositionFacts::Fact::SeaBlockaded, nation, sea,
+                           [&] { return blockadedNow(s, nation, sea); });
+  return blockadedNow(s, nation, sea);
 }
 bool facilityBlockaded(const State &s, const Id &nation, const Id &facility) {
   const auto seas = navalFacilitySeaZones(s, facility);
@@ -833,9 +849,9 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
             chineseHomeCountry(s, z))))
         continue;
       std::set<Id> adjacent;
-      for (const auto &e : node(s, z).require("neighbors").asArray())
-        if (s.territories.contains(e.require("neighbor_id").asString()))
-          adjacent.insert(e.require("neighbor_id").asString());
+      for (const auto &next : mapNeighbors(s, z))
+        if (s.territories.contains(next))
+          adjacent.insert(next);
       for (const auto &[id, r] : s.rails)
         if (r.endpointA == z)
           adjacent.insert(r.endpointB);
@@ -943,10 +959,8 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
           navalRange(origin) +
               (hasTech(s, nation, "improved_logistics") ? 1 : 0))
         continue;
-      for (const auto &e : node(s, sea.sea).require("neighbors").asArray()) {
-        const auto next = e.require("neighbor_id").asString();
-        if (s.territories.contains(next) ||
-            !s.definition->geography.require("nodes").find(next) ||
+      for (const auto &next : mapNeighbors(s, sea.sea)) {
+        if (s.territories.contains(next) || !findMapNode(s, next) ||
             seaBlockaded(s, nation, next) || !visitedSeas.insert(next).second)
           continue;
         auto path = sea.path;
@@ -975,6 +989,10 @@ SupplyRoute lendLeaseSupplyRoute(const State &s, const Id &sender,
   return traceSupply(s, sender, destination, recipient, navalUnit);
 }
 bool inSupply(const State &s, const Id &nation, const Id &zone) {
+  if (auto *facts = positionFacts(s))
+    return facts->remember(PositionFacts::Fact::InSupply, nation, zone, [&] {
+      return supplyRoute(s, nation, zone).connected;
+    });
   return supplyRoute(s, nation, zone).connected;
 }
 bool burmaRoadOpen(const State &s, bool ledo) {
@@ -1047,11 +1065,10 @@ std::set<Id> withdrawalEligibleRecipients(const State &s, const Id &attacker,
           canLeave = true;
           return;
         }
-        for (const auto &e :
-             node(s, path.back()).require("neighbors").asArray())
-          if (s.territories.contains(e.require("neighbor_id").asString())) {
+        for (const auto &zone : mapNeighbors(s, path.back()))
+          if (s.territories.contains(zone)) {
             auto next = path;
-            next.push_back(e.require("neighbor_id").asString());
+            next.push_back(zone);
             search(std::move(next));
           }
       };
@@ -1167,9 +1184,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
           if (path.size() >
               static_cast<std::size_t>(u.movementRemaining.value_or(0)))
             return;
-          for (const auto &e :
-               node(s, path.back()).require("neighbors").asArray()) {
-            const auto next = e.require("neighbor_id").asString();
+          for (const auto &next : mapNeighbors(s, path.back())) {
             if (!s.territories.contains(next) ||
                 std::find(path.begin(), path.end(), next) != path.end())
               continue;
@@ -1198,9 +1213,9 @@ std::vector<Action> MovementRules::actions(const State &s) const {
           todo.pop_front();
           const auto last = path.back();
           std::set<Id> adjacent;
-          for (const auto &e : node(s, last).require("neighbors").asArray())
-            if (s.territories.contains(e.require("neighbor_id").asString()))
-              adjacent.insert(e.require("neighbor_id").asString());
+          for (const auto &next : mapNeighbors(s, last))
+            if (s.territories.contains(next))
+              adjacent.insert(next);
           for (const auto &[rid, r] : s.rails)
             if (r.endpointA == last)
               adjacent.insert(r.endpointB);
@@ -1229,9 +1244,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
         while (!todo.empty()) {
           auto path = std::move(todo.front());
           todo.pop_front();
-          for (const auto &e :
-               node(s, path.back()).require("neighbors").asArray()) {
-            const auto next = e.require("neighbor_id").asString();
+          for (const auto &next : mapNeighbors(s, path.back())) {
             if (!s.territories.contains(next) || seen.contains(next))
               continue;
             auto p = path;

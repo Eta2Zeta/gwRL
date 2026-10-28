@@ -6,6 +6,7 @@
 #include <deque>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <stdexcept>
 
 namespace {
@@ -51,6 +52,17 @@ void digestsAndCanonicalJson() {
     check(contentDigest("")=="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","SHA-256 empty vector");
     check(contentDigest("abc")=="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad","SHA-256 abc vector");
     check(contentDigest(std::string(1000000,'a'))=="cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0","SHA-256 multiblock vector");
+    // Lengths on both sides of the 56- and 64-byte padding boundaries.
+    const std::map<std::size_t,std::string> boundaries{
+        {3,"2fe3269fa210706de21ff97cc964590ec5bddd6677885fc55cfa6bfd94924822"},{55,"7cda990214cc40c5e59b2a5f09f1c34da7ea4a7d44479d36b150ea7c04aa009a"},
+        {56,"642b572edefc37c5664b4b95a7a83bdc5617dc06b241bfac5c8094b10fec734e"},{63,"125d5830922e3666b5891332b54f12d328861b7ec30fec51a03fa27bbe549642"},
+        {64,"15c32cfa73534b3c34a1244e4331e3757b34daf267f6a7322d471c849e3a5c65"},{65,"ddd761939cd192b02ac5b652b6f4763b0351e0c40a325432c318b0aab6c4afc5"},
+        {119,"a1913d07c18ff09efb38be9e5317b92e7a4cf103f6fb7448257c30c7cab59462"},{120,"f9fe9011baded2c49c901e5d4d74f66a00f057070e9e9d641b566eeea45f3be3"},
+        {1000,"4256460c8769ec1a1d2a8e3edeeda0d3cc4fbc30b3c0f6a2b53da3ef9f60ea5e"}};
+    for(const auto& [size,expected]:boundaries) {
+        std::string text;for(std::size_t i=0;i<size;++i)text.push_back(static_cast<char>('a'+(i*7)%26));
+        check(contentDigest(text)==expected,"SHA-256 padding boundary vector");
+    }
     const auto raw=V(O{{"z",V(-0.0)},{"a",V(std::string("\x01\n\"\\"))}});const auto serialized=canonicalJson(raw);check(canonicalJson(game::json::parse(serialized))==serialized,"Canonical escaped JSON round trip");
     rejects([]{canonicalJson(V(std::numeric_limits<double>::infinity()));},"Nonfinite JSON accepted");
     for(auto p:{Phase::Production,Phase::CombatMovement,Phase::Combat,Phase::NonCombatMovement,Phase::PlaceUnits})check(parsePhase(toString(p))==p,"Phase round trip");
@@ -163,6 +175,32 @@ void immutableIndexedGeometry() {
     check(actual.definition->indexedGeography!=nullptr,"Campaign geography has no dense view");
     for(const auto& start:actual.definition->indexedGeography->nodeIds)for(int range=-1;range<=10;++range)
         check(actual.definition->indexedGeography->withinHops(start,range)==referenceGeometry(*actual.definition,start,range),"Campaign geometry differs from reference BFS");
+    // Map reads through the index match reading the JSON, duplicates and all.
+    const auto sameReads=[](const State& state) {
+        for(const auto& [id,node]:state.definition->geography.require("nodes").asObject()) {
+            check(findMapNode(state,id) && canonicalJson(mapNode(state,id))==canonicalJson(node),"Indexed node differs from its JSON");
+            std::vector<Id> expected;
+            for(const auto& edge:node.require("neighbors").asArray())expected.push_back(edge.require("neighbor_id").asString());
+            check(mapNeighbors(state,id).ids()==expected,"Indexed neighbors changed source order or duplicates");
+            for(const auto& next:expected) {
+                const V* first=nullptr;
+                for(const auto& edge:node.require("neighbors").asArray())
+                    if(!first && edge.require("neighbor_id").asString()==next)first=&edge;
+                check(mapEdge(state,id,next) && canonicalJson(*mapEdge(state,id,next))==canonicalJson(*first),"Indexed edge is not the first edge to its neighbor");
+            }
+            check(!mapEdge(state,id,"missing"),"Indexed edge invented a neighbor");
+        }
+        check(!findMapNode(state,"missing"),"Unknown node found");
+        rejects([&]{mapNode(state,"missing");},"Unknown node read");
+        rejects([&]{mapNeighbors(state,"missing");},"Unknown node neighbors listed");
+        rejects([&]{mapEdge(state,"missing","a");},"Unknown node edge read");
+    };
+    State indexed;indexed.definition=frozen;
+    sameReads(indexed);sameReads(actual);
+    const auto bare=fixture();
+    check(!bare.definition->indexedGeography && canonicalJson(mapNode(bare,"a"))==canonicalJson(bare.definition->geography.require("nodes").require("a")),
+          "Unindexed node read differs from its JSON");
+    rejects([&]{mapNeighbors(bare,"a");},"Unindexed node without edges listed neighbors");
 }
 V nestedNumber(double number) {
     return V(O{{"outer",V(V::Array{V(nullptr),V(true),V("opaque\n中国"),V(O{{"number",V(number)}})})}});
@@ -172,7 +210,10 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
         [](State& s,const V& v){s.politics.pending["opaque_finite_fixture"]=v;},
         [](State& s,const V& v){s.decisions.back().options.front().parameters=v;},
         [](State& s,const V& v){s.battles.begin()->second.data=v;},
-        [](State& s,const V& v){s.history.front().payload=v;},
+        [](State& s,const V& v){
+            // Recorded events are immutable; rebuild the log with an edited first event.
+            std::vector<Event> events=s.history;events.front().payload=v;
+            s.history.clear();for(auto& event:events)s.history.push_back(std::move(event));},
     };
     for(const auto& replace:payloads) {
         for(const double number:{std::numeric_limits<double>::quiet_NaN(),
@@ -209,5 +250,24 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
         rejects([&]{state.validate();},"Nested nonfinite action-interface number accepted");
     }
 }
+// Saves and planning keys write the state's canonical text directly; it must
+// equal the text of the JSON tree, including decisions, battles and history.
+void directTextMatchesJsonTree() {
+    const auto same=[](const State& state) {
+        check(state.serialize()==canonicalJson(state.toJson()),"Direct saved text differs from the JSON tree");
+        check(state.planningKey()==contentDigest(canonicalJson(state.toJson(false))),"Direct planning text differs from the JSON tree");
+    };
+    same(fixture());
+    auto engine=Engine::start(loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936"),
+                              trainingCampaignRules(),7);
+    std::mt19937 choose(7);
+    for(int step=0;step<400 && !engine.state().terminal;++step) {
+        same(engine.state());
+        if(engine.state().chance) {engine.resolveChance();continue;}
+        const auto actions=engine.legalActions();
+        if(actions.empty())break;
+        engine.step(actions[choose()%actions.size()]);
+    }
 }
-int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+}
+int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();directTextMatchesJsonTree();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

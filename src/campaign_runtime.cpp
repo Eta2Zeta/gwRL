@@ -1,6 +1,7 @@
 #include "game/campaign.hpp"
 #include "game/catalog.hpp"
 #include "game/politics.hpp"
+#include "game/position_facts.hpp"
 
 #include <algorithm>
 #include <charconv>
@@ -17,9 +18,13 @@ using V = json::Value;
 using O = V::Object;
 using A = V::Array;
 
-void require(bool condition, const std::string& message) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool condition, const Message &message) {
     if (!condition) throw std::runtime_error(message);
 }
+
+// This thread's open position scopes, innermost first.
+thread_local const PositionScope::Open* openScopes = nullptr;
 
 std::uint64_t nextRandom(std::uint64_t& state) {
     std::uint64_t value = (state += UINT64_C(0x9e3779b97f4a7c15));
@@ -276,6 +281,18 @@ Engine Engine::start(State initial, std::shared_ptr<const Rules> rules, std::uin
     return result;
 }
 
+PositionFacts* positionFacts(const State& state) {
+    for (auto* open = openScopes; open; open = open->outer)
+        if (open->state == &state) return open->facts;
+    return nullptr;
+}
+PositionScope::PositionScope(const State& state) : previous_(openScopes) {
+    if (positionFacts(state)) return;
+    open_ = {&state, &facts_.emplace(), openScopes};
+    openScopes = &open_;
+}
+PositionScope::~PositionScope() { openScopes = previous_; }
+
 std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
     std::lock_guard lock(decisionCache_->mutex);
     if (decisionCache_->actions) return decisionCache_->actions;
@@ -298,6 +315,7 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
     }
     const bool decisionPending = !state_.decisions.empty();
     auto& actions = menu->actions;
+    const PositionScope scope(state_);  // Covers the phase check below too.
     actions = decisionPending ? state_.decisions.back().options : rules_->actions(state_);
     const auto immediate = state_.flags.find("immediate_land_battles");
     if (!decisionPending && immediate != state_.flags.end() && immediate->second)
@@ -376,6 +394,7 @@ std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
     const auto naval = state_.flags.find("immediate_naval_battles");
     if (naval != state_.flags.end() && naval->second) return finish();
     auto& actions=menu->actions;
+    const PositionScope scope(state_);
     actions=rules_->interrupts(state_);
     std::set<Id> ids;
     for(auto& action:actions) {

@@ -5,6 +5,7 @@
 #include "game/naval.hpp"
 #include "game/movement.hpp"
 #include "game/politics.hpp"
+#include "game/position_facts.hpp"
 #include <algorithm>
 #include <deque>
 #include <functional>
@@ -15,7 +16,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool ok, const std::string &why) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool ok, const Message &why) {
     if (!ok)
         throw std::runtime_error(why);
 }
@@ -31,7 +33,7 @@ int flag(const std::map<Id, int> &f, const Id &k) {
     return i == f.end() ? 0 : i->second;
 }
 const V &node(const State &s, const Id &z) {
-    return s.definition->geography.require("nodes").require(z);
+    return mapNode(s, z);
 }
 bool land(const State &s, const Id &z) {
     return node(s, z).require("type").asString() == "land";
@@ -139,17 +141,21 @@ std::vector<Id> readIds(const V &v) {
         r.push_back(x.asString());
     return r;
 }
-std::vector<Id> neighbors(const State &s, const Id &z) {
-    std::vector<Id> r;
-    for (const auto &x : node(s, z).require("neighbors").asArray())
-        r.push_back(x.require("neighbor_id").asString());
-    return r;
+NeighborIds neighbors(const State &s, const Id &z) {
+    return mapNeighbors(s, z);
 }
 bool adjacent(const State &s, const Id &a, const Id &b) {
-    auto ns = neighbors(s, a);
-    return std::find(ns.begin(), ns.end(), b) != ns.end();
+    return mapEdge(s, a, b) != nullptr;
 }
 bool enemyFighter(const State &s, const Id &nation, const Id &z) {
+    if (auto *facts = positionFacts(s))
+        return facts->zones(PositionFacts::Fact::HostileFighterZones, nation, [&] {
+            std::set<Id> zones;
+            for (const auto &[id, u] : s.units)
+                if (hostile(s, nation, u.owner) && fighter(s, u))
+                    zones.insert(u.zone);
+            return zones;
+        }).contains(z);
     for (const auto &[id, u] : s.units)
         if (u.zone == z && hostile(s, nation, u.owner) && fighter(s, u))
             return true;
@@ -649,7 +655,7 @@ bool airLandingAvailable(const State &s, const Id &id, const Id &destination) {
         const auto &c = s.units.at(destination);
         if (!carrierEligible(s, u, c))
             return false;
-        const auto cap = s.definition->catalog->stats(c.type, c.damage, catalogContext(s, c.owner, c.zone))
+        const auto cap = catalogStats(s, c.type, c.damage, c.owner, c.zone)
                              .carrierCapacity.value_or(0);
         return occupiedCarrierSlots(s, destination, {id}) + carrierSlots(u) <= cap;
     }
@@ -660,31 +666,38 @@ bool airLandingAvailable(const State &s, const Id &id, const Id &destination) {
         return false;
     return heldSinceTurnStart(s, u.owner, destination, true);
 }
-bool airLandingPlanAvailable(const State &s, const std::vector<Id> &aircraft) {
+namespace {
+bool landingPlan(const State &s, const std::vector<Id> &aircraft) {
     std::set<Id> requested(aircraft.begin(), aircraft.end());
     if (aircraft.empty())
         for (const auto &[id, u] : s.units)
             if (isAircraft(s, u) && !marked(u.turnFlags, "scrambled") &&
                 (marked(u.turnFlags, "air_in_flight") || marked(u.gameFlags, "on_map")))
                 requested.insert(id);
+    // Free deck slots matter only to aircraft without a land spot in reach.
     std::map<Id, int> capacity;
-    for (const auto &[id, u] : s.units)
-        if (has(s, u, "carrier"))
-            capacity[id] = s.definition->catalog->stats(u.type, u.damage,
-                catalogContext(s, u.owner, u.zone)).carrierCapacity.value_or(0) -
-                occupiedCarrierSlots(s, id, requested);
+    bool capacityKnown = false;
+    const auto decks = [&]() -> std::map<Id, int> & {
+        if (!capacityKnown)
+            for (const auto &[id, u] : s.units)
+                if (has(s, u, "carrier"))
+                    capacity[id] = catalogStats(s, u.type, u.damage, u.owner, u.zone).carrierCapacity.value_or(0) -
+                        occupiedCarrierSlots(s, id, requested);
+        capacityKnown = true;
+        return capacity;
+    };
     struct Return { int slots; std::vector<Id> carriers; };
     std::vector<Return> returns;
     for (const auto &id : requested) {
         if (!s.units.contains(id) || !isAircraft(s, s.units.at(id))) return false;
         const auto &u = s.units.at(id);
         auto paths = flightPaths(s, id, false, marked(u.gameFlags, "on_map") ? flag(u.gameFlags, "map_range") : -1);
-        bool landAvailable = false;
-        for (const auto &[zone, path] : paths)
-            if (s.territories.contains(zone) && airLandingAvailable(s, id, zone)) landAvailable = true;
-        if (landAvailable) continue;
+        if (std::any_of(paths.begin(), paths.end(), [&](const auto &entry) {
+                return s.territories.contains(entry.first) && airLandingAvailable(s, id, entry.first);
+            }))
+            continue;
         Return options{carrierSlots(u), {}};
-        for (const auto &[carrier, remaining] : capacity)
+        for (const auto &[carrier, remaining] : decks())
             if (remaining >= options.slots && paths.contains(s.units.at(carrier).zone) &&
                 carrierEligible(s, u, s.units.at(carrier))) options.carriers.push_back(carrier);
         if (options.carriers.empty()) return false;
@@ -704,6 +717,15 @@ bool airLandingPlanAvailable(const State &s, const std::vector<Id> &aircraft) {
         return false;
     };
     return assign(0);
+}
+} // namespace
+bool airLandingPlanAvailable(const State &s, const std::vector<Id> &aircraft) {
+    const PositionScope scope(s);
+    if (aircraft.empty())
+        if (auto *facts = positionFacts(s))
+            return facts->remember(PositionFacts::Fact::AirLandingPlan, {}, {},
+                                   [&] { return landingPlan(s, aircraft); });
+    return landingPlan(s, aircraft);
 }
 namespace {
 using CarrierLandingBounds = std::map<Id, std::set<Id>>;
@@ -733,8 +755,8 @@ CarrierLandingBounds futureCarrierBounds(const State& state) {
         // Optimistic geometry only: allow both the port and Japanese surprise
         // bonuses, and ignore obstacles, ownership and commitments. This is an
         // upper bound used to prove impossibility, never a promised ship route.
-        const int base = state.definition->catalog->stats(carrier.type, carrier.damage,
-            catalogContext(state, carrier.owner, carrier.zone)).movement.value_or(0);
+        const int base = catalogStats(state, carrier.type, carrier.damage, carrier.owner, carrier.zone)
+                             .movement.value_or(0);
         const int range = std::max(carrier.movementRemaining.value_or(0),
                                   base + 2 - flag(carrier.turnFlags, "naval_movement_spent"));
         std::deque<std::pair<Id, int>> queue;
@@ -789,6 +811,7 @@ bool flightCanContinue(const State& state, const Id& id, const std::vector<Id>& 
 }
 } // namespace
 std::vector<Id> airLandingSpots(const State &s, const Id &id) {
+    const PositionScope scope(s);
     std::vector<Id> out;
     if (!s.units.contains(id))
         return out;
@@ -1104,6 +1127,11 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                                  {{"unit", V(id)}, {"cargo", V(cargo)}}));
                 continue;
             }
+            std::optional<int> patrolLimit;  // Fixed for this aircraft; read only when needed.
+            const auto patrolReach = [&] {
+                if (!patrolLimit) patrolLimit = patrolRange(s, u);
+                return *patrolLimit;
+            };
             auto paths = flightPaths(s, id, combat);
             for (const auto &[zone, path] : paths) {
                 if (path.size() > 1 && validateFlight(s, id, path, combat, false).allowed &&
@@ -1119,15 +1147,15 @@ std::vector<Action> AirRules::actions(const State &s) const {
                     if (!combat)
                         continue;
                 }
-                if (combat && !land(s, zone) && static_cast<int>(path.size()) - 1 <= patrolRange(s, u) &&
-                    patrolRange(s, u) > 0) {
+                if (combat && !land(s, zone) && static_cast<int>(path.size()) - 1 <= patrolReach() &&
+                    patrolReach() > 0) {
                     State patrol = s.clone();
                     moveFlight(patrol, id, path);
-                    patrol.units.at(id).movementRemaining = patrolRange(s, u);
+                    patrol.units.at(id).movementRemaining = patrolReach();
                     if (!airLandingSpots(patrol, id).empty())
                         out.push_back(action(
                             s, s.currentNation(), "air_start_patrol",
-                            {{"unit", V(id)}, {"path", V(ids(path))}, {"range", num(patrolRange(s, u))}}));
+                            {{"unit", V(id)}, {"path", V(ids(path))}, {"range", num(patrolReach())}}));
                 }
                 if (combat && enemyFighter(s, u.owner, zone) &&
                     validateFlight(s, id, path, true, true).allowed)

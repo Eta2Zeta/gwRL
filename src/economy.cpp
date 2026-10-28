@@ -12,7 +12,8 @@ namespace game::campaign {
 namespace {
 using V = json::Value;
 using O = V::Object;
-void require(bool yes, const std::string &why) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool yes, const Message &why) {
     if (!yes)
         throw std::runtime_error(why);
 }
@@ -27,7 +28,7 @@ bool flag(const std::map<Id, int> &flags, const Id &key) {
     return value(flags, key) != 0;
 }
 const V &node(const State &s, const Id &zone) {
-    return s.definition->geography.require("nodes").require(zone);
+    return mapNode(s, zone);
 }
 bool home(const State &s, const Id &nation, const Id &zone) {
     return s.definition->factions.at(nation).homeCountry.contains(zone);
@@ -79,8 +80,7 @@ bool ownsHeld(const State &s, const Id &nation, const Id &zone) {
 }
 std::vector<Id> neighbors(const State &s, const Id &zone, bool landOnly = false, bool seaOnly = false) {
     std::vector<Id> out;
-    for (const auto &edge : node(s, zone).require("neighbors").asArray()) {
-        const auto id = edge.require("neighbor_id").asString();
+    for (const auto &id : mapNeighbors(s, zone)) {
         const bool land = s.territories.contains(id);
         if ((landOnly && !land) || (seaOnly && land))
             continue;
@@ -89,10 +89,7 @@ std::vector<Id> neighbors(const State &s, const Id &zone, bool landOnly = false,
     return out;
 }
 const V *edge(const State &s, const Id &from, const Id &to) {
-    for (const auto &e : node(s, from).require("neighbors").asArray())
-        if (e.require("neighbor_id").asString() == to)
-            return &e;
-    return nullptr;
+    return mapEdge(s, from, to);
 }
 bool harshRail(const State &s, const Id &from, const Id &to) {
     const auto *e = edge(s, from, to);

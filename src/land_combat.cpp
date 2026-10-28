@@ -14,7 +14,8 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 using A = V::Array;
-void require(bool ok, const std::string &message) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool ok, const Message &message) {
     if (!ok)
         throw std::runtime_error(message);
 }
@@ -59,14 +60,11 @@ std::vector<Id> readIds(const V &x) {
     return v;
 }
 const V &node(const State &s, const Id &id) {
-    return s.definition->geography.require("nodes").require(id);
+    return mapNode(s, id);
 }
 const V *edge(const State &s, const Id &from, const Id &to) {
     if (from.empty()) return nullptr; // Shared-zone battles have no entry edge.
-    for (const auto &e : node(s, from).require("neighbors").asArray())
-        if (e.require("neighbor_id").asString() == to)
-            return &e;
-    return nullptr;
+    return mapEdge(s, from, to);
 }
 std::set<Id> terrain(const V *value) {
     std::set<Id> out;

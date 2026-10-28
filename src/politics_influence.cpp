@@ -13,7 +13,8 @@ using V = json::Value;
 using O = V::Object;
 using A = V::Array;
 
-void require(bool condition, const std::string& message) {
+// Builds the message only on failure; most messages are literals.
+template <class Message> void require(bool condition, const Message &message) {
     if (!condition) throw std::runtime_error(message);
 }
 
