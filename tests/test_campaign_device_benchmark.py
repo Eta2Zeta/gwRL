@@ -48,7 +48,8 @@ class FakeEvaluator:
 class CampaignDeviceBenchmarkTests(unittest.TestCase):
     def test_configuration_preserves_search_budget_and_resource_allowance(self):
         for values in ({"devices": ("cpu", "auto")}, {"simulations": 4}, {"max_depth": 8},
-                       {"threads": 10}, {"memory_bytes": 30_000_000_001}, {"batch_sizes": (1, 1)}):
+                       {"threads": 10}, {"memory_bytes": 30_000_000_001}, {"batch_sizes": (1, 1)},
+                       {"search_evaluation": "streamed"}):
             with self.subTest(values=values), self.assertRaises(ValueError): Config(**values)
 
     def test_allocator_cap_leaves_room_for_native_cpu_and_aggregate_guard(self):

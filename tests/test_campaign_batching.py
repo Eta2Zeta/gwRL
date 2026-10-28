@@ -243,9 +243,116 @@ class CampaignBatchingTests(unittest.TestCase):
     def test_empty_roots_and_configuration_validation(self):
         self.assertEqual(search_many([], RecordingEvaluator()), [])
         for kwargs in ({"configs": []}, {"max_batch_size": 0}, {"opponent_policies": []},
-                       {"config": MctsConfig(), "configs": [MctsConfig()]}):
+                       {"config": MctsConfig(), "configs": [MctsConfig()]}, {"evaluation": "streamed"},
+                       {"evaluation": "per_search", "max_batch_size": 2}):
             with self.assertRaises(ValueError):
                 search_many([TinyEnv()], RecordingEvaluator(), **kwargs)
+
+        class DeviceEvaluator(RecordingEvaluator):
+            concurrent_evaluation = False
+
+        with self.assertRaisesRegex(ValueError, "concurrent CPU calls"):
+            search_many([TinyEnv()], DeviceEvaluator(), evaluation="per_search")
+
+    def test_per_search_evaluates_alone_on_each_search_thread_and_matches_sequential_search(self):
+        class NamedEvaluator(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                self.threads.append(threading.current_thread().name)
+                return super().evaluate_batch(requests)
+
+        for noise in (False, True):
+            envs = [TinyEnv(actor=i % 3, tag=i * 11) for i in range(6)]
+            before = [env.serialize() for env in envs]
+            configs = [MctsConfig(simulations=96, max_depth=4, seed=31 + i, record_trace=True) for i in range(6)]
+            expected = [VectorMCTS(RecordingEvaluator(), config).search(env, add_root_noise=noise)
+                        for env, config in zip(envs, configs)]
+            evaluator, stats = NamedEvaluator(), BatchStats()
+            actual = self.bounded(lambda: search_many(envs, evaluator, configs=configs, add_root_noise=noise,
+                                                      stats=stats, evaluation="per_search"))
+            self.assertEqual([env.serialize() for env in envs], before)
+            for result, reference in zip(actual, expected):
+                self.assert_same_result(result, reference)
+            self.assertEqual({len(batch) for batch in evaluator.batches}, {1})
+            self.assertEqual(stats.batch_sizes, [1] * stats.requests)
+            self.assertEqual((stats.requests, stats.batches), (len(evaluator.batches), len(evaluator.batches)))
+            names = {name for name in evaluator.threads if isinstance(name, str)}
+            self.assertEqual(names, {f"campaign-search-{index}" for index in range(6)})
+
+    def test_per_search_roots_do_not_wait_for_a_slow_root(self):
+        others = threading.Semaphore(0)
+
+        class SlowFirstRoot(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                (env, _), = requests
+                if env.tag == 0:
+                    # Each other root must evaluate first. A wave barrier would
+                    # instead hold every other root until this call returns.
+                    for _ in range(len(envs) - 1):
+                        if not others.acquire(timeout=2):
+                            raise TimeoutError("Other roots waited for the slow root")
+                else:
+                    others.release()
+                return super().evaluate_batch(requests)
+
+        envs = [TinyEnv(tag=0)] + [TinyEnv(actor=i % 3, tag=i) for i in range(1, 4)]
+        config = MctsConfig(simulations=8, max_depth=2)
+        actual = self.bounded(lambda: search_many(envs, SlowFirstRoot(), config, evaluation="per_search"))
+        for env, result in zip(envs, actual):
+            self.assert_same_result(result, VectorMCTS(RecordingEvaluator(), config).search(env))
+
+    def test_per_search_failures_and_cancellation_release_every_root(self):
+        class Broken(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                if len(self.batches) >= 2:
+                    raise RuntimeError("deliberate inference failure")
+                return super().evaluate_batch(requests)
+
+        with self.assertRaisesRegex(RuntimeError, "deliberate inference failure"):
+            self.bounded(lambda: search_many([TinyEnv(tag=i) for i in range(5)], Broken(), evaluation="per_search"))
+
+        class BrokenEnv(TinyEnv):
+            def legal_actions(self):
+                raise LookupError("deliberate rules failure")
+
+        with self.assertRaisesRegex(LookupError, "deliberate rules failure"):
+            self.bounded(lambda: search_many([TinyEnv(), BrokenEnv(), TinyEnv(tag=2)], RecordingEvaluator(),
+                                             evaluation="per_search"))
+
+        class ShortBatch(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                return super().evaluate_batch(requests)[:-1]
+
+        class InvalidValue(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                return [Evaluation([1] * len(actions), (1, float("nan"), 3)) for _, actions in requests]
+
+        class ChangedVersion(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                self.version = "updated-model"
+                return super().evaluate_batch(requests)
+
+        for evaluator, message in ((ShortBatch(), "one Evaluation per request"), (InvalidValue(), "three finite"),
+                                   (ChangedVersion(), "version changed")):
+            with self.assertRaisesRegex(ValueError, message):
+                self.bounded(lambda: search_many([TinyEnv(), TinyEnv(tag=1)], evaluator, evaluation="per_search"))
+
+        cancel = threading.Event()
+
+        class CancelAtInference(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                cancel.set()
+                return super().evaluate_batch(requests)
+
+        with self.assertRaises(CancelledError):
+            self.bounded(lambda: search_many([TinyEnv(), TinyEnv(tag=2)], CancelAtInference(), cancel_event=cancel,
+                                             evaluation="per_search"))
+
+        class Interrupted(RecordingEvaluator):
+            def evaluate_batch(self, requests):
+                raise KeyboardInterrupt()
+
+        with self.assertRaises(KeyboardInterrupt):
+            self.bounded(lambda: search_many([TinyEnv(), TinyEnv(tag=1)], Interrupted(), evaluation="per_search"))
 
     def test_real_neural_models_batch_multiple_roots_per_actor_in_raw_units(self):
         import torch
@@ -297,6 +404,15 @@ class CampaignBatchingTests(unittest.TestCase):
                 self.assertTrue(all(model.batch_sizes[0] == 2 for model in models.values()),
                                 "Each actor model must really process two independent roots in one forward")
                 self.assertEqual(stats.batch_sizes[0], 6)
+                self.assertEqual([env.serialize() for env in envs], before)
+                # Per-search evaluation runs every position alone, exactly like
+                # scalar search, so even float32 network outputs match it.
+                for model in models.values():
+                    model.batch_sizes.clear()
+                actual = search_many(envs, evaluator, config, evaluation="per_search")
+                for result, reference in zip(actual, expected):
+                    self.assert_same_result(result, reference)
+                self.assertEqual({size for model in models.values() for size in model.batch_sizes}, {1})
                 self.assertEqual([env.serialize() for env in envs], before)
         finally:
             torch.set_num_threads(threads)

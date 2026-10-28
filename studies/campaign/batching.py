@@ -1,10 +1,16 @@
 """Batch inference across independent, otherwise unchanged VectorMCTS searches.
 
-Each worker owns one search tree and its RNG. At an evaluation boundary it
-waits while the calling thread evaluates all ready roots together. A wave ends
-when every live worker has requested inference or finished; a short/terminal
-root therefore cannot hold the remaining roots at a barrier. Only the calling
-thread invokes the evaluator (including when it uses an accelerator).
+Each worker owns one search tree and its RNG. With ``evaluation="batched"`` it
+waits at an evaluation boundary while the calling thread evaluates all ready
+roots together. A wave ends when every live worker has requested inference or
+finished; a short/terminal root therefore cannot hold the remaining roots at a
+barrier. Only the calling thread invokes the evaluator (including when it uses
+an accelerator).
+
+With ``evaluation="per_search"`` each worker evaluates its own requests one at a
+time on its own thread, so no root waits for another. Every request is a
+single-position batch, which keeps results independent of thread timing and of
+how many roots search together. The evaluator must allow concurrent CPU calls.
 """
 from __future__ import annotations
 
@@ -29,7 +35,11 @@ class BatchEvaluator(Protocol):
 
 @dataclass
 class BatchStats:
-    """Per-call, measured inference traffic; batch size means actual requests."""
+    """Per-call, measured inference traffic; batch size means actual requests.
+
+    Per-search evaluation sums inference seconds across search threads, so they
+    can exceed the elapsed wall time.
+    """
 
     roots: int = 0
     requests: int = 0
@@ -75,12 +85,47 @@ class _Proxy:
         raise _Aborted()
 
 
+class _DirectProxy:
+    """Evaluate each request alone on the calling search thread."""
+
+    def __init__(self, evaluator: BatchEvaluator, version: str, stop: threading.Event,
+                 cancel_event: threading.Event | None, metrics: BatchStats, lock: threading.Lock):
+        self.evaluator, self.version, self.stop = evaluator, version, stop
+        self.cancel_event, self.metrics, self.lock = cancel_event, metrics, lock
+
+    def evaluate(self, env: SearchEnv, actions: Sequence[Any]) -> Evaluation:
+        if self.stop.is_set():
+            raise _Aborted()
+        if self.cancel_event is not None and self.cancel_event.is_set():
+            raise CancelledError("Independent-root search cancelled")
+        if self.evaluator.version != self.version:
+            raise ValueError("Evaluator version changed during independent-root search")
+        actions = tuple(actions)
+        before = time.perf_counter()
+        evaluations = list(self.evaluator.evaluate_batch([(env, actions)]))
+        elapsed = time.perf_counter() - before
+        if self.evaluator.version != self.version:
+            raise ValueError("Evaluator version changed during independent-root search")
+        if len(evaluations) != 1:
+            raise ValueError("Batched evaluator must return one Evaluation per request")
+        weights = tuple(evaluations[0].priors)
+        probabilities(weights, len(actions))
+        result = Evaluation(weights, vector(evaluations[0].values))
+        with self.lock:
+            self.metrics.inference_seconds += elapsed
+            self.metrics.requests += 1
+            self.metrics.batches += 1
+            self.metrics.batch_sizes.append(1)
+        return result
+
+
 def search_many(
     envs: Sequence[SearchEnv], evaluator: BatchEvaluator, config: MctsConfig | None = None, *,
     configs: Sequence[MctsConfig] | None = None,
     opponent_policies: OpponentPolicy | Sequence[OpponentPolicy | None] | None = None,
     add_root_noise: bool = False, max_batch_size: int | None = None,
     cancel_event: threading.Event | None = None, stats: BatchStats | None = None,
+    evaluation: str = "batched",
 ) -> list[SearchResult]:
     """Search independent roots and return results in input order.
 
@@ -94,6 +139,10 @@ def search_many(
     evaluator already executing is allowed to return before cancellation is
     observed. No Python API can interrupt arbitrary evaluator/environment code.
     The evaluator's version must stay frozen throughout the call.
+
+    ``evaluation="per_search"`` evaluates every request alone on its search's
+    own thread (see the module notes). It takes no batch cap and refuses an
+    evaluator whose ``concurrent_evaluation`` is false.
     """
     roots = list(envs)
     count = len(roots)
@@ -110,6 +159,14 @@ def search_many(
         raise ValueError("Provide one opponent policy per root")
     if max_batch_size is not None and (not isinstance(max_batch_size, int) or max_batch_size <= 0):
         raise ValueError("Maximum batch size must be a positive integer")
+    if evaluation not in ("batched", "per_search"):
+        raise ValueError("Evaluation must be batched or per_search")
+    if evaluation == "per_search":
+        if max_batch_size is not None:
+            raise ValueError("A batch cap applies only to batched evaluation")
+        # Accelerated evaluators keep the single calling thread for device work.
+        if getattr(evaluator, "concurrent_evaluation", True) is not True:
+            raise ValueError("Per-search evaluation needs an evaluator that allows concurrent CPU calls")
     version = evaluator.version
     if not isinstance(version, str) or not version:
         raise ValueError("Batched evaluator needs a nonempty version")
@@ -128,11 +185,13 @@ def search_many(
     results: list[SearchResult | None] = [None] * count
     active = set(range(count))
     pending: dict[int, _Request] = {}
+    metrics_lock = threading.Lock()
 
     def worker(index: int) -> None:
         try:
-            search = VectorMCTS(_Proxy(index, version, events, stop), settings[index],
-                                opponent_policy=policies[index])
+            proxy = (_DirectProxy(evaluator, version, stop, cancel_event, metrics, metrics_lock)
+                     if evaluation == "per_search" else _Proxy(index, version, events, stop))
+            search = VectorMCTS(proxy, settings[index], opponent_policy=policies[index])
             result = search.search(roots[index], add_root_noise=add_root_noise)
             events.put(_Finished(index, result=result))
         except BaseException as error:
@@ -148,6 +207,17 @@ def search_many(
     try:
         for thread in workers:
             thread.start()
+        while active and evaluation == "per_search":
+            # Workers evaluate for themselves; only completions arrive here.
+            check_cancelled()
+            try:
+                finished = events.get(timeout=0.05)
+            except queue.Empty:
+                continue
+            active.remove(finished.root)
+            if finished.error is not None:
+                raise finished.error
+            results[finished.root] = finished.result
         while active:
             # Every worker is either computing, awaiting its one outstanding
             # request, or finished. Finished roots leave this dynamic barrier.

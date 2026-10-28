@@ -19,6 +19,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +47,7 @@ class Config:
     max_depth: int = 16
     max_transitions: int = 5000
     max_state_visits: int = 20
+    search_evaluation: str = "batched"
     hidden_dim: int = 16
     message_layers: int = 1
     token_buckets: int = 2048
@@ -75,6 +77,8 @@ class Config:
             raise ValueError("Model dimensions violate the current model contract")
         if self.simulations != 16 or self.max_depth != 16:
             raise ValueError("This matched benchmark preserves 16 simulations and depth cap 16")
+        if self.search_evaluation not in {"batched", "per_search"}:
+            raise ValueError("Search evaluation must be batched or per_search")
         roots = len(self.seeds) if self.mode == "selfplay" else 0
         if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(12, os.cpu_count() or 1) or self.threads + roots + 3 > self.cpu_budget:
             raise ValueError("Tensor threads, search workers and three coordinators must fit the 12-core allowance")
@@ -126,20 +130,31 @@ def model_digest(models):
 
 
 class TimedEvaluator:
-    """Blocking evaluator timing includes source assembly and host output transfer."""
+    """Blocking evaluator timing includes source assembly and host output transfer.
+
+    Per-search evaluation calls it from several threads; seconds are then summed
+    across those threads.
+    """
     def __init__(self, evaluator, device, synchronize):
         self.inner, self.device, self.synchronize = evaluator, device, synchronize
         self.version = evaluator.version
         self.seconds, self.calls, self.requests = 0.0, 0, 0
         self.batch_sizes = Counter()
+        self._lock = threading.Lock()
+
+    @property
+    def concurrent_evaluation(self):
+        return getattr(self.inner, "concurrent_evaluation", True)
 
     def evaluate_batch(self, requests):
         self.synchronize(self.device)
         before = time.perf_counter()
         result = self.inner.evaluate_batch(requests)
         self.synchronize(self.device)
-        self.seconds += time.perf_counter() - before
-        self.calls += 1; self.requests += len(requests); self.batch_sizes[len(requests)] += 1
+        elapsed = time.perf_counter() - before
+        with self._lock:
+            self.seconds += elapsed
+            self.calls += 1; self.requests += len(requests); self.batch_sizes[len(requests)] += 1
         return result
 
     def evaluate(self, env, actions):
@@ -164,14 +179,17 @@ def setup_models(config, device):
         torch.set_num_interop_threads(1)
     torch.manual_seed(config.model_seed)
     stats = {"seconds": 0.0, "calls": 0, "batch_sizes": Counter()}
+    stats_lock = threading.Lock()
     class MeasuredModel(CampaignPolicyValueNet):
         def forward_batch(self, inputs, **kwargs):
             synchronize_neural_device(target)
             before = time.perf_counter()
             result = super().forward_batch(inputs, **kwargs)
             synchronize_neural_device(target)
-            stats["seconds"] += time.perf_counter() - before
-            stats["calls"] += 1; stats["batch_sizes"][len(inputs)] += 1
+            elapsed = time.perf_counter() - before
+            with stats_lock:
+                stats["seconds"] += elapsed
+                stats["calls"] += 1; stats["batch_sizes"][len(inputs)] += 1
             return result
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
         token_buckets=config.token_buckets, value_scale=config.value_scale)
@@ -303,7 +321,8 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
             settings = [MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
                                   seed=search_rngs[index].getrandbits(64)) for index in indices]
             stats = BatchStats()
-            results = search_many(searching, evaluator, configs=settings, add_root_noise=True, stats=stats)
+            results = search_many(searching, evaluator, configs=settings, add_root_noise=True, stats=stats,
+                                  evaluation=config.search_evaluation)
             timings["search"] += stats.elapsed_seconds
             for index, search in zip(indices, results):
                 env = envs[index]
@@ -546,6 +565,8 @@ def main(argv=None):
         if name in {"devices", "seeds", "batch_sizes", "position_labels"}:
             parser.add_argument("--" + name.replace("_", "-"), default=",".join(map(str, default)))
         elif name == "mode": parser.add_argument("--mode", choices=("inference", "selfplay"), default=default)
+        elif name == "search_evaluation":
+            parser.add_argument("--search-evaluation", choices=("batched", "per_search"), default=default)
         else: parser.add_argument("--" + name.replace("_", "-"), type=float if name in {"seconds", "value_scale", "atol", "rtol"} else int, default=default)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", help=argparse.SUPPRESS)

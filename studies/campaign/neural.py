@@ -851,6 +851,12 @@ class NeuralEvaluator:
                 supported = False
             self._versioned_forward[player] = isinstance(model, CampaignPolicyValueNet) and supported
 
+    @property
+    def concurrent_evaluation(self) -> bool:
+        """CPU models may be evaluated from several search threads at once."""
+        return all(parameter.device.type == "cpu" for model in self.models.values()
+                   for parameter in model.parameters())
+
     def evaluate(self, env: Any, actions: Sequence[Any]) -> Evaluation:
         return self.evaluate_batch([(env, actions)])[0]
 
