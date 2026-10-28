@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import inspect
 import math
+import os
 import threading
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -21,6 +22,68 @@ from .features import (EXTERNAL_REFERENCE, NODE_TYPES, NUMERIC_DIM, RELATIONS, S
                        Graph, action_factors, cached_action, cached_context, cached_observation, canonical, context_source_key, make_input)
 
 NUMERIC_SCHEMA = "campaign-numeric-input-v1"
+
+
+def _require_no_mps_fallback() -> None:
+    if os.environ.get("PYTORCH_ENABLE_MPS_FALLBACK", "0") not in {"", "0"}:
+        raise ValueError("MPS execution requires PYTORCH_ENABLE_MPS_FALLBACK=0; CPU fallback is not allowed")
+
+
+def resolve_neural_device(device: str | torch.device = "cpu") -> torch.device:
+    """Validate an explicit target without choosing a different available device."""
+    if not isinstance(device, (str, torch.device)):
+        raise ValueError("Neural device must be cpu, mps or cuda[:index]")
+    try:
+        target = torch.device(device)
+    except (RuntimeError, ValueError) as error:
+        raise ValueError("Neural device must be cpu, mps or cuda[:index]") from error
+    if target.type == "cpu":
+        if target.index not in (None, 0):
+            raise ValueError("CPU neural execution has no indexed accelerator")
+        return torch.device("cpu")
+    if target.type == "mps":
+        if target.index not in (None, 0) or not torch.backends.mps.is_available():
+            raise ValueError("The requested MPS neural device is unavailable")
+        _require_no_mps_fallback()
+        return torch.device("mps")
+    if target.type == "cuda":
+        if not torch.cuda.is_available():
+            raise ValueError("The requested CUDA neural device is unavailable")
+        index = torch.cuda.current_device() if target.index is None else target.index
+        if not 0 <= index < torch.cuda.device_count():
+            raise ValueError("The requested CUDA neural device index is unavailable")
+        return torch.device("cuda", index)
+    raise ValueError("Neural device must be cpu, mps or cuda[:index]")
+
+
+def synchronize_neural_device(device: str | torch.device = "cpu") -> None:
+    """Wait for queued accelerator work at explicit timing/checkpoint boundaries."""
+    target = resolve_neural_device(device)
+    if target.type == "mps":
+        torch.mps.synchronize()
+    elif target.type == "cuda":
+        torch.cuda.synchronize(target)
+
+
+def neural_device_memory(device: str | torch.device = "cpu") -> dict[str, Any]:
+    """Allocator diagnostics, additional to the experiment's process-tree guard.
+
+    MPS driver allocation includes cached/workspace allocations beyond live
+    tensors. Its recommended maximum is a hardware recommendation, not the
+    user's memory allowance. CPU memory remains measured by the outer guard.
+    """
+    target = resolve_neural_device(device)
+    result: dict[str, Any] = {"device": str(target), "allocated_bytes": None,
+                              "driver_allocated_bytes": None, "reserved_bytes": None,
+                              "recommended_max_bytes": None}
+    if target.type == "mps":
+        result.update(allocated_bytes=int(torch.mps.current_allocated_memory()),
+                      driver_allocated_bytes=int(torch.mps.driver_allocated_memory()),
+                      recommended_max_bytes=int(torch.mps.recommended_max_memory()))
+    elif target.type == "cuda":
+        result.update(allocated_bytes=int(torch.cuda.memory_allocated(target)),
+                      reserved_bytes=int(torch.cuda.memory_reserved(target)))
+    return result
 
 
 @dataclass(frozen=True)
@@ -273,13 +336,15 @@ class _EncoderLayout:
     owners: Tensor
     counts: Tensor
     external: tuple[tuple[int, int, Tensor], ...]
+    external_banks: tuple[tuple[int, int], ...] = ()
+    external_joined_indices: Tensor | None = None
 
 
 _ENCODER_LAYOUTS = _SourceCache(64 * 1024 * 1024, 256)
 
 
-def _encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
-                    device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
+def _reference_encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
+                              device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
     contexts = tuple(tuple(context.graph for context in row) for row in external) if external is not None else ()
     key = (tuple(map(id, graphs)), tuple(tuple(map(id, row)) for row in contexts), device, dtype)
     cached = _ENCODER_LAYOUTS.get(key)
@@ -331,6 +396,54 @@ def _encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedG
     return _ENCODER_LAYOUTS.put(key, result, size + 256 + 32 * (len(graphs) + len(contexts)), sources=sources)
 
 
+def _gpu_encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
+                        device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
+    """Pack unchanged topology on CPU and transfer combined arrays once.
+
+    External banks are identified by encoded-object aliasing, not source graph
+    identity: two rows can encode the same graph into different learned vectors.
+    Cached layouts contain indices only; fresh learned nodes are read each call.
+    """
+    contexts = tuple(tuple(item.graph for item in row) for row in external) if external is not None else ()
+    aliases, representatives, pattern = {}, [], []
+    for row, values in enumerate(external or ()):
+        row_pattern = []
+        for column, value in enumerate(values):
+            identity = id(value)
+            if identity not in aliases:
+                aliases[identity] = len(representatives)
+                representatives.append((row, column))
+            row_pattern.append(aliases[identity])
+        pattern.append(tuple(row_pattern))
+    key = ("gpu_bulk", tuple(map(id, graphs)), tuple(tuple(map(id, row)) for row in contexts),
+           tuple(pattern), device, dtype)
+    cached = _ENCODER_LAYOUTS.get(key)
+    if cached is not None:
+        return cached
+    cpu = _reference_encoder_layout(graphs, external, torch.device("cpu"), dtype)
+    offsets, offset = [], 0
+    for row, column in representatives:
+        offsets.append(offset)
+        offset += external[row][column].nodes.shape[0]
+    with torch.inference_mode(False):
+        joined = (torch.cat([indices + offsets[pattern[row][column]] for row, column, indices in cpu.external]).to(device)
+                  if cpu.external else None)
+        fields = {name: getattr(cpu, name).to(device) for name in (
+            "ids", "offsets", "types", "numbers", "sources", "targets", "relations", "degree", "owners", "counts")}
+    result = _EncoderLayout(cpu.graphs, cpu.contexts, cpu.starts, **fields, external=(),
+                            external_banks=tuple(representatives), external_joined_indices=joined)
+    size = sum(value.numel() * value.element_size() for value in vars(result).values() if isinstance(value, Tensor))
+    sources = (*graphs, *(graph for row in contexts for graph in row))
+    return _ENCODER_LAYOUTS.put(key, result, size + 512 + 64 * (len(graphs) + len(representatives)), sources=sources)
+
+
+def _encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
+                    device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
+    if device.type == "cpu":
+        return _reference_encoder_layout(graphs, external, device, dtype)
+    return _gpu_encoder_layout(graphs, external, device, dtype)
+
+
 @dataclass
 class _FactorLevel:
     count: int
@@ -338,6 +451,16 @@ class _FactorLevel:
     owners: Tensor
     counts: Tensor
     parents: Tensor
+
+
+@dataclass
+class _BatchedFactorLevel:
+    count: int
+    parent_count: int
+    owners: Tensor
+    counts: Tensor
+    parents: Tensor
+    state_rows: Tensor
 
 
 _ACTION_FACTORS = _SourceCache(4 * 1024 * 1024, 4096)
@@ -378,6 +501,41 @@ def _factor_layout(factors: Sequence[tuple[str, ...]], device: torch.device,
     return _FACTOR_LAYOUTS.put(key, result, size)
 
 
+def _batched_factor_layout(factors: Sequence[Sequence[tuple[str, ...]]], device: torch.device,
+                           dtype: torch.dtype) -> tuple[_BatchedFactorLevel, ...]:
+    factors = tuple(tuple(tuple(value) for value in row) for row in factors)
+    key = ("gpu_batch", factors, device, dtype)
+    cached = _FACTOR_LAYOUTS.get(key)
+    if cached is not None:
+        return cached
+    rows = [(index, _factor_layout(row, torch.device("cpu"), dtype))
+            for index, row in enumerate(factors) if row]
+    levels = []
+    with torch.inference_mode(False):
+        for level in range(4):
+            owners, counts, parents, state_rows = [], [], [], []
+            group_offset = parent_offset = 0
+            for row, layouts in rows:
+                item = layouts[level]
+                owners.append(item.owners + group_offset)
+                counts.append(item.counts)
+                parents.append(item.parents + parent_offset)
+                state_rows.append(torch.full((item.count,), row, dtype=torch.long, device="cpu"))
+                group_offset += item.count
+                parent_offset += item.parent_count
+            require_rows = bool(rows)
+            if not require_rows:
+                raise ValueError("Batched policy factors require at least one legal action")
+            levels.append(_BatchedFactorLevel(group_offset, parent_offset,
+                torch.cat(owners).to(device), torch.cat(counts).to(device),
+                torch.cat(parents).to(device), torch.cat(state_rows).to(device)))
+    result = tuple(levels)
+    size = sum(value.numel() * value.element_size() for item in result for value in vars(item).values()
+               if isinstance(value, Tensor))
+    size += 512 + sum(64 + len(value.encode("utf-8")) for row in factors for factor in row for value in factor)
+    return _FACTOR_LAYOUTS.put(key, result, size)
+
+
 def _clear_static_after_load(module: nn.Module, incompatible_keys: Any) -> None:
     module.clear_inference_cache()
 
@@ -404,9 +562,13 @@ class _GraphEncoder(nn.Module):
         encoded = self.tokens(layout.ids, layout.offsets) + self.types(layout.types)
         encoded = self.input_norm(encoded + self.numbers(layout.numbers))
         # External vectors are always read from this forward's learned state.
-        external_chunks = ([external[row][column].nodes.index_select(0, indices)
-                            for row, column, indices in layout.external] if external is not None else [])
-        external_nodes = torch.cat(external_chunks) if external_chunks else None
+        if layout.external_joined_indices is not None:
+            bank = torch.cat([external[row][column].nodes for row, column in layout.external_banks])
+            external_nodes = bank.index_select(0, layout.external_joined_indices)
+        else:
+            external_chunks = ([external[row][column].nodes.index_select(0, indices)
+                                for row, column, indices in layout.external] if external is not None else [])
+            external_nodes = torch.cat(external_chunks) if external_chunks else None
         for message, update in zip(self.messages, self.updates, strict=True):
             bank = torch.cat((encoded, external_nodes)) if external_nodes is not None else encoded
             gathered = bank.index_select(0, layout.sources) + self.relations(layout.relations)
@@ -432,19 +594,24 @@ class CampaignPolicyValueNet(nn.Module):
     Actions read their own complete parameters plus referenced state/registry
     entities. All actual legal actions are scored; padded actions never exist.
     """
-    def __init__(self, config: CampaignModelConfig) -> None:
+    def __init__(self, config: CampaignModelConfig, *, device: str | torch.device = "cpu") -> None:
         super().__init__()
+        target = resolve_neural_device(device)
         self.config = config
         dim = config.hidden_dim
-        self.encoder = _GraphEncoder(config)
-        self.state_encoder = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.LayerNorm(dim))
-        self.policy_head = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
-        self.factor_heads = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
-                                         for _ in range(4))
-        self.value_head = nn.Sequential(nn.Linear(dim, dim), nn.GELU(), nn.Linear(dim, 3))
+        # Identical CPU initialization keeps matched CPU/GPU experiments on the
+        # same initial parameters and consumes the same CPU RNG sequence.
+        with torch.device("cpu"):
+            self.encoder = _GraphEncoder(config)
+            self.state_encoder = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.LayerNorm(dim))
+            self.policy_head = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
+            self.factor_heads = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
+                                             for _ in range(4))
+            self.value_head = nn.Sequential(nn.Linear(dim, dim), nn.GELU(), nn.Linear(dim, 3))
         self._static_contexts = _SourceCache(64 * 1024 * 1024, 8)
         self._static_signature: tuple | None = None
         self.register_load_state_dict_post_hook(_clear_static_after_load)
+        self.to(target)
 
     def clear_inference_cache(self) -> None:
         self._static_contexts.clear()
@@ -504,8 +671,26 @@ class CampaignPolicyValueNet(nn.Module):
             joint = joint + conditional.index_select(0, level.owners)
         return joint + self._conditional_log_softmax(scores, level.owners, level.count)
 
+    def _factored_logits_batch(self, states: Tensor, latent: Tensor, scores: Tensor,
+                               lengths: Sequence[int], factors: Sequence[Sequence[tuple[str, ...]]]) -> Tensor:
+        """The same four conditional heads with disjoint groups across rows."""
+        if len(lengths) != len(factors) or any(count != len(row) for count, row in zip(lengths, factors)):
+            raise ValueError("Batched policy factors differ from complete legal menus")
+        levels = _batched_factor_layout(factors, scores.device, latent.dtype)
+        joint = torch.zeros_like(scores)
+        for level, head in zip(levels, self.factor_heads, strict=True):
+            means = latent.new_zeros((level.count, latent.shape[1]))
+            means.index_add_(0, level.owners, latent)
+            group_scores = head(torch.cat((states.index_select(0, level.state_rows), means / level.counts), dim=1)).squeeze(1)
+            conditional = self._conditional_log_softmax(group_scores, level.parents, level.parent_count)
+            joint = joint + conditional.index_select(0, level.owners)
+        return joint + self._conditional_log_softmax(scores, level.owners, level.count)
+
     def forward_batch(self, inputs: Sequence[dict[str, Any]], *,
                       model_version: str | None = None) -> tuple[list[Tensor], Tensor]:
+        if self.value_head[-1].weight.device.type == "mps":
+            # Also covers callers using the normal PyTorch model.to('mps') API.
+            _require_no_mps_fallback()
         if not inputs:
             return [], self.value_head[-1].weight.new_empty((0, 3))
         contexts, context_rows, context_lookup = [], [], {}
@@ -568,16 +753,76 @@ class CampaignPolicyValueNet(nn.Module):
         logits = list(all_logits.split(lengths))
         if self.config.policy_factorization:
             action_latent = torch.stack([action.pooled for action in actions])
-            offset = 0
-            for row, count in enumerate(lengths):
-                if count:
-                    logits[row] = self._factored_logits(states[row], action_latent[offset:offset + count],
-                                                       logits[row], factors[row])
-                offset += count
+            if states.device.type != "cpu":
+                logits = list(self._factored_logits_batch(states, action_latent, all_logits, lengths, factors).split(lengths))
+            else:
+                offset = 0
+                for row, count in enumerate(lengths):
+                    if count:
+                        logits[row] = self._factored_logits(states[row], action_latent[offset:offset + count],
+                                                           logits[row], factors[row])
+                    offset += count
         return logits, values
 
     def forward(self, inputs: Sequence[dict[str, Any]]) -> tuple[list[Tensor], Tensor]:
         return self.forward_batch(inputs)
+
+
+def clear_neural_caches(models: Sequence[CampaignPolicyValueNet] = (), *,
+                        device: str | torch.device | None = None, release_allocator: bool = False) -> None:
+    """Explicit cold-benchmark cleanup; never called automatically per decision.
+
+    Clear source/device tensors and supplied models' learned inference caches.
+    Live caller references, model weights and optimizer state remain allocated.
+    """
+    global _GRAPH_TENSOR_BYTES
+    if release_allocator and device is None:
+        raise ValueError("Allocator release requires an explicit neural device")
+    target = resolve_neural_device(device) if device is not None else None
+    with _GRAPH_TENSOR_LOCK:
+        _GRAPH_TENSORS.clear()
+        _GRAPH_TENSOR_BYTES = 0
+    for cache in (_REFERENCE_INDICES, _REFERENCE_METADATA, _ENCODER_LAYOUTS, _ACTION_FACTORS, _FACTOR_LAYOUTS):
+        cache.clear()
+    for model in models:
+        model.clear_inference_cache()
+    if release_allocator:
+        synchronize_neural_device(target)
+        if target.type == "mps":
+            torch.mps.empty_cache()
+        elif target.type == "cuda":
+            with torch.cuda.device(target):
+                torch.cuda.empty_cache()
+
+
+def _gpu_evaluation_outputs(logits: Sequence[Tensor], values: Tensor, counts: Sequence[int],
+                            value_scale: float) -> tuple[list[list[float]], list[tuple[float, float, float]]]:
+    """Validate accelerator rows, then cross the host boundary twice per actor.
+
+    Keep each row's original softmax operation and every legal action. Packing
+    only consolidates finite checking and device-to-host copies; no padding,
+    truncation, policy normalization or owner/chance routing changes.
+    """
+    if values.shape != (len(counts), 3) or len(logits) != len(counts):
+        raise ValueError("Neural model returned an invalid batch shape")
+    for scores, count in zip(logits, counts, strict=True):
+        if scores.shape != (count,) or scores.device != values.device:
+            raise ValueError("Neural policy must contain one device-local logit per legal action")
+    if not counts:
+        return [], []
+    packed_scores = logits[0] if len(logits) == 1 else torch.cat(tuple(logits))
+    if packed_scores.numel() and not torch.isfinite(packed_scores).all():
+        raise ValueError("Neural policy must contain one finite logit per legal action")
+    row_probabilities = [scores.softmax(0) if scores.numel() else scores for scores in logits]
+    packed_probabilities = (row_probabilities[0] if len(row_probabilities) == 1
+                            else torch.cat(row_probabilities))
+    host_probabilities = packed_probabilities.cpu().tolist()
+    host_values = [vector(row) for row in (values * value_scale).cpu().tolist()]
+    probabilities, offset = [], 0
+    for count in counts:
+        probabilities.append(host_probabilities[offset:offset + count])
+        offset += count
+    return probabilities, host_values
 
 
 class NeuralEvaluator:
@@ -587,12 +832,13 @@ class NeuralEvaluator:
     three models' raw value vectors and emits no policy. This is a bootstrap
     convention, not a chance action or a peek at the execution random stream.
     """
-    def __init__(self, models: Mapping[str, CampaignPolicyValueNet], version: str) -> None:
+    def __init__(self, models: Mapping[str, CampaignPolicyValueNet], version: str, *, runtime_policy: Any = None) -> None:
         if set(models) != set(PLAYERS):
             raise ValueError("Provide one campaign model for Axis, Allies and Comintern")
         if not isinstance(version, str) or not version:
             raise ValueError("Neural evaluator needs a nonempty version")
         self.models, self.version = dict(models), version
+        self.runtime_policy = runtime_policy
         self._versioned_forward: dict[str, bool] = {}
         for player, model in self.models.items():
             try:
@@ -653,6 +899,7 @@ class NeuralEvaluator:
             model = self.models[player]
             training = model.training
             model.eval()
+            completed_mps_forward = False
             try:
                 with torch.inference_mode():
                     batch = [item for _, item in groups[player]]
@@ -662,6 +909,17 @@ class NeuralEvaluator:
                         logits, values = model.forward_batch(batch)
                     if values.shape != (len(groups[player]), 3) or len(logits) != len(groups[player]):
                         raise ValueError("Neural model returned an invalid batch shape")
+                    if values.device.type != "cpu":
+                        counts = [len(item["packed_graph"]["actions"]) if item["schema"] == NUMERIC_SCHEMA
+                                  else len(item["actions"]) for _, item in groups[player]]
+                        host_priors, host_values = _gpu_evaluation_outputs(logits, values, counts, model.config.value_scale)
+                        for index, (row, _) in enumerate(groups[player]):
+                            if row in chance_values:
+                                chance_values[row].append(host_values[index])
+                            else:
+                                results[row] = Evaluation(host_priors[index], host_values[index])
+                        completed_mps_forward = values.device.type == "mps"
+                        continue  # The existing finally still restores model.train(training).
                     for index, (row, item) in enumerate(groups[player]):
                         scores = logits[index]
                         count = len(item["packed_graph"]["actions"]) if item["schema"] == NUMERIC_SCHEMA else len(item["actions"])
@@ -674,6 +932,8 @@ class NeuralEvaluator:
                             results[row] = Evaluation(scores.softmax(0).tolist() if scores.numel() else [], raw)
             finally:
                 model.train(training)
+                if completed_mps_forward and self.runtime_policy is not None:
+                    self.runtime_policy.completed(1)
         for row, predictions in chance_values.items():
             results[row] = Evaluation([], vector([sum(value[i] for value in predictions) / len(PLAYERS) for i in range(3)]))
         if any(result is None for result in results):

@@ -22,7 +22,7 @@ import torch
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import compatibility, make_env, task_manifest
 from .learning import _model_digest
-from .neural import CampaignModelConfig, CampaignPolicyValueNet
+from .neural import CampaignModelConfig, CampaignPolicyValueNet, resolve_neural_device
 
 MODEL_EXPORT_SCHEMA = "campaign-evaluation-models-v1"
 _KEYS = {"schema", "config", "task", "training_environment_seeds", "model_config",
@@ -40,6 +40,7 @@ def _preserve_random_and_threads():
     """Legacy recovery construction seeds globals; never leak that into a caller."""
     python_state, numpy_state = random.getstate(), np.random.get_state()
     threads = torch.get_num_threads()
+    mps_state = torch.mps.get_rng_state() if torch.backends.mps.is_available() else None
     try:
         with torch.random.fork_rng(devices=list(range(torch.cuda.device_count()))):
             yield
@@ -47,6 +48,8 @@ def _preserve_random_and_threads():
         random.setstate(python_state)
         np.random.set_state(numpy_state)
         torch.set_num_threads(threads)
+        if mps_state is not None:
+            torch.mps.set_rng_state(mps_state)
 
 
 def save_model_export(path: str | Path, learner, runner: dict) -> dict:
@@ -149,7 +152,7 @@ def validate_model_export(path: str | Path, learner, runner: dict) -> dict:
             "generation": learner.generation, "model_versions": versions}
 
 
-def load_evaluation_models(path: str | Path) -> dict[str, Any]:
+def load_evaluation_models(path: str | Path, *, device: str | torch.device | None = None) -> dict[str, Any]:
     """Load policies without creating an optimizer or restoring rollout games.
 
     Existing full checkpoints remain accepted through their original, complete
@@ -176,9 +179,11 @@ def load_evaluation_models(path: str | Path) -> dict[str, Any]:
         with _preserve_random_and_threads():
             learner = _learner(config, template)
             learner.restore(value["learner"], env_template=template)
+        target = resolve_neural_device(config.neural_device if device is None else device)
+        models = {player: model.to(target) for player, model in learner.models.items()}
         return {"config": runner["config"], "task": runner["task"],
             "training_environment_seeds": runner["training_environment_seeds"],
-            "model_versions": learner.model_versions(), "models": learner.models,
+            "model_versions": learner.model_versions(), "models": models, "neural_device": str(target),
             "generation": learner.generation,
             "runtime_source_sha256": runner["runtime_source_sha256"], "source_schema": RUN_SCHEMA}
     if set(value) != _KEYS or value.get("schema") != MODEL_EXPORT_SCHEMA:
@@ -186,6 +191,7 @@ def load_evaluation_models(path: str | Path) -> dict[str, Any]:
     if value["runtime_source_sha256"] != source_hashes():
         raise ValueError("Runtime sources changed; an explicit model migration is required")
     config = RunConfig(**value["config"])
+    target = resolve_neural_device(config.neural_device if device is None else device)
     template = make_env(config.seed, calendar_rounds=config.calendar_rounds)
     if (value["task"] != task_manifest(template)
             or value["compatibility"] != compatibility(template)):
@@ -215,8 +221,11 @@ def load_evaluation_models(path: str | Path) -> dict[str, Any]:
             version = f"{player}:generation-{value['generation']}:{_model_digest(model)}"
             if value["model_versions"][player] != version:
                 raise ValueError("Exported model version does not match weights")
+        # Weight-only evaluation can explicitly choose a different device.
+        # This is not an optimizer/RNG migration or an exact training resume.
+        models = {player: model.to(target) for player, model in models.items()}
     return {"config": value["config"], "task": value["task"],
         "training_environment_seeds": value["training_environment_seeds"],
         "model_versions": value["model_versions"], "models": models,
         "generation": value["generation"], "runtime_source_sha256": value["runtime_source_sha256"],
-        "source_schema": MODEL_EXPORT_SCHEMA}
+        "source_schema": MODEL_EXPORT_SCHEMA, "neural_device": str(target)}

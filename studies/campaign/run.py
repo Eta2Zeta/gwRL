@@ -26,10 +26,11 @@ import torch
 
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
+from .device_runtime import runtime_policy_for_device
 from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .model_export import load_evaluation_models, save_model_export, validate_model_export
-from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
+from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator, resolve_neural_device
 
 RUN_SCHEMA = "campaign-foreground-run-v1"
 
@@ -57,8 +58,12 @@ class RunConfig:
     complete_episodes: bool = False
     max_episodes: int | None = None
     cpu_budget: int | None = None
+    neural_device: str = "cpu"
 
     def __post_init__(self):
+        if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
+                self.neural_device.startswith("cuda:") and self.neural_device[5:].isdigit()):
+            raise ValueError("Neural device must be cpu, mps or an explicit CUDA device")
         positive = ("batches", "transitions_per_batch", "parallel_envs", "simulations", "max_depth",
                     "hidden_dim", "message_layers", "token_buckets", "batch_size", "epochs",
                     "replay_capacity", "threads")
@@ -91,7 +96,8 @@ def source_hashes() -> dict[str, str]:
              *sorted((ROOT / "studies/campaign/backends").rglob("*.py")),
              ROOT / "studies/shared/campaign_adapter.py", ROOT / "studies/shared/multiplayer_mcts.py",
              ROOT / "studies/shared/immutable_json.py",
-             *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp"))]
+             *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp")),
+             *sorted((ROOT / "src").rglob("*.inc"))]
     return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
 
@@ -110,17 +116,20 @@ def _json(path: Path, value):
 
 
 def _learner(config: RunConfig, template):
+    device = resolve_neural_device(config.neural_device)
+    runtime_policy = runtime_policy_for_device(device)
     torch.set_num_threads(config.threads)
     random.seed(config.seed)
     np.random.seed(config.seed % (2 ** 32))
     torch.manual_seed(config.seed)
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
         token_buckets=config.token_buckets, value_scale=config.value_scale)
-    models = {player: CampaignPolicyValueNet(model_config).eval() for player in PLAYERS}
+    models = {player: CampaignPolicyValueNet(model_config, device=device).eval() for player in PLAYERS}
     learning = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
         replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed)
-    return CampaignLearner(models, model_config, learning, compatibility=compatibility(template))
+    return CampaignLearner(models, model_config, learning, compatibility=compatibility(template),
+                           runtime_policy=runtime_policy)
 
 
 def _save(path: Path, learner: CampaignLearner, runner: dict, *, backup_current=True):
@@ -291,11 +300,14 @@ def train(args) -> int:
                                     "explicit_wave_override": config.checkpoint_every_waves,
                                     "save_after_each_update": False},
                 "replay_trace": replay_writer.path.name if replay_writer else None,
-                "software": {"torch": torch.__version__, "device": "cpu", "threads": config.threads,
+                "software": {"torch": torch.__version__, "device": config.neural_device, "threads": config.threads,
+                             "rules_device": "cpu", "search_device": "cpu",
                              "graph_compiler": graph_compiler_backend()},
                 "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
                               "conservative_thread_budget": config.threads + config.parallel_envs + 1,
-                              "interop_threads": torch.get_num_interop_threads()},
+                              "interop_threads": torch.get_num_interop_threads(),
+                              "device_runtime": learner._device_runtime.stats()
+                                  if learner._device_runtime is not None else None},
                 "elapsed_seconds_this_invocation": time.perf_counter() - started,
                 "timings_seconds_this_invocation": dict(timings),
                 "collection_transitions_per_second_this_invocation":
@@ -414,20 +426,27 @@ def train(args) -> int:
 def evaluate_command(args) -> int:
     from .evaluation import evaluate, validate_heldout_seeds
     torch.set_num_threads(1)
-    loaded = load_evaluation_models(args.checkpoint)
+    requested_device = getattr(args, "neural_device", None)
+    loaded = (load_evaluation_models(args.checkpoint) if requested_device is None else
+              load_evaluation_models(args.checkpoint, device=requested_device))
     config = RunConfig(**loaded["config"])
     torch.set_num_threads(config.threads)
     template = make_env(config.seed, calendar_rounds=config.calendar_rounds)
     versions = loaded["model_versions"]
     version = hashlib.sha256(json.dumps(versions, sort_keys=True).encode()).hexdigest()
-    evaluator = NeuralEvaluator(loaded["models"], version=version)
+    evaluation_device = next(loaded["models"][PLAYERS[0]].parameters()).device
+    device_runtime = runtime_policy_for_device(evaluation_device)
+    evaluator = NeuralEvaluator(loaded["models"], version=version, runtime_policy=device_runtime)
     seeds = [int(value) for value in args.seeds.split(",")]
     targets = PLAYERS if args.target == "all" else (args.target,)
     separation = validate_heldout_seeds({player: seeds for player in PLAYERS},
                                       [config.seed, *loaded["training_environment_seeds"]])
     report = {"schema": "campaign-evaluation-bundle-v1", "task": task_manifest(template),
               "training_seed": config.seed, "seed_separation": separation,
-              "model_versions": versions, "results": []}
+              "model_versions": versions,
+              "execution": {"rules": "cpu", "search": "cpu", "neural_device":
+                            str(next(loaded["models"][PLAYERS[0]].parameters()).device)},
+              "results": []}
     for player in targets:
         result = evaluate(lambda seed: make_env(seed, calendar_rounds=config.calendar_rounds), evaluator,
             target_player=player, seeds=seeds, baseline_style=args.baseline_style,
@@ -436,6 +455,7 @@ def evaluate_command(args) -> int:
         report["results"].append(result)
         print(json.dumps({"target": player, "terminal_games": result["terminal_games"],
                           "truncated_games": result["truncated_games"]}), flush=True)
+    report["execution"]["device_runtime"] = device_runtime.stats() if device_runtime else None
     _json(args.output, report)
     print(json.dumps({"output": str(args.output)}), flush=True)
     return 0
@@ -451,11 +471,11 @@ def profile_command(args) -> int:
     loaded = None
     versions = learner.model_versions()
     version = hashlib.sha256(json.dumps(versions, sort_keys=True).encode()).hexdigest()
-    evaluator = NeuralEvaluator(learner.models, version=version)
+    evaluator = NeuralEvaluator(learner.models, version=version, runtime_policy=learner._device_runtime)
     envs = learner.parallel_envs or [template]
     report = profile(envs, evaluator, repeats=args.repeats)
     report.update(task=task_manifest(template), model_versions=versions,
-                  software={"torch": torch.__version__, "device": "cpu", "threads": config.threads})
+                  software={"torch": torch.__version__, "device": config.neural_device, "threads": config.threads})
     _json(args.output, report)
     print(json.dumps({"output": str(args.output), "actual_state_unchanged": report["actual_state_unchanged"]}), flush=True)
     return 0
@@ -473,6 +493,10 @@ def main(argv=None) -> int:
     training.add_argument("--extend-episode-budget", type=int,
                           help="Explicitly increase the resumable complete-episode transition guard")
     for field in fields(RunConfig):
+        if field.name == "neural_device":
+            training.add_argument("--neural-device", default=None,
+                                  help="cpu (default), mps (Apple GPU) or cuda[:index]; rules/search remain CPU")
+            continue
         if field.name == "complete_episodes":
             training.add_argument("--complete-episodes", action=argparse.BooleanOptionalAction, default=None,
                                   help="Freeze each batch until all games finish; a guard saves without updating")
@@ -482,6 +506,8 @@ def main(argv=None) -> int:
     training.add_argument("--full-campaign", action="store_true", help="Use the original July1936–July1941 target")
     evaluation = commands.add_parser("evaluate", help="Held-out fixed-opponent games without training noise")
     evaluation.add_argument("--checkpoint", type=Path, required=True)
+    evaluation.add_argument("--neural-device", default=None,
+                            help="Explicit evaluation device; never changes a saved learning checkpoint")
     evaluation.add_argument("--output", type=Path, required=True)
     evaluation.add_argument("--target", choices=["all", *PLAYERS], default="all")
     evaluation.add_argument("--seeds", default="1009,1013")

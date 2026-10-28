@@ -258,7 +258,8 @@ class CampaignLearner:
 
     def __init__(self, models: Mapping[str, nn.Module], model_config: Any,
                  config: LearningConfig | None = None, *, compatibility: Mapping[str, Any],
-                 replay_observer: Callable[[dict[str, Any]], None] | None = None):
+                 replay_observer: Callable[[dict[str, Any]], None] | None = None,
+                 runtime_policy: Any = None):
         self.config = config or LearningConfig()
         self.model_config = copy.deepcopy(asdict(model_config))
         self.compatibility = json.loads(_canonical(dict(compatibility)))
@@ -274,6 +275,11 @@ class CampaignLearner:
             raise ValueError("Actor policies must be separate model instances")
         if any(asdict(getattr(model, "config", None)) != self.model_config for model in self.models.values()):
             raise ValueError("Every actor model configuration must match the learner model configuration")
+        from .device_runtime import runtime_policy_for_device
+        self._mps_actor_count = sum(next(model.parameters()).device.type == "mps"
+                                    for model in self.models.values())
+        self._device_runtime = (runtime_policy if runtime_policy is not None else
+                                runtime_policy_for_device("mps") if self._mps_actor_count else None)
         self.optimizers = {player: self._optimizer(self.models[player]) for player in PLAYERS}
         self.policy_random = random.Random(self.config.seed)
         self.search_random = random.Random(self.config.seed ^ 0x9E3779B97F4A7C15)
@@ -341,7 +347,8 @@ class CampaignLearner:
         from .neural import NeuralEvaluator
         if self.frozen_models is None or self.batch_version is None:
             raise ValueError("No frozen rollout batch is active")
-        return NeuralEvaluator(self.frozen_models, version=self.batch_version)
+        return NeuralEvaluator(self.frozen_models, version=self.batch_version,
+                               runtime_policy=self._device_runtime)
 
     def begin_batch(self, env: Any = None) -> None:
         if self.frozen_models is not None:
@@ -633,6 +640,10 @@ class CampaignLearner:
             for player in PLAYERS:
                 self.optimizers[player].step()
                 self.models[player].eval()
+            if self._device_runtime is not None and self._mps_actor_count:
+                # All actor gradients and updates have completed; no pending
+                # autograd work is discarded by compilation-cache housekeeping.
+                self._device_runtime.completed(self._mps_actor_count)
         self.generation += 1
         self.counters["updates"] += 1
         return {"updated": True, "samples": min(self.config.batch_size, len(self.replay)), "losses": losses,
@@ -893,6 +904,8 @@ class CampaignLearner:
             if rng["mps"].dtype != expected_mps.dtype or rng["mps"].shape != expected_mps.shape:
                 raise ValueError("Invalid MPS random-generator state")
         # All parsing, compatibility and object loading succeeded. Commit once.
+        if self._device_runtime is not None:
+            self._device_runtime.reset()
         self.models, self.optimizers, self.env = models, optimizers, env
         self._context_pool = context_pool
         self._numeric_context_pool = numeric_context_pool
