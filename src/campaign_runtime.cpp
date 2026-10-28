@@ -6,8 +6,10 @@
 #include <charconv>
 #include <cmath>
 #include <limits>
+#include <list>
 #include <mutex>
 #include <stdexcept>
+#include <unordered_map>
 
 namespace game::campaign {
 namespace {
@@ -125,6 +127,32 @@ struct Engine::DecisionCache {
     std::optional<std::string> stateKey;
 };
 
+struct Engine::MenuTable {
+    static constexpr std::size_t limit = 64;
+    std::mutex mutex;
+    std::list<std::string> recent;
+    std::unordered_map<std::string, std::pair<std::shared_ptr<const ActionMenu>, std::list<std::string>::iterator>> menus;
+
+    std::shared_ptr<const ActionMenu> find(const std::string& key) {
+        std::lock_guard lock(mutex);
+        const auto found = menus.find(key);
+        if (found == menus.end()) return nullptr;
+        recent.splice(recent.end(), recent, found->second.second);
+        return found->second.first;
+    }
+
+    void insert(const std::string& key, std::shared_ptr<const ActionMenu> menu) {
+        std::lock_guard lock(mutex);
+        if (menus.contains(key)) return;
+        recent.push_back(key);
+        menus.emplace(key, std::make_pair(std::move(menu), std::prev(recent.end())));
+        while (menus.size() > limit) {
+            menus.erase(recent.front());
+            recent.pop_front();
+        }
+    }
+};
+
 void Engine::invalidateDecisionCache() {
     decisionCache_ = std::make_shared<DecisionCache>();
 }
@@ -222,7 +250,7 @@ double outcomeProbability(const ChanceRequest& request, const ChanceOutcome& out
 
 Engine::Engine(State initial, std::shared_ptr<const Rules> rules, std::uint64_t seed)
     : state_(std::move(initial)), rules_(std::move(rules)), random_(RandomStreams::seeded(seed)),
-      decisionCache_(std::make_shared<DecisionCache>()) {
+      decisionCache_(std::make_shared<DecisionCache>()), menuTable_(std::make_shared<MenuTable>()) {
     require(rules_ && !rules_->id().empty(), "Campaign execution requires an explicit rules module");
     state_.validate();
 }
@@ -259,6 +287,15 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
     if (state_.terminal || state_.chance) return finish();
     const auto player = state_.decisionPlayer();
     if (!player) return finish();
+    // Rules read only the complete decision state that the planning key covers,
+    // never history or random streams. Clones of this engine reaching the same
+    // state therefore share one immutable menu; step still compares payloads.
+    if (!decisionCache_->stateKey) decisionCache_->stateKey = state_.planningKey();
+    const auto& key = *decisionCache_->stateKey;
+    if (auto shared = menuTable_->find(key)) {
+        decisionCache_->actions = shared;
+        return shared;
+    }
     const bool decisionPending = !state_.decisions.empty();
     auto& actions = menu->actions;
     actions = decisionPending ? state_.decisions.back().options : rules_->actions(state_);
@@ -296,6 +333,7 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
         action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
         menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
+    menuTable_->insert(key, menu);
     return finish();
 }
 

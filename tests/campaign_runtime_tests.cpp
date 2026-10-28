@@ -688,6 +688,38 @@ void menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions() {
         "Source-key fixture lost its defender decision metadata");
 }
 
+void reachedMenusAreSharedAcrossClonesAndBounded() {
+    auto rules = std::make_shared<CountingRules>();
+    Engine engine(initialState(), rules, 777);
+    const auto mark = findAction(engine, "mark");
+    auto left = engine.cloneForSearch(1);
+    auto right = engine.cloneForSearch(2);
+    left.step(mark);
+    const auto reached = left.legalActions();
+    right.step(mark);
+    const auto again = right.legalActions();
+    require(rules->actionCalls == 2, "A clone regenerated a menu another clone built for the same decision state");
+    require(reached.size() == again.size(), "Clones reaching one state received different menus");
+    for (std::size_t i = 0; i < reached.size(); ++i)
+        require(reached[i].neuralSourceKey == again[i].neuralSourceKey, "A shared menu copied or changed its source bytes");
+    auto forged = findAction(right, "mark");
+    forged.parameters = V(O{{"value", V(999.0)}});
+    rejects([&] { right.step(forged); }, "A shared menu authorized a forged payload");
+    right.step(findAction(right, "mark"));
+    require(rules->actionCalls == 2 && right.state().flags.at("marks") == 2,
+            "Validating against a shared menu rebuilt it or misapplied the action");
+    Engine independent(initialState(), rules, 777);
+    independent.legalActions();
+    require(rules->actionCalls == 3, "Separately constructed engines shared a menu table");
+    auto walker = engine.cloneForSearch(3);
+    for (int step = 0; step < 200; ++step) walker.step(findAction(walker, "mark"));
+    const auto beforeRevisit = rules->actionCalls;
+    auto revisit = engine.cloneForSearch(4);
+    revisit.step(mark);
+    revisit.legalActions();
+    require(rules->actionCalls == beforeRevisit + 1, "The shared menu table retained unbounded old menus");
+}
+
 }  // namespace
 
 int main() {
@@ -709,6 +741,7 @@ int main() {
         {"decision menu reuse and invalidation", decisionMenusAreReusedAndTransactional},
         {"state key reuse and invalidation", runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys},
         {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
+        {"reached menus shared across clones and bounded", reachedMenusAreSharedAcrossClonesAndBounded},
     };
     for (const auto& [name, test] : tests) {
         try { test(); std::cout << "PASS " << name << '\n'; }

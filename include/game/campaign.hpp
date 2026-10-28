@@ -336,12 +336,16 @@ class Engine {
   private:
     struct ActionMenu;
     struct DecisionCache;
+    struct MenuTable;
     State state_;
     std::shared_ptr<const Rules> rules_;
     RandomStreams random_;
     // One complete decision state per engine. Clones share lazily constructed,
     // immutable menus; a mutation detaches before changing the cloned state.
     std::shared_ptr<DecisionCache> decisionCache_;
+    // Bounded menus by complete planning key, shared by every clone of one
+    // engine, so a search clone reaching another clone's state reuses its menu.
+    std::shared_ptr<MenuTable> menuTable_;
     std::shared_ptr<const ActionMenu> actionMenu() const;
     std::shared_ptr<const ActionMenu> interruptMenu() const;
     void invalidateDecisionCache();
