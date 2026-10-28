@@ -142,6 +142,113 @@ def _selected_features(action: Any) -> dict[str, Any]:
     return feature
 
 
+def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
+    order = sorted(range(len(actions)), key=lambda index: action_key(actions[index]))
+    threshold = rng.random()
+    for index in order:
+        threshold -= policy[index]
+        if threshold < 0:
+            return index
+    return order[-1]
+
+
+def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: LearningConfig,
+            rng: random.Random, numeric: bool, token_buckets: int, batch_version: str,
+            numeric_pool: dict[tuple[str, int], Any], context_pool: dict[str, dict[str, Any]],
+            replay: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Sample the played move from a search result, record its sample and apply it."""
+    from .features import NUMERIC_SCHEMA, make_numeric_input, validate_numeric_input
+    from .neural import make_input
+    owner = env.current_decision_player()
+    if owner not in PLAYERS:
+        raise ValueError("A policy choice must belong to one of the three actors")
+    logs = [math.log(p) / config.temperature if p > 0 else -math.inf for p in result.policy]
+    maximum = max(logs)
+    policy = probabilities([math.exp(value - maximum) for value in logs], len(logs))
+    index = _sample_index(result.actions, policy, rng)
+    features = make_numeric_input(env, result.actions, token_buckets) if numeric else make_input(env, result.actions)
+    numerical = features["schema"] == NUMERIC_SCHEMA
+    if numerical:
+        if (validate_numeric_input(features, buckets=token_buckets) != len(result.actions)
+                or features["owner"] != owner):
+            raise ValueError("Numerical replay differs from actual choice owner/menu")
+        features = features.copy()
+        _intern_numeric_context(features, numeric_pool)
+    else:
+        features["context"] = _intern_context(features["context"], context_pool)
+    pending.append({"input": features, "owner": owner, "policy": policy, "rollout_version": batch_version})
+    action = result.actions[index]
+    if numerical:
+        menu = [_selected_features(action) for action in result.actions] if replay is not None else None
+        selected = menu[index] if menu is not None else _selected_features(action)
+    else:
+        menu, selected = features["actions"], features["actions"][index]
+    raw = selected.get("action")
+    raw = raw if isinstance(raw, dict) else selected
+    if replay is not None:
+        replay.update(selected_index=index, selected_action=selected, decision_menu=menu,
+            search={"visit_counts": result.visit_counts, "priors": result.priors,
+                    "policy": result.policy, "sampling_policy": policy, "values": list(result.values),
+                    "action_values": result.action_values, "simulations": config.simulations,
+                    "max_depth": config.max_depth, "rollout_version": batch_version})
+    event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action),
+             "action_kind": raw.get("kind", "unknown"),
+             "action_parameters": copy.deepcopy(raw.get("parameters", {}))}
+    env.apply_action(action)
+    return event
+
+
+def episode_streams(learner_seed: int, environment_seed: int) -> tuple[random.Random, random.Random]:
+    """One game's own search-seed and move-sampling streams.
+
+    They depend only on the run seed and the game's environment seed, never on
+    other games, so an episode plays the same in any process or batch makeup.
+    """
+    return (random.Random(f"campaign-episode-search:{learner_seed}:{environment_seed}"),
+            random.Random(f"campaign-episode-policy:{learner_seed}:{environment_seed}"))
+
+
+def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_version: str, numeric: bool,
+                 token_buckets: int, batch_version: str, environment_seed: int,
+                 max_transitions: int) -> dict[str, Any]:
+    """Play one game to its end, or to the transition guard, with frozen policies.
+
+    A finished game returns terminal-labelled samples. A game stopped by the
+    guard returns no samples: complete-episode batches never bootstrap.
+    """
+    search_random, policy_random = episode_streams(config.seed, environment_seed)
+    pending: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+    counts = dict(transitions=0, decisions=0, chance_events=0)
+    numeric_pool: dict[tuple[str, int], Any] = {}
+    context_pool: dict[str, dict[str, Any]] = {}
+    while not env.is_terminal() and counts["transitions"] < max_transitions:
+        before = env.planning_key()
+        if env.decision_kind() == "chance":
+            env.resolve_chance()
+            counts["chance_events"] += 1
+            event = {"kind": "chance", "owner": None, "action": None}
+        else:
+            search = MctsConfig(
+                simulations=config.simulations, max_depth=config.max_depth, c_puct=config.c_puct,
+                seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
+                root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
+            result = VectorMCTS(evaluator, search).search(env, add_root_noise=config.root_noise, reuse_root=False)
+            event = _decide(env, result, pending, config=config, rng=policy_random, numeric=numeric,
+                            token_buckets=token_buckets, batch_version=batch_version,
+                            numeric_pool=numeric_pool, context_pool=context_pool)
+            counts["decisions"] += 1
+        counts["transitions"] += 1
+        event.update(before=before, after=env.planning_key(), terminal=env.is_terminal())
+        events.append(event)
+    terminal = env.is_terminal()
+    target = list(vector(env.returns())) if terminal else None
+    records = [{**sample, "values": target.copy(), "target_source": "terminal", "target_schema": TARGET_SCHEMA}
+               for sample in pending] if terminal else []
+    return {"terminal": terminal, "records": records, "events": events, "counts": counts,
+            "returns": target, "clock": env.observation()["state"]["clock"], "wealth": env.wealth()}
+
+
 def _checkpoint_contexts(payload: dict[str, Any]):
     """Visit sample contexts without requiring a valid checkpoint up front."""
     groups = [payload.get(name, []) for name in ("replay", "pending", "batch_records")]
@@ -302,6 +409,7 @@ class CampaignLearner:
         self.counters = dict(transitions=0, decisions=0, chance_events=0,
                              episodes=0, batches=0, updates=0)
         self.action_history: list[dict[str, Any]] = []
+        self._episodes_terminal: bool | None = None
         # Inspection-only callbacks are never checkpointed or restored. Their
         # absence leaves collection unchanged and performs no replay conversion.
         self.set_replay_observer(replay_observer)
@@ -358,6 +466,9 @@ class CampaignLearner:
         if self.env is None:
             raise ValueError("A rollout needs an environment")
         self.parallel_envs, self.parallel_pending = [], []
+        self._freeze_policies()
+
+    def _freeze_policies(self) -> None:
         self.frozen_models = {player: copy.deepcopy(self.models[player]).eval() for player in PLAYERS}
         self.frozen_versions = self.model_versions()
         self.batch_version = _fingerprint({"models": self.frozen_versions, "mode": self.config.mode,
@@ -396,49 +507,16 @@ class CampaignLearner:
             root_dirichlet_alpha=self.config.root_dirichlet_alpha,
             root_dirichlet_epsilon=self.config.root_dirichlet_epsilon)
 
+    def _numeric_models(self) -> bool:
+        from .neural import CampaignPolicyValueNet
+        return all(isinstance(model, CampaignPolicyValueNet) for model in self.models.values())
+
     def _apply_search_result(self, env: Any, result: Any, pending: list[dict[str, Any]],
                              replay: dict[str, Any] | None = None) -> dict[str, Any]:
-        from .features import NUMERIC_SCHEMA, make_numeric_input, validate_numeric_input
-        from .neural import CampaignPolicyValueNet, make_input
-        owner = env.current_decision_player()
-        if owner not in PLAYERS:
-            raise ValueError("A policy choice must belong to one of the three actors")
-        logs = [math.log(p) / self.config.temperature if p > 0 else -math.inf for p in result.policy]
-        maximum = max(logs)
-        policy = probabilities([math.exp(value - maximum) for value in logs], len(logs))
-        index = self._sample(result.actions, policy)
-        features = (make_numeric_input(env, result.actions, self.model_config["token_buckets"])
-                    if all(isinstance(model, CampaignPolicyValueNet) for model in self.models.values())
-                    else make_input(env, result.actions))
-        numerical = features["schema"] == NUMERIC_SCHEMA
-        if numerical:
-            if (validate_numeric_input(features, buckets=self.model_config["token_buckets"]) != len(result.actions)
-                    or features["owner"] != owner):
-                raise ValueError("Numerical replay differs from actual choice owner/menu")
-            features = features.copy()
-            _intern_numeric_context(features, self._numeric_context_pool)
-        else:
-            features["context"] = _intern_context(features["context"], self._context_pool)
-        pending.append({"input": features,
-                        "owner": owner, "policy": policy, "rollout_version": self.batch_version})
-        action = result.actions[index]
-        if numerical:
-            menu = [_selected_features(action) for action in result.actions] if replay is not None else None
-            selected = menu[index] if menu is not None else _selected_features(action)
-        else:
-            menu, selected = features["actions"], features["actions"][index]
-        raw = selected.get("action")
-        raw = raw if isinstance(raw, dict) else selected
-        if replay is not None:
-            replay.update(selected_index=index, selected_action=selected, decision_menu=menu,
-                search={"visit_counts": result.visit_counts, "priors": result.priors,
-                        "policy": result.policy, "sampling_policy": policy, "values": list(result.values),
-                        "action_values": result.action_values, "simulations": self.config.simulations,
-                        "max_depth": self.config.max_depth, "rollout_version": self.batch_version})
-        event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action),
-                 "action_kind": raw.get("kind", "unknown"),
-                 "action_parameters": copy.deepcopy(raw.get("parameters", {}))}
-        env.apply_action(action)
+        event = _decide(env, result, pending, config=self.config, rng=self.policy_random,
+                        numeric=self._numeric_models(), token_buckets=self.model_config["token_buckets"],
+                        batch_version=self.batch_version, numeric_pool=self._numeric_context_pool,
+                        context_pool=self._context_pool, replay=replay)
         self.counters["decisions"] += 1
         return event
 
@@ -563,13 +641,69 @@ class CampaignLearner:
                 "inference_batch_sizes": [size for stat in metrics for size in stat["batch_sizes"]]}
 
     def _sample(self, actions: Any, policy: list[float]) -> int:
-        order = sorted(range(len(actions)), key=lambda index: action_key(actions[index]))
-        threshold = self.policy_random.random()
-        for index in order:
-            threshold -= policy[index]
-            if threshold < 0:
-                return index
-        return order[-1]
+        return _sample_index(actions, policy, self.policy_random)
+
+    def begin_episode_batch(self) -> None:
+        """Freeze all three policies for complete episodes played by worker processes.
+
+        ``env`` stays a reference position whose static context checkpoints
+        verify; workers play the batch's games from their own seeds.
+        """
+        if self.frozen_models is not None:
+            raise ValueError("Finish the current rollout batch before starting another")
+        if self.env is None:
+            raise ValueError("Episode batches need a reference environment for context checks")
+        self.parallel_envs, self.parallel_pending = [], []
+        self._freeze_policies()
+        self._episodes_terminal = None
+
+    def abandon_batch(self) -> None:
+        """Drop an unfinished frozen batch; nothing it collected is kept."""
+        self.frozen_models, self.frozen_versions, self.batch_version = None, None, None
+        self.pending, self.batch_records = [], []
+        self.parallel_envs, self.parallel_pending = [], []
+        self._episodes_terminal = None
+
+    def collect_episodes(self, workers: Any, count: int, max_transitions: int, *,
+                         stop: Callable[[], bool] = lambda: False) -> dict[str, Any] | None:
+        """Play this many complete episodes in worker processes and keep their samples.
+
+        Each episode draws only from its own random streams, so results do not
+        depend on the number of workers. Nothing is recorded unless every episode
+        finishes; a stop request or the transition guard abandons the batch and
+        rewinds the environment-seed stream, so the batch replays exactly later.
+        Returns None when stopped.
+        """
+        from .features import NUMERIC_SCHEMA
+        if type(count) is not int or count <= 0 or type(max_transitions) is not int or max_transitions <= 0:
+            raise ValueError("Episode count and transition guard must be positive integers")
+        if self.frozen_models is None:
+            self.begin_episode_batch()
+        if self.parallel_envs or self.pending:
+            raise ValueError("An in-process rollout batch is active")
+        before = self.environment_random.getstate()
+        seeds = [self.environment_random.getrandbits(63) for _ in range(count)]
+        weights = {player: {name: tensor.detach().cpu() for name, tensor in model.state_dict().items()}
+                   for player, model in self.frozen_models.items()}
+        results = workers.play(list(enumerate(seeds)), weights=weights, batch_version=self.batch_version,
+                               max_transitions=max_transitions, stop=stop)
+        if results is None or not all(result["terminal"] for result in results):
+            self.environment_random.setstate(before)
+            self.abandon_batch()
+            return None if results is None else {"seeds": seeds, "exhausted": True, "results": results}
+        for result in results:
+            for record in result["records"]:
+                if record["input"]["schema"] == NUMERIC_SCHEMA:
+                    _intern_numeric_context(record["input"], self._numeric_context_pool)
+                else:
+                    record["input"]["context"] = _intern_context(record["input"]["context"], self._context_pool)
+            self.batch_records.extend(result["records"])
+            for name in ("transitions", "decisions", "chance_events"):
+                self.counters[name] += result["counts"][name]
+            self.counters["episodes"] += 1
+            self.action_history.extend({**event, "root": result["root"]} for event in result["events"])
+        self._episodes_terminal = True
+        return {"seeds": seeds, "exhausted": False, "results": results}
 
     def finish_batch(self) -> dict[str, Any]:
         if self.frozen_models is None:
@@ -593,10 +727,13 @@ class CampaignLearner:
         self.replay = (self.replay + records)[-self.config.replay_capacity:]
         result = {"samples": len(records), "terminal_samples": sum(r["target_source"] == "terminal" for r in records),
                   "bootstrap_samples": sum(r["target_source"] == "bootstrap" for r in records),
-                  "terminal": all(env.is_terminal() for env in self.parallel_envs) if self.parallel_envs else self.env.is_terminal(),
+                  "terminal": (self._episodes_terminal if self._episodes_terminal is not None
+                               else all(env.is_terminal() for env in self.parallel_envs) if self.parallel_envs
+                               else self.env.is_terminal()),
                   "rollout_version": self.batch_version}
         self.pending, self.batch_records = [], []
         self.frozen_models, self.frozen_versions, self.batch_version = None, None, None
+        self._episodes_terminal = None
         self.counters["batches"] += 1
         return result
 

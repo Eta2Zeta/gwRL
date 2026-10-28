@@ -27,6 +27,7 @@ import torch
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
+from .episode_workers import EpisodeWorkers
 from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .model_export import load_evaluation_models, save_model_export, validate_model_export
@@ -59,6 +60,7 @@ class RunConfig:
     max_episodes: int | None = None
     cpu_budget: int | None = None
     neural_device: str = "cpu"
+    episode_workers: int = 0
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -84,11 +86,23 @@ class RunConfig:
         if self.max_episodes is not None and (
                 type(self.max_episodes) is not int or self.max_episodes <= 0 or not self.complete_episodes):
             raise ValueError("An exact episode limit requires complete episodes and a positive integer")
+        if type(self.episode_workers) is not int or self.episode_workers < 0:
+            raise ValueError("Episode workers must be a nonnegative integer")
+        if self.episode_workers and (not self.complete_episodes or self.episode_workers > self.parallel_envs):
+            raise ValueError("Episode workers play complete episodes, at most one worker per game in a batch")
         if self.cpu_budget is not None:
             if type(self.cpu_budget) is not int or self.cpu_budget <= 0 or self.cpu_budget > (os.cpu_count() or 1):
                 raise ValueError("CPU budget must fit available logical cores")
-            if self.threads + self.parallel_envs + 1 > self.cpu_budget:
+            if busy_cores(self) > self.cpu_budget:
                 raise ValueError("Tensor threads, search workers and coordinator exceed CPU budget")
+
+
+def busy_cores(config: RunConfig) -> int:
+    """Conservative concurrent cores: one per game process, or threads plus roots."""
+    if config.episode_workers:
+        # Workers play while the coordinator waits; updates run after collection.
+        return max(config.episode_workers, config.threads) + 1
+    return config.threads + config.parallel_envs + 1
 
 
 def source_hashes() -> dict[str, str]:
@@ -203,6 +217,8 @@ def train(args) -> int:
     loaded = _read(args.resume) if args.resume else None
     resuming = loaded is not None
     config = _config(args, loaded["runner"]["config"] if loaded else None)
+    if config.episode_workers and getattr(args, "record_replay", False):
+        raise ValueError("--record-replay uses the in-process collector; run without --episode-workers")
     output = (args.run_dir or (args.resume.parent if args.resume else ROOT / "studies/campaign/runs" /
               f"{datetime.now():%Y%m%d-%H%M%S}-{uuid4().hex[:8]}" )).resolve()
     continuing_here = args.resume is not None and output == args.resume.parent.resolve()
@@ -252,6 +268,7 @@ def train(args) -> int:
     model_exports = 0
     latest_model_export = None
     last_checkpoint_time = time.monotonic()
+    workers = None
 
     @contextmanager
     def measure(name):
@@ -304,7 +321,8 @@ def train(args) -> int:
                              "rules_device": "cpu", "search_device": "cpu",
                              "graph_compiler": graph_compiler_backend()},
                 "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
-                              "conservative_thread_budget": config.threads + config.parallel_envs + 1,
+                              "conservative_thread_budget": busy_cores(config),
+                              "episode_workers": config.episode_workers,
                               "interop_threads": torch.get_num_interop_threads(),
                               "device_runtime": learner._device_runtime.stats()
                                   if learner._device_runtime is not None else None},
@@ -321,7 +339,7 @@ def train(args) -> int:
                 "full_target_game": runner["task"]["full_target_game"],
                 "limits": "Bounded training and bootstrapped cutoffs are not evidence of strategic strength."})
 
-    def progress(event, collection=None):
+    def progress(event, collection=None, episodes=None):
         with measure("progress_reporting"):
             value = {"event": event, "batch": runner["batch_index"], "wave": runner["wave_index"],
                      "counters": learner.counters.copy(), "elapsed_seconds": time.perf_counter() - started,
@@ -330,12 +348,20 @@ def train(args) -> int:
                      "last_actions": collection["events"] if collection else [],
                      "terminal_returns": [list(env.returns()) if env.is_terminal() else None
                                           for env in learner.parallel_envs]}
+            if episodes is not None:
+                value["episodes"] = episodes
             print(json.dumps(value, sort_keys=True), flush=True)
             with (output / "progress.jsonl").open("a") as handle:
                 handle.write(json.dumps(value, sort_keys=True) + "\n")
                 handle.flush()
 
     try:
+        if config.episode_workers:
+            if learner.env is None:
+                learner.env = template  # Reference context only; workers play from their own seeds.
+            workers = EpisodeWorkers(config.episode_workers, calendar_rounds=config.calendar_rounds,
+                                     model_config=learner.model_config, learning_config=asdict(learner.config),
+                                     rules_version=learner.compatibility["rules"], numeric=learner._numeric_models())
         if getattr(args, "record_replay", False):
             replay_writer = ReplayTraceWriter(output / "replay.jsonl", {
                 "kind": "training", "config": asdict(config), "task": runner["task"],
@@ -354,6 +380,45 @@ def train(args) -> int:
         while (runner["batch_index"] < config.batches and not stopped
                and (config.max_episodes is None or learner.counters["episodes"] < config.max_episodes
                     or learner.frozen_models is not None)):
+            if workers is not None:
+                # Worker batches start, finish and checkpoint as a whole; an
+                # interrupted or guarded batch is discarded and replays exactly.
+                count = config.parallel_envs
+                if config.max_episodes is not None:
+                    count = min(count, config.max_episodes - learner.counters["episodes"])
+                runner["batch_start_history"] = len(learner.action_history)
+                with measure("collection"):
+                    collection = learner.collect_episodes(workers, count, runner["episode_wave_limit"],
+                                                          stop=lambda: stopped)
+                if collection is None:
+                    break
+                runner["active_episode_seeds"] = collection["seeds"]
+                if collection["exhausted"]:
+                    exhausted = True
+                    break
+                runner["training_environment_seeds"].extend(collection["seeds"])
+                runner["total_waves"] += 1
+                episodes = [{"root": result["root"], "seed": result["seed"], "terminal": result["terminal"],
+                             "transitions_this_batch": result["counts"]["transitions"],
+                             "decisions_by_actor": dict(Counter(e["owner"] for e in result["events"]
+                                                                if e["owner"] is not None)),
+                             "action_counts": dict(Counter(e.get("action_kind", e["kind"]) for e in result["events"])),
+                             "clock": result["clock"], "wealth": result["wealth"],
+                             "observed_terminal_returns": result["returns"], "worker_seconds": result["seconds"]}
+                            for result in collection["results"]]
+                progress("episodes_completed", episodes=episodes)
+                with measure("learning_updates"):
+                    rollout = learner.finish_batch()
+                    update = learner.update()
+                runner["updates"].append({"rollout": rollout, "update": update, "episodes": episodes})
+                runner["batch_index"] += 1
+                export_model()
+                persist("running", recovery=recovery_checkpoint_due(
+                    config, runner["batch_index"], last_checkpoint_time, time.monotonic()))
+                progress("update")
+                if args.stop_after_waves is not None and runner["total_waves"] - initial_waves >= args.stop_after_waves:
+                    stopped, signal_name = True, "bounded_smoke_stop"
+                continue
             if learner.frozen_models is None:
                 with measure("collection"):
                     runner["batch_start_history"] = len(learner.action_history)
@@ -417,6 +482,8 @@ def train(args) -> int:
                           "stop_reason": signal_name, "checkpoint": str(checkpoint_path)}, sort_keys=True), flush=True)
         return 130 if stopped else 2 if exhausted else 0
     finally:
+        if workers is not None:
+            workers.terminate()  # Idle between batches; mid-batch games are discarded.
         if replay_writer is not None:
             replay_writer.close()
         for number, handler in old_handlers.items():
