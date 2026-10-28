@@ -10,6 +10,7 @@
 - [Three-round learning results](/Users/home/Desktop/gwRL/docs/stage_a/three_round_2026_10_25_results.md): sixty completed games, separate Japan/Dadao possession results, saved continuation and measured checkpoint overhead.
 - [Checkpoint saving pilot](/Users/home/Desktop/gwRL/docs/stage_a/checkpoint_pilot_2026_10_25.md): small model exports, thirty-minute recovery saves and ten three-round games in 30m 51s; matched first-eight elapsed time reduced by 10.8%.
 - [Native engine concurrency](/Users/home/Desktop/gwRL/docs/stage_a/native_concurrency_2026_10_25.md): independent games execute C++ work concurrently; four matched three-round games collected in 8m 46s versus 11m 38s, with identical search results and final states.
+- [CPU and GPU execution](docs/gpu/README.md): optional Apple GPU network with CPU rules and search, the multi-game interface, matched timings and the archived Metal rules port.
 - [Campaign learning](/Users/home/Desktop/gwRL/studies/campaign/README.md): foreground training, interrupt/resume, evaluation and profiling; [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md).
 - [Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md): local map viewer, self-play replay, optional live following and recorded MCTS decisions.
 - [Composition study](/Users/home/Desktop/gwRL/studies/composition/README.md): army-composition self-play, training code and its completed results.

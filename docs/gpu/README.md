@@ -1,33 +1,70 @@
-# Campaign execution backends
+# Campaign CPU and GPU execution
 
-GPU development starts on `codex/gpu-selfplay`, from CPU reference commit
-`d1c672954d8e1bb24ca43cd98c0199f4daac81f7`. Both implementations will live in the
-same repository. The existing C++ rules engine, scenario data and scalar CPU
-training path remain in place. This first step implements the shared interface,
-CPU wrapper and correctness/benchmark harness. **No GPU backend is implemented.**
+Current as of 28 October 2026.
 
-The [initial CPU conformance and timing evidence](cpu_foundation_2026_10_25.md)
-records the validated foundation and its measurement limits.
+**The C++ CPU engine runs all campaign rules and search.** The neural network can
+optionally run on an Apple GPU through PyTorch MPS, while rules and tree search
+stay on the CPU. CPU execution remains the default and the reference.
 
-## Execution contract
+| Area | Status |
+| --- | --- |
+| CPU campaign | Complete rules, legal choices, chance, search, training and recovery. |
+| GPU network | `--neural-device mps` for self-play, learner updates and evaluation, in an optional pinned environment. Slower than CPU at current batch sizes (below). |
+| Multi-game interface | [`studies/campaign/backends/`](../../studies/campaign/backends/): independent game lanes with bulk decision, action, chance, numerical-input, clone and snapshot operations. Only the CPU backend exists, and self-play does not use it yet. |
+| Explicit dice outcomes | `Engine::applyChanceOutcome` and backend `apply_chance_outcome(expected_key, faces)` apply chosen dice without consuming execution RNG, for conformance tests. |
 
-`studies/campaign/backends/protocol.py` defines independent game lanes and bulk
-decision, action, chance, numerical-input, clone/search-clone and snapshot operations. Execution
-payloads are opaque: a future backend can retain arrays on its device. Explicit
-inspection methods provide canonical host views for debugging and comparisons;
-they are not required inputs to a future device search loop.
+## Measured result
 
-The CPU backend wraps `CampaignAdapter` and its existing C++ environment. It
-dispatches lanes sequentially and reports that fact. It reuses complete decision
-keys, ordered legal menus and numerical inputs. Selection validation checks all
-lane keys and choices before executing any lane. Native rule failures remain
-atomic per lane; ordinary batch execution does not promise an expensive rollback
-across lanes. Snapshot restoration and explicit-outcome conformance batches stage
-replacements before committing the selected lanes together.
+The [26 October matched test](gpu_backend_2026_10_26_results.md) completed the same
+four three-round games twice: seeds 1951–1954, 16 simulations, depth cap 16,
+16-wide one-layer networks and fixed fresh weights.
 
-Use `scalar(lane)` when an existing tool requires the scalar environment API. A
-retained scalar view follows that lane after restoration. Existing MCTS can use
-this view, but this does not make its Python search batched or GPU accelerated.
+| Execution | Four games | Network preparation and forward |
+| --- | ---: | ---: |
+| CPU rules, search and network | 295 s | 70 s |
+| CPU rules and search, MPS network | 401 s | 144 s |
+
+The GPU network was 36% slower. Network calls carried one to four positions,
+1.7 on average, and 52% carried one. Four games run at once, each search asks
+for one position at a time, and each alliance has its own network. Rules and
+search outside the evaluator took 187 s on CPU, so even a network that cost
+nothing would make this workload at most about 1.3 times faster.
+
+A GPU network can pay off when the network is a large share of an all-CPU run,
+as with a larger model, and each call carries many positions from more
+simultaneous games. That comparison has not been measured.
+
+## Archived Metal rules port
+
+`codex/gpu-selfplay`, tagged `archive/gpu-rules-port-2026-10-27`, also ported
+parts of the rules to Metal: politics, income, recruitment, scoring and dice,
+plus byte-exact JSON and SHA-256 state identities. It cannot run complete games
+or search, because movement, combat, legal-move generation and the search loop
+were not ported. Its best result was one recruitment step at 512 simultaneous
+positions: 87 ms versus 154 ms for ten native CPU workers. It was 48 times
+slower than one CPU worker for a single position, and the CPU control scaled
+only 2.5 times over serial. The port is not carried forward. Its code and dated
+reports remain on that tag.
+
+## GPU environment
+
+Run from the repository root. Keep the optional environment separate from the
+CPU `.venv`:
+
+```sh
+.venv/bin/python -m venv tmp/gpu-mps-env
+tmp/gpu-mps-env/bin/python -m pip install -r requirements-gpu-mps.txt
+tmp/gpu-mps-env/bin/python -m studies.campaign.run train --help
+```
+
+The tested runtime is PyTorch 2.14.0. Long MPS runs require 2.13 or newer for
+graph-cache release. Unsupported runtimes, fast math and MPS CPU fallback are
+explicit errors. Caches are cleared at completed inference or update
+boundaries, normally every 32 actor forwards, without changing learning or game
+state. CUDA can be selected but has not been tested. Float32 device differences
+need numerical tolerances and can change search choices near ties.
+
+## Multi-game interface
 
 ```python
 from studies.campaign.backends import create_backend
@@ -39,39 +76,23 @@ decisions = backend.decision_batch()
 rows = backend.inspect_decisions(decisions)  # Explicit host inspection
 ```
 
-CPU is the only registered backend. Selecting `gpu` raises an explicit error.
-The CPU path imports no optional GPU framework. Future neural-device selection
-is separate from engine-backend selection. Neither menus nor state are truncated
-to arbitrary fixed capacities.
+The CPU backend wraps `CampaignAdapter`, dispatches lanes sequentially and
+reuses complete decision keys, ordered legal menus and numerical inputs.
+Selection validation checks every lane before executing any. `scalar(lane)`
+returns the scalar environment for existing tools; using it in MCTS does not
+batch the search. `clone_for_search(seeds, lanes=...)` forks a lane with
+independent search seeds without consuming its execution RNG.
 
-`clone_for_search(seeds, lanes=...)` can fork one source lane repeatedly with
-independent search seeds, without consuming the source game's execution RNG.
-Repeated source lanes are allowed for this read-only operation; mutating batches
-still require unique lanes.
+`chance_request()` exposes the current dice specification without future random
+values. `apply_chance_outcome(expected_key, faces)` validates the decision key,
+faces and required rerolls, then applies ordinary rules and history. Invalid
+outcomes and stale keys leave the lane unchanged. The
+[initial conformance evidence](cpu_foundation_2026_10_25.md) records the
+validated interface and its limits.
 
-## Chance and compatibility
+## Benchmarks
 
-`chance_request()` exposes the current public dice specification, without future
-random values. `apply_chance_outcome(expected_key, faces)` validates the complete
-decision key and every die face and required reroll, then applies ordinary rules
-and history without advancing execution RNG. Normal `resolve_chance()` retains
-its existing sampling behavior. Invalid outcomes and stale keys leave the lane
-unchanged.
-
-Explicit-outcome comparisons feed both implementations identical moves and dice.
-They compare complete rule state, history, scheduler state, ordered legal choices,
-acting factions and numerical inputs. Execution RNG is compared separately for
-sampled execution; a matching seed alone is not a cross-device conformance proof.
-The historical `Engine::replay` service still re-samples its chance events; this
-new explicit-outcome seam does not silently change that service.
-
-Nested backend Python sources now participate in training source fingerprints.
-Ignored run archives do not. Existing experiments retain their frozen runtimes
-and checkpoints; this branch does not rewrite or relabel their saved learners.
-
-## Initial benchmarks
-
-Run from the repository root, with a fresh output path:
+Use fresh output paths under ignored run storage:
 
 ```sh
 .venv/bin/python tools/benchmark_campaign_backends.py \
@@ -79,42 +100,19 @@ Run from the repository root, with a fresh output path:
   --repetitions 1 --warmups 1 --seconds 180 \
   --cpu-budget 3 --memory-bytes 8000000000 \
   --output studies/campaign/runs/backend-foundation/positions.json
-
-.venv/bin/python tools/benchmark_campaign_backends.py \
-  --backend cpu --mode scripted_games --seeds 1951 \
-  --repetitions 1 --warmups 1 --seconds 180 \
-  --cpu-budget 3 --memory-bytes 8000000000 \
-  --output studies/campaign/runs/backend-foundation/scripted-games.json
 ```
 
-Preparation records complete, real three-round games using the unchanged balanced
-scripted policy. Both measured paths then replay the same selected actions and
-explicit chance outcomes. Fixed-position cases include the opening, the first
-chance request, and Japan's first- and second-round combat movement. The candidate
-really calls the new batch wrapper; the reference calls the scalar adapter.
+Neural device comparisons use
+[`benchmark_campaign_devices.py`](../../tools/benchmark_campaign_devices.py) and
+[`benchmark_campaign_device_updates.py`](../../tools/benchmark_campaign_device_updates.py);
+each tool's `--help` lists its options. Report preparation, transfers,
+synchronized execution and auditing separately. Count only genuine terminal
+games as completed throughput.
 
-Reports separate preparation, warmup, operation timing and host audit/driver
-overhead, and pin source/native hashes, settings and fixture witnesses. Completed
-game throughput is reported only for genuine three-round terminals. Time,
-transition, repeated-state and memory limits remain truncations or failures, with
-no completed-throughput claim. The supervisor charges the complete owned process
-tree using the larger of RSS and macOS physical footprint where available.
+## Next work
 
-These are **audited rules-replay benchmarks**, not neural self-play, training,
-playing strength or GPU measurements. They are an initial conformance baseline.
-Future GPU work must also measure device transfers/synchronization, compilation,
-larger batch sizes and complete self-play under matched models and search budgets.
-Component speedups will remain separate from complete-game training throughput.
-
-## Next additions
-
-1. Measure GPU neural evaluation separately with the CPU engine retained.
-2. Add a GPU backend behind this contract, including device execution of pending
-   choices and interrupts; avoid a Python round trip for each individual lane.
-3. Run common conformance fixtures with explicit outcomes before speed comparisons.
-4. Extend the harness to real batched search and complete learning, recording
-   engine, search and neural-device choices independently.
-
-The CPU implementation remains the default, reference and fallback as GPU support
-is added. Share scenario/catalog data and conformance fixtures rather than keeping
-independent copies of the campaign rules data.
+- Profile CPU rules and search, the largest measured cost.
+- Run more games at once so network calls carry more positions, after checking
+  CPU scaling.
+- Compare a larger model on CPU and MPS under equal games, search budgets and
+  resource limits.
