@@ -1,0 +1,188 @@
+{
+  "date": "2026-10-28",
+  "provenance": {
+    "code_commit": "2440006d63ece6c7bdf59ad11e5da36d0844a55e",
+    "measurement_script_sha256": "7becb86be077caa148c782ab7d24ae15807ca4d2ac677e0352cdbfdc755d7abf",
+    "native_sha256": "6c2ddd58e14a1b82c34d32349364bd3b5328d7ff20a8f825c10a678aa652dca1",
+    "raw_artifacts": "studies/campaign/runs/training-workers-2026-10-28"
+  },
+  "runs": {
+    "in_process_4": {
+      "batches": [
+        {
+          "games": 4,
+          "transitions": 1386,
+          "worker_seconds": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "games": 4,
+          "transitions": 1236,
+          "worker_seconds": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "completed_games_per_hour": 53.3,
+      "config": {
+        "batches": 2,
+        "calendar_rounds": 3,
+        "complete_episodes": true,
+        "cpu_budget": 11,
+        "episode_workers": 0,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_episodes": 8,
+        "message_layers": 1,
+        "parallel_envs": 4,
+        "seed": 1936,
+        "simulations": 16,
+        "threads": 4,
+        "token_buckets": 2048
+      },
+      "episodes": 8,
+      "exit": 0,
+      "invocation_seconds": 540.1,
+      "peak_tree_rss_gb": 2.75,
+      "process_wall_seconds": 543.6,
+      "run": "in_process_4",
+      "status": "completed",
+      "timings": {
+        "checkpoint_save": 1.9,
+        "collection": 525.8,
+        "learning_updates": 0.8,
+        "model_export": 0.0,
+        "progress_reporting": 11.6
+      },
+      "transitions": 2622
+    },
+    "workers_4": {
+      "batches": [
+        {
+          "games": 4,
+          "transitions": 1105,
+          "worker_seconds": [
+            57.6,
+            57.4,
+            109.8,
+            91.1
+          ]
+        },
+        {
+          "games": 4,
+          "transitions": 1281,
+          "worker_seconds": [
+            69.6,
+            104.7,
+            65.1,
+            84.3
+          ]
+        }
+      ],
+      "completed_games_per_hour": 127.9,
+      "config": {
+        "batches": 2,
+        "calendar_rounds": 3,
+        "complete_episodes": true,
+        "cpu_budget": 11,
+        "episode_workers": 4,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_episodes": 8,
+        "message_layers": 1,
+        "parallel_envs": 4,
+        "seed": 1936,
+        "simulations": 16,
+        "threads": 4,
+        "token_buckets": 2048
+      },
+      "episodes": 8,
+      "exit": 0,
+      "invocation_seconds": 225.1,
+      "peak_tree_rss_gb": 5.09,
+      "process_wall_seconds": 228.7,
+      "run": "workers_4",
+      "status": "completed",
+      "timings": {
+        "checkpoint_save": 2.0,
+        "collection": 222.6,
+        "learning_updates": 0.5,
+        "model_export": 0.1,
+        "progress_reporting": 0.0
+      },
+      "transitions": 2386
+    },
+    "workers_8": {
+      "batches": [
+        {
+          "games": 8,
+          "transitions": 2549,
+          "worker_seconds": [
+            63.6,
+            64.2,
+            119.1,
+            99.2,
+            100.0,
+            123.3,
+            115.4,
+            88.9
+          ]
+        },
+        {
+          "games": 8,
+          "transitions": 2362,
+          "worker_seconds": [
+            128.7,
+            68.8,
+            73.2,
+            66.8,
+            82.9,
+            98.3,
+            117.4,
+            106.0
+          ]
+        }
+      ],
+      "completed_games_per_hour": 218.7,
+      "config": {
+        "batches": 2,
+        "calendar_rounds": 3,
+        "complete_episodes": true,
+        "cpu_budget": 11,
+        "episode_workers": 8,
+        "hidden_dim": 16,
+        "max_depth": 16,
+        "max_episodes": 16,
+        "message_layers": 1,
+        "parallel_envs": 8,
+        "seed": 1936,
+        "simulations": 16,
+        "threads": 4,
+        "token_buckets": 2048
+      },
+      "episodes": 16,
+      "exit": 0,
+      "invocation_seconds": 263.3,
+      "peak_tree_rss_gb": 7.83,
+      "process_wall_seconds": 267.4,
+      "run": "workers_8",
+      "status": "completed",
+      "timings": {
+        "checkpoint_save": 1.9,
+        "collection": 260.9,
+        "learning_updates": 0.5,
+        "model_export": 0.1,
+        "progress_reporting": 0.0
+      },
+      "transitions": 4911
+    }
+  },
+  "schema": "gwrl-training-workers-v1"
+}
