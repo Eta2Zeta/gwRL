@@ -2,15 +2,17 @@
 from __future__ import annotations
 
 import copy
+from concurrent.futures import Future
 import json
 from pathlib import Path
+import time
 from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from tools.benchmark_campaign_devices import (Config, TimedEvaluator, compare_selfplay,
-    mps_allocator_limit, numerical_comparison, selfplay, setup_models, supervise_device)
+    mps_allocator_limit, numerical_comparison, parallel_selfplay, selfplay, setup_models, supervise_device)
 
 
 class ToyEnv:
@@ -47,10 +49,55 @@ class FakeEvaluator:
 
 class CampaignDeviceBenchmarkTests(unittest.TestCase):
     def test_configuration_preserves_search_budget_and_resource_allowance(self):
+        selfplay_values = {"mode": "selfplay", "devices": ("cpu",), "threads": 1, "search_evaluation": "per_search"}
         for values in ({"devices": ("cpu", "auto")}, {"simulations": 4}, {"max_depth": 8},
                        {"threads": 10}, {"memory_bytes": 30_000_000_001}, {"batch_sizes": (1, 1)},
-                       {"search_evaluation": "streamed"}):
+                       {"search_evaluation": "streamed"}, {**selfplay_values, "processes": 5},
+                       {**selfplay_values, "processes": 2, "search_evaluation": "batched"},
+                       {**selfplay_values, "processes": 2, "threads": 2},
+                       {**selfplay_values, "processes": 11, "seeds": tuple(range(11))}):
             with self.subTest(values=values), self.assertRaises(ValueError): Config(**values)
+        self.assertEqual(Config(**selfplay_values, processes=10, seeds=tuple(range(10))).processes, 10)
+
+    def test_parallel_selfplay_merges_games_in_seed_order_and_requires_identical_weights(self):
+        class Immediate:
+            def submit(self, function, *arguments):
+                future = Future(); future.set_result(function(*arguments)); return future
+        calls = []
+        def run_group(values, seeds, seconds):
+            calls.append(tuple(seeds))
+            begin = 100. + seeds[0]
+            return {"weights_sha256": "w", "forward": {"seconds": 1., "calls": len(seeds), "batch_sizes": {1: len(seeds)}},
+                    "evaluator": {"synchronized_seconds": 2., "calls": len(seeds), "requests": len(seeds), "batch_sizes": {1: len(seeds)}},
+                    "result": {"task": {"seed": seeds[0]}, "status": "completed", "stop_reason": None, "selection": "s",
+                               "started_at_epoch": begin, "ended_at_epoch": begin + 10 * len(seeds), "cohort_wall_seconds": 10. * len(seeds),
+                               "preparation_seconds": 0., "warmup_seconds": 0., "timing_seconds": {"search": 3.},
+                               "inference_calls": len(seeds), "inference_requests": len(seeds), "actual_inference_batch_sizes": {1: len(seeds)},
+                               "games": [{"seed": seed, "terminal": True} for seed in seeds]}}
+        config = Config(mode="selfplay", devices=("cpu",), threads=1, search_evaluation="per_search", processes=2,
+                        seeds=(5, 6, 7), seconds=60.)
+        summary, forward, evaluated = parallel_selfplay(config, "w", float("inf"), run_group=run_group, executor=Immediate())
+        self.assertEqual(calls, [(5, 7), (6,)])
+        self.assertEqual([game["seed"] for game in summary["games"]], [5, 6, 7])
+        self.assertEqual(summary["status"], "completed")
+        self.assertEqual(summary["cohort_wall_seconds"], 20.)  # 105 to 125, first start to last end
+        self.assertEqual(summary["timing_seconds_summed_across_processes"], {"search": 6.})
+        self.assertEqual((forward["calls"], evaluated["requests"]), (3, 3))
+        self.assertEqual(summary["task"], {"seed": 5})
+        with self.assertRaisesRegex(ValueError, "different fresh weights"):
+            parallel_selfplay(config, "other", float("inf"), run_group=run_group, executor=Immediate())
+
+    def test_real_game_processes_reproduce_single_process_games_exactly(self):
+        config = Config(mode="selfplay", devices=("cpu",), threads=1, search_evaluation="per_search", processes=2,
+                        seeds=(1951, 1952), max_transitions=2, seconds=240.)
+        models, evaluator, forward_stats, metadata = setup_models(config, "cpu")
+        summary, _, _ = parallel_selfplay(config, metadata["weights_sha256"], time.monotonic() + 240.)
+        alone = selfplay(config, "cpu", models, evaluator, forward_stats, time.monotonic() + 240., lambda result=None: None)
+        self.assertEqual(summary["process_groups"], [[1951], [1952]])
+        self.assertEqual([game["trace_sha256"] for game in summary["games"]], [game["trace_sha256"] for game in alone["games"]])
+        self.assertEqual([game["final_state_and_rng_sha256"] for game in summary["games"]],
+                         [game["final_state_and_rng_sha256"] for game in alone["games"]])
+        self.assertTrue(all(game["transitions"] == 2 for game in summary["games"]))
 
     def test_allocator_cap_leaves_room_for_native_cpu_and_aggregate_guard(self):
         result = mps_allocator_limit(24_000_000_000, 30_000_000_000)

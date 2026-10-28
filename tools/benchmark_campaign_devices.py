@@ -48,6 +48,7 @@ class Config:
     max_transitions: int = 5000
     max_state_visits: int = 20
     search_evaluation: str = "batched"
+    processes: int = 1
     hidden_dim: int = 16
     message_layers: int = 1
     token_buckets: int = 2048
@@ -79,9 +80,16 @@ class Config:
             raise ValueError("This matched benchmark preserves 16 simulations and depth cap 16")
         if self.search_evaluation not in {"batched", "per_search"}:
             raise ValueError("Search evaluation must be batched or per_search")
+        if type(self.processes) is not int or not 1 <= self.processes <= len(self.seeds):
+            raise ValueError("Self-play processes must be between one and the number of games")
+        if self.processes > 1 and (self.mode != "selfplay" or self.search_evaluation != "per_search" or self.threads != 1):
+            raise ValueError("Process-parallel self-play needs per-search evaluation and one tensor thread")
         roots = len(self.seeds) if self.mode == "selfplay" else 0
-        if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(12, os.cpu_count() or 1) or self.threads + roots + 3 > self.cpu_budget:
-            raise ValueError("Tensor threads, search workers and three coordinators must fit the 12-core allowance")
+        # Game processes run tensors on their search threads: one busy core per
+        # game, plus this coordinator and its supervisor.
+        cores = roots + 2 if self.processes > 1 else self.threads + roots + 3
+        if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(12, os.cpu_count() or 1) or cores > self.cpu_budget:
+            raise ValueError("Tensor threads, search workers and coordinators must fit the 12-core allowance")
         if type(self.memory_bytes) is not int or not 2_000_000_000 < self.memory_bytes <= 30_000_000_000:
             raise ValueError("Aggregate memory must leave a CPU/monitor reserve and fit 30 GB")
         for name in ("seconds", "value_scale", "atol", "rtol"):
@@ -296,6 +304,7 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     histogram_before = evaluator.batch_sizes.copy()
     timings = {"search": 0.0, "actual_rules_execution": 0.0}
     started, waves, stop_reason = time.perf_counter(), 0, None
+    started_epoch = time.time()
     completed_at = [None] * len(envs)
     while not all(env.is_terminal() for env in envs):
         if time.monotonic() >= deadline:
@@ -347,6 +356,7 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     inference_seconds = evaluator.seconds - inference_before
     forward_seconds = forward_stats["seconds"] - forward_before
     result.update(status="completed" if complete else "truncated", stop_reason=stop_reason,
+        started_at_epoch=started_epoch, ended_at_epoch=started_epoch + elapsed,
         completed_games=sum(env.is_terminal() for env in envs), cohort_wall_seconds=elapsed,
         complete_three_round_games_per_hour=len(envs) * 3600 / elapsed if complete else None,
         search_simulations=config.simulations, search_depth_cap=config.max_depth,
@@ -364,6 +374,71 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
             "final_state_and_rng_sha256": hashlib.sha256(env.serialize().encode()).hexdigest()}
             for seed, env, count, trace, ended in zip(config.seeds, envs, counts, traces, completed_at)])
     return result
+
+
+def _selfplay_group(values, seeds, seconds):
+    """Play some of a cohort's games in a separate process with the same fresh weights."""
+    config = Config(**{**values, "seeds": tuple(seeds), "processes": 1, "devices": ("cpu",)})
+    models, evaluator, forward_stats, metadata = setup_models(config, "cpu")
+    result = selfplay(config, "cpu", models, evaluator, forward_stats, time.monotonic() + seconds,
+                      lambda result=None: None)
+    return {"result": result, "weights_sha256": metadata["weights_sha256"],
+            "forward": {**forward_stats, "batch_sizes": dict(forward_stats["batch_sizes"])},
+            "evaluator": {"synchronized_seconds": evaluator.seconds, "calls": evaluator.calls,
+                          "requests": evaluator.requests, "batch_sizes": dict(evaluator.batch_sizes)}}
+
+
+def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, executor=None):
+    """Split a cohort's games across processes, each with its own interpreter lock.
+
+    Per-search games do not depend on which games share a process, so each game
+    matches its single-process result. Cohort wall time runs from the first
+    process's start to the last one's end; timings and counts are summed.
+    """
+    import multiprocessing
+    from concurrent.futures import ProcessPoolExecutor
+    groups = [config.seeds[index::config.processes] for index in range(config.processes)]
+    values, remaining = asdict(config), max(1.0, deadline - time.monotonic())
+    pool = executor or ProcessPoolExecutor(max_workers=config.processes, mp_context=multiprocessing.get_context("spawn"))
+    try:
+        futures = [pool.submit(run_group, values, group, remaining) for group in groups]
+        parts = [future.result() for future in futures]
+    finally:
+        if executor is None:
+            pool.shutdown(wait=True, cancel_futures=True)
+    require(all(part["weights_sha256"] == weights for part in parts), "A game process built different fresh weights")
+    results = [part["result"] for part in parts]
+    order = {seed: index for index, seed in enumerate(config.seeds)}
+    games = sorted((game for result in results for game in result["games"]), key=lambda game: order[game["seed"]])
+    complete = all(result["status"] == "completed" for result in results)
+    started = min(result["started_at_epoch"] for result in results)
+    span = max(result["ended_at_epoch"] for result in results) - started
+    timing = Counter()
+    for result in results:
+        timing.update(result["timing_seconds"])
+    def merged(name):
+        return sum((Counter(part[name]["batch_sizes"]) for part in parts), Counter())
+    forward = {"seconds": sum(part["forward"]["seconds"] for part in parts),
+               "calls": sum(part["forward"]["calls"] for part in parts), "batch_sizes": merged("forward")}
+    evaluated = {"synchronized_seconds": sum(part["evaluator"]["synchronized_seconds"] for part in parts),
+                 "calls": sum(part["evaluator"]["calls"] for part in parts),
+                 "requests": sum(part["evaluator"]["requests"] for part in parts), "batch_sizes": merged("evaluator")}
+    summary = {"task": results[0]["task"], "status": "completed" if complete else "truncated",
+        "stop_reason": [result["stop_reason"] for result in results], "root_noise": True,
+        "selection": results[0]["selection"], "processes": config.processes, "process_groups": [list(group) for group in groups],
+        "started_at_epoch": started, "ended_at_epoch": started + span,
+        "completed_games": sum(game["terminal"] for game in games), "cohort_wall_seconds": span,
+        "complete_three_round_games_per_hour": len(games) * 3600 / span if complete else None,
+        "search_simulations": config.simulations, "search_depth_cap": config.max_depth,
+        "timing_seconds_summed_across_processes": dict(timing),
+        "inference_calls": sum(result["inference_calls"] for result in results),
+        "inference_requests": sum(result["inference_requests"] for result in results),
+        "actual_inference_batch_sizes": dict(sum((Counter(result["actual_inference_batch_sizes"]) for result in results), Counter())),
+        "process_results": [{"seeds": list(group), "status": result["status"], "cohort_wall_seconds": result["cohort_wall_seconds"],
+                             "preparation_seconds": result["preparation_seconds"], "warmup_seconds": result["warmup_seconds"],
+                             "timing_seconds": result["timing_seconds"]} for group, result in zip(groups, results)],
+        "games": games}
+    return summary, forward, evaluated
 
 
 def compare_selfplay(before, after):
@@ -426,6 +501,13 @@ def worker(config, device, progress):
     persist()
     if config.mode == "inference":
         result = inference(config, device, models, evaluator, forward_stats, deadline, persist)
+    elif config.processes > 1:
+        require(device == "cpu", "Process-parallel self-play runs only on CPU")
+        result, forward, evaluated = parallel_selfplay(config, metadata["weights_sha256"], deadline)
+        # Report the game processes' merged traffic; this coordinator evaluates nothing.
+        forward_stats.update(seconds=forward["seconds"], calls=forward["calls"], batch_sizes=forward["batch_sizes"])
+        evaluator.seconds, evaluator.calls = evaluated["synchronized_seconds"], evaluated["calls"]
+        evaluator.requests, evaluator.batch_sizes = evaluated["requests"], evaluated["batch_sizes"]
     else:
         result = selfplay(config, device, models, evaluator, forward_stats, deadline, persist)
     report["result"] = result; report["status"] = result["status"]
