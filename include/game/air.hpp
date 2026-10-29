@@ -38,8 +38,9 @@ bool movingSideAirborne(const State &);
 // The fewest airborne aircraft whose loss lets the rest land as the carriers
 // stand; where there is a choice, earlier aircraft in unit order keep theirs.
 std::vector<Id> strandedAircraft(const State &);
-// Removes them as Combat Movement ends and counts them in the state flag
-// "stranded_aircraft_lost". Only dice or another nation's turn leave any.
+// Removes them, counting them in the state flag "stranded_aircraft_lost",
+// when Combat Movement ends with nothing else legal. Normally their owner gives
+// up the aircraft that must be lost first, choosing which.
 void eliminateStrandedAircraft(State &);
 void enforcePatrolLandingAvailability(State &);
 void beginAirDefence(State &, const Id &battle);

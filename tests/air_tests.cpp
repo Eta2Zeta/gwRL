@@ -343,8 +343,8 @@ void failedLanding() {
 void strandedAttackersStillEndCombatMovement() {
     // Moves never leave more aircraft without a landing, so only dice or another
     // nation's turn strand an attacker; this fixture does it by editing the
-    // bomber's fuel. Other moves stay open, the phase may end at once, and the
-    // attacker is lost before combat and counted in "stranded_aircraft_lost".
+    // bomber's fuel. Its owner gives it up while other moves stay open, and the
+    // phase then ends; the battle it was to fight ends for the defender.
     auto s = fixture();
     add(s, "bomber", "tactical_bomber", "japan", beiping);
     add(s, "defender", "infantry", "kmt", hopeh);
@@ -358,15 +358,16 @@ void strandedAttackersStillEndCombatMovement() {
     auto busy = stranded.clone();
     add(busy, "spare", "infantry", "japan", shantung);
     Engine waiting(busy, rules());
-    check(offered(waiting, "end_phase") && waiting.legalActions().size() > 1,
-          "A stranded attacker made the side use up its other moves before Combat Movement could end");
+    check(!offered(waiting, "end_phase") && offered(waiting, "air_failed_landing") && waiting.legalActions().size() > 2,
+          "A stranded attacker could not be given up, or Combat Movement ended with it still flying");
     Engine e(stranded, rules());
     const auto menu = e.legalActions();
-    check(menu.size() == 1 && menu.front().kind == "end_phase", "Stranded attacker left Combat Movement without an end");
+    check(menu.size() == 1 && menu.front().kind == "air_failed_landing", "The stranded attacker could not be given up");
     e.step(menu.front());
-    check(!e.state().units.contains("bomber") && e.state().clock.phase == Phase::Combat &&
-              e.state().flags.at("stranded_aircraft_lost") == 1,
-          "Stranded attacker survived the end of Combat Movement or went uncounted");
+    check(!e.state().units.contains("bomber") && offered(e, "end_phase") && !e.state().flags.contains("stranded_aircraft_lost"),
+          "Giving up the stranded attacker did not let Combat Movement end");
+    choose(e, "end_phase");
+    check(e.state().clock.phase == Phase::Combat, "Combat Movement did not end after the attacker was given up");
     for (int step = 0; step < 8 && !offered(e, "end_phase"); ++step)
         if (e.state().chance) e.resolveChance();
         else e.step(e.legalActions().front());

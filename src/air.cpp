@@ -1086,11 +1086,23 @@ bool flightKeepsLanding(const State &s, const Id &id, const std::vector<Id> &pat
     const auto preview = flightPreview(s, id, path);
     return reachablePlan(s, reachableShortfall(s), &preview);
 }
-// Whether an aircraft in flight can no longer land in any plan that keeps the
-// rest: no spot is in reach, or every remaining plan leaves it out.
-bool landingLost(const State &s, const Id &id) {
-    return airLandingSpots(s, id).empty() ||
-           (reachableShortfall(s) > 0 && !flightKeepsLanding(s, id, {s.units.at(id).zone}));
+// Whether the owner may give up an airborne aircraft. Where some aircraft must
+// be lost, their owner chooses which: any whose loss leaves the rest a plan
+// that loses no more. One with no spot in reach as things stand may also be
+// given up, except an attacker in Combat Movement, whose carriers may still come.
+bool mayBeGivenUp(const State &s, const UnitState &u) {
+    if ((s.clock.phase != Phase::CombatMovement || !u.commitments.contains("air_combat")) &&
+        airLandingSpots(s, u.id).empty())
+        return true;
+    const PositionScope scope(s);
+    const int shortfall = reachableShortfall(s);
+    if (shortfall == 0)
+        return false;
+    // It holds no seat when it can land ashore, so losing it lands no other aircraft.
+    if (ownLandingAshore(s, u))
+        return false;
+    const LandingPreview gone{u.id, u.zone, 0, false, std::nullopt};  // Neither airborne nor seated.
+    return reachablePlan(s, shortfall - 1, &gone);
 }
 } // namespace
 bool airLandingPlanReachable(const State &s) {
@@ -1424,6 +1436,12 @@ std::vector<Action> AirRules::actions(const State &s) const {
         if (isAircraft(s, u) && movementController(s, u.owner) &&
             (!u.carriedBy || has(s, s.units.at(*u.carriedBy), "carrier"))) {
             if (s.clock.phase == Phase::Combat && !marked(u.turnFlags, "air_screening_ready")) continue;
+            // An aircraft still flying that some loss must include may be given up:
+            // attackers and continuing (screening) aircraft too, and in Combat a
+            // screened aircraft left without a landing. In Combat Movement this also
+            // ends a flight that relied on a Carrier that never came.
+            if (marked(u.turnFlags, "air_in_flight") && mayBeGivenUp(s, u))
+                out.push_back(action(s, s.currentNation(), "air_failed_landing", {{"unit", V(id)}}));
             if (marked(u.turnFlags, "air_screening_wait")) continue;
             if (marked(u.gameFlags, "on_map")) {
                 int range = flag(u.gameFlags, "map_range");
@@ -1436,7 +1454,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                               {"path", V(ids(paths.at(zone)))},
                                               {"destination", V(destination)}}));
                 }
-                if (airLandingSpots(s, id).empty())
+                if (mayBeGivenUp(s, u))
                     out.push_back(action(s, s.currentNation(), "air_failed_landing", {{"unit", V(id)}}));
                 continue;
             }
@@ -1445,11 +1463,6 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 continue;
             if (!combat && used(s, u) && !marked(u.turnFlags, "air_in_flight"))
                 continue;
-            // An aircraft still flying without a landing spot is lost. In Combat Movement
-            // this ends a flight that relied on a Carrier that never came; a patrol can
-            // no longer rescue it, because a patrol cannot follow a flight.
-            if (s.clock.phase != Phase::Combat && marked(u.turnFlags, "air_in_flight") && landingLost(s, id))
-                out.push_back(action(s, s.currentNation(), "air_failed_landing", {{"unit", V(id)}}));
             if (!combat && transport(u) && u.cargo.size() > 1) {
                 if (land(s, u.zone) && heldSinceTurnStart(s, u.owner, u.zone, true))
                     for (const auto &cargo : u.cargo)
@@ -1591,10 +1604,9 @@ std::vector<Action> AirRules::actions(const State &s) const {
     return out;
 }
 bool AirRules::phaseComplete(const State &s) const {
-    // Combat Movement ends once the carriers stand where they land every
-    // aircraft that a plan can land; any that none can are lost as it ends.
-    if (s.clock.phase == Phase::CombatMovement && !airLandingPlanAvailable(s) &&
-        (reachableShortfall(s) == 0 || standingShortfall(s) > reachableShortfall(s))) return false;
+    // Combat Movement ends once every airborne aircraft can land as the
+    // carriers stand; the owner gives up any that no plan can land.
+    if (s.clock.phase == Phase::CombatMovement && !airLandingPlanAvailable(s)) return false;
     // Moves may rely on a carrier sailing to a patrol later, so Noncombat
     // Movement ends only once the mover's own patrols can land as things stand.
     if (s.clock.phase == Phase::NonCombatMovement) {
@@ -1656,9 +1668,27 @@ void AirRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "air_failed_landing") {
         auto id = p.require("unit").asString();
-        require(marked(s.units.at(id).gameFlags, "on_map") ? airLandingSpots(s, id).empty() : landingLost(s, id),
+        const auto &u = s.units.at(id);
+        require(ownAirborne(s, u) && (s.clock.phase != Phase::Combat || marked(u.turnFlags, "air_screening_ready")) &&
+                    mayBeGivenUp(s, u),
                 "Aircraft can still land");
         eraseAirUnit(s, id);
+        // A bombing mission whose last bomber is given up before combat has nothing
+        // to escort: it ends, and its escorts fly on uncommitted.
+        std::vector<Id> emptied;
+        for (const auto &[bid, b] : s.battles)
+            if (marked(b.flags, "air_mission") && !marked(b.flags, "rocket_mission") &&
+                !marked(b.flags, "artillery_city_bombing") && b.stage == "air_declared" &&
+                std::none_of(b.attackers.begin(), b.attackers.end(), [&](const Id &x) {
+                    return s.units.contains(x) && bomber(s, s.units.at(x));
+                }))
+                emptied.push_back(bid);
+        for (const auto &bid : emptied) {
+            for (const auto &x : s.battles.at(bid).attackers)
+                if (s.units.contains(x))
+                    s.units.at(x).commitments.erase("air_combat");
+            eraseBattle(s, bid);
+        }
         return;
     }
     if (a.kind == "air_start_patrol") {

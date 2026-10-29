@@ -81,9 +81,10 @@ bool phaseWorkClear(const State& state) {
     return true;
 }
 
-// Combat Movement ends once its carriers land every aircraft that a plan can
-// land. Should no legal move reach that, the phase may still end when nothing
-// else is legal, and the aircraft that cannot land are lost before combat.
+// Combat Movement ends once every airborne aircraft can land as the carriers
+// stand, after the owner gives up any that no plan can land. Should no legal
+// move reach that, the phase may still end when nothing else is legal, and the
+// aircraft that cannot land are lost before combat.
 bool strandedAircraftMayEndPhase(const State& state, const Rules& rules) {
     if (state.clock.phase != Phase::CombatMovement || strandedAircraft(state).empty()) return false;
     State after = state.clone();
