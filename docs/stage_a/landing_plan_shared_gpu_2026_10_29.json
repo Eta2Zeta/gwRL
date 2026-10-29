@@ -6,9 +6,12 @@
   "engine_commits": {
    "rule": "69bfbed",
    "second_review_fixes": "29f0a0f",
-   "shortfall_rule": "cebfb58"
+   "shortfall_rule": "cebfb58",
+   "no_carrier_unloads_and_submarine_port_exit": "f5aa675"
   },
   "stranded_aircraft_lost": "counts aircraft removed as Combat Movement ends because no landing remains; only dice or another nation's turn leave any",
+  "carrier_aircraft_ruling": "User ruling 2026-10-29: a carrier never unloads aircraft; an aircraft takes off from it by flying and lands on it where it ends its move",
+  "submarine_port_exit": "Enemy surface warships off a port force a screen only on surface ships; a submarine leaves without one, as the route check already allowed. In Noncombat Movement the forced screen had left no legal action",
   "remaining_gap": "A war declared during Combat Movement, by the mover or by a neutral answering a peaceful entry where a carrier's route ends, can change which zones aircraft may enter or hold a carrier in battle; no plan check follows it",
   "conservative_cases": "Carrier routes count only if they meet no unfriendly unit before their last zone, and a ship that combat-moved into Enemy units is treated as staying for their battle",
   "copying": "Flights, landings, attacks and naval air attacks preview the aircraft's end on the position itself; carrier routes and engagements test a copy only when landings are at stake; patrol starts test a copy",
@@ -137,10 +140,10 @@
     "mean_decisions": 1650.4,
     "mean_game_seconds": 20.84
    },
-   "final": {
-    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall",
+   "shortfall_with_carrier_unloads": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall-with-carrier-unloads",
     "engine": "cebfb58",
-    "checks": "no legal action, engine errors, a rise in the landing shortfall between settled positions of either movement phase (no naval move or Chinese-truce battle pending) beyond the seats of carriers lost or damaged and without a new war, and aircraft lost as Combat Movement ends beyond the shortfall; explained rises and losses within the shortfall are noted",
+    "checks": "the final checks, with carriers still able to unload aircraft",
     "games": 322,
     "completed_all_rounds": 322,
     "problems_by_kind": {},
@@ -150,8 +153,39 @@
     "mean_decisions": 1650.4,
     "mean_game_seconds": 13.48
    },
+   "without_unloads_before_submarine_fix": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-no-unloads-submarine-dead-end",
+    "engine": "carrier unloads removed",
+    "checks": "the final checks; it found a submarine port exit forced to screen in Noncombat Movement",
+    "games": 322,
+    "completed_all_rounds": 321,
+    "problems_by_kind": {
+     "no_legal_action": 1
+    },
+    "failing_seeds": [
+     5267
+    ],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1650.2,
+    "mean_game_seconds": 15.11
+   },
+   "final": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall",
+    "engine": "f5aa675",
+    "checks": "no legal action, engine errors, a rise in the landing shortfall between settled positions of either movement phase (no naval move or Chinese-truce battle pending) beyond the seats of carriers lost or damaged and without a new war, and aircraft lost as Combat Movement ends beyond the shortfall; explained rises and losses within the shortfall are noted",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1651.3,
+    "mean_game_seconds": 16.12
+   },
    "games_unchanged_by_second_review_fixes": 322,
    "games_unchanged_by_shortfall_rule": 315,
+   "games_unchanged_by_removing_carrier_unloads": 98,
    "first_attempt_causes": [
     "a landing preview kept the fuel from before its landing flight",
     "a carrier in port was treated as launching its aircraft in port rather than at sea"
@@ -266,6 +300,79 @@
    "first_version": 3.3,
    "host_softmax": 1.5,
    "two_nonblocking_packed_transfers": 0.94
+  },
+  "coordinator_profile": {
+   "tool": "tools/profile_shared_coordinator.py",
+   "output": "studies/campaign/runs/shared-gpu-2026-10-29/coordinator_profile.txt",
+   "positions": 455,
+   "mean_legal_actions": 51.8,
+   "tensor_operations_per_call": 285,
+   "ms_per_call": {
+    "1": {
+     "merge": 0.26,
+     "send": 0.18,
+     "issue": 1.68,
+     "device": 1.29,
+     "outputs": 0.25,
+     "total": 3.67
+    },
+    "4": {
+     "merge": 0.7,
+     "send": 0.36,
+     "issue": 1.79,
+     "device": 2.89,
+     "outputs": 0.34,
+     "total": 6.08
+    },
+    "10": {
+     "merge": 1.62,
+     "send": 0.7,
+     "issue": 2.41,
+     "device": 6.65,
+     "outputs": 0.47,
+     "total": 11.84
+    },
+    "32": {
+     "merge": 4.98,
+     "send": 1.35,
+     "issue": 3.99,
+     "device": 21.93,
+     "outputs": 0.71,
+     "total": 32.95
+    }
+   },
+   "device_ms_by_part_drained": {
+    "1": {
+     "observation_graph": 1.25,
+     "action_graphs": 0.74,
+     "factored_policy": 0.86
+    },
+    "4": {
+     "observation_graph": 2.82,
+     "action_graphs": 1.0,
+     "factored_policy": 0.94
+    },
+    "10": {
+     "observation_graph": 6.6,
+     "action_graphs": 1.61,
+     "factored_policy": 1.08
+    },
+    "32": {
+     "observation_graph": 19.54,
+     "action_graphs": 4.25,
+     "factored_policy": 1.25
+    }
+   },
+   "position_graph_means": {
+    "observation_nodes": 3654,
+    "observation_edges_with_map_references": 10921,
+    "observation_tokens": 23403,
+    "action_graph_nodes": 711,
+    "action_graph_edges": 1514,
+    "map_context_nodes": 33400,
+    "sample": "random play on seeds 5000-5001, every ninth decision"
+   },
+   "note": "The coordinator process CPU-time counter (67% of the run) also counts time spent waiting for the GPU; the stage timings separate CPU work from GPU time."
   },
   "setup_probes": {
    "seconds": 300,
@@ -424,7 +531,7 @@
   }
  },
  "tests": {
-  "cpp": "26 of 26 ctest groups pass, with new tests for aircraft that cannot land, a medium bomber left out, carrier unloads and port entries, and multi-ship port sorties; each new test fails with its fix reverted",
+  "cpp": "26 of 26 ctest groups pass, with new tests for aircraft that cannot land, a medium bomber left out, port entries, multi-ship port sorties, carriers that never unload aircraft and submarine port exits; each new test fails with its fix reverted",
   "python": "565 tests; the only failure was the known guardian timeout under full-suite load, which passes alone"
  }
 }

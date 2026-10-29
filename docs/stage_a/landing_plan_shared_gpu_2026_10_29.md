@@ -47,10 +47,9 @@ and moves, such as Dadao's on Japan's turn. Other nations' patrols land on their
 own turns and are lost at a phase end when no landing remains, as RB 9.3.1
 prescribes. Flights, landings, attacks and naval air attacks check the plan on
 the position itself, previewing where each aircraft would end. Carrier routes
-and engagements test the move on a copy of the position, but only when the
-ships carry aircraft, or include a carrier while the moving side has aircraft
-in the air; so do a carrier unloading an aircraft and a carrier entering port,
-and starting a patrol also tests a copy.
+and engagements test the move on a copy of the position, but only when the ships
+carry aircraft, or include a carrier while the moving side has aircraft in the
+air; so does a carrier entering port, and starting a patrol also tests a copy.
 
 ### When aircraft already cannot land
 
@@ -134,7 +133,7 @@ The same 322 seeds as the dead-end search:
 | Games with no legal action | 0 | 1 | 0 |
 | Games where moves stranded aircraft | not counted | 15 | 0 |
 | Moves that raised the shortfall | not checked | not checked | 0 |
-| Mean decisions per game | 1,625 | — | 1,650 |
+| Mean decisions per game | 1,625 | — | 1,651 |
 
 The first attempt had two defects, both found by replaying the failing seeds: a
 landing preview kept the fuel the aircraft had before its landing flight, so it
@@ -147,15 +146,18 @@ that dice sank or damaged counts as dice, and so does one after a declaration of
 war, which the engine does not check; ending Combat Movement may lose no more
 aircraft than the shortfall. Its first run found a gap that the earlier check,
 which looked only at Combat Movement, could not see. In Noncombat Movement a
-carrier may unload an aircraft onto adjacent land, which ends the carrier's
+carrier could unload an aircraft onto adjacent land, which ended the carrier's
 move, and in two games it did so while a fighter at sea still needed the carrier
-to sail. A carrier unloading or entering port now falls under the rule. Whether
-unloading an aircraft should end a carrier's move at all is a rules question for
-the user. In the final run no rise needed dice or a war to explain it, and no
-aircraft was lost as Combat Movement ended. Seven games took a different course
-than before the count rule, which changes what is legal only where some aircraft
-already lack a landing, or where a carrier unloads or a ship enters port; the
-fourth review's fixes changed none.
+to sail. On the user's ruling a carrier now cannot unload aircraft at all: an
+aircraft takes off from it by flying and lands on it where it ends its move. A
+carrier entering port falls under the landing rule. Removing carrier unloads
+changed the course of 224 of the 322 games, and one of them then met an older
+dead end. A submarine that KMT had captured left a port past Japanese cruisers
+in Noncombat Movement and was forced to screen, a battle that phase cannot
+fight, so KMT had no legal action. The engine's route check already lets
+submarines pass Enemy surface warships, so a port exit now forces a screen only
+on surface ships. In the final run no rise needed dice or a war to explain it,
+and no aircraft was lost as Combat Movement ended.
 
 The engine costs about the same. Per call, building a move list took 1.08 ms
 against 1.15 ms before the landing rule, and applying a move 1.22 ms against
@@ -262,11 +264,22 @@ and the games spent 59% of their time waiting for it, 13% preparing inputs
 (about 7 ms of a game thread's time per position, including waits for the other
 threads in its process) and 27% searching and simulating moves. Each serving
 round collected 9.8 waiting positions on average, but they divide among the
-three alliances' models, so a model call averaged 4.1 positions, a size at which
-the GPU's fixed cost per operation still dominates. More games per process made
-larger calls in the probes but slowed the games more. Evaluating the three
-models in one call, or cutting the number of separate GPU operations in each
-call, are the next steps to try; neither has been measured.
+three alliances' models, so a model call averaged 4.1 positions; a quarter of
+calls held a single position.
+
+Timed alone on 455 positions from random play
+(`tools/profile_shared_coordinator.py`), a model call of four positions took 6.1
+ms: 0.7 ms merging the positions' arrays, 0.4 ms sending them, 1.8 ms issuing
+the network's 285 separate tensor operations, 2.9 ms waiting for the GPU and 0.3
+ms reading the results. The GPU's time grows by about 0.65 ms per position,
+mostly encoding each position's observation graph, which averages 3,650 nodes
+and 10,900 edges built from 23,400 input tokens; at 32 positions it is
+two-thirds of the call. So a call costs about 3 ms however small, and each
+position adds about 0.9 ms: larger calls would cut the cost per position by at
+most about 40%. Evaluating the three models in one call would save the fixed
+part of two calls per round, and a cheaper observation-graph encoding would cut
+the part that grows; neither has been tried. More games per process made larger
+calls in the probes but slowed the games more.
 
 The run stayed within the planned nine processes and the allowance, at most
 10.0 GB of the 30 GB. Its long-run rate, 566 evaluations per second, is below
