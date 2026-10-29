@@ -289,6 +289,22 @@ void noncombatPortExitCannotPassEnemyWarships() {
   check(validateNavalRoute(combat, {{"dd"}, {p16}, true}).allowed,
         "Combat Movement lost its port sortie against an Enemy warship");
 }
+// Enemy surface warships off a port stop surface ships, which must screen to
+// leave, but a submarine slips out. In Noncombat Movement, where no screen can
+// be fought, a forced screen used to leave the phase with no legal action.
+void submarinesLeavePortPastSurfaceWarships() {
+  auto s = fixture();
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  add(s, "sub", "submarine", tokyo);
+  s.units.at("sub").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+  add(s, "enemy", "heavy_cruiser", p16, "kmt");
+  Engine e(s, rules());
+  move(e, "sub", {p16, p15});
+  check(e.state().units.at("sub").zone == p15 && e.state().battles.empty() &&
+            e.state().decisions.empty(),
+        "A submarine leaving port was held to screen past surface warships");
+}
 // A carrier's route must keep aircraft landings wherever it can end: a passing
 // Enemy transport does not stop it, while blocking warships make a lone carrier
 // screen and stay.
@@ -363,26 +379,29 @@ void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
             validateNavalRoute(fuelled, {{"cv", "dd"}, {p16}, true}).allowed,
         "A force's sortie ignored its carrier staying in port behind a screen");
 }
-// A carrier that unloads stays where it is, and one that enters port leaves
-// its sea zone, so neither may strand an aircraft that still needs it.
-void stoppingCarriersKeepLandings() {
+// Aircraft never unload from a carrier: they take off by flying and land on
+// it where it ends its move. A carrier that enters port leaves its sea zone,
+// so it may not strand an aircraft that still needs it.
+void carriersNeitherUnloadNorStrandPatrols() {
   auto s = fixture();
   add(s, "cv", "fleet_carrier", p15);
   add(s, "deck", "fighter", p15);
   attachCargo(s, "cv", "deck");
-  add(s, "waiting", "fighter", p14);
-  s.units.at("waiting").movementRemaining = 0;
-  s.units.at("waiting").turnFlags["air_in_flight"] = 1;
   const auto count = [](const std::vector<Action> &actions, const Id &kind) {
     return std::count_if(actions.begin(), actions.end(),
                          [&](const Action &a) { return a.kind == kind; });
   };
-  auto unloaded = s.clone();
-  unloaded.units.erase("waiting");
-  check(airLandingPlanReachable(s) &&
-            count(navalMovementActions(s), "naval_unload") == 0 &&
-            count(navalMovementActions(unloaded), "naval_unload") > 0,
-        "A carrier unloaded although a fighter at sea needs it to sail");
+  Action unload;
+  unload.kind = "naval_unload";
+  unload.parameters = V(V::Object{{"transport", V(Id("cv"))}, {"unit", V(Id("deck"))}, {"zone", V(honshu)}});
+  bool refused = false;
+  try {
+    applyNavalMovementAction(s, unload);
+  } catch (const std::exception &) {
+    refused = true;
+  }
+  check(count(navalMovementActions(s), "naval_unload") == 0 && refused && s.units.at("deck").carriedBy,
+        "A carrier unloaded an aircraft instead of letting it fly off");
   // Entering port ends every other ship's move and every patrol's return for
   // the rest of the phase, so a berth must leave the patrols landable as the
   // carriers stand, even where the carrier could otherwise sail back.
@@ -744,6 +763,7 @@ int main() {
              {"zero-cost port exit", portExitCostsZero},
              {"noncombat port exit blockers",
               noncombatPortExitCannotPassEnemyWarships},
+             {"submarine port exit", submarinesLeavePortPastSurfaceWarships},
              {"staged blocked port sortie",
               blockadedPortKeepsContinuingShipsInBerth},
              {"carrier route landing stops",
@@ -752,7 +772,7 @@ int main() {
               engagingCannotHoldACarrierItsAircraftNeed},
              {"carrier routes past reactions",
               carrierRoutesAreNotHeldWhereTheForceSailsOn},
-             {"stopping carriers keep landings", stoppingCarriersKeepLandings},
+             {"carriers neither unload nor strand patrols", carriersNeitherUnloadNorStrandPatrols},
              {"immediate submarine reaction",
               immediateSubmarineReactionResumesTheVoyage},
              {"carrier patrol reaction",

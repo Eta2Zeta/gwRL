@@ -477,14 +477,19 @@ void encounter(State &s, const Id &id) {
     return;
   }
   const auto n = b.attacker;
+  bool surface = false;
+  for (const auto &unit : r.units)
+    surface |= has(s, s.units.at(unit), "surface_ship");
   if (b.data.find("waiting_ports")) {
     if (peaceEntryWindow(s, b, b.zone))
       return;
+    // Enemy surface warships off the port stop surface ships, which must
+    // screen to leave; submarines pass them, as everywhere on a route.
     auto opposing = blockers(s, n, b.zone);
     std::erase_if(opposing, [&](const Id &unit) {
       return !has(s, s.units.at(unit), "surface_warship");
     });
-    if (!opposing.empty()) {
+    if (surface && !opposing.empty()) {
       b.stage = "naval_screen_selection";
       put(b, "screening", V(A{}));
       screenChoice(s, b);
@@ -497,9 +502,6 @@ void encounter(State &s, const Id &id) {
     data.erase("waiting_ports");
     b.data = V(std::move(data));
   }
-  bool surface = false;
-  for (const auto &unit : r.units)
-    surface |= has(s, s.units.at(unit), "surface_ship");
   const auto declined = b.data.find("declined")
                             ? readIds(b.data.require("declined"))
                             : std::vector<Id>{};
@@ -720,7 +722,9 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
     return false;
   const auto &t = s.units.at(ship);
   const auto &c = s.units.at(cargo);
-  if (c.carriedBy != ship || !movementController(s, c.owner) ||
+  // Aircraft never unload from a carrier: they take off from it by flying, and
+  // land on it where it ends its move.
+  if (c.carriedBy != ship || !movementController(s, c.owner) || isAircraft(s, c) ||
       marked(t.turnFlags, "naval_combat_unloaded"))
     return false;
   const auto owner = s.territories.at(destination).possessor;
@@ -856,15 +860,6 @@ void unloadCargo(State &s, const Id &ship, const Id &cargo, const Id &zone) {
   s.units.at(cargo).movementRemaining = 0;
   s.units.at(ship).turnFlags["naval_unloaded"] = 1;
   s.units.at(ship).movementRemaining = 0;
-}
-// A carrier that unloads stays where it is, so it must leave no more of the
-// moving side's aircraft without a landing.
-bool unloadKeepsLandings(const State &s, const Id &ship, const Id &cargo, const Id &zone) {
-  if (!has(s, s.units.at(ship), "carrier") || !movingSideAirborne(s))
-    return true;
-  State probe = s.clone();
-  unloadCargo(probe, ship, cargo, zone);
-  return airLandingsKept(s, probe);
 }
 // Engaging holds the selected ships in battle where they are and launches
 // their own aircraft there, so it must keep the aircraft's landing plan.
@@ -1370,7 +1365,7 @@ std::vector<Action> navalMovementActions(const State &s) {
                              {{"transport", V(id)}, {"unit", V(cargo)}}));
       if (c.carriedBy == id)
         for (const auto &[zone, t] : s.territories)
-          if (canUnload(s, id, cargo, zone) && unloadKeepsLandings(s, id, cargo, zone))
+          if (canUnload(s, id, cargo, zone))
             out.push_back(action(
                 s, c.owner, "naval_unload",
                 {{"transport", V(id)}, {"unit", V(cargo)}, {"zone", V(zone)}}));
@@ -1433,7 +1428,6 @@ bool applyNavalMovementAction(State &s, const Action &a) {
                cargo = p.require("unit").asString(),
                zone = p.require("zone").asString();
     require(canUnload(s, ship, cargo, zone), "Illegal naval unloading");
-    require(unloadKeepsLandings(s, ship, cargo, zone), "Unloading leaves aircraft without a landing");
     unloadCargo(s, ship, cargo, zone);
     return true;
   }
