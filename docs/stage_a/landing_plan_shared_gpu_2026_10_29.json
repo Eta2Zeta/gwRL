@@ -276,6 +276,14 @@
     "let the owner choose which aircraft are lost when several sets lose equally many"
    ]
   },
+  "fifth": {
+   "scope": "carriers never unload aircraft; submarine port exits",
+   "findings": 0,
+   "pre_existing_notes": [
+    "a lone raider battlecruiser leaving port past blockers must screen without the slip roll the rest of a route gives it; RB 9.4.4 and 11.5 can be read either way",
+    "aircraft may land on a carrier already in port, which is how carriers in port hold aircraft"
+   ]
+  },
   "unfixed": [
    "war declarations during Combat Movement are not followed by a plan check"
   ]

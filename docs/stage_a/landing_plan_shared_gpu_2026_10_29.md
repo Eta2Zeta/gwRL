@@ -103,7 +103,7 @@ move, never allowed the first half of that swap.
 
 ### Reviews
 
-Independent reviews examined the change four times, each after the previous
+Independent reviews examined the change five times, each after the previous
 one's fixes. The first found that route checks looked only where a force first
 met other units rather than wherever it can stop, that engaging could hold a
 carrier its aircraft needed, that Noncombat Movement could lose patrols without
@@ -115,13 +115,14 @@ plan; that routes were held where only Enemy patrol aircraft stood, or where a
 lone carrier left port; and that random play counted a carrier sunk in a
 reaction battle as a broken plan. The third found the blocking described above.
 The fourth found that a medium bomber, which takes two of a heavy carrier's
-three seats, could be left with no legal action, and that ending Combat
-Movement could lose two fighters where losing the bomber alone would do; that
-entering port, which freezes every other naval move and patrol return for the
-rest of the phase, could still leave patrols without a landing; and that route
-checks solved more than before even with a complete plan. All confirmed defects
-are fixed except the war-declaration gap. When several sets of aircraft lose
-equally many, unit order rather than the player decides which are lost.
+three seats, could be left with no legal action, and that ending Combat Movement
+could lose two fighters where losing the bomber alone would do; that entering
+port, which freezes every other naval move and patrol return for the rest of the
+phase, could still leave patrols without a landing; and that route checks solved
+more than before even with a complete plan. All confirmed defects are fixed
+except the war-declaration gap. When several sets of aircraft lose equally many,
+unit order rather than the player decides which are lost. The fifth, of the
+carrier and submarine changes below, found no defects.
 
 ### Random play
 
