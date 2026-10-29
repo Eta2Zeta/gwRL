@@ -610,7 +610,10 @@ std::vector<Action> navalOperationActions(const State &s) {
           (!flag(u.turnFlags, "naval_screening_continuing") ||
            u.commitments.contains("naval_combat")))
         continue;
-      if (isAircraft(s, u) && !u.commitments.contains("combat") &&
+      // Aircraft on Maritime Air Patrol attack only Enemy ships in their own
+      // sea zone, in the Combat Phase (RB 9.3.1): see naval_patrol_attack.
+      if (isAircraft(s, u) && !flag(u.gameFlags, "on_map") &&
+          !u.commitments.contains("combat") &&
           !u.commitments.contains("air_battle") &&
           !flag(u.turnFlags, "air_in_flight")) {
         std::optional<std::map<Id, std::vector<Id>>> paths;

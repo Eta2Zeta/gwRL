@@ -1190,6 +1190,75 @@ void actualNavalAirDeclarationsKeepContextAndCombatPhase() {
           "Actual naval air mission declaration replay differs");
   }
 }
+// RB 9.3.1: a patrol is an aircraft's whole combat move, into a sea zone
+// within MAP range of the land zone or Carrier it takes off from.
+void patrolsStartOnlyFromWhereAircraftTakeOff() {
+  const auto patrols = [](Engine &e, const Id &zone) {
+    const auto actions = e.legalActions();
+    return std::any_of(actions.begin(), actions.end(), [&](const Action &a) {
+      return a.kind == "air_start_patrol" &&
+             a.parameters.require("path").asArray().back().asString() == zone;
+    });
+  };
+  auto s = fixture();
+  add(s, "fighter", "fighter", "japan", beiping);
+  Engine landBased(s, rules());
+  check(patrols(landBased, p14),
+        "A Fighter could not patrol the sea zone next to its land zone");
+  check(!patrols(landBased, "sea_p15") && !patrols(landBased, "sea_p32"),
+        "A Fighter patrolled beyond its MAP range of one");
+  choose(landBased, "air_fly", [](const Action &a) {
+    const auto &path = a.parameters.require("path").asArray();
+    return path.size() == 2 && path.back().asString() == p14;
+  });
+  check(!offered(landBased, "air_start_patrol"),
+        "An aircraft started a patrol at the end of an ordinary flight");
+
+  auto c = fixture();
+  add(c, "carrier", "fleet_carrier", "japan", p16);
+  add(c, "deck", "fighter", "japan", p16);
+  attachCargo(c, "carrier", "deck");
+  Engine carrierBased(c, rules());
+  check(patrols(carrierBased, p16) && patrols(carrierBased, "sea_p15"),
+        "A carrier Fighter could not patrol its Carrier's or the next sea zone");
+  check(!patrols(carrierBased, p14) && !patrols(carrierBased, "sea_p32") &&
+            !patrols(carrierBased, "sea_p33"),
+        "A carrier Fighter patrolled two sea zones from its Carrier");
+}
+// RB 9.3.1: on patrol an aircraft attacks only Enemy naval units in its own sea
+// zone, in its Combat Phase, and must end the patrol before any other use.
+void patrollingAircraftAttackOnlyInTheirOwnSeaZone() {
+  const auto patrol = [](State &s, const Id &zone) {
+    add(s, "plane", "fighter", "japan", zone);
+    auto &plane = s.units.at("plane");
+    plane.gameFlags["on_map"] = 1;
+    plane.gameFlags["map_range"] = 1;
+    plane.turnFlags["on_map"] = 1;
+    plane.commitments.insert("maritime_air_patrol");
+  };
+  for (const bool patrolling : {false, true}) {
+    auto s = fixture();
+    if (patrolling)
+      patrol(s, "sea_p15");
+    else
+      add(s, "plane", "fighter", "japan", beiping);
+    add(s, "ship", "destroyer", "kmt", p14);
+    add(s, "docked", "destroyer", "kmt", shantung);
+    s.units.at("docked").gameFlags["in_port:port"] = 1;
+    s.facilities["port"] = {"port", "major_port", shantung, 0, {{"border:" + p14, 1}}};
+    Engine e(s, rules());
+    check(offered(e, "naval_air_attack") != patrolling &&
+              offered(e, "naval_port_attack") != patrolling,
+          patrolling ? "A patrolling aircraft attacked outside its own sea zone"
+                     : "An aircraft at its base lost its naval air and port attacks");
+  }
+  auto s = fixture(Phase::Combat);
+  patrol(s, "sea_p15");
+  add(s, "ship", "destroyer", "kmt", "sea_p15");
+  Engine e(s, rules());
+  check(offered(e, "naval_patrol_attack"),
+        "A patrol could not attack Enemy ships in its own sea zone");
+}
 } // namespace
 int main() {
   try {
@@ -1241,7 +1310,10 @@ int main() {
              {"combined overland/amphibious preparation and retreat",
               adjacentLandAndAmphibiousAttacksResolveTogether},
              {"actual naval air declaration",
-              actualNavalAirDeclarationsKeepContextAndCombatPhase}}) {
+              actualNavalAirDeclarationsKeepContextAndCombatPhase},
+             {"patrol take-off range", patrolsStartOnlyFromWhereAircraftTakeOff},
+             {"patrol attacks stay in their sea zone",
+              patrollingAircraftAttackOnlyInTheirOwnSeaZone}}) {
       test();
       std::cout << "PASS " << name << '\n';
     }

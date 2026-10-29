@@ -800,14 +800,8 @@ bool flightCanContinue(const State& state, const Id& id, const std::vector<Id>& 
                 for (const auto& zone : destinations) if (zones.contains(zone)) return true;
         return false;
     };
-    if (possibleLanding(reachable)) return true;
-    if (state.clock.phase == Phase::CombatMovement) {
-        const int range = patrolRange(state, preview);
-        if (range > 0) for (const auto& zone : reachable) if (!land(state, zone)) {
-            if (possibleLanding(potentialFlightZones(state, zone, range))) return true;
-        }
-    }
-    return false;
+    // No patrol can follow this flight; a patrol is a whole combat move of its own.
+    return possibleLanding(reachable);
 }
 } // namespace
 std::vector<Id> airLandingSpots(const State &s, const Id &id) {
@@ -1117,7 +1111,11 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 continue;
             if (!combat && used(s, u) && !marked(u.turnFlags, "air_in_flight"))
                 continue;
-            if (!combat && marked(u.turnFlags, "air_in_flight") && airLandingSpots(s, id).empty())
+            // An aircraft still flying without a landing spot is lost. In Combat Movement
+            // this ends a flight that relied on a Carrier that never came; a patrol can
+            // no longer rescue it, because a patrol cannot follow a flight.
+            if (s.clock.phase != Phase::Combat && marked(u.turnFlags, "air_in_flight") &&
+                airLandingSpots(s, id).empty())
                 out.push_back(action(s, s.currentNation(), "air_failed_landing", {{"unit", V(id)}}));
             if (!combat && transport(u) && u.cargo.size() > 1) {
                 if (land(s, u.zone) && heldSinceTurnStart(s, u.owner, u.zone, true))
@@ -1127,6 +1125,10 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                                  {{"unit", V(id)}, {"cargo", V(cargo)}}));
                 continue;
             }
+            // A patrol is the aircraft's whole combat move, into a sea zone within MAP
+            // range of the land zone or Carrier it takes off from (RB 9.3.1).
+            const bool takesOff = s.clock.phase == Phase::CombatMovement && u.route.empty() &&
+                                  !marked(u.turnFlags, "air_in_flight");
             std::optional<int> patrolLimit;  // Fixed for this aircraft; read only when needed.
             const auto patrolReach = [&] {
                 if (!patrolLimit) patrolLimit = patrolRange(s, u);
@@ -1147,7 +1149,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                     if (!combat)
                         continue;
                 }
-                if (combat && !land(s, zone) && static_cast<int>(path.size()) - 1 <= patrolReach() &&
+                if (takesOff && !land(s, zone) && static_cast<int>(path.size()) - 1 <= patrolReach() &&
                     patrolReach() > 0) {
                     State patrol = s.clone();
                     moveFlight(patrol, id, path);

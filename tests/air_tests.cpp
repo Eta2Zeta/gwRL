@@ -327,14 +327,18 @@ void airliftHeavyCapacityAndContinuation() {
           "Transport cannot continue after unloading");
 }
 void failedLanding() {
-    auto s = fixture(Phase::NonCombatMovement);
-    add(s, "f", "fighter", "japan", hopeh);
-    s.units.at("f").movementRemaining = 0;
-    s.units.at("f").turnFlags["air_in_flight"] = 1;
-    Engine e(s, rules());
-    check(!offered(e, "end_phase"), "Stranded plane let phase complete");
-    choose(e, "air_failed_landing");
-    check(!e.state().units.contains("f"), "Stranded aircraft survived");
+    // Combat Movement too: a flight that waited for a Carrier that never came
+    // cannot be rescued by a patrol, because a patrol cannot follow a flight.
+    for (const auto phase : {Phase::NonCombatMovement, Phase::CombatMovement}) {
+        auto s = fixture(phase);
+        add(s, "f", "fighter", "japan", phase == Phase::NonCombatMovement ? hopeh : "sea_p14");
+        s.units.at("f").movementRemaining = 0;
+        s.units.at("f").turnFlags["air_in_flight"] = 1;
+        Engine e(s, rules());
+        check(!offered(e, "end_phase") && !offered(e, "air_start_patrol"), "Stranded plane let phase complete");
+        choose(e, "air_failed_landing");
+        check(!e.state().units.contains("f"), "Stranded aircraft survived");
+    }
 }
 void noAircraftCapture() {
     auto s = fixture();

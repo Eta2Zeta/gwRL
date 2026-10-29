@@ -117,7 +117,7 @@ faster, more processes run network arithmetic at the same moment, and each
 five-core cluster shares its cache and, likely, its matrix unit. The network is
 now 71% of search time.
 
-## A rules defect found by the check
+## Rules defects found by the check
 
 Seed 1955 stops at position 561 with the engine error "Landing beyond range",
 with and without these changes. After a naval battle, a Japanese Fighter on
@@ -127,8 +127,27 @@ applying the landing measures reach with the aircraft's remaining movement, so
 any landing outside its own zone throws. An ordinary end of patrol instead
 raises movement to the patrol range and clears the patrol flags. Either the
 post-battle landing should do the same, or the menu should offer only spots
-within remaining movement. Which one is a rules decision; until it is made, a
-long game that reaches this position fails.
+within remaining movement.
+
+The rulebook settles it differently (section 9.3.1, page 55): a patrol is an
+aircraft's whole combat move, into a sea zone within its MAP range of the land
+zone or Carrier it takes off from, and a patrolling aircraft attacks only Enemy
+naval units in its own sea zone until it ends the patrol. The engine had let
+aircraft start a patrol at the end of an ordinary flight and let patrolling
+aircraft join air and port attacks in other sea zones; this Fighter did both,
+first flying to sea zone P15 and then patrolling P33, then attacking the port
+from P14. Both are now refused. Without the patrol as a rescue, a flight that
+counted on a Carrier that never came ends in a failed landing during Combat
+Movement instead of leaving the phase with no legal action. Under these rules
+seed 1955 plays all eleven rounds. The move-list reference was re-recorded
+under them; the identity checks above used the earlier reference, kept as
+`reference-pre-patrol-*`.
+
+Seed 1954 then exposed an unrelated politics defect in round 10. The CCP's
+evolution decision still offered Nanking as its capital after the CCP had
+given that capture to the KMT, and choosing it fails with "Capital choice lost
+possession". The decision's options are not refreshed when an earlier choice
+changes possession. It is not fixed here.
 
 ## Still slow
 
