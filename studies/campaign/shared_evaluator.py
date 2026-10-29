@@ -1,0 +1,525 @@
+"""Network evaluations for many self-play processes in one serving process.
+
+Game processes keep the rules, the search and the network's input
+preparation. For each position a search asks about, a game thread writes the
+prepared arrays into its own shared-memory buffer and sends a short header
+through its own pipe. The serving process merges every waiting position into
+one batch per alliance model, evaluates it on its device and replies with the
+priors and values. A thread waits for its reply before preparing its next
+position, so its buffer is never overwritten while the server reads it. When
+the server stops, it closes the pipes still open, and a thread waiting for a
+reply raises EvaluatorClosed instead of waiting forever.
+
+The forward pass repeats CampaignPolicyValueNet.forward_batch for positions
+whose graphs, external references and policy factors arrive already laid out,
+so the server does no per-graph Python work. Results match NeuralEvaluator's
+up to floating-point summation order.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from multiprocessing import shared_memory
+from multiprocessing.connection import Connection, wait
+import time
+from typing import Any, Callable, Sequence
+
+import numpy as np
+
+from studies.shared.multiplayer_mcts import Evaluation, PLAYERS, vector
+
+GRAPH_FIELDS = (("ids", "token_ids", np.int32), ("offsets", "token_offsets", np.int32), ("types", "types", np.int32),
+                ("numbers", "numeric", np.float32), ("sources", "sources", np.int32),
+                ("targets", "targets", np.int32), ("relations", "relations", np.int32))
+
+
+def _graph_arrays(graph: Any, prefix: str) -> dict[str, np.ndarray]:
+    arrays = graph.arrays()
+    return {prefix + name: np.ascontiguousarray(arrays[source], dtype=dtype) for name, source, dtype in GRAPH_FIELDS}
+
+
+def _factor_levels(factors: Sequence[Sequence[str]]) -> dict[str, np.ndarray]:
+    """The four factor levels of CampaignPolicyValueNet._factor_layout, as arrays."""
+    out, parent_counts = {}, []
+    factors = [tuple(factor) for factor in factors]
+    for level in range(1, 5):
+        prefixes = sorted({factor[:level] for factor in factors})
+        lookup = {prefix: index for index, prefix in enumerate(prefixes)}
+        owners = np.fromiter((lookup[factor[:level]] for factor in factors), dtype=np.int32, count=len(factors))
+        parents = {prefix: index for index, prefix in enumerate(sorted({prefix[:-1] for prefix in prefixes}))}
+        out[f"f{level}_owners"] = owners
+        out[f"f{level}_counts"] = np.bincount(owners, minlength=len(prefixes)).astype(np.int32)
+        out[f"f{level}_parents"] = np.fromiter((parents[prefix[:-1]] for prefix in prefixes), dtype=np.int32,
+                                               count=len(prefixes))
+        parent_counts.append(len(parents))
+    out["f_parent_counts"] = np.asarray(parent_counts, dtype=np.int32)
+    return out
+
+
+def prepare(env: Any, actions: Sequence[Any], buckets: int) -> tuple[str, dict[str, np.ndarray], Any]:
+    """A position's complete network input as flat arrays, and its context graph.
+
+    The legal menu's action graphs are joined into one block, as the model's
+    encoder layout joins them; their node indices and external references stay
+    local to the block and to the position's own observation.
+    """
+    from .features import make_numeric_input
+    item = make_numeric_input(env, tuple(actions), buckets)
+    if not isinstance(item, dict) or "packed_graph" not in item:
+        raise ValueError("The shared evaluator needs native numerical inputs")
+    packed = item["packed_graph"]
+    context, observation, menu = packed["context"], packed["observation"], packed["actions"]
+    arrays = _graph_arrays(observation, "obs_")
+    destinations, indices = observation.external_references(context)
+    arrays["obs_ref_dest"] = np.asarray(destinations, dtype=np.int32)
+    arrays["obs_ref_index"] = np.asarray(indices, dtype=np.int32)
+    parts: dict[str, list[np.ndarray]] = {name: [] for name in (
+        "ids", "offsets", "types", "numbers", "sources", "targets", "relations",
+        "obs_dest", "obs_index", "ctx_dest", "ctx_index")}
+    nodes, node_start, token_start = [], 0, 0
+    for graph in menu:
+        block = _graph_arrays(graph, "")
+        parts["ids"].append(block["ids"])
+        parts["offsets"].append(block["offsets"][:-1] + token_start)
+        for name in ("types", "numbers", "relations"):
+            parts[name].append(block[name])
+        parts["sources"].append(block["sources"] + node_start)
+        parts["targets"].append(block["targets"] + node_start)
+        for bank, other in (("obs", observation), ("ctx", context)):
+            destination, index = graph.external_references(other)
+            parts[bank + "_dest"].append(np.asarray(destination, dtype=np.int32) + node_start)
+            parts[bank + "_index"].append(np.asarray(index, dtype=np.int32))
+        nodes.append(graph.node_count)
+        node_start += graph.node_count
+        token_start += len(block["ids"])
+    empty = {"numbers": np.zeros((0, arrays["obs_numbers"].shape[1]), dtype=np.float32)}
+    for name, values in parts.items():
+        prototype = empty.get(name, np.zeros(0, dtype=np.int32))
+        arrays["act_" + name] = np.concatenate(values) if values else prototype
+    arrays["act_offsets"] = np.append(arrays["act_offsets"], np.int32(token_start)).astype(np.int32)
+    arrays["act_nodes"] = np.asarray(nodes, dtype=np.int32)
+    arrays.update(_factor_levels(packed["action_factors"]) if menu else {})
+    return item["context_key"], arrays, context
+
+
+def write_arrays(buffer: memoryview, arrays: dict[str, np.ndarray]) -> list[tuple[str, str, tuple, int]]:
+    header, offset = [], 0
+    for name, value in arrays.items():
+        offset = (offset + 15) & ~15
+        end = offset + value.nbytes
+        if end > len(buffer):
+            raise ValueError("A prepared position exceeds its shared-memory buffer")
+        np.ndarray(value.shape, value.dtype, buffer=buffer, offset=offset)[...] = value
+        header.append((name, value.dtype.str, value.shape, offset))
+        offset = end
+    return header
+
+
+def read_arrays(buffer: memoryview, header: Sequence[tuple[str, str, tuple, int]]) -> dict[str, np.ndarray]:
+    return {name: np.ndarray(shape, np.dtype(dtype), buffer=buffer, offset=offset)
+            for name, dtype, shape, offset in header}
+
+
+@dataclass
+class ClientStats:
+    requests: int = 0
+    prepare_seconds: float = 0.0
+    wait_seconds: float = 0.0
+
+
+class EvaluatorClosed(RuntimeError):
+    """The serving process closed this thread's pipe; its game cannot continue."""
+
+
+class RemoteEvaluator:
+    """One game thread's evaluator: one request in flight through its own pipe."""
+
+    def __init__(self, connection: Connection, buffer_name: str, buckets: int, version: str) -> None:
+        self.connection, self.buckets, self.version = connection, buckets, version
+        self.memory = shared_memory.SharedMemory(name=buffer_name)
+        self.sent_contexts: set[str] = set()
+        self.stats = ClientStats()
+
+    def evaluate(self, env: Any, actions: Sequence[Any]) -> Evaluation:
+        if env.is_terminal():
+            if actions:
+                raise ValueError("A terminal state cannot have policy actions")
+            return Evaluation([], vector(env.returns()))
+        actor = env.current_decision_player()
+        if actor is None and (env.decision_kind() != "chance" or actions):
+            raise ValueError("An ownerless nonterminal evaluation must be a chance cutoff")
+        if actor is not None and actor not in PLAYERS:
+            raise ValueError(f"Unknown campaign decision player: {actor}")
+        started = time.perf_counter()
+        key, arrays, context = prepare(env, actions, self.buckets)
+        header = write_arrays(self.memory.buf, arrays)
+        context_arrays = None
+        if key not in self.sent_contexts:
+            context_arrays = {**_graph_arrays(context, "ctx_"), "ctx_nodes": np.asarray([context.node_count])}
+        sent = time.perf_counter()
+        try:
+            self.connection.send((actor, key, len(actions), header, context_arrays))
+            priors, values = self.connection.recv()
+        except (EOFError, OSError) as error:  # BrokenPipeError is an OSError.
+            raise EvaluatorClosed("The shared evaluator closed this game thread's pipe") from error
+        # Only an answered request shows that the server holds the context.
+        self.sent_contexts.add(key)
+        self.stats.requests += 1
+        self.stats.prepare_seconds += sent - started
+        self.stats.wait_seconds += time.perf_counter() - sent
+        if len(priors) != len(actions):
+            raise ValueError("The shared evaluator returned a different legal menu")
+        return Evaluation(priors, vector(values))
+
+    def close(self) -> None:
+        self.memory.close()
+        self.connection.close()
+
+
+def _encode(encoder: Any, layout: dict[str, Any], rows: int, external: Any) -> tuple[Any, Any]:
+    """_GraphEncoder.forward on a layout built outside it."""
+    import torch
+    encoded = encoder.tokens(layout["ids"], layout["offsets"]) + encoder.types(layout["types"])
+    encoded = encoder.input_norm(encoded + encoder.numbers(layout["numbers"]))
+    for message, update in zip(encoder.messages, encoder.updates, strict=True):
+        bank = torch.cat((encoded, external)) if external is not None else encoded
+        gathered = bank.index_select(0, layout["sources"]) + encoder.relations(layout["relations"])
+        aggregate = torch.zeros_like(encoded)
+        aggregate.index_add_(0, layout["targets"], message(gathered))
+        encoded = encoded + update(torch.cat((encoded, aggregate / layout["degree"]), dim=1))
+    summed = encoded.new_zeros((rows, encoded.shape[1]))
+    summed.index_add_(0, layout["owners"], encoded)
+    maximum = encoded.new_full(summed.shape, -torch.inf)
+    maximum.scatter_reduce_(0, layout["owners"].unsqueeze(1).expand_as(encoded), encoded, reduce="amax",
+                            include_self=True)
+    pooled = encoder.pool(torch.cat((summed / layout["counts"], maximum, layout["counts"].log1p()), dim=1))
+    return encoded, pooled
+
+
+class _Transfer:
+    """Host arrays sent to the device as one integer and one float buffer.
+
+    Each separate host-to-device copy costs a fixed overhead on MPS, larger
+    than moving the data itself, so a batch's index arrays travel together.
+    """
+
+    def __init__(self) -> None:
+        self.integers: list[tuple[str, np.ndarray]] = []
+        self.floats: list[tuple[str, np.ndarray]] = []
+
+    def integer(self, name: str, values: Any) -> None:
+        self.integers.append((name, np.asarray(values, dtype=np.int64).ravel()))
+
+    def real(self, name: str, values: Any) -> None:
+        values = np.asarray(values, dtype=np.float32)
+        self.floats.append((name, values))
+
+    def send(self, device: Any) -> dict[str, Any]:
+        """Device views of every array. A blocking copy would first wait for the
+        device's queued work; the host buffers stay referenced under "_host"
+        until the caller drops the views, after the copies have run."""
+        import torch
+        out: dict[str, Any] = {"_host": []}
+        for parts, dtype in ((self.integers, np.int64), (self.floats, np.float32)):
+            if not parts:
+                continue
+            host = torch.from_numpy(np.concatenate([values.ravel() for _, values in parts]).astype(dtype, copy=False))
+            out["_host"].append(host)
+            joined = host.to(device, non_blocking=True)
+            offset = 0
+            for name, values in parts:
+                out[name] = joined[offset:offset + values.size].view(values.shape)
+                offset += values.size
+        return out
+
+
+def _layout(graphs: Sequence[dict[str, np.ndarray]], prefix: str, external: Sequence[tuple[np.ndarray, np.ndarray]],
+            node_counts: np.ndarray, transfer: _Transfer, name: str) -> None:
+    """Join laid-out graph blocks, adding external edges after each block's own.
+
+    `external` gives each block's (destination, joined bank index) arrays; the
+    caller has already offset the bank indices.
+    """
+    from .features import EXTERNAL_REFERENCE
+    nodes = np.array([len(graph[prefix + "offsets"]) - 1 for graph in graphs], dtype=np.int64)
+    node_starts = np.concatenate(([0], np.cumsum(nodes)[:-1]))
+    token_starts = np.concatenate(([0], np.cumsum([len(graph[prefix + "ids"]) for graph in graphs])[:-1]))
+    total = int(nodes.sum())
+    ext_total = int(sum(len(dest) for dest, _ in external))
+    sources = np.concatenate([graph[prefix + "sources"] + start for graph, start in zip(graphs, node_starts)]
+                             + [total + np.arange(ext_total, dtype=np.int64)])
+    targets = np.concatenate([graph[prefix + "targets"] + start for graph, start in zip(graphs, node_starts)]
+                             + [dest + start for (dest, _), start in zip(external, node_starts)])
+    relations = np.concatenate([graph[prefix + "relations"] for graph in graphs]
+                               + [np.full(ext_total, EXTERNAL_REFERENCE, dtype=np.int32)])
+    offsets = np.concatenate([graph[prefix + "offsets"][:-1] + start for graph, start in zip(graphs, token_starts)]
+                             + [[sum(len(graph[prefix + "ids"]) for graph in graphs)]])
+    for field, values in (("ids", np.concatenate([graph[prefix + "ids"] for graph in graphs])), ("offsets", offsets),
+                          ("types", np.concatenate([graph[prefix + "types"] for graph in graphs])),
+                          ("sources", sources), ("targets", targets), ("relations", relations),
+                          ("owners", np.repeat(np.arange(len(node_counts)), node_counts)),
+                          ("external_index", np.concatenate([index for _, index in external]) if external else ())):
+        transfer.integer(f"{name}.{field}", values)
+    transfer.real(f"{name}.numbers", np.concatenate([graph[prefix + "numbers"] for graph in graphs]))
+    transfer.real(f"{name}.degree", np.maximum(np.bincount(targets, minlength=total), 1)[:, None])
+    transfer.real(f"{name}.counts", np.asarray(node_counts)[:, None])
+
+
+def _fields(device_arrays: dict[str, Any], name: str) -> dict[str, Any]:
+    prefix = name + "."
+    return {key[len(prefix):]: value for key, value in device_arrays.items() if key.startswith(prefix)}
+
+
+class _Contexts:
+    """Each context graph's arrays, and each model's encoding of it, by key."""
+
+    def __init__(self) -> None:
+        self.arrays: dict[str, dict[str, np.ndarray]] = {}
+        self.encoded: dict[tuple[int, str], tuple[Any, Any]] = {}
+
+    def encoding(self, model: Any, key: str, device: Any) -> tuple[Any, Any]:
+        found = self.encoded.get((id(model), key))
+        if found is None:
+            arrays = self.arrays[key]
+            transfer = _Transfer()
+            _layout([arrays], "ctx_", [(np.zeros(0, np.int32), np.zeros(0, np.int32))],
+                    np.asarray([int(arrays["ctx_nodes"][0])]), transfer, "ctx")
+            device_arrays = transfer.send(device)
+            found = self.encoded[(id(model), key)] = _encode(model.encoder, _fields(device_arrays, "ctx"), 1, None)
+            found[1].cpu()  # Once per model: the copies' host buffers may go now.
+        return found
+
+
+def forward_prepared(model: Any, items: Sequence[tuple[str, dict[str, np.ndarray]]], contexts: _Contexts,
+                     device: Any) -> tuple[Any, list[int], Any, list[Any]]:
+    """CampaignPolicyValueNet.forward_batch for prepared positions.
+
+    Returns every legal action's logit in position order, each position's action
+    count, the raw value rows, and the host buffers the device copies read,
+    which must stay alive until the outputs are collected. All host arrays reach
+    the device in two copies.
+    """
+    import torch
+    keys = list(dict.fromkeys(key for key, _ in items))
+    static = [contexts.encoding(model, key, device) for key in keys]
+    bank_offsets = np.concatenate(([0], np.cumsum([nodes.shape[0] for nodes, _ in static])[:-1]))
+    context_row = {key: index for index, key in enumerate(keys)}
+    positions = [arrays for _, arrays in items]
+    rows = len(positions)
+    lengths = [len(arrays["act_nodes"]) for arrays in positions]
+    obs_nodes = np.array([len(arrays["obs_offsets"]) - 1 for arrays in positions], dtype=np.int64)
+    transfer = _Transfer()
+    _layout(positions, "obs_", [(arrays["obs_ref_dest"], arrays["obs_ref_index"] + bank_offsets[context_row[key]])
+                                for key, arrays in items], obs_nodes, transfer, "obs")
+    transfer.integer("context_rows", [context_row[key] for key, _ in items])
+    if sum(lengths):
+        # Action graphs read their own position's observation nodes, which follow
+        # one another in the encoder output, then the context nodes after them.
+        obs_starts = np.concatenate(([0], np.cumsum(obs_nodes)[:-1]))
+        dynamic_total = int(obs_nodes.sum())
+        act_external = [(np.concatenate((arrays["act_obs_dest"], arrays["act_ctx_dest"])),
+                         np.concatenate((arrays["act_obs_index"] + start,
+                                         arrays["act_ctx_index"] + dynamic_total + bank_offsets[context_row[key]])))
+                        for (key, arrays), start in zip(items, obs_starts)]
+        graph_nodes = np.concatenate([arrays["act_nodes"] for arrays in positions]).astype(np.int64)
+        _layout(positions, "act_", act_external, graph_nodes, transfer, "act")
+        transfer.integer("policy_owners", np.repeat(np.arange(rows), lengths))
+        factor_sizes = _factor_transfer(positions, lengths, transfer) if model.config.policy_factorization else None
+    device_arrays = transfer.send(device)
+    context_bank = static[0][0] if len(static) == 1 else torch.cat([nodes for nodes, _ in static])
+    observation = _fields(device_arrays, "obs")
+    dynamic_nodes, dynamic_pooled = _encode(model.encoder, observation, rows,
+                                            context_bank.index_select(0, observation["external_index"]))
+    context_pooled = (torch.cat([pooled for _, pooled in static]) if len(static) > 1 else static[0][1])
+    states = model.state_encoder(torch.cat((dynamic_pooled, context_pooled.index_select(0, device_arrays["context_rows"])),
+                                           dim=1))
+    values = model.value_head(states)
+    if not sum(lengths):
+        return values.new_empty((0,)), lengths, values, device_arrays["_host"]
+    actions = _fields(device_arrays, "act")
+    bank = torch.cat((dynamic_nodes, context_bank))
+    _, action_pooled = _encode(model.encoder, actions, len(graph_nodes), bank.index_select(0, actions["external_index"]))
+    scores = model.policy_head(torch.cat((states.index_select(0, device_arrays["policy_owners"]), action_pooled),
+                                         dim=1)).squeeze(1)
+    if factor_sizes is not None:
+        scores = _factored(model, states, action_pooled, scores, device_arrays, factor_sizes)
+    return scores, lengths, values, device_arrays["_host"]
+
+
+def evaluate_prepared(model: Any, items: Sequence[tuple[str, dict[str, np.ndarray]]], contexts: _Contexts,
+                      device: Any) -> tuple[list[list[float]], list[list[float]]]:
+    """Each position's priors and raw values in NeuralEvaluator's units.
+
+    One device-to-host copy carries every logit and value; each position's
+    softmax then runs on the host, where a short menu costs microseconds rather
+    than one accelerator dispatch per position.
+    """
+    return collect(model, *forward_prepared(model, items, contexts, device))
+
+
+def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
+            host_buffers: Sequence[Any] = ()) -> tuple[list[list[float]], list[list[float]]]:
+    """Host priors and raw values from forward_prepared's device outputs.
+
+    Reading them back waits for the device, after which `host_buffers` may go."""
+    import torch
+    host = torch.cat((scores, (raw * model.config.value_scale).reshape(-1))).cpu().numpy().astype(np.float64)
+    if not np.isfinite(host).all():
+        raise ValueError("Neural evaluation returned a nonfinite logit or value")
+    split = int(sum(lengths))
+    logits, values = host[:split], host[split:].reshape(-1, 3)
+    priors, offset = [], 0
+    for count in lengths:
+        row = logits[offset:offset + count]
+        offset += count
+        if count:
+            weights = np.exp(row - row.max())
+            priors.append((weights / weights.sum()).tolist())
+        else:
+            priors.append([])
+    return priors, values.tolist()
+
+
+def _factor_transfer(positions: Sequence[dict[str, np.ndarray]], lengths: Sequence[int], transfer: _Transfer) -> list[int]:
+    """The batched factor levels of CampaignPolicyValueNet._batched_factor_layout."""
+    present = [(row, arrays) for row, (arrays, count) in enumerate(zip(positions, lengths)) if count]
+    sizes = []
+    for level in range(1, 5):
+        owners, counts, parents, state_rows = [], [], [], []
+        group_offset = parent_offset = 0
+        for row, arrays in present:
+            group_counts = arrays[f"f{level}_counts"]
+            owners.append(arrays[f"f{level}_owners"] + group_offset)
+            counts.append(group_counts)
+            parents.append(arrays[f"f{level}_parents"] + parent_offset)
+            state_rows.append(np.full(len(group_counts), row))
+            group_offset += len(group_counts)
+            parent_offset += int(arrays["f_parent_counts"][level - 1])
+        for field, values in (("owners", owners), ("parents", parents), ("state_rows", state_rows)):
+            transfer.integer(f"f{level}.{field}", np.concatenate(values))
+        transfer.real(f"f{level}.counts", np.concatenate(counts)[:, None])
+        sizes += [group_offset, parent_offset]
+    return sizes  # Group and parent counts per level, kept on the host for shapes.
+
+
+def _factored(model: Any, states: Any, latent: Any, scores: Any, device_arrays: dict[str, Any],
+              sizes: Sequence[int]) -> Any:
+    """CampaignPolicyValueNet._factored_logits_batch on prepared factor levels."""
+    import torch
+    joint = torch.zeros_like(scores)
+    for level, head in zip(range(1, 5), model.factor_heads, strict=True):
+        fields = _fields(device_arrays, f"f{level}")
+        groups, parent_count = sizes[2 * level - 2], sizes[2 * level - 1]
+        means = latent.new_zeros((groups, latent.shape[1]))
+        means.index_add_(0, fields["owners"], latent)
+        group_scores = head(torch.cat((states.index_select(0, fields["state_rows"]), means / fields["counts"]),
+                                      dim=1)).squeeze(1)
+        conditional = model._conditional_log_softmax(group_scores, fields["parents"], parent_count)
+        joint = joint + conditional.index_select(0, fields["owners"])
+    return joint + model._conditional_log_softmax(scores, fields["owners"], groups)
+
+
+@dataclass
+class ServerStats:
+    requests: int = 0
+    rounds: int = 0                  # Serving rounds: the waiting requests answered together.
+    requests_per_round: dict[int, int] = field(default_factory=dict)
+    forwards: int = 0                # Model forwards: one per alliance model with positions in a round.
+    positions_per_forward: dict[int, int] = field(default_factory=dict)
+    receive_seconds: float = 0.0     # Reading requests from the ready pipes.
+    forward_seconds: float = 0.0     # Merge, transfer, forward and host outputs.
+    reply_seconds: float = 0.0       # Sending priors and values back.
+    idle_seconds: float = 0.0
+
+
+class SharedEvaluatorServer:
+    """Answers every game thread's requests, batching whatever is waiting."""
+
+    def __init__(self, models: dict[str, Any], device: Any, connections: Sequence[Connection],
+                 buffer_names: Sequence[str], runtime_policy: Any = None) -> None:
+        if set(models) != set(PLAYERS):
+            raise ValueError("Provide one campaign model for Axis, Allies and Comintern")
+        self.models, self.device = models, device
+        # MPS graph-cache housekeeping after completed forwards (device_runtime).
+        self.runtime_policy = runtime_policy
+        self.connections = list(connections)
+        self.memories = {connection: shared_memory.SharedMemory(name=name)
+                         for connection, name in zip(connections, buffer_names, strict=True)}
+        self.contexts = _Contexts()
+        self.stats = ServerStats()
+
+    def serve(self, keep_running: Callable[[], bool]) -> None:
+        """Answer requests until every client closes its pipe or keep_running() is false.
+
+        Stopping closes the pipes still open, so a thread still sending or waiting
+        for its reply gets EvaluatorClosed rather than waiting forever."""
+        open_connections = list(self.connections)
+        while open_connections:
+            if not keep_running():
+                for connection in open_connections:
+                    connection.close()
+                return
+            before = time.perf_counter()
+            ready = wait(open_connections, timeout=0.05)
+            received = time.perf_counter()
+            self.stats.idle_seconds += received - before
+            requests = []
+            for connection in ready:
+                try:
+                    message = connection.recv()
+                except EOFError:
+                    open_connections.remove(connection)
+                    continue
+                requests.append((connection, message))
+            self.stats.receive_seconds += time.perf_counter() - received
+            if requests:
+                self.answer(requests)
+
+    def answer(self, requests: Sequence[tuple[Connection, tuple]]) -> None:
+        import torch
+        started = time.perf_counter()
+        groups: dict[str, list[int]] = {player: [] for player in PLAYERS}
+        items = []
+        for row, (connection, (actor, key, count, header, context_arrays)) in enumerate(requests):
+            if context_arrays is not None and key not in self.contexts.arrays:
+                self.contexts.arrays[key] = context_arrays
+            items.append((key, read_arrays(self.memories[connection].buf, header)))
+            for player in PLAYERS if actor is None else (actor,):
+                groups[player].append(row)
+        priors: list[list[float]] = [[] for _ in requests]
+        chance: dict[int, list[list[float]]] = {}
+        values: list[list[float] | None] = [None] * len(requests)
+        with torch.inference_mode():
+            # Queue every model's work before reading any result back, so the
+            # host lays out one model's batch while the device runs another's.
+            launched = [(player, rows, forward_prepared(self.models[player], [items[row] for row in rows],
+                                                        self.contexts, self.device))
+                        for player, rows in groups.items() if rows]
+            for player, rows, outputs in launched:
+                row_priors, row_values = collect(self.models[player], *outputs)
+                for row, prior, value in zip(rows, row_priors, row_values, strict=True):
+                    if requests[row][1][0] is None:
+                        chance.setdefault(row, []).append(value)
+                    else:
+                        priors[row], values[row] = prior, value
+        for row, rows in chance.items():
+            values[row] = [sum(value[i] for value in rows) / len(PLAYERS) for i in range(3)]
+        sending = time.perf_counter()
+        for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
+            connection.send((row_priors, value))
+        sent = time.perf_counter()
+        if self.runtime_policy is not None:
+            self.runtime_policy.completed(len(launched))
+        stats = self.stats
+        stats.requests += len(requests)
+        stats.rounds += 1
+        stats.requests_per_round[len(requests)] = stats.requests_per_round.get(len(requests), 0) + 1
+        stats.forwards += len(launched)
+        for _, rows, _ in launched:
+            stats.positions_per_forward[len(rows)] = stats.positions_per_forward.get(len(rows), 0) + 1
+        stats.reply_seconds += sent - sending
+        # Graph-cache housekeeping after the replies counts as device work.
+        stats.forward_seconds += (sending - started) + (time.perf_counter() - sent)
+
+    def close(self) -> None:
+        for memory in self.memories.values():
+            memory.close()

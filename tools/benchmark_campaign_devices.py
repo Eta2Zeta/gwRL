@@ -21,6 +21,7 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -49,6 +50,9 @@ class Config:
     max_state_visits: int = 20
     search_evaluation: str = "batched"
     processes: int = 1
+    # Process-parallel MPS self-play: games each process plays at once, one per
+    # thread, all evaluated in shared batches by the coordinating process.
+    games_per_process: int = 1
     calendar_rounds: int = 3
     hidden_dim: int = 16
     message_layers: int = 1
@@ -85,6 +89,15 @@ class Config:
             raise ValueError("Self-play processes must be between one and the number of games")
         if self.processes > 1 and (self.mode != "selfplay" or self.search_evaluation != "per_search" or self.threads != 1):
             raise ValueError("Process-parallel self-play needs per-search evaluation and one tensor thread")
+        if type(self.games_per_process) is not int or self.games_per_process < 1 or (
+                self.games_per_process > 1 and (self.processes < 2 or self.devices != ("mps",))):
+            raise ValueError("Several games per process need process-parallel self-play on the shared MPS evaluator")
+        if self.processes > 1 and {"cpu", "mps"} <= set(self.devices):
+            raise ValueError("Paired CPU/MPS runs need one process: compare_selfplay compares per-game traces, "
+                             "which shared MPS self-play does not record; run each device separately")
+        if self.processes > 1 and self.devices == ("mps",) and len(self.seeds) < self.processes * self.games_per_process:
+            # Fewer games would leave slots idle from the start and void the all-slots-busy rate.
+            raise ValueError("Shared MPS self-play needs at least one game for every game slot")
         roots = len(self.seeds) if self.mode == "selfplay" else 0
         # Game processes run tensors on their search threads: one busy core per
         # process, plus this coordinator and its supervisor.
@@ -473,6 +486,287 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
     return summary, forward, evaluated
 
 
+SHARED_BUFFER_BYTES = 8 * 1024 * 1024  # One prepared position; 11-round inputs take about 1 MB.
+
+
+def play_shared_game(config, seed, evaluator, deadline_epoch):
+    """One game as selfplay plays it, with a RemoteEvaluator answering searches.
+
+    When the coordinator closes the pipe at the end of the run, the game stops
+    without a failure.
+    """
+    import random
+    from studies.campaign.curriculum import make_env
+    from studies.campaign.shared_evaluator import EvaluatorClosed
+    from studies.shared.multiplayer_mcts import MctsConfig, VectorMCTS
+    from tools.benchmark_campaign_backends import check_terminal
+    started_epoch, started = time.time(), time.perf_counter()
+    env = make_env(seed, calendar_rounds=config.calendar_rounds)
+    search_rng = random.Random(seed ^ 0x9E3779B97F4A7C15)
+    policy_rng = random.Random(seed ^ 0xD1B54A32D192ED03)
+    visits, count = Counter({env.planning_key(): 1}), Counter(transitions=0, decisions=0, chance_events=0)
+    timings, failure, stop_reason = Counter(), None, None
+    before_stats = (evaluator.stats.requests, evaluator.stats.prepare_seconds, evaluator.stats.wait_seconds)
+    while not env.is_terminal():
+        if time.time() >= deadline_epoch:
+            stop_reason = "wall_limit"; break
+        if count["transitions"] >= config.max_transitions or visits[env.planning_key()] > config.max_state_visits:
+            stop_reason = "transition_or_repetition_limit"; break
+        try:
+            if env.decision_kind() == "chance":
+                before = time.perf_counter(); env.resolve_chance()
+                timings["actual_rules_execution"] += time.perf_counter() - before
+                count.update(transitions=1, chance_events=1)
+            else:
+                settings = MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
+                                      seed=search_rng.getrandbits(64))
+                before = time.perf_counter()
+                search = VectorMCTS(evaluator, settings).search(env, add_root_noise=True)
+                timings["search"] += time.perf_counter() - before
+                chosen = policy_rng.choices(search.actions, weights=search.policy, k=1)[0]
+                before = time.perf_counter(); env.apply_action(chosen)
+                timings["actual_rules_execution"] += time.perf_counter() - before
+                count.update(transitions=1, decisions=1)
+            if env.is_terminal():
+                check_terminal(env, config.calendar_rounds)
+        except EvaluatorClosed:
+            stop_reason = "evaluator_closed"; break
+        except (RuntimeError, ValueError) as error:
+            failure = game_failure(env, count, error); break
+        visits[env.planning_key()] += 1
+    elapsed = time.perf_counter() - started
+    requests, prepared, waited = (now - then for now, then in zip(
+        (evaluator.stats.requests, evaluator.stats.prepare_seconds, evaluator.stats.wait_seconds), before_stats))
+    timings.update(input_preparation=prepared, waiting_for_evaluations=waited)
+    return {"seed": seed, **dict(count), "terminal": env.is_terminal(), "stop_reason": stop_reason,
+            "clock": env.observation()["state"]["clock"], "started_at_epoch": started_epoch,
+            "ended_at_epoch": started_epoch + elapsed, "game_seconds": elapsed, "evaluations": requests,
+            "terminal_returns": list(env.returns()) if env.is_terminal() else None,
+            "timing_seconds": dict(timings), "failure": failure, "process": os.getpid()}
+
+
+def _shared_game_process(values, slots, connections, buffer_names, tasks, results, deadline_epoch, version):
+    """A game process: one thread per game slot, each taking seeds until its stop marker."""
+    from studies.campaign.shared_evaluator import RemoteEvaluator
+    config = Config(**values)
+    def slot(index, connection, name):
+        evaluator = RemoteEvaluator(connection, name, config.token_buckets, version)
+        try:
+            # A blocking get: get_nowait can report an empty queue before the
+            # coordinator's queued seeds reach this process.
+            while (seed := tasks.get()) is not None:
+                started, requests = time.time(), evaluator.stats.requests
+                try:
+                    record = play_shared_game(config, seed, evaluator, deadline_epoch)
+                except BaseException as error:
+                    # Any other defect ends only this game; the slot takes the next seed.
+                    ended = time.time()
+                    record = {"seed": seed, "terminal": False, "stop_reason": "game_exception",
+                              "started_at_epoch": started, "ended_at_epoch": ended, "game_seconds": ended - started,
+                              "evaluations": evaluator.stats.requests - requests, "terminal_returns": None,
+                              "timing_seconds": {}, "process": os.getpid(),
+                              "failure": {"error": f"{type(error).__name__}: {error}",
+                                          "traceback": traceback.format_exc()}}
+                results.put({**record, "slot": index})
+        finally:
+            evaluator.close()
+    threads = [threading.Thread(target=slot, args=arguments, name=f"campaign-game-{arguments[0]}", daemon=True)
+               for arguments in zip(slots, connections, buffer_names)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+
+def shared_selfplay(config, device, models, weights, deadline, persist, runtime_policy=None):
+    """Game processes keep rules, search and input preparation; this process
+    evaluates every waiting position in shared device batches.
+
+    Each process plays `games_per_process` games at once, one per thread, taking
+    seeds from one queue, so a finished game's slot starts the next game. See
+    studies/campaign/shared_evaluator.py for the request protocol. Returns the
+    report and, as parallel_selfplay does, the traffic as model forwards and
+    evaluator calls.
+    """
+    import multiprocessing
+    import queue
+    import resource
+    from multiprocessing import shared_memory
+    import torch
+    from studies.campaign.curriculum import make_env, task_manifest
+    from studies.campaign.shared_evaluator import SharedEvaluatorServer
+    context = multiprocessing.get_context("spawn")
+    slots = config.processes * config.games_per_process
+    pipes = [context.Pipe() for _ in range(slots)]
+    memories = [shared_memory.SharedMemory(create=True, size=SHARED_BUFFER_BYTES) for _ in range(slots)]
+    tasks, results = context.Queue(), context.Queue()
+    for seed in [*config.seeds, *[None] * slots]:  # One stop marker per game slot.
+        tasks.put(seed)
+    # Games stop a minute and a half before the worker's deadline: their searches
+    # get half a minute to finish, then the pipes close, the processes get 20
+    # seconds to exit, and the report is written before the supervisor's own
+    # wall limit.
+    deadline_epoch = time.time() + max(1.0, deadline - time.monotonic() - 90)
+    values, processes, games, samples = asdict(config), [], [], []
+    self_before = resource.getrusage(resource.RUSAGE_SELF)
+    children_before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    server = None
+    try:
+        for index in range(config.processes):
+            members = range(index * config.games_per_process, (index + 1) * config.games_per_process)
+            process = context.Process(target=_shared_game_process, daemon=True, args=(
+                values, list(members), [pipes[member][1] for member in members],
+                [memories[member].name for member in members], tasks, results, deadline_epoch, weights))
+            process.start()
+            processes.append(process)
+        for _, child in pipes:
+            child.close()
+        server = SharedEvaluatorServer(models, torch.device(device), [parent for parent, _ in pipes],
+                                       [memory.name for memory in memories], runtime_policy)
+        # (epoch, requests answered) about every 10 seconds, for the rate while
+        # every slot plays.
+        samples.append((time.time(), 0))
+        last_persist = time.monotonic()
+        def keep_running():
+            nonlocal last_persist
+            while True:
+                try:
+                    games.append(results.get_nowait())
+                except queue.Empty:
+                    break
+            require(all(process.is_alive() or process.exitcode == 0 for process in processes),
+                    "A game process exited abnormally")
+            now = time.time()
+            if now - samples[-1][0] >= 10:
+                samples.append((now, server.stats.requests))
+            if time.monotonic() - last_persist > 60:
+                persist({"status": "running", "finished_games": len(games), "server_requests": server.stats.requests,
+                         "server_rounds": server.stats.rounds}); last_persist = time.monotonic()
+            # Game threads stop at the deadline; allow them half a minute to report.
+            return now < deadline_epoch + 30
+        server.serve(keep_running)
+        samples.append((time.time(), server.stats.requests))
+        # The server closed every pipe still open, so a thread still waiting for
+        # an evaluation ends its game. A process exits only once its queued
+        # results reach the pipe, so collect them while all processes exit
+        # against one deadline.
+        stop = time.monotonic() + 20
+        while time.monotonic() < stop and any(process.is_alive() for process in processes):
+            try:
+                games.append(results.get(timeout=0.1))
+            except queue.Empty:
+                pass
+        stragglers = [process for process in processes if process.is_alive()]
+        for process in stragglers:
+            process.kill()
+        for process in stragglers:
+            process.join(timeout=1)  # Reaped, so their CPU time is counted.
+        stop = time.monotonic() + 5
+        while len(games) < len(config.seeds) and time.monotonic() < stop:
+            try:
+                games.append(results.get(timeout=0.5))
+            except queue.Empty:
+                break
+    finally:
+        for process in processes:
+            if process.is_alive():
+                process.kill()
+        if server is not None:
+            server.close()
+        for memory in memories:
+            memory.close(); memory.unlink()
+        for parent, _ in pipes:
+            parent.close()
+    self_after, children = resource.getrusage(resource.RUSAGE_SELF), resource.getrusage(resource.RUSAGE_CHILDREN)
+    return shared_summary(config, games, server.stats, samples,
+        task=task_manifest(make_env(config.seeds[0], calendar_rounds=config.calendar_rounds)),
+        game_process_cpu_seconds=(children.ru_utime - children_before.ru_utime) + (children.ru_stime - children_before.ru_stime),
+        coordinator_cpu_seconds=(self_after.ru_utime - self_before.ru_utime) + (self_after.ru_stime - self_before.ru_stime))
+
+
+def all_slots_busy(games, samples):
+    """The evaluation rate from the earliest game start to the first game end.
+
+    Config gives every slot a first game, so in that window every slot plays,
+    apart from the seconds the later slots take to start: it is the rate a long
+    queue of games sustains. Only games send requests, so none precede the
+    earliest start; the count at the first end is interpolated between the
+    server's (epoch, requests answered) samples.
+    """
+    import numpy as np
+    if not games or not samples:
+        return None
+    start = min(game["started_at_epoch"] for game in games)
+    end = min(game["ended_at_epoch"] for game in games)
+    if end <= start:
+        return None
+    times, counts = zip(*samples)
+    evaluations = float(np.interp(end, times, counts))
+    return {"seconds": end - start, "evaluations": evaluations, "evaluations_per_second": evaluations / (end - start)}
+
+
+def shared_summary(config, games, stats, samples, *, task, game_process_cpu_seconds, coordinator_cpu_seconds):
+    """shared_selfplay's report from its game records and the server's statistics.
+
+    Like parallel_selfplay, it also returns the traffic as model forwards (one
+    per alliance model with positions in a serving round) and evaluator calls
+    (one per serving round).
+    """
+    order = {seed: index for index, seed in enumerate(config.seeds)}
+    games = sorted(games, key=lambda game: order[game["seed"]])
+    reported = {game["seed"] for game in games}
+    missing = [seed for seed in config.seeds if seed not in reported]
+    failed = sum(game["failure"] is not None for game in games)
+    complete = not missing and not failed and all(game["terminal"] for game in games)
+    finished = [game for game in games if game["terminal"] and game["failure"] is None]
+    started = min(game["started_at_epoch"] for game in games) if games else time.time()
+    span = max(game["ended_at_epoch"] for game in games) - started if games else 0.0
+    timing = Counter()
+    for game in games:
+        timing.update(game["timing_seconds"])
+    busy = all_slots_busy(games, samples)
+    per_game = sum(game["evaluations"] for game in finished) / len(finished) if finished else None
+    mean_seconds = sum(game["game_seconds"] for game in finished) / len(finished) if finished else None
+    positions = sum(size * count for size, count in stats.positions_per_forward.items())
+    result = {"task": task,
+        "status": "game_error" if failed or missing else "completed" if complete else "truncated", "root_noise": True,
+        "selection": "visit-policy sampling, independent per-game policy/search RNG streams",
+        "evaluation": "every game's positions batched by one coordinating process on the device",
+        "processes": config.processes, "games_per_process": config.games_per_process,
+        "game_slots": config.processes * config.games_per_process,
+        "started_at_epoch": started, "ended_at_epoch": started + span, "completed_games": len(finished),
+        "failed_games": failed, "missing_seeds": missing, "cohort_wall_seconds": span,
+        "complete_games_per_hour": len(games) * 3600 / span if complete and span > 0 else None,
+        # Slots kept busy until the queue empties: the rate a long queue of games
+        # sustains. Unfinished games are the long ones, so only a complete
+        # cohort's mean game length is unbiased; the same holds below.
+        "queue_estimate_games_per_hour": len({game["slot"] for game in finished}) * 3600 / mean_seconds
+                                         if complete else None,
+        "all_slots_busy": busy, "mean_evaluations_per_finished_game": per_game,
+        "steady_state_games_per_hour": busy["evaluations_per_second"] * 3600 / per_game if complete and busy else None,
+        "search_simulations": config.simulations, "search_depth_cap": config.max_depth,
+        "timing_seconds_summed_across_games": dict(timing),
+        "game_process_cpu_seconds": game_process_cpu_seconds,
+        "game_process_utilization": game_process_cpu_seconds / (config.processes * span) if span else None,
+        "coordinator_cpu_seconds": coordinator_cpu_seconds,
+        "inference_requests": stats.requests, "serving_rounds": stats.rounds,
+        "mean_requests_per_serving_round": stats.requests / stats.rounds if stats.rounds else None,
+        "requests_per_serving_round": dict(sorted(stats.requests_per_round.items())),
+        "model_forwards": stats.forwards,
+        "mean_positions_per_model_forward": positions / stats.forwards if stats.forwards else None,
+        "positions_per_model_forward": dict(sorted(stats.positions_per_forward.items())),
+        "server_seconds": {"receiving_requests": stats.receive_seconds,
+                           "forward_including_merge_transfer_and_outputs": stats.forward_seconds,
+                           "sending_replies": stats.reply_seconds, "waiting_for_requests": stats.idle_seconds},
+        "games": games}
+    forward = {"seconds": stats.forward_seconds, "calls": stats.forwards,
+               "batch_sizes": dict(sorted(stats.positions_per_forward.items()))}
+    evaluated = {"synchronized_seconds": stats.receive_seconds + stats.forward_seconds + stats.reply_seconds,
+                 "calls": stats.rounds, "requests": stats.requests,
+                 "batch_sizes": dict(sorted(stats.requests_per_round.items()))}
+    return result, forward, evaluated
+
+
 def compare_selfplay(before, after):
     require(before["status"] == after["status"] == "completed", "Incomplete games cannot establish matched throughput")
     require(before["task"] == after["task"] and before["search_simulations"] == after["search_simulations"] and
@@ -534,9 +828,13 @@ def worker(config, device, progress):
     if config.mode == "inference":
         result = inference(config, device, models, evaluator, forward_stats, deadline, persist)
     elif config.processes > 1:
-        require(device == "cpu", "Process-parallel self-play runs only on CPU")
-        result, forward, evaluated = parallel_selfplay(config, metadata["weights_sha256"], deadline)
-        # Report the game processes' merged traffic; this coordinator evaluates nothing.
+        if device == "mps":
+            result, forward, evaluated = shared_selfplay(config, device, models, metadata["weights_sha256"], deadline,
+                                                         persist, evaluator.inner.runtime_policy)
+        else:
+            result, forward, evaluated = parallel_selfplay(config, metadata["weights_sha256"], deadline)
+        # Report the game processes' merged traffic, or the shared server's model
+        # forwards and serving rounds; this process's own evaluator is unused.
         forward_stats.update(seconds=forward["seconds"], calls=forward["calls"], batch_sizes=forward["batch_sizes"])
         evaluator.seconds, evaluator.calls = evaluated["synchronized_seconds"], evaluated["calls"]
         evaluator.requests, evaluator.batch_sizes = evaluated["requests"], evaluated["batch_sizes"]

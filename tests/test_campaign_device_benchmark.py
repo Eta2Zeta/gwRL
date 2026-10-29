@@ -11,9 +11,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from studies.campaign.shared_evaluator import EvaluatorClosed, ServerStats
 from studies.shared.multiplayer_mcts import NoLegalActionError
-from tools.benchmark_campaign_devices import (Config, TimedEvaluator, compare_selfplay,
-    mps_allocator_limit, numerical_comparison, parallel_selfplay, selfplay, setup_models, supervise_device)
+from tools.benchmark_campaign_devices import (Config, TimedEvaluator, all_slots_busy, compare_selfplay,
+    mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, selfplay, setup_models,
+    shared_summary, supervise_device)
 
 
 class ToyEnv:
@@ -184,6 +186,72 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         self.assertEqual(json.loads(failure["position"]), [8, 0])
         searched = self.run_toy(fail=NoLegalActionError(ToyEnv(9)))["games"][0]["failure"]
         self.assertEqual(json.loads(searched["searched_position"]), [9, 0])
+
+    def play_shared_toy(self, rounds=3, fail=None):
+        config = Config(mode="selfplay", devices=("cpu",), seeds=(7,), threads=1, cpu_budget=5, calendar_rounds=rounds)
+        class Search:
+            def __init__(self, evaluator, settings): pass
+            def search(self, env, **kwargs):
+                if fail is not None:
+                    raise fail
+                return SimpleNamespace(actions=["move"], policy=[1.])
+        evaluator = SimpleNamespace(stats=SimpleNamespace(requests=0, prepare_seconds=0., wait_seconds=0.))
+        with patch("studies.campaign.curriculum.make_env", side_effect=lambda seed, **_: ToyEnv(seed)), \
+             patch("studies.shared.multiplayer_mcts.VectorMCTS", Search):
+            return play_shared_game(config, 7, evaluator, time.time() + 60)
+
+    def test_shared_games_stop_at_a_closed_pipe_and_fail_at_a_false_terminal(self):
+        record = self.play_shared_toy()
+        self.assertEqual((record["terminal"], record["stop_reason"], record["failure"]), (True, None, None))
+        closed = self.play_shared_toy(fail=EvaluatorClosed("closed"))
+        self.assertEqual((closed["terminal"], closed["stop_reason"], closed["failure"]),
+                         (False, "evaluator_closed", None))
+        # The toy ends after three rounds, so a two-round game fails its terminal check.
+        wrong = self.play_shared_toy(rounds=2)
+        self.assertEqual(wrong["failure"]["error"], "ValueError: Workload did not reach the genuine 2-round terminal")
+
+    def summarize_shared(self, games):
+        config = Config(mode="selfplay", devices=("mps",), threads=1, search_evaluation="per_search", processes=2,
+                        games_per_process=2, seeds=(1, 2, 3, 4, 5))
+        stats = ServerStats(requests=2000, rounds=500, requests_per_round={4: 500}, forwards=800,
+                            positions_per_forward={2: 400, 3: 400}, forward_seconds=30., reply_seconds=2.)
+        samples = [(1000., 0), (1050., 500), (1150., 1500), (1250., 2000)]
+        return shared_summary(config, games, stats, samples, task={"calendar_rounds": 3},
+                              game_process_cpu_seconds=100., coordinator_cpu_seconds=50.)
+
+    def test_shared_summary_rates_use_played_slots_and_need_a_complete_cohort(self):
+        def game(seed, slot, start, end, evaluations, terminal=True, failure=None):
+            return {"seed": seed, "slot": slot, "terminal": terminal, "failure": failure, "started_at_epoch": start,
+                    "ended_at_epoch": end, "game_seconds": end - start, "evaluations": evaluations,
+                    "timing_seconds": {"search": 1.}}
+        # Slot 0 plays two games and slot 3 none: three slots played.
+        games = [game(5, 0, 1100., 1200., 300), game(1, 0, 1000., 1100., 400), game(2, 1, 1000., 1150., 500),
+                 game(3, 2, 1010., 1200., 600), game(4, 1, 1150., 1250., 200)]
+        result, forward, evaluated = self.summarize_shared(games)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual([row["seed"] for row in result["games"]], [1, 2, 3, 4, 5])
+        self.assertEqual((result["completed_games"], result["missing_seeds"]), (5, []))
+        self.assertAlmostEqual(result["complete_games_per_hour"], 5 * 3600 / 250.)
+        self.assertAlmostEqual(result["queue_estimate_games_per_hour"], 3 * 3600 / 128.)  # Mean game: 128 s.
+        # From the first start (1000) to the first end (1100), 1000 requests interpolated between samples.
+        self.assertEqual(result["all_slots_busy"], {"seconds": 100., "evaluations": 1000.,
+                                                    "evaluations_per_second": 10.})
+        self.assertAlmostEqual(result["steady_state_games_per_hour"], 10. * 3600 / 400.)  # 400 evaluations a game.
+        self.assertEqual((result["mean_requests_per_serving_round"], result["mean_positions_per_model_forward"]),
+                         (4., 2.5))
+        self.assertEqual((forward["calls"], forward["seconds"], forward["batch_sizes"]), (800, 30., {2: 400, 3: 400}))
+        self.assertEqual((evaluated["calls"], evaluated["requests"], evaluated["synchronized_seconds"]), (500, 2000, 32.))
+        truncated, _, _ = self.summarize_shared(games[:-1] + [game(4, 1, 1150., 1250., 200, terminal=False)])
+        self.assertEqual((truncated["status"], truncated["completed_games"]), ("truncated", 4))
+        for name in ("complete_games_per_hour", "queue_estimate_games_per_hour", "steady_state_games_per_hour"):
+            self.assertIsNone(truncated[name], name)
+        self.assertEqual(truncated["all_slots_busy"]["evaluations_per_second"], 10.)
+        missing, _, _ = self.summarize_shared(games[:-1])
+        self.assertEqual((missing["status"], missing["missing_seeds"]), ("game_error", [4]))
+        self.assertIsNone(missing["queue_estimate_games_per_hour"])
+        failed, _, _ = self.summarize_shared(games[:-1] + [game(4, 1, 1150., 1250., 200, failure={"error": "x"})])
+        self.assertEqual((failed["status"], failed["failed_games"], failed["completed_games"]), ("game_error", 1, 4))
+        self.assertIsNone(all_slots_busy([], [(0., 0)]))
 
     def test_selfplay_comparison_reports_divergence_without_claiming_exact_workload(self):
         left = self.run_toy(); right = copy.deepcopy(left)
