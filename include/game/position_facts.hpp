@@ -25,6 +25,8 @@ class PositionFacts {
         AirLandingPlan,
         NavalAllowance,
         AirLandingReachable,   // Air rules: joint landing plan with ships still to move.
+        AirLandingShortfall,   // Air rules: airborne aircraft that no such plan lands.
+        AirLandingStandingShortfall,  // Air rules: those that cannot land as the carriers stand.
         AircraftReturnZones,   // Air rules: zones an airborne or carried aircraft can still reach.
         AircraftAshore,        // Air rules: a friendly land landing within that reach.
         NavalEndZones,         // Naval rules: zones a ship can still end this phase's move in.

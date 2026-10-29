@@ -149,7 +149,7 @@ void moveAircraft(State &s, const Id &id, const std::vector<Id> &path) {
   u.commitments.insert("combat_move");
 }
 bool landingAfter(const State &s, const Id &id, const std::vector<Id> &path) {
-  return airLandingPlanReachableAfterFlight(s, id, path);
+  return airFlightKeepsLandings(s, id, path);
 }
 std::vector<Id> portDefenders(const State &s, const Id &facility,
                               const Id &owner) {
@@ -559,6 +559,43 @@ void evacuationChoice(State &s, const Id &facility, int moved,
                             {"declined", V(declined)}}));
   decision(s, owner, "naval_port_evacuation", facility, std::move(options));
 }
+// Puts a ship in port, unloading its own cargo there if asked.
+void berthShip(State &s, const Id &id, const Id &facility, bool unload) {
+  auto &u = s.units.at(id);
+  s.flags["naval_berthing"] = 1;
+  u.zone = s.facilities.at(facility).zone;
+  u.gameFlags["in_port:" + facility] = 1;
+  u.gameFlags.erase("raider");
+  u.commitments.erase("raider");
+  for (const auto &c : u.cargo)
+    s.units.at(c).zone = u.zone;
+  if (!unload)
+    return;
+  auto cargo = u.cargo;
+  for (const auto &c : cargo) {
+    auto &v = s.units.at(c);
+    if (v.owner != u.owner)
+      continue;
+    detachCargo(s, id, c, u.zone);
+    v.movementRemaining = 0;
+    v.gameFlags["port_unloaded_round"] = s.clock.roundIndex + 1;
+    v.commitments.insert("transport_unloaded");
+  }
+}
+// Entering port ends every other naval move and patrol return for the rest of
+// the phase (NavalRules::actions), and Noncombat Movement then ends only once
+// the patrols can land as the carriers stand. canBerth waits for aircraft in
+// flight, so the moving side's airborne aircraft here are patrols, which every
+// berth must leave landable as things stand. canBerth admits only empty carriers.
+bool berthKeepsLandings(const State &s, const Id &id, const Id &facility) {
+  if (!movingSideAirborne(s))
+    return true;
+  if (!unitClass(s, s.units.at(id), "carrier"))
+    return airLandingPlanAvailable(s);
+  State probe = s.clone();
+  berthShip(probe, id, facility, false);
+  return airLandingPlanAvailable(probe);
+}
 } // namespace
 
 std::vector<Action> navalOperationActions(const State &s) {
@@ -703,7 +740,7 @@ std::vector<Action> navalOperationActions(const State &s) {
     for (const auto &[id, u] : s.units)
       if (movementController(s, u.owner))
         for (const auto &[fid, f] : s.facilities)
-          if (canBerth(s, u, fid)) {
+          if (canBerth(s, u, fid) && berthKeepsLandings(s, id, fid)) {
             out.push_back(action(
                 s, s.currentNation(), "naval_enter_port",
                 {{"unit", V(id)}, {"facility", V(fid)}, {"unload", V(false)}}));
@@ -735,9 +772,10 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     const auto owner = s.units.at(id).owner;
     const auto origin = s.units.at(id).zone;
     const auto water = a.parameters.require("sea").asString();
-    moveAircraft(s, id, readIds(a.parameters.require("path")));
-    require(airLandingPlanReachable(s),
+    const auto path = readIds(a.parameters.require("path"));
+    require(airFlightKeepsLandings(s, id, path),
             "Naval air attack has no joint landing plan");
+    moveAircraft(s, id, path);
     // This is a declared Combat attack, as with shared land/strategic air
     // missions. Keep its aircraft committed until the naval battle resolves.
     s.units.at(id).commitments.insert("air_combat");
@@ -893,27 +931,9 @@ bool applyNavalOperationAction(State &s, const Action &a) {
   if (a.kind == "naval_enter_port") {
     const auto id = a.parameters.require("unit").asString(),
                f = a.parameters.require("facility").asString();
-    auto &u = s.units.at(id);
-    require(canBerth(s, u, f), "Ship cannot enter this port");
-    s.flags["naval_berthing"] = 1;
-    u.zone = s.facilities.at(f).zone;
-    u.gameFlags["in_port:" + f] = 1;
-    u.gameFlags.erase("raider");
-    u.commitments.erase("raider");
-    for (const auto &c : u.cargo)
-      s.units.at(c).zone = u.zone;
-    if (a.parameters.require("unload").asBool()) {
-      auto cargo = u.cargo;
-      for (const auto &c : cargo) {
-        auto &v = s.units.at(c);
-        if (v.owner != u.owner)
-          continue;
-        detachCargo(s, id, c, u.zone);
-        v.movementRemaining = 0;
-        v.gameFlags["port_unloaded_round"] = s.clock.roundIndex + 1;
-        v.commitments.insert("transport_unloaded");
-      }
-    }
+    require(canBerth(s, s.units.at(id), f), "Ship cannot enter this port");
+    require(berthKeepsLandings(s, id, f), "Entering port leaves aircraft without a landing");
+    berthShip(s, id, f, a.parameters.require("unload").asBool());
     return true;
   }
   if (a.kind == "naval_roll_capture") {

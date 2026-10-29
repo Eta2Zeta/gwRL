@@ -8,6 +8,7 @@
 #include "game/position_facts.hpp"
 #include <algorithm>
 #include <deque>
+#include <iterator>
 #include <functional>
 #include <numeric>
 #include <stdexcept>
@@ -390,7 +391,13 @@ void queueLandings(State &s, BattleState &b) {
             continue;
         const auto owner = s.units.at(id).owner;
         auto spots = airLandingSpots(s, id);
-        std::erase_if(spots, [&](const Id &destination) { return !preservesLandingPlan(s, id, destination); });
+        // Spots that keep other aircraft's landings come first, but an aircraft
+        // that can reach a free spot lands rather than being lost (RB 10.10).
+        std::vector<Id> keeping;
+        std::copy_if(spots.begin(), spots.end(), std::back_inserter(keeping),
+                     [&](const Id &destination) { return preservesLandingPlan(s, id, destination); });
+        if (!keeping.empty())
+            spots = std::move(keeping);
         if (spots.empty()) {
             eraseAirUnit(s, id);
             continue;
@@ -672,7 +679,9 @@ bool airLandingAvailable(const State &s, const Id &id, const Id &destination) {
     return heldSinceTurnStart(s, u.owner, destination, true);
 }
 namespace {
-bool landingPlan(const State &s, const std::vector<Id> &aircraft) {
+// Whether the aircraft can all land as the carriers stand, but for at most
+// `spare` of them.
+bool landingPlan(const State &s, const std::vector<Id> &aircraft, int spare = 0) {
     std::set<Id> requested(aircraft.begin(), aircraft.end());
     if (aircraft.empty())
         for (const auto &[id, u] : s.units)
@@ -704,23 +713,37 @@ bool landingPlan(const State &s, const std::vector<Id> &aircraft) {
         for (const auto &[carrier, remaining] : decks())
             if (remaining >= options.slots && paths.contains(s.units.at(carrier).zone) &&
                 carrierEligible(s, u, s.units.at(carrier))) options.carriers.push_back(carrier);
-        if (options.carriers.empty()) return false;
+        if (options.carriers.empty()) {
+            if (spare == 0) return false;
+            --spare;
+            continue;
+        }
         returns.push_back(std::move(options));
     }
     std::sort(returns.begin(), returns.end(), [](const Return &a, const Return &b) {
         return a.carriers.size() != b.carriers.size() ? a.carriers.size() < b.carriers.size() : a.slots > b.slots;
     });
-    std::function<bool(std::size_t)> assign = [&](std::size_t index) {
+    std::function<bool(std::size_t, int)> assign = [&](std::size_t index, int left) {
         if (index == returns.size()) return true;
         const auto &r = returns[index];
         for (const auto &carrier : r.carriers) if (capacity[carrier] >= r.slots) {
             capacity[carrier] -= r.slots;
-            if (assign(index + 1)) return true;
+            if (assign(index + 1, left)) return true;
             capacity[carrier] += r.slots;
         }
-        return false;
+        return left > 0 && assign(index + 1, left - 1);
     };
-    return assign(0);
+    return assign(0, spare);
+}
+// Airborne aircraft of the moving side that cannot land as the carriers stand.
+int standingShortfall(const State &s) {
+    const PositionScope scope(s);
+    return positionFacts(s)->number(PositionFacts::Fact::AirLandingStandingShortfall, {}, [&] {
+        int lost = 0;
+        while (!landingPlan(s, {}, lost))
+            ++lost;
+        return lost;
+    });
 }
 } // namespace
 bool airLandingPlanAvailable(const State &s, const std::vector<Id> &aircraft) {
@@ -739,6 +762,8 @@ namespace {
 // to. One carrier ends in one zone; a carrier that sails launches its own
 // aircraft first; an aircraft it carries that can still fly ashore frees its
 // seat. Planes only check this joint plan, so no position needs copying.
+// Dice, or another nation's turn, can leave aircraft that no plan lands; a
+// move then must not leave more of them, so they cannot block other moves.
 struct LandingPreview {
     Id unit;
     Id zone;
@@ -841,8 +866,11 @@ std::optional<LandingNeed> releasedNeed(const State &s, const UnitState &u, cons
         return std::nullopt;
     return LandingNeed{u.id, carrierSlots(u), common.value_or(std::set<Id>{})};
 }
-bool solveReachablePlan(const State &s, const LandingPreview *preview) {
+// Whether a joint plan lands every airborne aircraft but at most `spare` of
+// them. A previewed flight's own aircraft must land.
+bool solveReachablePlan(const State &s, const LandingPreview *preview, int spare) {
     const auto previewed = [&](const Id &id) { return preview && preview->unit == id; };
+    const auto mustLand = [&](const Id &id) { return previewed(id) && preview->inFlight; };
     // A deque keeps references to earlier needs valid while sailing carriers
     // append the aircraft they launch.
     std::deque<LandingNeed> needs;
@@ -901,6 +929,8 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview) {
                 if (previewed(u->id) || !mayFlyAshore(s, *u))
                     staying += carrierSlots(*u);
                 const int fuel = previewed(u->id) ? preview->movement : u->movementRemaining.value_or(0);
+                if (!movementController(s, c.owner))
+                    continue;  // It cannot sail, so its aircraft are never released.
                 if (auto need = releasedNeed(s, *u, c, fuel, previewed(u->id)))
                     deck.released.push_back(std::move(*need));
             }
@@ -930,22 +960,40 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview) {
         return count;
     };
     // An aircraft with no possible seat, or more seats needed than all carriers
-    // hold, fails at once rather than after trying every other assignment.
-    int needed = 0, seats = 0;
+    // hold, spends the spare at once rather than after trying every other
+    // assignment.
     for (auto &need : needs) {
-        if ((need.options = options(need)) == 0)
+        if ((need.options = options(need)) > 0)
+            continue;
+        if (mustLand(need.unit) || spare == 0)
             return false;
+        --spare;
+    }
+    std::erase_if(needs, [](const LandingNeed &need) { return need.options == 0; });
+    int needed = 0, seats = 0;
+    std::vector<int> sizes;  // Seats each aircraft that may be left out needs.
+    for (const auto &need : needs) {
         needed += need.slots;
+        if (!mustLand(need.unit))
+            sizes.push_back(need.slots);
     }
     for (const auto &deck : decks)
-        seats += std::max(0, deck.movedFree);
-    if (needed > seats)
-        return false;
+        if (std::any_of(needs.begin(), needs.end(), [&](const LandingNeed &need) {
+                return carrierEligible(s, s.units.at(need.unit), s.units.at(deck.id));
+            }))
+            seats += std::max(0, deck.movedFree);
+    std::sort(sizes.rbegin(), sizes.rend());
+    std::size_t dropped = 0;
+    while (needed > seats) {
+        if (dropped == sizes.size() || static_cast<int>(dropped) == spare)
+            return false;
+        needed -= sizes[dropped++];
+    }
     std::sort(needs.begin(), needs.end(), [](const LandingNeed &a, const LandingNeed &b) {
         return std::tie(a.options, b.slots, a.unit) < std::tie(b.options, a.slots, b.unit);
     });
     // Seats where the carriers are first: the usual case moves no ship.
-    std::function<bool(std::size_t, bool)> place = [&](std::size_t index, bool sailing) -> bool {
+    std::function<bool(std::size_t, bool, int)> place = [&](std::size_t index, bool sailing, int left) -> bool {
         if (index == needs.size())
             return true;
         const auto &need = needs[index];  // Stable: later needs are appended behind it.
@@ -977,7 +1025,7 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview) {
                 deck.used += need.slots;
                 if (fresh && sails)
                     needs.insert(needs.end(), deck.released.begin(), deck.released.end());
-                if (place(index + 1, sailing))
+                if (place(index + 1, sailing, left))
                     return true;
                 needs.resize(count);
                 deck.used -= need.slots;
@@ -985,26 +1033,36 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview) {
                     deck.end.reset();
             }
         }
-        return false;
+        // Failing every seat, the plan may still leave this aircraft out.
+        return left > 0 && !mustLand(need.unit) && place(index + 1, sailing, left - 1);
     };
-    return place(0, false) || place(0, true);
+    return place(0, false, spare) || place(0, true, spare);
 }
-bool reachablePlan(const State &s, const LandingPreview *preview = nullptr) {
+bool reachablePlan(const State &s, int spare = 0, const LandingPreview *preview = nullptr) {
     const PositionScope scope(s);
-    if (preview)
-        return solveReachablePlan(s, preview);
+    if (preview || spare > 0)
+        return solveReachablePlan(s, preview, spare);
     return positionFacts(s)->remember(PositionFacts::Fact::AirLandingReachable, {}, {},
-                                      [&] { return solveReachablePlan(s, nullptr); });
+                                      [&] { return solveReachablePlan(s, nullptr, 0); });
+}
+// Airborne aircraft of the moving side that no plan lands: none unless dice or
+// another nation's turn left some without a landing.
+int reachableShortfall(const State &s) {
+    const PositionScope scope(s);
+    return positionFacts(s)->number(PositionFacts::Fact::AirLandingShortfall, {}, [&] {
+        int lost = 0;
+        while (!reachablePlan(s, lost))
+            ++lost;
+        return lost;
+    });
 }
 LandingPreview flightPreview(const State &s, const Id &id, const std::vector<Id> &path) {
     const auto &u = s.units.at(id);
     return {id, path.back(), u.movementRemaining.value_or(0) - static_cast<int>(path.size()) + 1, true, std::nullopt};
 }
+// A landing must leave no more aircraft without one than before.
 bool landingKeepsReachablePlan(const State &s, const Id &id, const Id &destination) {
-    // A position that already lacks a plan cannot lose one. Landing stays open
-    // there so that a later phase can still resolve aircraft that cannot land.
-    if (!reachablePlan(s))
-        return true;
+    const PositionScope scope(s);
     const auto &u = s.units.at(id);
     const bool carrier = s.units.contains(destination);
     const Id zone = carrier ? s.units.at(destination).zone : destination;
@@ -1017,102 +1075,45 @@ bool landingKeepsReachablePlan(const State &s, const Id &id, const Id &destinati
         fuel = u.movementRemaining.value_or(0) - (found == paths.end() ? 0 : static_cast<int>(found->second.size()) - 1);
     }
     const LandingPreview preview{id, zone, fuel, false, carrier ? std::optional<Id>(destination) : std::nullopt};
-    return reachablePlan(s, &preview);
+    return reachablePlan(s, reachableShortfall(s), &preview);
+}
+// A flight must leave its own aircraft a landing, and no more aircraft without
+// one than before.
+bool flightKeepsLanding(const State &s, const Id &id, const std::vector<Id> &path) {
+    if (path.empty())
+        return false;
+    const PositionScope scope(s);
+    const auto preview = flightPreview(s, id, path);
+    return reachablePlan(s, reachableShortfall(s), &preview);
+}
+// Whether an aircraft in flight can no longer land in any plan that keeps the
+// rest: no spot is in reach, or every remaining plan leaves it out.
+bool landingLost(const State &s, const Id &id) {
+    return airLandingSpots(s, id).empty() ||
+           (reachableShortfall(s) > 0 && !flightKeepsLanding(s, id, {s.units.at(id).zone}));
 }
 } // namespace
 bool airLandingPlanReachable(const State &s) {
     return reachablePlan(s);
 }
-bool airLandingPlanReachableAfterFlight(const State &s, const Id &unit, const std::vector<Id> &path) {
-    const auto preview = flightPreview(s, unit, path);
-    return reachablePlan(s, &preview);
+int airLandingShortfall(const State &s) {
+    return reachableShortfall(s);
 }
-namespace {
-using CarrierLandingBounds = std::map<Id, std::set<Id>>;
-std::set<Id> potentialFlightZones(const State& state, const Id& start, int range) {
-    // This bound depends only on physical geometry. Permissions and enemy
-    // Fighters remain in the actual flight/landing checks below.
-    if(state.definition->indexedGeography)
-        return state.definition->indexedGeography->withinHops(start,range);
-    std::set<Id> zones{start};
-    std::deque<std::pair<Id, int>> queue{{start, 0}};
-    while (!queue.empty()) {
-        const auto [zone, distance] = queue.front(); queue.pop_front();
-        if (distance >= range) continue;
-        // A necessary-condition bound only. Real flight validation and the
-        // final landing planner still enforce permissions and enemy Fighters.
-        for (const auto& next : neighbors(state, zone))
-            if (zones.insert(next).second) queue.emplace_back(next, distance + 1);
-    }
-    return zones;
+bool airLandingPlanReachableWithin(const State &s, int shortfall) {
+    return reachablePlan(s, shortfall);
 }
-CarrierLandingBounds futureCarrierBounds(const State& state) {
-    CarrierLandingBounds bounds;
-    for (const auto& [id, carrier] : state.units) {
-        if (!has(state, carrier, "carrier")) continue;
-        auto& destinations = bounds[id];
-        destinations.insert(carrier.zone);
-        // Optimistic geometry only: allow both the port and Japanese surprise
-        // bonuses, and ignore obstacles, ownership and commitments. This is an
-        // upper bound used to prove impossibility, never a promised ship route.
-        const int base = catalogStats(state, carrier.type, carrier.damage, carrier.owner, carrier.zone)
-                             .movement.value_or(0);
-        const int range = std::max(carrier.movementRemaining.value_or(0),
-                                  base + 2 - flag(carrier.turnFlags, "naval_movement_spent"));
-        std::deque<std::pair<Id, int>> queue;
-        if (land(state, carrier.zone)) {
-            for (const auto& zone : neighbors(state, carrier.zone)) if (!land(state, zone)) {
-                if (destinations.insert(zone).second) queue.emplace_back(zone, 0);
-            }
-        } else queue.emplace_back(carrier.zone, 0);
-        while (!queue.empty()) {
-            const auto [zone, distance] = queue.front(); queue.pop_front();
-            if (distance >= range) continue;
-            for (const auto& next : neighbors(state, zone))
-                if (!land(state, next) && destinations.insert(next).second)
-                    queue.emplace_back(next, distance + 1);
-        }
-    }
-    return bounds;
+bool airLandingsKept(const State &before, const State &after) {
+    if (reachablePlan(after))
+        return true;  // The usual case, at the cost of the complete-plan check alone.
+    const int shortfall = reachableShortfall(before);
+    return shortfall > 0 && reachablePlan(after, shortfall);
 }
-bool flightCanContinue(const State& state, const Id& id, const std::vector<Id>& path,
-                       std::optional<CarrierLandingBounds>* cachedBounds = nullptr) {
-    // Flight changes one aircraft's origin/range and releases its former deck
-    // slot. Reuse immutable board data rather than copying the whole position
-    // for every candidate destination in an aircraft's movement menu.
-    auto preview = state.units.at(id);
-    preview.zone = path.back();
-    preview.movementRemaining = preview.movementRemaining.value_or(0) - static_cast<int>(path.size()) + 1;
-    preview.carriedBy.reset();
-    preview.turnFlags["air_in_flight"] = 1;
-    std::optional<CarrierLandingBounds> local;
-    auto& bounds = cachedBounds ? *cachedBounds : local;
-    const auto reachable = potentialFlightZones(state, preview.zone, preview.movementRemaining.value_or(0));
-    auto possibleLanding = [&](const std::set<Id>& zones) {
-        for (const auto& zone : zones)
-            if (airLandingAvailable(state, id, zone)) return true;
-        // A partial flight may precede a carrier's movement or another aircraft
-        // vacating its deck. Ignore deck occupancy in this optimistic bound;
-        // ending Combat Movement still requires the actual joint assignment.
-        if (!bounds) bounds = futureCarrierBounds(state);
-        for (const auto& [carrierId, destinations] : *bounds)
-            if (carrierEligible(state, preview, state.units.at(carrierId)))
-                for (const auto& zone : destinations) if (zones.contains(zone)) return true;
-        return false;
-    };
-    // No patrol can follow this flight; a patrol is a whole combat move of its own.
-    return possibleLanding(reachable);
+bool airFlightKeepsLandings(const State &s, const Id &unit, const std::vector<Id> &path) {
+    return flightKeepsLanding(s, unit, path);
 }
-bool flightKeepsLanding(const State &s, const Id &id, const std::vector<Id> &path,
-                        std::optional<CarrierLandingBounds> *bounds = nullptr) {
-    // Where aircraft already lack a joint plan, only the flight's own return
-    // remains checked, so the others can still land or be lost.
-    if (!reachablePlan(s))
-        return flightCanContinue(s, id, path, bounds);
-    const auto preview = flightPreview(s, id, path);
-    return reachablePlan(s, &preview);
+bool movingSideAirborne(const State &s) {
+    return std::any_of(s.units.begin(), s.units.end(), [&](const auto &entry) { return ownAirborne(s, entry.second); });
 }
-} // namespace
 std::vector<Id> airLandingSpots(const State &s, const Id &id) {
     const PositionScope scope(s);
     std::vector<Id> out;
@@ -1130,15 +1131,24 @@ std::vector<Id> airLandingSpots(const State &s, const Id &id) {
     return out;
 }
 std::vector<Id> strandedAircraft(const State &s) {
-    std::vector<Id> kept, stranded;
+    std::vector<Id> remaining, stranded;
     for (const auto &[id, u] : s.units)
-        if (ownAirborne(s, u)) {
-            kept.push_back(id);
-            if (!airLandingPlanAvailable(s, kept)) {
-                kept.pop_back();
-                stranded.push_back(id);
-            }
+        if (ownAirborne(s, u))
+            remaining.push_back(id);
+    // Leaving out the latest aircraft whose loss still lets the rest land, but
+    // for the losses yet to choose, loses exactly the standing shortfall.
+    int spare = standingShortfall(s);
+    for (auto i = remaining.size(); spare > 0 && i-- > 0;) {
+        auto rest = remaining;
+        rest.erase(rest.begin() + static_cast<std::ptrdiff_t>(i));
+        // landingPlan reads an empty list as every airborne aircraft.
+        if (rest.empty() || landingPlan(s, rest, spare - 1)) {
+            stranded.push_back(remaining[i]);
+            remaining = std::move(rest);
+            --spare;
         }
+    }
+    std::reverse(stranded.begin(), stranded.end());
     return stranded;
 }
 void eliminateStrandedAircraft(State &s) {
@@ -1315,7 +1325,6 @@ std::vector<Action> AirRules::interrupts(const State &s) const {
 }
 std::vector<Action> AirRules::actions(const State &s) const {
     auto out = gameplay_ ? gameplay_->actions(s) : std::vector<Action>{};
-    std::optional<CarrierLandingBounds> carrierBounds;
     if (s.chance || !s.decisions.empty())
         return out;
     if (s.clock.phase == Phase::Combat) {
@@ -1343,7 +1352,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         std::vector<Id> path{u.zone, zone};
                         if (!validateFlight(s, id, path, true, true).allowed)
                             continue;
-                        if (airLandingPlanReachableAfterFlight(s, id, path))
+                        if (flightKeepsLanding(s, id, path))
                             out.push_back(action(s, s.currentNation(), "air_blitz",
                                                  {{"unit", V(id)}, {"path", V(ids(path))}}));
                     }
@@ -1439,8 +1448,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
             // An aircraft still flying without a landing spot is lost. In Combat Movement
             // this ends a flight that relied on a Carrier that never came; a patrol can
             // no longer rescue it, because a patrol cannot follow a flight.
-            if (s.clock.phase != Phase::Combat && marked(u.turnFlags, "air_in_flight") &&
-                airLandingSpots(s, id).empty())
+            if (s.clock.phase != Phase::Combat && marked(u.turnFlags, "air_in_flight") && landingLost(s, id))
                 out.push_back(action(s, s.currentNation(), "air_failed_landing", {{"unit", V(id)}}));
             if (!combat && transport(u) && u.cargo.size() > 1) {
                 if (land(s, u.zone) && heldSinceTurnStart(s, u.owner, u.zone, true))
@@ -1462,7 +1470,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
             auto paths = flightPaths(s, id, combat);
             for (const auto &[zone, path] : paths) {
                 if (path.size() > 1 && validateFlight(s, id, path, combat, false).allowed &&
-                    flightKeepsLanding(s, id, path, &carrierBounds) &&
+                    flightKeepsLanding(s, id, path) &&
                     (!combat || !enemyFighter(s, u.owner, zone)))
                     out.push_back(
                         action(s, s.currentNation(), "air_fly", {{"unit", V(id)}, {"path", V(ids(path))}}));
@@ -1479,8 +1487,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                     State patrol = s.clone();
                     moveFlight(patrol, id, path);
                     patrol.units.at(id).movementRemaining = patrolReach();
-                    if (!airLandingSpots(patrol, id).empty() &&
-                        (!airLandingPlanReachable(s) || airLandingPlanReachable(patrol)))
+                    if (!airLandingSpots(patrol, id).empty() && airLandingsKept(s, patrol))
                         out.push_back(action(
                             s, s.currentNation(), "air_start_patrol",
                             {{"unit", V(id)}, {"path", V(ids(path))}, {"range", num(patrolReach())}}));
@@ -1491,13 +1498,13 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         if (b.zone == zone && b.attacker == u.owner && !marked(b.flags, "air_mission") &&
                             !marked(b.flags, "finished") &&
                             (b.stage == "awaiting_combat_rules" || b.stage == "naval_declared")) {
-                            if (airLandingPlanReachableAfterFlight(s, id, path))
+                            if (flightKeepsLanding(s, id, path))
                                 out.push_back(action(s, s.currentNation(), "air_screen_continue",
                                     {{"unit", V(id)}, {"path", V(ids(path))}, {"battle", V(bid)}}));
                         }
                 const auto owner =
                     s.territories.contains(zone) ? s.territories.at(zone).possessor : std::nullopt;
-                if (!owner || !hostile(s, u.owner, *owner) || !airLandingPlanReachableAfterFlight(s, id, path))
+                if (!owner || !hostile(s, u.owner, *owner) || !flightKeepsLanding(s, id, path))
                     continue;
                 if (bomber(s, u)) {
                     for (const auto &kind : {"facility", "construction", "city", "rail"})
@@ -1584,7 +1591,10 @@ std::vector<Action> AirRules::actions(const State &s) const {
     return out;
 }
 bool AirRules::phaseComplete(const State &s) const {
-    if (s.clock.phase == Phase::CombatMovement && !airLandingPlanAvailable(s)) return false;
+    // Combat Movement ends once the carriers stand where they land every
+    // aircraft that a plan can land; any that none can are lost as it ends.
+    if (s.clock.phase == Phase::CombatMovement && !airLandingPlanAvailable(s) &&
+        (reachableShortfall(s) == 0 || standingShortfall(s) > reachableShortfall(s))) return false;
     // Moves may rely on a carrier sailing to a patrol later, so Noncombat
     // Movement ends only once the mover's own patrols can land as things stand.
     if (s.clock.phase == Phase::NonCombatMovement) {
@@ -1621,6 +1631,7 @@ void AirRules::apply(State &s, const Action &a) const {
         const auto id = p.require("unit").asString();
         const auto path = readIds(p.require("path"));
         require(validateFlight(s, id, path, true, true).allowed, "Invalid continuing-force flight");
+        require(flightKeepsLanding(s, id, path), "Continuing aircraft have no joint return plan");
         moveFlight(s, id, path);
         auto &u = s.units.at(id);u.turnFlags.erase("air_screening_ready");
         u.turnFlags["air_screening_wait"] = 1;
@@ -1628,7 +1639,6 @@ void AirRules::apply(State &s, const Action &a) const {
         auto &b = s.battles.at(p.require("battle").asString());
         auto waiting = array(b, "air_screening_continuing");waiting.emplace_back(id);
         put(b, "air_screening_continuing", V(std::move(waiting)));
-        require(airLandingPlanReachable(s), "Continuing aircraft have no joint return plan");
         return;
     }
     if (a.kind == "air_artillery_city_bomb") {
@@ -1646,7 +1656,8 @@ void AirRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "air_failed_landing") {
         auto id = p.require("unit").asString();
-        require(airLandingSpots(s, id).empty(), "Aircraft can still land");
+        require(marked(s.units.at(id).gameFlags, "on_map") ? airLandingSpots(s, id).empty() : landingLost(s, id),
+                "Aircraft can still land");
         eraseAirUnit(s, id);
         return;
     }
@@ -1728,12 +1739,12 @@ void AirRules::apply(State &s, const Action &a) const {
             require(marked(s.units.at(id).turnFlags, "blitz_eligible") &&
                         blitzPairValid(s, s.units.at(id), path.front(), path.back()),
                     "Aircraft has no paired blitz path");
+        require(flightKeepsLanding(s, id, path), "No joint legal return landing plan");
         moveFlight(s, id, path);
         auto &u = s.units.at(id);
         u.turnFlags.erase("air_screening_ready");
         if (a.kind == "air_blitz")
             u.turnFlags.erase("blitz_eligible");
-        require(airLandingPlanReachable(s), "No joint legal return landing plan");
         u.commitments.insert("air_combat");
         if (a.kind == "air_support" || a.kind == "air_escort") {
             auto &b = s.battles.at(p.require("battle").asString());

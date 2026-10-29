@@ -846,17 +846,30 @@ bool landingsAtStake(const State &s, const std::vector<Id> &ships) {
   };
   const auto carrier = [&](const Id &id) { return has(s, s.units.at(id), "carrier"); };
   return std::any_of(ships.begin(), ships.end(), carries) ||
-         (std::any_of(ships.begin(), ships.end(), carrier) &&
-          std::any_of(s.units.begin(), s.units.end(), [&](const auto &entry) {
-            const auto &u = entry.second;
-            return isAircraft(s, u) && movementController(s, u.owner) && !marked(u.turnFlags, "scrambled") &&
-                   (marked(u.turnFlags, "air_in_flight") || marked(u.gameFlags, "on_map"));
-          }));
+         (std::any_of(ships.begin(), ships.end(), carrier) && movingSideAirborne(s));
+}
+// Unloading ends the ship's move as well as the cargo's.
+void unloadCargo(State &s, const Id &ship, const Id &cargo, const Id &zone) {
+  detachCargo(s, ship, cargo, zone);
+  s.units.at(cargo).turnFlags["naval_unloaded"] = 1;
+  s.units.at(cargo).route.push_back(zone);
+  s.units.at(cargo).movementRemaining = 0;
+  s.units.at(ship).turnFlags["naval_unloaded"] = 1;
+  s.units.at(ship).movementRemaining = 0;
+}
+// A carrier that unloads stays where it is, so it must leave no more of the
+// moving side's aircraft without a landing.
+bool unloadKeepsLandings(const State &s, const Id &ship, const Id &cargo, const Id &zone) {
+  if (!has(s, s.units.at(ship), "carrier") || !movingSideAirborne(s))
+    return true;
+  State probe = s.clone();
+  unloadCargo(probe, ship, cargo, zone);
+  return airLandingsKept(s, probe);
 }
 // Engaging holds the selected ships in battle where they are and launches
 // their own aircraft there, so it must keep the aircraft's landing plan.
 bool engagementKeepsLanding(const State &s, const std::vector<Id> &selected, const Id &zone) {
-  if (!landingsAtStake(s, selected) || !airLandingPlanReachable(s))
+  if (!landingsAtStake(s, selected))
     return true;
   State probe = s.clone();
   detachAircraft(probe, selected, zone);
@@ -865,7 +878,7 @@ bool engagementKeepsLanding(const State &s, const std::vector<Id> &selected, con
     u.commitments.insert("combat_move");
     u.turnFlags["naval_movement_spent"] = 1000;
   }
-  return airLandingPlanReachable(probe);
+  return airLandingsKept(s, probe);
 }
 class NavalOrderCompletion {
 public:
@@ -1193,7 +1206,9 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
     // larger force leaves port past either, with the ships that do not screen
     // still in port and their own aircraft already launched. Patrol and
     // submarine reactions, and passing transports, submerged submarines or
-    // raiders, do not stop the force.
+    // raiders, do not stop the force. Where dice or another nation's turn
+    // already left aircraft that no plan lands, the move must not add to them.
+    const PositionScope scope(s);
     const bool fromPort =
         std::any_of(r.units.begin(), r.units.end(),
                     [&](const Id &id) { return !port(s.units.at(id)).empty(); });
@@ -1249,7 +1264,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
       if (held)
         for (const auto &id : r.units)
           probe.units.at(id).turnFlags["naval_movement_spent"] = 1000;  // Held there.
-      if (!airLandingPlanReachable(probe))
+      if (!airLandingsKept(s, probe))
         return fail(
             "Carrier movement leaves aircraft without a joint landing plan");
     }
@@ -1355,7 +1370,7 @@ std::vector<Action> navalMovementActions(const State &s) {
                              {{"transport", V(id)}, {"unit", V(cargo)}}));
       if (c.carriedBy == id)
         for (const auto &[zone, t] : s.territories)
-          if (canUnload(s, id, cargo, zone))
+          if (canUnload(s, id, cargo, zone) && unloadKeepsLandings(s, id, cargo, zone))
             out.push_back(action(
                 s, c.owner, "naval_unload",
                 {{"transport", V(id)}, {"unit", V(cargo)}, {"zone", V(zone)}}));
@@ -1418,12 +1433,8 @@ bool applyNavalMovementAction(State &s, const Action &a) {
                cargo = p.require("unit").asString(),
                zone = p.require("zone").asString();
     require(canUnload(s, ship, cargo, zone), "Illegal naval unloading");
-    detachCargo(s, ship, cargo, zone);
-    s.units.at(cargo).turnFlags["naval_unloaded"] = 1;
-    s.units.at(cargo).route.push_back(zone);
-    s.units.at(cargo).movementRemaining = 0;
-    s.units.at(ship).turnFlags["naval_unloaded"] = 1;
-    s.units.at(ship).movementRemaining = 0;
+    require(unloadKeepsLandings(s, ship, cargo, zone), "Unloading leaves aircraft without a landing");
+    unloadCargo(s, ship, cargo, zone);
     return true;
   }
   if (a.kind == "naval_entry_declare" || a.kind == "naval_entry_peaceful" ||

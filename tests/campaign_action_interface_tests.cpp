@@ -226,12 +226,16 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
   check(validateNavalRoute(state, {{"carrier"}, {p16, p15}}).allowed &&
             validateNavalRoute(state, {{"carrier"}, {p16, p15, p14}}).allowed,
         "A carrier leg that can still reach a waiting aircraft was refused");
-  // With movement for one leg only, stopping short strands the aircraft.
+  // With movement for one leg only, the aircraft beyond reach is lost already,
+  // and stopping short strands one waiting beside the carrier.
   auto oneLeg = state.clone();
   for (int spent = 1; spent < 12 &&
                       validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15, p14}}).allowed;
        ++spent)
     oneLeg.units.at("carrier").turnFlags["naval_movement_spent"] = spent;
+  add(oneLeg, "beside", "fighter", p16);
+  oneLeg.units.at("beside").turnFlags["air_in_flight"] = 1;
+  oneLeg.units.at("beside").movementRemaining = 0;
   const auto shortLeg = validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15}});
   check(!shortLeg.allowed &&
             shortLeg.reason == "Carrier movement leaves aircraft without a joint landing plan" &&
@@ -263,10 +267,12 @@ void carriersMayJoinWaitingAircraftOneAtATime() {
   check(validateNavalRoute(state, {{"a"}, {p16, p15, p14}}).allowed &&
             validateNavalRoute(state, {{"a", "b", "c"}, {p16, p15, p14}}).allowed,
         "A carrier could not sail toward aircraft the other carriers can still seat");
+  // Two carriers can seat only two of the three, so one aircraft is lost
+  // whatever they do; each may still sail to save the others.
   auto twoSeats = state.clone();
   twoSeats.units.erase("c");
-  check(!validateNavalRoute(twoSeats, {{"a"}, {p16, p15, p14}}).allowed,
-        "Carriers sailed although three waiting aircraft can never find seats");
+  check(airLandingShortfall(twoSeats) == 1 && validateNavalRoute(twoSeats, {{"a"}, {p16, p15, p14}}).allowed,
+        "A carrier could not sail to save two of three aircraft that two seats can hold");
   Engine engine(state, trainingCampaignRules());
   for (const auto &id : {"a", "b", "c"}) {
     chooseUnit(engine, "naval_start_move", id);

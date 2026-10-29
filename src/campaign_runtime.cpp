@@ -81,10 +81,9 @@ bool phaseWorkClear(const State& state) {
     return true;
 }
 
-// RB 9.3 checks attacking aircraft's landing spots only when Combat Movement
-// ends, so legal moves can strand some beyond any rescue, where a player at the
-// table would take moves back. With no other legal action the phase may still
-// end, and the stranded aircraft are lost before combat.
+// Combat Movement ends once its carriers land every aircraft that a plan can
+// land. Should no legal move reach that, the phase may still end when nothing
+// else is legal, and the aircraft that cannot land are lost before combat.
 bool strandedAircraftMayEndPhase(const State& state, const Rules& rules) {
     if (state.clock.phase != Phase::CombatMovement || strandedAircraft(state).empty()) return false;
     State after = state.clone();
@@ -488,8 +487,8 @@ void Engine::commitChance(const ChanceRequest& request, const ChanceOutcome& out
 }
 
 void Engine::endPhase() {
-    // Offered with Combat Movement incomplete only when stranded aircraft are all that remain.
-    if (state_.clock.phase == Phase::CombatMovement && !rules_->phaseComplete(state_))
+    // Aircraft that cannot land as the carriers stand are lost as Combat Movement ends.
+    if (state_.clock.phase == Phase::CombatMovement && !airLandingPlanAvailable(state_))
         eliminateStrandedAircraft(state_);
     require(phaseWorkClear(state_) && rules_->phaseComplete(state_), "Campaign phase is not complete");
     const auto beforePhase=state_.clock;

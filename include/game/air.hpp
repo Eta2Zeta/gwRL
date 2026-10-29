@@ -18,15 +18,28 @@ bool airLandingPlanAvailable(const State &, const std::vector<Id> &aircraft = {}
 // The joint plan that every move must keep (RB 9.3): carriers the mover can
 // still sail may end in any sea zone they can reach, a carrier that sails
 // launches its own aircraft first, and carried aircraft that can still fly
-// ashore free their seats. Combat Movement ends only once the plan above holds.
+// ashore free their seats.
 bool airLandingPlanReachable(const State &);
-// The same after `unit` flies `path`, without changing or copying the state.
-bool airLandingPlanReachableAfterFlight(const State &, const Id &unit, const std::vector<Id> &path);
-// Airborne aircraft, in unit order, that no joint landing assignment can
-// include once the earlier ones keep theirs.
+// How many of the moving side's airborne aircraft no such plan lands. Moves
+// never raise it, so it is zero unless dice or another nation's turn left
+// aircraft without a landing; those must not block moves that strand no one.
+int airLandingShortfall(const State &);
+// Whether a plan lands all of them but at most `shortfall`.
+bool airLandingPlanReachableWithin(const State &, int shortfall);
+// Whether `after`, a probe of a move from `before`, leaves no more aircraft
+// without a landing; it solves `before` only when `after` lacks a complete plan.
+bool airLandingsKept(const State &before, const State &after);
+// Whether `unit` flying `path` keeps itself a landing and leaves no more
+// aircraft without one, without changing or copying the state.
+bool airFlightKeepsLandings(const State &, const Id &unit, const std::vector<Id> &path);
+// Whether the moving side has aircraft in flight or on patrol, whose landings
+// its moves must keep; without them no move can strand one.
+bool movingSideAirborne(const State &);
+// The fewest airborne aircraft whose loss lets the rest land as the carriers
+// stand; where there is a choice, earlier aircraft in unit order keep theirs.
 std::vector<Id> strandedAircraft(const State &);
-// Removes them and counts them in the state flag "stranded_aircraft_lost", an
-// alarm: moves keep a reachable plan, so legal play should never strand one.
+// Removes them as Combat Movement ends and counts them in the state flag
+// "stranded_aircraft_lost". Only dice or another nation's turn leave any.
 void eliminateStrandedAircraft(State &);
 void enforcePatrolLandingAvailability(State &);
 void beginAirDefence(State &, const Id &battle);

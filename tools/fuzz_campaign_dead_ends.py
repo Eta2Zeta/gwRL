@@ -4,13 +4,17 @@
 Each game plays the campaign through the environment that search uses, choosing
 uniformly among legal actions and ending a phase with extra probability (2%, 5%
 or 10% by seed) so games reach later rounds. A game stops at a nonterminal
-decision with no legal action, at an engine error, at a Combat Movement move
-that leaves some airborne aircraft no reachable joint landing plan, when ending
-a phase loses aircraft that had no landing (the engine's "stranded_aircraft_lost"
-alarm), or at its end. Legal play should never do the middle two. Dice can also
-break a plan, as when a reaction sinks a carrier while it sails; aircraft lost
-at the end of that same Combat Movement are noted with the game, which plays on.
-Failing positions are saved for inspection; replaying the seed reproduces the game.
+decision with no legal action, at an engine error, at its end or decision cap,
+or when the landing rule fails. That rule counts the airborne aircraft that no
+reachable joint landing plan lands (the engine's landing shortfall): no move in
+either movement phase may raise it, and ending Combat Movement may lose only
+that many aircraft (the "stranded_aircraft_lost" count). The shortfall is
+compared between settled positions, with no naval move or Chinese-truce battle
+pending. Dice may raise it, as when a reaction sinks a carrier while it sails,
+by at most the seats of the carriers they sink or damage; so may a declaration
+of war, which the engine does not check. Such rises are noted with the game,
+which plays on, and so is every aircraft lost as Combat Movement ends. Failing
+positions are saved for inspection; replaying the seed reproduces the game.
 Random play reaches far more unusual positions per second than search-driven
 self-play, so run it after rules changes and before long self-play runs.
 """
@@ -27,11 +31,12 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 BIASES = (0.02, 0.05, 0.1)
-# Casualty choices in Combat Movement's immediate naval battles, where a lost
-# carrier is a combat outcome rather than a move that broke a landing plan.
-CASUALTY_CHOICES = {"naval_take_casualty", "naval_casualty_accept", "naval_casualty_dispute"}
+# Seats per carrier type; damage lowers a carrier's movement, not its seats.
+CARRIERS = {"light_carrier": 1, "fleet_carrier": 2, "heavy_fleet_carrier": 3}
+MOVEMENT_PHASES = {"combat_movement", "non_combat_movement"}
 CLOCK = re.compile(r'"clock":(\{[^}]*\})')
 STRANDED = re.compile(r'"stranded_aircraft_lost":(\d+)')
+UNDER_WAY = re.compile(r'"immediate_(?:land|naval)_battles":[1-9]')
 
 
 def turn_phase(serialized: str) -> tuple[int, int, str]:
@@ -46,6 +51,18 @@ def stranded(serialized: str) -> int:
     return int(found.group(1)) if found else 0
 
 
+def explained_rise(before: str, after: str) -> dict:
+    """What between two positions can raise the landing shortfall without an engine
+    defect: carriers lost or damaged, with the seats they held, and new wars."""
+    old, new = json.loads(before)["state"], json.loads(after)["state"]
+    carriers = {key: unit for key, unit in old["units"].items() if unit["type"] in CARRIERS}
+    hit = sorted(key for key, unit in carriers.items()
+                 if key not in new["units"] or new["units"][key]["damage"] > unit["damage"])
+    wars = sorted(f"{key}:{enemy}" for key, nation in new["nations"].items()
+                  for enemy in nation["at_war_with"] if enemy not in old["nations"][key]["at_war_with"])
+    return {"carriers": hit, "seats": sum(CARRIERS[carriers[key]["type"]] for key in hit), "wars": wars}
+
+
 def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
     """Play one seeded random game, saving the position of any failure."""
     if str(ROOT) not in sys.path:
@@ -56,17 +73,37 @@ def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
     env = make_env(seed, calendar_rounds=rounds)
     rng = random.Random(f"fuzz:{seed}")
     decisions, problem, notes = 0, None, []
-    broken_by_dice = None  # The Combat Movement in which dice last broke the landing plan.
-    while not env.is_terminal() and decisions < max_decisions:
+    settled = None  # (moment, landing shortfall, serialized state) at the last settled movement position.
+    span: list[str] = []  # Actions since then.
+    current = None  # The serialized present position, kept until the next change.
+
+    def check_settled(action: str) -> dict | None:
+        """Compares the landing shortfall with the last settled position of this phase,
+        saving the earlier position of a rise that neither dice nor a war explains."""
+        nonlocal settled, span, current
+        current = text = env.raw.serialize()
+        span.append(action)
+        moment = turn_phase(text)
+        if moment[2] not in MOVEMENT_PHASES or UNDER_WAY.search(text):
+            return None
+        shortfall = env.raw.landing_shortfall()
+        previous, settled, actions, span = settled, (moment, shortfall, text), span, []
+        if previous is None or previous[0] != moment or shortfall <= previous[1]:
+            return None
+        cause = explained_rise(previous[2], text)
+        if cause["wars"] or shortfall - previous[1] <= cause["seats"]:
+            notes.append({"kind": "landing_shortfall_after_war" if cause["wars"] else "landing_shortfall_after_dice",
+                          "actions": actions, **cause, "shortfall": [previous[1], shortfall],
+                          "completed_rounds": moment[0], "nation_index": moment[1], "decisions": decisions})
+            return None
+        broken = {"kind": "landing_plan_broken", "actions": actions, "shortfall": [previous[1], shortfall]}
+        (output / f"broken-{seed}.json").write_text(json.dumps({"seed": seed, **broken, "state": previous[2]}) + "\n")
+        return broken
+
+    while not env.is_terminal() and decisions < max_decisions and problem is None:
         if env.decision_kind() == "chance":
-            planned = env.raw.landing_plan_reachable()
             env.resolve_chance()
-            if planned and not env.raw.landing_plan_reachable():
-                # Chance never moves the clock, so reading it only after a broken
-                # plan gives the phase the dice fell in.
-                rolled = turn_phase(env.raw.serialize())
-                if rolled[2] == "combat_movement":
-                    broken_by_dice = rolled
+            problem = check_settled("chance")
             continue
         options = list(env.legal_actions())
         if not options:
@@ -77,10 +114,10 @@ def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
             break
         ending = [action for action in options if action.id.endswith(":play:end_phase")]
         choice = ending[0] if ending and rng.random() < bias else rng.choice(options)
-        before = env.raw.serialize()
+        before = current if current is not None else env.raw.serialize()
         moment = turn_phase(before)
-        movement = moment[2] == "combat_movement" and choice not in ending
-        planned = movement and env.raw.landing_plan_reachable()
+        # Ending Combat Movement may lose only the aircraft that no plan lands.
+        allowed = env.raw.landing_shortfall() if choice in ending and moment[2] == "combat_movement" else 0
         try:
             env.apply_action(choice)
         except (RuntimeError, ValueError) as error:
@@ -88,21 +125,16 @@ def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
             (output / f"error-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
             break
         decisions += 1
-        if planned and not env.raw.landing_plan_reachable():
-            if choice.raw["kind"] in CASUALTY_CHOICES:
-                broken_by_dice = moment
-            else:
-                problem = {"kind": "landing_plan_broken", "action": choice.id}
-                (output / f"broken-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
-                break
-        lost = stranded(env.raw.serialize()) - stranded(before) if choice in ending else 0
-        if lost and moment == broken_by_dice:
-            notes.append({"kind": "stranded_after_dice", "action": choice.id, "aircraft_lost": lost,
-                          "completed_rounds": moment[0], "nation_index": moment[1], "decisions": decisions})
-        elif lost:
-            problem = {"kind": "stranded_aircraft_lost", "action": choice.id}
+        # After an ending, this sets the new phase's first settled position.
+        problem = check_settled(choice.id)
+        lost = stranded(current) - stranded(before) if choice in ending else 0
+        if lost > allowed:
+            problem = {"kind": "stranded_aircraft_lost", "action": choice.id, "aircraft_lost": lost,
+                       "shortfall": allowed}
             (output / f"stranded-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
-            break
+        elif lost:
+            notes.append({"kind": "aircraft_lost_without_landing", "action": choice.id, "aircraft_lost": lost,
+                          "completed_rounds": moment[0], "nation_index": moment[1], "decisions": decisions})
     clock = json.loads(env.raw.serialize())["state"]["clock"]
     return {"seed": seed, "bias": bias, "decisions": decisions, "terminal": env.is_terminal(),
             "completed_rounds": clock["completed_rounds"], "problem": problem, "notes": notes,
@@ -136,7 +168,7 @@ def main(argv=None) -> int:
                 break
     failed = [result for result in results if result["problem"]]
     noted = [result for result in results if result["notes"]]
-    # Notes are dice outcomes, not engine defects, so they do not fail the run.
+    # Notes record dice, wars or another nation's turn, not engine defects, so they do not fail the run.
     print(json.dumps({"games": len(results), "completed": sum(result["terminal"] for result in results),
                       "problems": len(failed), "seeds": sorted(result["seed"] for result in failed),
                       "notes": sum(len(result["notes"]) for result in noted),

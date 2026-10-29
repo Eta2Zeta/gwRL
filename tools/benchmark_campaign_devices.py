@@ -661,10 +661,11 @@ def shared_selfplay(config, device, models, weights, deadline, persist, runtime_
             process.kill()
         for process in stragglers:
             process.join(timeout=1)  # Reaped, so their CPU time is counted.
-        # A killed process may leave half a message, on which a read would wait
-        # forever; only processes that exited cleanly left complete records.
+        # A process killed or crashed mid-message leaves half of it, on which a
+        # read would wait forever, so drain only after every process exited cleanly.
+        clean = all(process.exitcode == 0 for process in processes)
         stop = time.monotonic() + 5
-        while not stragglers and len(games) < len(config.seeds) and time.monotonic() < stop:
+        while clean and len(games) < len(config.seeds) and time.monotonic() < stop:
             try:
                 games.append(results.get(timeout=0.5))
             except queue.Empty:
@@ -739,9 +740,11 @@ def shared_summary(config, games, stats, samples, *, task, game_process_cpu_seco
         "started_at_epoch": started, "ended_at_epoch": started + span, "completed_games": len(finished),
         "failed_games": failed, "missing_seeds": missing, "cohort_wall_seconds": span,
         "complete_games_per_hour": len(games) * 3600 / span if complete and span > 0 else None,
-        # Slots kept busy until the queue empties: the rate a long queue of games
-        # sustains. Unfinished games are the long ones, so only a complete
-        # cohort's mean game length is unbiased; the same holds below.
+        # Slots over the mean game length: an upper bound on a long queue's rate,
+        # since the last games run faster once others finish and stop competing
+        # for the coordinator. steady_state_games_per_hour estimates the long-run
+        # rate from the window in which every slot plays.
+        # Unfinished games are the long ones, so only a complete cohort counts.
         "queue_estimate_games_per_hour": len({game["slot"] for game in finished}) * 3600 / mean_seconds
                                          if complete else None,
         "all_slots_busy": busy, "mean_evaluations_per_finished_game": per_game,

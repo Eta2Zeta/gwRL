@@ -122,7 +122,10 @@ void jointLandingCannotCountTheSameCarrierSlotsTwice() {
     check(airLandingPlanAvailable(s),"Two returning fighters cannot share a two-slot carrier");
     add(s,"c","fighter","sea_p41");s.units.at("c").movementRemaining=0;s.units.at("c").turnFlags["air_in_flight"]=1;
     for(const auto& id:{Id("a"),Id("b"),Id("c")})check(airLandingAvailable(s,id,"carrier"),"Individual landing query unexpectedly reserved an unassigned aircraft");
-    check(!airLandingPlanAvailable(s)&&!AirRules{}.phaseComplete(s),"Three attackers reused two carrier slots at the Combat Movement boundary");
+    // As attackers, one of the three is lost as Combat Movement ends, and only one.
+    for(const auto& id:{Id("a"),Id("b"),Id("c")})s.units.at(id).commitments.insert("air_combat");
+    check(!airLandingPlanAvailable(s)&&airLandingShortfall(s)==1&&AirRules{}.phaseComplete(s)&&strandedAircraft(s).size()==1,
+          "Three attackers reused two carrier slots at the Combat Movement boundary");
 }
 void jointLandingUsesWeightedCarrierAssignments() {
     auto s=fixture();add(s,"heavy","heavy_fleet_carrier","sea_p41");add(s,"fleet","fleet_carrier","sea_p41");
@@ -218,7 +221,7 @@ void secondBomberCannotTakeTheAttackersOnlySeat() {
             return a.kind==kind&&a.parameters.require("unit").asString()=="returning"&&(kind=="air_fly"
                 ?a.parameters.require("path").asArray().back().asString()==place:a.parameters.require("destination").asString()==place);});};
         check(offeredFor("air_land_noncombat","land_manchuria_rehe"),"The second bomber lost its landing ashore");
-        check(offeredFor("air_fly","sea_p14")==swap&&airLandingPlanReachableAfterFlight(s,"returning",back)==swap,
+        check(offeredFor("air_fly","sea_p14")==swap&&airFlightKeepsLandings(s,"returning",back)==swap,
               swap?"The carriers could not swap zones to seat both bombers and the fighter"
                   :"A second bomber took the only seat an attacking bomber can reach");
     }
@@ -287,6 +290,75 @@ void aControlledMinorsAircraftKeepTheirLandings() {
         fuels.push_back(s.units.at("leased").movementRemaining.value_or(0)-static_cast<int>(a.parameters.require("path").asArray().size())+1);
     check(!fuels.empty()&&std::all_of(fuels.begin(),fuels.end(),[](int fuel){return fuel>=1;}),
           "A controlled minor's fighter was offered a flight from which it can never land");
+}
+void aircraftThatCannotLandDoNotBlockOtherMoves() {
+    // Two patrols left by another nation's turn share one free seat, so one is
+    // lost whatever Japan does. Moves that leave no more aircraft without a
+    // landing stay legal, a carrier still may not abandon the patrol it can
+    // seat, and Combat Movement may end at once.
+    auto s=fixture();
+    for(const Id zone:{"land_china_hopeh","land_china_shensi","land_china_suiyuan","land_china_szechwan","land_china_tsinghai"})
+        s.territories.at(zone).possessor="kmt";
+    s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");s.captureTurnStart();
+    add(s,"cv","light_carrier","sea_p16");
+    for(const Id id:{"p1","p2"}){
+        add(s,id,"fighter","sea_p16");auto &u=s.units.at(id);
+        u.gameFlags["on_map"]=1;u.gameFlags["map_range"]=0;u.commitments.insert("maritime_air_patrol");
+    }
+    // A carrier with one zone of movement left, too far to bring a second seat.
+    add(s,"other","light_carrier","sea_p32");
+    for(int spent=1;spent<12&&validateNavalRoute(s,{{"other"},{"sea_p32","sea_p15","sea_p16"},true}).reason!=
+                          "Insufficient naval movement";++spent)
+        s.units.at("other").turnFlags["naval_movement_spent"]=spent;
+    add(s,"bomber","tactical_bomber",beiping);add(s,"defender","infantry","land_china_hopeh","kmt");
+    check(airLandingShortfall(s)==1&&!airLandingPlanReachable(s),"Two patrols for one seat did not leave exactly one without a landing");
+    const auto attacks=[](const State& state,const Id& unit,const Id& target){
+        const auto actions=AirRules{}.actions(state);
+        return std::any_of(actions.begin(),actions.end(),[&](const auto& a){
+            return (a.kind=="air_ground_attack"||a.kind=="air_bomb"||a.kind=="air_support")&&
+                   a.parameters.require("unit").asString()==unit&&a.parameters.require("path").asArray().back().asString()==target;});
+    };
+    check(attacks(s,"bomber","land_china_hopeh"),"A patrol that cannot land blocked an unrelated attack");
+    check(validateNavalRoute(s,{{"other"},{"sea_p32","sea_p33"},true}).allowed,"A patrol that cannot land blocked an unrelated carrier");
+    check(!validateNavalRoute(s,{{"cv"},{"sea_p16","sea_p15","sea_p33"},true}).allowed,"A carrier abandoned the patrol it can still seat");
+    check(AirRules{}.phaseComplete(s),"A patrol that no plan can land kept Combat Movement open");
+    // A fighter in flight may attack only if it can still land afterwards, even
+    // where it is already lost without the attack.
+    add(s,"target","infantry","land_china_suiyuan","kmt");
+    add(s,"stray","fighter","land_china_shensi");s.units.at("stray").turnFlags["air_in_flight"]=1;
+    s.units.at("stray").movementRemaining=3;
+    check(airLandingShortfall(s)==1&&attacks(s,"stray","land_china_suiyuan"),"A fighter able to return was refused its attack");
+    s.units.at("stray").movementRemaining=1;
+    check(airLandingShortfall(s)==2&&!attacks(s,"stray","land_china_suiyuan"),"A fighter that cannot land spent its last flight attacking");
+    // Combat Movement stays open while a carrier can still save an aircraft,
+    // even with another already lost.
+    auto waiting=s.clone();waiting.units.erase("stray");
+    add(waiting,"late","fighter","sea_p33");waiting.units.at("late").movementRemaining=0;
+    waiting.units.at("late").turnFlags["air_in_flight"]=1;waiting.units.at("late").commitments.insert("air_combat");
+    check(airLandingShortfall(waiting)==1&&!AirRules{}.phaseComplete(waiting),
+          "Combat Movement ended while a carrier could still sail to an attacker it can seat");
+    waiting.units.at("other").zone="sea_p33";
+    check(AirRules{}.phaseComplete(waiting),"Combat Movement stayed open with every savable aircraft able to land");
+}
+void aMediumBomberLeftOutMayBeGivenUpAndAloneIsLost() {
+    // A medium bomber takes two of a heavy carrier's seats. With two seats left
+    // and two fighters also needing them, the plan that lands the most loses the
+    // bomber: it may be given up although a free seat remains, and ending Combat
+    // Movement loses it alone rather than both fighters.
+    auto s=fixture();add(s,"heavy","heavy_fleet_carrier","sea_p41");
+    add(s,"x","fighter","sea_p41");attachCargo(s,"heavy","x");s.units.at("x").movementRemaining=0;
+    for(const auto& [id,type]:{std::pair<Id,Id>{"a","medium_bomber"},{"b","fighter"},{"c","fighter"}}){
+        add(s,id,type,"sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags["air_in_flight"]=1;
+    }
+    for(const auto& id:{Id("b"),Id("c")})s.units.at(id).commitments.insert("air_combat");
+    const auto actions=AirRules{}.actions(s);
+    check(airLandingShortfall(s)==1&&!airLandingSpots(s,"a").empty()&&
+              std::any_of(actions.begin(),actions.end(),[](const auto& a){
+                  return a.kind=="air_failed_landing"&&a.parameters.require("unit").asString()=="a";}),
+          "A medium bomber that no plan can land could not be given up");
+    s.units.at("a").commitments.insert("air_combat");
+    check(AirRules{}.phaseComplete(s)&&strandedAircraft(s)==std::vector<Id>{"a"},
+          "Ending Combat Movement lost two fighters where losing the bomber alone would do");
 }
 void attackDeclarationsRequireACombinedReturnPlan() {
     auto s=fixture();s.territories.at(beiping).possessor="kmt";s.territories.at(shantung).possessor="kmt";
@@ -436,13 +508,15 @@ int main() {
             {"noncombat patrol landings",noncombatMovementEndsOnlyWithTheMoversPatrolsLandable},
             {"released aircraft seats",aSailingCarriersAircraftMayUseAnyCarrier},
             {"controlled minor's aircraft",aControlledMinorsAircraftKeepTheirLandings},
+            {"aircraft that cannot land",aircraftThatCannotLandDoNotBlockOtherMoves},
+            {"medium bomber left out",aMediumBomberLeftOutMayBeGivenUpAndAloneIsLost},
             {"attack return planning",attackDeclarationsRequireACombinedReturnPlan},
             {"grounded landing no-op",groundedLandingCannotRepeatWithoutChangingState},
             {"actual same-zone returns",sameZoneLandingsRetainActualReturnEffects},
             {"starting carrier reattachment",startingCarrierAircraftDoNotOfferRedundantReattachment}}){
             test();std::cout<<"PASS "<<name<<'\n';
         }
-        std::cout << "19 air logistics fixture groups passed\n";
+        std::cout << "21 air logistics fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

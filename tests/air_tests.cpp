@@ -341,10 +341,10 @@ void failedLanding() {
     }
 }
 void strandedAttackersStillEndCombatMovement() {
-    // Moves keep a reachable joint landing plan, so legal play cannot strand an
-    // attacking aircraft; this fixture does it by editing the bomber's fuel. The
-    // phase may still end when nothing else is legal, losing the aircraft before
-    // combat and counting it in the "stranded_aircraft_lost" alarm.
+    // Moves never leave more aircraft without a landing, so only dice or another
+    // nation's turn strand an attacker; this fixture does it by editing the
+    // bomber's fuel. Other moves stay open, the phase may end at once, and the
+    // attacker is lost before combat and counted in "stranded_aircraft_lost".
     auto s = fixture();
     add(s, "bomber", "tactical_bomber", "japan", beiping);
     add(s, "defender", "infantry", "kmt", hopeh);
@@ -358,7 +358,8 @@ void strandedAttackersStillEndCombatMovement() {
     auto busy = stranded.clone();
     add(busy, "spare", "infantry", "japan", shantung);
     Engine waiting(busy, rules());
-    check(!offered(waiting, "end_phase"), "Stranded attacker let Combat Movement end while moves remained");
+    check(offered(waiting, "end_phase") && waiting.legalActions().size() > 1,
+          "A stranded attacker made the side use up its other moves before Combat Movement could end");
     Engine e(stranded, rules());
     const auto menu = e.legalActions();
     check(menu.size() == 1 && menu.front().kind == "end_phase", "Stranded attacker left Combat Movement without an end");

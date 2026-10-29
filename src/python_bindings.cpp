@@ -351,10 +351,16 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return self.call([](const CampaignEnv& env) { return env.planningKey(); });
         })
         // Whether every airborne aircraft still has a reachable joint landing
-        // plan; random-play testing checks that no Combat Movement move breaks it.
+        // plan, and how many no plan lands; random-play testing checks that
+        // no move raises that number.
         .def("landing_plan_reachable", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) {
                 return game::campaign::airLandingPlanReachable(env.engine().state());
+            });
+        })
+        .def("landing_shortfall", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) {
+                return game::campaign::airLandingShortfall(env.engine().state());
             });
         })
         .def("serialize", [](const NativeCampaignEnv& self) {

@@ -315,7 +315,13 @@ void carrierRoutesKeepLandingsWhereverTheyCanEnd() {
   blocked.units.erase("convoy");
   add(blocked, "screen", "destroyer", p15, "kmt");
   blocked.units.at("f").zone = p14;
-  check(!validateNavalRoute(blocked, {{"cv"}, {p16, p15, p14}, true}).allowed,
+  // No carrier can pass the warships, so the fighter beyond them is lost
+  // already; the carrier may not also abandon the one waiting beside it.
+  add(blocked, "g", "fighter", p16);
+  blocked.units.at("g").movementRemaining = 0;
+  blocked.units.at("g").turnFlags["air_in_flight"] = 1;
+  check(airLandingShortfall(blocked) == 1 &&
+            !validateNavalRoute(blocked, {{"cv"}, {p16, p15, p14}, true}).allowed,
         "A lone carrier counted on passing blocking warships to reach its aircraft");
 }
 // Patrol aircraft only react, so a carrier sails on past them; and a lone
@@ -346,6 +352,62 @@ void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
   add(sortie, "enemy", "destroyer", p16, "kmt");
   check(validateNavalRoute(sortie, {{"cv"}, {p16}, true}).allowed,
         "A lone carrier's sortie was refused as if it could stay in port");
+  // A larger force may leave its carrier in port while an escort screens, so
+  // the aircraft the carrier launches outside must still have a landing.
+  auto pair = sortie.clone();
+  add(pair, "dd", "destroyer", tokyo);
+  pair.units.at("dd").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+  auto fuelled = pair.clone();
+  fuelled.units.at("deck").movementRemaining = 2;
+  check(!validateNavalRoute(pair, {{"cv", "dd"}, {p16}, true}).allowed &&
+            validateNavalRoute(fuelled, {{"cv", "dd"}, {p16}, true}).allowed,
+        "A force's sortie ignored its carrier staying in port behind a screen");
+}
+// A carrier that unloads stays where it is, and one that enters port leaves
+// its sea zone, so neither may strand an aircraft that still needs it.
+void stoppingCarriersKeepLandings() {
+  auto s = fixture();
+  add(s, "cv", "fleet_carrier", p15);
+  add(s, "deck", "fighter", p15);
+  attachCargo(s, "cv", "deck");
+  add(s, "waiting", "fighter", p14);
+  s.units.at("waiting").movementRemaining = 0;
+  s.units.at("waiting").turnFlags["air_in_flight"] = 1;
+  const auto count = [](const std::vector<Action> &actions, const Id &kind) {
+    return std::count_if(actions.begin(), actions.end(),
+                         [&](const Action &a) { return a.kind == kind; });
+  };
+  auto unloaded = s.clone();
+  unloaded.units.erase("waiting");
+  check(airLandingPlanReachable(s) &&
+            count(navalMovementActions(s), "naval_unload") == 0 &&
+            count(navalMovementActions(unloaded), "naval_unload") > 0,
+        "A carrier unloaded although a fighter at sea needs it to sail");
+  // Entering port ends every other ship's move and every patrol's return for
+  // the rest of the phase, so a berth must leave the patrols landable as the
+  // carriers stand, even where the carrier could otherwise sail back.
+  auto berth = fixture();
+  add(berth, "cv", "light_carrier", p16);
+  add(berth, "patrol", "fighter", p16);
+  auto &patrol = berth.units.at("patrol");
+  patrol.gameFlags["on_map"] = 1;
+  patrol.gameFlags["map_range"] = 0;
+  patrol.commitments.insert("maritime_air_patrol");
+  auto alone = berth.clone();
+  alone.units.erase("patrol");
+  const auto berths = [&](const State &state, const Id &unit) {
+    const auto actions = navalOperationActions(state);
+    return std::count_if(actions.begin(), actions.end(), [&](const Action &a) {
+      return a.kind == "naval_enter_port" && a.parameters.require("unit").asString() == unit;
+    });
+  };
+  check(airLandingPlanReachable(berth) && berths(berth, "cv") == 0 && berths(alone, "cv") > 0,
+        "A carrier entered port, leaving its patrol at sea without a landing");
+  add(berth, "dd", "destroyer", p16);
+  auto away = berth.clone();
+  away.units.at("cv").zone = p15;
+  check(berths(berth, "dd") > 0 && airLandingPlanReachable(away) && berths(away, "dd") == 0,
+        "A destroyer entered port while the patrol's carrier still had to sail back to it");
 }
 // Engaging holds the carrier where it is, so it may not strand an aircraft
 // that needs the carrier to sail.
@@ -690,6 +752,7 @@ int main() {
               engagingCannotHoldACarrierItsAircraftNeed},
              {"carrier routes past reactions",
               carrierRoutesAreNotHeldWhereTheForceSailsOn},
+             {"stopping carriers keep landings", stoppingCarriersKeepLandings},
              {"immediate submarine reaction",
               immediateSubmarineReactionResumesTheVoyage},
              {"carrier patrol reaction",
