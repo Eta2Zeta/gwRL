@@ -15,9 +15,18 @@ bool airLandingAvailable(const State &, const Id &unit, const Id &destination);
 // Carrier seats occupied by grounded cargo or reserved for scramble returns
 // cannot also support another aircraft's proposed return.
 bool airLandingPlanAvailable(const State &, const std::vector<Id> &aircraft = {});
+// The joint plan that every move must keep (RB 9.3): carriers the mover can
+// still sail may end in any sea zone they can reach, a carrier that sails
+// launches its own aircraft first, and carried aircraft that can still fly
+// ashore free their seats. Combat Movement ends only once the plan above holds.
+bool airLandingPlanReachable(const State &);
+// The same after `unit` flies `path`, without changing or copying the state.
+bool airLandingPlanReachableAfterFlight(const State &, const Id &unit, const std::vector<Id> &path);
 // Airborne aircraft, in unit order, that no joint landing assignment can
 // include once the earlier ones keep theirs.
 std::vector<Id> strandedAircraft(const State &);
+// Removes them and counts them in the state flag "stranded_aircraft_lost", an
+// alarm: moves keep a reachable plan, so legal play should never strand one.
 void eliminateStrandedAircraft(State &);
 void enforcePatrolLandingAvailability(State &);
 void beginAirDefence(State &, const Id &battle);

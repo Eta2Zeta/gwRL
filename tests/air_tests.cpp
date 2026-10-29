@@ -341,9 +341,10 @@ void failedLanding() {
     }
 }
 void strandedAttackersStillEndCombatMovement() {
-    // RB 9.3 checks landing spots only when Combat Movement ends, so later moves
-    // can strand an attacking aircraft beyond rescue. Only when nothing else is
-    // legal may the phase still end, losing the stranded aircraft before combat.
+    // Moves keep a reachable joint landing plan, so legal play cannot strand an
+    // attacking aircraft; this fixture does it by editing the bomber's fuel. The
+    // phase may still end when nothing else is legal, losing the aircraft before
+    // combat and counting it in the "stranded_aircraft_lost" alarm.
     auto s = fixture();
     add(s, "bomber", "tactical_bomber", "japan", beiping);
     add(s, "defender", "infantry", "kmt", hopeh);
@@ -362,8 +363,9 @@ void strandedAttackersStillEndCombatMovement() {
     const auto menu = e.legalActions();
     check(menu.size() == 1 && menu.front().kind == "end_phase", "Stranded attacker left Combat Movement without an end");
     e.step(menu.front());
-    check(!e.state().units.contains("bomber") && e.state().clock.phase == Phase::Combat,
-          "Stranded attacker survived the end of Combat Movement");
+    check(!e.state().units.contains("bomber") && e.state().clock.phase == Phase::Combat &&
+              e.state().flags.at("stranded_aircraft_lost") == 1,
+          "Stranded attacker survived the end of Combat Movement or went uncounted");
     for (int step = 0; step < 8 && !offered(e, "end_phase"); ++step)
         if (e.state().chance) e.resolveChance();
         else e.step(e.legalActions().front());

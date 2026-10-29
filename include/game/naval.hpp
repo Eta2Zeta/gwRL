@@ -15,6 +15,10 @@ struct NavalRouteRequest {
 };
 
 RouteResult validateNavalRoute(const State &, const NavalRouteRequest &);
+// Sea zones where a ship can still end this phase's movement, its own zone
+// included, by a route that meets no unfriendly unit before its last zone, so
+// that no encounter, screen or peace entry can stop it short.
+std::set<Id> navalEndZones(const State &, const Id &ship);
 int strategicNavalCapacity(const State &, const Id &nation);
 int navalCompletedTurns(const State &, const Id &nation);
 bool navalCargoFits(const State &, const Id &transport, const std::vector<Id> &cargo);

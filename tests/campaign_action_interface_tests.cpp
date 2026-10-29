@@ -221,8 +221,21 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
   add(state, "plane", "fighter", p14);
   state.units.at("plane").turnFlags["air_in_flight"] = 1;
   state.units.at("plane").movementRemaining = 0;
-  check(!validateNavalRoute(state, {{"carrier"}, {p16, p15}}).allowed &&
+  // RB 9.3 needs the seat only when movement ends, so a first leg that keeps
+  // the waiting aircraft within the carrier's remaining reach is legal.
+  check(validateNavalRoute(state, {{"carrier"}, {p16, p15}}).allowed &&
             validateNavalRoute(state, {{"carrier"}, {p16, p15, p14}}).allowed,
+        "A carrier leg that can still reach a waiting aircraft was refused");
+  // With movement for one leg only, stopping short strands the aircraft.
+  auto oneLeg = state.clone();
+  for (int spent = 1; spent < 12 &&
+                      validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15, p14}}).allowed;
+       ++spent)
+    oneLeg.units.at("carrier").turnFlags["naval_movement_spent"] = spent;
+  const auto shortLeg = validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15}});
+  check(!shortLeg.allowed &&
+            shortLeg.reason == "Carrier movement leaves aircraft without a joint landing plan" &&
+            validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15, p14}}).reason == "Insufficient naval movement",
         "Landing-prefix fixture does not distinguish the two destinations");
   for (const auto &rules : {campaignRules(), trainingCampaignRules()}) {
     Engine engine(state, rules);
@@ -236,7 +249,9 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
   }
 }
 
-void jointlyValidCarrierFleetsRetainTheirConstructionPath() {
+void carriersMayJoinWaitingAircraftOneAtATime() {
+  // Three aircraft without fuel need three seats only when movement ends
+  // (RB 9.3), so each carrier may sail alone while the others can follow.
   auto state = fixture();
   for (const auto &id : {"a", "b", "c"})
     add(state, id, "light_carrier", p16);
@@ -245,27 +260,25 @@ void jointlyValidCarrierFleetsRetainTheirConstructionPath() {
     state.units.at(id).turnFlags["air_in_flight"] = 1;
     state.units.at(id).movementRemaining = 0;
   }
-  check(!validateNavalRoute(state, {{"a"}, {p16, p15, p14}}).allowed &&
-            !validateNavalRoute(state, {{"b"}, {p16, p15, p14}}).allowed &&
-            !validateNavalRoute(state, {{"a", "b"}, {p16, p15, p14}}).allowed &&
+  check(validateNavalRoute(state, {{"a"}, {p16, p15, p14}}).allowed &&
             validateNavalRoute(state, {{"a", "b", "c"}, {p16, p15, p14}}).allowed,
-        "Joint-carrier fixture has an independently valid carrier");
+        "A carrier could not sail toward aircraft the other carriers can still seat");
+  auto twoSeats = state.clone();
+  twoSeats.units.erase("c");
+  check(!validateNavalRoute(twoSeats, {{"a"}, {p16, p15, p14}}).allowed,
+        "Carriers sailed although three waiting aircraft can never find seats");
   Engine engine(state, trainingCampaignRules());
-  chooseUnit(engine, "naval_start_move", "a");
-  check(!hasKind(engine, "naval_route") && hasKind(engine, "naval_force_add"),
-        "A jointly valid fleet was forced to commit its invalid singleton prefix");
-  chooseUnit(engine, "naval_force_add", "b");
-  check(!hasKind(engine, "naval_route") && hasKind(engine, "naval_force_add"),
-        "Completion search only retained a single carrier helper");
-  chooseUnit(engine, "naval_force_add", "c");
-  choose(engine, "naval_route", [&](const Action &candidate) {
-    return canonicalJson(candidate.parameters.require("request").require("path")) ==
-           canonicalJson(V(V::Array{V(p16), V(p15), V(p14)}));
-  });
+  for (const auto &id : {"a", "b", "c"}) {
+    chooseUnit(engine, "naval_start_move", id);
+    choose(engine, "naval_route", [&](const Action &candidate) {
+      return canonicalJson(candidate.parameters.require("request").require("path")) ==
+             canonicalJson(V(V::Array{V(p16), V(p15), V(p14)}));
+    });
+  }
   check(engine.state().units.at("a").zone == p14 &&
             engine.state().units.at("b").zone == p14 &&
             engine.state().units.at("c").zone == p14,
-        "Joint carrier completion failed to execute");
+        "Carriers joining one at a time failed to execute");
 }
 
 void screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice() {
@@ -427,7 +440,7 @@ int main() {
     allFleetOrdersRemainAvailableAndEveryDraftTerminates();
     exhaustedAndZeroRouteStartsAreAbsentButPortExitRemains();
     landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes();
-    jointlyValidCarrierFleetsRetainTheirConstructionPath();
+    carriersMayJoinWaitingAircraftOneAtATime();
     screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice();
     declarationsAndSubmarineReactionsRemainActualDecisions();
     laterBlockingSeasStartAFreshScreenSelection();

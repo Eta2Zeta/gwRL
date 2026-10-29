@@ -149,9 +149,7 @@ void moveAircraft(State &s, const Id &id, const std::vector<Id> &path) {
   u.commitments.insert("combat_move");
 }
 bool landingAfter(const State &s, const Id &id, const std::vector<Id> &path) {
-  auto after = s.clone();
-  moveAircraft(after, id, path);
-  return airLandingPlanAvailable(after);
+  return airLandingPlanReachableAfterFlight(s, id, path);
 }
 std::vector<Id> portDefenders(const State &s, const Id &facility,
                               const Id &owner) {
@@ -738,7 +736,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     const auto origin = s.units.at(id).zone;
     const auto water = a.parameters.require("sea").asString();
     moveAircraft(s, id, readIds(a.parameters.require("path")));
-    require(airLandingPlanAvailable(s),
+    require(airLandingPlanReachable(s),
             "Naval air attack has no joint landing plan");
     // This is a declared Combat attack, as with shared land/strategic air
     // missions. Keep its aircraft committed until the naval battle resolves.

@@ -289,6 +289,58 @@ void noncombatPortExitCannotPassEnemyWarships() {
   check(validateNavalRoute(combat, {{"dd"}, {p16}, true}).allowed,
         "Combat Movement lost its port sortie against an Enemy warship");
 }
+// A carrier's route must keep aircraft landings wherever it can end: a passing
+// Enemy transport does not stop it, while blocking warships make a lone carrier
+// screen and stay.
+void carrierRoutesKeepLandingsWhereverTheyCanEnd() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  add(s, "cv", "light_carrier", p16);
+  add(s, "convoy", "naval_transport", p15, "kmt");
+  add(s, "f", "fighter", p15);
+  s.units.at("f").movementRemaining = 0;
+  s.units.at("f").turnFlags["air_in_flight"] = 1;
+  // Leave the carrier exactly the two points this route spends.
+  for (int spent = 1; spent < 12 &&
+                      validateNavalRoute(s, {{"cv"}, {p16, p15, p14}, true}).reason !=
+                          "Insufficient naval movement";
+       ++spent)
+    s.units.at("cv").turnFlags["naval_movement_spent"] = spent;
+  --s.units.at("cv").turnFlags["naval_movement_spent"];
+  check(validateNavalRoute(s, {{"cv"}, {p16, p15}, true}).allowed &&
+            !validateNavalRoute(s, {{"cv"}, {p16, p15, p14}, true}).allowed,
+        "A carrier sailed past a transport, away from the aircraft waiting for it");
+  auto blocked = s.clone();
+  blocked.units.erase("convoy");
+  add(blocked, "screen", "destroyer", p15, "kmt");
+  blocked.units.at("f").zone = p14;
+  check(!validateNavalRoute(blocked, {{"cv"}, {p16, p15, p14}, true}).allowed,
+        "A lone carrier counted on passing blocking warships to reach its aircraft");
+}
+// Engaging holds the carrier where it is, so it may not strand an aircraft
+// that needs the carrier to sail.
+void engagingCannotHoldACarrierItsAircraftNeed() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  add(s, "cv", "light_carrier", p16);
+  add(s, "sub", "submarine", p16, "kmt");
+  auto alone = s.clone();
+  add(s, "f", "fighter", p15);
+  s.units.at("f").movementRemaining = 0;
+  s.units.at("f").turnFlags["air_in_flight"] = 1;
+  const auto engageOffered = [](const State &state) {
+    Engine e(state, rules());
+    choose(e, "naval_start_move",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "cv"; });
+    const auto actions = e.legalActions();
+    return std::any_of(actions.begin(), actions.end(),
+                       [](const Action &a) { return a.kind == "naval_engage_force"; });
+  };
+  check(engageOffered(alone) && !engageOffered(s),
+        "Engaging froze a carrier that a waiting aircraft needs to sail");
+}
 void blockadedPortKeepsContinuingShipsInBerth() {
   auto s = fixture(Phase::CombatMovement);
   s.nations.at("japan").atWarWith.insert("kmt");
@@ -603,6 +655,10 @@ int main() {
               noncombatPortExitCannotPassEnemyWarships},
              {"staged blocked port sortie",
               blockadedPortKeepsContinuingShipsInBerth},
+             {"carrier route landing stops",
+              carrierRoutesKeepLandingsWhereverTheyCanEnd},
+             {"engagement keeps landings",
+              engagingCannotHoldACarrierItsAircraftNeed},
              {"immediate submarine reaction",
               immediateSubmarineReactionResumesTheVoyage},
              {"carrier patrol reaction",

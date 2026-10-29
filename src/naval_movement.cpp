@@ -834,6 +834,28 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
   return false;
 }
 
+// Engaging holds the selected ships in battle where they are and launches
+// their own aircraft there, so it must keep the aircraft's landing plan.
+bool engagementKeepsLanding(const State &s, const std::vector<Id> &selected, const Id &zone) {
+  const bool carriesAircraft =
+      std::any_of(selected.begin(), selected.end(), [&](const Id &id) {
+        const auto &u = s.units.at(id);
+        return has(s, u, "carrier") ||
+               std::any_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
+                 return isAircraft(s, s.units.at(c));
+               });
+      });
+  if (!carriesAircraft || !airLandingPlanReachable(s))
+    return true;
+  State probe = s.clone();
+  detachAircraft(probe, selected, zone);
+  for (const auto &id : selected) {
+    auto &u = probe.units.at(id);
+    u.commitments.insert("combat_move");
+    u.turnFlags["naval_movement_spent"] = 1000;
+  }
+  return airLandingPlanReachable(probe);
+}
 class NavalOrderCompletion {
 public:
   explicit NavalOrderCompletion(const State &state) : state_(state) {}
@@ -849,7 +871,8 @@ public:
       return known->second;
     const auto &first = state_.units.at(selected.front());
     if (state_.clock.phase != Phase::NonCombatMovement &&
-        sea(state_, first.zone) && anyEnemy(state_, first.owner, first.zone))
+        sea(state_, first.zone) && anyEnemy(state_, first.owner, first.zone) &&
+        engagementKeepsLanding(state_, selected, first.zone))
       return complete_[selected] = true;
     bool landingBlocked = false;
     if (visitNavalRoutes(state_, selected,
@@ -903,7 +926,8 @@ void routeChoices(State &s, BattleState &b) {
   options.push_back(
       action(s, b.attacker, "naval_cancel_move", {{"plan", V(b.id)}}));
   if (!selected.empty() && s.clock.phase != Phase::NonCombatMovement &&
-      sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone))
+      sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone) &&
+      engagementKeepsLanding(s, selected, b.zone))
     options.push_back(
         action(s, b.attacker, "naval_engage_force", {{"plan", V(b.id)}}));
   visitNavalRoutes(s, selected, [&](const NavalRouteRequest &request) {
@@ -1140,7 +1164,8 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
           return fail("Enemy surface warship or MAP blocks noncombat movement");
   }
   // The joint landing plan reads only aircraft and carriers. A force with no
-  // carrier, aircraft or aircraft cargo leaves all of them where they are.
+  // carrier, aircraft or aircraft cargo leaves all of them, and every carrier's
+  // remaining reach, where they are.
   const bool movesAircraft =
       std::any_of(r.units.begin(), r.units.end(), [&](const Id &id) {
         const auto &u = s.units.at(id);
@@ -1149,26 +1174,134 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
                  return isAircraft(s, s.units.at(c));
                });
       });
-  bool landingPlan;
   if (movesAircraft) {
-    State probe = s.clone();
-    detachAircraft(probe, r.units, r.path.front());
-    for (const auto &id : r.units) {
-      auto &u = probe.units.at(id);
-      u.zone = r.path.back();
-      for (const auto &child : u.cargo)
-        probe.units.at(child).zone = u.zone;
+    // Aircraft must keep a reachable landing plan wherever the move can end:
+    // in its last zone; short of it where blockers force a screen (a lone
+    // carrier must screen and stays) or where neutral units raise a peace
+    // entry (a declaration can make them blockers); and, leaving port past
+    // either, in port with its own aircraft already launched. Reactions and
+    // passing transports, submarines or raiders do not stop the force.
+    const bool fromPort =
+        std::any_of(r.units.begin(), r.units.end(),
+                    [&](const Id &id) { return !port(s.units.at(id)).empty(); });
+    const bool surface =
+        std::any_of(r.units.begin(), r.units.end(),
+                    [&](const Id &id) { return has(s, s.units.at(id), "surface_ship"); });
+    const auto canStop = [&](const Id &zone) {
+      if (surface && !blockers(s, n, zone).empty())
+        return true;
+      for (const auto &[id, other] : s.units)
+        if (other.zone == zone && other.owner != n && !hostile(s, n, other.owner) &&
+            s.nations.at(other.owner).alliance != s.nations.at(n).alliance &&
+            s.nations.at(other.owner).player &&
+            (mayDeclareWar(s, n, other.owner).allowed || mayDeclareWar(s, other.owner, n).allowed))
+          return true;
+      return false;
+    };
+    // (zone index, or -1 for still in port; whether the force stops there for good)
+    std::vector<std::pair<int, bool>> stops;
+    if (r.combat && !r.strategic) {
+      if (fromPort && canStop(r.path.front()))
+        stops.emplace_back(-1, true);
+      for (std::size_t i = fromPort ? 0 : 1; i + 1 < r.path.size(); ++i)
+        if (canStop(r.path[i]))
+          stops.emplace_back(static_cast<int>(i), true);
     }
-    landingPlan = airLandingPlanAvailable(probe);
-  } else
-    landingPlan = airLandingPlanAvailable(s);
-  if (!landingPlan)
-    return fail(
-        "Carrier movement leaves aircraft without a joint landing plan");
+    stops.emplace_back(static_cast<int>(r.path.size()) - 1, false);
+    for (const auto &[stop, held] : stops) {
+      // The force as the move leaves it there, with the movement it spends,
+      // so the plan sees how far these carriers can still sail.
+      State probe = s.clone();
+      detachAircraft(probe, r.units, r.path.front());
+      if (stop >= 0)
+        for (const auto &id : r.units) {
+          auto &u = probe.units.at(id);
+          if (!port(u).empty())
+            u.turnFlags["naval_start_sea:" + r.path.front()] = 1;
+          for (auto i = u.gameFlags.begin(); i != u.gameFlags.end();)
+            i = i->first.rfind("in_port:", 0) == 0 ? u.gameFlags.erase(i) : std::next(i);
+          u.zone = r.path[static_cast<std::size_t>(stop)];
+          if (r.strategic)
+            u.turnFlags["naval_strategic_moved"] = 1;
+          else
+            u.turnFlags["naval_movement_spent"] += stop;
+          if (r.combat)
+            u.commitments.insert("combat_move");
+          for (const auto &child : u.cargo)
+            probe.units.at(child).zone = u.zone;
+        }
+      if (held)
+        for (const auto &id : r.units)
+          probe.units.at(id).turnFlags["naval_movement_spent"] = 1000;  // Held there.
+      if (!airLandingPlanReachable(probe))
+        return fail(
+            "Carrier movement leaves aircraft without a joint landing plan");
+    }
+  }
   RouteResult result;
   result.allowed = true;
   result.cost = totalCost;
   return result;
+}
+std::set<Id> navalEndZones(const State &s, const Id &ship) {
+  auto compute = [&] {
+    std::set<Id> out;
+    if (!s.units.contains(ship))
+      return out;
+    const auto &u = s.units.at(ship);
+    out.insert(u.zone);
+    const bool combat = s.clock.phase != Phase::NonCombatMovement;
+    // A ship that sailed into Enemy units this phase stays for their battle.
+    if ((s.clock.phase != Phase::CombatMovement &&
+         s.clock.phase != Phase::NonCombatMovement) ||
+        !available(s, u, combat) ||
+        (u.commitments.contains("combat_move") && anyEnemy(s, u.owner, u.zone)))
+      return out;
+    // A route ends early wherever an encounter can stop it. Enemy units may
+    // wait only in a Combat Movement route's last zone, where its battle is
+    // fought; neutral units, which raise a peace entry, nowhere.
+    const auto unfriendly = [&](const Id &zone, bool enemiesAllowed) {
+      for (const auto &[id, other] : s.units)
+        if (other.zone == zone && !other.carriedBy && other.owner != u.owner &&
+            !politicallyFriendly(s, u.owner, other.owner) &&
+            (!enemiesAllowed || !hostile(s, u.owner, other.owner)))
+          return true;
+      return false;
+    };
+    const bool inPort = !port(u).empty();
+    for (const auto &start : seasAt(s, ship)) {
+      // Leaving port enters the first sea zone, where blockers force a screen.
+      if (inPort && unfriendly(start, false))
+        continue;
+      // A Japanese surprise attack adds one point for its own target zone.
+      const int reach =
+          std::max(0, allowance(s, u, combat, Id{}, start) + 1 - spent(s, u));
+      std::map<Id, int> distance{{start, 0}};
+      std::deque<Id> queue{start};
+      while (!queue.empty()) {
+        const auto zone = queue.front();
+        queue.pop_front();
+        const int steps = distance.at(zone);
+        const bool entered = steps > 0 || inPort;
+        if (entered &&
+            steps <= allowance(s, u, combat, zone, start) - spent(s, u) &&
+            !unfriendly(zone, combat))
+          out.insert(zone);
+        if (steps >= reach || (entered && unfriendly(zone, false)))
+          continue;
+        for (const auto &next : mapNeighbors(s, zone))
+          if (sea(s, next) && !distance.contains(next) &&
+              passage(s, u, zone, next, false)) {
+            distance.emplace(next, steps + 1);
+            queue.push_back(next);
+          }
+      }
+    }
+    return out;
+  };
+  if (auto *facts = positionFacts(s))
+    return facts->zones(PositionFacts::Fact::NavalEndZones, ship, compute);
+  return compute();
 }
 bool navalLoadAllowed(const State &s, const Id &transport, const Id &cargo) {
   return canLoad(s, transport, cargo);
@@ -1307,6 +1440,8 @@ bool applyNavalMovementAction(State &s, const Action &a) {
     release(s, a);
     const auto b = s.battles.at(plan);
     const auto selected = readIds(b.data.require("selected"));
+    require(engagementKeepsLanding(s, selected, b.zone),
+            "Engaging leaves aircraft without a joint landing plan");
     detachAircraft(s, selected, b.zone);
     std::map<Id, Id> origins;
     std::vector<Id> enemies;

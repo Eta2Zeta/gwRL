@@ -1,4 +1,5 @@
 #include "game/action.hpp"
+#include "game/air.hpp"
 #include "game/composition_battle_env.hpp"
 #include "game/japan_training_env.hpp"
 #include "game/mdp.hpp"
@@ -348,6 +349,13 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         })
         .def("planning_key", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.planningKey(); });
+        })
+        // Whether every airborne aircraft still has a reachable joint landing
+        // plan; random-play testing checks that no Combat Movement move breaks it.
+        .def("landing_plan_reachable", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) {
+                return game::campaign::airLandingPlanReachable(env.engine().state());
+            });
         })
         .def("serialize", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.serialize(); });
