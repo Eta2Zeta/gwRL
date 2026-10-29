@@ -12,6 +12,19 @@ Click a location to inspect it; use +/− to zoom and drag the zoomed map to pan
 The reset button restores the whole map. Use the timeline, arrows, play button
 and speed selector to browse events. Home/End jump to the first/last position.
 
+The **Combat & dice** panel under the timeline explains fighting at the selected
+position. At a dice event it names the battle type and location, the combat
+round and stage, both sides' units by nation, and every die: the unit that fired
+it, the numbers that hit (a die hits when it rolls at or under its unit's hit
+number), the face rolled and whether it hit. Shore bombardment dice belong to
+the bombarding ships, and coastal artillery fires at the landing ships; before
+landing, an amphibious assault's sides are its landing force and bombarding
+ships against the defending units. Rolls outside battles, such as
+research or recruitment, show their purpose, roller and faces. Between dice
+events the panel lists the battles in progress, and the map marks their
+locations with ⚔. Battle dice are requested by the nation whose turn it is, so
+the panel names the side whose units actually fired.
+
 Map labels show current possession and retain the original nation when it
 differs. The location inspector lists possession changes with links to their
 events, and the event journal names transfers that happen while finishing a

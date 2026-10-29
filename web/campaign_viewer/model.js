@@ -216,10 +216,158 @@ export function factionColor(id) {
   return '#7c8583';
 }
 
+const ROLL_LABELS = {
+  land_combat_roll: 'Land combat fire', land_casualty_dispute: 'Casualty dispute roll',
+  naval_combat_roll: 'Naval combat fire', naval_shore_roll: 'Shore bombardment and coastal fire',
+  naval_shore_dispute: 'Shore casualty dispute roll', naval_casualty_dispute: 'Naval casualty dispute roll',
+  naval_raider_discovery: 'Raider discovery roll', naval_port_aa: 'Port anti-aircraft fire',
+  naval_port_capture: 'Captured-ship roll: 1–9 scuttled, 10–12 captured',
+  air_interception_roll: 'Air interception', air_bomb_damage: 'Bombing damage',
+  air_facility_aa: 'Facility anti-aircraft fire', air_rocket_aa: 'Anti-aircraft fire at a rocket',
+  recruitment_roll: 'Recruitment roll', influence_roll: 'Influence roll',
+};
+// Battles record each die's firing unit and hit number under these data keys.
+const SHOT_KEYS = { land_combat_roll: 'shots', naval_combat_roll: 'naval_shots',
+  air_interception_roll: 'air_shots', naval_shore_roll: 'shore_shots' };
+
+export function rollLabel(purpose, replay) {
+  if (ROLL_LABELS[purpose]) return ROLL_LABELS[purpose];
+  if (String(purpose).startsWith('economy_research:')) return `Research roll · ${displayName(String(purpose).slice(17), replay)}`;
+  return displayName(purpose, replay);
+}
+
+// Naval movement orders share the battle records but are not fights.
+const fighting = (battle) => battle?.stage !== 'finished' && !battle?.flags?.finished && !battle?.flags?.naval_movement_plan;
+const STAGES = { awaiting_combat_rules: 'declared, not yet fought', attacker_fire: 'attacker fires',
+  defender_fire: 'defender fires', air_fire: 'aircraft fire', first_strike: 'first strike',
+  choose_hits: 'choosing casualties', retreat: 'retreat decision', retreat_air: 'aircraft retreat',
+  retreat_assign: 'assigning retreats', awaiting_air_defence: 'awaiting air defence', post_capture: 'after capture',
+  amphibious_declared: 'assault declared', amphibious_shore_selection: 'choosing shore bombardment',
+  amphibious_shore_roll: 'shore bombardment', amphibious_shore_casualties: 'shore casualties',
+  naval_attacker_fire: 'attacker fires', naval_defender_fire: 'defender fires' };
+export function stageLabel(stage) {
+  return STAGES[stage] || String(stage ?? '').replace(/_/g, ' ');
+}
+export function battleKind(battle) {
+  const flags = battle?.flags || {};
+  const id = String(battle?.id ?? '');
+  if (flags.air_mission || id.startsWith('air_')) return 'Air mission';
+  if (flags.naval_battle || id.startsWith('naval_')) return battle?.data?.context === 'port_attack' ? 'Port attack' : 'Naval battle';
+  if (flags.amphibious_preparation || battle?.stage?.startsWith?.('amphibious')) return 'Amphibious assault';
+  return 'Land battle';
+}
+
+// Before landing, an amphibious assault lists no combatants: its attacker is the
+// landing force and bombarding ships, and its defenders are the units shore
+// bombardment can hit, or else the defending nation's units in the zone.
+function sideIds(battle, state, role) {
+  const listed = role === 'attacker' ? battle?.attackers : battle?.defenders;
+  const data = battle?.data;
+  if (listed?.length || !Array.isArray(data?.cargo)) return listed;
+  if (role === 'attacker') return [...data.cargo, ...(data.bombarding || [])];
+  const bombarded = (data.shore_shots || []).find((shot) => shot.owner === battle.defender);
+  return bombarded?.eligible ?? recordEntries(state?.units)
+    .filter(([, unit]) => unit.zone === battle.zone && !unit.carried_by && ownerOf(unit) === battle.defender).map(([id]) => id);
+}
+
+/** Each side's surviving units, grouped by nation and type, from the recorded unit lists. */
+export function battleSides(battle, state) {
+  return [['attacker', sideIds(battle, state, 'attacker'), battle?.attacker],
+    ['defender', sideIds(battle, state, 'defender'), battle?.defender]]
+    .map(([role, ids, nation]) => {
+      const nations = new Map();
+      for (const id of ids || []) {
+        const unit = state?.units?.[id];
+        if (!unit) continue;
+        const owner = ownerOf(unit);
+        if (!nations.has(owner)) nations.set(owner, new Map());
+        const types = nations.get(owner);
+        types.set(unit.type, (types.get(unit.type) || 0) + 1);
+      }
+      return { role, nation, nations: [...nations].map(([owner, types]) => ({ nation: owner,
+        units: [...types].map(([type, count]) => ({ type, count })) })) };
+    });
+}
+
+export function activeBattles(state) {
+  return recordEntries(state?.battles).filter(([, battle]) => fighting(battle)).map(([id, battle]) => ({
+    id, kind: battleKind(battle), zone: battle.zone, attacker: battle.attacker, defender: battle.defender,
+    stage: battle.data?.rolling_phase ?? battle.stage, round: battle.data?.round ?? null,
+    sides: battleSides(battle, state) }));
+}
+
+// Shore shots name the side that takes the hit. The engine adds one die per
+// bombarding ship in the battle's bombarding order, so ships match dice when the
+// counts agree, then coastal artillery fires at the landing ships.
+function shoreFirers(battle, shots, units) {
+  const ships = (battle.data?.bombarding || []).filter((id) => units?.[id]);
+  const bombardment = shots.filter((shot) => shot.owner === battle.defender).length;
+  let next = 0;
+  return shots.map((shot) => {
+    if (shot.owner !== battle.defender) return { unit: null, type: 'coastal_artillery', nation: battle.defender, side: 'defender' };
+    const unit = bombardment === ships.length ? ships[next++] : null;
+    return { unit, type: null, nation: unit ? ownerOf(units[unit]) : battle.attacker, side: 'attacker' };
+  });
+}
+
+/** A dice event as recorded: its purpose, roller, faces and, in battles, who fired each die. */
+export function diceReport(step, before, replay) {
+  const request = step?.chance?.request;
+  if (!request) return null;
+  const outcome = (step.chance.events || []).find((event) => event.kind === 'chance')?.payload?.outcome;
+  const dice = (request.dice || []).map((die, index) => {
+    const faces = outcome?.faces?.[index] || [];
+    const modifier = Number(die.modifier || 0);
+    return { sides: die.sides, modifier, faces,
+      effective: faces.length ? Number(faces[faces.length - 1]) + modifier : null };
+  });
+  const report = { purpose: request.purpose, label: rollLabel(request.purpose, replay), roller: request.nation,
+    battleId: request.continuation, dice, battle: null };
+  const battle = before?.battles?.[request.continuation];
+  if (!battle) return report;
+  const shots = battle.data?.[SHOT_KEYS[request.purpose]];
+  // A die maps to a shot only when the battle recorded exactly one shot per die.
+  const mapped = Array.isArray(shots) && shots.length === dice.length;
+  const firers = mapped && request.purpose === 'naval_shore_roll' ? shoreFirers(battle, shots, before.units) : null;
+  report.dice = dice.map((die, index) => {
+    const shot = mapped ? shots[index] : null;
+    if (!shot) return die;
+    const firer = firers?.[index];
+    const unitId = firer ? firer.unit : shot.unit ?? null;
+    const unit = unitId ? before.units?.[unitId] : null;
+    const threshold = Number.isFinite(Number(shot.threshold)) ? Number(shot.threshold) : null;
+    const side = firer ? firer.side : typeof shot.victim_attacker === 'boolean' ? (shot.victim_attacker ? 'defender' : 'attacker')
+      : shot.target === 'defender' ? 'attacker' : shot.target === 'attacker' ? 'defender' : null;
+    const target = Number(shot.target);
+    return { ...die, unitId, unitType: unit?.type ?? firer?.type ?? null,
+      nation: firer ? firer.nation : shot.nation ?? shot.owner ?? ownerOf(unit) ?? null, side, threshold,
+      hit: threshold !== null && die.effective !== null ? die.effective <= threshold : null,
+      targeted: Number.isFinite(target) && target > 0 && die.effective !== null && die.effective <= target };
+  });
+  report.battle = { id: request.continuation, kind: battleKind(battle), zone: battle.zone,
+    attacker: battle.attacker, defender: battle.defender, round: battle.data?.round ?? null,
+    stage: battle.data?.rolling_phase ?? battle.stage, sides: battleSides(battle, before) };
+  report.hits = mapped ? report.dice.filter((die) => die.hit).length : null;
+  return report;
+}
+
+function chanceSummary(step, replay) {
+  const request = step.chance?.request;
+  if (!request) return 'Dice event resolved';
+  const battle = step.changes?.battles?.[request.continuation];
+  const outcome = (step.chance.events || []).find((event) => event.kind === 'chance')?.payload?.outcome;
+  const faces = (outcome?.faces || []).map((die) => die.join('→')).join(' ');
+  const count = request.dice?.length || 0;
+  // Battle dice are requested by the turn's nation even when defenders fire,
+  // so only rolls outside battles name who rolled.
+  const inBattle = Boolean(battle) || /battle|air_mission/.test(String(request.continuation));
+  return `${rollLabel(request.purpose, replay)}${battle?.zone ? ` at ${displayName(battle.zone, replay)}` : ''} · ${inBattle ? '' : `${displayName(request.nation, replay)} rolls `}${count} ${count === 1 ? 'die' : 'dice'}${faces ? `: ${faces}` : ''}`;
+}
+
 export function eventSummary(step, replay) {
   if (!step) return 'Initial campaign position';
   const action = step.action || {};
-  const summary = step.summary ? String(step.summary) : step.kind === 'chance' ? 'Dice event resolved'
+  const summary = step.kind === 'chance' ? chanceSummary(step, replay) : step.summary ? String(step.summary)
     : `${displayName(step.actor ?? step.nation, replay)} · ${displayName(action.kind ?? step.kind, replay)}`;
   const history = replay ? possessionHistory(replay) : null;
   const changes = history?.steps[history.indices.get(step)] || [];

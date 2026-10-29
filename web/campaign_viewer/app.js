@@ -1,6 +1,6 @@
 import { createReplayModel, displayName, eventSummary, factionColor, locationOf,
   ownerOf, recordEntries, changedLocations, territoryIdentity, possessionChanges,
-  possessionChangeText } from './model.js';
+  possessionChangeText, diceReport, activeBattles, stageLabel } from './model.js';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
@@ -94,8 +94,10 @@ function seek(position) {
   // Restore the seek cache's current position after obtaining the prior event.
   UI.model.seek(UI.position);
   const changed = changedLocations(before, UI.state);
+  const step = UI.replay.steps[UI.position - 1];
+  UI.dice = step?.kind === 'chance' ? diceReport(step, before, UI.replay) : null;
   renderClock(); renderMap(changed, before); renderInspector(); renderLedger();
-  renderPlayback(); renderSearch(); renderEvents();
+  renderPlayback(); renderCombat(); renderSearch(); renderEvents();
   if (UI.position === UI.replay.steps.length && UI.playing) stop();
 }
 function renderClock() {
@@ -145,6 +147,8 @@ function renderMap(changed = new Set(), before = null) {
   }
   const nodes = recordEntries(UI.replay.map.nodes);
   const indexes = new Map(nodes.map(([id], index) => [id,index]));
+  const fighting = new Set(activeBattles(UI.state).map((battle) => battle.zone));
+  if (UI.dice?.battle?.zone) fighting.add(UI.dice.battle.zone);
   if (UI.showConnections) {
     const edges = new Set();
     for (const [id, node] of nodes) {
@@ -179,7 +183,7 @@ function renderMap(changed = new Set(), before = null) {
     const identity = territoryIdentity(id, UI.state, UI.replay);
     const owner = identity.owner;
     const sea = node.type === 'sea' || id.startsWith('sea_');
-    const group = svgElement('g', { transform:`translate(${x},${y})`, class:`map-node${sea ? ' sea-node' : ''}${id === UI.selected ? ' selected' : ''}${changed.has(id) ? ' changed' : ''}`, tabindex:0, role:'button', 'aria-label':`${node.name || id}, ${sea ? 'sea zone' : identity.subtitle}, ${unitsAt(id).length} units`, 'data-location':id, 'aria-pressed':id === UI.selected });
+    const group = svgElement('g', { transform:`translate(${x},${y})`, class:`map-node${sea ? ' sea-node' : ''}${id === UI.selected ? ' selected' : ''}${changed.has(id) ? ' changed' : ''}${fighting.has(id) ? ' battle' : ''}`, tabindex:0, role:'button', 'aria-label':`${node.name || id}, ${sea ? 'sea zone' : identity.subtitle}, ${unitsAt(id).length} units`, 'data-location':id, 'aria-pressed':id === UI.selected });
     const width = Math.max(130,Math.min(170,(node.name || id).length*7.5+26));
     if (changed.has(id)) group.append(svgElement('rect',{x:-width/2-5,y:-32,width:width+10,height:69,rx:9,class:'change-ring'}));
     group.append(svgElement('rect',{x:-width/2,y:-27,width,height:59,rx:6,class:'node-card'}));
@@ -188,6 +192,7 @@ function renderMap(changed = new Set(), before = null) {
     const secondary = sea ? 'Sea zone' : identity.subtitle;
     group.append(svgElement('text',{x:0,y:5,'text-anchor':'middle',class:'node-subtitle'},secondary.length > 26 ? secondary.slice(0,25)+'…' : secondary));
     if (node.is_city) group.append(svgElement('rect',{x:width/2-12,y:-20,width:5,height:5,class:'city-dot'}));
+    if (fighting.has(id)) group.append(svgElement('text',{x:-width/2+10,y:-11,class:'battle-mark'},'⚔'));
     const units = unitsAt(id);
     const byNation = new Map();
     for (const unit of units) { const nation = ownerOf(unit); byNation.set(nation,(byNation.get(nation)||0)+1); }
@@ -329,6 +334,94 @@ function renderPlayback() {
   $('event-record-json').textContent=step ? JSON.stringify(step.kind==='chance' ? {kind:'chance',actor:step.actor,chance:step.chance} : {kind:'action',actor:step.actor,nation:step.nation,action:step.action},null,2) : '';
   $('first').disabled=$('prev').disabled=UI.position===0;
   $('next').disabled=$('last').disabled=UI.position===UI.replay.steps.length;
+}
+function sidesView(battle, rolling) {
+  const sides = element('div', 'combat-sides');
+  for (const side of battle.sides) {
+    const card = element('div', `combat-side${side.role === rolling ? ' rolling' : ''}`);
+    card.style.setProperty('--faction', factionColor(side.nation));
+    const heading = element('h4', '', side.role === 'attacker' ? 'ATTACKER' : 'DEFENDER');
+    if (side.role === rolling) heading.append(element('span', 'rolling-tag', 'ROLLING'));
+    card.append(heading);
+    if (!side.nations.length) card.append(element('span', 'side-nation', human(side.nation)), element('p', 'side-units', 'No units'));
+    for (const group of side.nations) {
+      card.append(element('span', 'side-nation', human(group.nation)));
+      card.append(element('p', 'side-units', group.units.map((unit) => `${unit.count} × ${human(unit.type)}`).join(' · ')));
+    }
+    sides.append(card);
+  }
+  return sides;
+}
+function battleView(battle, rolling = null, meta = null) {
+  const item = element('div', 'combat-battle');
+  item.append(element('h3', 'combat-title', `${battle.kind} at ${human(battle.zone)}`));
+  item.append(element('p', 'combat-meta', meta ?? [`${human(battle.attacker)} attacks ${human(battle.defender)}`,
+    battle.round ? `Combat round ${battle.round}` : '', battle.stage ? stageLabel(battle.stage) : ''].filter(Boolean).join(' · ')));
+  item.append(sidesView(battle, rolling));
+  return item;
+}
+function diceTable(report) {
+  const table = element('table', 'dice-table'); const head = element('tr');
+  for (const label of ['Die', 'Fired by', 'Hits on', 'Rolled', 'Result']) head.append(element('th', '', label));
+  const thead = element('thead'); thead.append(head); table.append(thead);
+  const body = element('tbody');
+  report.dice.forEach((die, index) => {
+    const row = element('tr', die.hit ? 'hit' : '');
+    const shooter = die.unitType ? `${human(die.unitType)}${die.nation ? ` (${human(die.nation)})` : ''}`
+      : die.side ? `${die.side === 'attacker' ? 'Attacking' : 'Defending'} unit${die.nation ? ` (${human(die.nation)})` : ''}` : '—';
+    const faces = die.faces.length ? die.faces.join(' → ') : '—';
+    const modified = die.modifier ? ` ${die.modifier > 0 ? '+' : '−'} ${Math.abs(die.modifier)} = ${die.effective}` : '';
+    const result = element('td');
+    if (die.hit === true) result.append(element('span', 'result-chip hit', die.targeted ? 'HIT · TARGETED' : 'HIT'));
+    else if (die.hit === false) result.append(element('span', 'result-chip miss', 'MISS'));
+    else result.textContent = '—';
+    row.append(element('td', '', `${index + 1} · d${die.sides}`), element('td', '', shooter),
+      element('td', '', die.threshold !== null && die.threshold !== undefined ? `1–${die.threshold}` : '—'),
+      element('td', 'die-face', `${faces}${modified}`), result);
+    body.append(row);
+  });
+  table.append(body);
+  return table;
+}
+function renderCombat() {
+  const box = $('combat-details'); box.replaceChildren();
+  const report = UI.dice;
+  const battles = activeBattles(UI.state);
+  if (report) {
+    $('combat-tag').textContent = 'DICE ROLLED';
+    $('combat-caption').textContent = `Event ${UI.position} · actual dice, not imagined search`;
+    const battle = report.battle;
+    const sides = [...new Set(report.dice.map((die) => die.side).filter(Boolean))];
+    const rolling = sides.length === 1 ? sides[0] : sides.length > 1 ? null : battle?.attacker === report.roller ? 'attacker'
+      : battle?.defender === report.roller ? 'defender' : null;
+    const count = `${report.dice.length} ${report.dice.length === 1 ? 'die' : 'dice'}`;
+    if (battle) {
+      const firing = rolling === 'attacker' ? battle.attacker : rolling === 'defender' ? battle.defender : report.roller;
+      box.append(battleView(battle, rolling, [report.label, battle.round ? `Combat round ${battle.round}` : '',
+        stageLabel(battle.stage), sides.length > 1 ? `Both sides fire ${count}`
+          : `${human(firing)}${rolling ? ` (${rolling})` : ''} fires ${count}`].filter(Boolean).join(' · ')));
+    } else {
+      box.append(element('h3', 'combat-title', report.label),
+        element('p', 'combat-meta', `${human(report.roller)} rolls ${count}`));
+    }
+    box.append(diceTable(report));
+    if (Number.isInteger(report.hits)) box.append(element('p', 'combat-total', `${report.hits} ${report.hits === 1 ? 'hit' : 'hits'} from ${count}. A die hits when it rolls at or under its unit’s hit number.`));
+    else box.append(element('p', 'combat-note', battle ? 'This recording does not say which unit fired each die for this kind of roll.' : 'This roll is not part of a battle.'));
+    const others = battles.filter((item) => item.id !== report.battleId);
+    if (others.length) {
+      const list = element('div', 'other-battles'); list.append(element('h4', '', 'OTHER BATTLES IN PROGRESS'));
+      for (const item of others) list.append(battleView(item));
+      box.append(list);
+    }
+  } else if (battles.length) {
+    $('combat-tag').textContent = `${battles.length} ACTIVE`;
+    $('combat-caption').textContent = 'Battles in progress at the selected position';
+    for (const battle of battles) box.append(battleView(battle));
+  } else {
+    $('combat-tag').textContent = 'NO COMBAT';
+    $('combat-caption').textContent = 'Battles and dice rolls at the selected position';
+    box.append(element('p', 'empty-copy', 'No battle is in progress at this position. Step to a dice event, or filter the event journal by Combat or Dice events.'));
+  }
 }
 function valuesPanel(values) {
   const panel=element('div','value-estimates');

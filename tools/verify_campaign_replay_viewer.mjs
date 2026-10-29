@@ -1,8 +1,8 @@
 /** Verify the browser reducer against immutable synthetic and optional real data. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { applyChanges, createReplayModel, eventSummary, initialState, possessionChanges,
-  possessionChangeText, stateAt, territoryIdentity, validateReplay }
+import { activeBattles, applyChanges, createReplayModel, diceReport, eventSummary, initialState,
+  possessionChanges, possessionChangeText, stageLabel, stateAt, territoryIdentity, validateReplay }
   from '../web/campaign_viewer/model.js';
 
 const replay = {
@@ -78,6 +78,73 @@ assert.equal(possessionChangeText(ownershipChanges[2][0], ownershipReplay),
 assert.equal(eventSummary(ownershipReplay.steps[2], ownershipReplay),
   'Finish combat · Tsinghai: Ma Clique → KMT (alignment after CCP attack)');
 assert.equal(JSON.stringify(ownershipReplay), ownershipSource, 'ownership annotations cannot mutate evidence');
+
+// Combat panel: each die maps to the shot the battle recorded for it, hits are
+// rolls at or under the hit number, and naval movement orders are not battles.
+{
+  const before = {
+    units: { a1: { id: 'a1', type: 'infantry', owner: 'ccp', zone: 'z' },
+      d1: { id: 'd1', type: 'cavalry', owner: 'kmt', zone: 'z' }, d2: { id: 'd2', type: 'infantry', owner: 'kmt', zone: 'z' } },
+    battles: {
+      land_battle_1: { id: 'land_battle_1', zone: 'z', attacker: 'ccp', defender: 'kmt', attackers: ['a1'],
+        defenders: ['d1', 'd2'], stage: 'defender_fire', flags: {}, data: { round: 2, rolling_phase: 'defender_fire',
+          shots: [{ unit: 'd1', nation: 'kmt', threshold: 2, target: 0, victim_attacker: true },
+            { unit: 'd2', nation: 'kmt', threshold: 4, target: 0, victim_attacker: true }] } },
+      naval_plan_1: { id: 'naval_plan_1', zone: 'sea', attacker: 'ccp', stage: 'naval_force_selection',
+        flags: { naval_movement_plan: 1 }, data: {} },
+    },
+  };
+  const roll = { kind: 'chance', changes: {}, chance: {
+    request: { continuation: 'land_battle_1', purpose: 'land_combat_roll', nation: 'ccp',
+      dice: [{ sides: 12, modifier: 0, reroll_faces: [], max_rerolls: 0 }, { sides: 12, modifier: 1, reroll_faces: [], max_rerolls: 0 }] },
+    events: [{ kind: 'chance', payload: { outcome: { faces: [[2], [5]] } } }] } };
+  const report = diceReport(roll, before, { map: { nodes: { z: { name: 'Zone' } } } });
+  assert.equal(report.battle.kind, 'Land battle');
+  assert.equal(report.battle.round, 2);
+  assert.deepEqual(report.dice.map((die) => [die.unitType, die.side, die.threshold, die.effective, die.hit]),
+    [['cavalry', 'defender', 2, 2, true], ['infantry', 'defender', 4, 6, false]]);
+  assert.equal(report.hits, 1);
+  assert.deepEqual(report.battle.sides.map((side) => side.nations.map((group) => group.units.map((unit) => `${unit.count} ${unit.type}`))),
+    [[['1 infantry']], [['1 cavalry', '1 infantry']]]);
+  assert.deepEqual(activeBattles(before).map((battle) => battle.id), ['land_battle_1']);
+  assert.equal(stageLabel('awaiting_combat_rules'), 'declared, not yet fought');
+  // Battle dice are requested by the turn's nation, so the summary names no roller.
+  const recording = (steps) => ({ map: { nodes: {} }, initial: { territories: {}, nations: {} }, steps });
+  assert.equal(eventSummary(roll, recording([roll])), 'Land combat fire · 2 dice: 2 5');
+  const research = { kind: 'chance', changes: {}, chance: { request: { continuation: 'economy_research', purpose: 'economy_research:radar',
+    nation: 'japan', dice: [{ sides: 12, modifier: 0 }] }, events: [{ kind: 'chance', payload: { outcome: { faces: [[7]] } } }] } };
+  const outside = diceReport(research, before, { map: { nodes: {} } });
+  assert.equal(outside.battle, null);
+  assert.equal(outside.label, 'Research roll · Radar');
+  assert.equal(eventSummary(research, recording([research])), 'Research roll · Radar · Japan rolls 1 die: 7');
+
+  // Shore shots name the side hit: bombardment dice belong to the bombarding
+  // ships in order, coastal artillery fires at the landing ships, and an
+  // assault's sides come from its landing force before any land combat.
+  const coast = {
+    units: { bb: { id: 'bb', type: 'battleship', owner: 'japan', zone: 'sea' },
+      ca: { id: 'ca', type: 'heavy_cruiser', owner: 'japan', zone: 'sea' },
+      tr: { id: 'tr', type: 'transport', owner: 'japan', zone: 'sea', cargo: ['inf'] },
+      inf: { id: 'inf', type: 'infantry', owner: 'japan', zone: 'sea', carried_by: 'tr' },
+      mil: { id: 'mil', type: 'militia', owner: 'kmt', zone: 'shore' } },
+    battles: { amphibious_1: { id: 'amphibious_1', zone: 'shore', attacker: 'japan', defender: 'kmt', attackers: [],
+      defenders: [], stage: 'amphibious_shore_roll', flags: { amphibious_preparation: 1 },
+      data: { sea: 'sea', cargo: ['inf'], bombarding: ['bb', 'ca'], shore_shots: [
+        { owner: 'kmt', threshold: 4, eligible: ['mil'] }, { owner: 'kmt', threshold: 2, eligible: ['mil'] },
+        { owner: 'japan', threshold: 3, eligible: ['tr'] }] } } },
+  };
+  const shore = { kind: 'chance', changes: {}, chance: {
+    request: { continuation: 'amphibious_1', purpose: 'naval_shore_roll', nation: 'japan',
+      dice: [{ sides: 12, modifier: 0 }, { sides: 12, modifier: 0 }, { sides: 12, modifier: 0 }] },
+    events: [{ kind: 'chance', payload: { outcome: { faces: [[3], [4], [1]] } } }] } };
+  const bombardment = diceReport(shore, coast, { map: { nodes: {} } });
+  assert.equal(bombardment.battle.kind, 'Amphibious assault');
+  assert.deepEqual(bombardment.dice.map((die) => [die.unitType, die.nation, die.side, die.hit]),
+    [['battleship', 'japan', 'attacker', true], ['heavy_cruiser', 'japan', 'attacker', false],
+      ['coastal_artillery', 'kmt', 'defender', true]]);
+  assert.deepEqual(bombardment.battle.sides.map((side) => side.nations.map((group) => group.units.map((unit) => `${unit.count} ${unit.type}`))),
+    [[['1 infantry', '1 battleship', '1 heavy_cruiser']], [['1 militia']]]);
+}
 
 for (const path of process.argv.slice(2)) {
   const data = JSON.parse(fs.readFileSync(path, 'utf8'));
