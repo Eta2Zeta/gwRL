@@ -228,6 +228,7 @@ state.
 - [Ten workers and a game queue: 32.0 to 34.9 games per hour](worker_queue_2026_10_28.md)
 - [Faster move generation: 7.3 times faster move lists, 1.39 times faster self-play, identical games](move_generation_2026_10_28.md)
 - [Three dead ends fixed; eleven-round self-play at 12.6 to 14.6 games per hour](dead_ends_2026_10_28.md)
+- [Reachable landing plans; shared GPU self-play at 23.2 to 24.2 games per hour](landing_plan_shared_gpu_2026_10_29.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)

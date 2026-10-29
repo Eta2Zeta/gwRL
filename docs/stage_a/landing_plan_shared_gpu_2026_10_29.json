@@ -1,0 +1,430 @@
+{
+ "schema": "campaign-landing-plan-shared-gpu-v1",
+ "date": "2026-10-29",
+ "landing_plan": {
+  "rule": "A joint landing plan lands the moving side's airborne aircraft (its own and those of minors it controls and moves): each lands ashore within its remaining range or on a carrier seat in a zone the carrier is in or can still reach this phase; each carrier ends in one zone; a sailing carrier launches its own aircraft where its route begins; an aircraft on a carrier that can still fly ashore frees its seat. The shortfall counts the aircraft that no such plan lands. No move may raise it, and a flying aircraft must itself keep a landing; with a complete plan this is the complete-plan rule. Combat Movement ends once the carriers stand where they land every aircraft a plan can land (RB 9.3), and the rest are lost as it ends; Noncombat Movement ends only when the mover's patrols can land as the carriers stand. Other nations' patrols are lost by RB 9.3.1.",
+  "engine_commits": {
+   "rule": "69bfbed",
+   "second_review_fixes": "29f0a0f",
+   "shortfall_rule": "cebfb58"
+  },
+  "stranded_aircraft_lost": "counts aircraft removed as Combat Movement ends because no landing remains; only dice or another nation's turn leave any",
+  "remaining_gap": "A war declared during Combat Movement, by the mover or by a neutral answering a peaceful entry where a carrier's route ends, can change which zones aircraft may enter or hold a carrier in battle; no plan check follows it",
+  "conservative_cases": "Carrier routes count only if they meet no unfriendly unit before their last zone, and a ship that combat-moved into Enemy units is treated as staying for their battle",
+  "copying": "Flights, landings, attacks and naval air attacks preview the aircraft's end on the position itself; carrier routes and engagements test a copy only when landings are at stake; patrol starts test a copy",
+  "random_play": {
+   "tool": "tools/fuzz_campaign_dead_ends.py",
+   "seeds": [
+    5000,
+    5321
+   ],
+   "calendar_rounds": 11,
+   "max_decisions": 8000,
+   "processes": 10,
+   "before": {
+    "directory": "studies/campaign/runs/dead-ends-2026-10-28/after",
+    "engine": "873058a, no plan check",
+    "checks": "no legal action and engine errors",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": null,
+    "noted_seeds": null,
+    "mean_decisions": 1625.0,
+    "mean_game_seconds": 13.88
+   },
+   "first_attempt": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-first-attempt",
+    "engine": "first landing-plan version",
+    "checks": "also aircraft lost to the stranded-aircraft count",
+    "games": 322,
+    "completed_all_rounds": 306,
+    "problems_by_kind": {
+     "stranded_aircraft_lost": 15,
+     "no_legal_action": 1
+    },
+    "failing_seeds": [
+     5022,
+     5048,
+     5072,
+     5121,
+     5133,
+     5163,
+     5185,
+     5195,
+     5201,
+     5228,
+     5232,
+     5265,
+     5271,
+     5281,
+     5286,
+     5296
+    ],
+    "notes_by_kind": null,
+    "noted_seeds": null,
+    "mean_decisions": 1587.6,
+    "mean_game_seconds": 14.15
+   },
+   "after_preview_fixes": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-before-review-fixes",
+    "engine": "landing fuel and port-launch fixes",
+    "checks": "also Combat Movement moves that break a complete plan",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": null,
+    "noted_seeds": null,
+    "mean_decisions": 1652.1,
+    "mean_game_seconds": 14.61
+   },
+   "after_first_review": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz",
+    "engine": "working tree later committed as 69bfbed",
+    "checks": "also plan breaks after Combat Movement dice, noted as dice",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1652.1,
+    "mean_game_seconds": 22.4
+   },
+   "after_second_review": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-after-second-review",
+    "engine": "29f0a0f",
+    "checks": "also casualty choices treated as dice",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1652.1,
+    "mean_game_seconds": 14.87
+   },
+   "shortfall_before_unload_check": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall-before-unload-check",
+    "engine": "shortfall rule before the unload and port checks",
+    "checks": "the final checks; it found carriers unloading in Noncombat Movement while a fighter needed them",
+    "games": 322,
+    "completed_all_rounds": 320,
+    "problems_by_kind": {
+     "landing_plan_broken": 2
+    },
+    "failing_seeds": [
+     5076,
+     5096
+    ],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1643.8,
+    "mean_game_seconds": 20.74
+   },
+   "shortfall_before_fourth_review": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall-before-review",
+    "engine": "shortfall rule with the unload and port checks",
+    "checks": "the final checks before the fourth review's fixes",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1650.4,
+    "mean_game_seconds": 20.84
+   },
+   "final": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall",
+    "engine": "cebfb58",
+    "checks": "no legal action, engine errors, a rise in the landing shortfall between settled positions of either movement phase (no naval move or Chinese-truce battle pending) beyond the seats of carriers lost or damaged and without a new war, and aircraft lost as Combat Movement ends beyond the shortfall; explained rises and losses within the shortfall are noted",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1650.4,
+    "mean_game_seconds": 13.48
+   },
+   "games_unchanged_by_second_review_fixes": 322,
+   "games_unchanged_by_shortfall_rule": 315,
+   "first_attempt_causes": [
+    "a landing preview kept the fuel from before its landing flight",
+    "a carrier in port was treated as launching its aircraft in port rather than at sea"
+   ]
+  },
+  "engine_cost_ms_per_call": {
+   "workload": "random games on seeds 5000-5002, one process; before is the build before the landing rule, after is the final engine; the games differ, so their positions do too",
+   "legal_actions": {
+    "before": 1.153,
+    "after": 1.078
+   },
+   "apply_action": {
+    "before": 1.205,
+    "after": 1.219
+   },
+   "chance": {
+    "before": 0.569,
+    "after": 0.611
+   }
+  }
+ },
+ "reviews": {
+  "first": {
+   "findings": 26,
+   "confirmed": 21,
+   "landing_defects": [
+    "route checks only where a force first met other units",
+    "engaging could hold a carrier its aircraft needed",
+    "Noncombat Movement could lose patrols uncounted",
+    "flight previews missed a fighter's effect on Enemy patrols",
+    "plan search had no early failure or bound",
+    "aircraft launched by a sailing carrier could not use other carriers",
+    "dice losses raised the alarm"
+   ],
+   "harness_defects": [
+    "deadline handling could lose the report",
+    "a failing game thread dropped its game without a record",
+    "queue estimate counted idle slots and ignored the faster tail",
+    "batch sizes counted requests per round, not model calls",
+    "paired CPU and MPS runs with several processes crashed"
+   ]
+  },
+  "second": {
+   "findings": 7,
+   "confirmed": 6,
+   "defects": [
+    "controlled minors' aircraft (Dadao) dropped out of the plan",
+    "routes held at Enemy patrol aircraft, and lone carriers tested as staying in port",
+    "report said no plan check copies the position",
+    "random play counted a carrier sunk in a reaction battle as a broken plan",
+    "queue estimate overstated a long run in shared mode",
+    "post-kill result drain could block on a half-written message"
+   ]
+  },
+  "third": {
+   "code_findings": 5,
+   "report_findings": 16,
+   "confirmed": [
+    "aircraft already without a landing blocked every carrier route and attack flight, and Combat Movement could end only after every other move",
+    "random play judged dice by action kind rather than by effect"
+   ],
+   "refuted": [
+    "a lone single-zone sortie into a peace-entry zone is unreachable from a valid position"
+   ],
+   "also_fixed": [
+    "no test guarded the multi-ship in-port probe",
+    "the drain guard covered killed processes but not crashed ones",
+    "the shared-mode queue estimate was described as the long-run rate",
+    "sixteen report corrections"
+   ]
+  },
+  "fourth": {
+   "findings": 18,
+   "distinct": 15,
+   "verified_real": 6,
+   "fixed": [
+    "a medium bomber left out of every plan had no legal action",
+    "ending Combat Movement could lose more aircraft than the shortfall",
+    "after combat a medium bomber with a free seat could be destroyed",
+    "berths froze patrol returns and naval moves while patrols could not land as the carriers stand",
+    "route and attack checks solved the shortfall even with a complete plan",
+    "no test held Combat Movement open with an aircraft already lost",
+    "the seat bound counted carriers no aircraft could use",
+    "random play excused rises of any size after any carrier hit, and failed games on declarations of war",
+    "random play serialized each position twice"
+   ],
+   "deferred": [
+    "let the owner choose which aircraft are lost when several sets lose equally many"
+   ]
+  },
+  "unfixed": [
+   "war declarations during Combat Movement are not followed by a plan check"
+  ]
+ },
+ "shared_gpu": {
+  "design": {
+   "game_processes": 8,
+   "games_per_process": 4,
+   "coordinator_processes": 1,
+   "transport": "per-thread 8 MB shared-memory buffer and pipe; the coordinator batches per alliance model",
+   "device": "Apple M4 Max GPU through PyTorch MPS",
+   "torch": "2.14.0",
+   "python_environment": "tmp/gpu-mps-env"
+  },
+  "parity": {
+   "positions": 48,
+   "max_prior_difference": 2e-07,
+   "max_value_difference": 3e-05,
+   "reference": "CampaignPolicyValueNet on the CPU"
+  },
+  "coordinator_ms_per_position_at_32": {
+   "first_version": 3.3,
+   "host_softmax": 1.5,
+   "two_nonblocking_packed_transfers": 0.94
+  },
+  "setup_probes": {
+   "seconds": 300,
+   "note": "opening rounds only; chose the setup, not compared with complete runs",
+   "four_games_per_process": {
+    "evaluations_per_second": 635,
+    "requests_per_round": 12.0,
+    "coordinator_busy": 0.94,
+    "game_process_cores": 8.8
+   },
+   "six_games_per_process": {
+    "evaluations_per_second": 480,
+    "requests_per_round": 15.5,
+    "coordinator_busy": 0.91,
+    "game_process_cores": 8.3
+   },
+   "four_games_lower_priority": {
+    "evaluations_per_second": 518,
+    "requests_per_round": 11.8,
+    "coordinator_busy": 0.94,
+    "game_process_cores": 7.6
+   }
+  },
+  "run": {
+   "directory": "studies/campaign/runs/shared-gpu-2026-10-29",
+   "command": "studies/campaign/runs/shared-gpu-2026-10-29/command.sh",
+   "engine_and_harness_commit": "b89e86ddec1e86ea3010d89ce9b016a1d473c20a",
+   "native_sha256": "c3b70d9bd8b8309f1423bffd263b32a4f98912485c930421fa43bc29b7c551c7",
+   "sources_unchanged": true,
+   "weights_unchanged": true,
+   "settings": {
+    "hidden_dim": 64,
+    "message_layers": 2,
+    "token_buckets": 16384,
+    "simulations": 64,
+    "max_depth": 16,
+    "calendar_rounds": 11,
+    "search_evaluation": "per_search",
+    "threads": 1,
+    "processes": 8,
+    "games_per_process": 4,
+    "seeds": [
+     1951,
+     1952,
+     1953,
+     1954,
+     1955,
+     1956,
+     1957,
+     1958,
+     1959,
+     1960,
+     1961,
+     1962,
+     1963,
+     1964,
+     1965,
+     1966,
+     1967,
+     1968,
+     1969,
+     1970,
+     1971,
+     1972,
+     1973,
+     1974,
+     1975,
+     1976,
+     1977,
+     1978,
+     1979,
+     1980,
+     1981,
+     1982
+    ],
+    "max_transitions": 20000,
+    "max_state_visits": 20
+   },
+   "status": "completed",
+   "completed_games": 32,
+   "failed_games": 0,
+   "cohort_wall_seconds": 4957.6,
+   "complete_games_per_hour_one_batch": 23.24,
+   "game_seconds": {
+    "mean": 4562.3,
+    "min": 3868.2,
+    "max": 4957.6
+   },
+   "evaluations_per_game_mean": 84123.2,
+   "all_slots_busy": {
+    "seconds": 3868.2,
+    "evaluations_per_second": 566.4
+   },
+   "games_per_hour_every_slot_playing": 24.24,
+   "games_per_hour_whole_game_average": 25.25,
+   "whole_game_average_note": "slots / mean game time, as the CPU-only figure is computed; it counts the faster last games, so it overstates a long run",
+   "eight_hour_complete_games": {
+    "mean": 179.3,
+    "p5": 175,
+    "p95": 184
+   },
+   "game_time_shares": {
+    "waiting_for_evaluations": 0.591,
+    "input_preparation": 0.134,
+    "input_preparation_ms_per_position_thread_time": 7.26,
+    "search_and_simulated_moves": 0.272
+   },
+   "coordinator": {
+    "forward_share_of_wall": 0.89,
+    "waiting_share_of_wall": 0.021,
+    "requests_per_serving_round": 9.8,
+    "positions_per_model_call": 4.12,
+    "model_calls": 653569,
+    "cpu_seconds": 3325.3
+   },
+   "cpu_cores_used_run_average": 8.24,
+   "peak_charged_bytes": 10011181160
+  },
+  "cpu_only_reference": {
+   "report": "docs/stage_a/dead_ends_2026_10_28.md",
+   "directory": "studies/campaign/runs/eleven-round-confirm-2026-10-28",
+   "engine_commit": "873058a79087de6d3e520395c11425f70d526991",
+   "processes": 10,
+   "completed_games": 10,
+   "cohort_wall_seconds": 2847.1,
+   "complete_games_per_hour_one_batch": 12.64,
+   "game_seconds": {
+    "mean": 2460.5,
+    "min": 2066.0,
+    "max": 2846.8
+   },
+   "evaluations_per_game_mean": 84928.3,
+   "evaluations_per_second_whole_game_average": 345.2,
+   "games_per_hour_whole_game_average": 14.63,
+   "whole_game_average_note": "no record over time was kept, so the rate with all ten playing is unknown",
+   "torch": "2.11.0",
+   "seeds": [
+    1951,
+    1960
+   ],
+   "eight_hour_complete_games": {
+    "mean": 111.8,
+    "p5": 110,
+    "p95": 114
+   },
+   "cpu_cores_used_run_average": 7.82,
+   "peak_charged_bytes": 9144691032
+  },
+  "comparison": {
+   "long_run_ratio_gpu_every_slot_playing_vs_cpu_average": 1.66,
+   "long_run_ratio_both_whole_game_averages": 1.73,
+   "one_batch_ratio": 1.84,
+   "one_batch_note": "a batch's rate depends on its size (10 and 32 games), so the long-run ratios compare fairly",
+   "limits": "No learning updates and no strength measurement; same seeds do not force identical games; the runs used different seeds (1951-1960, 1951-1982), PyTorch 2.11.0 and 2.14.0, and engines 873058a and b89e86d, one rule change apart at about the same cost per call",
+   "eight_hour_ratio": 1.6
+  }
+ },
+ "tests": {
+  "cpp": "26 of 26 ctest groups pass, with new tests for aircraft that cannot land, a medium bomber left out, carrier unloads and port entries, and multi-ship port sorties; each new test fails with its fix reverted",
+  "python": "565 tests; the only failure was the known guardian timeout under full-suite load, which passes alone"
+ }
+}
