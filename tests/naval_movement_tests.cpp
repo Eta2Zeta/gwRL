@@ -318,6 +318,35 @@ void carrierRoutesKeepLandingsWhereverTheyCanEnd() {
   check(!validateNavalRoute(blocked, {{"cv"}, {p16, p15, p14}, true}).allowed,
         "A lone carrier counted on passing blocking warships to reach its aircraft");
 }
+// Patrol aircraft only react, so a carrier sails on past them; and a lone
+// carrier leaving port past Enemy warships must screen, so it cannot stay in
+// port while its own aircraft wait outside.
+void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  add(s, "cv", "light_carrier", p16);
+  add(s, "patrol", "fighter", p15, "kmt");
+  s.units.at("patrol").gameFlags["on_map"] = 1;
+  s.units.at("patrol").gameFlags["map_range"] = 1;
+  s.units.at("patrol").commitments.insert("maritime_air_patrol");
+  add(s, "f", "fighter", p14);
+  s.units.at("f").movementRemaining = 0;
+  s.units.at("f").turnFlags["air_in_flight"] = 1;
+  check(validateNavalRoute(s, {{"cv"}, {p16, p15, p14}, true}).allowed,
+        "A carrier was held behind an Enemy patrol that only reacts");
+  auto sortie = fixture(Phase::CombatMovement);
+  sortie.nations.at("japan").atWarWith.insert("kmt");
+  sortie.nations.at("kmt").atWarWith.insert("japan");
+  add(sortie, "cv", "light_carrier", tokyo);
+  sortie.units.at("cv").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+  add(sortie, "deck", "fighter", tokyo);
+  attachCargo(sortie, "cv", "deck");
+  sortie.units.at("deck").movementRemaining = 0;
+  add(sortie, "enemy", "destroyer", p16, "kmt");
+  check(validateNavalRoute(sortie, {{"cv"}, {p16}, true}).allowed,
+        "A lone carrier's sortie was refused as if it could stay in port");
+}
 // Engaging holds the carrier where it is, so it may not strand an aircraft
 // that needs the carrier to sail.
 void engagingCannotHoldACarrierItsAircraftNeed() {
@@ -659,6 +688,8 @@ int main() {
               carrierRoutesKeepLandingsWhereverTheyCanEnd},
              {"engagement keeps landings",
               engagingCannotHoldACarrierItsAircraftNeed},
+             {"carrier routes past reactions",
+              carrierRoutesAreNotHeldWhereTheForceSailsOn},
              {"immediate submarine reaction",
               immediateSubmarineReactionResumesTheVoyage},
              {"carrier patrol reaction",

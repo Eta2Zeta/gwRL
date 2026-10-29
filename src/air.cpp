@@ -106,11 +106,13 @@ bool used(const State &s, const UnitState &u) {
 void stamp(State &s, UnitState &u) {
     u.turnFlags["air_battle_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
 }
-// The moving nation's aircraft in flight or on Maritime Air Patrol, whose
-// landings its moves must keep. Other nations' patrols land on their own turns
-// and are lost by RB 9.3.1 when no landing remains (enforcePatrolLandingAvailability).
+// The moving side's aircraft in flight or on Maritime Air Patrol, whose
+// landings its moves must keep: the moving nation's, and those of a minor it
+// controls and moves, such as Dadao. Other nations' patrols land on their own
+// turns and are lost by RB 9.3.1 when no landing remains
+// (enforcePatrolLandingAvailability).
 bool ownAirborne(const State &s, const UnitState &u) {
-    return isAircraft(s, u) && u.owner == s.currentNation() && !marked(u.turnFlags, "scrambled") &&
+    return isAircraft(s, u) && movementController(s, u.owner) && !marked(u.turnFlags, "scrambled") &&
            (marked(u.turnFlags, "air_in_flight") || marked(u.gameFlags, "on_map"));
 }
 bool landingChangesState(const State &s, const UnitState &u, const Id &destination) {
@@ -846,7 +848,7 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview) {
     std::deque<LandingNeed> needs;
     std::set<Id> airborne;
     for (const auto &[id, u] : s.units) {
-        if (!isAircraft(s, u) || marked(u.turnFlags, "scrambled") || u.owner != s.currentNation())
+        if (!isAircraft(s, u) || marked(u.turnFlags, "scrambled") || !movementController(s, u.owner))
             continue;
         const bool onMap = marked(u.gameFlags, "on_map") && !previewed(id);
         const bool flying = previewed(id) ? preview->inFlight : marked(u.turnFlags, "air_in_flight");

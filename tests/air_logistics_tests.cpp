@@ -276,6 +276,18 @@ void aSailingCarriersAircraftMayUseAnyCarrier() {
     check(!airLandingPlanAvailable(s)&&airLandingPlanReachable(s),
           "A sailing carrier's own aircraft could not use a carrier no airborne aircraft needed");
 }
+void aControlledMinorsAircraftKeepTheirLandings() {
+    // Japan moves Dadao's units, so a Dadao fighter's flights must keep its
+    // landing. It may land only on Dadao land, not Japan's.
+    auto s=fixture();ensureDadao(s);s.territories.at("land_china_hopeh").possessor="dadao";s.captureTurnStart();
+    add(s,"leased","fighter","land_china_hopeh","dadao");s.units.at("leased").movementRemaining=2;
+    const auto actions=AirRules{}.actions(s);
+    std::vector<int> fuels;
+    for(const auto& a:actions)if(a.kind=="air_fly"&&a.parameters.require("unit").asString()=="leased")
+        fuels.push_back(s.units.at("leased").movementRemaining.value_or(0)-static_cast<int>(a.parameters.require("path").asArray().size())+1);
+    check(!fuels.empty()&&std::all_of(fuels.begin(),fuels.end(),[](int fuel){return fuel>=1;}),
+          "A controlled minor's fighter was offered a flight from which it can never land");
+}
 void attackDeclarationsRequireACombinedReturnPlan() {
     auto s=fixture();s.territories.at(beiping).possessor="kmt";s.territories.at(shantung).possessor="kmt";
     s.territories.at("land_china_hopeh").possessor="kmt";
@@ -423,13 +435,14 @@ int main() {
             {"other nations' patrols",otherNationsPatrolsDoNotHoldTheMoversPlan},
             {"noncombat patrol landings",noncombatMovementEndsOnlyWithTheMoversPatrolsLandable},
             {"released aircraft seats",aSailingCarriersAircraftMayUseAnyCarrier},
+            {"controlled minor's aircraft",aControlledMinorsAircraftKeepTheirLandings},
             {"attack return planning",attackDeclarationsRequireACombinedReturnPlan},
             {"grounded landing no-op",groundedLandingCannotRepeatWithoutChangingState},
             {"actual same-zone returns",sameZoneLandingsRetainActualReturnEffects},
             {"starting carrier reattachment",startingCarrierAircraftDoNotOfferRedundantReattachment}}){
             test();std::cout<<"PASS "<<name<<'\n';
         }
-        std::cout << "18 air logistics fixture groups passed\n";
+        std::cout << "19 air logistics fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

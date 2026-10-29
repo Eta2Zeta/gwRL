@@ -661,8 +661,10 @@ def shared_selfplay(config, device, models, weights, deadline, persist, runtime_
             process.kill()
         for process in stragglers:
             process.join(timeout=1)  # Reaped, so their CPU time is counted.
+        # A killed process may leave half a message, on which a read would wait
+        # forever; only processes that exited cleanly left complete records.
         stop = time.monotonic() + 5
-        while len(games) < len(config.seeds) and time.monotonic() < stop:
+        while not stragglers and len(games) < len(config.seeds) and time.monotonic() < stop:
             try:
                 games.append(results.get(timeout=0.5))
             except queue.Empty:

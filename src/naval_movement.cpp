@@ -834,18 +834,29 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
   return false;
 }
 
+// Whether moving these ships can change a landing: they carry aircraft, or
+// the moving side has aircraft airborne that a carrier among them may seat.
+// Otherwise no landing is at stake and no position need be copied.
+bool landingsAtStake(const State &s, const std::vector<Id> &ships) {
+  const auto carries = [&](const Id &id) {
+    const auto &u = s.units.at(id);
+    return isAircraft(s, u) || std::any_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
+             return isAircraft(s, s.units.at(c));
+           });
+  };
+  const auto carrier = [&](const Id &id) { return has(s, s.units.at(id), "carrier"); };
+  return std::any_of(ships.begin(), ships.end(), carries) ||
+         (std::any_of(ships.begin(), ships.end(), carrier) &&
+          std::any_of(s.units.begin(), s.units.end(), [&](const auto &entry) {
+            const auto &u = entry.second;
+            return isAircraft(s, u) && movementController(s, u.owner) && !marked(u.turnFlags, "scrambled") &&
+                   (marked(u.turnFlags, "air_in_flight") || marked(u.gameFlags, "on_map"));
+          }));
+}
 // Engaging holds the selected ships in battle where they are and launches
 // their own aircraft there, so it must keep the aircraft's landing plan.
 bool engagementKeepsLanding(const State &s, const std::vector<Id> &selected, const Id &zone) {
-  const bool carriesAircraft =
-      std::any_of(selected.begin(), selected.end(), [&](const Id &id) {
-        const auto &u = s.units.at(id);
-        return has(s, u, "carrier") ||
-               std::any_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
-                 return isAircraft(s, s.units.at(c));
-               });
-      });
-  if (!carriesAircraft || !airLandingPlanReachable(s))
+  if (!landingsAtStake(s, selected) || !airLandingPlanReachable(s))
     return true;
   State probe = s.clone();
   detachAircraft(probe, selected, zone);
@@ -1174,13 +1185,15 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
                  return isAircraft(s, s.units.at(c));
                });
       });
-  if (movesAircraft) {
+  if (movesAircraft && landingsAtStake(s, r.units)) {
     // Aircraft must keep a reachable landing plan wherever the move can end:
-    // in its last zone; short of it where blockers force a screen (a lone
-    // carrier must screen and stays) or where neutral units raise a peace
-    // entry (a declaration can make them blockers); and, leaving port past
-    // either, in port with its own aircraft already launched. Reactions and
-    // passing transports, submarines or raiders do not stop the force.
+    // in its last zone; short of it where Enemy surface warships force a
+    // screen (a lone carrier must screen and stays) or where neutral units
+    // raise a peace entry (a declaration can make them blockers); and, when a
+    // larger force leaves port past either, with the ships that do not screen
+    // still in port and their own aircraft already launched. Patrol and
+    // submarine reactions, and passing transports, submerged submarines or
+    // raiders, do not stop the force.
     const bool fromPort =
         std::any_of(r.units.begin(), r.units.end(),
                     [&](const Id &id) { return !port(s.units.at(id)).empty(); });
@@ -1188,7 +1201,10 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
         std::any_of(r.units.begin(), r.units.end(),
                     [&](const Id &id) { return has(s, s.units.at(id), "surface_ship"); });
     const auto canStop = [&](const Id &zone) {
-      if (surface && !blockers(s, n, zone).empty())
+      const auto opposing = blockers(s, n, zone);
+      if (surface && std::any_of(opposing.begin(), opposing.end(), [&](const Id &id) {
+            return has(s, s.units.at(id), "surface_warship");
+          }))
         return true;
       for (const auto &[id, other] : s.units)
         if (other.zone == zone && other.owner != n && !hostile(s, n, other.owner) &&
@@ -1201,7 +1217,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
     // (zone index, or -1 for still in port; whether the force stops there for good)
     std::vector<std::pair<int, bool>> stops;
     if (r.combat && !r.strategic) {
-      if (fromPort && canStop(r.path.front()))
+      if (fromPort && r.units.size() > 1 && canStop(r.path.front()))
         stops.emplace_back(-1, true);
       for (std::size_t i = fromPort ? 0 : 1; i + 1 < r.path.size(); ++i)
         if (canStop(r.path[i]))

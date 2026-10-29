@@ -27,6 +27,9 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 BIASES = (0.02, 0.05, 0.1)
+# Casualty choices in Combat Movement's immediate naval battles, where a lost
+# carrier is a combat outcome rather than a move that broke a landing plan.
+CASUALTY_CHOICES = {"naval_take_casualty", "naval_casualty_accept", "naval_casualty_dispute"}
 CLOCK = re.compile(r'"clock":(\{[^}]*\})')
 STRANDED = re.compile(r'"stranded_aircraft_lost":(\d+)')
 
@@ -86,9 +89,12 @@ def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
             break
         decisions += 1
         if planned and not env.raw.landing_plan_reachable():
-            problem = {"kind": "landing_plan_broken", "action": choice.id}
-            (output / f"broken-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
-            break
+            if choice.raw["kind"] in CASUALTY_CHOICES:
+                broken_by_dice = moment
+            else:
+                problem = {"kind": "landing_plan_broken", "action": choice.id}
+                (output / f"broken-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
+                break
         lost = stranded(env.raw.serialize()) - stranded(before) if choice in ending else 0
         if lost and moment == broken_by_dice:
             notes.append({"kind": "stranded_after_dice", "action": choice.id, "aircraft_lost": lost,
