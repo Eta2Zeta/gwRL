@@ -9,7 +9,7 @@ from dataclasses import replace
 
 from studies.shared.campaign_adapter import CampaignAdapter, ScheduledAction
 from studies.shared.multiplayer_mcts import (
-    PLAYERS, Bounds, Edge, Evaluation, MctsConfig, Node, OpponentPolicy,
+    PLAYERS, Bounds, Edge, Evaluation, MctsConfig, NoLegalActionError, Node, OpponentPolicy,
     UniformEvaluator, VectorMCTS, action_key, apply_fixed_opponent, score_actions,
 )
 
@@ -448,6 +448,14 @@ class MultiplayerMctsTests(unittest.TestCase):
         self.assertFalse(internal, "A repeated planning state must cut off before another selection")
         self.assertTrue(any(trace.leaf_source == "cycle_cutoff" for trace in cycled.simulations))
         self.assertEqual(sum(cycled.visit_counts), 96)
+
+    def test_dead_end_keeps_the_imagined_position(self):
+        graph = {"root": {"player": "axis", "actions": {"stuck": "dead"}},
+                 "dead": {"player": "allies", "actions": {}}}
+        with self.assertRaises(NoLegalActionError) as raised:
+            VectorMCTS(config=MctsConfig(simulations=4, seed=3)).search(TreeEnv(graph))
+        self.assertIsInstance(raised.exception, ValueError)
+        self.assertEqual(json.loads(raised.exception.state)["node"], "dead")
 
     def test_invalid_versions_values_and_opponent_modes_are_rejected(self):
         for kwargs in ({"simulations": 0}, {"max_depth": 0}, {"c_puct": float("nan")}, {"rules_version": ""},

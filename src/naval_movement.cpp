@@ -1115,7 +1115,15 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
     return fail(
         "A raiding battlecruiser cannot combine attacks with other units");
   else if (!r.combat) {
-    for (std::size_t i = 1; i < r.path.size(); ++i)
+    // Ships in port begin in an adjacent sea zone but still enter it: exiting
+    // past Enemy Surface Warships needs a screening force, which is combat
+    // movement (RB 9.4.2, 11.4, 11.5).
+    const std::size_t entered =
+        std::any_of(r.units.begin(), r.units.end(),
+                    [&](const Id &id) { return !port(s.units.at(id)).empty(); })
+            ? 0
+            : 1;
+    for (std::size_t i = entered; i < r.path.size(); ++i)
       for (const auto &[id, u] : s.units)
         if (u.zone == r.path[i] && !hostile(s, n, u.owner) && u.owner != n &&
             s.nations.at(u.owner).alliance != s.nations.at(n).alliance &&
@@ -1127,7 +1135,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
     for (const auto &id : r.units)
       surface |= has(s, s.units.at(id), "surface_ship");
     if (surface)
-      for (std::size_t i = 1; i < r.path.size(); ++i)
+      for (std::size_t i = entered; i < r.path.size(); ++i)
         if (!blockers(s, n, r.path[i]).empty())
           return fail("Enemy surface warship or MAP blocks noncombat movement");
   }

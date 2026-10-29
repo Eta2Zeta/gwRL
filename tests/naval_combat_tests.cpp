@@ -164,6 +164,13 @@ void shipScrambleAndSkeletonCrewExclusion(){
     for(const auto& a:e.legalActions())check(a.parameters.require("unit").asString()=="scramble","Skeleton crew was allowed to scramble");choose(e,"naval_scramble","scramble");
     check(e.state().units.at("scramble").zone==sea&&e.state().units.at("scramble").commitments.contains("naval_scramble_origin:scramble_port"),"Ship scramble lost physical source");
 }
+void scrambledCarrierTakesItsAircraft(){
+    auto s=fixture();s.territories.at(tokyo).possessor="kmt";FacilityState port;port.id="scramble_port";port.type="major_port";port.zone=tokyo;port.flags["border:"+sea]=1;s.facilities[port.id]=port;
+    add(s,"a","destroyer","japan");add(s,"d","destroyer","kmt");add(s,"carrier","fleet_carrier","kmt",tokyo);add(s,"plane","fighter","kmt",tokyo);
+    s.units.at("carrier").gameFlags["in_port:scramble_port"]=1;attachCargo(s,"carrier","plane");s.captureTurnStart();
+    registerNavalBattle(s,sea,"japan",{"a"},{{"a",from}});Engine e(s,rules());choose(e,"naval_begin_battle");choose(e,"naval_scramble","carrier");
+    check(e.state().units.at("carrier").zone==sea&&e.state().units.at("plane").zone==sea,"Scrambled Carrier left its aircraft in port");
+}
 void seaplaneAswBonusTargetsSubmarines(){
     auto s=fixture();add(s,"a","seaplane","japan");add(s,"d","submarine","kmt");s.nations.at("japan").technologyStages["anti_submarine_warfare"]=4;
     s.units.at("a").gameFlags["on_map"]=1;s.units.at("a").gameFlags["map_range"]=2;const auto base=s.definition->catalog->stats("seaplane",0,catalogContext(s,"japan",sea)).attack.value();battle(s,{"a"});
@@ -178,8 +185,9 @@ int main(){try{
         {"carrier", carrierLossRescuesDefendingAircraft}, {"air merge", declaredAircraftMergeAndAttackOriginsStayNaval}, {"carrier return", defendingAircraftReturnToTheirIntactCarrier},
         {"port AA", portAttackStillGetsFacilityAaAfterShipLoss}, {"movement reaction", oneRoundMovementEncounterExcludesParkedFleet},
         {"raider",raiderDiscoveryTiesAndSlipStayInSea}, {"joint defense",jointDefenseDisputeUsesEntitledPlayers},
-        {"ship scramble",shipScrambleAndSkeletonCrewExclusion}, {"seaplane ASW",seaplaneAswBonusTargetsSubmarines}
+        {"ship scramble",shipScrambleAndSkeletonCrewExclusion}, {"carrier scramble cargo",scrambledCarrierTakesItsAircraft},
+        {"seaplane ASW",seaplaneAswBonusTargetsSubmarines}
     };
     for (const auto& [name, test] : checks) { std::cerr << "checking " << name << '\n'; test(); }
-    std::cout<<"17 naval combat fixture groups passed\n";return 0;
+    std::cout<<"18 naval combat fixture groups passed\n";return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

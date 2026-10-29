@@ -1,3 +1,4 @@
+#include "game/air.hpp"
 #include "game/campaign.hpp"
 #include "game/catalog.hpp"
 #include "game/politics.hpp"
@@ -78,6 +79,17 @@ bool phaseWorkClear(const State& state) {
         if (battle.stage != "awaiting_combat_rules" && battle.stage != "air_declared"
                 && battle.stage != "naval_declared" && battle.stage != "amphibious_declared") return false;
     return true;
+}
+
+// RB 9.3 checks attacking aircraft's landing spots only when Combat Movement
+// ends, so legal moves can strand some beyond any rescue, where a player at the
+// table would take moves back. With no other legal action the phase may still
+// end, and the stranded aircraft are lost before combat.
+bool strandedAircraftMayEndPhase(const State& state, const Rules& rules) {
+    if (state.clock.phase != Phase::CombatMovement || strandedAircraft(state).empty()) return false;
+    State after = state.clone();
+    eliminateStrandedAircraft(after);
+    return phaseWorkClear(after) && rules.phaseComplete(after);
 }
 
 Action endPhaseAction(const State& state, const Id& player) {
@@ -345,7 +357,8 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
         action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
         menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
-    if (!decisionPending && phaseWorkClear(state_) && rules_->phaseComplete(state_)) {
+    if (!decisionPending && phaseWorkClear(state_) &&
+        (rules_->phaseComplete(state_) || (actions.empty() && strandedAircraftMayEndPhase(state_, *rules_)))) {
         actions.push_back(endPhaseAction(state_, *player));
         auto& action = actions.back();
         action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
@@ -475,6 +488,9 @@ void Engine::commitChance(const ChanceRequest& request, const ChanceOutcome& out
 }
 
 void Engine::endPhase() {
+    // Offered with Combat Movement incomplete only when stranded aircraft are all that remain.
+    if (state_.clock.phase == Phase::CombatMovement && !rules_->phaseComplete(state_))
+        eliminateStrandedAircraft(state_);
     require(phaseWorkClear(state_) && rules_->phaseComplete(state_), "Campaign phase is not complete");
     const auto beforePhase=state_.clock;
     const bool beforeTerminal=state_.terminal;

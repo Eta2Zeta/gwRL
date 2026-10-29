@@ -714,6 +714,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
             if (!f.flags.contains("naval_scramble_turn") || f.flags.at("naval_scramble_turn") != static_cast<int>(s.clock.playerTurnSerial + 1)) f.flags["naval_scramble_used"] = 0;
             f.flags["naval_scramble_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1); ++f.flags["naval_scramble_used"];
             auto& u = s.units.at(unit); u.gameFlags.erase("in_port:" + facility); u.zone = b.zone;
+            for (const auto& cargo : u.cargo) s.units.at(cargo).zone = b.zone;
             u.commitments.insert("naval_scramble_origin:" + facility); u.turnFlags["naval_combat_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
             b.defenders.push_back(unit);
         }

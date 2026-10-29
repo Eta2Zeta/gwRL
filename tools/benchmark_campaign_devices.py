@@ -279,6 +279,13 @@ def inference(config, device, models, evaluator, forward_stats, deadline, persis
     return result
 
 
+def game_failure(env, count, error):
+    """A failed game's actual position, and the searched one where search found no move."""
+    return {"error": f"{type(error).__name__}: {error}", "decisions": count["decisions"],
+            "clock": env.observation()["state"]["clock"], "position": env.serialize(),
+            "searched_position": getattr(error, "state", None)}
+
+
 def selfplay(config, device, models, evaluator, forward_stats, deadline, persist):
     import random
     from studies.campaign.batching import BatchStats, search_many
@@ -307,10 +314,11 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     started, waves, stop_reason = time.perf_counter(), 0, None
     started_epoch = time.time()
     completed_at = [None] * len(envs)
-    while not all(env.is_terminal() for env in envs):
+    # A rules defect ends only the games it reaches; the others play on.
+    failures = {}
+    while active := [index for index, env in enumerate(envs) if not env.is_terminal() and index not in failures]:
         if time.monotonic() >= deadline:
             stop_reason = "wall_limit"; break
-        active = [index for index, env in enumerate(envs) if not env.is_terminal()]
         if any(counts[index]["transitions"] >= config.max_transitions or
                visits[index][envs[index].planning_key()] > config.max_state_visits for index in active):
             stop_reason = "transition_or_repetition_limit"; break
@@ -319,7 +327,11 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
             env = envs[index]
             if env.decision_kind() == "chance":
                 key, request, cursor = env.planning_key(), env.chance_request(), env.raw.history_size()
-                before = time.perf_counter(); env.resolve_chance()
+                before = time.perf_counter()
+                try:
+                    env.resolve_chance()
+                except (RuntimeError, ValueError) as error:
+                    failures[index] = game_failure(env, counts[index], error); continue
                 timings["actual_rules_execution"] += time.perf_counter() - before
                 traces[index].append({"kind": "chance", "owner": None, "before": key, "after": env.planning_key(),
                     "request": request, "recorded_events": env.raw.history_since(cursor)})
@@ -331,15 +343,25 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
             settings = [MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
                                   seed=search_rngs[index].getrandbits(64)) for index in indices]
             stats = BatchStats()
-            results = search_many(searching, evaluator, configs=settings, add_root_noise=True, stats=stats,
-                                  evaluation=config.search_evaluation)
+            try:
+                results = search_many(searching, evaluator, configs=settings, add_root_noise=True, stats=stats,
+                                      evaluation=config.search_evaluation)
+            except (RuntimeError, ValueError) as error:
+                # One search's defect cannot be told apart within a batch: it ends
+                # every game searched with it, which is one game per process.
+                failures.update((index, game_failure(envs[index], counts[index], error)) for index in indices)
+                results = []
             timings["search"] += stats.elapsed_seconds
             for index, search in zip(indices, results):
                 env = envs[index]
                 chosen = policy_rngs[index].choices(search.actions, weights=search.policy, k=1)[0]
                 event = {"kind": env.decision_kind(), "owner": env.current_decision_player(),
                          "action": action_key(chosen), "before": env.planning_key()}
-                before = time.perf_counter(); env.apply_action(chosen)
+                before = time.perf_counter()
+                try:
+                    env.apply_action(chosen)
+                except (RuntimeError, ValueError) as error:
+                    failures[index] = game_failure(env, counts[index], error); continue
                 timings["actual_rules_execution"] += time.perf_counter() - before
                 event["after"] = env.planning_key(); traces[index].append(event)
                 counts[index].update(transitions=1, decisions=1)
@@ -356,9 +378,9 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     complete = all(env.is_terminal() for env in envs)
     inference_seconds = evaluator.seconds - inference_before
     forward_seconds = forward_stats["seconds"] - forward_before
-    result.update(status="completed" if complete else "truncated", stop_reason=stop_reason,
+    result.update(status="completed" if complete else "game_error" if failures else "truncated", stop_reason=stop_reason,
         started_at_epoch=started_epoch, ended_at_epoch=started_epoch + elapsed,
-        completed_games=sum(env.is_terminal() for env in envs), cohort_wall_seconds=elapsed,
+        completed_games=sum(env.is_terminal() for env in envs), failed_games=len(failures), cohort_wall_seconds=elapsed,
         complete_games_per_hour=len(envs) * 3600 / elapsed if complete else None,
         search_simulations=config.simulations, search_depth_cap=config.max_depth,
         timing_seconds={**timings, "synchronized_evaluator": inference_seconds,
@@ -372,8 +394,9 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
             "clock": env.observation()["state"]["clock"], "completed_after_seconds": ended,
             "terminal_returns": list(env.returns()) if env.is_terminal() else None,
             "wealth_at_stop": env.wealth(), "trace": trace, "trace_sha256": digest(trace),
-            "final_state_and_rng_sha256": hashlib.sha256(env.serialize().encode()).hexdigest()}
-            for seed, env, count, trace, ended in zip(config.seeds, envs, counts, traces, completed_at)])
+            "final_state_and_rng_sha256": hashlib.sha256(env.serialize().encode()).hexdigest(),
+            "failure": failures.get(index)}
+            for index, (seed, env, count, trace, ended) in enumerate(zip(config.seeds, envs, counts, traces, completed_at))])
     return result
 
 
@@ -429,11 +452,12 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
     evaluated = {"synchronized_seconds": sum(part["evaluator"]["synchronized_seconds"] for part in parts),
                  "calls": sum(part["evaluator"]["calls"] for part in parts),
                  "requests": sum(part["evaluator"]["requests"] for part in parts), "batch_sizes": merged("evaluator")}
-    summary = {"task": results[0]["task"], "status": "completed" if complete else "truncated",
+    failed = sum(result["failed_games"] for result in results)
+    summary = {"task": results[0]["task"], "status": "completed" if complete else "game_error" if failed else "truncated",
         "stop_reason": [result["stop_reason"] for result in results], "root_noise": True,
         "selection": results[0]["selection"], "processes": config.processes,
         "started_at_epoch": started, "ended_at_epoch": started + span,
-        "completed_games": sum(game["terminal"] for game in games), "cohort_wall_seconds": span,
+        "completed_games": sum(game["terminal"] for game in games), "failed_games": failed, "cohort_wall_seconds": span,
         "complete_games_per_hour": len(games) * 3600 / span if complete else None,
         "process_utilization": busy / (config.processes * span) if span > 0 else None,
         "search_simulations": config.simulations, "search_depth_cap": config.max_depth,
@@ -591,9 +615,9 @@ def supervise_device(config, device, output, seconds):
         report = json.loads(progress.read_text()) if progress.exists() else {"schema": SCHEMA, "device": device}
         if stopped:
             report["status"] = stopped
-        elif (report.get("status") not in {"completed", "truncated", "device_error", "changed_inputs"} or
+        elif (report.get("status") not in {"completed", "truncated", "game_error", "device_error", "changed_inputs"} or
               (process.returncode != 0 and not (process.returncode == 2 and report.get("status") in {
-                  "truncated", "device_error", "changed_inputs"}))):
+                  "truncated", "game_error", "device_error", "changed_inputs"}))):
             report["status"] = "worker_error"; report["error"] = (directory / "stderr").read_text()[-4000:]
         report["guard"] = {"elapsed_seconds": time.monotonic() - started, "sampled_peak_charged_bytes": peak,
             "memory_bytes": config.memory_bytes, "margin_bytes": 1_000_000_000,

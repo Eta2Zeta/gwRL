@@ -271,6 +271,24 @@ void portExitCostsZero() {
             e.state().units.at("dd").movementRemaining == 4,
         "Port exit consumed ship movement");
 }
+void noncombatPortExitCannotPassEnemyWarships() {
+  // Ships in port begin in an adjacent sea zone but still enter it. Sailing out
+  // past Enemy Surface Warships needs a screening force, which is combat
+  // movement (RB 9.4.2, 11.4, 11.5).
+  auto s = fixture();
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  add(s, "dd", "destroyer", tokyo);
+  s.units.at("dd").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+  add(s, "enemy", "destroyer", p16, "kmt");
+  check(!validateNavalRoute(s, {{"dd"}, {p16}}).allowed &&
+            !validateNavalRoute(s, {{"dd"}, {p16, p15}}).allowed,
+        "Noncombat port exit passed an Enemy Surface Warship");
+  auto combat = s.clone();
+  combat.clock.phase = Phase::CombatMovement;
+  check(validateNavalRoute(combat, {{"dd"}, {p16}, true}).allowed,
+        "Combat Movement lost its port sortie against an Enemy warship");
+}
 void blockadedPortKeepsContinuingShipsInBerth() {
   auto s = fixture(Phase::CombatMovement);
   s.nations.at("japan").atWarWith.insert("kmt");
@@ -581,6 +599,8 @@ int main() {
              {"naval blockers", strategicAndNoncombatBlockers},
              {"carrier independent flight", carrierMovementGivesNoAircraftRide},
              {"zero-cost port exit", portExitCostsZero},
+             {"noncombat port exit blockers",
+              noncombatPortExitCannotPassEnemyWarships},
              {"staged blocked port sortie",
               blockadedPortKeepsContinuingShipsInBerth},
              {"immediate submarine reaction",

@@ -30,6 +30,19 @@ class SearchEnv(Protocol):
     def planning_key(self) -> str: ...
 
 
+class NoLegalActionError(ValueError):
+    """A nonterminal decision without legal actions, which is a rules defect.
+
+    Keeps the position's serialized state when the environment offers one, so an
+    imagined search position can be reproduced as well as an actual one.
+    """
+
+    def __init__(self, env: Any):
+        super().__init__("Nonterminal decision has no legal action")
+        serialize = getattr(env, "serialize", None)
+        self.state = serialize() if callable(serialize) else None
+
+
 def action_key(action: Any) -> str:
     """Stable legal-action identity, independent of list position."""
     if isinstance(action, dict) and "id" in action:
@@ -298,7 +311,7 @@ class VectorMCTS:
                 raise ValueError("A policy decision must name its entitled player")
             actions = list(env.legal_actions())
             if not actions:
-                raise ValueError("Nonterminal decision has no legal action")
+                raise NoLegalActionError(env)
             keys = [action_key(action) for action in actions]
             if len(set(keys)) != len(keys):
                 raise ValueError("Legal actions need unique stable identities")

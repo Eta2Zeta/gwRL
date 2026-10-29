@@ -11,6 +11,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from studies.shared.multiplayer_mcts import NoLegalActionError
 from tools.benchmark_campaign_devices import (Config, TimedEvaluator, compare_selfplay,
     mps_allocator_limit, numerical_comparison, parallel_selfplay, selfplay, setup_models, supervise_device)
 
@@ -73,7 +74,7 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
             return {"weights_sha256": "w", "process": 40 + seeds[0] % 2,
                     "forward": {"seconds": 1., "calls": len(seeds), "batch_sizes": {1: len(seeds)}},
                     "evaluator": {"synchronized_seconds": 2., "calls": len(seeds), "requests": len(seeds), "batch_sizes": {1: len(seeds)}},
-                    "result": {"task": {"seed": seeds[0]}, "status": "completed", "stop_reason": None, "selection": "s",
+                    "result": {"task": {"seed": seeds[0]}, "status": "completed", "stop_reason": None, "selection": "s", "failed_games": 0,
                                "started_at_epoch": begin, "ended_at_epoch": begin + 10 * len(seeds), "cohort_wall_seconds": 10. * len(seeds),
                                "preparation_seconds": 0., "warmup_seconds": 0., "timing_seconds": {"search": 3.},
                                "inference_calls": len(seeds), "inference_requests": len(seeds), "actual_inference_batch_sizes": {1: len(seeds)},
@@ -143,13 +144,16 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         self.assertEqual(first[3]["config"]["token_buckets"], 2048)
         self.assertTrue(all(parameter.device.type == "cpu" for model in first[0].values() for parameter in model.parameters()))
 
-    def run_toy(self, steps=1, cap=5000):
-        config = Config(mode="selfplay", devices=("cpu",), seeds=(7,), threads=1, cpu_budget=5, max_transitions=cap)
+    def run_toy(self, steps=1, cap=5000, seeds=(7,), choose=lambda env: "move", fail=None):
+        config = Config(mode="selfplay", devices=("cpu",), seeds=seeds, threads=1, cpu_budget=4 + len(seeds),
+                        max_transitions=cap)
         evaluator = FakeEvaluator()
         def search(envs, evaluator, *, configs, stats, **kwargs):
             self.assertTrue(all(row.simulations == row.max_depth == 16 for row in configs))
             stats.elapsed_seconds = 0.
-            return [SimpleNamespace(actions=["move"], policy=[1.]) for _ in envs]
+            if fail is not None:
+                raise fail
+            return [SimpleNamespace(actions=[choose(env)], policy=[1.]) for env in envs]
         with patch("studies.campaign.curriculum.make_env", side_effect=lambda seed, **_: ToyEnv(seed, steps)), \
              patch("studies.campaign.curriculum.task_manifest", return_value={"calendar_rounds": 3}), \
              patch("studies.campaign.batching.search_many", side_effect=search):
@@ -168,6 +172,18 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         self.assertIsNone(report["complete_games_per_hour"])
         self.assertIsNone(report["games"][0]["terminal_returns"])
         self.assertEqual(report["completed_games"], 0)
+
+    def test_a_failing_game_keeps_its_position_and_spares_the_others(self):
+        report = self.run_toy(seeds=(7, 8), choose=lambda env: "stuck" if env.seed == 8 else "move")
+        self.assertEqual(report["status"], "game_error")
+        self.assertEqual((report["completed_games"], report["failed_games"]), (1, 1))
+        self.assertIsNone(report["complete_games_per_hour"])
+        self.assertIsNone(report["games"][0]["failure"])
+        failure = report["games"][1]["failure"]
+        self.assertEqual(failure["error"], "ValueError: invalid")
+        self.assertEqual(json.loads(failure["position"]), [8, 0])
+        searched = self.run_toy(fail=NoLegalActionError(ToyEnv(9)))["games"][0]["failure"]
+        self.assertEqual(json.loads(searched["searched_position"]), [9, 0])
 
     def test_selfplay_comparison_reports_divergence_without_claiming_exact_workload(self):
         left = self.run_toy(); right = copy.deepcopy(left)

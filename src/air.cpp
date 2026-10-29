@@ -820,6 +820,23 @@ std::vector<Id> airLandingSpots(const State &s, const Id &id) {
             out.push_back(carrier);
     return out;
 }
+std::vector<Id> strandedAircraft(const State &s) {
+    std::vector<Id> kept, stranded;
+    for (const auto &[id, u] : s.units)
+        if (isAircraft(s, u) && !marked(u.turnFlags, "scrambled") &&
+            (marked(u.turnFlags, "air_in_flight") || marked(u.gameFlags, "on_map"))) {
+            kept.push_back(id);
+            if (!airLandingPlanAvailable(s, kept)) {
+                kept.pop_back();
+                stranded.push_back(id);
+            }
+        }
+    return stranded;
+}
+void eliminateStrandedAircraft(State &s) {
+    for (const auto &id : strandedAircraft(s))
+        eraseAirUnit(s, id);
+}
 void enforcePatrolLandingAvailability(State &s) {
     std::vector<Id> stranded;
     for (const auto &[id, u] : s.units)

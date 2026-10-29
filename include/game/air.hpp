@@ -15,6 +15,10 @@ bool airLandingAvailable(const State &, const Id &unit, const Id &destination);
 // Carrier seats occupied by grounded cargo or reserved for scramble returns
 // cannot also support another aircraft's proposed return.
 bool airLandingPlanAvailable(const State &, const std::vector<Id> &aircraft = {});
+// Airborne aircraft, in unit order, that no joint landing assignment can
+// include once the earlier ones keep theirs.
+std::vector<Id> strandedAircraft(const State &);
+void eliminateStrandedAircraft(State &);
 void enforcePatrolLandingAvailability(State &);
 void beginAirDefence(State &, const Id &battle);
 void prepareLandAirborneDrop(State &, const Id &battle);

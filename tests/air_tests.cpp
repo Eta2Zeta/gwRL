@@ -340,6 +340,36 @@ void failedLanding() {
         check(!e.state().units.contains("f"), "Stranded aircraft survived");
     }
 }
+void strandedAttackersStillEndCombatMovement() {
+    // RB 9.3 checks landing spots only when Combat Movement ends, so later moves
+    // can strand an attacking aircraft beyond rescue. Only when nothing else is
+    // legal may the phase still end, losing the stranded aircraft before combat.
+    auto s = fixture();
+    add(s, "bomber", "tactical_bomber", "japan", beiping);
+    add(s, "defender", "infantry", "kmt", hopeh);
+    s.captureTurnStart();
+    Engine attack(s, rules());
+    choose(attack, "air_ground_attack", [](const Action &a) {
+        return a.parameters.require("path").asArray().back().asString() == hopeh;
+    });
+    auto stranded = attack.state().clone();
+    stranded.units.at("bomber").movementRemaining = 0;
+    auto busy = stranded.clone();
+    add(busy, "spare", "infantry", "japan", shantung);
+    Engine waiting(busy, rules());
+    check(!offered(waiting, "end_phase"), "Stranded attacker let Combat Movement end while moves remained");
+    Engine e(stranded, rules());
+    const auto menu = e.legalActions();
+    check(menu.size() == 1 && menu.front().kind == "end_phase", "Stranded attacker left Combat Movement without an end");
+    e.step(menu.front());
+    check(!e.state().units.contains("bomber") && e.state().clock.phase == Phase::Combat,
+          "Stranded attacker survived the end of Combat Movement");
+    for (int step = 0; step < 8 && !offered(e, "end_phase"); ++step)
+        if (e.state().chance) e.resolveChance();
+        else e.step(e.legalActions().front());
+    check(offered(e, "end_phase") && e.state().units.contains("defender"),
+          "Battle that lost its only attacker did not end for the defender");
+}
 void noAircraftCapture() {
     auto s = fixture();
     add(s, "f", "fighter", "japan", hopeh);
@@ -361,9 +391,10 @@ int main() {
         improvedConstructionPerPlayerTurn();
         airliftHeavyCapacityAndContinuation();
         failedLanding();
+        strandedAttackersStillEndCombatMovement();
         noAircraftCapture();
         indexedGeometryPreservesAircraftMenus();
-        std::cout << "13 air fixture groups passed\n";
+        std::cout << "14 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
