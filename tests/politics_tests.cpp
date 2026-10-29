@@ -454,6 +454,51 @@ void declarationGatesAndUnknownAccounting() {
     check(minor.clock.incomeCollected && !minor.nations.at("mongolia").treasury
             && minor.nations.at("japan").treasury == japanCash, "Mongolia collected or redirected ordinary income");
 }
+
+// RB 10.10.1's choice to give conquered Chinese land to a Chinese faction is for
+// outside Major Powers; an evolved CCP or KMT simply keeps what it conquers.
+void chineseFactionsKeepTheirConquests() {
+    for (const Id conqueror : {Id("ccp"), Id("kmt")}) {
+        auto state = fixture(conqueror);
+        state.nations.at(conqueror).powerStatus = "major";
+        addUnit(state, "conqueror", conqueror, beiping);
+        captureLand(state, conqueror, beiping, {"ccp", "kmt"});
+        check(state.territories.at(beiping).possessor == conqueror
+                && std::none_of(state.decisions.begin(), state.decisions.end(), [](const auto& decision) {
+                       return decision.kind == "politics_chinese_liberation"; }),
+              "A Chinese faction was offered to give away its own conquest");
+    }
+}
+
+// A pending capital choice offers only land its nation still possesses.
+void capitalChoicesFollowPossession() {
+    auto state = fixture("japan", Phase::Combat);
+    prepareTwelveIppKmt(state);
+    changePossession(state, "land_hainan", "kmt", PossessionCause::Alignment);
+    const auto offered = [&](const Id& zone) {
+        const auto& options = state.decisions.back().options;
+        return std::any_of(options.begin(), options.end(), [&](const auto& option) {
+            return option.parameters.require("zone").asString() == zone; });
+    };
+    check(state.decisions.back().kind == "politics_evolution" && offered(beiping) && offered(nanking),
+          "Evolution did not offer the evolving faction's land");
+    changePossession(state, beiping, "japan", PossessionCause::Capture, "japan");
+    check(state.decisions.back().kind == "politics_evolution" && !offered(beiping) && offered(nanking),
+          "A capital choice still offered land its nation lost");
+
+    // With no land left to offer, the choice is withdrawn rather than left empty.
+    auto lone = fixture("japan", Phase::Combat);
+    lone.territories.at(beiping).possessor = "kmt";
+    Action only;
+    only.id = "capital_only";
+    only.kind = "politics_choose_capital";
+    only.parameters = V(O{{"zone", V(beiping)}, {"factory", V(false)}});
+    queuePoliticalDecision(lone, "kmt", "politics_evolution", {only});
+    lone.flags["evolution_pending_kmt"] = 1;
+    changePossession(lone, beiping, "japan", PossessionCause::Capture, "japan");
+    check(lone.decisions.empty() && !lone.flags.contains("evolution_pending_kmt"),
+          "A capital choice without land stayed pending");
+}
 } // namespace
 
 int main() {
@@ -466,6 +511,8 @@ int main() {
         {"CCP elimination is not surrender", ccpNoUnitsIsNotSurrenderOrGameEnd},
         {"capital capture and facility aftermath", captureCapitalAndFacilities},
         {"mandatory liberation and proven withdrawal", mandatoryLiberationAndProvenWithdrawal},
+        {"Chinese factions keep their conquests", chineseFactionsKeepTheirConquests},
+        {"capital choices follow possession", capitalChoicesFollowPossession},
         {"Japan surrender queue boundary and replay", japanSurrenderQueueBoundaryAndReplay},
         {"direct Axis Dadao after Japan surrender", directAxisDadaoSurvivesJapan},
         {"out-of-turn declaration priority and replay", outOfTurnPriorityCheckpointAndClone},

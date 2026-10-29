@@ -42,6 +42,16 @@ void releaseDecision(State& s,const Action& action) {
     require(action.decision&& !s.decisions.empty()&&s.decisions.back().id==*action.decision,"Missing political choice");
     erasePoliticalContinuation(s,s.decisions.back().continuation);s.decisions.pop_back();
 }
+// A pending capital choice offers only land its nation still possesses. With
+// none left it is withdrawn, so a later evolution offers the land held then.
+void pruneCapitalChoices(State& s,const Id& nation,const Id& zone) {
+    for(auto it=s.decisions.begin();it!=s.decisions.end();) {
+        if(it->kind!="politics_evolution"||it->nation!=nation) {++it;continue;}
+        std::erase_if(it->options,[&](const Action& option){return option.parameters.require("zone").asString()==zone;});
+        if(!it->options.empty()) {++it;continue;}
+        erasePoliticalContinuation(s,it->continuation);s.flags.erase("evolution_pending_"+nation);it=s.decisions.erase(it);
+    }
+}
 void chooseEvolution(State& s,const Id& nation) {
     if(s.politics.evolutionAwarded.contains(nation))return;
     const auto key="evolution_pending_"+nation;
@@ -369,6 +379,7 @@ void changePossession(State& s,const Id& zone,const Id& recipient,PossessionCaus
     if(old==recipient)return;
     if(old&&s.politics.capitals.contains(*old)&&s.politics.capitals.at(*old)==zone&&s.nations.at(*old).treasury)s.nations.at(*old).treasury=0;
     territory.possessor=recipient;territory.flags["last_possession_change_turn"]=static_cast<int>(s.clock.playerTurnSerial);
+    if(old)pruneCapitalChoices(s,*old,zone);
     if(cause==PossessionCause::Capture||cause==PossessionCause::Liberation) {
         reconcileCapturedFacilities(s,zone,old.value_or(recipient),recipient);
         std::set<Id> removed;
@@ -399,7 +410,10 @@ void captureLand(State& s,const Id& attacker,const Id& zone,const std::set<Id>& 
     const Id original=originalNation(s,zone);Id recipient=attacker;
     if(original!=attacker&&s.nations.at(original).powerStatus=="major"&&s.nations.at(original).alliance==s.nations.at(attacker).alliance&&!s.politics.surrendered.contains(original))recipient=original;
     changePossession(s,zone,recipient,recipient==attacker?PossessionCause::Capture:PossessionCause::Liberation,attacker);
-    if(recipient==attacker&&s.nations.at(attacker).powerStatus=="major"&&chineseHomeCountry(s,zone)&&original!=attacker) {
+    // RB 10.10.1 lets an outside Major Power give conquered Chinese land to a
+    // Chinese faction; the CCP and KMT themselves simply keep what they conquer.
+    if(recipient==attacker&&attacker!="ccp"&&attacker!="kmt"&&s.nations.at(attacker).powerStatus=="major"&&
+       chineseHomeCountry(s,zone)&&original!=attacker) {
         std::vector<Action> options{politicalAction(s,attacker,"politics_keep_capture",V(O{{"zone",V(zone)}}))};
         for(const auto& china:{"ccp","kmt"})if(!s.politics.surrendered.contains(china)
                 &&(politicallyFriendly(s,attacker,china)||withdrawalEligibleRecipients.contains(china)))

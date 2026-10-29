@@ -143,11 +143,17 @@ seed 1955 plays all eleven rounds. The move-list reference was re-recorded
 under them; the identity checks above used the earlier reference, kept as
 `reference-pre-patrol-*`.
 
-Seed 1954 then exposed an unrelated politics defect in round 10. The CCP's
-evolution decision still offered Nanking as its capital after the CCP had
-given that capture to the KMT, and choosing it fails with "Capital choice lost
-possession". The decision's options are not refreshed when an earlier choice
-changes possession. It is not fixed here.
+Seed 1954 then exposed a politics defect in round 10. The CCP, a Major Power
+after evolving that turn, captured Nanking and was offered to give it to the
+KMT, the faction it was at war with, or to itself. It gave Nanking away, and its
+pending capital choice still offered Nanking, so choosing it failed with
+"Capital choice lost possession". Section 10.10.1 lets a Major Power give
+conquered Chinese land to a Chinese faction; on the user's ruling, that choice
+is for outside powers only, and the CCP and KMT simply keep what they conquer.
+A pending capital choice now also drops any territory its nation loses before
+deciding. With both changes all eight reference games play all eleven rounds;
+the reference was re-recorded again and the previous one kept as
+`reference-pre-conquest-*`.
 
 ## Still slow
 
