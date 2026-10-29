@@ -1,0 +1,186 @@
+{
+  "schema": "campaign-dead-ends-v1",
+  "date": "2026-10-28",
+  "stopped_run": {
+    "directory": "studies/campaign/runs/eleven-round-2026-10-28",
+    "engine_commit": "fe23c95b782ec621869d88df1e72594e2a2b9004",
+    "status": "worker_error",
+    "error": "Nonterminal decision has no legal action",
+    "elapsed_seconds": 2721.7,
+    "games_discarded": 8,
+    "position_kept": false
+  },
+  "fuzz": {
+    "tool": "tools/fuzz_campaign_dead_ends.py",
+    "seeds": [
+      5000,
+      5321
+    ],
+    "calendar_rounds": 11,
+    "end_phase_bias_by_seed_mod_3": [
+      0.02,
+      0.05,
+      0.1
+    ],
+    "max_decisions": 8000,
+    "processes": 10,
+    "raw_artifacts": "studies/campaign/runs/dead-ends-2026-10-28",
+    "before": {
+      "engine_commit": "fe23c95",
+      "games": 322,
+      "completed_all_rounds": 303,
+      "no_legal_action_non_combat_movement": 14,
+      "no_legal_action_combat_movement": 4,
+      "engine_error": 1,
+      "mean_game_seconds": 14.72,
+      "failing_seeds": [
+        5001,
+        5059,
+        5090,
+        5116,
+        5117,
+        5129,
+        5136,
+        5137,
+        5175,
+        5184,
+        5199,
+        5202,
+        5242,
+        5256,
+        5258,
+        5261,
+        5265,
+        5271,
+        5303
+      ]
+    },
+    "after": {
+      "engine_commit": "873058a",
+      "games": 322,
+      "completed_all_rounds": 322,
+      "no_legal_action_non_combat_movement": 0,
+      "no_legal_action_combat_movement": 0,
+      "engine_error": 0,
+      "mean_game_seconds": 13.88,
+      "failing_seeds": []
+    }
+  },
+  "defects": [
+    {
+      "games": 14,
+      "phase": "non_combat_movement",
+      "cause": "Ships in port could exit past Enemy Surface Warships; route checks skipped the first entered sea zone",
+      "rules": [
+        "RB 9.4.2",
+        "RB 11.4",
+        "RB 11.5"
+      ],
+      "fix": "First sea zone counts as entered for ships in port in Non-combat Movement"
+    },
+    {
+      "games": 4,
+      "phase": "combat_movement",
+      "cause": "Legal moves left attacking aircraft without any landing; RB 9.3 checks only at phase end and the engine has no take-back",
+      "rules": [
+        "RB 9.3",
+        "RB 10.10"
+      ],
+      "fix": "With no other legal action, Combat Movement may end; aircraft no joint landing assignment can include are lost before combat, in unit order",
+      "engineering_decision": true
+    },
+    {
+      "games": 1,
+      "phase": "combat",
+      "cause": "Carrier scrambling out of port left its aircraft cargo behind",
+      "fix": "Cargo moves with the scrambling ship"
+    }
+  ],
+  "confirmation": {
+    "directory": "studies/campaign/runs/eleven-round-confirm-2026-10-28",
+    "engine_commit": "873058a79087de6d3e520395c11425f70d526991",
+    "native_sha256": "53413da0bd140e514c083aca72d89af7961b179261fd5e5c34b6fe737ef7dc3e",
+    "sources_unchanged": true,
+    "weights_unchanged": true,
+    "settings": {
+      "hidden_dim": 64,
+      "message_layers": 2,
+      "token_buckets": 16384,
+      "simulations": 64,
+      "max_depth": 16,
+      "calendar_rounds": 11,
+      "search_evaluation": "per_search",
+      "threads": 1,
+      "processes": 10,
+      "seeds": [
+        1951,
+        1952,
+        1953,
+        1954,
+        1955,
+        1956,
+        1957,
+        1958,
+        1959,
+        1960
+      ],
+      "max_transitions": 20000,
+      "max_state_visits": 20
+    },
+    "status": "completed",
+    "completed_games": 10,
+    "failed_games": 0,
+    "cohort_wall_seconds": 2847.1,
+    "complete_games_per_hour_one_batch": 12.64,
+    "process_utilization": 0.864,
+    "game_seconds": {
+      "mean": 2460.5,
+      "min": 2066.0,
+      "max": 2846.8,
+      "each": {
+        "1951": 2547.9,
+        "1952": 2524.8,
+        "1953": 2066.0,
+        "1954": 2387.5,
+        "1955": 2846.8,
+        "1956": 2334.3,
+        "1957": 2701.3,
+        "1958": 2087.7,
+        "1959": 2582.2,
+        "1960": 2526.6
+      }
+    },
+    "queue_estimate_games_per_hour_at_10_processes": 14.63,
+    "eight_hour_estimate_complete_games": "about 110, less games still running at the end",
+    "decisions_per_game": [
+      1323,
+      1332,
+      1139,
+      1348,
+      1455,
+      1338,
+      1328,
+      1250,
+      1284,
+      1303
+    ],
+    "network_share_of_search": 0.71,
+    "peak_charged_bytes": 9144691032
+  },
+  "recorded_viewer_games": {
+    "1959": {
+      "elapsed_worker_seconds": 2828.6,
+      "decisions": 1412,
+      "status": "completed"
+    },
+    "1960": {
+      "elapsed_worker_seconds": 2799.7,
+      "decisions": 1350,
+      "status": "completed"
+    }
+  },
+  "tests": {
+    "cpp": "26 of 26 ctest groups pass, including new port-exit, carrier-scramble and stranded-aircraft tests",
+    "python": "556 tests; the only failure was the known guardian timeout under full-suite load, which passes alone; a new benchmark test's CPU setting was corrected and its file passes (13 tests)"
+  }
+}
