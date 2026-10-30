@@ -13,11 +13,13 @@ from unittest.mock import patch
 import numpy as np
 import torch
 
+from gwrl_cpp import campaign_pass_snapshot
 from studies.campaign.curriculum import make_env
-from studies.campaign.features import make_numeric_input
+from studies.campaign.features import make_numeric_input, numeric_compiler
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 from studies.campaign.shared_evaluator import (EvaluatorClosed, RemoteEvaluator, SharedEvaluatorServer, _Contexts,
                                                _graph_arrays, evaluate_prepared, prepare, prepare_into, read_arrays)
+from studies.shared.campaign_adapter import SCHEMA as SCHEDULER
 from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, UniformEvaluator, VectorMCTS
 from tools.benchmark_campaign_devices import Config, _shared_game_process
 
@@ -172,6 +174,22 @@ class NativeEvaluationArraysTests(unittest.TestCase):
         buffer = memoryview(bytearray(1 << 23))
         arrays = read_arrays(buffer, packed["observation"].write_evaluation(buffer, packed["context"], graphs, factors))
         self.assertSameArrays({name: arrays[name] for name in expected}, expected)
+
+    def test_negative_zero_keeps_its_sign_in_both_blocks(self):
+        env = make_env(SEED, calendar_rounds=2)
+        packed = make_numeric_input(env, tuple(env.legal_actions()), BUCKETS)["packed_graph"]
+        decision = env._decision_cache()
+        compiler = numeric_compiler(BUCKETS)
+        observation = compiler.compile(env.raw.numeric_observation().scheduled_observation(
+            decision.owner, decision.kind, [], SCHEDULER, env.interrupt_order, ["-0"]))
+        action = compiler.compile(campaign_pass_snapshot("-0", "pass_interrupt", "axis"))
+        buffer = memoryview(bytearray(1 << 23))
+        arrays = read_arrays(buffer, observation.write_evaluation(buffer, packed["context"], (action,),
+                                                                  (("a", "b", "c", "d"),)))
+        for name, graph in (("obs_numbers", observation), ("act_numbers", action)):
+            expected = np.ascontiguousarray(graph.arrays()["numeric"], dtype=np.float32)
+            self.assertTrue(np.signbit(expected[:, 0]).any(), name)
+            self.assertEqual(arrays[name].tobytes(), expected.tobytes(), name)
 
     def test_a_bad_menu_is_refused(self):
         env = make_env(SEED, calendar_rounds=2)

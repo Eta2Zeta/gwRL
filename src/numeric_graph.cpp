@@ -769,16 +769,17 @@ private:
     py::list header_;
 };
 
-// Copies values narrowed to the model's array type, with `shift` added; returns the end.
+// Copies values narrowed to the model's array type; returns the end.
 template <class Source, class Target>
-Target* narrowed(const Source* values, std::size_t count, Target* out, Target shift = 0) {
-    for (std::size_t index = 0; index < count; ++index) out[index] = static_cast<Target>(values[index]) + shift;
-    return out + count;
+Target* narrowed(const std::vector<Source>& values, Target* out) {
+    for (std::size_t index = 0; index < values.size(); ++index) out[index] = static_cast<Target>(values[index]);
+    return out + values.size();
 }
 
-template <class Source, class Target>
-Target* narrowed(const std::vector<Source>& values, Target* out, Target shift = 0) {
-    return narrowed(values.data(), values.size(), out, shift);
+// The same for node or token indices, moved past a block's earlier graphs.
+std::int32_t* shifted(const std::int64_t* values, std::size_t count, std::int32_t* out, std::int32_t shift) {
+    for (std::size_t index = 0; index < count; ++index) out[index] = static_cast<std::int32_t>(values[index]) + shift;
+    return out + count;
 }
 
 void writeBlock(EvaluationWriter& out, const std::string& prefix, const std::vector<const NumericGraphData*>& graphs) {
@@ -798,11 +799,11 @@ void writeBlock(EvaluationWriter& out, const std::string& prefix, const std::vec
     std::int32_t nodeStart = 0, tokenStart = 0;
     for (const auto* graph : graphs) {
         ids = narrowed(graph->tokenIds, ids);
-        offsets = narrowed(graph->tokenOffsets.data(), graph->types.size(), offsets, tokenStart);
+        offsets = shifted(graph->tokenOffsets.data(), graph->types.size(), offsets, tokenStart);
         types = narrowed(graph->types, types);
         numbers = narrowed(graph->numeric, numbers);
-        sources = narrowed(graph->sources, sources, nodeStart);
-        targets = narrowed(graph->targets, targets, nodeStart);
+        sources = shifted(graph->sources.data(), graph->sources.size(), sources, nodeStart);
+        targets = shifted(graph->targets.data(), graph->targets.size(), targets, nodeStart);
         relations = narrowed(graph->relations, relations);
         nodeStart += static_cast<std::int32_t>(graph->types.size());
         tokenStart += static_cast<std::int32_t>(graph->tokenIds.size());
@@ -836,7 +837,7 @@ void writeFactorLevels(EvaluationWriter& out, const std::vector<std::array<std::
         return factors[left] < factors[right];
     });
     std::vector<std::int32_t> owners(factors.size()), counts, parents, above(factors.size(), 0);
-    std::array<std::int32_t, 4> parentCounts;
+    std::vector<std::int32_t> parentCounts;
     std::int32_t groupsAbove = 1;
     for (std::size_t level = 1; level <= factors.front().size(); ++level) {
         counts.clear();
@@ -855,11 +856,11 @@ void writeFactorLevels(EvaluationWriter& out, const std::vector<std::array<std::
         narrowed(owners, out.array<std::int32_t>(name + "owners", owners.size()));
         narrowed(counts, out.array<std::int32_t>(name + "counts", counts.size()));
         narrowed(parents, out.array<std::int32_t>(name + "parents", parents.size()));
-        parentCounts[level - 1] = groupsAbove;
+        parentCounts.push_back(groupsAbove);
         groupsAbove = static_cast<std::int32_t>(counts.size());
         above = owners;
     }
-    narrowed(parentCounts.data(), parentCounts.size(), out.array<std::int32_t>("f_parent_counts", parentCounts.size()));
+    narrowed(parentCounts, out.array<std::int32_t>("f_parent_counts", parentCounts.size()));
 }
 
 }  // namespace
