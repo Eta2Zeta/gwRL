@@ -165,10 +165,17 @@ def _search(env, result: dict, config: dict) -> dict:
     simulations = config["simulations"]
     _require(type(simulations) is int and simulations > 0 and type(config["max_depth"]) is int
              and config["max_depth"] > 0, "Invalid recorded search budget")
-    _require(sum(result["visit_counts"]) == simulations, "Search visits do not match simulation budget")
+    # A root with one legal action is played without a search: no visits, no value.
+    searched = result["values"] is not None
+    if searched:
+        _require(sum(result["visit_counts"]) == simulations, "Search visits do not match simulation budget")
+    else:
+        _require(size == 1 and result["visit_counts"] == [0] and result["action_values"] == [None],
+                 "Only a one-action root may omit its search")
+        simulations = 0
     # Unvisited actions have no estimated value. Preserve null rather than
     # inventing a zero estimate, which could look like a strategic preference.
-    vectors = [result["values"], *(value for value in result["action_values"] if value is not None)]
+    vectors = [*([result["values"]] if searched else []), *(value for value in result["action_values"] if value is not None)]
     _require(all(isinstance(row, list) and len(row) == 3 and
                  all(isinstance(x, (float, int)) and not isinstance(x, bool) and math.isfinite(x) for x in row)
                  for row in vectors), "Invalid three-alliance search value vector")

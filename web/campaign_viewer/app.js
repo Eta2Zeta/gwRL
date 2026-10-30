@@ -453,6 +453,7 @@ function renderSearch() {
   for (const [label,value] of [['Simulations',search.simulations],['Depth cap',search.depth_cap],['Legal choices',search.actions?.length]]) {
     const item=element('span','',label);item.append(element('strong','',number(value)));stats.append(item);
   }
+  if (search.simulations===0) box.append(element('p','search-info','Only one legal move here, so it was played without a search.'));
   box.append(stats,element('p','search-info','Simulations are imagined continuations for one choice. The depth cap is a maximum number of search steps, not a number of turns. Visits count exploration; prior is the network preference; policy is the resulting search distribution.'));
   if (search.values) box.append(valuesPanel(search.values));
   box.append(element('p','search-info','Value estimates predict the campaign’s score target. They are not win probabilities. Highlighted choice is the action that was actually played.'));

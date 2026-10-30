@@ -5,6 +5,8 @@ Three separate entity-graph policy/value networks guide vector MCTS. A rollout
 batch freezes all three policies; training then updates all three together.
 Each policy learns choices made by its actual alliance, including reactions and
 controlled minors. Every value target retains `[Axis, Allies, Comintern]`.
+A decision with one legal action is played without a search or a network
+evaluation, and still records its training sample.
 
 The approved objective is the terminal wealth-gap vector. Intermediate rewards
 are zero, gamma is one, and the network divides values by a positive scale

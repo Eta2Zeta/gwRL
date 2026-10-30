@@ -331,7 +331,8 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
             if searching:
                 stats = BatchStats()
                 configs = [MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
-                                     seed=search_rngs[index].getrandbits(64)) for index in indices]
+                                     seed=search_rngs[index].getrandbits(64),
+                                     search_forced_root=config.mode == "search") for index in indices]
                 report["pending_wave"] = {"index": waves, "root_indices": indices,
                                           "search_configs": [asdict(value) for value in configs]}
                 persist()
@@ -343,7 +344,7 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
                 report["waves"].append({"index": waves, "root_indices": indices,
                     "cache_temperature": "cold_first_search" if waves == 0 else "warm_feature_caches",
                     "search_configs": [asdict(value) for value in configs], "add_root_noise": True, **asdict(stats)})
-                report["decisions"] += len(results)
+                report["decisions"] += sum(result.values is not None for result in results)
                 before = time.perf_counter()
                 if config.mode == "episode":
                     for index, result in zip(indices, results, strict=True):
@@ -357,7 +358,8 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
                             replay.update(selected_index=selected_index, selected_action=menu[selected_index], decision_menu=menu,
                                 search={"visit_counts": result.visit_counts, "priors": result.priors,
                                         "policy": result.policy, "sampling_policy": result.policy,
-                                        "values": list(result.values), "action_values": result.action_values,
+                                        "values": None if result.values is None else list(result.values),
+                                        "action_values": result.action_values,
                                         "simulations": config.simulations, "max_depth": config.max_depth,
                                         "rollout_version": evaluator.version})
                             event = {"kind": env.decision_kind(), "owner": env.current_decision_player(),

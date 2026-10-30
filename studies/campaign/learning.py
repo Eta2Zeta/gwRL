@@ -188,7 +188,8 @@ def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: Lea
     if replay is not None:
         replay.update(selected_index=index, selected_action=selected, decision_menu=menu,
             search={"visit_counts": result.visit_counts, "priors": result.priors,
-                    "policy": result.policy, "sampling_policy": policy, "values": list(result.values),
+                    "policy": result.policy, "sampling_policy": policy,
+                    "values": None if result.values is None else list(result.values),
                     "action_values": result.action_values, "simulations": config.simulations,
                     "max_depth": config.max_depth, "rollout_version": batch_version})
     event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action),

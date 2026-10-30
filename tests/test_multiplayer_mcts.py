@@ -365,8 +365,8 @@ class MultiplayerMctsTests(unittest.TestCase):
         for depth in (1, 2, 32):
             env = TreeEnv(graph)
             before = env.serialize()
-            result = VectorMCTS(ConstantEvaluator(), MctsConfig(simulations=16, max_depth=depth,
-                                                                record_trace=True)).search(env)
+            result = VectorMCTS(ConstantEvaluator(), MctsConfig(simulations=16, max_depth=depth, record_trace=True,
+                                                                search_forced_root=True)).search(env)
             self.assertFalse(env.is_terminal())
             self.assertEqual(env.serialize(), before)
             self.assertEqual(result.root.visits, 16)
@@ -388,8 +388,8 @@ class MultiplayerMctsTests(unittest.TestCase):
                  "comintern": {"player": "comintern", "actions": {"return": "root"}}}
         env = TreeEnv(graph)
         before = env.serialize()
-        search = VectorMCTS(ConstantEvaluator(), MctsConfig(simulations=16, max_depth=32,
-                                                            record_trace=True))
+        search = VectorMCTS(ConstantEvaluator(), MctsConfig(simulations=16, max_depth=32, record_trace=True,
+                                                            search_forced_root=True))
         result = search.search(env)
         self.assertEqual(result.root.visits, 16)
         self.assertEqual(result.visit_counts, [16])
@@ -453,7 +453,7 @@ class MultiplayerMctsTests(unittest.TestCase):
         graph = {"root": {"player": "axis", "actions": {"stuck": "dead"}},
                  "dead": {"player": "allies", "actions": {}}}
         with self.assertRaises(NoLegalActionError) as raised:
-            VectorMCTS(config=MctsConfig(simulations=4, seed=3)).search(TreeEnv(graph))
+            VectorMCTS(config=MctsConfig(simulations=4, seed=3, search_forced_root=True)).search(TreeEnv(graph))
         self.assertIsInstance(raised.exception, ValueError)
         self.assertEqual(json.loads(raised.exception.state)["node"], "dead")
 
@@ -475,6 +475,113 @@ class MultiplayerMctsTests(unittest.TestCase):
                 return "axis"
         with self.assertRaisesRegex(ValueError, "policy decision owner"):
             VectorMCTS().search(PolicyOwnedChance(stochastic_game(), "coin"))
+
+
+class ForcedRootTests(unittest.TestCase):
+    """A root with one legal action is played without evaluating or simulating it."""
+    GAME = {"root": {"player": "axis", "actions": {"only": "choice"}},
+            "choice": {"player": "allies", "actions": {"left": "coin", "right": "forced"}},
+            "coin": {"outcomes": [(0.5, "forced"), (0.5, "end")]},
+            "forced": {"player": "comintern", "actions": {"last": "end"}},
+            "end": {"returns": [1.0, 0.0, -1.0]}}
+
+    class Evaluator:
+        version = "counting-v1"
+
+        def __init__(self):
+            self.calls = 0
+
+        def evaluate(self, env, actions):
+            self.calls += 1
+            return Evaluation([1.0] * len(actions), (1.0, 2.0, 3.0))
+
+    def test_one_action_root_costs_no_evaluation_or_simulation(self):
+        class NoCopies(TreeEnv):
+            def clone_for_search(self, seed):
+                raise AssertionError("A forced move needs no simulation")
+
+        env, evaluator = NoCopies(self.GAME), self.Evaluator()
+        before = env.serialize()
+        result = VectorMCTS(evaluator, MctsConfig(simulations=16, seed=3)).search(env, add_root_noise=True)
+        self.assertEqual(evaluator.calls, 0)
+        self.assertEqual((result.actions, result.visit_counts, result.policy, result.priors),
+                         (["only"], [0], [1.0], [1.0]))
+        # No search ran, so no value is claimed; zero would look like an estimate.
+        self.assertIsNone(result.values)
+        self.assertEqual((result.action_values, result.simulations), ([None], []))
+        self.assertEqual(result.best_action(), "only")
+        self.assertEqual(env.serialize(), before)
+
+    def test_a_search_can_still_be_asked_for(self):
+        evaluator = self.Evaluator()
+        result = VectorMCTS(evaluator, MctsConfig(simulations=16, seed=3, search_forced_root=True)).search(TreeEnv(self.GAME))
+        self.assertGreater(evaluator.calls, 0)
+        self.assertEqual((result.visit_counts, result.policy, result.priors), ([16], [1.0], [1.0]))
+        self.assertIsNotNone(result.values)
+
+    def test_skipping_changes_no_move_or_random_stream_of_a_game(self):
+        def play(seed, search_forced_root):
+            env, search_rng, policy_rng = TreeEnv(self.GAME, seed=seed), random.Random(seed), random.Random(seed + 1)
+            moves = []
+            while not env.is_terminal():
+                if env.decision_kind() == "chance":
+                    env.resolve_chance()
+                    continue
+                config = MctsConfig(simulations=32, seed=search_rng.getrandbits(64), search_forced_root=search_forced_root)
+                result = VectorMCTS(self.Evaluator(), config).search(env, add_root_noise=True)
+                moves.append(policy_rng.choices(result.actions, weights=result.policy, k=1)[0])
+                env.apply_action(moves[-1])
+            return moves, env.serialize(), search_rng.getstate(), policy_rng.getstate()
+
+        games = [play(seed, False) for seed in range(40)]
+        self.assertEqual(games, [play(seed, True) for seed in range(40)])
+        self.assertEqual({len(game[0]) for game in games}, {2, 3})
+
+    def test_roots_with_a_choice_dice_or_an_ending_search_as_before(self):
+        evaluator = self.Evaluator()
+        choice = VectorMCTS(evaluator, MctsConfig(simulations=16, seed=3)).search(TreeEnv(self.GAME, "choice"))
+        self.assertEqual(sum(choice.visit_counts), 16)
+        self.assertIsNotNone(choice.values)
+        dice = VectorMCTS(evaluator, MctsConfig(simulations=16, seed=3)).search(TreeEnv(self.GAME, "coin"))
+        self.assertEqual(dice.actions, [])
+        self.assertIsNotNone(dice.values)
+        ending = VectorMCTS(evaluator, MctsConfig(simulations=2)).search(TreeEnv(self.GAME, "end"))
+        self.assertEqual((ending.actions, ending.values), ([], (1.0, 0.0, -1.0)))
+
+    def test_a_forced_root_passes_the_same_checks_as_any_other(self):
+        ownerless = {"root": {"actions": {"only": "end"}}, "end": {"returns": [0.0, 0.0, 0.0]}}
+        with self.assertRaisesRegex(ValueError, "entitled player"):
+            VectorMCTS().search(TreeEnv(ownerless))
+        dead = {"root": {"player": "axis", "actions": {}}}
+        with self.assertRaises(NoLegalActionError):
+            VectorMCTS().search(TreeEnv(dead))
+
+    def test_a_dead_end_behind_a_forced_move_is_found_at_the_next_root(self):
+        graph = {"root": {"player": "axis", "actions": {"stuck": "dead"}},
+                 "dead": {"player": "allies", "actions": {}}}
+        env = TreeEnv(graph)
+        env.apply_action(VectorMCTS().search(env).best_action())
+        with self.assertRaises(NoLegalActionError) as raised:
+            VectorMCTS().search(env)
+        self.assertEqual(json.loads(raised.exception.state)["node"], "dead")
+
+    def test_a_reused_tree_keeps_its_statistics_across_a_forced_root(self):
+        search = VectorMCTS(self.Evaluator(), MctsConfig(simulations=32, seed=3))
+        first = search.search(TreeEnv(self.GAME, "choice"))
+        forced = search.search(TreeEnv(self.GAME, "forced"))
+        self.assertEqual((forced.visit_counts, forced.values), ([0], None))
+        self.assertTrue(forced.reused_root)
+        again = search.search(TreeEnv(self.GAME, "choice"))
+        self.assertEqual(sum(again.visit_counts), sum(first.visit_counts) + 32)
+
+    def test_fixed_opponent_search_does_not_ask_the_opponent_policy(self):
+        def refuse(env, actions):
+            raise AssertionError("A forced move needs no opponent model")
+
+        policy = OpponentPolicy("refuses-v1", refuse)
+        config = MctsConfig(simulations=8, mode="fixed_opponents", target_player="axis")
+        result = VectorMCTS(self.Evaluator(), config, opponent_policy=policy).search(TreeEnv(self.GAME))
+        self.assertEqual(result.best_action(), "only")
 
 
 class InterruptRawEnv:

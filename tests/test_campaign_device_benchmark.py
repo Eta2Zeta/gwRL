@@ -1,8 +1,10 @@
 """Device timing stays synchronized, matched and honest about unfinished games."""
 from __future__ import annotations
 
+import contextlib
 import copy
 from concurrent.futures import Future
+import io
 import json
 from pathlib import Path
 import time
@@ -13,7 +15,7 @@ from unittest.mock import patch
 
 from studies.campaign.shared_evaluator import EvaluatorClosed, ServerStats
 from studies.shared.multiplayer_mcts import NoLegalActionError
-from tools.benchmark_campaign_devices import (Config, TimedEvaluator, all_slots_busy, compare_selfplay,
+from tools.benchmark_campaign_devices import (Config, TimedEvaluator, all_slots_busy, compare_selfplay, main,
     mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, selfplay, setup_models,
     shared_summary, supervise_device)
 
@@ -63,6 +65,20 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
             with self.subTest(values=values), self.assertRaises(ValueError): Config(**values)
         self.assertEqual(Config(**selfplay_values, processes=10, seeds=tuple(range(10))).processes, 10)
         self.assertEqual(len(Config(**selfplay_values, processes=10, seeds=tuple(range(30))).seeds), 30)
+
+    def test_searching_forced_roots_is_an_explicit_switch(self):
+        self.assertFalse(Config().search_forced_roots)
+        with self.assertRaisesRegex(ValueError, "search_forced_roots"):
+            Config(search_forced_roots=1)
+        seen = []
+        def paired(config, output):
+            seen.append(config.search_forced_roots)
+            return {"status": "completed"}
+        with patch("tools.benchmark_campaign_devices.paired", side_effect=paired), \
+             contextlib.redirect_stdout(io.StringIO()):
+            main(["--output", "unused.json"])
+            main(["--output", "unused.json", "--search-forced-roots"])
+        self.assertEqual(seen, [False, True])
 
     def test_parallel_selfplay_merges_games_in_seed_order_and_requires_identical_weights(self):
         class Immediate:
@@ -241,6 +257,9 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
                          (4., 2.5))
         self.assertEqual((forward["calls"], forward["seconds"], forward["batch_sizes"]), (800, 30., {2: 400, 3: 400}))
         self.assertEqual((evaluated["calls"], evaluated["requests"], evaluated["synchronized_seconds"]), (500, 2000, 32.))
+        # Games of forced moves alone make no requests, and the rate has no meaning.
+        silent, _, _ = self.summarize_shared([{**row, "evaluations": 0} for row in games])
+        self.assertIsNone(silent["steady_state_games_per_hour"])
         truncated, _, _ = self.summarize_shared(games[:-1] + [game(4, 1, 1150., 1250., 200, terminal=False)])
         self.assertEqual((truncated["status"], truncated["completed_games"]), ("truncated", 4))
         for name in ("complete_games_per_hour", "queue_estimate_games_per_hour", "steady_state_games_per_hour"):

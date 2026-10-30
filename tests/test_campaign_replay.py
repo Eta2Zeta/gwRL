@@ -160,6 +160,42 @@ class CampaignReplayTests(unittest.TestCase):
             self.assertEqual(json.loads(output.read_text()), {"schema": "fixture"})
             self.assertEqual([path.name for path in Path(directory).iterdir()], ["viewer.json"])
 
+    def forced_position(self):
+        """A real decision with one legal action, reached by seeded play."""
+        env = make_env(9182, calendar_rounds=1)
+        while True:
+            if env.decision_kind() == "chance":
+                env.resolve_chance()
+                continue
+            actions = env.legal_actions()
+            if len(actions) == 1:
+                return env, actions
+            env.apply_action(actions[-1])
+
+    def test_a_forced_move_replays_with_no_search_and_no_value(self):
+        env, actions = self.forced_position()
+        ids = [action.id for action in actions]
+        played = {"action_ids": ids, "visit_counts": [0], "priors": [1.], "policy": [1.], "values": None,
+                  "action_values": [None]}
+        search = replay_module._search(env, played, {"simulations": 64, "max_depth": 16})
+        self.assertEqual((search["simulations"], search["values"]), (0, None))
+        self.assertEqual((search["actions"][0]["visits"], search["actions"][0]["policy"]), (0, 1.))
+        for forged in ({"visit_counts": [64]}, {"action_values": [[0., 0., 0.]]}):
+            with self.assertRaisesRegex(ValueError, "one-action root"):
+                replay_module._search(env, {**played, **forged}, {"simulations": 64, "max_depth": 16})
+        with self.assertRaisesRegex(ValueError, "simulation budget"):
+            replay_module._search(env, {**played, "values": [0., 0., 0.]}, {"simulations": 64, "max_depth": 16})
+
+    def test_only_a_one_action_root_may_omit_its_search(self):
+        env = make_env(9182, calendar_rounds=1)
+        actions = env.legal_actions()
+        self.assertGreater(len(actions), 1)
+        size = len(actions)
+        with self.assertRaisesRegex(ValueError, "one-action root"):
+            replay_module._search(env, {"action_ids": [action.id for action in actions], "visit_counts": [0] * size,
+                                        "priors": [1 / size] * size, "policy": [1 / size] * size, "values": None,
+                                        "action_values": [None] * size}, {"simulations": 64, "max_depth": 16})
+
     def test_training_stream_prefix_preserves_origin_search_and_observed_events(self):
         env = make_env(9182, calendar_rounds=1)
         context = env.context()

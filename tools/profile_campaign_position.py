@@ -184,7 +184,8 @@ def worker(args) -> dict:
             search_seed = reference["waves"][0]["search_configs"][0]["seed"]
         else:
             search_seed = random.Random(args.seed ^ 0x9E3779B97F4A7C15).getrandbits(64)
-    config = MctsConfig(simulations=16, max_depth=16, seed=search_seed, mode="multiplayer", record_trace=True)
+    config = MctsConfig(simulations=16, max_depth=16, seed=search_seed, mode="multiplayer", record_trace=True,
+                        search_forced_root=True)
     report["status"] = "profiling_serial_search"
     report["serial_search"] = {"config": asdict(config), "add_root_noise": True,
                               "cache_scope": "Root features warmed by three operation-profile repeats; descendants first-use",

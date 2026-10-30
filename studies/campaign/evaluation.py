@@ -287,7 +287,8 @@ def evaluate(env_factory: Callable[[int], Any], evaluator: Any, *, target_player
             _merge_stats(batch_stats, wave)
             for index, result, action in zip(indices, results, selected, strict=True):
                 env = envs[index]
-                if predictions[index] is None:
+                # A one-action root has no search value; the next searched decision gives it.
+                if predictions[index] is None and result.values is not None:
                     predictions[index] = list(vector(result.values))
                     prediction_points[index] = {"planning_key": env.planning_key(),
                                                 "transitions": counts[index]["transitions"],

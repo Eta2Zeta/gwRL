@@ -51,6 +51,25 @@ class ScalingBenchmarkTests(unittest.TestCase):
                     self.assertEqual(record["selected_action"], record["decision_menu"][record["selected_index"]])
                     self.assertEqual(record["search"]["simulations"], 1)
 
+    def test_episodes_play_forced_moves_at_once_and_count_only_real_searches(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "result.json"
+            command = [sys.executable, "-m", "studies.campaign.scaling_benchmark", "--output", str(output),
+                       "--mode", "episode", "--roots", "1", "--threads", "1", "--simulations", "1",
+                       "--max-depth", "2", "--max-transitions", "30", "--seconds", "60",
+                       "--hidden-dim", "8", "--message-layers", "1", "--token-buckets", "128", "--record-replay"]
+            result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=70)
+            self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+            report = json.loads(output.read_text())
+            records = [json.loads(line) for line in output.with_suffix(".replay.jsonl").read_text().splitlines()]
+        self.assertFalse(report["waves"][0]["search_configs"][0]["search_forced_root"])
+        played = [record for record in records if record["type"] == "transition" and record["event"]["kind"] != "chance"]
+        forced = [record["search"] for record in played if len(record["decision_menu"]) == 1]
+        self.assertGreater(len(forced), 0)
+        self.assertTrue(all((row["visit_counts"], row["values"]) == ([0], None) for row in forced))
+        self.assertEqual(report["executed_decisions"], len(played))
+        self.assertEqual(report["decisions"], len(played) - len(forced))
+
     def test_authorized_resource_envelope_includes_both_coordinators(self):
         config = BenchmarkConfig(roots=6, threads=4)
         self.assertEqual(config.roots + config.threads + 2, 12)
@@ -155,6 +174,7 @@ class ScalingBenchmarkTests(unittest.TestCase):
         self.assertTrue(all(row["transitions"] == 0 and row["status"] == "reached"
                             for row in report["preparation"]["roots"]))
         self.assertEqual(report["waves"][0]["roots"], 2)
+        self.assertTrue(all(row["search_forced_root"] for row in report["waves"][0]["search_configs"]))
         self.assertEqual(report["model"]["training_updates"], 0)
         self.assertTrue(report["model"]["frozen"])
         self.assertEqual(set(report["model"]["versions"]), {"axis", "allies", "comintern"})

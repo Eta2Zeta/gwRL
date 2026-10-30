@@ -3,9 +3,11 @@
 
 Runs the shared self-play of tools/benchmark_campaign_devices.py (game
 processes with one thread per game, plus one MPS coordinator) at the settings
-of the 2026-10-29 shared-GPU run, with every game process instrumented. Each
-game thread charges its own CPU time (time.thread_time_ns) to the innermost
-category it is in, so time in nested calls is counted once, in the inner one:
+of the 2026-10-29 shared-GPU run, with every game process instrumented. That
+run searched one-action roots; here they are played at once unless
+--search-forced-roots asks for the search. Each game thread charges its own CPU
+time (time.thread_time_ns) to the innermost category it is in, so time in nested
+calls is counted once, in the inner one:
 
   search logic          VectorMCTS's tree code: everything in a search not below
   adapter               CampaignAdapter's Python layer around the engine
@@ -325,6 +327,7 @@ def main(argv=None) -> int:
     parser.add_argument("--sample-at", default="",
                         help="Comma-separated seconds into the run at which to sample one game process's native stacks")
     parser.add_argument("--sample-seconds", type=int, default=30)
+    parser.add_argument("--search-forced-roots", action="store_true", help="Search one-action roots too")
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_progress", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
@@ -339,7 +342,8 @@ def main(argv=None) -> int:
     from tools.benchmark_campaign_devices import Config
     from tools.supervise_campaign_training import aggregate_rss
     values = {**asdict(Config()), **SETTINGS, "seeds": [int(seed) for seed in args.seeds.split(",")],
-              "processes": args.processes, "games_per_process": args.games_per_process, "seconds": args.seconds}
+              "processes": args.processes, "games_per_process": args.games_per_process, "seconds": args.seconds,
+              "search_forced_roots": args.search_forced_roots}
     Config(**{**values, **{name: tuple(values[name]) for name in ("devices", "seeds", "batch_sizes",
                                                                   "position_labels")}})
     output.parent.mkdir(parents=True, exist_ok=True)

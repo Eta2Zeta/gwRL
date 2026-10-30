@@ -137,7 +137,38 @@ class ToggleEnv(EvaluationEnv):
         self.node = 1 - self.node
 
 
+class ForcedEnv(EvaluationEnv):
+    """Listed target decisions have one legal action."""
+    forced = (0,)
+
+    def legal_actions(self):
+        actions = super().legal_actions()
+        return actions[:1] if self.node in self.forced else actions
+
+
 class CampaignEvaluationTests(unittest.TestCase):
+    def test_a_forced_first_decision_leaves_the_prediction_to_the_first_search(self):
+        report = evaluate(ForcedEnv, CountingEvaluator(), target_player="axis", seeds=[1009],
+                          simulations=4, max_depth=4, max_transitions=5)
+        game = report["games"][0]
+        self.assertEqual(game["decisions_by_actor"]["axis"], 2)
+        self.assertIsNotNone(game["first_search_value_prediction"])
+        self.assertEqual(game["first_search_prediction_point"]["transitions"], 1)
+        self.assertEqual(report["value_calibration"]["complete_games"], 1)
+
+    def test_a_game_with_only_forced_target_decisions_has_no_fake_prediction(self):
+        class AllForced(ForcedEnv):
+            forced = (0, 1)
+
+        report = evaluate(AllForced, CountingEvaluator(), target_player="axis", seeds=[1009],
+                          simulations=4, max_depth=4, max_transitions=5)
+        game = report["games"][0]
+        self.assertEqual(game["counts"]["transitions"], 5)
+        self.assertIsNone(game["first_search_value_prediction"])
+        self.assertIsNone(game["terminal_value_error"])
+        self.assertEqual(report["value_calibration"]["complete_games"], 0)
+        json.dumps(report, allow_nan=False)
+
     def test_network_only_uses_batched_priors_without_search_or_fake_root_values(self):
         actual = []
 

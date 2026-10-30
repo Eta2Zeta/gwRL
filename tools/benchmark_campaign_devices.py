@@ -49,6 +49,8 @@ class Config:
     max_transitions: int = 5000
     max_state_visits: int = 20
     search_evaluation: str = "batched"
+    # Search one-action roots anyway, to compare against playing them at once.
+    search_forced_roots: bool = False
     processes: int = 1
     # Process-parallel MPS self-play: games each process plays at once, one per
     # thread, all evaluated in shared batches by the coordinating process.
@@ -85,6 +87,8 @@ class Config:
             raise ValueError("Self-play horizon must be between one and eleven rounds")
         if self.search_evaluation not in {"batched", "per_search"}:
             raise ValueError("Search evaluation must be batched or per_search")
+        if type(self.search_forced_roots) is not bool:
+            raise ValueError("search_forced_roots must be true or false")
         if type(self.processes) is not int or not 1 <= self.processes <= len(self.seeds):
             raise ValueError("Self-play processes must be between one and the number of games")
         if self.processes > 1 and (self.mode != "selfplay" or self.search_evaluation != "per_search" or self.threads != 1):
@@ -354,7 +358,8 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
                 searching.append(env); indices.append(index)
         if searching:
             settings = [MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
-                                  seed=search_rngs[index].getrandbits(64)) for index in indices]
+                                  seed=search_rngs[index].getrandbits(64),
+                                  search_forced_root=config.search_forced_roots) for index in indices]
             stats = BatchStats()
             try:
                 results = search_many(searching, evaluator, configs=settings, add_root_noise=True, stats=stats,
@@ -519,7 +524,8 @@ def play_shared_game(config, seed, evaluator, deadline_epoch):
                 count.update(transitions=1, chance_events=1)
             else:
                 settings = MctsConfig(simulations=config.simulations, max_depth=config.max_depth,
-                                      seed=search_rng.getrandbits(64))
+                                      seed=search_rng.getrandbits(64),
+                                      search_forced_root=config.search_forced_roots)
                 before = time.perf_counter()
                 search = VectorMCTS(evaluator, settings).search(env, add_root_noise=True)
                 timings["search"] += time.perf_counter() - before
@@ -748,7 +754,8 @@ def shared_summary(config, games, stats, samples, *, task, game_process_cpu_seco
         "queue_estimate_games_per_hour": len({game["slot"] for game in finished}) * 3600 / mean_seconds
                                          if complete else None,
         "all_slots_busy": busy, "mean_evaluations_per_finished_game": per_game,
-        "steady_state_games_per_hour": busy["evaluations_per_second"] * 3600 / per_game if complete and busy else None,
+        "steady_state_games_per_hour": busy["evaluations_per_second"] * 3600 / per_game
+                                       if complete and busy and per_game else None,
         "search_simulations": config.simulations, "search_depth_cap": config.max_depth,
         "timing_seconds_summed_across_games": dict(timing),
         "game_process_cpu_seconds": game_process_cpu_seconds,
@@ -984,6 +991,7 @@ def main(argv=None):
         elif name == "mode": parser.add_argument("--mode", choices=("inference", "selfplay"), default=default)
         elif name == "search_evaluation":
             parser.add_argument("--search-evaluation", choices=("batched", "per_search"), default=default)
+        elif name == "search_forced_roots": parser.add_argument("--search-forced-roots", action="store_true")
         else: parser.add_argument("--" + name.replace("_", "-"), type=float if name in {"seconds", "value_scale", "atol", "rtol"} else int, default=default)
     parser.add_argument("--_worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--_device", help=argparse.SUPPRESS)

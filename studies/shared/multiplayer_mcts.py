@@ -3,6 +3,13 @@
 The three components always mean Axis, Allies, Comintern. Decision owners choose
 their own component; chance samples the rules environment and never becomes a
 policy decision. This is finite-budget Max-N search, not an equilibrium solver.
+
+A root with one legal action has nothing to decide, so a search returns it at
+once: no evaluation, no simulations and no value estimate. The caller's random
+draws are outside the search, so a game evaluated one position at a time plays
+exactly as if it had searched. With batched evaluation the skipped positions
+leave their batches, which can change other positions' network outputs in the
+last digits.
 """
 from __future__ import annotations
 
@@ -138,6 +145,7 @@ class MctsConfig:
     root_dirichlet_alpha: float = 0.3
     root_dirichlet_epsilon: float = 0.25
     record_trace: bool = False
+    search_forced_root: bool = False  # Simulate a one-action root anyway.
 
     def __post_init__(self) -> None:
         if self.simulations <= 0 or self.max_depth <= 0:
@@ -250,7 +258,7 @@ class SearchResult:
     visit_counts: list[int]
     policy: list[float]
     priors: list[float]
-    values: Vector
+    values: Vector | None  # None when a one-action root was not searched.
     action_values: list[Vector | None]
     root: Node
     cache_identity: tuple[str, ...]
@@ -301,20 +309,25 @@ class VectorMCTS:
             raise ValueError("Planning key merges different decision owners or kinds")
         return node, reused
 
+    def _legal(self, node: Node, env: SearchEnv) -> tuple[list[Any], list[str]]:
+        """A policy decision's legal actions and their stable identities."""
+        if node.player not in PLAYERS:
+            raise ValueError("A policy decision must name its entitled player")
+        actions = list(env.legal_actions())
+        if not actions:
+            raise NoLegalActionError(env)
+        keys = [action_key(action) for action in actions]
+        if len(set(keys)) != len(keys):
+            raise ValueError("Legal actions need unique stable identities")
+        return actions, keys
+
     def _expand(self, node: Node, env: SearchEnv) -> Vector:
         if env.is_terminal():
             node.evaluation = vector(env.returns())
         elif node.kind == "chance":
             node.evaluation = ZERO
         else:
-            if node.player not in PLAYERS:
-                raise ValueError("A policy decision must name its entitled player")
-            actions = list(env.legal_actions())
-            if not actions:
-                raise NoLegalActionError(env)
-            keys = [action_key(action) for action in actions]
-            if len(set(keys)) != len(keys):
-                raise ValueError("Legal actions need unique stable identities")
+            actions, keys = self._legal(node, env)
             evaluation = self.evaluator.evaluate(env, actions)
             priors = probabilities(evaluation.priors, len(actions))
             node.evaluation = vector(evaluation.values)
@@ -339,6 +352,10 @@ class VectorMCTS:
             self._bounds.clear()
         identity = self.cache_identity(env)
         root, reused = self._node(env)
+        if root.kind not in {"chance", "terminal"} and not self.config.search_forced_root:
+            actions, _ = self._legal(root, env)
+            if len(actions) == 1:
+                return SearchResult(actions, [0], [1.0], [1.0], None, [None], root, identity, reused, [])
         if not root.expanded:
             self._expand(root, env)
         bounds = self._bounds.setdefault(identity[:-1], [Bounds() for _ in PLAYERS])

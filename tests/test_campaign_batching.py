@@ -114,6 +114,27 @@ class CampaignBatchingTests(unittest.TestCase):
         for name in ("actions", "visit_counts", "policy", "priors", "values", "action_values", "cache_identity", "simulations"):
             self.assertEqual(getattr(actual, name), getattr(expected, name), name)
 
+    def test_one_action_roots_finish_without_a_request_in_both_evaluation_modes(self):
+        class Forced(TinyEnv):
+            def legal_actions(self):
+                return ["reply"] if self.node == "root" else super().legal_actions()
+
+        for evaluation in ("batched", "per_search"):
+            envs = [Forced(actor=0, tag=1), TinyEnv(actor=1, tag=2), Forced(actor=2, tag=3)]
+            configs = [MctsConfig(simulations=16, max_depth=4, seed=31 + i) for i in range(3)]
+            evaluator, stats = RecordingEvaluator(), BatchStats()
+            first, searched, last = self.bounded(lambda: search_many(envs, evaluator, configs=configs, stats=stats,
+                                                                     add_root_noise=True, evaluation=evaluation))
+            self.assertEqual((first.actions, first.visit_counts, first.values), (["reply"], [0], None))
+            self.assertEqual((last.actions, last.visit_counts, last.values), (["reply"], [0], None))
+            self.assertEqual(sum(searched.visit_counts), 16)
+            self.assertEqual({row[0] for batch in evaluator.batches for row in batch}, {2})
+            evaluator, stats = RecordingEvaluator(), BatchStats()
+            results = self.bounded(lambda: search_many([Forced(), Forced(tag=1)], evaluator, config=MctsConfig(simulations=8),
+                                                       stats=stats, evaluation=evaluation))
+            self.assertEqual([result.visit_counts for result in results], [[0], [0]])
+            self.assertEqual((stats.requests, stats.batches, evaluator.batches), (0, 0, []))
+
     def test_real_batches_match_sequential_search_for_all_actors_and_noise(self):
         for noise in (False, True):
             envs = [TinyEnv(actor=i % 3, tag=i * 11) for i in range(6)]
