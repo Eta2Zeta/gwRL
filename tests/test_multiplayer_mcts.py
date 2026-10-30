@@ -256,7 +256,9 @@ class MultiplayerMctsTests(unittest.TestCase):
         self.assertEqual(multiplayer.best_action(), "safe")
         enter = next(edge for edge in fixed.root.edges if edge.action == "enter")
         self.assertAlmostEqual(enter.values[0], expected[0], delta=0.3)
-        self.assertTrue(any(choice.mode == "opponent_policy" for trace in fixed.simulations for choice in trace.selections))
+        choices = [choice for trace in fixed.simulations for choice in trace.selections]
+        self.assertEqual({bool(choice.scores) for choice in choices if choice.mode == "opponent_policy"}, {False})
+        self.assertEqual({bool(choice.scores) for choice in choices if choice.mode == "puct"}, {True})
         rng = random.Random(512)
         actual = []
         for _ in range(2000):
