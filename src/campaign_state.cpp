@@ -48,12 +48,16 @@ std::uint64_t readCounter(const V& v) {
 }
 void writeString(std::string& out,const std::string& text) {
     static constexpr char hex[]="0123456789abcdef"; out+='"';
-    for (unsigned char c:text) {
-        if (c=='"' || c=='\\') { out+='\\'; out+=static_cast<char>(c); }
-        else if (c<32) { out+="\\u00"; out+=hex[c>>4]; out+=hex[c&15]; }
-        else out+=static_cast<char>(c);
+    // Almost all text holds nothing to escape, so it is appended in whole runs.
+    std::size_t run=0;
+    for (std::size_t at=0;at<text.size();++at) {
+        const unsigned char c=text[at];
+        if (c>=32 && c!='"' && c!='\\') continue;
+        out.append(text.data()+run,at-run); run=at+1;
+        if (c<32) { out+="\\u00"; out+=hex[c>>4]; out+=hex[c&15]; }
+        else { out+='\\'; out+=static_cast<char>(c); }
     }
-    out+='"';
+    out.append(text.data()+run,text.size()-run); out+='"';
 }
 void writeJson(std::string& out,const V& v) {
     if (v.isNull()) out+="null";
@@ -155,7 +159,7 @@ ChanceRequest readChance(const V& v) { ChanceRequest c; c.id=v.require("id").asS
 // Objects list their keys in the sorted order canonicalJson gives a JSON
 // object; integers print as canonicalJson prints them as numbers.
 // An object's first key opens it; each later key follows a comma.
-void writeKey(std::string& out,const char* key,bool first=false) { out+=first?'{':','; out+='"'; out+=key; out+="\":"; }
+template<std::size_t N> void writeKey(std::string& out,const char (&key)[N],bool first=false) { out+=first?'{':','; out+='"'; out.append(key,N-1); out.append("\":",2); }
 void writeInt(std::string& out,int value) { char buffer[16]; const auto end=std::to_chars(buffer,buffer+sizeof(buffer),value).ptr; out.append(buffer,end); }
 void writeBool(std::string& out,bool value) { out+=value?"true":"false"; }
 void writeOptionalId(std::string& out,const std::optional<Id>& value) { if(value)writeString(out,*value); else out+="null"; }
@@ -407,7 +411,7 @@ State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     s.validate();return s;
 }
 std::string State::serialize() const { validate();std::string out;out.reserve(1<<17);writeState(out,*this,true);return out; }
-std::string State::planningKey() const { std::string out;out.reserve(1<<16);writeState(out,*this,false);return contentDigest(out); }
+std::string State::planningKey() const { std::string out;out.reserve(1<<17);writeState(out,*this,false);return contentDigest(out); }
 V State::observation() const { auto object=toJson(false).asObject();object.erase("definition_fingerprint");return V(std::move(object)); }
 
 void State::validate() const {

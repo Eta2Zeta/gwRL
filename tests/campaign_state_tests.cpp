@@ -266,6 +266,34 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
         rejects([&]{state.validate();},"Nested nonfinite action-interface number accepted");
     }
 }
+// Strings are appended in whole runs; they must escape exactly as written one
+// character at a time, wherever an escaped byte falls.
+void canonicalStringsEscapeEveryByte() {
+    const auto escaped=[](const std::string& text) {
+        static constexpr char hex[]="0123456789abcdef";std::string out="\"";
+        for(unsigned char c:text) {
+            if(c=='"'||c=='\\'){out+='\\';out+=static_cast<char>(c);}
+            else if(c<32){out+="\\u00";out+=hex[c>>4];out+=hex[c&15];}
+            else out+=static_cast<char>(c);
+        }
+        return out+'"';
+    };
+    const auto same=[&](const std::string& text) {
+        check(canonicalJson(V(text))==escaped(text),"Canonical string differs from its escaped characters");
+        check(canonicalJson(V(O{{text,V(1.0)}}))=="{"+escaped(text)+":1}","Canonical key differs from its escaped characters");
+    };
+    same("");
+    for(int byte=0;byte<256;++byte) {
+        const std::string c(1,static_cast<char>(byte));
+        for(const auto& text:{c,c+c+c,"ab"+c,c+"cd","ab"+c+"cd","ab"+c+"cd"+c})same(text);
+    }
+    std::mt19937_64 random(2049);
+    for(int sample=0;sample<2000;++sample) {
+        std::string text(random()%64,'\0');
+        for(auto& c:text)c=random()%8?static_cast<char>('a'+random()%26):static_cast<char>(random());
+        same(text);
+    }
+}
 // Saves and planning keys write the state's canonical text directly; it must
 // equal the text of the JSON tree, including decisions, battles and history.
 void directTextMatchesJsonTree() {
@@ -286,4 +314,4 @@ void directTextMatchesJsonTree() {
     }
 }
 }
-int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();directTextMatchesJsonTree();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();canonicalStringsEscapeEveryByte();directTextMatchesJsonTree();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
