@@ -75,7 +75,7 @@ class CampaignNumericLearningTests(unittest.TestCase):
         result = _result(self.env)
         # Populate the one-time immutable context before prohibiting public
         # board conversion; subsequent decisions use native snapshots.
-        make_numeric_input(self.env, result.actions, self.model_config.token_buckets)
+        prepared = make_numeric_input(self.env, result.actions, self.model_config.token_buckets)
         original = ScheduledAction.features
         with mock.patch.object(self.env, "observation", side_effect=AssertionError("No public board conversion")), \
              mock.patch.object(self.env, "neural_observation", side_effect=AssertionError("No source board conversion")), \
@@ -87,6 +87,9 @@ class CampaignNumericLearningTests(unittest.TestCase):
         self.assertNotIn("observation", saved)
         self.assertNotIn("actions", saved)
         self.assertIsInstance(saved["packed_graph"]["observation"], gwrl_cpp.CampaignNumericGraph)
+        # Replay keeps an exact copy, so the search's arrays can be reused.
+        self.assertIsNot(saved["packed_graph"]["observation"], prepared["packed_graph"]["observation"])
+        self.assertEqual(saved["packed_graph"]["observation"], prepared["packed_graph"]["observation"])
         self.assertEqual(len(saved["packed_graph"]["actions"]), len(result.actions))
         selected = features.call_args.args[0]
         raw = selected.features().get("action") or selected.features()

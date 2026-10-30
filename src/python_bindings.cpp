@@ -189,6 +189,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def_property_readonly("token_buckets", &game::neural::NumericGraph::bucketCount)
         .def_property_readonly("nbytes", &game::neural::NumericGraph::retainedBytes)
         .def("packed_state", &game::neural::NumericGraph::packedState)
+        .def("compacted", &game::neural::NumericGraph::compacted)
         .def_static("from_packed", &game::neural::NumericGraph::fromPacked)
         .def("__deepcopy__", [](const std::shared_ptr<game::neural::NumericGraph>& graph, py::dict) { return graph; })
         .def(py::pickle(

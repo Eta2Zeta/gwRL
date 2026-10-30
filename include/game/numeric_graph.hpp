@@ -29,6 +29,8 @@ public:
     pybind11::dict debugGraph() const;
     pybind11::dict packedState() const;
     static std::shared_ptr<NumericGraph> fromPacked(const pybind11::dict& state);
+    // An equal graph with no spare capacity, for retaining an observation.
+    std::shared_ptr<NumericGraph> compacted() const;
 
     // Preserve the model's reference-first, sorted-identity-index ordering.
     // The returned arrays are (destination indices, context node indices).
@@ -47,7 +49,6 @@ public:
 private:
     explicit NumericGraph(std::shared_ptr<const NumericGraphData> data);
     std::shared_ptr<const NumericGraphData> data_;
-    std::size_t retainedBytes_ = 0;
     friend class NumericGraphCompiler;
 };
 
