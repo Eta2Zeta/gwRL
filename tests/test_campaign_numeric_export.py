@@ -250,6 +250,39 @@ class CampaignNumericExportTests(unittest.TestCase):
         gc.collect()
         self.assert_graph_equal(compact, expected)
 
+    def test_cached_graphs_keep_no_spare_capacity(self):
+        packed = make_numeric_input(self.env, self.env.legal_actions(), BUCKETS)["packed_graph"]
+        for graph in (packed["context"], packed["actions"][0]):
+            self.assertEqual(graph.nbytes, graph.compacted().nbytes)
+
+    def test_spare_observation_graphs_stay_bounded(self):
+        menu = self.env.legal_actions()
+        decision = self.env._decision_cache()
+        snapshot = self.env.raw.numeric_observation().scheduled_observation(
+            decision.owner, decision.kind, tuple(action.numeric_snapshot() for action in menu), SCHEDULER,
+            self.env.interrupt_order, sorted(self.env._passed))
+        compiler = numeric_compiler(BUCKETS)
+        capacity = compiler.cache_stats()["set_capacity"]
+        graphs = [compiler.compile(snapshot) for _ in range(capacity + 5)]
+        self.assertEqual(compiler.cache_stats()["spare_graphs"], 0)
+        del graphs
+        gc.collect()
+        self.assertEqual(compiler.cache_stats()["spare_graphs"], capacity)
+
+    def test_scheduling_a_snapshot_again_replaces_its_menu(self):
+        menu = self.env.legal_actions()
+        decision = self.env._decision_cache()
+        snapshots = tuple(action.numeric_snapshot() for action in menu[:2])
+        def schedule(source):
+            return source.scheduled_observation(decision.owner, decision.kind, snapshots, SCHEDULER,
+                                                self.env.interrupt_order, sorted(self.env._passed))
+        once = schedule(self.env.raw.numeric_observation())
+        twice = schedule(once)
+        self.assertEqual(len(twice.to_python()["legal_actions"]), len(snapshots))
+        self.assertEqual(twice.to_python(), once.to_python())
+        compiler = numeric_compiler(BUCKETS)
+        self.assertEqual(compiler.compile(twice), compiler.compile(once))
+
     def test_threads_compiling_together_use_separate_bounded_cache_sets(self):
         threads = 4
         inside = threading.Barrier(threads)
@@ -383,6 +416,16 @@ class CampaignNumericExportTests(unittest.TestCase):
         foreign = ScheduledAction("foreign-menu-id", "play", chosen.player, chosen.raw)
         with self.assertRaisesRegex(ValueError, "stale/foreign"):
             self.env.numeric_input((foreign,), BUCKETS)
+        # A list as long as the menu that is not the menu gets no shortcut.
+        menu = tuple(actions)
+        self.assertGreater(len(menu), 1)
+        packed = self.env.numeric_input(menu, BUCKETS)["packed_graph"]
+        turned = self.env.numeric_input(tuple(reversed(menu)), BUCKETS)["packed_graph"]
+        self.assertEqual(turned["actions"], packed["actions"][::-1])
+        self.assertEqual(turned["action_factors"], packed["action_factors"][::-1])
+        self.assertIsNone(self.env.numeric_input((equal, *menu[1:]), BUCKETS))
+        with self.assertRaisesRegex(ValueError, "stale/foreign"):
+            self.env.numeric_input((foreign, *menu[1:]), BUCKETS)
         self.env.apply_action(chosen)
         try:
             stale = self.env.numeric_input((chosen,), BUCKETS)

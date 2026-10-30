@@ -141,6 +141,7 @@ class NativeEvaluationArraysTests(unittest.TestCase):
                 self.assertMatchesReference(env, actions)
                 self.assertMatchesReference(env, ())
                 self.assertMatchesReference(env, tuple(reversed(actions[::2])))
+                self.assertMatchesReference(env, tuple(reversed(actions)))
             if step % 150 == 0:
                 VectorMCTS(Checking(), MctsConfig(simulations=8, max_depth=8, seed=step)).search(env)
                 searches += 1

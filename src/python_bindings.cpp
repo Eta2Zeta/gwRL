@@ -96,6 +96,7 @@ struct NumericSnapshot {
         result.overrides["current_decision_player"] = owner ? V(*owner) : V(nullptr);
         result.overrides["decision_kind"] = V(kind);
         result.overrides["legal_actions"] = V(V::Array{});
+        result.menu.clear();
         result.menu.reserve(actions.size());
         for (const NumericSnapshot& action : actions) {
             result.menu.push_back(action.overrides.empty() ? action.source : std::make_shared<const V>(action.materialize()));

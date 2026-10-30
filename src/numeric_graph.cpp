@@ -203,6 +203,7 @@ struct NumericGraphData {
         relations.shrink_to_fit();
         references.shrink_to_fit();
         identities.shrink_to_fit();
+        for (auto& identity : identities) identity.nodes.shrink_to_fit();
     }
 
     void addTokens(const std::vector<std::int64_t>& tokens) {
@@ -956,8 +957,14 @@ py::dict NumericGraphCompiler::cacheStats() const {
             bytes += caches->fields.bytes + caches->values.bytes;
         }
     }
+    std::size_t spareGraphs = 0;
+    {
+        std::lock_guard lock(impl_->spares->mutex);
+        spareGraphs = impl_->spares->graphs.size();
+    }
     py::dict result;
     result["cache_sets"] = sets;
+    result["spare_graphs"] = spareGraphs;
     result["field_tokens"] = fields;
     result["value_tokens"] = values;
     result["numeric_features"] = numeric;

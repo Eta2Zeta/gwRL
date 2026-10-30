@@ -112,7 +112,7 @@ def prepare_fixture(config, *, factory=None, deadline=None):
     from studies.campaign.baselines import scripted_policy
     from studies.campaign.curriculum import compatibility, make_env, task_manifest
     from studies.campaign.features import NUMERIC_SCHEMA, make_numeric_input
-    from studies.campaign.learning import CampaignLearner, TARGET_SCHEMA
+    from studies.campaign.learning import CampaignLearner, TARGET_SCHEMA, retained_numeric_input
     from studies.campaign.run import source_hashes
     from studies.shared.multiplayer_mcts import PLAYERS, OpponentPolicy, action_key, probabilities, vector
     from tools.benchmark_campaign_backends import check_terminal
@@ -138,6 +138,7 @@ def prepare_fixture(config, *, factory=None, deadline=None):
             desired = probabilities(policy.distribution(env, actions), len(actions))
             features = make_numeric_input(env, actions, config.token_buckets)
             require(features["schema"] == NUMERIC_SCHEMA, "Real fixture requires direct complete numerical inputs")
+            features = retained_numeric_input(features)
             sample = {"input": features, "owner": owner, "policy": desired, "rollout_version": policy.version}
             CampaignLearner._validate_sample(sample, labeled=False, buckets=config.token_buckets)
             # The same standard sampler consumes the already computed complete

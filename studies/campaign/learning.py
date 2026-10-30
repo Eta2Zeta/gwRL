@@ -142,6 +142,12 @@ def _selected_features(action: Any) -> dict[str, Any]:
     return feature
 
 
+def retained_numeric_input(features: dict[str, Any]) -> dict[str, Any]:
+    """A numeric input to keep for a run: its observation has no spare capacity."""
+    packed = features["packed_graph"]
+    return {**features, "packed_graph": {**packed, "observation": packed["observation"].compacted()}}
+
+
 def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
     order = sorted(range(len(actions)), key=lambda index: action_key(actions[index]))
     threshold = rng.random()
@@ -172,10 +178,7 @@ def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: Lea
         if (validate_numeric_input(features, buckets=token_buckets) != len(result.actions)
                 or features["owner"] != owner):
             raise ValueError("Numerical replay differs from actual choice owner/menu")
-        features = features.copy()
-        # Replay keeps the observation for the run, without its spare capacity.
-        packed = features["packed_graph"]
-        features["packed_graph"] = {**packed, "observation": packed["observation"].compacted()}
+        features = retained_numeric_input(features)
         _intern_numeric_context(features, numeric_pool)
     else:
         features["context"] = _intern_context(features["context"], context_pool)
