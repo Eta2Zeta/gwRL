@@ -60,6 +60,7 @@ class CampaignBenchmarkEnv {
     std::shared_ptr<const campaign::Rules> rules_;
     std::optional<campaign::Engine> engine_;
     void resolvePendingChance();
+    void useOrdinaryEngine();  // A plain copy of a search copy would have no rollback.
 };
 
 } // namespace game

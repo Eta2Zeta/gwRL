@@ -403,6 +403,7 @@ void CampaignBenchmarkEnv::setDiceTapeForTesting(std::vector<int> tape) { engine
 std::string CampaignBenchmarkEnv::serialize() const { return engine_->serialize(); }
 void CampaignBenchmarkEnv::restore(const std::string &snapshot) { engine_ = Engine::restore(initial_.definition, rules_, snapshot); }
 void CampaignBenchmarkEnv::useSearchSeed(std::uint64_t seed) { engine_ = engine_->cloneForSearch(seed); }
+void CampaignBenchmarkEnv::useOrdinaryEngine() { engine_ = engine_->clone(); }
 std::string CompositionBattleEnv::winnerId() const {
     if (!isTerminal()) return "";
     if (unitCountFor("Attacker") && !unitCountFor("Defender")) return "Attacker";

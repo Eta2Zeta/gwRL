@@ -101,6 +101,30 @@ class CampaignBenchmarkTests(unittest.TestCase):
                 ordinary.step(action)
             self.assertEqual(search.serialize(), ordinary.serialize())
 
+    def test_clone_of_a_search_copy_keeps_its_rollback(self):
+        decision = "unhandled_decision"
+        option = {"id": "unhandled", "kind": "unhandled", "player": "allies", "nation": "kmt",
+                  "decision": decision, "parameters": {}}
+        for make in (gwrl_cpp.CompositionBattleEnv, lambda: gwrl_cpp.JapanTrainingEnv(str(TINY))):
+            env = make()
+            saved = json.loads(env.serialize())
+            saved["state"]["decisions"].append({"id": decision, "kind": "unhandled_reaction", "nation": "kmt",
+                                                "reaction": True, "continuation": "unhandled", "options": [option]})
+            env.restore(json.dumps(saved, sort_keys=True, separators=(",", ":")))
+            search = env.clone_for_search(5)
+            clone = search.clone()
+            before = clone.serialize()
+            action = clone.legal_actions()[0]
+            self.assertEqual(action.kind, "unhandled")
+            with self.assertRaises(RuntimeError):
+                clone.step(action)
+            self.assertEqual(clone.serialize(), before)
+            with self.assertRaises(RuntimeError):
+                search.step(action)
+            for call in (search.serialize, search.clone):
+                with self.assertRaisesRegex(RuntimeError, "Search copy failed"):
+                    call()
+
     def test_invalid_configuration_and_empty_forces(self):
         with self.assertRaises(RuntimeError):
             gwrl_cpp.CompositionBattleEnv(-1, 2)
