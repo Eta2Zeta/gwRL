@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import random
 import unittest
 
 import gwrl_cpp
@@ -14,6 +15,51 @@ SCENARIO = Path(__file__).resolve().parents[1] / "game_content/scenarios/japan_c
 
 def end_phase(env):
     env.apply_action(next(a for a in env.legal_actions() if a.kind == "end_phase"))
+
+
+def play_search_copy_beside_ordinary_copy(test, seed, rounds):
+    """Play one random complete game on a search copy and on an ordinary engine, comparing every step."""
+    in_place = gwrl_cpp.CampaignEnv.curriculum(str(SCENARIO), rounds, seed, training_actions=True).clone_for_search(seed)
+    copying = in_place.clone()
+    choice = random.Random(f"search-copy:{seed}")
+    steps = 0
+    while True:
+        steps += 1
+        test.assertEqual(in_place.planning_key(), copying.planning_key())
+        test.assertEqual(in_place.serialize(), copying.serialize())
+        if in_place.is_terminal():
+            test.assertTrue(copying.is_terminal())
+            return steps
+        if in_place.decision_kind() == "chance":
+            in_place.resolve_chance()
+            copying.resolve_chance()
+            continue
+        actions, interrupts = in_place.legal_actions(), in_place.legal_interrupts()
+        test.assertEqual([action.describe() for action in actions], [action.describe() for action in copying.legal_actions()])
+        test.assertEqual([action.describe() for action in interrupts],
+                         [action.describe() for action in copying.legal_interrupts()])
+        if interrupts and choice.random() < 0.02:
+            action = choice.choice(interrupts)
+            in_place.apply_interrupt(action)
+            copying.apply_interrupt(action)
+            continue
+        ending = [action for action in actions if action.kind == "end_phase"]
+        action = ending[0] if ending and choice.random() < 0.05 else choice.choice(actions)
+        in_place.apply_action(action)
+        copying.apply_action(action)
+
+
+def env_with_unhandled_decision(seed):
+    """A saved game whose pending decision lists an option the rules accept, then fail on."""
+    env = gwrl_cpp.CampaignEnv(str(SCENARIO), seed)
+    saved = json.loads(env.serialize())
+    decision = "unhandled_decision"
+    option = {"id": "unhandled", "kind": "unhandled", "player": "allies", "nation": "kmt",
+              "decision": decision, "parameters": {}}
+    saved["state"]["decisions"].append({"id": decision, "kind": "unhandled_reaction", "nation": "kmt", "reaction": True,
+                                        "continuation": "unhandled", "options": [option]})
+    env.restore(json.dumps(saved, sort_keys=True, separators=(",", ":")))
+    return env
 
 
 class CampaignEnvironmentTests(unittest.TestCase):
@@ -73,6 +119,50 @@ class CampaignEnvironmentTests(unittest.TestCase):
         self.assertEqual(search.observation(), env.observation())
         self.assertEqual(search.planning_key(), env.planning_key())
         self.assertNotEqual(search.serialize(), env.serialize())
+
+    def test_search_copies_play_complete_games_exactly_like_ordinary_engines(self):
+        for seed in (61, 62, 63):
+            with self.subTest(seed=seed):
+                self.assertGreater(play_search_copy_beside_ordinary_copy(self, seed, 2), 100)
+
+    def test_search_copy_that_fails_mid_move_refuses_every_later_call(self):
+        env = env_with_unhandled_decision(71)
+        checkpoint, key, observation = env.serialize(), env.planning_key(), env.observation()
+        search = env.clone_for_search(5)
+        option = search.legal_actions()[0]
+        ordinary = env.clone()
+        with self.assertRaises(RuntimeError):
+            ordinary.apply_action(option)
+        self.assertEqual(ordinary.serialize(), checkpoint)
+        with self.assertRaises(RuntimeError):
+            search.apply_action(option)
+        calls = {"is_terminal": (), "current_decision_player": (), "current_nation": (), "decision_kind": (),
+                 "legal_actions": (), "legal_interrupts": (), "apply_action": (option,), "apply_interrupt": (option,),
+                 "resolve_chance": (), "chance_request": (), "apply_chance_outcome": (key, ()), "returns": (),
+                 "wealth": (), "observation": (), "numeric_observation": (), "numeric_context": (), "context": (),
+                 "clone": (), "clone_for_search": (1,), "planning_key": (), "landing_plan_reachable": (),
+                 "landing_shortfall": (), "serialize": (), "history_size": (), "history_since": (0,),
+                 "restore": (checkpoint,)}
+        for name, arguments in calls.items():
+            with self.subTest(call=name), self.assertRaisesRegex(RuntimeError, "Search copy failed"):
+                getattr(search, name)(*arguments)
+        self.assertEqual((env.serialize(), env.planning_key(), env.observation()), (checkpoint, key, observation))
+        self.assertEqual(env.clone_for_search(6).planning_key(), key)
+
+    def test_rejected_actions_leave_a_search_copy_usable(self):
+        env = gwrl_cpp.CampaignEnv(str(SCENARIO), 72)
+        other = gwrl_cpp.CampaignEnv(str(SCENARIO), 72)
+        end_phase(other)
+        stale = other.legal_actions()[0]
+        search = env.clone_for_search(5)
+        before = search.serialize()
+        with self.assertRaises(RuntimeError):
+            search.apply_action(stale)
+        with self.assertRaises(RuntimeError):
+            search.resolve_chance()
+        self.assertEqual(search.serialize(), before)
+        end_phase(search)
+        self.assertEqual(search.planning_key(), other.planning_key())
 
     def test_recruitment_is_a_chance_node_and_does_not_advance_the_turn(self):
         env = gwrl_cpp.CampaignEnv(str(SCENARIO), 11)

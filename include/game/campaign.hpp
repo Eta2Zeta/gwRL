@@ -399,12 +399,12 @@ class Rules {
 
 class Engine {
   public:
-    Id rulesId() const { return rules_->id(); }
+    Id rulesId() const { requireIntact(); return rules_->id(); }
     // Wrap an already prepared state; no start-of-turn hook is re-applied.
     Engine(State initial, std::shared_ptr<const Rules> rules, std::uint64_t seed = 1);
     // A fresh campaign invokes the first nation's beginTurn exactly once.
     static Engine start(State initial, std::shared_ptr<const Rules> rules, std::uint64_t seed = 1);
-    const State& state() const { return state_; }
+    const State& state() const { requireIntact(); return state_; }
     std::vector<Action> legalActions() const;
     std::vector<Action> legalInterrupts() const;
     void step(const Action& action);
@@ -413,7 +413,11 @@ class Engine {
     // Explicit conformance/replay input. Validates the complete current decision
     // and every face/reroll, applies ordinary rules/history, and consumes no RNG.
     void applyChanceOutcome(const std::string& expectedKey, const ChanceOutcome&);
-    Engine clone() const;
+    Engine clone() const;  // An ordinary engine, also when copied from a search copy.
+    // A copy for one simulation, on the search random stream. It is thrown away
+    // afterwards, so it changes its state in place, without the rollback an
+    // ordinary engine has. Should a transition fail after its legality check,
+    // the copy refuses every later call; a rejected action leaves it usable.
     Engine cloneForSearch(std::uint64_t seed) const;
     void setDiceTapeForTesting(std::vector<int> tape);
     std::string serialize() const;
@@ -422,6 +426,9 @@ class Engine {
                          const std::string& checkpoint, const std::vector<Event>& events);
     std::string exactReplayIdentity() const;
     std::string planningKey() const;
+    void requireIntact() const {
+        if (unfinished_) throw std::runtime_error("Search copy failed during a transition");
+    }
 
   private:
     struct ActionMenu;
@@ -436,9 +443,12 @@ class Engine {
     // Bounded menus by complete planning key, shared by every clone of one
     // engine, so a search clone reaching another clone's state reuses its menu.
     std::shared_ptr<MenuTable> menuTable_;
+    bool disposable_ {false};
+    bool unfinished_ {false};  // Stays set if a transition in place throws.
     std::shared_ptr<const ActionMenu> actionMenu() const;
     std::shared_ptr<const ActionMenu> interruptMenu() const;
     void invalidateDecisionCache();
+    template <class Change> void transition(Change&& change);
     void commitChance(const ChanceRequest&, const ChanceOutcome&);
     void endPhase();
 };

@@ -28,8 +28,8 @@ class CampaignEnv {
     // Valid until this environment's next successful mutation. Callers that
     // need an independently mutable snapshot can copy the returned value.
     const json::Value& observation() const;
-    json::Value context() const { return *context_; }
-    std::shared_ptr<const json::Value> contextSnapshot() const { return context_; }
+    json::Value context() const { engine_.requireIntact(); return *context_; }
+    std::shared_ptr<const json::Value> contextSnapshot() const { engine_.requireIntact(); return context_; }
     std::shared_ptr<const json::Value> observationSnapshot() const;
     CampaignEnv clone() const;
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
@@ -51,6 +51,8 @@ class CampaignEnv {
     std::shared_ptr<const json::Value> context_;
     // Engine state is exposed as const; successful wrapper mutations are the
     // only invalidation points. Search reseeding leaves decision identity alone.
+    // A search copy that failed mid-move still shares its source's cache here,
+    // so cached reads ask the engine whether it is intact first.
     std::shared_ptr<DecisionCache> decisionCache_;
 };
 

@@ -733,8 +733,22 @@ class HistoryRules : public FixtureRules {
         }
         return actions;
     }
+    std::vector<Action> interrupts(const State&) const override {
+        Action action;
+        action.id = action.kind = "interrupt_after_mutation";
+        action.nation = "kmt";
+        action.player = "allies";
+        action.parameters = V(O{});
+        return {action};
+    }
     void apply(State& state, const Action& action) const override {
         if (action.kind == "append_event") state.history.push_back(Event{"audit", V(O{{"value", V(1.0)}}), "key"});
+        else if (action.kind == "interrupt_after_mutation") {
+            state.flags["bad_mutation"] = 1;
+            throw std::runtime_error("Synthetic interrupt failure");
+        }
+        // As the economy rules do, read the action after removing the decision that held it.
+        else if (action.kind == "react") { state.decisions.pop_back(); ++state.flags["reacted:" + action.kind]; }
         else if (action.kind == "append_nonfinite")
             state.history.push_back(Event{"audit", V(O{{"value", V(std::numeric_limits<double>::infinity())}}), "key"});
         else if (action.kind == "rebuild_history") {
@@ -764,6 +778,107 @@ void transitionsCheckAddedHistoryAndEverythingElse() {
     }
     engine.step(findAction(engine, "append_event"));
     require(engine.state().history.size() == 5, "A rejected transition stopped later ones");
+}
+
+void refusesEveryCall(Engine& failed) {
+    Action action;
+    action.id = action.kind = "mark";
+    const std::vector<std::function<void()>> calls{
+        [&] { failed.state(); }, [&] { failed.rulesId(); }, [&] { failed.legalActions(); },
+        [&] { failed.legalInterrupts(); }, [&] { failed.step(action); }, [&] { failed.interrupt(action); },
+        [&] { failed.resolveChance(); }, [&] { failed.applyChanceOutcome("key", ChanceOutcome{{{2}, {7}}}); },
+        [&] { failed.clone(); }, [&] { failed.cloneForSearch(1); }, [&] { failed.setDiceTapeForTesting({1}); },
+        [&] { failed.serialize(); }, [&] { failed.exactReplayIdentity(); }, [&] { failed.planningKey(); },
+        [&] { auto copy = failed; copy.state(); }};
+    for (const auto& call : calls) {
+        std::string message;
+        try { call(); } catch (const std::exception& error) { message = error.what(); }
+        require(message == "Search copy failed during a transition", "A failed search copy answered a call: " + message);
+    }
+}
+
+void searchCopiesRefuseEveryCallAfterFailingMidTransition() {
+    auto rules = std::make_shared<HistoryRules>();
+    Engine engine(initialState(), rules, 81);
+    engine.step(findAction(engine, "mark"));
+    const auto checkpoint = engine.serialize();
+    const auto key = engine.planningKey();
+    for (const auto& kind : {"throw_after_mutation", "change_clock", "append_nonfinite", "clear_history", "corrupt_state"}) {
+        auto search = engine.cloneForSearch(3);
+        rejects([&] { search.step(findAction(search, kind)); }, std::string("Search copy accepted ") + kind);
+        refusesEveryCall(search);
+    }
+    auto interrupted = engine.cloneForSearch(4);
+    rejects([&] { interrupted.interrupt(interrupted.legalInterrupts().front()); }, "Search copy accepted a failing interrupt");
+    refusesEveryCall(interrupted);
+
+    auto pending = engine.clone();
+    pending.step(findAction(pending, "request_chance"));
+    rules->throwOnChance = true;
+    auto rolled = pending.cloneForSearch(5);
+    rejects([&] { rolled.resolveChance(); }, "Search copy accepted a failing chance handler");
+    refusesEveryCall(rolled);
+    auto explicitOutcome = pending.cloneForSearch(6);
+    rejects([&] { explicitOutcome.applyChanceOutcome(explicitOutcome.planningKey(), ChanceOutcome{{{2}, {7}}}); },
+            "Search copy accepted a failing explicit chance handler");
+    refusesEveryCall(explicitOutcome);
+    rules->throwOnChance = false;
+
+    require(engine.serialize() == checkpoint && engine.planningKey() == key, "A failed search copy changed its source");
+    auto fresh = engine.cloneForSearch(7);
+    fresh.step(findAction(fresh, "mark"));
+    require(fresh.state().flags.at("marks") == 2, "A failed search copy spoiled later copies");
+}
+
+void searchCopiesStayUsableAfterRejections() {
+    auto rules = std::make_shared<HistoryRules>();
+    Engine engine(initialState(), rules, 82);
+    auto search = engine.cloneForSearch(3);
+    const auto before = search.serialize();
+    auto forged = findAction(search, "mark");
+    forged.parameters = V(O{{"value", V(999.0)}});
+    rejects([&] { search.step(forged); }, "Search copy accepted a forged action");
+    rejects([&] { search.interrupt(forged); }, "Search copy accepted a forged interrupt");
+    rejects([&] { search.resolveChance(); }, "Search copy resolved absent chance");
+    rejects([&] { search.applyChanceOutcome(search.planningKey(), ChanceOutcome{{{2}, {7}}}); }, "Search copy applied absent chance");
+    require(search.serialize() == before, "A rejected call changed a search copy");
+    search.step(findAction(search, "request_chance"));
+    const auto pending = search.serialize();
+    rejects([&] { search.applyChanceOutcome("stale key", ChanceOutcome{{{2}, {7}}}); }, "Search copy applied a stale outcome");
+    rejects([&] { search.applyChanceOutcome(search.planningKey(), ChanceOutcome{{{2}, {99}}}); }, "Search copy applied an impossible outcome");
+    require(search.serialize() == pending, "A rejected outcome changed a search copy");
+    search.resolveChance();
+    require(search.state().flags.contains("result"), "A rejection stopped a search copy");
+}
+
+void searchCopiesMatchEnginesThatRollBack() {
+    auto rules = std::make_shared<HistoryRules>();
+    Engine engine(initialState(), rules, 83);
+    auto inPlace = engine.cloneForSearch(3);
+    auto copying = inPlace.clone();
+    const auto both = [&](const std::function<void(Engine&)>& change) {
+        change(inPlace);
+        change(copying);
+        require(inPlace.serialize() == copying.serialize() && inPlace.planningKey() == copying.planningKey(),
+                "Changing a search copy in place differs from swapping in a copy");
+    };
+    const auto mark = [](Engine& next) { next.step(findAction(next, "mark")); };
+    const auto chance = [](Engine& next) { next.step(findAction(next, "request_chance")); };
+    both(mark);
+    both([](Engine& next) { next.step(findAction(next, "request_reaction")); });
+    // The action passed here lives inside the decision that the rules remove.
+    both([](Engine& next) { next.step(next.state().decisions.back().options.front()); });
+    require(inPlace.state().flags.at("reacted:react") == 1, "Rules lost the action they were applying");
+    both(chance);
+    both([](Engine& next) { next.resolveChance(); });
+    both(chance);
+    both([](Engine& next) { next.applyChanceOutcome(next.planningKey(), ChanceOutcome{{{2}, {7}}}); });
+    for (int phase = 0; phase < 12; ++phase) both(endPhase);
+
+    const auto snapshot = copying.serialize();
+    rejects([&] { copying.step(findAction(copying, "throw_after_mutation")); }, "Throwing handler accepted");
+    require(copying.serialize() == snapshot, "A plain copy of a search copy lost its rollback");
+    both(mark);
 }
 
 void eventLogCopiesShareEventsAndStayIndependent() {
@@ -833,6 +948,9 @@ int main() {
         {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
         {"reached menus shared across clones and bounded", reachedMenusAreSharedAcrossClonesAndBounded},
         {"transitions check added history and everything else", transitionsCheckAddedHistoryAndEverythingElse},
+        {"failed search copies refuse every call", searchCopiesRefuseEveryCallAfterFailingMidTransition},
+        {"rejections leave search copies usable", searchCopiesStayUsableAfterRejections},
+        {"search copies match engines that roll back", searchCopiesMatchEnginesThatRollBack},
         {"event log copies share events", eventLogCopiesShareEventsAndStayIndependent},
         {"position facts scoped to one state", positionFactsAreScopedToOneUnchangedState},
     };

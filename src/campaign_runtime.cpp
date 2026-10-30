@@ -324,6 +324,7 @@ PositionScope::PositionScope(const State& state) : previous_(openScopes) {
 PositionScope::~PositionScope() { openScopes = previous_; }
 
 std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
+    requireIntact();
     std::lock_guard lock(decisionCache_->mutex);
     if (decisionCache_->actions) return decisionCache_->actions;
     auto menu = std::make_shared<ActionMenu>();
@@ -390,29 +391,48 @@ std::vector<Action> Engine::legalActions() const {
     return actionMenu()->actions;
 }
 
+// An ordinary engine changes a copy and swaps it in, so a failure leaves it as
+// it was. A disposable engine changes itself. A failure then leaves no position
+// behind, and CampaignEnv copies still share their source's cached key and
+// observation, so unfinished_ stays set and every later call is refused.
+template <class Change> void Engine::transition(Change&& change) {
+    if (disposable_) {
+        unfinished_ = true;
+        invalidateDecisionCache();
+        change(*this);
+        unfinished_ = false;
+        return;
+    }
+    Engine next = clone();
+    next.invalidateDecisionCache();
+    change(next);
+    *this = std::move(next);
+}
+
 void Engine::step(const Action& action) {
     const auto proposed = canonicalJson(actionJson(action));
     const auto menu = actionMenu();
     const auto found = menu->canonicalById.find(action.id);
     require(found != menu->canonicalById.end() && *found->second == proposed, "Illegal campaign action");
-    Engine next = clone();
-    next.invalidateDecisionCache();
-    const RecordedHistory recorded(next.state_);
-    if (reserved(action)) next.endPhase();
-    else {
-        const auto before = next.state_.clock;
-        const bool terminal = next.state_.terminal;
-        next.rules_->apply(next.state_, action);
-        checkHookClock(next.state_, before, terminal);
-    }
-    recorded.validate(next.state_);
-    const auto stateKey=next.state_.planningKey();
-    next.state_.history.push_back(Event{"action", actionJson(action), stateKey});
-    next.decisionCache_->stateKey=stateKey;
-    *this = std::move(next);
+    // Changing state_ in place can destroy the decision option passed here.
+    transition([chosen = action](Engine& next) {
+        const RecordedHistory recorded(next.state_);
+        if (reserved(chosen)) next.endPhase();
+        else {
+            const auto before = next.state_.clock;
+            const bool terminal = next.state_.terminal;
+            next.rules_->apply(next.state_, chosen);
+            checkHookClock(next.state_, before, terminal);
+        }
+        recorded.validate(next.state_);
+        const auto stateKey=next.state_.planningKey();
+        next.state_.history.push_back(Event{"action", actionJson(chosen), stateKey});
+        next.decisionCache_->stateKey=stateKey;
+    });
 }
 
 std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
+    requireIntact();
     std::lock_guard lock(decisionCache_->mutex);
     if (decisionCache_->interrupts) return decisionCache_->interrupts;
     auto menu = std::make_shared<ActionMenu>();
@@ -450,48 +470,48 @@ void Engine::interrupt(const Action& action) {
     const auto menu=interruptMenu();
     const auto found=menu->canonicalById.find(action.id);
     require(found!=menu->canonicalById.end()&&*found->second==proposed, "Illegal campaign interrupt");
-    auto next=clone();
-    next.invalidateDecisionCache();
-    const RecordedHistory recorded(next.state_);
-    const auto before=next.state_.clock;
-    const bool beforeTerminal=next.state_.terminal;
-    next.rules_->apply(next.state_,action);
-    checkHookClock(next.state_,before,beforeTerminal);
-    recorded.validate(next.state_);
-    const auto stateKey=next.state_.planningKey();
-    next.state_.history.push_back(Event{"interrupt",actionJson(action),stateKey});
-    next.decisionCache_->stateKey=stateKey;
-    *this=std::move(next);
+    transition([chosen=action](Engine& next) {
+        const RecordedHistory recorded(next.state_);
+        const auto before=next.state_.clock;
+        const bool beforeTerminal=next.state_.terminal;
+        next.rules_->apply(next.state_,chosen);
+        checkHookClock(next.state_,before,beforeTerminal);
+        recorded.validate(next.state_);
+        const auto stateKey=next.state_.planningKey();
+        next.state_.history.push_back(Event{"interrupt",actionJson(chosen),stateKey});
+        next.decisionCache_->stateKey=stateKey;
+    });
 }
 
 void Engine::resolveChance() {
+    requireIntact();
     require(!state_.terminal && state_.chance.has_value(), "No pending campaign chance request");
-    Engine next = clone();
-    next.invalidateDecisionCache();
-    const ChanceRequest request = *next.state_.chance;
-    ChanceOutcome outcome;
-    for (const auto& die : request.dice) {
-        validateDie(die);
-        std::vector<int> faces;
-        for (int count = 0;; ++count) {
-            const int face = next.random_.roll(die.sides);
-            faces.push_back(face);
-            if (!die.rerollFaces.contains(face) || count == die.maxRerolls) break;
+    transition([](Engine& next) {
+        const ChanceRequest request = *next.state_.chance;
+        ChanceOutcome outcome;
+        for (const auto& die : request.dice) {
+            validateDie(die);
+            std::vector<int> faces;
+            for (int count = 0;; ++count) {
+                const int face = next.random_.roll(die.sides);
+                faces.push_back(face);
+                if (!die.rerollFaces.contains(face) || count == die.maxRerolls) break;
+            }
+            outcome.faces.push_back(std::move(faces));
         }
-        outcome.faces.push_back(std::move(faces));
-    }
-    next.commitChance(request, outcome);
-    *this = std::move(next);
+        next.commitChance(request, outcome);
+    });
 }
 
 void Engine::applyChanceOutcome(const std::string& expectedKey, const ChanceOutcome& outcome) {
+    requireIntact();
     require(!state_.terminal && state_.chance.has_value(), "No pending campaign chance request");
     require(planningKey() == expectedKey, "Stale campaign chance outcome");
-    auto next = clone();
-    next.invalidateDecisionCache();
-    const auto request = *next.state_.chance;
-    next.commitChance(request, outcome);
-    *this = std::move(next);
+    (void)effectiveResults(*state_.chance, outcome);  // An invalid outcome changes nothing, in place or not.
+    transition([&outcome](Engine& next) {
+        const auto request = *next.state_.chance;
+        next.commitChance(request, outcome);
+    });
 }
 
 void Engine::commitChance(const ChanceRequest& request, const ChanceOutcome& outcome) {
@@ -555,10 +575,16 @@ void Engine::endPhase() {
     checkHookClock(state_, before, terminal);
 }
 
-Engine Engine::clone() const { return *this; }
+Engine Engine::clone() const {
+    requireIntact();
+    Engine result = *this;
+    result.disposable_ = false;
+    return result;
+}
 
 Engine Engine::cloneForSearch(std::uint64_t seed) const {
     Engine result = clone();
+    result.disposable_ = true;
     result.random_.search = RandomStreams::seeded(seed).search;
     result.random_.active = "search";
     result.random_.testTape.clear();
@@ -567,12 +593,14 @@ Engine Engine::cloneForSearch(std::uint64_t seed) const {
 }
 
 void Engine::setDiceTapeForTesting(std::vector<int> tape) {
+    requireIntact();
     for (int face : tape) require(face > 0, "Invalid test dice tape face");
     random_.testTape = std::move(tape);
     random_.tapePosition = 0;
 }
 
 std::string Engine::serialize() const {
+    requireIntact();
     return canonicalJson(V(O{{"schema_version", V(1.0)}, {"rules_id", V(rules_->id())},
                              {"state", state_.toJson()}, {"random", random_.toJson()}}));
 }
@@ -619,6 +647,7 @@ Engine Engine::replay(std::shared_ptr<const Definition> definition, std::shared_
 std::string Engine::exactReplayIdentity() const { return contentDigest(serialize()); }
 
 std::string Engine::planningKey() const {
+    requireIntact();
     std::lock_guard lock(decisionCache_->mutex);
     if(!decisionCache_->stateKey)decisionCache_->stateKey=state_.planningKey();
     return contentDigest(canonicalJson(V(O{{"rules_id", V(rules_->id())}, {"state_key", V(*decisionCache_->stateKey)}})));

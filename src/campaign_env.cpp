@@ -81,6 +81,7 @@ std::string CampaignEnv::decisionKind() const {
 const V& CampaignEnv::observation() const { return *observationSnapshot(); }
 
 std::shared_ptr<const V> CampaignEnv::observationSnapshot() const {
+    engine_.requireIntact();
     std::lock_guard lock(decisionCache_->mutex);
     if (decisionCache_->observation) return decisionCache_->observation;
     const auto owner = currentDecisionPlayer();
@@ -97,9 +98,10 @@ std::shared_ptr<const V> CampaignEnv::observationSnapshot() const {
     return decisionCache_->observation;
 }
 
-CampaignEnv CampaignEnv::clone() const { return *this; }
+CampaignEnv CampaignEnv::clone() const { return CampaignEnv(engine_.clone(), *this); }
 CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const { return CampaignEnv(engine_.cloneForSearch(seed), *this); }
 std::string CampaignEnv::planningKey() const {
+    engine_.requireIntact();
     std::lock_guard lock(decisionCache_->mutex);
     if (!decisionCache_->planningKey) decisionCache_->planningKey = engine_.planningKey();
     return *decisionCache_->planningKey;

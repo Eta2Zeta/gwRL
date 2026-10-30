@@ -218,6 +218,41 @@ void searchCopiesKeepTheirSourceEnvironment() {
     require(env.serialize() == checkpoint && env.planningKey() == key, "Search copy changed its source");
 }
 
+void failedSearchCopiesRefuseEveryCall() {
+    auto s = loadScenario(scenario);
+    queuePoliticalDecision(s, "kmt", "test_reaction", {politicalAction(s, "kmt", "test_reaction")});
+    CampaignEnv env(Engine(s, campaignRules(), 7));
+    const auto checkpoint = env.serialize();
+    const auto key = env.planningKey();
+    const auto* snapshot = &env.observation();
+    const auto refuses = [](const std::function<void()>& operation, const std::string& message) {
+        try { operation(); } catch (const std::exception&) { return; }
+        throw std::runtime_error(message);
+    };
+    auto search = env.cloneForSearch(9);
+    const auto unhandled = search.legalActions().front();
+    auto forged = unhandled;
+    forged.parameters = V(O{{"forged", V(true)}});
+    refuses([&] { search.applyAction(forged); }, "Search copy accepted a forged action");
+    require(search.planningKey() == key && &search.observation() == snapshot, "A rejected action spoiled a search copy");
+    // The rules take this listed option up and then fail on it.
+    refuses([&] { search.applyAction(unhandled); }, "Search copy accepted an action its rules cannot apply");
+    const std::vector<std::function<void()>> calls{
+        [&] { search.isTerminal(); }, [&] { search.currentDecisionPlayer(); }, [&] { search.currentNation(); },
+        [&] { search.decisionKind(); }, [&] { search.legalActions(); }, [&] { search.legalInterrupts(); },
+        [&] { search.applyAction(unhandled); }, [&] { search.applyInterrupt(unhandled); }, [&] { search.resolveChance(); },
+        [&] { search.chanceRequest(); }, [&] { search.applyChanceOutcome(key, ChanceOutcome{}); }, [&] { search.returns(); },
+        [&] { search.wealth(); }, [&] { search.observation(); }, [&] { search.observationSnapshot(); },
+        [&] { search.context(); }, [&] { search.contextSnapshot(); }, [&] { search.clone(); },
+        [&] { search.cloneForSearch(1); }, [&] { search.planningKey(); }, [&] { search.serialize(); },
+        [&] { search.historySize(); }, [&] { search.historySince(0); }, [&] { search.restore(checkpoint); },
+        [&] { search.engine().state(); }};
+    for (const auto& call : calls) refuses(call, "A failed search copy answered a call");
+    require(env.planningKey() == key && &env.observation() == snapshot && env.serialize() == checkpoint,
+            "A failed search copy changed its source");
+    require(env.cloneForSearch(10).planningKey() == key, "A failed search copy spoiled later copies");
+}
+
 void setupValuesAndNoDoubleCounting() {
     auto s = loadScenario(scenario);
     const auto initial = allianceWealth(s);
@@ -308,6 +343,7 @@ int main() {
         {"planning key cache invalidation", cachedPlanningKeysTrackEveryMutation},
         {"observation snapshot reuse", observationsAreSharedOnlyForTheSameDecisionState},
         {"search copies keep their source environment", searchCopiesKeepTheirSourceEnvironment},
+        {"failed search copies refuse every call", failedSearchCopiesRefuseEveryCall},
         {"setup and temporary asset values", setupValuesAndNoDoubleCounting},
         {"repair/rail/neutral accounting", repairsRailAndNeutralAttribution},
         {"ordered general-sum returns", terminalThreeVector},

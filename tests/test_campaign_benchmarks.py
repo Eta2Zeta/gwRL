@@ -12,6 +12,7 @@ import gwrl_cpp
 
 ROOT = Path(__file__).resolve().parents[1]
 TINY = ROOT / "game_content/scenarios/china_simplified_setup.json"
+CAMPAIGN = ROOT / "game_content/scenarios/japan_china_1936"
 
 
 def choose(env, kind):
@@ -81,6 +82,24 @@ class CampaignBenchmarkTests(unittest.TestCase):
         search = env.clone_for_search(201)
         self.assertEqual(search.encode_state(), env.encode_state())
         self.assertNotEqual(search.serialize(), env.serialize())
+
+    def test_search_copies_play_like_ordinary_engines(self):
+        foreign = gwrl_cpp.CampaignEnv(str(CAMPAIGN), 1).legal_actions()[0]
+        for make in (gwrl_cpp.CompositionBattleEnv, lambda: gwrl_cpp.JapanTrainingEnv(str(TINY))):
+            env = make()
+            search = env.clone_for_search(202)
+            ordinary = env.clone()
+            ordinary.restore(search.serialize())
+            with self.assertRaises(RuntimeError):
+                search.step(foreign)
+            for _ in range(300):
+                self.assertEqual(search.serialize(), ordinary.serialize())
+                if search.is_terminal():
+                    break
+                action = search.legal_actions()[0]
+                search.step(action)
+                ordinary.step(action)
+            self.assertEqual(search.serialize(), ordinary.serialize())
 
     def test_invalid_configuration_and_empty_forces(self):
         with self.assertRaises(RuntimeError):
