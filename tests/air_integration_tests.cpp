@@ -303,6 +303,43 @@ void ordinaryAircraftRetreatUsesRemainingFlightAndReplays() {
     auto replay=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Aircraft retreat/landing replay diverged");
 }
+void ownerChoosesWhoIsLostWhenCombatSinksACarrier() {
+    // Two fighters attack from two carriers. Should combat sink one carrier, the
+    // returning fighters have one seat between them and their owner decides who
+    // is lost; with a seat for each, landing needs no such choice.
+    auto s=fixture();s.territories.at(beiping).possessor="kmt";s.captureTurnStart();
+    add(s,"c1","light_carrier","japan","sea_p14");add(s,"c2","light_carrier","japan","sea_p14");
+    for(const auto& [fighter,carrier]:{std::pair<Id,Id>{"f1","c1"},{"f2","c2"}}){
+        add(s,fighter,"fighter","japan","sea_p14");attachCargo(s,carrier,fighter);s.units.at(fighter).movementRemaining=2;
+    }
+    add(s,"defender","infantry","kmt",hopeh);
+    Engine e(s,rules(),13);
+    for(const auto& [unit,kind]:{std::pair<Id,Id>{"f1","air_ground_attack"},{"f2","air_support"}})
+        e.step(select(e,kind,[&](const Action& a){
+            return a.parameters.require("unit").asString()==unit&&a.parameters.require("path").asArray().back().asString()==hopeh;}));
+    e.step(select(e,"end_phase"));
+    auto sunk=e.state().clone();sunk.units.erase("c2");  // As if sunk in another battle.
+    for(const bool lost:{false,true}){
+        Engine combat(lost?sunk:e.state().clone(),rules(),13);combat.setDiceTapeForTesting({12,12,12,12,12,12});
+        combat.step(select(combat,"land_begin_battle"));combat.resolveChance();combat.resolveChance();
+        combat.step(select(combat,"land_retreat_begin"));
+        const auto first=combat.legalActions();
+        const bool choice=std::any_of(first.begin(),first.end(),[](const Action& a){return a.kind=="air_failed_landing";});
+        check(combat.state().decisions.back().kind=="air_landing"&&choice==lost&&
+                  std::any_of(first.begin(),first.end(),[](const Action& a){return a.kind=="air_land";}),
+              lost?"Returning fighters short of a seat gave their owner no choice of who is lost":
+                   "A returning fighter with a seat for each was offered to be given up");
+        if(!lost)continue;
+        const auto given=select(combat,"air_failed_landing").parameters.require("unit").asString();
+        combat.step(select(combat,"air_failed_landing"));
+        const auto second=combat.legalActions();
+        check(!combat.state().units.contains(given)&&
+                  std::none_of(second.begin(),second.end(),[](const Action& a){return a.kind=="air_failed_landing";})&&
+                  std::any_of(second.begin(),second.end(),[](const Action& a){
+                      return a.kind=="air_land"&&a.parameters.require("destination").asString()=="c1";}),
+              "After one fighter was given up, the other could not land on the remaining seat");
+    }
+}
 
 } // namespace
 int main() {
@@ -317,7 +354,8 @@ int main() {
         continuingAircraftCannotPerformAnAirborneAssault();
         survivingAirborneTransportLandsBeforeInfantryAttack();
         ordinaryAircraftRetreatUsesRemainingFlightAndReplays();
-        std::cout << "10 air/land integration fixture groups passed\n";
+        ownerChoosesWhoIsLostWhenCombatSinksACarrier();
+        std::cout << "11 air/land integration fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

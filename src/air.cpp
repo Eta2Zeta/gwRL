@@ -274,6 +274,7 @@ void continueDefence(State &s, BattleState &b);
 void continueBombing(State &s, BattleState &b);
 void queueAirCasualty(State &s, BattleState &b);
 bool landingKeepsReachablePlan(const State &s, const Id &id, const Id &destination);
+bool mayBeGivenUp(const State &s, const UnitState &u);
 bool preservesLandingPlan(const State &s, const Id &id, const Id &destination) {
     return landingKeepsReachablePlan(s, id, destination);
 }
@@ -391,21 +392,26 @@ void queueLandings(State &s, BattleState &b) {
             continue;
         const auto owner = s.units.at(id).owner;
         auto spots = airLandingSpots(s, id);
-        // Spots that keep other aircraft's landings come first, but an aircraft
-        // that can reach a free spot lands rather than being lost (RB 10.10).
+        if (spots.empty()) {
+            eraseAirUnit(s, id);  // No spot in reach (RB 10.10).
+            continue;
+        }
+        // Spots that keep the other aircraft's landings. Where a carrier sunk in
+        // combat leaves too few seats, the owner decides who is lost: this aircraft
+        // may be given up when its loss keeps the losses fewest, and where no spot
+        // keeps them it may land anywhere in reach, at the cost of aircraft still
+        // fighting should they survive.
         std::vector<Id> keeping;
         std::copy_if(spots.begin(), spots.end(), std::back_inserter(keeping),
                      [&](const Id &destination) { return preservesLandingPlan(s, id, destination); });
         if (!keeping.empty())
             spots = std::move(keeping);
-        if (spots.empty()) {
-            eraseAirUnit(s, id);
-            continue;
-        }
         std::vector<Action> opts;
         for (const auto &z : spots)
             opts.push_back(
                 action(s, owner, "air_land", {{"battle", V(b.id)}, {"unit", V(id)}, {"destination", V(z)}}));
+        if (mayBeGivenUp(s, s.units.at(id)))
+            opts.push_back(action(s, owner, "air_failed_landing", {{"battle", V(b.id)}, {"unit", V(id)}}));
         decision(s, b, owner, "air_landing", std::move(opts));
         return;
     }
@@ -1667,9 +1673,14 @@ void AirRules::apply(State &s, const Action &a) const {
         return;
     }
     if (a.kind == "air_failed_landing") {
+        // Also an option of the landing decision after combat.
+        const bool landing = a.decision.has_value();
+        if (landing)
+            release(s, a);
         auto id = p.require("unit").asString();
         const auto &u = s.units.at(id);
-        require(ownAirborne(s, u) && (s.clock.phase != Phase::Combat || marked(u.turnFlags, "air_screening_ready")) &&
+        require(ownAirborne(s, u) &&
+                    (landing || s.clock.phase != Phase::Combat || marked(u.turnFlags, "air_screening_ready")) &&
                     mayBeGivenUp(s, u),
                 "Aircraft can still land");
         eraseAirUnit(s, id);
@@ -1689,6 +1700,8 @@ void AirRules::apply(State &s, const Action &a) const {
                     s.units.at(x).commitments.erase("air_combat");
             eraseBattle(s, bid);
         }
+        if (landing)
+            queueLandings(s, s.battles.at(p.require("battle").asString()));
         return;
     }
     if (a.kind == "air_start_patrol") {
