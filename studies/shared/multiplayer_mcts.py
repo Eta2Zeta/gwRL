@@ -234,6 +234,27 @@ def score_actions(node: Node, config: MctsConfig, bounds: Sequence[Bounds], *, u
     return result
 
 
+def selection_scores(node: Node, config: MctsConfig, bounds: Sequence[Bounds], *, use_selection_priors: bool = True) -> list[float]:
+    """The scores of score_actions, without a record per edge.
+
+    A search calls this at every step of every simulation; traces use
+    score_actions. Each value that reaches an edge has already passed vector().
+    """
+    if node.player not in PLAYERS:
+        raise ValueError("Only an entitled player decision has PUCT action scores")
+    component = PLAYERS.index(node.player)
+    normalize = bounds[component].normalize
+    c_puct = config.c_puct
+    scale = math.sqrt(sum([edge.visits for edge in node.edges]) + 1.0)
+    scores = []
+    for edge in node.edges:
+        visits = edge.visits
+        normalized = normalize(edge.value_sum[component] / visits) if visits else 1.0
+        prior = edge.selection_prior if use_selection_priors else edge.prior
+        scores.append(normalized + c_puct * prior * scale / (visits + 1.0))
+    return scores
+
+
 @dataclass(frozen=True, slots=True)
 class Selection:
     state_key: str
@@ -296,16 +317,17 @@ class VectorMCTS:
         interrupts = getattr(env, "legal_interrupts", None)
         if callable(interrupts) and interrupts():
             raise ValueError("Wrap raw campaign interrupts in CampaignAdapter; search cannot silently skip an opponent's opportunity")
-        if env.decision_kind() in {"chance", "terminal"} and env.current_decision_player() is not None:
+        kind, player = env.decision_kind(), env.current_decision_player()
+        if kind in {"chance", "terminal"} and player is not None:
             raise ValueError("Chance and terminal states cannot have a policy decision owner")
-        if env.is_terminal() != (env.decision_kind() == "terminal"):
+        if env.is_terminal() != (kind == "terminal"):
             raise ValueError("Terminal status and decision kind disagree")
         identity = self.cache_identity(env)
         reused = identity in self.nodes
         if not reused:
-            self.nodes[identity] = Node(env.planning_key(), env.current_decision_player(), env.decision_kind())
+            self.nodes[identity] = Node(identity[-1], player, kind)
         node = self.nodes[identity]
-        if node.player != env.current_decision_player() or node.kind != env.decision_kind():
+        if node.player != player or node.kind != kind:
             raise ValueError("Planning key merges different decision owners or kinds")
         return node, reused
 
@@ -404,22 +426,21 @@ class VectorMCTS:
                 if not node.expanded:
                     values, source = self._expand(node, simulation), "evaluator"
                     break
-                actions = [edge.action for edge in node.edges]
                 fixed = self.config.mode == "fixed_opponents" and node.player != self.config.target_player
                 if fixed:
                     assert self.opponent_policy is not None
-                    selected = self.opponent_policy.sample(simulation, actions, policy_random)
-                    scores = []
+                    selected = self.opponent_policy.sample(simulation, [edge.action for edge in node.edges], policy_random)
                 else:
-                    scores = score_actions(node, self.config, bounds, use_selection_priors=_depth == 0)
-                    maximum = max(score.score for score in scores)
-                    tied = sorted((i for i, score in enumerate(scores) if score.score == maximum),
+                    scores = selection_scores(node, self.config, bounds, use_selection_priors=_depth == 0)
+                    maximum = max(scores)
+                    tied = sorted((i for i, score in enumerate(scores) if score == maximum),
                                   key=lambda i: node.edges[i].key)
                     selected = tied[policy_random.randrange(len(tied))]
                 edge = node.edges[selected]
                 if self.config.record_trace:
+                    records = [] if fixed else score_actions(node, self.config, bounds, use_selection_priors=_depth == 0)
                     selections.append(Selection(node.state_key, str(node.player), edge.key,
-                                                "opponent_policy" if fixed else "puct", tuple(scores)))
+                                                "opponent_policy" if fixed else "puct", tuple(records)))
                 simulation.apply_action(edge.action)
                 edges_path.append(edge)
                 successor, _ = self._node(simulation)

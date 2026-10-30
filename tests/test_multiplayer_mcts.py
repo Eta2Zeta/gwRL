@@ -5,12 +5,14 @@ import hashlib
 import json
 import random
 import unittest
+from collections import Counter
 from dataclasses import replace
+from unittest.mock import patch
 
 from studies.shared.campaign_adapter import CampaignAdapter, ScheduledAction
 from studies.shared.multiplayer_mcts import (
     PLAYERS, Bounds, Edge, Evaluation, MctsConfig, NoLegalActionError, Node, OpponentPolicy,
-    UniformEvaluator, VectorMCTS, action_key, apply_fixed_opponent, score_actions,
+    UniformEvaluator, VectorMCTS, action_key, apply_fixed_opponent, score_actions, selection_scores,
 )
 
 
@@ -254,7 +256,9 @@ class MultiplayerMctsTests(unittest.TestCase):
         self.assertEqual(multiplayer.best_action(), "safe")
         enter = next(edge for edge in fixed.root.edges if edge.action == "enter")
         self.assertAlmostEqual(enter.values[0], expected[0], delta=0.3)
-        self.assertTrue(any(choice.mode == "opponent_policy" for trace in fixed.simulations for choice in trace.selections))
+        choices = [choice for trace in fixed.simulations for choice in trace.selections]
+        self.assertEqual({bool(choice.scores) for choice in choices if choice.mode == "opponent_policy"}, {False})
+        self.assertEqual({bool(choice.scores) for choice in choices if choice.mode == "puct"}, {True})
         rng = random.Random(512)
         actual = []
         for _ in range(2000):
@@ -475,6 +479,113 @@ class MultiplayerMctsTests(unittest.TestCase):
                 return "axis"
         with self.assertRaisesRegex(ValueError, "policy decision owner"):
             VectorMCTS().search(PolicyOwnedChance(stochastic_game(), "coin"))
+
+
+class SelectionScoreTests(unittest.TestCase):
+    """A search selects from plain scores; traces report the same numbers as records."""
+    def statistics(self, rng):
+        """A node and bounds as a search can leave them: ties, unvisited edges, noised priors."""
+        edges = []
+        for index in range(rng.randint(1, 40)):
+            prior = rng.choice((0.0, 0.25, rng.random()))
+            visits = rng.choice((0, 0, rng.randint(1, 30)))
+            edges.append(Edge(f"action-{index}", f"action-{index}", prior, rng.choice((prior, rng.random())), visits=visits,
+                              value_sum=[rng.uniform(-90, 90) * visits for _ in PLAYERS]))
+        bounds = [Bounds() for _ in PLAYERS]
+        for bound in bounds:
+            for _ in range(rng.randrange(3)):
+                bound.update(rng.uniform(-90, 90))
+        return Node("fixture", rng.choice(PLAYERS), "choose", expanded=True, edges=edges), bounds
+
+    def test_plain_scores_are_the_traced_scores_bit_for_bit(self):
+        rng = random.Random(61)
+        for _ in range(400):
+            node, bounds = self.statistics(rng)
+            config = MctsConfig(c_puct=rng.choice((0.0, 1.5, rng.uniform(0.1, 9))))
+            for use_selection_priors in (True, False):
+                traced = score_actions(node, config, bounds, use_selection_priors=use_selection_priors)
+                plain = selection_scores(node, config, bounds, use_selection_priors=use_selection_priors)
+                self.assertEqual([score.hex() for score in plain], [score.score.hex() for score in traced])
+
+    def test_plain_scores_keep_the_entitled_player_check(self):
+        with self.assertRaisesRegex(ValueError, "entitled player"):
+            selection_scores(Node("fixture", None, "chance"), MctsConfig(), [Bounds() for _ in PLAYERS])
+
+    def test_tracing_changes_no_choice_and_reports_the_winning_score(self):
+        for game in (deterministic_game(), stochastic_three_owner_game()):
+            plain, traced = (VectorMCTS(config=MctsConfig(simulations=128, seed=29, record_trace=trace)).search(
+                TreeEnv(game), add_root_noise=True) for trace in (False, True))
+            self.assertEqual((traced.visit_counts, traced.values, traced.action_values),
+                             (plain.visit_counts, plain.values, plain.action_values))
+            selections = [selection for trace in traced.simulations for selection in trace.selections]
+            self.assertTrue(selections)
+            for selection in selections:
+                scores = {score.action_key: score.score for score in selection.scores}
+                self.assertEqual(scores[selection.chosen_key], max(scores.values()))
+
+    def test_every_selection_draws_once_and_ties_ignore_the_menu_order(self):
+        draws = []
+        class CountedRandom(random.Random):
+            def randrange(self, *args):
+                draws.append(*args)
+                return super().randrange(*args)
+
+        chosen = []
+        for reverse in (False, True):
+            draws.clear()
+            with patch.object(random, "Random", CountedRandom):
+                result = VectorMCTS(config=MctsConfig(simulations=64, seed=83, record_trace=True)).search(
+                    TreeEnv(deterministic_game(), reverse=reverse))
+            chosen.append([selection.chosen_key for trace in result.simulations for selection in trace.selections])
+            self.assertEqual(len(draws), len(chosen[-1]))
+            self.assertTrue({1, 3}.issubset(draws))
+        self.assertEqual(*chosen)
+
+
+class NodeCheckTests(unittest.TestCase):
+    class Counted(TreeEnv):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.calls = Counter()
+
+        def current_decision_player(self):
+            self.calls["current_decision_player"] += 1
+            return super().current_decision_player()
+
+        def decision_kind(self):
+            self.calls["decision_kind"] += 1
+            return super().decision_kind()
+
+        def planning_key(self):
+            self.calls["planning_key"] += 1
+            return super().planning_key()
+
+    def test_a_position_is_asked_each_question_once(self):
+        env, search = self.Counted(deterministic_game()), VectorMCTS()
+        for reused in (False, True):
+            env.calls.clear()
+            self.assertEqual(search._node(env)[1], reused)
+            self.assertEqual(env.calls, {"current_decision_player": 1, "decision_kind": 1, "planning_key": 1})
+
+    def test_a_terminal_status_must_agree_with_its_decision_kind(self):
+        class Unfinished(TreeEnv):
+            def is_terminal(self):
+                return False
+
+        with self.assertRaisesRegex(ValueError, "Terminal status and decision kind disagree"):
+            VectorMCTS()._node(Unfinished({"root": terminal(1, 0, 0)}))
+
+    def test_a_planning_key_cannot_merge_owners_or_kinds(self):
+        class SharedKey(TreeEnv):
+            def planning_key(self):
+                return "one key"
+
+        graph = {**deterministic_game(), "reaction": {"player": "axis", "kind": "reaction", "actions": {"only": "a"}}}
+        for other in ("comintern", "reaction"):
+            search = VectorMCTS()
+            search._node(SharedKey(graph))
+            with self.subTest(other=other), self.assertRaisesRegex(ValueError, "merges different decision owners or kinds"):
+                search._node(SharedKey(graph, other))
 
 
 class ForcedRootTests(unittest.TestCase):
