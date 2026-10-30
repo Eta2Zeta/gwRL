@@ -1,0 +1,657 @@
+{
+ "schema": "campaign-game-process-cpu-profile-v1",
+ "date": "2026-10-29",
+ "question": "Where shared-GPU self-play game processes spend CPU per game: search, rules and input preparation.",
+ "tool": "tools/profile_game_process_cpu.py",
+ "run": {
+  "directory": "studies/campaign/runs/game-cpu-profile-2026-10-29",
+  "argv": [
+   "tools/profile_game_process_cpu.py",
+   "--output",
+   "studies/campaign/runs/game-cpu-profile-2026-10-29/profile.json",
+   "--seeds",
+   "1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982",
+   "--processes",
+   "8",
+   "--games-per-process",
+   "4",
+   "--seconds",
+   "21600",
+   "--sample-at",
+   "600,2400,4000",
+   "--sample-seconds",
+   "30"
+  ],
+  "commit": "e8de23ea4d3e8d03c5acb76dbad8d2421341f5de",
+  "native_sha256": "5a759c2b001bb039b24e075188181bd274dcf79dca6406f59db3690ac8f6d77d",
+  "sources_unchanged": true,
+  "weights_unchanged": true,
+  "python": "3.13.5",
+  "torch": "2.14.0",
+  "python_environment": "tmp/gpu-mps-env",
+  "malloc_nano_zone": "0 (inherited from the agent session environment; the tiny allocator was used)",
+  "settings": {
+   "calendar_rounds": 11,
+   "simulations": 64,
+   "max_depth": 16,
+   "hidden_dim": 64,
+   "message_layers": 2,
+   "token_buckets": 16384,
+   "value_scale": 100.0,
+   "model_seed": 1951,
+   "processes": 8,
+   "games_per_process": 4,
+   "cpu_budget": 12,
+   "memory_bytes": 30000000000
+  },
+  "seeds": "1951-1982",
+  "status": "completed",
+  "completed_games": 32,
+  "failed_games": 0,
+  "cohort_wall_seconds": 5994.3,
+  "steady_state_games_per_hour": 20.1,
+  "games_per_hour_note": "Not comparable with the 24.2 games/h run (b89e86d). Game CPU per evaluation was 7% higher (14.60 vs 13.62 ms); instrumentation explains at least a fifth of that and the rules commits since b89e86d were not measured separately. The coordinator sets the pace, and its model calls took 14% longer (7.67 vs 6.75 ms) on slightly smaller batches (3.98 vs 4.12 positions), which accounts for the 16% lower evaluation rate (478 vs 566 per second with every slot playing). Why they were slower was not measured; other applications were running on the machine.",
+  "baseline_run": {
+   "file": "studies/campaign/runs/shared-gpu-2026-10-29/selfplay_8x4.mps.json",
+   "commit": "b89e86d",
+   "game_cpu_ms_per_evaluation": 13.62,
+   "coordinator_ms_per_model_call": 6.75,
+   "positions_per_model_call": 4.12,
+   "coordinator_model_call_share_of_wall": 0.89,
+   "coordinator_waiting_for_requests_share_of_wall": 0.021,
+   "evaluations_per_second_every_slot_playing": 566.4,
+   "game_process_cores_average": 7.4
+  },
+  "per_game_means": {
+   "decisions": 1320.5,
+   "chance_events": 132.8,
+   "transitions": 1453.3,
+   "evaluations": 85623.1,
+   "game_seconds": 5484.9
+  },
+  "game_time_shares": {
+   "actual_rules_execution": 0.002,
+   "input_preparation": 0.144,
+   "search": 0.996,
+   "waiting_for_evaluations": 0.576
+  },
+  "game_time_note": "search includes waiting for evaluations and input preparation",
+  "coordinator_model_call_share_of_wall": 0.883,
+  "coordinator_waiting_for_requests_share_of_wall": 0.021,
+  "coordinator_ms_per_model_call": 7.67,
+  "game_wall_split": {
+   "waiting_for_evaluations": 0.576,
+   "thread_cpu": 0.228,
+   "neither": 0.196,
+   "neither_note": "much of it waiting for the interpreter lock (take_gil 13-29% of game-thread samples)"
+  },
+  "game_process_cores_average": 6.67,
+  "coordinator_cores_average": 0.62,
+  "mean_positions_per_model_call": 3.98,
+  "mean_requests_per_serving_round": 9.06,
+  "peak_charged_bytes": 9948757952
+ },
+ "profile": {
+  "accounting": "Each game thread charges time.thread_time_ns to the innermost wrapped call; categories sum exactly to thread CPU.",
+  "thread_cpu_seconds_per_game": 1250.0,
+  "thread_cpu_seconds_per_game_range": [
+   973.5,
+   1592.4
+  ],
+  "rusage_game_process_cpu_seconds_per_game": 1250.2,
+  "coordinator_cpu_seconds_per_game": 116.0,
+  "seconds_by_group": {
+   "search logic": 92.5,
+   "adapter": 47.0,
+   "rules engine": 619.6,
+   "input: graph compile": 113.4,
+   "input: native": 235.4,
+   "input: python": 103.7,
+   "messaging": 19.6,
+   "game loop": 18.8
+  },
+  "share_by_group": {
+   "search logic": 0.074,
+   "adapter": 0.0376,
+   "rules engine": 0.4957,
+   "input: graph compile": 0.0908,
+   "input: native": 0.1883,
+   "input: python": 0.0829,
+   "messaging": 0.0157,
+   "game loop": 0.0151
+  },
+  "per_game_share_by_group": {
+   "rules engine": {
+    "mean": 0.4952,
+    "min": 0.4504,
+    "max": 0.5354
+   },
+   "input: native": {
+    "mean": 0.1885,
+    "min": 0.1732,
+    "max": 0.2047
+   },
+   "input: graph compile": {
+    "mean": 0.091,
+    "min": 0.0793,
+    "max": 0.0954
+   },
+   "input: python": {
+    "mean": 0.0828,
+    "min": 0.0706,
+    "max": 0.1005
+   },
+   "search logic": {
+    "mean": 0.0741,
+    "min": 0.0663,
+    "max": 0.0787
+   },
+   "adapter": {
+    "mean": 0.0377,
+    "min": 0.0338,
+    "max": 0.0413
+   },
+   "messaging": {
+    "mean": 0.0158,
+    "min": 0.0128,
+    "max": 0.0173
+   },
+   "game loop": {
+    "mean": 0.015,
+    "min": 0.0127,
+    "max": 0.0183
+   },
+   "all input preparation": {
+    "mean": 0.3622,
+    "min": 0.3333,
+    "max": 0.3972
+   }
+  },
+  "seconds_by_method_at_least_2s": {
+   "rules engine/apply_action": 418.47,
+   "input: native/numeric_observation": 136.12,
+   "rules engine/legal_actions": 114.41,
+   "input: graph compile/compile": 113.45,
+   "search logic": 92.46,
+   "input: python/prepare": 82.31,
+   "rules engine/clone_for_search": 38.76,
+   "rules engine/resolve_chance": 35.41,
+   "input: native/external_references": 34.13,
+   "input: native/scheduled_snapshot": 32.68,
+   "input: native/arrays": 25.41,
+   "adapter/apply_action": 22.38,
+   "input: python/numeric_input": 21.38,
+   "game loop": 18.82,
+   "adapter/legal_actions": 9.05,
+   "input: native/scheduled_observation": 6.84,
+   "rules engine/planning_key": 6.27,
+   "adapter/planning_key": 6.16,
+   "messaging/write_arrays": 5.8,
+   "messaging/evaluate": 5.65,
+   "adapter/decision_kind": 4.59,
+   "messaging/recv": 4.31,
+   "rules engine/legal_interrupts": 4.18,
+   "messaging/send": 3.83,
+   "adapter/clone_for_search": 2.35
+  },
+  "calls_per_game": {
+   "rules engine/apply_action": 218362.5,
+   "input: native/numeric_observation": 85623.1,
+   "rules engine/legal_actions": 218261.7,
+   "input: graph compile/compile": 151433.8,
+   "search logic": 1320.5,
+   "input: python/prepare": 85623.1,
+   "rules engine/clone_for_search": 84512.0,
+   "rules engine/resolve_chance": 30920.9,
+   "input: native/external_references": 7645531.9,
+   "input: native/scheduled_snapshot": 7149778.2,
+   "input: native/arrays": 3865578.5,
+   "adapter/apply_action": 218650.5,
+   "input: python/numeric_input": 85623.1,
+   "adapter/legal_actions": 86909.5,
+   "input: native/scheduled_observation": 85623.1,
+   "rules engine/planning_key": 2851150.9,
+   "adapter/planning_key": 377071.0,
+   "messaging/write_arrays": 85623.1,
+   "messaging/evaluate": 85623.1,
+   "adapter/decision_kind": 1205697.6,
+   "messaging/recv": 85623.1,
+   "rules engine/legal_interrupts": 176562.4,
+   "messaging/send": 85623.1,
+   "adapter/clone_for_search": 84512.0
+  },
+  "instrumentation": {
+   "ns_per_wrapped_call": 659.0,
+   "wrapped_calls_per_game": 27868167,
+   "estimated_seconds_per_game": 18.4,
+   "note": "Included in the categories, about half in the wrapped call and half in its caller. A lower bound; clock reads alone cost 11.6 s per game in the run, so 25-35 s is plausible."
+  },
+  "one_legal_action_searches": {
+   "per_game": 245.625,
+   "of_searches": 1320.5,
+   "inclusive_cpu_seconds": 259.7,
+   "share_of_thread_cpu": {
+    "mean": 0.2081,
+    "min": 0.1706,
+    "max": 0.2525
+   },
+   "seconds_per_search": {
+    "one legal action": 1.054,
+    "others": 0.9
+   },
+   "estimated_evaluations_inside": 15927
+  },
+  "evaluations_by_legal_menu_size": {
+   "0": 34.1,
+   "1": 15431.8,
+   "2+": 70157.3
+  },
+  "evaluation_cpu_seconds_by_legal_menu_size": {
+   "0": 0.1,
+   "1": 45.8,
+   "2+": 394.6
+  },
+  "evaluation_ms_each": {
+   "one action": 2.97,
+   "two or more": 5.62
+  }
+ },
+ "native_samples": {
+  "tool": "/usr/bin/sample, 1 ms interval",
+  "process": "one game process (seeds 1966, 1972, 1973, 1975), 30 s at 600, 2400 and 4000 s",
+  "files": [
+   "studies/campaign/runs/game-cpu-profile-2026-10-29/profile.sample-600s.txt",
+   "studies/campaign/runs/game-cpu-profile-2026-10-29/profile.sample-2400s.txt",
+   "studies/campaign/runs/game-cpu-profile-2026-10-29/profile.sample-4000s.txt"
+  ],
+  "library_uuid": "0610A10C-9261-30A0-B1CB-4AAD32E9A02A (matches the profiled gwrl_cpp build)",
+  "busy_definition": "Not under take_gil/_PyThreadState_Attach and not ending in a blocking leaf (read, __psynch_cvwait, __psynch_mutexwait, __ulock_wait2, write).",
+  "thread_samples": [
+   69532,
+   65644,
+   67816
+  ],
+  "thread_sample_shares": {
+   "busy": [
+    0.447,
+    0.409,
+    0.482
+   ],
+   "waiting_for_evaluation": [
+    0.298,
+    0.273,
+    0.371
+   ],
+   "waiting_for_gil": [
+    0.215,
+    0.293,
+    0.126
+   ],
+   "malloc_lock": [
+    0.024,
+    0.011,
+    0.011
+   ]
+  },
+  "caveat": "Busy samples were about twice the measured CPU rate (21-27% of wall time), so samples give the make-up of busy CPU, not CPU seconds. Work tied to game phases varies between windows.",
+  "apply_action": {
+   "busy_samples": [
+    10596,
+    6392,
+    12970
+   ],
+   "share_of_busy_by_window": {
+    "structural_check_validate": [
+     0.158,
+     0.257,
+     0.414
+    ],
+    "of_which_history_payload_walk": [
+     0.08,
+     0.198,
+     0.356
+    ],
+    "planning_key": [
+     0.227,
+     0.151,
+     0.215
+    ],
+    "of_which_sha256": [
+     0.129,
+     0.082,
+     0.102
+    ],
+    "engine_copy": [
+     0.076,
+     0.053,
+     0.083
+    ],
+    "move_assignment_destroying_old_state": [
+     0.076,
+     0.055,
+     0.083
+    ],
+    "rules_apply_and_end_phase": [
+     0.452,
+     0.472,
+     0.199
+    ],
+    "of_which_economy_recheck": [
+     0.152,
+     0.338,
+     0.007
+    ],
+    "legality_check_and_history_append": [
+     0.006,
+     0.003,
+     0.004
+    ]
+   },
+   "combined_shares": {
+    "validate": "28-31%",
+    "history_walk": "21-26%",
+    "planning_key": "about 20%",
+    "copy_then_swap": "14-15%",
+    "rules_including_end_phase": "33-37%"
+   },
+   "code": "src/campaign_runtime.cpp:375-394 (Engine::step), src/campaign_state.cpp:382-458 (validate; history walk at :457), :379 (planningKey), :242-264 (contentDigest)"
+  },
+  "resolve_chance": {
+   "busy_samples": [
+    3362,
+    0,
+    2381
+   ],
+   "share_of_busy_at_600_and_4000": {
+    "validate": [
+     0.248,
+     0.491
+    ],
+    "history_walk": [
+     0.102,
+     0.417
+    ],
+    "planning_key": [
+     0.361,
+     0.239
+    ],
+    "engine_copy": [
+     0.116,
+     0.081
+    ],
+    "move_assignment": [
+     0.116,
+     0.106
+    ],
+    "rules_apply_chance": [
+     0.148,
+     0.074
+    ]
+   }
+  },
+  "clone_for_search": {
+   "busy_samples": [
+    861,
+    793,
+    1250
+   ],
+   "second_copy_and_destroying_first_share": [
+    0.554,
+    0.525,
+    0.576
+   ],
+   "code": "src/campaign_env.cpp:97-101"
+  },
+  "legal_actions": {
+   "busy_samples": 6456,
+   "menu_generation_on_table_misses": 0.903,
+   "copy_and_python_conversion": 0.087,
+   "menu_table_lookup": 0.003,
+   "validation_only_calls_per_game": 132817,
+   "validation_only_snapshots_per_game": 3369823
+  },
+  "numeric_observation": {
+   "busy_samples": [
+    2835,
+    2694,
+    4204
+   ],
+   "initializer_list_copy_in_observation_snapshot": [
+    0.288,
+    0.273,
+    0.248
+   ],
+   "observation_copy_of_toJson": [
+    0.201,
+    0.208,
+    0.235
+   ],
+   "toJson": [
+    0.466,
+    0.418,
+    0.499
+   ],
+   "copy_and_destroy_overhead_total": "80-88%",
+   "malloc_and_free_leaves": "54-60%",
+   "code": "src/campaign_env.cpp:89-92, src/campaign_state.cpp:341-357 and :380"
+  },
+  "compile": {
+   "busy_samples": [
+    2486,
+    2458,
+    3014
+   ],
+   "observation_compiles_per_evaluation": 1,
+   "action_compiles_per_game": 65810,
+   "action_cache_miss_rate": 0.0181,
+   "shares": {
+    "token_cache_lookups": "15-24%",
+    "token_appends": "11-17%",
+    "shared_mutex_locking": "11-15% (16% single-threaded)",
+    "traversal_self": "12-17%",
+    "python_callbacks": "0.1-2.3%"
+   }
+  },
+  "search_logic_92_5_s": {
+   "engine_clone_destruction": "35-42 s (two thirds freeing the leaf's cached observation JSON)",
+   "leaf_graph_frees": "about 11.5 s",
+   "garbage_collection": "5-20 s",
+   "tree_code": "17-42 s (about 30 s; score_actions is the largest part)"
+  },
+  "game_loop_18_8_s": {
+   "freeing_previous_search_tree": "about 17 s"
+  },
+  "malloc": {
+   "libsystem_malloc_self_share_of_game_thread_busy": [
+    0.294,
+    0.287,
+    0.25
+   ],
+   "nanov2_frames": 0
+  }
+ },
+ "allocator_ab": {
+  "workload": "whole random 11-round games through the adapter and rules engine, one thread, verify-input-prep/rgame.py, alternating runs, load average about 7 from other applications",
+  "cpu_seconds": {
+   "seed 7": {
+    "MallocNanoZone=0": [
+     4.98,
+     5.0
+    ],
+    "default": [
+     3.86,
+     3.85
+    ]
+   },
+   "seed 8": {
+    "MallocNanoZone=0": [
+     4.48,
+     4.46
+    ],
+    "default": [
+     3.58,
+     3.54
+    ]
+   }
+  },
+  "identical_final_planning_keys": true,
+  "single_thread_inputs_us": {
+   "numeric_observation": {
+    "MallocNanoZone=0": 958,
+    "default": 608
+   },
+   "scheduled_snapshot": {
+    "MallocNanoZone=0": 2.85,
+    "default": 1.47
+   },
+   "action_compile": {
+    "MallocNanoZone=0": 6.7,
+    "default": 5.0
+   },
+   "observation_compile": {
+    "MallocNanoZone=0": 531,
+    "default": 492
+   },
+   "prepare_at_44_actions": {
+    "MallocNanoZone=0": 1072,
+    "default": 903
+   }
+  },
+  "untested": "the effect with 4 threads per process, 8 processes and the coordinator"
+ },
+ "candidates": {
+  "basis": "CPU-seconds per game out of 1,250, from in-run costs and native-sample shares; each estimate was checked by an independent verifier who re-derived it from the raw data and reran the scripts.",
+  "keep_moves_dice_and_search_results": [
+   {
+    "change": "validate only history events added by the transition",
+    "seconds": [
+     97,
+     121
+    ],
+    "risk": "very low; keep the full check on restore, construction, serialization and tests"
+   },
+   {
+    "change": "assemble each evaluation's menu arrays in one native call",
+    "seconds": [
+     90,
+     120
+    ],
+    "risk": "low; arrays must stay identical"
+   },
+   {
+    "change": "build the observation JSON with moves instead of copies",
+    "seconds": [
+     80,
+     110
+    ],
+    "risk": "low; identical JSON"
+   },
+   {
+    "change": "apply moves in place on throwaway search copies",
+    "seconds": [
+     67,
+     70
+    ],
+    "risk": "a copy that fails mid-move must refuse all later calls; other engines share cloneForSearch"
+   },
+   {
+    "change": "hardware SHA-256 for the planning key",
+    "seconds": [
+     40,
+     42
+    ],
+    "risk": "low; byte-identical keys, 5.8 times faster in a scratch benchmark"
+   },
+   {
+    "change": "let Engine::step's legality check validate tree moves instead of rebuilding the menu",
+    "seconds": [
+     36,
+     42
+    ],
+    "risk": "low; identical stub searches in 60 of 60 positions, same outcomes in 2,781 stale/foreign cases"
+   },
+   {
+    "change": "cheaper graph compile: lock-free caches, one probe per string, native numeric features",
+    "seconds": [
+     25,
+     45
+    ],
+    "risk": "native features must match Python bit for bit"
+   },
+   {
+    "change": "copy once in CampaignEnv::cloneForSearch",
+    "seconds": [
+     21,
+     21
+    ],
+    "risk": "very low"
+   },
+   {
+    "change": "smaller items: position text, action snapshots, numeric_input, edge scoring, small caches",
+    "seconds": [
+     30,
+     65
+    ],
+    "risk": "low; partly unmeasured"
+   },
+   {
+    "change": "skip the economy re-check after the engine's own legality check",
+    "seconds": [
+     47,
+     63
+    ],
+    "risk": "medium; only for actions Engine::step has just matched; relies on a cross-module guarantee verified for the current code; keep the check for actions the rules build themselves, such as the approved rail purchase (src/economy.cpp:703-704)"
+   },
+   {
+    "change": "reuse the previous search's network evaluations (keyed by model version and planning key)",
+    "seconds": [
+     95,
+     119
+    ],
+    "risk": "same priors and values; clear on weight updates; also removes 25-30% of coordinator work by count; duplicate rate measured with stand-in evaluators",
+    "overlap_with_one_move_skip": "repeats are 48-52% of evaluations in one-move searches against 20-25% elsewhere; after the skip, reuse saves at most about 65-80 s and the two together cut at most about 35-40% of evaluations, not 44-49%"
+   }
+  ],
+  "decisions_for_the_user": [
+   {
+    "change": "play the only legal move without a search",
+    "seconds": [
+     255,
+     260
+    ],
+    "effect": "moves, dice and training samples unchanged provided the skip still draws the decision's search seed and move-sampling random number; 18.6% fewer evaluations; search traces lose statistics for those moves; a bit-for-bit check needs a deterministic evaluator"
+   },
+   {
+    "change": "skip the rest of the structural check on search copies only",
+    "seconds": [
+     30,
+     31
+    ],
+    "effect": "on top of the incremental history check (about 130-150 s instead of it); removes the rules-bug tripwire on 99.4% of transitions"
+   },
+   {
+    "change": "search passes through one-move positions without evaluating them (algorithm change)",
+    "seconds": [
+     -90,
+     -85
+    ],
+    "effect": "moves about 18% of evaluations to positions with a choice; needs an equal-compute strength test"
+   }
+  ],
+  "configuration": [
+   {
+    "change": "use the default macOS allocator for game processes",
+    "single_thread_cpu_saving": "20-23%",
+    "effect": "unmeasured under the 8x4 load"
+   }
+  ],
+  "combined": "The first nine changes sum to 486-636 s, about 40-50% of game-process CPU. The one-move skip then removes about a fifth of what remains (about 130-160 s), about 50-60% in all; its 255-260 s today does not add to the nine. Contention changes per-call costs 1.5-3.6 times, so the whole must be re-measured in the 8x4 configuration."
+ },
+ "limits": [
+  "One instrumented run; native samples of one process in three 30 s windows.",
+  "Single-thread micro-benchmarks run 1.5-3.6 times faster per call than the loaded run for substantial calls, and far faster for tiny ones.",
+  "Other applications kept the machine's load average near 7 during the analysis.",
+  "CPU savings alone raise games per hour little at the same concurrency, because the coordinator spent 88% of the run in model calls and waited for requests only 2% of it; larger gains need more concurrent games or fewer evaluations.",
+  "No learning updates; nothing here measures playing strength."
+ ]
+}
