@@ -526,10 +526,10 @@ class NativePlayActionTests(unittest.TestCase):
         expected = env.clone()
         expected.apply_action(second)
         before = env.serialize()
-        unknown = ScheduledAction(f"{SCHEMA}:play:unknown", "play", first.player, first._source)
-        with self.assertRaisesRegex(ValueError, "Illegal scheduled campaign action"):
-            env.apply_action(unknown)
-        self.assertEqual(env.serialize(), before)
+        for forged in (f"{SCHEMA}:play:unknown", f"other-schema:play:{first._source.id}"):
+            with self.subTest(id=forged), self.assertRaisesRegex(ValueError, "Illegal scheduled campaign action"):
+                env.apply_action(ScheduledAction(forged, "play", first.player, first._source))
+            self.assertEqual(env.serialize(), before)
         env.apply_action(ScheduledAction(second.id, "play", second.player, first._source))
         self.assertEqual(env.serialize(), expected.serialize())
 
@@ -584,10 +584,11 @@ class NativePlayActionTests(unittest.TestCase):
         class BrokenRaw(CountingRaw):
             def apply_action(self, action):
                 super().apply_action(action)
-                raise RuntimeError("Rules failure part-way through a move")
+                # The rules raise this part-way through a move, unlike the engine's harmless refusal.
+                raise RuntimeError("Illegal economy action")
 
         env = self.counted(self.opening, BrokenRaw)
-        with self.assertRaisesRegex(RuntimeError, "part-way through a move"):
+        with self.assertRaisesRegex(RuntimeError, "^Illegal economy action$"):
             env.apply_action(self.moves()[0])
         self.assertEqual(env.raw.calls, {"apply_action": 1})
 
