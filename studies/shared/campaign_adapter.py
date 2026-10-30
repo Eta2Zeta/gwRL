@@ -176,10 +176,36 @@ class CampaignAdapter:
     def legal_actions(self) -> list[ScheduledAction]:
         return list(self._legal_actions(self._decision_cache()))
 
+    def _apply_native_play(self, action: ScheduledAction, decision: _DecisionCache) -> bool:
+        """Let the engine check a move it issued, without listing the menu here.
+
+        Engine::step compares the whole payload with its menu entry for this id,
+        and Python cannot build or change a native action. A refusal leaves the
+        engine untouched, so apply_action's full check then decides. Any other
+        failure may have damaged the engine and must not be retried.
+        """
+        source = getattr(action, "_source", None)
+        if source is None or decision.offered is not None or action.kind != "play" or action.player != decision.owner:
+            return False
+        from gwrl_cpp import CampaignAction
+        if type(source) is not CampaignAction or action.id != f"{SCHEMA}:play:{source.id}":
+            return False
+        try:
+            self.raw.apply_action(source)
+        except RuntimeError as error:
+            if str(error) != "Illegal campaign action":
+                raise
+            return False
+        return True
+
     def apply_action(self, action: ScheduledAction) -> None:
+        decision = self._decision_cache()
+        if self._apply_native_play(action, decision):
+            self._invalidate_raw()
+            self._sync()
+            return
         # Validate against the unchanged decision's canonical legal objects. A
         # forged or mutated public raw payload is never sent to the engine.
-        decision = self._decision_cache()
         actions = self._legal_actions(decision)
         matches = [index for index, candidate in enumerate(actions)
                    if candidate.id == action.id and candidate.kind == action.kind and candidate.player == action.player]
