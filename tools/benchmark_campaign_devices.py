@@ -584,6 +584,15 @@ def _shared_game_process(values, slots, connections, buffer_names, tasks, result
         thread.join()
 
 
+def raise_descriptor_limit(wanted):
+    """Raise the soft open-file limit towards `wanted`, never lowering it."""
+    import resource
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    wanted = wanted if hard == resource.RLIM_INFINITY else min(wanted, hard)
+    if soft != resource.RLIM_INFINITY and soft < wanted:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (wanted, hard))
+
+
 def shared_selfplay(config, device, models, weights, deadline, persist, runtime_policy=None):
     """Game processes keep rules, search and input preparation; this process
     evaluates every waiting position in shared device batches.
@@ -603,6 +612,9 @@ def shared_selfplay(config, device, models, weights, deadline, persist, runtime_
     from studies.campaign.shared_evaluator import SharedEvaluatorServer
     context = multiprocessing.get_context("spawn")
     slots = config.processes * config.games_per_process
+    # A slot holds two pipe ends and its buffer mapped twice, and a shell's default
+    # limit of 256 stops at eight processes of six games.
+    raise_descriptor_limit(6 * slots + 64)
     pipes = [context.Pipe() for _ in range(slots)]
     memories = [shared_memory.SharedMemory(create=True, size=SHARED_BUFFER_BYTES) for _ in range(slots)]
     tasks, results = context.Queue(), context.Queue()

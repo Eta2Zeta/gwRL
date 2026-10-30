@@ -7,6 +7,7 @@ from concurrent.futures import Future
 import io
 import json
 from pathlib import Path
+import resource
 import time
 from types import SimpleNamespace
 import tempfile
@@ -16,8 +17,8 @@ from unittest.mock import patch
 from studies.campaign.shared_evaluator import EvaluatorClosed, ServerStats
 from studies.shared.multiplayer_mcts import NoLegalActionError
 from tools.benchmark_campaign_devices import (Config, TimedEvaluator, all_slots_busy, compare_selfplay, main,
-    mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, selfplay, setup_models,
-    shared_summary, supervise_device)
+    mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, raise_descriptor_limit, selfplay,
+    setup_models, shared_summary, supervise_device)
 
 
 class ToyEnv:
@@ -234,6 +235,17 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         samples = [(1000., 0), (1050., 500), (1150., 1500), (1250., 2000)]
         return shared_summary(config, games, stats, samples, task={"calendar_rounds": 3},
                               game_process_cpu_seconds=100., coordinator_cpu_seconds=50.)
+
+    def test_descriptor_limit_rises_within_the_hard_limit_and_never_falls(self):
+        infinite = resource.RLIM_INFINITY
+        for limits, wanted, expected in (((256, infinite), 1000, (1000, infinite)), ((256, 512), 1000, (512, 512)),
+                                         ((2048, infinite), 1000, None), ((infinite, infinite), 1000, None)):
+            with patch("resource.getrlimit", return_value=limits), patch("resource.setrlimit") as change:
+                raise_descriptor_limit(wanted)
+            if expected is None:
+                change.assert_not_called()
+            else:
+                change.assert_called_once_with(resource.RLIMIT_NOFILE, expected)
 
     def test_shared_summary_rates_use_played_slots_and_need_a_complete_cohort(self):
         def game(seed, slot, start, end, evaluations, terminal=True, failure=None):
