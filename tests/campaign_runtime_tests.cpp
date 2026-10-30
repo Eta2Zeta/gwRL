@@ -724,6 +724,8 @@ void reachedMenusAreSharedAcrossClonesAndBounded() {
 // Transitions reread only the history they add, so rules may only append to it.
 class HistoryRules : public FixtureRules {
   public:
+    std::string chanceEffect;  // An action kind that applyChance applies instead of the fixture's result.
+
     std::vector<Action> actions(const State& state) const override {
         auto actions = FixtureRules::actions(state);
         auto option = actions.front();
@@ -734,12 +736,22 @@ class HistoryRules : public FixtureRules {
         return actions;
     }
     std::vector<Action> interrupts(const State&) const override {
-        Action action;
-        action.id = action.kind = "interrupt_after_mutation";
-        action.nation = "kmt";
-        action.player = "allies";
-        action.parameters = V(O{});
-        return {action};
+        std::vector<Action> interrupts;
+        for (const auto& kind : {"interrupt_after_mutation", "append_event", "append_nonfinite", "rebuild_history", "clear_history"}) {
+            Action action;
+            action.id = action.kind = kind;
+            action.nation = "kmt";
+            action.player = "allies";
+            action.parameters = V(O{});
+            interrupts.push_back(action);
+        }
+        return interrupts;
+    }
+    void applyChance(State& state, const ChanceRequest& request, const ChanceOutcome& outcome) const override {
+        if (chanceEffect.empty()) { FixtureRules::applyChance(state, request, outcome); return; }
+        Action effect;
+        effect.kind = chanceEffect;
+        apply(state, effect);
     }
     void apply(State& state, const Action& action) const override {
         if (action.kind == "append_event") state.history.push_back(Event{"audit", V(O{{"value", V(1.0)}}), "key"});
@@ -778,6 +790,50 @@ void transitionsCheckAddedHistoryAndEverythingElse() {
     }
     engine.step(findAction(engine, "append_event"));
     require(engine.state().history.size() == 5, "A rejected transition stopped later ones");
+}
+
+Action findInterrupt(const Engine& engine, const std::string& kind) {
+    const auto interrupts = engine.legalInterrupts();
+    const auto found = std::find_if(interrupts.begin(), interrupts.end(), [&](const Action& action) { return action.kind == kind; });
+    require(found != interrupts.end(), "Missing legal interrupt: " + kind);
+    return *found;
+}
+
+void interruptsAndChanceCheckAddedHistory() {
+    auto rules = std::make_shared<HistoryRules>();
+    Engine engine(initialState(), rules, 32);
+    engine.step(findAction(engine, "mark"));
+    engine.interrupt(findInterrupt(engine, "append_event"));
+    require(engine.state().history.size() == 3 && engine.state().history[1].kind == "audit"
+            && engine.state().history[2].kind == "interrupt", "Rules' events lost their place before the interrupt's");
+    const auto before = engine.serialize();
+    for (const std::string kind : {"append_nonfinite", "rebuild_history", "clear_history"}) {
+        const auto action = findInterrupt(engine, kind);
+        rejects([&] { engine.interrupt(action); }, "Interrupt accepted " + kind);
+        require(engine.serialize() == before, "A rejected interrupt changed the engine");
+        auto search = engine.cloneForSearch(5);
+        rejects([&] { search.interrupt(action); }, "Search interrupt accepted " + kind);
+    }
+
+    engine.step(findAction(engine, "request_chance"));
+    const auto pending = engine.serialize();
+    const ChanceOutcome outcome{{{2}, {7}}};
+    for (const std::string kind : {"append_nonfinite", "rebuild_history", "clear_history"}) {
+        rules->chanceEffect = kind;
+        rejects([&] { engine.resolveChance(); }, "Chance accepted " + kind);
+        rejects([&] { engine.applyChanceOutcome(engine.planningKey(), outcome); }, "Explicit chance accepted " + kind);
+        require(engine.serialize() == pending, "A rejected chance changed the engine");
+        auto rolled = engine.cloneForSearch(6);
+        rejects([&] { rolled.resolveChance(); }, "Search chance accepted " + kind);
+        auto explicitOutcome = engine.cloneForSearch(7);
+        rejects([&] { explicitOutcome.applyChanceOutcome(explicitOutcome.planningKey(), outcome); },
+                "Explicit search chance accepted " + kind);
+    }
+    rules->chanceEffect = "append_event";
+    engine.resolveChance();
+    const auto& history = engine.state().history;
+    require(history.size() == 6 && history[4].kind == "audit" && history[5].kind == "chance",
+            "Rules' events lost their place before the chance's");
 }
 
 void refusesEveryCall(Engine& failed) {
@@ -865,6 +921,7 @@ void searchCopiesMatchEnginesThatRollBack() {
     const auto mark = [](Engine& next) { next.step(findAction(next, "mark")); };
     const auto chance = [](Engine& next) { next.step(findAction(next, "request_chance")); };
     both(mark);
+    both([](Engine& next) { next.interrupt(findInterrupt(next, "append_event")); });
     both([](Engine& next) { next.step(findAction(next, "request_reaction")); });
     // The action passed here lives inside the decision that the rules remove.
     both([](Engine& next) { next.step(next.state().decisions.back().options.front()); });
@@ -948,6 +1005,7 @@ int main() {
         {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
         {"reached menus shared across clones and bounded", reachedMenusAreSharedAcrossClonesAndBounded},
         {"transitions check added history and everything else", transitionsCheckAddedHistoryAndEverythingElse},
+        {"interrupts and chance check added history", interruptsAndChanceCheckAddedHistory},
         {"failed search copies refuse every call", searchCopiesRefuseEveryCallAfterFailingMidTransition},
         {"rejections leave search copies usable", searchCopiesStayUsableAfterRejections},
         {"search copies match engines that roll back", searchCopiesMatchEnginesThatRollBack},
