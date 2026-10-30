@@ -266,6 +266,16 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
         rejects([&]{state.validate();},"Nested nonfinite action-interface number accepted");
     }
 }
+void transitionsReadOnlyTheHistoryTheyAdd() {
+    auto state=fixture();
+    std::vector<Event> events=state.history;events.front().payload=nestedNumber(std::numeric_limits<double>::quiet_NaN());
+    state.history.clear();for(auto& event:events)state.history.push_back(std::move(event));
+    state.history.push_back(Event{"added",nestedNumber(1.25),"after"});
+    rejects([&]{state.validate();},"Full validation skipped recorded history");
+    state.validate(1);
+    state.history.push_back(Event{"added",nestedNumber(std::numeric_limits<double>::infinity()),"after"});
+    rejects([&]{state.validate(2);},"Transition validation skipped an added event");
+}
 // Strings are appended in whole runs; they must escape exactly as written one
 // character at a time, wherever an escaped byte falls.
 void canonicalStringsEscapeEveryByte() {
@@ -314,4 +324,4 @@ void directTextMatchesJsonTree() {
     }
 }
 }
-int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();canonicalStringsEscapeEveryByte();directTextMatchesJsonTree();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+int main(){try{digestsAndCanonicalJson();completeRoundTrip();cloneIsolationAndKeys();invalidReferencesAndCargo();consistentClockProgression();nationalityRoutingCalendarAndSnapshot();immutableIndexedGeometry();everyFreeFormPayloadRetainsFiniteValidation();transitionsReadOnlyTheHistoryTheyAdd();canonicalStringsEscapeEveryByte();directTextMatchesJsonTree();std::cout<<"campaign state tests passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

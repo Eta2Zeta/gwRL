@@ -110,6 +110,24 @@ void increment(int& value, const std::string& name) {
     ++value;
 }
 
+// A transition rereads only the history it added. Rules hold a mutable State,
+// so check that they only appended: copies of a log share their events, so the
+// last event's address identifies everything recorded up to it.
+class RecordedHistory {
+  public:
+    explicit RecordedHistory(const State& state)
+        : size_(state.history.size()), last_(size_ ? &state.history.back() : nullptr) {}
+    void validate(const State& state) const {
+        require(state.history.size() >= size_ && (!last_ || &state.history[size_ - 1] == last_),
+                "Rules changed recorded history");
+        state.validate(size_);
+    }
+
+  private:
+    std::size_t size_;
+    const Event* last_;
+};
+
 void prepareTurnStart(State& state) {
     const auto active = state.currentNation();
     state.nations.at(active).turnFlags.clear();
@@ -379,6 +397,7 @@ void Engine::step(const Action& action) {
     require(found != menu->canonicalById.end() && *found->second == proposed, "Illegal campaign action");
     Engine next = clone();
     next.invalidateDecisionCache();
+    const RecordedHistory recorded(next.state_);
     if (reserved(action)) next.endPhase();
     else {
         const auto before = next.state_.clock;
@@ -386,7 +405,7 @@ void Engine::step(const Action& action) {
         next.rules_->apply(next.state_, action);
         checkHookClock(next.state_, before, terminal);
     }
-    next.state_.validate();
+    recorded.validate(next.state_);
     const auto stateKey=next.state_.planningKey();
     next.state_.history.push_back(Event{"action", actionJson(action), stateKey});
     next.decisionCache_->stateKey=stateKey;
@@ -433,11 +452,12 @@ void Engine::interrupt(const Action& action) {
     require(found!=menu->canonicalById.end()&&*found->second==proposed, "Illegal campaign interrupt");
     auto next=clone();
     next.invalidateDecisionCache();
+    const RecordedHistory recorded(next.state_);
     const auto before=next.state_.clock;
     const bool beforeTerminal=next.state_.terminal;
     next.rules_->apply(next.state_,action);
     checkHookClock(next.state_,before,beforeTerminal);
-    next.state_.validate();
+    recorded.validate(next.state_);
     const auto stateKey=next.state_.planningKey();
     next.state_.history.push_back(Event{"interrupt",actionJson(action),stateKey});
     next.decisionCache_->stateKey=stateKey;
@@ -476,12 +496,13 @@ void Engine::applyChanceOutcome(const std::string& expectedKey, const ChanceOutc
 
 void Engine::commitChance(const ChanceRequest& request, const ChanceOutcome& outcome) {
     (void)effectiveResults(request, outcome);
+    const RecordedHistory recorded(state_);
     const auto before = state_.clock;
     const bool terminal = state_.terminal;
     state_.chance.reset();
     rules_->applyChance(state_, request, outcome);
     checkHookClock(state_, before, terminal);
-    state_.validate();
+    recorded.validate(state_);
     const auto stateKey = state_.planningKey();
     state_.history.push_back(Event{"chance", V(O{{"request_id", V(request.id)}, {"outcome", outcomeJson(outcome)}}), stateKey});
     decisionCache_->stateKey = stateKey;

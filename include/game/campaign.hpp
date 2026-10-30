@@ -337,7 +337,8 @@ struct State {
     bool terminal {false};
 
     State clone() const;  // Value-copy mutable data; share immutable definition.
-    void validate() const;
+    // A transition starts at the events it added: recorded events never change.
+    void validate(std::size_t historyFrom = 0) const;
     const Id& currentNation() const;
     std::optional<Id> decisionPlayer() const;
     std::pair<int, int> calendarDate() const;

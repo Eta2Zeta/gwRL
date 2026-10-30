@@ -414,7 +414,7 @@ std::string State::serialize() const { validate();std::string out;out.reserve(1<
 std::string State::planningKey() const { std::string out;out.reserve(1<<17);writeState(out,*this,false);return contentDigest(out); }
 V State::observation() const { auto object=toJson(false).asObject();object.erase("definition_fingerprint");return V(std::move(object)); }
 
-void State::validate() const {
+void State::validate(std::size_t historyFrom) const {
     require(definition!=nullptr&&!definition->fingerprint.empty(),"State requires a frozen definition");
     require(actionInterface.isObject(),"Action-interface state must be an object");
     validateTrainingActionState(*this);
@@ -489,6 +489,6 @@ void State::validate() const {
     validateJsonNumbers(actionInterface);
     for(const auto& decision:decisions)for(const auto& action:decision.options)validateJsonNumbers(action.parameters);
     for(const auto& [id,battle]:battles)validateJsonNumbers(battle.data);
-    for(const auto& event:history)validateJsonNumbers(event.payload);
+    for(std::size_t index=historyFrom;index<history.size();++index)validateJsonNumbers(history[index].payload);
 }
 } // namespace game::campaign

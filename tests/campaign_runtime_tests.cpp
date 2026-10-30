@@ -721,6 +721,51 @@ void reachedMenusAreSharedAcrossClonesAndBounded() {
     require(rules->actionCalls == beforeRevisit + 1, "The shared menu table retained unbounded old menus");
 }
 
+// Transitions reread only the history they add, so rules may only append to it.
+class HistoryRules : public FixtureRules {
+  public:
+    std::vector<Action> actions(const State& state) const override {
+        auto actions = FixtureRules::actions(state);
+        auto option = actions.front();
+        for (const auto& kind : {"append_event", "append_nonfinite", "rebuild_history", "clear_history", "corrupt_state"}) {
+            option.id = option.kind = kind;
+            actions.push_back(option);
+        }
+        return actions;
+    }
+    void apply(State& state, const Action& action) const override {
+        if (action.kind == "append_event") state.history.push_back(Event{"audit", V(O{{"value", V(1.0)}}), "key"});
+        else if (action.kind == "append_nonfinite")
+            state.history.push_back(Event{"audit", V(O{{"value", V(std::numeric_limits<double>::infinity())}}), "key"});
+        else if (action.kind == "rebuild_history") {
+            const std::vector<Event> events = state.history;
+            state.history.clear();
+            for (const auto& event : events) state.history.push_back(event);
+        }
+        else if (action.kind == "clear_history") state.history.clear();
+        else if (action.kind == "corrupt_state") state.nations.at("ccp").treasury = -1;
+        else FixtureRules::apply(state, action);
+    }
+};
+
+void transitionsCheckAddedHistoryAndEverythingElse() {
+    auto rules = std::make_shared<HistoryRules>();
+    Engine engine(initialState(), rules, 31);
+    engine.step(findAction(engine, "mark"));
+    engine.step(findAction(engine, "append_event"));
+    require(engine.state().history.size() == 3 && engine.state().history[1].kind == "audit"
+            && engine.state().history[2].kind == "action", "Rules' events lost their place before the action's");
+    const auto before = engine.serialize();
+    for (const auto& kind : {"append_nonfinite", "rebuild_history", "clear_history", "corrupt_state"}) {
+        rejects([&] { engine.step(findAction(engine, kind)); }, std::string("Transition accepted ") + kind);
+        require(engine.serialize() == before, "A rejected transition changed the engine");
+        auto search = engine.cloneForSearch(5);
+        rejects([&] { search.step(findAction(search, kind)); }, std::string("Search transition accepted ") + kind);
+    }
+    engine.step(findAction(engine, "append_event"));
+    require(engine.state().history.size() == 5, "A rejected transition stopped later ones");
+}
+
 void eventLogCopiesShareEventsAndStayIndependent() {
     EventLog log;
     log.push_back(Event{"first", V(O{{"n", V(1.0)}}), "k1"});
@@ -787,6 +832,7 @@ int main() {
         {"state key reuse and invalidation", runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys},
         {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
         {"reached menus shared across clones and bounded", reachedMenusAreSharedAcrossClonesAndBounded},
+        {"transitions check added history and everything else", transitionsCheckAddedHistoryAndEverythingElse},
         {"event log copies share events", eventLogCopiesShareEventsAndStayIndependent},
         {"position facts scoped to one state", positionFactsAreScopedToOneUnchangedState},
     };
