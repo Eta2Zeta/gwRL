@@ -112,20 +112,22 @@ void increment(int& value, const std::string& name) {
 
 // A transition rereads only the history it added. Rules hold a mutable State,
 // so check that they only appended: copies of a log share their events, so the
-// last event's address identifies everything recorded up to it.
+// last event's address identifies everything recorded up to it. Holding the event
+// keeps that address from being reused by a rewritten log, since a search copy's
+// own events have no other owner.
 class RecordedHistory {
   public:
     explicit RecordedHistory(const State& state)
-        : size_(state.history.size()), last_(size_ ? &state.history.back() : nullptr) {}
+        : size_(state.history.size()), last_(state.history.lastEntry()) {}
     void validate(const State& state) const {
-        require(state.history.size() >= size_ && (!last_ || &state.history[size_ - 1] == last_),
+        require(state.history.size() >= size_ && (!last_ || &state.history[size_ - 1] == last_.get()),
                 "Rules changed recorded history");
         state.validate(size_);
     }
 
   private:
     std::size_t size_;
-    const Event* last_;
+    std::shared_ptr<const Event> last_;
 };
 
 void prepareTurnStart(State& state) {

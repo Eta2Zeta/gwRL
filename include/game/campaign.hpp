@@ -304,6 +304,7 @@ class EventLog {
     bool empty() const { return entries_.empty(); }
     const Event& operator[](std::size_t index) const { return *entries_[index]; }
     const Event& back() const { return *entries_.back(); }
+    std::shared_ptr<const Event> lastEntry() const { return entries_.empty() ? nullptr : entries_.back(); }
     const_iterator begin() const { return const_iterator(entries_.begin()); }
     const_iterator end() const { return const_iterator(entries_.end()); }
     operator std::vector<Event>() const { return {begin(), end()}; }

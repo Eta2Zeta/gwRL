@@ -891,6 +891,27 @@ void searchCopiesRefuseEveryCallAfterFailingMidTransition() {
     require(fresh.state().flags.at("marks") == 2, "A failed search copy spoiled later copies");
 }
 
+void searchCopiesCheckHistoryOnlyTheyHold() {
+    // Nothing else holds a copy's own events, so a rewrite frees them for the new log.
+    auto rules = std::make_shared<HistoryRules>();
+    Engine engine(initialState(), rules, 84);
+    require(engine.state().history.empty(), "This check needs a copy of an empty log");
+    const auto recorded = [&] {
+        auto search = engine.cloneForSearch(3);
+        search.step(findAction(search, "mark"));
+        return search;
+    };
+    auto stepped = recorded();
+    rejects([&] { stepped.step(findAction(stepped, "rebuild_history")); }, "Search step accepted a rewritten log");
+    auto interrupted = recorded();
+    const auto interrupt = findInterrupt(interrupted, "rebuild_history");
+    rejects([&] { interrupted.interrupt(interrupt); }, "Search interrupt accepted a rewritten log");
+    auto rolled = recorded();
+    rolled.step(findAction(rolled, "request_chance"));
+    rules->chanceEffect = "rebuild_history";
+    rejects([&] { rolled.resolveChance(); }, "Search chance accepted a rewritten log");
+}
+
 void searchCopiesStayUsableAfterRejections() {
     auto rules = std::make_shared<HistoryRules>();
     Engine engine(initialState(), rules, 82);
@@ -1013,6 +1034,7 @@ int main() {
         {"interrupts and chance check added history", interruptsAndChanceCheckAddedHistory},
         {"failed search copies refuse every call", searchCopiesRefuseEveryCallAfterFailingMidTransition},
         {"rejections leave search copies usable", searchCopiesStayUsableAfterRejections},
+        {"search copies check history only they hold", searchCopiesCheckHistoryOnlyTheyHold},
         {"search copies match engines that roll back", searchCopiesMatchEnginesThatRollBack},
         {"event log copies share events", eventLogCopiesShareEventsAndStayIndependent},
         {"position facts scoped to one state", positionFactsAreScopedToOneUnchangedState},
