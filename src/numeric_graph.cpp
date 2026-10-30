@@ -2,6 +2,7 @@
 
 #include <pybind11/numpy.h>
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <cmath>
@@ -9,10 +10,10 @@
 #include <deque>
 #include <limits>
 #include <mutex>
-#include <set>
-#include <shared_mutex>
+#include <numeric>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -27,9 +28,9 @@ enum Kind { Null, Bool, Number, String, Array, Object };
 enum Path { OtherPath, RootPath, GeographyPath, GeographyNodesPath };
 
 constexpr std::size_t LexicalCacheEntries = 131072;
-constexpr std::size_t DescriptorCacheEntries = 131072;
 constexpr std::size_t NumericCacheEntries = 32768;
 constexpr std::size_t StringCacheBytes = 16 * 1024 * 1024;
+constexpr std::size_t CacheSets = 8;
 constexpr std::size_t MaximumDepth = 1024;
 
 std::int64_t indexValue(std::size_t value) {
@@ -57,14 +58,19 @@ struct NumericKeyHash {
     }
 };
 
-struct StringDescription {
-    std::int64_t length;
-    double number;
+struct FieldEncoding {
+    std::vector<std::int64_t> tokens;
+    bool collection = false;
 };
 
-// FIFO bounds both entry count and retained source-string bytes. Hits do not
-// mutate the cache, so simultaneous native traversals take shared locks only.
-// An unusually large scalar is still encoded completely, but is not retained.
+struct ValueEncoding {
+    std::vector<std::int64_t> tokens;
+    std::int64_t length = 0;
+    double number = 0;
+};
+
+// FIFO bounds both entry count and retained source-string bytes. An unusually
+// large scalar is still encoded completely, but is not retained.
 template <class Value>
 struct StringCache {
     struct Entry {
@@ -74,26 +80,33 @@ struct StringCache {
     std::unordered_map<std::string, Entry> values;
     std::deque<std::string> order;
     std::size_t bytes = 0;
+    Value unretained;
 
-    void insert(const std::string& key, Value value, std::size_t valueBytes, std::size_t capacity) {
+    const Value& insert(const std::string& key, Value value, std::size_t valueBytes, std::size_t capacity) {
         const auto entryBytes = key.size() * 2 + valueBytes;
-        if (entryBytes > StringCacheBytes || values.contains(key)) return;
+        if (entryBytes > StringCacheBytes) return unretained = std::move(value);
         while (!order.empty() && (values.size() >= capacity || bytes + entryBytes > StringCacheBytes)) {
             const auto found = values.find(order.front());
             bytes -= found->second.bytes;
             values.erase(found);
             order.pop_front();
         }
-        values.emplace(key, Entry{std::move(value), entryBytes});
         order.push_back(key);
         bytes += entryBytes;
+        return values.emplace(key, Entry{std::move(value), entryBytes}).first->second.value;
     }
+};
 
-    void clear() {
-        values.clear();
-        order.clear();
-        bytes = 0;
-    }
+// One compile's scalar encodings. A compile owns its set from start to finish
+// and no other thread can reach it, so lookups take no lock. Threads compiling
+// at the same time use different sets, which fill independently.
+struct ScalarCaches {
+    explicit ScalarCaches(std::uint64_t currentGeneration) : generation(currentGeneration) {}
+    std::uint64_t generation;
+    StringCache<FieldEncoding> fields;
+    StringCache<ValueEncoding> values;
+    std::unordered_map<NumericKey, std::array<double, 8>, NumericKeyHash> numeric;
+    std::deque<NumericKey> numericOrder;
 };
 
 bool entityCollection(const std::string& key) {
@@ -151,7 +164,7 @@ struct NumericGraphData {
     };
     struct Identity {
         std::string name;
-        std::set<std::int64_t> nodes;
+        std::vector<std::int64_t> nodes;  // Sorted and unique.
     };
     std::vector<std::int64_t> tokenIds;
     std::vector<std::int64_t> tokenOffsets;
@@ -166,6 +179,20 @@ struct NumericGraphData {
     std::size_t leaves = 0;
     std::int64_t buckets = 0;
 
+    void clear() {
+        tokenIds.clear();
+        tokenOffsets.clear();
+        types.clear();
+        numeric.clear();
+        sources.clear();
+        targets.clear();
+        relations.clear();
+        references.clear();
+        identities.clear();
+        identityLookup.clear();
+        leaves = 0;
+    }
+
     void compact() {
         tokenIds.shrink_to_fit();
         tokenOffsets.shrink_to_fit();
@@ -178,6 +205,10 @@ struct NumericGraphData {
         identities.shrink_to_fit();
     }
 
+    void addTokens(const std::vector<std::int64_t>& tokens) {
+        for (const auto token : tokens) tokenIds.push_back(token);
+    }
+
     void addEdge(std::int64_t source, std::int64_t target, std::int64_t relation) {
         sources.push_back(source);
         targets.push_back(target);
@@ -185,9 +216,38 @@ struct NumericGraphData {
     }
 
     void bind(const std::string& identity, std::int64_t index) {
-        const auto [found, inserted] = identityLookup.emplace(identity, identities.size());
+        const auto [found, inserted] = identityLookup.try_emplace(identity, identities.size());
         if (inserted) identities.push_back({identity, {}});
-        identities[found->second].nodes.insert(index);
+        auto& nodes = identities[found->second].nodes;
+        const auto position = std::lower_bound(nodes.begin(), nodes.end(), index);
+        if (position == nodes.end() || *position != index) nodes.insert(position, index);
+    }
+};
+
+// Finished observation graphs, kept to reuse their arrays. Freeing a large vector
+// hands its pages to the kernel and the next graph faults them in again, and growing
+// one copies it. A graph lands here only when its last owner lets go, so whoever
+// takes it from here owns it alone.
+struct SpareGraphs {
+    std::mutex mutex;
+    std::vector<std::unique_ptr<NumericGraphData>> graphs;
+
+    static std::shared_ptr<NumericGraphData> take(const std::shared_ptr<SpareGraphs>& spares) {
+        std::unique_ptr<NumericGraphData> graph;
+        {
+            std::lock_guard lock(spares->mutex);
+            if (!spares->graphs.empty()) {
+                graph = std::move(spares->graphs.back());
+                spares->graphs.pop_back();
+            }
+        }
+        if (!graph) graph = std::make_unique<NumericGraphData>();
+        return {graph.release(), [spares](NumericGraphData* finished) {
+            std::unique_ptr<NumericGraphData> owned(finished);
+            owned->clear();
+            std::lock_guard lock(spares->mutex);
+            if (spares->graphs.size() < CacheSets) spares->graphs.push_back(std::move(owned));
+        }};
     }
 };
 
@@ -196,64 +256,69 @@ struct NumericGraphCompiler::Impl {
         : buckets(bucketCount), lexicalIds(std::move(lexical)),
           stringDescriptor(std::move(descriptor)), numericFeatures(std::move(numeric)) {}
 
-    void addTokens(const std::string& text, bool value, std::vector<std::int64_t>& output) {
-        auto& cache = value ? valueTokens : fieldTokens;
-        {
-            std::shared_lock lock(cacheMutex);
-            const auto found = cache.values.find(text);
-            if (found != cache.values.end()) {
-                const auto& tokens = found->second.value;
-                output.insert(output.end(), tokens.begin(), tokens.end());
-                return;
-            }
-        }
-        std::vector<std::int64_t> encoded;
-        {
-            py::gil_scoped_acquire gil;
-            const auto found = lexicalIds(py::str(text), value ? "value" : "field", buckets);
-            const auto sequence = py::reinterpret_steal<py::object>(PySequence_Tuple(found.ptr()));
-            if (!sequence) throw py::error_already_set();
-            const auto count = PyTuple_GET_SIZE(sequence.ptr());
-            encoded.reserve(static_cast<std::size_t>(count));
-            for (py::ssize_t index = 0; index < count; ++index) {
-                encoded.push_back(py::cast<std::int64_t>(py::handle(PyTuple_GET_ITEM(sequence.ptr(), index))));
-            }
-        }
-        output.insert(output.end(), encoded.begin(), encoded.end());
-        const auto encodedBytes = encoded.size() * sizeof(std::int64_t);
-        std::unique_lock lock(cacheMutex);
-        cache.insert(text, std::move(encoded), encodedBytes, LexicalCacheEntries);
+    std::unique_ptr<ScalarCaches> checkOut() {
+        std::lock_guard lock(poolMutex);
+        if (pool.empty()) return std::make_unique<ScalarCaches>(generation);
+        auto caches = std::move(pool.back());
+        pool.pop_back();
+        return caches;
     }
 
-    StringDescription describe(const std::string& text) {
-        {
-            std::shared_lock lock(cacheMutex);
-            const auto found = stringDescriptions.values.find(text);
-            if (found != stringDescriptions.values.end()) return found->second.value;
+    void checkIn(std::unique_ptr<ScalarCaches> caches) {
+        std::lock_guard lock(poolMutex);
+        if (caches->generation == generation && pool.size() < CacheSets) pool.push_back(std::move(caches));
+    }
+
+    std::vector<std::int64_t> lexical(const std::string& text, const char* role) {
+        const auto found = lexicalIds(py::str(text), role, buckets);
+        const auto sequence = py::reinterpret_steal<py::object>(PySequence_Tuple(found.ptr()));
+        if (!sequence) throw py::error_already_set();
+        const auto count = PyTuple_GET_SIZE(sequence.ptr());
+        std::vector<std::int64_t> encoded;
+        encoded.reserve(static_cast<std::size_t>(count));
+        for (py::ssize_t index = 0; index < count; ++index) {
+            encoded.push_back(py::cast<std::int64_t>(py::handle(PyTuple_GET_ITEM(sequence.ptr(), index))));
         }
-        StringDescription encoded;
-        {
-            py::gil_scoped_acquire gil;
-            const auto value = stringDescriptor(py::str(text));
-            if (!PyTuple_Check(value.ptr()) || PyTuple_GET_SIZE(value.ptr()) != 2) {
-                throw py::type_error("String descriptor must return (UTF-8 length, numeric value)");
-            }
-            encoded = {py::cast<std::int64_t>(value[py::int_(0)]), py::cast<double>(value[py::int_(1)])};
-        }
-        std::unique_lock lock(cacheMutex);
-        stringDescriptions.insert(text, encoded, sizeof(encoded), DescriptorCacheEntries);
         return encoded;
     }
 
-    std::array<double, 8> numbers(double number, std::int64_t length,
-                                  std::int64_t size, std::int64_t position) {
+    const FieldEncoding& field(ScalarCaches& caches, const std::string& text) {
+        const auto found = caches.fields.values.find(text);
+        if (found != caches.fields.values.end()) return found->second.value;
+        FieldEncoding encoded;
+        {
+            py::gil_scoped_acquire gil;
+            encoded.tokens = lexical(text, "field");
+        }
+        encoded.collection = entityCollection(text);
+        const auto encodedBytes = encoded.tokens.size() * sizeof(std::int64_t);
+        return caches.fields.insert(text, std::move(encoded), encodedBytes, LexicalCacheEntries);
+    }
+
+    const ValueEncoding& value(ScalarCaches& caches, const std::string& text) {
+        const auto found = caches.values.values.find(text);
+        if (found != caches.values.values.end()) return found->second.value;
+        ValueEncoding encoded;
+        {
+            py::gil_scoped_acquire gil;
+            const auto description = stringDescriptor(py::str(text));
+            if (!PyTuple_Check(description.ptr()) || PyTuple_GET_SIZE(description.ptr()) != 2) {
+                throw py::type_error("String descriptor must return (UTF-8 length, numeric value)");
+            }
+            encoded.length = py::cast<std::int64_t>(description[py::int_(0)]);
+            encoded.number = py::cast<double>(description[py::int_(1)]);
+            encoded.tokens = lexical(text, "value");
+        }
+        const auto encodedBytes = encoded.tokens.size() * sizeof(std::int64_t) + sizeof(ValueEncoding);
+        return caches.values.insert(text, std::move(encoded), encodedBytes, LexicalCacheEntries);
+    }
+
+    const std::array<double, 8>& numbers(ScalarCaches& caches, double number, std::int64_t length,
+                                         std::int64_t size, std::int64_t position) {
         // Float equality alone loses the distinction between -0.0 and +0.0.
         const NumericKey key{std::bit_cast<std::uint64_t>(number), length, size, position};
-        {
-            std::shared_lock lock(cacheMutex);
-            const auto found = numericCache.find(key);
-            if (found != numericCache.end()) return found->second;
-        }
+        const auto found = caches.numeric.find(key);
+        if (found != caches.numeric.end()) return found->second;
         std::array<double, 8> encoded;
         {
             py::gil_scoped_acquire gil;
@@ -265,25 +330,27 @@ struct NumericGraphCompiler::Impl {
                 encoded[index] = py::cast<double>(py::handle(PyTuple_GET_ITEM(value.ptr(), index)));
             }
         }
-        std::unique_lock lock(cacheMutex);
-        if (!numericCache.contains(key)) {
-            if (numericCache.size() >= NumericCacheEntries) {
-                numericCache.erase(numericOrder.front());
-                numericOrder.pop_front();
-            }
-            numericCache.emplace(key, encoded);
-            numericOrder.push_back(key);
+        if (caches.numeric.size() >= NumericCacheEntries) {
+            caches.numeric.erase(caches.numericOrder.front());
+            caches.numericOrder.pop_front();
         }
-        return encoded;
+        caches.numericOrder.push_back(key);
+        return caches.numeric.emplace(key, encoded).first->second;
     }
 
     struct Builder {
-        explicit Builder(Impl& scalarCompiler) : compiler(scalarCompiler), graph(std::make_shared<NumericGraphData>()) {
-            graph->buckets = compiler.buckets;
-        }
+        explicit Builder(Impl& scalarCompiler)
+            : compiler(scalarCompiler), caches(compiler.checkOut()) {}
+
+        ~Builder() { compiler.checkIn(std::move(caches)); }
 
         std::shared_ptr<const NumericGraphData> run(const json::Value& value,
-                                                   const json::Value::Object* rootOverrides = nullptr) {
+                                                   const json::Value::Object* rootOverrides = nullptr,
+                                                   const NumericGraphCompiler::Menu* menu = nullptr) {
+            const bool observation = rootOverrides && rootOverrides->contains("legal_actions");
+            scheduledMenu = observation ? menu : nullptr;
+            graph = observation ? SpareGraphs::take(compiler.spares) : std::make_shared<NumericGraphData>();
+            graph->buckets = compiler.buckets;
             graph->tokenOffsets.push_back(0);
             visit(value, "$", 0, RootPath, 0, rootOverrides);
             for (const auto& reference : graph->references) {
@@ -297,15 +364,17 @@ struct NumericGraphCompiler::Impl {
                 }
             }
             addAdjacency(value, rootOverrides);
-            // Published graphs are immutable. Do not retain the transient
-            // append-growth capacity in every replay position for the run.
-            graph->compact();
+            // Published graphs are immutable. Actions and contexts are cached for
+            // the run, so they keep no append-growth capacity. Most observations
+            // die within a simulation; a caller retaining one takes compacted().
+            if (!observation) graph->compact();
             return std::move(graph);
         }
 
         std::int64_t visit(const json::Value& value, const std::string& key,
                            std::int64_t position, Path path, std::size_t depth,
-                           const json::Value::Object* rootOverrides = nullptr) {
+                           const json::Value::Object* rootOverrides = nullptr,
+                           const NumericGraphCompiler::Menu* elements = nullptr) {
             if (depth >= MaximumDepth) throw std::runtime_error("Campaign neural JSON nesting exceeds 1024 levels");
             if (rootOverrides && !value.isObject()) throw std::invalid_argument("Campaign neural root overrides require an object");
             const auto index = indexValue(graph->types.size());
@@ -313,7 +382,9 @@ struct NumericGraphCompiler::Impl {
             std::int64_t length = 0;
             std::int64_t size = 0;
             Kind kind;
-            compiler.addTokens(key, false, graph->tokenIds);
+            const auto& field = compiler.field(*caches, key);
+            const bool collection = field.collection;
+            graph->addTokens(field.tokens);
             if (value.isNull()) {
                 kind = Null;
             } else if (value.isBool()) {
@@ -329,14 +400,14 @@ struct NumericGraphCompiler::Impl {
             } else if (value.isString()) {
                 kind = String;
                 const auto& text = value.asString();
-                const auto description = compiler.describe(text);
-                length = description.length;
-                number = description.number;
-                compiler.addTokens(text, true, graph->tokenIds);
+                const auto& encoded = compiler.value(*caches, text);
+                length = encoded.length;
+                number = encoded.number;
+                graph->addTokens(encoded.tokens);
                 graph->references.push_back({index, text});
             } else if (value.isArray()) {
                 kind = Array;
-                size = indexValue(value.asArray().size());
+                size = indexValue(elements ? elements->size() : value.asArray().size());
             } else {
                 kind = Object;
                 size = indexValue(value.asObject().size());
@@ -348,7 +419,7 @@ struct NumericGraphCompiler::Impl {
             }
             graph->tokenOffsets.push_back(indexValue(graph->tokenIds.size()));
             graph->types.push_back(kind);
-            const auto encoded = compiler.numbers(number, length, size, position);
+            const auto& encoded = compiler.numbers(*caches, number, length, size, position);
             graph->numeric.insert(graph->numeric.end(), encoded.begin(), encoded.end());
             if (kind == Object) {
                 const auto overriddenIdentity = rootOverrides ? rootOverrides->find("id") : json::Value::Object::const_iterator{};
@@ -357,14 +428,14 @@ struct NumericGraphCompiler::Impl {
                 if (identity && identity->isString()) {
                     graph->bind(identity->asString(), index);
                 }
-                const bool collection = entityCollection(key);
                 // Native JSON objects use std::map. For valid UTF-8 this is the
                 // same code-point order as sorted() in the feature oracle.
                 const auto visitField = [&](const std::string& field, const json::Value& child) {
                     Path childPath = OtherPath;
                     if (path == RootPath && field == "geography") childPath = GeographyPath;
                     if (path == GeographyPath && field == "nodes") childPath = GeographyNodesPath;
-                    const auto target = visit(child, field, 0, childPath, depth + 1);
+                    const auto target = visit(child, field, 0, childPath, depth + 1, nullptr,
+                                              rootOverrides && field == "legal_actions" ? scheduledMenu : nullptr);
                     graph->addEdge(index, target, ParentToChild);
                     graph->addEdge(target, index, ChildToParent);
                     if (collection && child.isObject()) graph->bind(field, target);
@@ -382,10 +453,15 @@ struct NumericGraphCompiler::Impl {
                 }
             } else if (kind == Array) {
                 std::int64_t offset = 0;
-                for (const auto& child : value.asArray()) {
+                const auto visitElement = [&](const json::Value& child) {
                     const auto target = visit(child, "[]", offset++, OtherPath, depth + 1);
                     graph->addEdge(index, target, ParentToChild);
                     graph->addEdge(target, index, ChildToParent);
+                };
+                if (elements) {
+                    for (const auto& child : *elements) visitElement(*child);
+                } else {
+                    for (const auto& child : value.asArray()) visitElement(child);
                 }
             } else {
                 ++graph->leaves;
@@ -423,23 +499,33 @@ struct NumericGraphCompiler::Impl {
         }
 
         Impl& compiler;
+        std::unique_ptr<ScalarCaches> caches;
         std::shared_ptr<NumericGraphData> graph;
         std::unordered_map<std::string, std::int64_t> geographyNodes;
+        const NumericGraphCompiler::Menu* scheduledMenu = nullptr;
     };
 
     std::int64_t buckets;
     py::function lexicalIds;
     py::function stringDescriptor;
     py::function numericFeatures;
-    mutable std::shared_mutex cacheMutex;
-    StringCache<std::vector<std::int64_t>> fieldTokens;
-    StringCache<std::vector<std::int64_t>> valueTokens;
-    StringCache<StringDescription> stringDescriptions;
-    std::unordered_map<NumericKey, std::array<double, 8>, NumericKeyHash> numericCache;
-    std::deque<NumericKey> numericOrder;
+    mutable std::mutex poolMutex;
+    std::vector<std::unique_ptr<ScalarCaches>> pool;
+    std::uint64_t generation = 0;
+    std::shared_ptr<SpareGraphs> spares = std::make_shared<SpareGraphs>();
 };
 
-NumericGraph::NumericGraph(std::shared_ptr<const NumericGraphData> data) : data_(std::move(data)) {
+NumericGraph::NumericGraph(std::shared_ptr<const NumericGraphData> data) : data_(std::move(data)) {}
+
+std::shared_ptr<NumericGraph> NumericGraph::compacted() const {
+    return std::shared_ptr<NumericGraph>(new NumericGraph(std::make_shared<NumericGraphData>(*data_)));
+}
+
+std::size_t NumericGraph::nodeCount() const { return data_->types.size(); }
+std::size_t NumericGraph::leafCount() const { return data_->leaves; }
+std::int64_t NumericGraph::bucketCount() const { return data_->buckets; }
+
+std::size_t NumericGraph::retainedBytes() const {
     // Include vector capacities and the native reference index, not only the
     // exported ndarray lengths. Container-node overhead is a conservative
     // portable estimate; allocator bookkeeping is outside this accounting.
@@ -454,19 +540,14 @@ NumericGraph::NumericGraph(std::shared_ptr<const NumericGraphData> data) : data_
     bytes += data_->identities.capacity() * sizeof(NumericGraphData::Identity);
     for (const auto& identity : data_->identities) {
         bytes += identity.name.capacity() + 1;
-        bytes += identity.nodes.size() * (sizeof(std::int64_t) + 4 * sizeof(void*));
+        bytes += identity.nodes.capacity() * sizeof(std::int64_t);
     }
     bytes += data_->identityLookup.bucket_count() * sizeof(void*);
     for (const auto& [name, ignored] : data_->identityLookup) {
         bytes += sizeof(std::pair<const std::string, std::size_t>) + 2 * sizeof(void*) + name.capacity() + 1;
     }
-    retainedBytes_ = bytes;
+    return bytes;
 }
-
-std::size_t NumericGraph::nodeCount() const { return data_->types.size(); }
-std::size_t NumericGraph::leafCount() const { return data_->leaves; }
-std::int64_t NumericGraph::bucketCount() const { return data_->buckets; }
-std::size_t NumericGraph::retainedBytes() const { return retainedBytes_; }
 
 bool NumericGraph::equals(const NumericGraph& other) const {
     if (data_ == other.data_) return true;
@@ -620,14 +701,14 @@ std::shared_ptr<NumericGraph> NumericGraph::fromPacked(const py::dict& state) {
         if (!py::isinstance<py::tuple>(item.second)) throw std::invalid_argument("Packed campaign graph identity indices must be a tuple");
         const auto name = py::cast<std::string>(item.first);
         std::int64_t previous = -1;
-        std::set<std::int64_t> indices;
+        std::vector<std::int64_t> indices;
         for (const auto value : py::reinterpret_borrow<py::iterable>(item.second)) {
             if (!PyLong_CheckExact(value.ptr())) throw std::invalid_argument("Packed campaign graph identity indices must be integers");
             const auto index = py::cast<std::int64_t>(value);
             if (index <= previous || index >= nodes || data->types[index] != Object) {
                 throw std::invalid_argument("Packed campaign graph identity indices must be sorted unique object indices");
             }
-            indices.insert(index);
+            indices.push_back(index);
             previous = index;
         }
         if (indices.empty()) throw std::invalid_argument("Packed campaign graph identity has no target");
@@ -652,6 +733,145 @@ std::shared_ptr<NumericGraph> NumericGraph::fromPacked(const py::dict& state) {
     return std::shared_ptr<NumericGraph>(new NumericGraph(std::move(data)));
 }
 
+namespace {
+
+template <class Visit>
+void forEachReference(const NumericGraphData& graph, const NumericGraphData& bank, Visit&& visit) {
+    for (const auto& reference : graph.references) {
+        const auto found = bank.identityLookup.find(reference.identity);
+        if (found == bank.identityLookup.end()) continue;
+        for (const auto index : bank.identities[found->second].nodes) visit(reference.source, index);
+    }
+}
+
+// An evaluation's arrays laid out in a caller's buffer, as read_arrays reads them.
+class EvaluationWriter {
+public:
+    explicit EvaluationWriter(const py::buffer& buffer) : view_(buffer.request(true)) {
+        // The arrays are written straight through the pointer, so the buffer must
+        // be one run of bytes starting where an int32 or float32 can be stored.
+        if (view_.ndim != 1 || view_.strides[0] != view_.itemsize ||
+            reinterpret_cast<std::uintptr_t>(view_.ptr) % alignof(std::int32_t) != 0) {
+            throw py::buffer_error("Evaluation arrays need a contiguous, aligned buffer");
+        }
+    }
+
+    template <class Value>
+    Value* array(const std::string& name, std::size_t rows, std::size_t columns = 0) {
+        const auto start = (end_ + 15) & ~std::size_t{15};
+        end_ = start + rows * std::max<std::size_t>(columns, 1) * sizeof(Value);
+        if (end_ > static_cast<std::size_t>(view_.size * view_.itemsize)) {
+            throw std::invalid_argument("A prepared position exceeds its shared-memory buffer");
+        }
+        py::tuple shape = columns ? py::tuple(py::make_tuple(rows, columns)) : py::tuple(py::make_tuple(rows));
+        header_.append(py::make_tuple(name, std::is_same_v<Value, float> ? "<f4" : "<i4", shape, start));
+        return reinterpret_cast<Value*>(static_cast<char*>(view_.ptr) + start);
+    }
+
+    py::list header() const { return header_; }
+
+private:
+    py::buffer_info view_;
+    std::size_t end_ = 0;
+    py::list header_;
+};
+
+// Copies values narrowed to the model's array type; returns the end.
+template <class Source, class Target>
+Target* narrowed(const std::vector<Source>& values, Target* out) {
+    for (std::size_t index = 0; index < values.size(); ++index) out[index] = static_cast<Target>(values[index]);
+    return out + values.size();
+}
+
+// The same for node or token indices, moved past a block's earlier graphs.
+std::int32_t* shifted(const std::int64_t* values, std::size_t count, std::int32_t* out, std::int32_t shift) {
+    for (std::size_t index = 0; index < count; ++index) out[index] = static_cast<std::int32_t>(values[index]) + shift;
+    return out + count;
+}
+
+void writeBlock(EvaluationWriter& out, const std::string& prefix, const std::vector<const NumericGraphData*>& graphs) {
+    std::size_t tokenCount = 0, nodeCount = 0, edgeCount = 0;
+    for (const auto* graph : graphs) {
+        tokenCount += graph->tokenIds.size();
+        nodeCount += graph->types.size();
+        edgeCount += graph->sources.size();
+    }
+    auto* ids = out.array<std::int32_t>(prefix + "ids", tokenCount);
+    auto* offsets = out.array<std::int32_t>(prefix + "offsets", nodeCount + 1);
+    auto* types = out.array<std::int32_t>(prefix + "types", nodeCount);
+    auto* numbers = out.array<float>(prefix + "numbers", nodeCount, 8);
+    auto* sources = out.array<std::int32_t>(prefix + "sources", edgeCount);
+    auto* targets = out.array<std::int32_t>(prefix + "targets", edgeCount);
+    auto* relations = out.array<std::int32_t>(prefix + "relations", edgeCount);
+    std::int32_t nodeStart = 0, tokenStart = 0;
+    for (const auto* graph : graphs) {
+        ids = narrowed(graph->tokenIds, ids);
+        offsets = shifted(graph->tokenOffsets.data(), graph->types.size(), offsets, tokenStart);
+        types = narrowed(graph->types, types);
+        numbers = narrowed(graph->numeric, numbers);
+        sources = shifted(graph->sources.data(), graph->sources.size(), sources, nodeStart);
+        targets = shifted(graph->targets.data(), graph->targets.size(), targets, nodeStart);
+        relations = narrowed(graph->relations, relations);
+        nodeStart += static_cast<std::int32_t>(graph->types.size());
+        tokenStart += static_cast<std::int32_t>(graph->tokenIds.size());
+    }
+    *offsets = tokenStart;
+}
+
+void writeReferences(EvaluationWriter& out, const std::string& prefix,
+                     const std::vector<const NumericGraphData*>& graphs, const NumericGraphData& bank) {
+    std::vector<std::int32_t> destinations, indices;
+    std::int32_t nodeStart = 0;
+    for (const auto* graph : graphs) {
+        forEachReference(*graph, bank, [&](std::int64_t source, std::int64_t index) {
+            destinations.push_back(static_cast<std::int32_t>(source) + nodeStart);
+            indices.push_back(static_cast<std::int32_t>(index));
+        });
+        nodeStart += static_cast<std::int32_t>(graph->types.size());
+    }
+    narrowed(destinations, out.array<std::int32_t>(prefix + "dest", destinations.size()));
+    narrowed(indices, out.array<std::int32_t>(prefix + "index", indices.size()));
+}
+
+// The four levels of CampaignPolicyValueNet._factor_layout. Once the actions are
+// sorted, those sharing a prefix are adjacent, in the sorted order of the
+// prefixes, so each level's groups and their parents come from one walk. UTF-8
+// byte order is code-point order, which is how Python sorts the same strings.
+void writeFactorLevels(EvaluationWriter& out, const std::vector<std::array<std::string_view, 4>>& factors) {
+    std::vector<std::int32_t> order(factors.size());
+    std::iota(order.begin(), order.end(), 0);
+    std::sort(order.begin(), order.end(), [&](std::int32_t left, std::int32_t right) {
+        return factors[left] < factors[right];
+    });
+    std::vector<std::int32_t> owners(factors.size()), counts, parents, above(factors.size(), 0);
+    std::vector<std::int32_t> parentCounts;
+    std::int32_t groupsAbove = 1;
+    for (std::size_t level = 1; level <= factors.front().size(); ++level) {
+        counts.clear();
+        parents.clear();
+        for (std::size_t rank = 0; rank < order.size(); ++rank) {
+            const auto action = order[rank];
+            if (rank == 0 || !std::equal(factors[action].begin(), factors[action].begin() + level,
+                                         factors[order[rank - 1]].begin())) {
+                counts.push_back(0);
+                parents.push_back(above[action]);
+            }
+            owners[action] = static_cast<std::int32_t>(counts.size()) - 1;
+            ++counts.back();
+        }
+        const auto name = "f" + std::to_string(level) + "_";
+        narrowed(owners, out.array<std::int32_t>(name + "owners", owners.size()));
+        narrowed(counts, out.array<std::int32_t>(name + "counts", counts.size()));
+        narrowed(parents, out.array<std::int32_t>(name + "parents", parents.size()));
+        parentCounts.push_back(groupsAbove);
+        groupsAbove = static_cast<std::int32_t>(counts.size());
+        above = owners;
+    }
+    narrowed(parentCounts, out.array<std::int32_t>("f_parent_counts", parentCounts.size()));
+}
+
+}  // namespace
+
 py::tuple NumericGraph::externalReferences(const NumericGraph& context) const {
     struct Pairs {
         std::vector<std::int64_t> destinations;
@@ -660,18 +880,32 @@ py::tuple NumericGraph::externalReferences(const NumericGraph& context) const {
     auto pairs = std::make_shared<Pairs>();
     {
         py::gil_scoped_release release;
-        for (const auto& reference : data_->references) {
-            const auto found = context.data_->identityLookup.find(reference.identity);
-            if (found == context.data_->identityLookup.end()) continue;
-            const auto& indices = context.data_->identities[found->second].nodes;
-            for (const auto index : indices) {
-                pairs->destinations.push_back(reference.source);
-                pairs->indices.push_back(index);
-            }
-        }
+        forEachReference(*data_, *context.data_, [&](std::int64_t source, std::int64_t index) {
+            pairs->destinations.push_back(source);
+            pairs->indices.push_back(index);
+        });
     }
     std::shared_ptr<const Pairs> immutable = std::move(pairs);
     return py::make_tuple(arrayView(immutable, immutable->destinations), arrayView(immutable, immutable->indices));
+}
+
+py::list NumericGraph::writeEvaluation(const py::buffer& buffer, const NumericGraph& context,
+                                       const std::vector<std::reference_wrapper<const NumericGraph>>& actions,
+                                       const std::vector<std::array<std::string_view, 4>>& factors) const {
+    if (actions.size() != factors.size()) throw std::invalid_argument("Numerical legal menu and factors disagree");
+    std::vector<const NumericGraphData*> menu;
+    menu.reserve(actions.size());
+    for (const auto& action : actions) menu.push_back(action.get().data_.get());
+    EvaluationWriter out(buffer);
+    writeBlock(out, "obs_", {data_.get()});
+    writeReferences(out, "obs_ref_", {data_.get()}, *context.data_);
+    writeBlock(out, "act_", menu);
+    writeReferences(out, "act_obs_", menu, *data_);
+    writeReferences(out, "act_ctx_", menu, *context.data_);
+    auto* nodes = out.array<std::int32_t>("act_nodes", menu.size());
+    for (const auto* graph : menu) *nodes++ = static_cast<std::int32_t>(graph->types.size());
+    if (!menu.empty()) writeFactorLevels(out, factors);
+    return out.header();
 }
 
 NumericGraphCompiler::NumericGraphCompiler(std::int64_t buckets, py::function lexicalIds,
@@ -693,37 +927,45 @@ std::shared_ptr<NumericGraph> NumericGraphCompiler::compile(const json::Value& v
 }
 
 std::shared_ptr<NumericGraph> NumericGraphCompiler::compile(const json::Value& value,
-                                                          const json::Value::Object& rootOverrides) {
+                                                          const json::Value::Object& rootOverrides,
+                                                          const Menu& menu) {
     if (PyGILState_Check()) {
         py::gil_scoped_release release;
-        return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides)));
+        return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides, &menu)));
     }
-    return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides)));
+    return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides, &menu)));
 }
 
 std::int64_t NumericGraphCompiler::bucketCount() const { return impl_->buckets; }
 
 void NumericGraphCompiler::clearCaches() {
-    std::unique_lock lock(impl_->cacheMutex);
-    impl_->fieldTokens.clear();
-    impl_->valueTokens.clear();
-    impl_->stringDescriptions.clear();
-    impl_->numericCache.clear();
-    impl_->numericOrder.clear();
+    std::lock_guard lock(impl_->poolMutex);
+    impl_->pool.clear();
+    ++impl_->generation;
 }
 
 py::dict NumericGraphCompiler::cacheStats() const {
+    std::size_t fields = 0, values = 0, numeric = 0, bytes = 0, sets = 0;
+    {
+        std::lock_guard lock(impl_->poolMutex);
+        sets = impl_->pool.size();
+        for (const auto& caches : impl_->pool) {
+            fields += caches->fields.values.size();
+            values += caches->values.values.size();
+            numeric += caches->numeric.size();
+            bytes += caches->fields.bytes + caches->values.bytes;
+        }
+    }
     py::dict result;
-    std::shared_lock lock(impl_->cacheMutex);
-    result["field_tokens"] = impl_->fieldTokens.values.size();
-    result["value_tokens"] = impl_->valueTokens.values.size();
-    result["string_descriptors"] = impl_->stringDescriptions.values.size();
-    result["numeric_features"] = impl_->numericCache.size();
-    result["retained_string_bytes"] = impl_->fieldTokens.bytes + impl_->valueTokens.bytes + impl_->stringDescriptions.bytes;
-    result["lexical_capacity"] = LexicalCacheEntries;
-    result["descriptor_capacity"] = DescriptorCacheEntries;
-    result["numeric_capacity"] = NumericCacheEntries;
-    result["string_byte_capacity"] = StringCacheBytes * 3;
+    result["cache_sets"] = sets;
+    result["field_tokens"] = fields;
+    result["value_tokens"] = values;
+    result["numeric_features"] = numeric;
+    result["retained_string_bytes"] = bytes;
+    result["set_capacity"] = CacheSets;
+    result["lexical_capacity"] = LexicalCacheEntries * CacheSets;
+    result["numeric_capacity"] = NumericCacheEntries * CacheSets;
+    result["string_byte_capacity"] = StringCacheBytes * 2 * CacheSets;
     return result;
 }
 

@@ -80,22 +80,39 @@ std::string CampaignEnv::decisionKind() const {
 
 const V& CampaignEnv::observation() const { return *observationSnapshot(); }
 
-std::shared_ptr<const V> CampaignEnv::observationSnapshot() const {
+V::Object CampaignEnv::observationFields() const {
     engine_.requireIntact();
-    std::lock_guard lock(decisionCache_->mutex);
-    if (decisionCache_->observation) return decisionCache_->observation;
     const auto owner = currentDecisionPlayer();
-    A actions, interrupts;
-    for (const auto& action : legalActions()) actions.push_back(actionJson(action));
+    A interrupts;
     for (const auto& action : legalInterrupts()) interrupts.push_back(actionJson(action));
     // Entity maps retain every rule status, route/origin, relationship, pending
     // choice and chance request. Geography/catalog registries are shared context.
     // Execution RNG, dice tapes, history and planning hashes are never features.
-    decisionCache_->observation = std::make_shared<const V>(O{{"schema", V(std::string("campaign_entities_v1"))}, {"state", engine_.state().observation()},
-        {"current_decision_player", owner ? V(*owner) : V(nullptr)},
-        {"decision_kind", V(decisionKind())}, {"legal_actions", V(std::move(actions))},
-        {"legal_interrupts", V(std::move(interrupts))}});
+    O fields;
+    fields.emplace("schema", V(std::string("campaign_entities_v1")));
+    fields.emplace("state", engine_.state().observation());
+    fields.emplace("current_decision_player", owner ? V(*owner) : V(nullptr));
+    fields.emplace("decision_kind", V(decisionKind()));
+    fields.emplace("legal_interrupts", V(std::move(interrupts)));
+    return fields;
+}
+
+std::shared_ptr<const V> CampaignEnv::observationSnapshot() const {
+    engine_.requireIntact();
+    std::lock_guard lock(decisionCache_->mutex);
+    if (decisionCache_->observation) return decisionCache_->observation;
+    auto fields = observationFields();
+    const auto menu = engine_.legalActionMenu();
+    A actions;
+    actions.reserve(menu->size());
+    for (const auto& action : *menu) actions.push_back(actionJson(action));
+    fields.emplace("legal_actions", V(std::move(actions)));
+    decisionCache_->observation = std::make_shared<const V>(std::move(fields));
     return decisionCache_->observation;
+}
+
+std::shared_ptr<const V> CampaignEnv::observationWithoutMenu() const {
+    return std::make_shared<const V>(observationFields());
 }
 
 CampaignEnv CampaignEnv::clone() const { return CampaignEnv(engine_.clone(), *this); }

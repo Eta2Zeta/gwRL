@@ -24,9 +24,9 @@ from typing import Any
 from studies.shared.immutable_json import FrozenDict
 
 try:
-    from gwrl_cpp import compile_campaign_graph as _native_compile_graph
+    from gwrl_cpp import CampaignNumericSnapshot, compile_campaign_graph as _native_compile_graph
 except ImportError:
-    _native_compile_graph = None
+    CampaignNumericSnapshot = _native_compile_graph = None
 
 SCHEMA = "campaign-neural-input-v1"
 NODE_TYPES = ("null", "bool", "number", "string", "array", "object")
@@ -395,7 +395,6 @@ def cached_numeric_context(snapshot: Any, buckets: int, source_key: str):
 
 def cached_numeric_action(snapshot: Any, buckets: int):
     """Return the complete action graph and factors, never keyed by action ID alone."""
-    from gwrl_cpp import CampaignNumericSnapshot
     source_key = getattr(snapshot, "cache_key", None) if isinstance(snapshot, CampaignNumericSnapshot) else None
     key = (source_key, buckets) if source_key is not None else None
     if key is not None:

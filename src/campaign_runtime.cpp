@@ -391,6 +391,11 @@ std::vector<Action> Engine::legalActions() const {
     return actionMenu()->actions;
 }
 
+std::shared_ptr<const std::vector<Action>> Engine::legalActionMenu() const {
+    const auto menu = actionMenu();
+    return {menu, &menu->actions};
+}
+
 // An ordinary engine changes a copy and swaps it in, so a failure leaves it as
 // it was. A disposable engine changes itself. A failure then leaves no position
 // behind, and CampaignEnv copies still share their source's cached key and

@@ -1,11 +1,13 @@
 """Native numerical transport retains the complete campaign feature contract."""
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import copy
 import gc
 import json
 from pathlib import Path
 import pickle
+import threading
 import unittest
 from unittest import mock
 
@@ -16,7 +18,7 @@ from studies.campaign.features import (Graph, NUMERIC_SCHEMA, SCHEMA, _numeric_f
                                       _string_descriptor, action_factors, canonical,
                                       compile_graph_python, lexical_ids, make_input,
                                       make_numeric_input, numeric_compiler, validate_numeric_input)
-from studies.shared.campaign_adapter import CampaignAdapter, ScheduledAction
+from studies.shared.campaign_adapter import SCHEMA as SCHEDULER, CampaignAdapter, ScheduledAction
 
 
 SCENARIO = Path(__file__).resolve().parents[1] / "game_content/scenarios/japan_china_1936"
@@ -121,12 +123,45 @@ class CampaignNumericExportTests(unittest.TestCase):
         self.assertLessEqual(stats["numeric_features"], stats["numeric_capacity"])
         self.assertLessEqual(stats["field_tokens"], stats["lexical_capacity"])
         self.assertLessEqual(stats["value_tokens"], stats["lexical_capacity"])
-        self.assertLessEqual(stats["string_descriptors"], stats["descriptor_capacity"])
         self.assertLessEqual(stats["retained_string_bytes"], stats["string_byte_capacity"])
+        self.assertEqual(stats["cache_sets"], 1)
         compiler.clear_caches()
         self.assertEqual(compiler.cache_stats()["numeric_features"], 0)
         self.assert_graph_equal(compiler.compile(snapshot), expected)
         self.assertGreater(calls["lexical"], warm_calls["lexical"])
+
+    def test_scheduled_observation_shares_the_menu_and_keeps_its_complete_json(self):
+        menu = self.env.legal_actions()
+        decision = self.env._decision_cache()
+        snapshots = [action.numeric_snapshot() for action in menu]
+        base = self.raw.numeric_observation()
+        self.assertNotIn("legal_actions", base.to_python())
+        scheduled = base.scheduled_observation(decision.owner, decision.kind, snapshots, SCHEDULER,
+                                               self.env.interrupt_order, sorted(self.env._passed))
+        document = scheduled.to_python()
+        self.assertEqual(document["legal_actions"], [snapshot.to_python() for snapshot in snapshots])
+        self.assertEqual(document["current_decision_player"], decision.owner)
+        self.assertEqual(document["interrupt_scheduler"], {"schema": SCHEDULER, "order": list(self.env.interrupt_order),
+                                                           "passed": []})
+        self.assert_graph_equal(numeric_compiler(BUCKETS).compile(scheduled), oracle(document))
+        empty = base.scheduled_observation(decision.owner, decision.kind, [], SCHEDULER, self.env.interrupt_order, [])
+        self.assertEqual(empty.to_python()["legal_actions"], [])
+        self.assert_graph_equal(numeric_compiler(BUCKETS).compile(empty), oracle(empty.to_python()))
+        with_overrides = snapshots[0].scheduled_context("schema", ["axis"])
+        wrapped = base.scheduled_observation(decision.owner, decision.kind, [with_overrides], SCHEDULER,
+                                             self.env.interrupt_order, [])
+        self.assertEqual(wrapped.to_python()["legal_actions"], [with_overrides.to_python()])
+        self.assert_graph_equal(numeric_compiler(BUCKETS).compile(wrapped), oracle(wrapped.to_python()))
+
+    def test_scheduled_snapshots_keep_every_action_and_wrapper_field(self):
+        for action in self.raw.legal_actions():
+            self.assertEqual(action.scheduled_snapshot(f"wrapper:{action.id}", "interrupt", "allies").to_python(),
+                             {"id": f"wrapper:{action.id}", "kind": "interrupt", "player": "allies",
+                              "action": {"id": action.id, "kind": action.kind, "player": action.player,
+                                         "nation": action.nation, "decision": action.decision,
+                                         "parameters": action.parameters}})
+        self.assertEqual(gwrl_cpp.campaign_pass_snapshot("pass", "pass_interrupt", "axis").to_python(),
+                         {"id": "pass", "kind": "pass_interrupt", "player": "axis", "action": None})
 
     def test_old_native_snapshot_and_buffers_outlive_mutation_environment_and_compiler(self):
         raw = self.raw.clone()
@@ -150,6 +185,131 @@ class CampaignNumericExportTests(unittest.TestCase):
                     array.flat[0] = 0
                 with self.assertRaises(ValueError):
                     array.setflags(write=True)
+
+    def test_finished_observation_arrays_are_reused_and_live_graphs_never_change(self):
+        first, second = self.env.clone(), self.env.clone()
+        second.apply_action(next(action for action in second.legal_actions() if action.kind == "pass_interrupt"))
+        # Its own compiler, so no other graph can reach these spare arrays first.
+        compiler = gwrl_cpp.CampaignNumericGraphCompiler(BUCKETS, lexical_ids, _string_descriptor, _numeric_features)
+        scheduled = []
+        for env in (first, second):
+            menu = env.legal_actions()
+            decision = env._decision_cache()
+            scheduled.append(env.raw.numeric_observation().scheduled_observation(
+                decision.owner, decision.kind, tuple(action.numeric_snapshot() for action in menu),
+                SCHEDULER, env.interrupt_order, sorted(env._passed)))
+        expected = [oracle(snapshot.to_python()) for snapshot in scheduled]
+        kept = compiler.compile(scheduled[0])
+        finished = compiler.compile(scheduled[1])
+        views = finished.arrays()
+        saved = {key: array.copy() for key, array in views.items()}
+        address = views["numeric"].ctypes.data
+        del finished
+        # Only the views still pin these arrays, so a new graph must not take them.
+        other = compiler.compile(scheduled[0])
+        self.assertNotEqual(other.arrays()["numeric"].ctypes.data, address)
+        for key, array in views.items():
+            np.testing.assert_array_equal(array.view(np.uint64), saved[key].view(np.uint64))
+        del views, array
+        reused = compiler.compile(scheduled[1])
+        self.assertEqual(reused.arrays()["numeric"].ctypes.data, address)
+        self.assert_graph_equal(reused, expected[1])
+        self.assert_graph_equal(kept, expected[0])
+        self.assert_graph_equal(other, expected[0])
+
+    def test_threads_reusing_observation_arrays_keep_their_graphs_intact(self):
+        env = self.env.clone()
+        menu = env.legal_actions()
+        decision = env._decision_cache()
+        snapshots = [env.raw.numeric_observation().scheduled_observation(
+            decision.owner, decision.kind, tuple(action.numeric_snapshot() for action in actions), SCHEDULER,
+            env.interrupt_order, sorted(env._passed)) for actions in (menu, menu[:len(menu) // 2], menu[:1])]
+        compiler = numeric_compiler(BUCKETS)
+        expected = [compiler.compile(snapshot).compacted() for snapshot in snapshots]
+
+        def work(thread):
+            for step in range(60):
+                index = (thread + step) % len(snapshots)
+                if not compiler.compile(snapshots[index]) == expected[index]:
+                    return False
+            return True
+
+        with ThreadPoolExecutor(4) as pool:
+            self.assertTrue(all(pool.map(work, range(4))))
+
+    def test_compacted_observation_is_an_equal_independent_graph(self):
+        observation = make_numeric_input(self.env, self.env.legal_actions(), BUCKETS)["packed_graph"]["observation"]
+        expected = Graph(**observation.debug_graph())
+        compact = observation.compacted()
+        self.assertIsNot(compact, observation)
+        self.assertEqual(compact, observation)
+        self.assertLessEqual(compact.nbytes, observation.nbytes)
+        self.assertNotEqual(compact.arrays()["numeric"].ctypes.data, observation.arrays()["numeric"].ctypes.data)
+        del observation
+        self.env._decision = None
+        gc.collect()
+        self.assert_graph_equal(compact, expected)
+
+    def test_threads_compiling_together_use_separate_bounded_cache_sets(self):
+        threads = 4
+        inside = threading.Barrier(threads)
+
+        def numeric(*args):
+            # Every thread is inside one compile at once, or this times out.
+            inside.wait(timeout=60)
+            return _numeric_features(*args)
+
+        compiler = gwrl_cpp.CampaignNumericGraphCompiler(BUCKETS, lexical_ids, _string_descriptor, numeric)
+        snapshot = gwrl_cpp.campaign_pass_snapshot("pass", "pass_interrupt", "axis")
+        expected = oracle(snapshot.to_python())
+        with ThreadPoolExecutor(threads) as pool:
+            for graph in pool.map(lambda _: compiler.compile(snapshot), range(threads)):
+                self.assert_graph_equal(graph, expected)
+        stats = compiler.cache_stats()
+        self.assertEqual(stats["cache_sets"], threads)
+        compiler.clear_caches()
+        self.assertEqual(compiler.cache_stats()["cache_sets"], 0)
+        threads = stats["set_capacity"] + 3
+        inside = threading.Barrier(threads)
+        with ThreadPoolExecutor(threads) as pool:
+            for graph in pool.map(lambda _: compiler.compile(snapshot), range(threads)):
+                self.assert_graph_equal(graph, expected)
+        self.assertEqual(compiler.cache_stats()["cache_sets"], stats["set_capacity"])
+
+    def test_clearing_caches_during_a_compile_drops_the_old_set(self):
+        entered, release = threading.Event(), threading.Event()
+
+        def lexical(*args):
+            entered.set()
+            release.wait(timeout=60)
+            return lexical_ids(*args)
+
+        compiler = gwrl_cpp.CampaignNumericGraphCompiler(BUCKETS, lexical, _string_descriptor, _numeric_features)
+        snapshot = gwrl_cpp.campaign_pass_snapshot("pass", "pass_interrupt", "axis")
+        with ThreadPoolExecutor(1) as pool:
+            running = pool.submit(compiler.compile, snapshot)
+            self.assertTrue(entered.wait(timeout=60))
+            compiler.clear_caches()
+            release.set()
+            self.assert_graph_equal(running.result(timeout=60), oracle(snapshot.to_python()))
+        self.assertEqual(compiler.cache_stats()["cache_sets"], 0)
+
+    def test_oversized_scalars_are_encoded_completely_without_being_retained(self):
+        text = "x" * (9 << 20)
+        calls = {"oversized": 0, "other": 0}
+
+        def lexical(value, role, buckets):
+            calls["oversized" if value == text else "other"] += 1
+            return lexical_ids(value, role, buckets)
+
+        compiler = gwrl_cpp.CampaignNumericGraphCompiler(BUCKETS, lexical, _string_descriptor, _numeric_features)
+        snapshot = gwrl_cpp.campaign_pass_snapshot(text, "pass_interrupt", "axis")
+        expected = oracle(snapshot.to_python())
+        self.assert_graph_equal(compiler.compile(snapshot), expected)
+        cold = calls["other"]
+        self.assert_graph_equal(compiler.compile(snapshot), expected)
+        self.assertEqual(calls, {"oversized": 2, "other": cold})
+        self.assertLess(compiler.cache_stats()["retained_string_bytes"], 1 << 20)
 
     def test_scheduler_pass_clone_subset_order_and_mutation_invalidate_only_changed_decision(self):
         actions = self.env.legal_actions()

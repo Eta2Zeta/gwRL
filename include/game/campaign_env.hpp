@@ -31,6 +31,8 @@ class CampaignEnv {
     json::Value context() const { engine_.requireIntact(); return *context_; }
     std::shared_ptr<const json::Value> contextSnapshot() const { engine_.requireIntact(); return context_; }
     std::shared_ptr<const json::Value> observationSnapshot() const;
+    // A new observation without legal_actions, for a caller supplying its own menu.
+    std::shared_ptr<const json::Value> observationWithoutMenu() const;
     CampaignEnv clone() const;
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
     std::string planningKey() const;
@@ -46,6 +48,7 @@ class CampaignEnv {
     struct DecisionCache;
     // Another engine at the source's decision state, sharing its caches.
     CampaignEnv(Engine engine, const CampaignEnv& source);
+    json::Value::Object observationFields() const;
     Engine engine_;
     bool trainingActions_ {false};
     std::shared_ptr<const json::Value> context_;

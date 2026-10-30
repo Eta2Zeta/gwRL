@@ -173,6 +173,9 @@ def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: Lea
                 or features["owner"] != owner):
             raise ValueError("Numerical replay differs from actual choice owner/menu")
         features = features.copy()
+        # Replay keeps the observation for the run, without its spare capacity.
+        packed = features["packed_graph"]
+        features["packed_graph"] = {**packed, "observation": packed["observation"].compacted()}
         _intern_numeric_context(features, numeric_pool)
     else:
         features["context"] = _intern_context(features["context"], context_pool)

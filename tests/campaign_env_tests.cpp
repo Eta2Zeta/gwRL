@@ -94,6 +94,11 @@ void cachedPlanningKeysTrackEveryMutation() {
                 message + ": observation retained a different legal menu");
         require(observed.require("decision_kind").asString() == env.decisionKind(),
                 message + ": observation retained a different pending decision");
+        auto withoutMenu = env.observationWithoutMenu()->asObject();
+        require(!withoutMenu.contains("legal_actions"), message + ": numeric observation built the menu it replaces");
+        withoutMenu.emplace("legal_actions", observed.require("legal_actions"));
+        require(canonicalJson(V(std::move(withoutMenu))) == canonicalJson(observed),
+                message + ": numeric observation differs from the public one");
     };
     const auto rejects = [](const std::function<void()>& operation) {
         try { operation(); } catch (const std::exception&) { return; }

@@ -10,13 +10,17 @@ import time
 import unittest
 from unittest.mock import patch
 
+import numpy as np
 import torch
 
+from gwrl_cpp import campaign_pass_snapshot
 from studies.campaign.curriculum import make_env
+from studies.campaign.features import make_numeric_input, numeric_compiler
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 from studies.campaign.shared_evaluator import (EvaluatorClosed, RemoteEvaluator, SharedEvaluatorServer, _Contexts,
-                                               _graph_arrays, evaluate_prepared, prepare)
-from studies.shared.multiplayer_mcts import PLAYERS
+                                               _graph_arrays, evaluate_prepared, prepare, prepare_into, read_arrays)
+from studies.shared.campaign_adapter import SCHEMA as SCHEDULER
+from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, UniformEvaluator, VectorMCTS
 from tools.benchmark_campaign_devices import Config, _shared_game_process
 
 BUCKETS = 2048
@@ -47,6 +51,163 @@ def restore(serialized):
     env = make_env(SEED, calendar_rounds=2)
     env.restore(serialized)
     return env
+
+
+def factor_levels(factors):
+    """The four factor levels of CampaignPolicyValueNet._factor_layout, by Python's own sorting."""
+    out, parent_counts = {}, []
+    factors = [tuple(factor) for factor in factors]
+    for level in range(1, 5):
+        prefixes = sorted({factor[:level] for factor in factors})
+        lookup = {prefix: index for index, prefix in enumerate(prefixes)}
+        owners = np.fromiter((lookup[factor[:level]] for factor in factors), dtype=np.int32, count=len(factors))
+        parents = {prefix: index for index, prefix in enumerate(sorted({prefix[:-1] for prefix in prefixes}))}
+        out[f"f{level}_owners"] = owners
+        out[f"f{level}_counts"] = np.bincount(owners, minlength=len(prefixes)).astype(np.int32)
+        out[f"f{level}_parents"] = np.fromiter((parents[prefix[:-1]] for prefix in prefixes), dtype=np.int32,
+                                               count=len(prefixes))
+        parent_counts.append(len(parents))
+    out["f_parent_counts"] = np.asarray(parent_counts, dtype=np.int32)
+    return out
+
+
+def reference_arrays(env, actions, buckets):
+    """A position's arrays joined graph by graph in Python, which the native writer must equal."""
+    packed = make_numeric_input(env, tuple(actions), buckets)["packed_graph"]
+    context, observation, menu = packed["context"], packed["observation"], packed["actions"]
+    arrays = _graph_arrays(observation, "obs_")
+    destinations, indices = observation.external_references(context)
+    arrays["obs_ref_dest"] = np.asarray(destinations, dtype=np.int32)
+    arrays["obs_ref_index"] = np.asarray(indices, dtype=np.int32)
+    parts = {name: [] for name in ("ids", "offsets", "types", "numbers", "sources", "targets", "relations",
+                                   "obs_dest", "obs_index", "ctx_dest", "ctx_index")}
+    nodes, node_start, token_start = [], 0, 0
+    for graph in menu:
+        block = _graph_arrays(graph, "")
+        parts["ids"].append(block["ids"])
+        parts["offsets"].append(block["offsets"][:-1] + token_start)
+        for name in ("types", "numbers", "relations"):
+            parts[name].append(block[name])
+        parts["sources"].append(block["sources"] + node_start)
+        parts["targets"].append(block["targets"] + node_start)
+        for bank, other in (("obs", observation), ("ctx", context)):
+            destination, index = graph.external_references(other)
+            parts[bank + "_dest"].append(np.asarray(destination, dtype=np.int32) + node_start)
+            parts[bank + "_index"].append(np.asarray(index, dtype=np.int32))
+        nodes.append(graph.node_count)
+        node_start += graph.node_count
+        token_start += len(block["ids"])
+    empty = {"numbers": np.zeros((0, arrays["obs_numbers"].shape[1]), dtype=np.float32)}
+    for name, values in parts.items():
+        arrays["act_" + name] = np.concatenate(values) if values else empty.get(name, np.zeros(0, dtype=np.int32))
+    arrays["act_offsets"] = np.append(arrays["act_offsets"], np.int32(token_start)).astype(np.int32)
+    arrays["act_nodes"] = np.asarray(nodes, dtype=np.int32)
+    arrays.update(factor_levels(packed["action_factors"]) if menu else {})
+    return arrays
+
+
+class NativeEvaluationArraysTests(unittest.TestCase):
+    def assertSameArrays(self, got, expected):
+        self.assertEqual(list(got), list(expected))
+        for name, value in expected.items():
+            self.assertEqual((got[name].dtype, got[name].shape), (value.dtype, value.shape), name)
+            self.assertEqual(got[name].tobytes(), value.tobytes(), name)
+
+    def assertMatchesReference(self, env, actions):
+        self.assertSameArrays(prepare(env, actions, BUCKETS)[1], reference_arrays(env, actions, BUCKETS))
+
+    def test_random_play_and_search_positions_match_the_reference_exactly(self):
+        checked = self
+        positions_checked = []
+
+        class Checking(UniformEvaluator):
+            def evaluate(self, env, actions):
+                checked.assertMatchesReference(env, actions)
+                positions_checked.append(len(actions))
+                return super().evaluate(env, actions)
+
+        env = make_env(SEED, calendar_rounds=2)
+        rng = random.Random(SEED)
+        searches = 0
+        for step in range(600):
+            if env.is_terminal():
+                break
+            if env.decision_kind() == "chance":
+                self.assertMatchesReference(env, ())
+                env.resolve_chance()
+                continue
+            actions = tuple(env.legal_actions())
+            if step % 40 == 0:
+                self.assertMatchesReference(env, actions)
+                self.assertMatchesReference(env, ())
+                self.assertMatchesReference(env, tuple(reversed(actions[::2])))
+            if step % 150 == 0:
+                VectorMCTS(Checking(), MctsConfig(simulations=8, max_depth=8, seed=step)).search(env)
+                searches += 1
+            env.apply_action(rng.choice(actions))
+        self.assertGreater(searches, 2)
+        self.assertGreater(max(positions_checked), 20)
+
+    def test_the_header_lays_arrays_out_as_shared_memory_needs(self):
+        env = make_env(SEED, calendar_rounds=2)
+        actions = tuple(env.legal_actions())
+        buffer = memoryview(bytearray(1 << 23))
+        key, header, context = prepare_into(buffer, env, actions, BUCKETS)
+        self.assertEqual(key, make_numeric_input(env, actions, BUCKETS)["context_key"])
+        self.assertIs(context, make_numeric_input(env, actions, BUCKETS)["packed_graph"]["context"])
+        end = 0
+        for name, dtype, shape, offset in header:
+            self.assertEqual(offset, (end + 15) & ~15, name)
+            end = offset + int(np.prod(shape)) * np.dtype(dtype).itemsize
+        self.assertSameArrays(read_arrays(buffer, header), reference_arrays(env, actions, BUCKETS))
+        with self.assertRaisesRegex(ValueError, "exceeds its shared-memory buffer"):
+            prepare_into(memoryview(bytearray(end - 1)), env, actions, BUCKETS)
+        self.assertEqual(len(prepare_into(memoryview(bytearray(end)), env, actions, BUCKETS)[1]), len(header))
+
+    def test_factor_levels_sort_strings_by_code_point_as_python_does(self):
+        env = make_env(SEED, calendar_rounds=2)
+        packed = make_numeric_input(env, tuple(env.legal_actions()), BUCKETS)["packed_graph"]
+        factors = (("b", "\U00010000", "a", "z"), ("b", "\uffff", "a", "z"), ("a", "", "é", "z"),
+                   ("b", "\uffff", "a", "y"), ("b", "\uffff", "a", "z"), ("", "", "", ""), ("海軍", "", "", ""))
+        expected = factor_levels(factors)
+        graphs = (packed["actions"][0],) * len(factors)
+        buffer = memoryview(bytearray(1 << 23))
+        arrays = read_arrays(buffer, packed["observation"].write_evaluation(buffer, packed["context"], graphs, factors))
+        self.assertSameArrays({name: arrays[name] for name in expected}, expected)
+
+    def test_negative_zero_keeps_its_sign_in_both_blocks(self):
+        env = make_env(SEED, calendar_rounds=2)
+        packed = make_numeric_input(env, tuple(env.legal_actions()), BUCKETS)["packed_graph"]
+        decision = env._decision_cache()
+        compiler = numeric_compiler(BUCKETS)
+        observation = compiler.compile(env.raw.numeric_observation().scheduled_observation(
+            decision.owner, decision.kind, [], SCHEDULER, env.interrupt_order, ["-0"]))
+        action = compiler.compile(campaign_pass_snapshot("-0", "pass_interrupt", "axis"))
+        buffer = memoryview(bytearray(1 << 23))
+        arrays = read_arrays(buffer, observation.write_evaluation(buffer, packed["context"], (action,),
+                                                                  (("a", "b", "c", "d"),)))
+        for name, graph in (("obs_numbers", observation), ("act_numbers", action)):
+            expected = np.ascontiguousarray(graph.arrays()["numeric"], dtype=np.float32)
+            self.assertTrue(np.signbit(expected[:, 0]).any(), name)
+            self.assertEqual(arrays[name].tobytes(), expected.tobytes(), name)
+
+    def test_a_bad_menu_or_buffer_is_refused(self):
+        env = make_env(SEED, calendar_rounds=2)
+        packed = make_numeric_input(env, tuple(env.legal_actions()), BUCKETS)["packed_graph"]
+        buffer = memoryview(bytearray(1 << 23))
+        observation, context, graph = packed["observation"], packed["context"], packed["actions"][0]
+        with self.assertRaisesRegex(ValueError, "menu and factors disagree"):
+            observation.write_evaluation(buffer, context, (graph,), ())
+        with self.assertRaises(TypeError):
+            observation.write_evaluation(buffer, context, (None,), (("a", "b", "c", "d"),))
+        with self.assertRaises(TypeError):
+            observation.write_evaluation(buffer, context, (graph,), (("a", "b", "c"),))
+        with self.assertRaises(BufferError):
+            observation.write_evaluation(bytes(1 << 23), context, (graph,), (("a", "b", "c", "d"),))
+        # A reversed view points at its last byte, so writing through it would overrun.
+        for view in (buffer[::2], buffer[::-1], buffer[1:], buffer.cast("B", (1 << 11, 1 << 12))):
+            with self.assertRaisesRegex(BufferError, "contiguous, aligned"):
+                observation.write_evaluation(view, context, (graph,), (("a", "b", "c", "d"),))
 
 
 class SharedEvaluatorTests(unittest.TestCase):

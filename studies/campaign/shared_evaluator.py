@@ -37,81 +37,30 @@ def _graph_arrays(graph: Any, prefix: str) -> dict[str, np.ndarray]:
     return {prefix + name: np.ascontiguousarray(arrays[source], dtype=dtype) for name, source, dtype in GRAPH_FIELDS}
 
 
-def _factor_levels(factors: Sequence[Sequence[str]]) -> dict[str, np.ndarray]:
-    """The four factor levels of CampaignPolicyValueNet._factor_layout, as arrays."""
-    out, parent_counts = {}, []
-    factors = [tuple(factor) for factor in factors]
-    for level in range(1, 5):
-        prefixes = sorted({factor[:level] for factor in factors})
-        lookup = {prefix: index for index, prefix in enumerate(prefixes)}
-        owners = np.fromiter((lookup[factor[:level]] for factor in factors), dtype=np.int32, count=len(factors))
-        parents = {prefix: index for index, prefix in enumerate(sorted({prefix[:-1] for prefix in prefixes}))}
-        out[f"f{level}_owners"] = owners
-        out[f"f{level}_counts"] = np.bincount(owners, minlength=len(prefixes)).astype(np.int32)
-        out[f"f{level}_parents"] = np.fromiter((parents[prefix[:-1]] for prefix in prefixes), dtype=np.int32,
-                                               count=len(prefixes))
-        parent_counts.append(len(parents))
-    out["f_parent_counts"] = np.asarray(parent_counts, dtype=np.int32)
-    return out
+def prepare_into(buffer: memoryview, env: Any, actions: Sequence[Any],
+                 buckets: int) -> tuple[str, list[tuple[str, str, tuple, int]], Any]:
+    """Write a position's complete network input into `buffer`.
 
-
-def prepare(env: Any, actions: Sequence[Any], buckets: int) -> tuple[str, dict[str, np.ndarray], Any]:
-    """A position's complete network input as flat arrays, and its context graph.
-
-    The legal menu's action graphs are joined into one block, as the model's
-    encoder layout joins them; their node indices and external references stay
-    local to the block and to the position's own observation.
+    Returns its context key, the header read_arrays reads it by, and its context
+    graph. The legal menu's action graphs are joined into one block, as the
+    model's encoder layout joins them; their node indices and external references
+    stay local to the block and to the position's own observation.
     """
     from .features import make_numeric_input
     item = make_numeric_input(env, tuple(actions), buckets)
     if not isinstance(item, dict) or "packed_graph" not in item:
         raise ValueError("The shared evaluator needs native numerical inputs")
     packed = item["packed_graph"]
-    context, observation, menu = packed["context"], packed["observation"], packed["actions"]
-    arrays = _graph_arrays(observation, "obs_")
-    destinations, indices = observation.external_references(context)
-    arrays["obs_ref_dest"] = np.asarray(destinations, dtype=np.int32)
-    arrays["obs_ref_index"] = np.asarray(indices, dtype=np.int32)
-    parts: dict[str, list[np.ndarray]] = {name: [] for name in (
-        "ids", "offsets", "types", "numbers", "sources", "targets", "relations",
-        "obs_dest", "obs_index", "ctx_dest", "ctx_index")}
-    nodes, node_start, token_start = [], 0, 0
-    for graph in menu:
-        block = _graph_arrays(graph, "")
-        parts["ids"].append(block["ids"])
-        parts["offsets"].append(block["offsets"][:-1] + token_start)
-        for name in ("types", "numbers", "relations"):
-            parts[name].append(block[name])
-        parts["sources"].append(block["sources"] + node_start)
-        parts["targets"].append(block["targets"] + node_start)
-        for bank, other in (("obs", observation), ("ctx", context)):
-            destination, index = graph.external_references(other)
-            parts[bank + "_dest"].append(np.asarray(destination, dtype=np.int32) + node_start)
-            parts[bank + "_index"].append(np.asarray(index, dtype=np.int32))
-        nodes.append(graph.node_count)
-        node_start += graph.node_count
-        token_start += len(block["ids"])
-    empty = {"numbers": np.zeros((0, arrays["obs_numbers"].shape[1]), dtype=np.float32)}
-    for name, values in parts.items():
-        prototype = empty.get(name, np.zeros(0, dtype=np.int32))
-        arrays["act_" + name] = np.concatenate(values) if values else prototype
-    arrays["act_offsets"] = np.append(arrays["act_offsets"], np.int32(token_start)).astype(np.int32)
-    arrays["act_nodes"] = np.asarray(nodes, dtype=np.int32)
-    arrays.update(_factor_levels(packed["action_factors"]) if menu else {})
-    return item["context_key"], arrays, context
+    header = packed["observation"].write_evaluation(buffer, packed["context"], packed["actions"],
+                                                    packed["action_factors"])
+    return item["context_key"], header, packed["context"]
 
 
-def write_arrays(buffer: memoryview, arrays: dict[str, np.ndarray]) -> list[tuple[str, str, tuple, int]]:
-    header, offset = [], 0
-    for name, value in arrays.items():
-        offset = (offset + 15) & ~15
-        end = offset + value.nbytes
-        if end > len(buffer):
-            raise ValueError("A prepared position exceeds its shared-memory buffer")
-        np.ndarray(value.shape, value.dtype, buffer=buffer, offset=offset)[...] = value
-        header.append((name, value.dtype.str, value.shape, offset))
-        offset = end
-    return header
+def prepare(env: Any, actions: Sequence[Any], buckets: int) -> tuple[str, dict[str, np.ndarray], Any]:
+    """prepare_into for a caller that keeps the arrays instead of sending them."""
+    buffer = memoryview(bytearray(8 * 1024 * 1024))
+    key, header, context = prepare_into(buffer, env, actions, buckets)
+    return key, {name: array.copy() for name, array in read_arrays(buffer, header).items()}, context
 
 
 def read_arrays(buffer: memoryview, header: Sequence[tuple[str, str, tuple, int]]) -> dict[str, np.ndarray]:
@@ -150,8 +99,7 @@ class RemoteEvaluator:
         if actor is not None and actor not in PLAYERS:
             raise ValueError(f"Unknown campaign decision player: {actor}")
         started = time.perf_counter()
-        key, arrays, context = prepare(env, actions, self.buckets)
-        header = write_arrays(self.memory.buf, arrays)
+        key, header, context = prepare_into(self.memory.buf, env, actions, self.buckets)
         context_arrays = None
         if key not in self.sent_contexts:
             context_arrays = {**_graph_arrays(context, "ctx_"), "ctx_nodes": np.asarray([context.node_count])}

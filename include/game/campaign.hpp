@@ -406,6 +406,8 @@ class Engine {
     static Engine start(State initial, std::shared_ptr<const Rules> rules, std::uint64_t seed = 1);
     const State& state() const { requireIntact(); return state_; }
     std::vector<Action> legalActions() const;
+    // The cached menu itself, which stays valid after this engine changes.
+    std::shared_ptr<const std::vector<Action>> legalActionMenu() const;
     std::vector<Action> legalInterrupts() const;
     void step(const Action& action);
     void interrupt(const Action& action);

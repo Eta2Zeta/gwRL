@@ -39,7 +39,9 @@ class Value {
     int asInt() const;
     const std::string& asString() const;
     const Array& asArray() const;
-    const Object& asObject() const;
+    const Object& asObject() const&;
+    // A temporary gives up its object, so `auto x = make().asObject()` copies nothing.
+    Object asObject() &&;
 
     const Value& require(const std::string& key) const;
     const Value* find(const std::string& key) const;

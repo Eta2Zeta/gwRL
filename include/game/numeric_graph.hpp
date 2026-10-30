@@ -4,9 +4,13 @@
 
 #include <pybind11/pybind11.h>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <string_view>
+#include <vector>
 
 namespace game::neural {
 
@@ -25,15 +29,26 @@ public:
     pybind11::dict debugGraph() const;
     pybind11::dict packedState() const;
     static std::shared_ptr<NumericGraph> fromPacked(const pybind11::dict& state);
+    // An equal graph with no spare capacity, for retaining an observation.
+    std::shared_ptr<NumericGraph> compacted() const;
 
     // Preserve the model's reference-first, sorted-identity-index ordering.
     // The returned arrays are (destination indices, context node indices).
     pybind11::tuple externalReferences(const NumericGraph& context) const;
 
+    // Writes one evaluation's whole network input into a caller's buffer, as
+    // int32 and float32 arrays: this observation and its references into the
+    // context, then the menu's graphs joined as one block, as the model's
+    // encoder joins them, with their references and policy factor levels.
+    // Returns each array's (name, dtype, shape, offset). The work is short
+    // enough to keep the GIL rather than hand it over and wait to get it back.
+    pybind11::list writeEvaluation(const pybind11::buffer& buffer, const NumericGraph& context,
+                                   const std::vector<std::reference_wrapper<const NumericGraph>>& actions,
+                                   const std::vector<std::array<std::string_view, 4>>& factors) const;
+
 private:
     explicit NumericGraph(std::shared_ptr<const NumericGraphData> data);
     std::shared_ptr<const NumericGraphData> data_;
-    std::size_t retainedBytes_ = 0;
     friend class NumericGraphCompiler;
 };
 
@@ -52,8 +67,12 @@ public:
     NumericGraphCompiler(const NumericGraphCompiler&) = delete;
     NumericGraphCompiler& operator=(const NumericGraphCompiler&) = delete;
 
+    // The menu's elements replace a root legal_actions override, without being copied into it.
+    using Menu = std::vector<std::shared_ptr<const json::Value>>;
+
     std::shared_ptr<NumericGraph> compile(const json::Value& value);
-    std::shared_ptr<NumericGraph> compile(const json::Value& value, const json::Value::Object& rootOverrides);
+    std::shared_ptr<NumericGraph> compile(const json::Value& value, const json::Value::Object& rootOverrides,
+                                          const Menu& menu);
     std::int64_t bucketCount() const;
     void clearCaches();
     pybind11::dict cacheStats() const;

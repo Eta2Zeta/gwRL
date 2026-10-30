@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass, field, replace
+from operator import is_
 from typing import Any
 
 from .immutable_json import FrozenDict, freeze_json
@@ -263,15 +264,17 @@ class CampaignAdapter:
                                               cached_numeric_context, compile_numeric)
         decision = self._decision_cache()
         menu = self._legal_actions(decision)
-        lookup = {action.id: index for index, action in enumerate(menu)}
-        try:
-            indices = tuple(lookup[action.id] for action in actions)
-        except KeyError as error:
-            raise ValueError("Numerical input contains a stale/foreign action") from error
-        if any(menu[index] is not action for index, action in zip(indices, actions)):
-            # Equal external wrappers still require the authoritative public
-            # validation path; they cannot inject a numerical feature payload.
-            return None
+        indices = None
+        if len(actions) != len(menu) or not all(map(is_, actions, menu)):
+            lookup = {action.id: index for index, action in enumerate(menu)}
+            try:
+                indices = tuple(lookup[action.id] for action in actions)
+            except KeyError as error:
+                raise ValueError("Numerical input contains a stale/foreign action") from error
+            if any(menu[index] is not action for index, action in zip(indices, actions)):
+                # Equal external wrappers still require the authoritative public
+                # validation path; they cannot inject a numerical feature payload.
+                return None
         context_key = (buckets, self.interrupt_order)
         if context_key not in self._numeric_contexts:
             context = self.raw.numeric_context().scheduled_context(SCHEMA, self.interrupt_order)
@@ -284,21 +287,22 @@ class CampaignAdapter:
             self._numeric_contexts[context_key] = (source_key, cached_numeric_context(context, buckets, source_key))
         source_key, context_graph = self._numeric_contexts[context_key]
         if buckets not in decision.numeric:
-            snapshots = tuple(action.numeric_snapshot() for action in menu)
-            if any(snapshot is None for snapshot in snapshots):
+            snapshots = [action.numeric_snapshot() for action in menu]
+            if not all(snapshots):
                 return None
             observation = self.raw.numeric_observation().scheduled_observation(
                 decision.owner, decision.kind, snapshots, SCHEMA, self.interrupt_order, sorted(self._passed))
-            prepared = tuple(cached_numeric_action(snapshot, buckets) for snapshot in snapshots)
-            graphs, factors = tuple(item[0] for item in prepared), tuple(item[1] for item in prepared)
+            prepared = [cached_numeric_action(snapshot, buckets) for snapshot in snapshots]
+            graphs, factors = tuple([item[0] for item in prepared]), tuple([item[1] for item in prepared])
             if len(decision.numeric) >= 8:
                 decision.numeric.clear()
             decision.numeric[buckets] = (compile_numeric(observation, buckets), graphs, factors)
         observation_graph, graphs, factors = decision.numeric[buckets]
+        if indices is not None:
+            graphs, factors = tuple(graphs[index] for index in indices), tuple(factors[index] for index in indices)
         return {"schema": NUMERIC_SCHEMA, "owner": decision.owner, "context_key": source_key,
                 "packed_graph": {"context": context_graph, "observation": observation_graph,
-                                 "actions": tuple(graphs[index] for index in indices),
-                                 "action_factors": tuple(factors[index] for index in indices)}}
+                                 "actions": graphs, "action_factors": factors}}
 
     def observation(self) -> dict[str, Any]:
         # Public callers may edit a detached mutable observation; inference

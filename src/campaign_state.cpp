@@ -33,6 +33,9 @@ template<class C> V strings(const C& values) { A a; for (const auto& v : values)
 std::vector<Id> readStrings(const V& v) { std::vector<Id> a; for (const auto& x : v.asArray()) a.push_back(x.asString()); return a; }
 std::set<Id> readSet(const V& v) { auto a = readStrings(v); std::set<Id> s(a.begin(), a.end()); require(s.size() == a.size(), "Duplicate set value"); return s; }
 V ints(const std::vector<int>& values) { A a; for (int v : values) a.push_back(number(v)); return V(std::move(a)); }
+// Builds an object by moving its values; an initializer list would copy each one.
+struct Field { const char* key; V value; };
+template<std::size_t N> O fields(Field (&&list)[N]) { O o; for(auto& field:list)o.emplace(field.key,std::move(field.value)); return o; }
 std::vector<int> readInts(const V& v) { std::vector<int> a; for (const auto& x : v.asArray()) a.push_back(x.asInt()); return a; }
 V intMap(const std::map<Id, int>& values) { O o; for (const auto& [k,v] : values) o.emplace(k,number(v)); return V(std::move(o)); }
 std::map<Id,int> readIntMap(const V& v) { std::map<Id,int> o; for (const auto& [k,x] : v.asObject()) o.emplace(k,x.asInt()); return o; }
@@ -133,12 +136,12 @@ V politicsJson(const PoliticalState& p) {
     O attacks, pending;
     for(const auto& [id,actors]:p.attackedWarlords)attacks.emplace(id,strings(actors));
     for(const auto& [id,value]:p.pending)pending.emplace(id,value);
-    return V(O{{"chinese_truce",V(p.chineseTruce)}, {"truce_permanently_ended",V(p.trucePermanentlyEnded)},
+    return V(fields({{"chinese_truce",V(p.chineseTruce)}, {"truce_permanently_ended",V(p.trucePermanentlyEnded)},
         {"foreign_china_war_pending",V(p.foreignChinaWarPending)}, {"truce_offer_pending",V(p.truceOfferPending)},
         {"china_invader",optionalId(p.chinaInvader)}, {"attacked_warlords",V(std::move(attacks))},
         {"alignment_queue",strings(p.alignmentQueue)}, {"capitals",idMap(p.capitals)},
         {"surrendered",strings(p.surrendered)}, {"evolution_awarded",strings(p.evolutionAwarded)},
-        {"pending",V(std::move(pending))}});
+        {"pending",V(std::move(pending))}}));
 }
 PoliticalState readPolitics(const V& v) {
     PoliticalState p;
@@ -150,9 +153,9 @@ PoliticalState readPolitics(const V& v) {
     p.surrendered=readSet(v.require("surrendered"));p.evolutionAwarded=readSet(v.require("evolution_awarded"));
     p.pending=v.require("pending").asObject();return p;
 }
-V decisionJson(const Decision& d) { A options; for (const auto& a:d.options) options.push_back(actionJson(a)); return V(O{{"id",V(d.id)},{"kind",V(d.kind)},{"nation",V(d.nation)},{"reaction",V(d.reaction)},{"continuation",V(d.continuation)},{"options",V(std::move(options))}}); }
+V decisionJson(const Decision& d) { A options; for (const auto& a:d.options) options.push_back(actionJson(a)); return V(fields({{"id",V(d.id)},{"kind",V(d.kind)},{"nation",V(d.nation)},{"reaction",V(d.reaction)},{"continuation",V(d.continuation)},{"options",V(std::move(options))}})); }
 Decision readDecision(const V& v) { Decision d; d.id=v.require("id").asString(); d.kind=v.require("kind").asString(); d.nation=v.require("nation").asString(); d.reaction=v.require("reaction").asBool(); d.continuation=v.require("continuation").asString(); for(const auto& a:v.require("options").asArray())d.options.push_back(actionFromJson(a)); return d; }
-V chanceJson(const ChanceRequest& c) { A dice; for(const auto& d:c.dice) { std::vector<int> faces(d.rerollFaces.begin(),d.rerollFaces.end()); dice.emplace_back(O{{"sides",number(d.sides)},{"modifier",number(d.modifier)},{"reroll_faces",ints(faces)},{"max_rerolls",number(d.maxRerolls)}}); } return V(O{{"id",V(c.id)},{"purpose",V(c.purpose)},{"nation",V(c.nation)},{"continuation",V(c.continuation)},{"dice",V(std::move(dice))}}); }
+V chanceJson(const ChanceRequest& c) { A dice; for(const auto& d:c.dice) { std::vector<int> faces(d.rerollFaces.begin(),d.rerollFaces.end()); dice.emplace_back(fields({{"sides",number(d.sides)},{"modifier",number(d.modifier)},{"reroll_faces",ints(faces)},{"max_rerolls",number(d.maxRerolls)}})); } return V(fields({{"id",V(c.id)},{"purpose",V(c.purpose)},{"nation",V(c.nation)},{"continuation",V(c.continuation)},{"dice",V(std::move(dice))}})); }
 ChanceRequest readChance(const V& v) { ChanceRequest c; c.id=v.require("id").asString(); c.purpose=v.require("purpose").asString(); c.nation=v.require("nation").asString(); c.continuation=v.require("continuation").asString(); for(const auto& x:v.require("dice").asArray()) { DieSpec d; d.sides=x.require("sides").asInt(); d.modifier=x.require("modifier").asInt(); d.maxRerolls=x.require("max_rerolls").asInt(); auto faces=readInts(x.require("reroll_faces")); d.rerollFaces={faces.begin(),faces.end()}; require(d.rerollFaces.size()==faces.size(),"Duplicate reroll face"); c.dice.push_back(std::move(d)); } return c; }
 
 // The canonical text of State::toJson without building the JSON tree first.
@@ -362,7 +365,7 @@ NeighborIds mapNeighbors(const State& s,const Id& zone) {
     return NeighborIds::own(std::move(ids));
 }
 
-V actionJson(const Action& a) { return V(O{{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}}); }
+V actionJson(const Action& a) { return V(fields({{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}})); }
 Action actionFromJson(const V& v) { Action a; a.id=v.require("id").asString();a.kind=v.require("kind").asString();a.player=v.require("player").asString();a.nation=v.require("nation").asString();a.decision=readOptionalId(v.require("decision"));a.parameters=v.require("parameters"); return a; }
 V outcomeJson(const ChanceOutcome& o) { A a; for(const auto& faces:o.faces)a.push_back(ints(faces)); return V(O{{"faces",V(std::move(a))}}); }
 ChanceOutcome outcomeFromJson(const V& v) { ChanceOutcome o; for(const auto& faces:v.require("faces").asArray())o.faces.push_back(readInts(faces)); return o; }
@@ -375,17 +378,17 @@ void State::captureTurnStart() { turnStart={};for(const auto& [id,t]:territories
 
 V State::toJson(bool includeHistory) const {
     require(definition!=nullptr,"State has no definition"); O n,t,u,f,r,b,j,bs; A ds,events; O snapshotUnits;
-    for(const auto& [id,x]:nations)n.emplace(id,V(O{{"controller_nation",optionalId(x.controllerNation)},{"player",optionalId(x.player)},{"alliance",optionalId(x.alliance)},{"power_status",V(x.powerStatus)},{"treasury",optionalInt(x.treasury)},{"income_components",intMap(x.incomeComponents)},{"income_known",V(x.incomeKnown)},{"technology_stages",intMap(x.technologyStages)},{"at_war_with",strings(x.atWarWith)},{"allies",strings(x.allies)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}}));
-    for(const auto& [id,x]:territories)t.emplace(id,V(O{{"possessor",optionalId(x.possessor)},{"flags",intMap(x.flags)}}));
-    for(const auto& [id,x]:units)u.emplace(id,V(O{{"id",V(x.id)},{"type",V(x.type)},{"owner",V(x.owner)},{"zone",V(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",V(x.turnOrigin)},{"route",strings(x.route)},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}}));
-    for(const auto& [id,x]:facilities)f.emplace(id,V(O{{"id",V(x.id)},{"type",V(x.type)},{"zone",V(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}}));
-    for(const auto& [id,x]:rails)r.emplace(id,V(O{{"id",V(x.id)},{"endpoint_a",V(x.endpointA)},{"endpoint_b",V(x.endpointB)},{"damage_by_endpoint",intMap(x.damageByEndpoint)}}));
-    for(const auto& [id,x]:construction)b.emplace(id,V(O{{"id",V(x.id)},{"owner",V(x.owner)},{"type",V(x.type)},{"site",optionalId(x.site)},{"queue_position",number(x.queuePosition)},{"paid_ipp",number(x.paidIpp)},{"remaining_payments",ints(x.remainingPayments)},{"flags",intMap(x.flags)}}));
-    for(const auto& [id,x]:repairs)j.emplace(id,V(O{{"id",V(x.id)},{"owner",V(x.owner)},{"target",V(x.target)},{"remaining_damage",number(x.remainingDamage)},{"remaining_cost",number(x.remainingCost)},{"restricts_action",V(x.restrictsAction)},{"endpoint",optionalId(x.endpoint)}}));
-    for(const auto& [id,x]:battles)bs.emplace(id,V(O{{"id",V(x.id)},{"zone",V(x.zone)},{"attacker",V(x.attacker)},{"defender",V(x.defender)},{"stage",V(x.stage)},{"attackers",strings(x.attackers)},{"defenders",strings(x.defenders)},{"pending_hits",intMap(x.pendingHits)},{"flags",intMap(x.flags)},{"data",x.data}}));
+    for(const auto& [id,x]:nations)n.emplace(id,V(fields({{"controller_nation",optionalId(x.controllerNation)},{"player",optionalId(x.player)},{"alliance",optionalId(x.alliance)},{"power_status",V(x.powerStatus)},{"treasury",optionalInt(x.treasury)},{"income_components",intMap(x.incomeComponents)},{"income_known",V(x.incomeKnown)},{"technology_stages",intMap(x.technologyStages)},{"at_war_with",strings(x.atWarWith)},{"allies",strings(x.allies)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
+    for(const auto& [id,x]:territories)t.emplace(id,V(fields({{"possessor",optionalId(x.possessor)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:units)u.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"owner",V(x.owner)},{"zone",V(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",V(x.turnOrigin)},{"route",strings(x.route)},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
+    for(const auto& [id,x]:facilities)f.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"zone",V(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:rails)r.emplace(id,V(fields({{"id",V(x.id)},{"endpoint_a",V(x.endpointA)},{"endpoint_b",V(x.endpointB)},{"damage_by_endpoint",intMap(x.damageByEndpoint)}})));
+    for(const auto& [id,x]:construction)b.emplace(id,V(fields({{"id",V(x.id)},{"owner",V(x.owner)},{"type",V(x.type)},{"site",optionalId(x.site)},{"queue_position",number(x.queuePosition)},{"paid_ipp",number(x.paidIpp)},{"remaining_payments",ints(x.remainingPayments)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:repairs)j.emplace(id,V(fields({{"id",V(x.id)},{"owner",V(x.owner)},{"target",V(x.target)},{"remaining_damage",number(x.remainingDamage)},{"remaining_cost",number(x.remainingCost)},{"restricts_action",V(x.restrictsAction)},{"endpoint",optionalId(x.endpoint)}})));
+    for(const auto& [id,x]:battles)bs.emplace(id,V(fields({{"id",V(x.id)},{"zone",V(x.zone)},{"attacker",V(x.attacker)},{"defender",V(x.defender)},{"stage",V(x.stage)},{"attackers",strings(x.attackers)},{"defenders",strings(x.defenders)},{"pending_hits",intMap(x.pendingHits)},{"flags",intMap(x.flags)},{"data",x.data}})));
     for(const auto& d:decisions)ds.push_back(decisionJson(d));
     for(const auto& [id,pair]:turnStart.units)snapshotUnits.emplace(id,V(A{V(pair.first),V(pair.second)}));
-    O result{{"schema_version",number(1)},{"definition_fingerprint",V(definition->fingerprint)},{"nations",V(std::move(n))},{"territories",V(std::move(t))},{"units",V(std::move(u))},{"facilities",V(std::move(f))},{"rails",V(std::move(r))},{"construction",V(std::move(b))},{"repairs",V(std::move(j))},{"clock",V(O{{"round_index",number(clock.roundIndex)},{"nation_index",number(clock.nationIndex)},{"phase",V(toString(clock.phase))},{"completed_rounds",number(clock.completedRounds)},{"player_turn_serial",V(std::to_string(clock.playerTurnSerial))},{"income_collected",V(clock.incomeCollected)}})},{"turn_start",V(O{{"possessions",optionalIdMap(turnStart.possessions)},{"units",V(std::move(snapshotUnits))}})},{"politics",politicsJson(politics)},{"completed_turns",intMap(completedTurns)},{"decisions",V(std::move(ds))},{"battles",V(std::move(bs))},{"battle_order",strings(battleOrder)},{"chance",chance?chanceJson(*chance):V(nullptr)},{"flags",intMap(flags)},{"terminal",V(terminal)}};
+    O result=fields({{"schema_version",number(1)},{"definition_fingerprint",V(definition->fingerprint)},{"nations",V(std::move(n))},{"territories",V(std::move(t))},{"units",V(std::move(u))},{"facilities",V(std::move(f))},{"rails",V(std::move(r))},{"construction",V(std::move(b))},{"repairs",V(std::move(j))},{"clock",V(fields({{"round_index",number(clock.roundIndex)},{"nation_index",number(clock.nationIndex)},{"phase",V(toString(clock.phase))},{"completed_rounds",number(clock.completedRounds)},{"player_turn_serial",V(std::to_string(clock.playerTurnSerial))},{"income_collected",V(clock.incomeCollected)}}))},{"turn_start",V(fields({{"possessions",optionalIdMap(turnStart.possessions)},{"units",V(std::move(snapshotUnits))}}))},{"politics",politicsJson(politics)},{"completed_turns",intMap(completedTurns)},{"decisions",V(std::move(ds))},{"battles",V(std::move(bs))},{"battle_order",strings(battleOrder)},{"chance",chance?chanceJson(*chance):V(nullptr)},{"flags",intMap(flags)},{"terminal",V(terminal)}});
     if(!actionInterface.asObject().empty()) result.emplace("action_interface",actionInterface);
     if(includeHistory) { for(const auto& e:history)events.emplace_back(O{{"kind",V(e.kind)},{"payload",e.payload},{"after_state_key",V(e.afterStateKey)}});result.emplace("history",V(std::move(events))); }
     return V(std::move(result));
