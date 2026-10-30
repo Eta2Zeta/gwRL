@@ -291,6 +291,18 @@ part of two calls per round, and a cheaper observation-graph encoding would cut
 the part that grows; neither has been tried. More games per process made larger
 calls in the probes but slowed the games more.
 
+One call for all three alliances' networks was tried and not kept. It ran the
+graph bookkeeping once per round and only the weight layers separately for each
+alliance, cutting a round of three calls from 855 tensor operations to 491, yet
+on the same rounds it was slower: 0.93 times the speed at 4 positions, 0.87 at
+10 and 0.80 at 32, because joining each alliance's rows back together copies
+large node and edge tensors. Writing the rows in place instead was several times
+slower still on this GPU. The gain could only have been small: three separate
+calls already overlap, the coordinator issuing one alliance's work while the GPU
+runs another's, so they cost only about 2 ms more than one call holding all ten
+positions (13.6 against 11.6 ms). The GPU's work per position on the observation
+graph remains the larger lever.
+
 The run stayed within the planned nine processes and the allowance, at most
 10.0 GB of the 30 GB. Its long-run rate, 566 evaluations per second, is below
 the five-minute probe's 635, which saw only the opening rounds. No learning

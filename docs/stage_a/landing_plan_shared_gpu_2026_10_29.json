@@ -439,6 +439,38 @@
    },
    "note": "The coordinator process CPU-time counter (67% of the run) also counts time spent waiting for the GPU; the stage timings separate CPU work from GPU time."
   },
+  "grouped_call_experiment": {
+   "kept": false,
+   "design": "one call per serving round for all three alliance models: shared graph operations once, stacked embedding tables, each model's weight layers on its own rows",
+   "tensor_operations_three_calls_vs_one": [
+    855,
+    491
+   ],
+   "median_ms_per_round_separate_vs_grouped": {
+    "4 positions, 3 models": [
+     7.79,
+     8.37
+    ],
+    "10 positions, 3 models": [
+     13.61,
+     15.73
+    ],
+    "10 positions, 1 model": [
+     11.58,
+     12.52
+    ],
+    "32 positions, 3 models": [
+     32.9,
+     41.32
+    ],
+    "32 positions, 1 model": [
+     31.92,
+     33.73
+    ]
+   },
+   "in_place_writes": "addmm and in-place scale writes into row slices were 2.5 to 8 times slower on MPS",
+   "ceiling": "three separate calls overlap and cost about 2 ms more than one call holding all ten positions"
+  },
   "setup_probes": {
    "seconds": 300,
    "note": "opening rounds only; chose the setup, not compared with complete runs",
