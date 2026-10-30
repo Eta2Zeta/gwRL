@@ -747,7 +747,14 @@ void forEachReference(const NumericGraphData& graph, const NumericGraphData& ban
 // An evaluation's arrays laid out in a caller's buffer, as read_arrays reads them.
 class EvaluationWriter {
 public:
-    explicit EvaluationWriter(const py::buffer& buffer) : view_(buffer.request(true)) {}
+    explicit EvaluationWriter(const py::buffer& buffer) : view_(buffer.request(true)) {
+        // The arrays are written straight through the pointer, so the buffer must
+        // be one run of bytes starting where an int32 or float32 can be stored.
+        if (view_.ndim != 1 || view_.strides[0] != view_.itemsize ||
+            reinterpret_cast<std::uintptr_t>(view_.ptr) % alignof(std::int32_t) != 0) {
+            throw py::buffer_error("Evaluation arrays need a contiguous, aligned buffer");
+        }
+    }
 
     template <class Value>
     Value* array(const std::string& name, std::size_t rows, std::size_t columns = 0) {

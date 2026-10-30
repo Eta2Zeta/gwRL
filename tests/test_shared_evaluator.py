@@ -191,7 +191,7 @@ class NativeEvaluationArraysTests(unittest.TestCase):
             self.assertTrue(np.signbit(expected[:, 0]).any(), name)
             self.assertEqual(arrays[name].tobytes(), expected.tobytes(), name)
 
-    def test_a_bad_menu_is_refused(self):
+    def test_a_bad_menu_or_buffer_is_refused(self):
         env = make_env(SEED, calendar_rounds=2)
         packed = make_numeric_input(env, tuple(env.legal_actions()), BUCKETS)["packed_graph"]
         buffer = memoryview(bytearray(1 << 23))
@@ -204,6 +204,10 @@ class NativeEvaluationArraysTests(unittest.TestCase):
             observation.write_evaluation(buffer, context, (graph,), (("a", "b", "c"),))
         with self.assertRaises(BufferError):
             observation.write_evaluation(bytes(1 << 23), context, (graph,), (("a", "b", "c", "d"),))
+        # A reversed view points at its last byte, so writing through it would overrun.
+        for view in (buffer[::2], buffer[::-1], buffer[1:], buffer.cast("B", (1 << 11, 1 << 12))):
+            with self.assertRaisesRegex(BufferError, "contiguous, aligned"):
+                observation.write_evaluation(view, context, (graph,), (("a", "b", "c", "d"),))
 
 
 class SharedEvaluatorTests(unittest.TestCase):
