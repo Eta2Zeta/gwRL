@@ -352,6 +352,8 @@ struct State {
 // JSON is canonical and finite. Large execution counters use decimal strings.
 std::string canonicalJson(const json::Value& value);
 std::string contentDigest(const std::string& value);
+// The same digest without hardware instructions, which tests compare it with.
+std::string portableContentDigest(const std::string& value);
 json::Value actionJson(const Action& action);
 Action actionFromJson(const json::Value& value);
 json::Value outcomeJson(const ChanceOutcome& outcome);

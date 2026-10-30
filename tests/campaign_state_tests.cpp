@@ -63,6 +63,22 @@ void digestsAndCanonicalJson() {
         std::string text;for(std::size_t i=0;i<size;++i)text.push_back(static_cast<char>('a'+(i*7)%26));
         check(contentDigest(text)==expected,"SHA-256 padding boundary vector");
     }
+    const std::map<std::string,std::string> published{
+        {"","e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+        {"abc","ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"},
+        {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq","248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"},
+        {"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu","cf5b16a778af8380036ce59e7b0492370b249b11e8f07a51afac45037afee9d1"}};
+    for(const auto& [text,expected]:published)check(contentDigest(text)==expected&&portableContentDigest(text)==expected,"SHA-256 published vector");
+    // Every length across several blocks, then longer texts, at shifted starts.
+    std::mt19937_64 random(2048);
+    const auto samePaths=[&](std::size_t size) {
+        std::string text(size+8,'\0');for(auto& c:text)c=static_cast<char>(random());
+        check(contentDigest(text)==portableContentDigest(text),"Hardware and portable SHA-256 differ");
+        const auto shifted=text.substr(random()%8);
+        check(contentDigest(shifted)==portableContentDigest(shifted),"Hardware and portable SHA-256 differ on a shifted buffer");
+    };
+    for(std::size_t size=0;size<=320;++size)samePaths(size);
+    for(int sample=0;sample<200;++sample)samePaths(random()%100000);
     const auto raw=V(O{{"z",V(-0.0)},{"a",V(std::string("\x01\n\"\\"))}});const auto serialized=canonicalJson(raw);check(canonicalJson(game::json::parse(serialized))==serialized,"Canonical escaped JSON round trip");
     rejects([]{canonicalJson(V(std::numeric_limits<double>::infinity()));},"Nonfinite JSON accepted");
     for(auto p:{Phase::Production,Phase::CombatMovement,Phase::Combat,Phase::NonCombatMovement,Phase::PlaceUnits})check(parsePhase(toString(p))==p,"Phase round trip");
