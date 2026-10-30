@@ -345,11 +345,13 @@ struct NumericGraphCompiler::Impl {
         ~Builder() { compiler.checkIn(std::move(caches)); }
 
         std::shared_ptr<const NumericGraphData> run(const json::Value& value,
-                                                   const json::Value::Object* rootOverrides = nullptr) {
+                                                   const json::Value::Object* rootOverrides = nullptr,
+                                                   const NumericGraphCompiler::Menu* menu = nullptr) {
             const bool observation = rootOverrides && rootOverrides->contains("legal_actions");
             graph = observation ? SpareGraphs::take(compiler.spares) : std::make_shared<NumericGraphData>();
             graph->buckets = compiler.buckets;
             graph->tokenOffsets.push_back(0);
+            scheduledMenu = menu;
             visit(value, "$", 0, RootPath, 0, rootOverrides);
             for (const auto& reference : graph->references) {
                 const auto found = graph->identityLookup.find(reference.identity);
@@ -371,7 +373,8 @@ struct NumericGraphCompiler::Impl {
 
         std::int64_t visit(const json::Value& value, const std::string& key,
                            std::int64_t position, Path path, std::size_t depth,
-                           const json::Value::Object* rootOverrides = nullptr) {
+                           const json::Value::Object* rootOverrides = nullptr,
+                           const NumericGraphCompiler::Menu* elements = nullptr) {
             if (depth >= MaximumDepth) throw std::runtime_error("Campaign neural JSON nesting exceeds 1024 levels");
             if (rootOverrides && !value.isObject()) throw std::invalid_argument("Campaign neural root overrides require an object");
             const auto index = indexValue(graph->types.size());
@@ -404,7 +407,7 @@ struct NumericGraphCompiler::Impl {
                 graph->references.push_back({index, text});
             } else if (value.isArray()) {
                 kind = Array;
-                size = indexValue(value.asArray().size());
+                size = indexValue(elements ? elements->size() : value.asArray().size());
             } else {
                 kind = Object;
                 size = indexValue(value.asObject().size());
@@ -431,7 +434,8 @@ struct NumericGraphCompiler::Impl {
                     Path childPath = OtherPath;
                     if (path == RootPath && field == "geography") childPath = GeographyPath;
                     if (path == GeographyPath && field == "nodes") childPath = GeographyNodesPath;
-                    const auto target = visit(child, field, 0, childPath, depth + 1);
+                    const auto target = visit(child, field, 0, childPath, depth + 1, nullptr,
+                                              rootOverrides && field == "legal_actions" ? scheduledMenu : nullptr);
                     graph->addEdge(index, target, ParentToChild);
                     graph->addEdge(target, index, ChildToParent);
                     if (collection && child.isObject()) graph->bind(field, target);
@@ -449,10 +453,15 @@ struct NumericGraphCompiler::Impl {
                 }
             } else if (kind == Array) {
                 std::int64_t offset = 0;
-                for (const auto& child : value.asArray()) {
+                const auto visitElement = [&](const json::Value& child) {
                     const auto target = visit(child, "[]", offset++, OtherPath, depth + 1);
                     graph->addEdge(index, target, ParentToChild);
                     graph->addEdge(target, index, ChildToParent);
+                };
+                if (elements) {
+                    for (const auto& child : *elements) visitElement(*child);
+                } else {
+                    for (const auto& child : value.asArray()) visitElement(child);
                 }
             } else {
                 ++graph->leaves;
@@ -493,6 +502,7 @@ struct NumericGraphCompiler::Impl {
         std::unique_ptr<ScalarCaches> caches;
         std::shared_ptr<NumericGraphData> graph;
         std::unordered_map<std::string, std::int64_t> geographyNodes;
+        const NumericGraphCompiler::Menu* scheduledMenu = nullptr;
     };
 
     std::int64_t buckets;
@@ -909,12 +919,13 @@ std::shared_ptr<NumericGraph> NumericGraphCompiler::compile(const json::Value& v
 }
 
 std::shared_ptr<NumericGraph> NumericGraphCompiler::compile(const json::Value& value,
-                                                          const json::Value::Object& rootOverrides) {
+                                                          const json::Value::Object& rootOverrides,
+                                                          const Menu& menu) {
     if (PyGILState_Check()) {
         py::gil_scoped_release release;
-        return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides)));
+        return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides, &menu)));
     }
-    return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides)));
+    return std::shared_ptr<NumericGraph>(new NumericGraph(Impl::Builder(*impl_).run(value, &rootOverrides, &menu)));
 }
 
 std::int64_t NumericGraphCompiler::bucketCount() const { return impl_->buckets; }

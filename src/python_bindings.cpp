@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <memory>
@@ -57,6 +58,9 @@ struct NumericSnapshot {
     V::Object overrides;
     std::shared_ptr<const std::string> actionSourceKey;
     bool passAction {false};
+    // An observation's legal_actions elements, shared with the actions' own
+    // snapshots; the array in `overrides` stays empty.
+    game::neural::NumericGraphCompiler::Menu menu;
 
     py::object cacheKey() const {
         if (!overrides.empty() || (!actionSourceKey && !passAction)) return py::none();
@@ -69,6 +73,11 @@ struct NumericSnapshot {
         if (overrides.empty()) return *source;
         auto result = source->asObject();
         for (const auto& [key, value] : overrides) result.insert_or_assign(key, value);
+        if (!menu.empty()) {
+            V::Array elements;
+            for (const auto& element : menu) elements.push_back(*element);
+            result.insert_or_assign("legal_actions", V(std::move(elements)));
+        }
         return V(std::move(result));
     }
 
@@ -81,15 +90,18 @@ struct NumericSnapshot {
     }
 
     NumericSnapshot scheduledObservation(const std::optional<std::string>& owner, const std::string& kind,
-            const std::vector<NumericSnapshot>& actions, const std::string& schema,
+            const std::vector<std::reference_wrapper<const NumericSnapshot>>& actions, const std::string& schema,
             const std::vector<std::string>& order, const std::vector<std::string>& passed) const {
         auto result = scheduledContext(schema, order);
         result.overrides["current_decision_player"] = owner ? V(*owner) : V(nullptr);
         result.overrides["decision_kind"] = V(kind);
-        V::Array menu, passSequence;
-        for (const auto& action : actions) menu.emplace_back(action.materialize());
+        result.overrides["legal_actions"] = V(V::Array{});
+        result.menu.reserve(actions.size());
+        for (const NumericSnapshot& action : actions) {
+            result.menu.push_back(action.overrides.empty() ? action.source : std::make_shared<const V>(action.materialize()));
+        }
+        V::Array passSequence;
         for (const auto& player : passed) passSequence.emplace_back(player);
-        result.overrides["legal_actions"] = V(std::move(menu));
         auto scheduler = result.overrides.at("interrupt_scheduler").asObject();
         scheduler["passed"] = V(std::move(passSequence));
         result.overrides["interrupt_scheduler"] = V(std::move(scheduler));
@@ -169,7 +181,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     py::class_<NumericSnapshot>(module, "CampaignNumericSnapshot")
         .def_property_readonly("cache_key", &NumericSnapshot::cacheKey)
         .def("scheduled_context", &NumericSnapshot::scheduledContext, py::call_guard<py::gil_scoped_release>())
-        .def("scheduled_observation", &NumericSnapshot::scheduledObservation, py::call_guard<py::gil_scoped_release>())
+        .def("scheduled_observation", &NumericSnapshot::scheduledObservation)
         .def("factor_json", &NumericSnapshot::factorJson, py::call_guard<py::gil_scoped_release>())
         .def("to_python", [](const NumericSnapshot& snapshot) {
             return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(snapshot.materialize()));
@@ -203,7 +215,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     py::class_<game::neural::NumericGraphCompiler>(module, "CampaignNumericGraphCompiler")
         .def(py::init<std::int64_t, py::function, py::function, py::function>())
         .def("compile", [](game::neural::NumericGraphCompiler& compiler, const NumericSnapshot& snapshot) {
-            return compiler.compile(*snapshot.source, snapshot.overrides);
+            return compiler.compile(*snapshot.source, snapshot.overrides, snapshot.menu);
         })
         .def("clear_caches", &game::neural::NumericGraphCompiler::clearCaches)
         .def("cache_stats", &game::neural::NumericGraphCompiler::cacheStats);

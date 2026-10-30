@@ -130,6 +130,29 @@ class CampaignNumericExportTests(unittest.TestCase):
         self.assert_graph_equal(compiler.compile(snapshot), expected)
         self.assertGreater(calls["lexical"], warm_calls["lexical"])
 
+    def test_scheduled_observation_shares_the_menu_and_keeps_its_complete_json(self):
+        menu = self.env.legal_actions()
+        decision = self.env._decision_cache()
+        snapshots = [action.numeric_snapshot() for action in menu]
+        base = self.raw.numeric_observation()
+        self.assertNotIn("legal_actions", base.to_python())
+        scheduled = base.scheduled_observation(decision.owner, decision.kind, snapshots, SCHEDULER,
+                                               self.env.interrupt_order, sorted(self.env._passed))
+        document = scheduled.to_python()
+        self.assertEqual(document["legal_actions"], [snapshot.to_python() for snapshot in snapshots])
+        self.assertEqual(document["current_decision_player"], decision.owner)
+        self.assertEqual(document["interrupt_scheduler"], {"schema": SCHEDULER, "order": list(self.env.interrupt_order),
+                                                           "passed": []})
+        self.assert_graph_equal(numeric_compiler(BUCKETS).compile(scheduled), oracle(document))
+        empty = base.scheduled_observation(decision.owner, decision.kind, [], SCHEDULER, self.env.interrupt_order, [])
+        self.assertEqual(empty.to_python()["legal_actions"], [])
+        self.assert_graph_equal(numeric_compiler(BUCKETS).compile(empty), oracle(empty.to_python()))
+        with_overrides = snapshots[0].scheduled_context("schema", ["axis"])
+        wrapped = base.scheduled_observation(decision.owner, decision.kind, [with_overrides], SCHEDULER,
+                                             self.env.interrupt_order, [])
+        self.assertEqual(wrapped.to_python()["legal_actions"], [with_overrides.to_python()])
+        self.assert_graph_equal(numeric_compiler(BUCKETS).compile(wrapped), oracle(wrapped.to_python()))
+
     def test_scheduled_snapshots_keep_every_action_and_wrapper_field(self):
         for action in self.raw.legal_actions():
             self.assertEqual(action.scheduled_snapshot(f"wrapper:{action.id}", "interrupt", "allies").to_python(),

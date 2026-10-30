@@ -67,8 +67,12 @@ public:
     NumericGraphCompiler(const NumericGraphCompiler&) = delete;
     NumericGraphCompiler& operator=(const NumericGraphCompiler&) = delete;
 
+    // The menu's elements replace a root legal_actions override, without being copied into it.
+    using Menu = std::vector<std::shared_ptr<const json::Value>>;
+
     std::shared_ptr<NumericGraph> compile(const json::Value& value);
-    std::shared_ptr<NumericGraph> compile(const json::Value& value, const json::Value::Object& rootOverrides);
+    std::shared_ptr<NumericGraph> compile(const json::Value& value, const json::Value::Object& rootOverrides,
+                                          const Menu& menu);
     std::int64_t bucketCount() const;
     void clearCaches();
     pybind11::dict cacheStats() const;
