@@ -183,6 +183,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("__eq__", &game::neural::NumericGraph::equals, py::is_operator(), py::call_guard<py::gil_scoped_release>())
         .def("debug_graph", &game::neural::NumericGraph::debugGraph)
         .def("external_references", &game::neural::NumericGraph::externalReferences)
+        .def("write_evaluation", &game::neural::NumericGraph::writeEvaluation)
         .def_property_readonly("node_count", &game::neural::NumericGraph::nodeCount)
         .def_property_readonly("leaf_count", &game::neural::NumericGraph::leafCount)
         .def_property_readonly("token_buckets", &game::neural::NumericGraph::bucketCount)

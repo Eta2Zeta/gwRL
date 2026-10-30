@@ -13,9 +13,9 @@ calls is counted once, in the inner one:
   adapter               CampaignAdapter's Python layer around the engine
   rules engine          gwrl_cpp.CampaignEnv calls: legal moves, moves, dice, clones, keys
   input: graph compile  native graph compiles, including their Python token callbacks
-  input: native         numeric snapshots and graph array exports
-  input: python         shared_evaluator.prepare and the adapter's numeric_input
-  messaging             the evaluator's own code, shared-memory writes and the pipe's CPU
+  input: native         numeric snapshots, graph array exports and the evaluation's arrays
+  input: python         shared_evaluator.prepare_into and the adapter's numeric_input
+  messaging             the evaluator's own code and the pipe's CPU
   game loop             play_shared_game outside searches
 
 Wrapped calls are charged per method, as "group/method". Freeing engine objects
@@ -161,14 +161,13 @@ def _install() -> float:
     wrap(gwrl_cpp.CampaignNumericSnapshot, ("scheduled_observation", "scheduled_context", "factor_json"),
          "input: native")
     wrap(gwrl_cpp.CampaignAction, ("scheduled_snapshot",), "input: native")
-    wrap(gwrl_cpp.CampaignNumericGraph, ("arrays", "external_references"), "input: native")
+    wrap(gwrl_cpp.CampaignNumericGraph, ("arrays", "external_references", "write_evaluation"), "input: native")
     wrap(gwrl_cpp.CampaignNumericGraphCompiler, ("compile",), "input: graph compile")
     wrap(campaign_adapter.CampaignAdapter, ("planning_key", "decision_kind", "current_decision_player",
                                             "is_terminal", "legal_actions", "apply_action", "resolve_chance",
                                             "clone", "clone_for_search", "returns"), "adapter")
     wrap(campaign_adapter.CampaignAdapter, ("numeric_input",), "input: python")
-    wrap(shared_evaluator, ("prepare",), "input: python")
-    wrap(shared_evaluator, ("write_arrays",), "messaging")
+    wrap(shared_evaluator, ("prepare_into",), "input: python")
     wrap(Connection, ("send", "recv"), "messaging")
     shared_evaluator.RemoteEvaluator.evaluate = _evaluations(shared_evaluator.RemoteEvaluator.evaluate)
     multiplayer_mcts.VectorMCTS.search = _searches(multiplayer_mcts.VectorMCTS.search)

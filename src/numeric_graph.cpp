@@ -2,6 +2,7 @@
 
 #include <pybind11/numpy.h>
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <cmath>
@@ -9,6 +10,7 @@
 #include <deque>
 #include <limits>
 #include <mutex>
+#include <numeric>
 #include <set>
 #include <shared_mutex>
 #include <stdexcept>
@@ -652,6 +654,137 @@ std::shared_ptr<NumericGraph> NumericGraph::fromPacked(const py::dict& state) {
     return std::shared_ptr<NumericGraph>(new NumericGraph(std::move(data)));
 }
 
+namespace {
+
+template <class Visit>
+void forEachReference(const NumericGraphData& graph, const NumericGraphData& bank, Visit&& visit) {
+    for (const auto& reference : graph.references) {
+        const auto found = bank.identityLookup.find(reference.identity);
+        if (found == bank.identityLookup.end()) continue;
+        for (const auto index : bank.identities[found->second].nodes) visit(reference.source, index);
+    }
+}
+
+// An evaluation's arrays laid out in a caller's buffer, as read_arrays reads them.
+class EvaluationWriter {
+public:
+    explicit EvaluationWriter(const py::buffer& buffer) : view_(buffer.request(true)) {}
+
+    template <class Value>
+    Value* array(const std::string& name, std::size_t rows, std::size_t columns = 0) {
+        const auto start = (end_ + 15) & ~std::size_t{15};
+        end_ = start + rows * std::max<std::size_t>(columns, 1) * sizeof(Value);
+        if (end_ > static_cast<std::size_t>(view_.size * view_.itemsize)) {
+            throw std::invalid_argument("A prepared position exceeds its shared-memory buffer");
+        }
+        py::tuple shape = columns ? py::tuple(py::make_tuple(rows, columns)) : py::tuple(py::make_tuple(rows));
+        header_.append(py::make_tuple(name, std::is_same_v<Value, float> ? "<f4" : "<i4", shape, start));
+        return reinterpret_cast<Value*>(static_cast<char*>(view_.ptr) + start);
+    }
+
+    py::list header() const { return header_; }
+
+private:
+    py::buffer_info view_;
+    std::size_t end_ = 0;
+    py::list header_;
+};
+
+// Copies values narrowed to the model's array type, with `shift` added; returns the end.
+template <class Source, class Target>
+Target* narrowed(const Source* values, std::size_t count, Target* out, Target shift = 0) {
+    for (std::size_t index = 0; index < count; ++index) out[index] = static_cast<Target>(values[index]) + shift;
+    return out + count;
+}
+
+template <class Source, class Target>
+Target* narrowed(const std::vector<Source>& values, Target* out, Target shift = 0) {
+    return narrowed(values.data(), values.size(), out, shift);
+}
+
+void writeBlock(EvaluationWriter& out, const std::string& prefix, const std::vector<const NumericGraphData*>& graphs) {
+    std::size_t tokenCount = 0, nodeCount = 0, edgeCount = 0;
+    for (const auto* graph : graphs) {
+        tokenCount += graph->tokenIds.size();
+        nodeCount += graph->types.size();
+        edgeCount += graph->sources.size();
+    }
+    auto* ids = out.array<std::int32_t>(prefix + "ids", tokenCount);
+    auto* offsets = out.array<std::int32_t>(prefix + "offsets", nodeCount + 1);
+    auto* types = out.array<std::int32_t>(prefix + "types", nodeCount);
+    auto* numbers = out.array<float>(prefix + "numbers", nodeCount, 8);
+    auto* sources = out.array<std::int32_t>(prefix + "sources", edgeCount);
+    auto* targets = out.array<std::int32_t>(prefix + "targets", edgeCount);
+    auto* relations = out.array<std::int32_t>(prefix + "relations", edgeCount);
+    std::int32_t nodeStart = 0, tokenStart = 0;
+    for (const auto* graph : graphs) {
+        ids = narrowed(graph->tokenIds, ids);
+        offsets = narrowed(graph->tokenOffsets.data(), graph->types.size(), offsets, tokenStart);
+        types = narrowed(graph->types, types);
+        numbers = narrowed(graph->numeric, numbers);
+        sources = narrowed(graph->sources, sources, nodeStart);
+        targets = narrowed(graph->targets, targets, nodeStart);
+        relations = narrowed(graph->relations, relations);
+        nodeStart += static_cast<std::int32_t>(graph->types.size());
+        tokenStart += static_cast<std::int32_t>(graph->tokenIds.size());
+    }
+    *offsets = tokenStart;
+}
+
+void writeReferences(EvaluationWriter& out, const std::string& prefix,
+                     const std::vector<const NumericGraphData*>& graphs, const NumericGraphData& bank) {
+    std::vector<std::int32_t> destinations, indices;
+    std::int32_t nodeStart = 0;
+    for (const auto* graph : graphs) {
+        forEachReference(*graph, bank, [&](std::int64_t source, std::int64_t index) {
+            destinations.push_back(static_cast<std::int32_t>(source) + nodeStart);
+            indices.push_back(static_cast<std::int32_t>(index));
+        });
+        nodeStart += static_cast<std::int32_t>(graph->types.size());
+    }
+    narrowed(destinations, out.array<std::int32_t>(prefix + "dest", destinations.size()));
+    narrowed(indices, out.array<std::int32_t>(prefix + "index", indices.size()));
+}
+
+// The four levels of CampaignPolicyValueNet._factor_layout. Once the actions are
+// sorted, those sharing a prefix are adjacent, in the sorted order of the
+// prefixes, so each level's groups and their parents come from one walk. UTF-8
+// byte order is code-point order, which is how Python sorts the same strings.
+void writeFactorLevels(EvaluationWriter& out, const std::vector<std::array<std::string_view, 4>>& factors) {
+    std::vector<std::int32_t> order(factors.size());
+    std::iota(order.begin(), order.end(), 0);
+    std::sort(order.begin(), order.end(), [&](std::int32_t left, std::int32_t right) {
+        return factors[left] < factors[right];
+    });
+    std::vector<std::int32_t> owners(factors.size()), counts, parents, above(factors.size(), 0);
+    std::array<std::int32_t, 4> parentCounts;
+    std::int32_t groupsAbove = 1;
+    for (std::size_t level = 1; level <= factors.front().size(); ++level) {
+        counts.clear();
+        parents.clear();
+        for (std::size_t rank = 0; rank < order.size(); ++rank) {
+            const auto action = order[rank];
+            if (rank == 0 || !std::equal(factors[action].begin(), factors[action].begin() + level,
+                                         factors[order[rank - 1]].begin())) {
+                counts.push_back(0);
+                parents.push_back(above[action]);
+            }
+            owners[action] = static_cast<std::int32_t>(counts.size()) - 1;
+            ++counts.back();
+        }
+        const auto name = "f" + std::to_string(level) + "_";
+        narrowed(owners, out.array<std::int32_t>(name + "owners", owners.size()));
+        narrowed(counts, out.array<std::int32_t>(name + "counts", counts.size()));
+        narrowed(parents, out.array<std::int32_t>(name + "parents", parents.size()));
+        parentCounts[level - 1] = groupsAbove;
+        groupsAbove = static_cast<std::int32_t>(counts.size());
+        above = owners;
+    }
+    narrowed(parentCounts.data(), parentCounts.size(), out.array<std::int32_t>("f_parent_counts", parentCounts.size()));
+}
+
+}  // namespace
+
 py::tuple NumericGraph::externalReferences(const NumericGraph& context) const {
     struct Pairs {
         std::vector<std::int64_t> destinations;
@@ -660,18 +793,32 @@ py::tuple NumericGraph::externalReferences(const NumericGraph& context) const {
     auto pairs = std::make_shared<Pairs>();
     {
         py::gil_scoped_release release;
-        for (const auto& reference : data_->references) {
-            const auto found = context.data_->identityLookup.find(reference.identity);
-            if (found == context.data_->identityLookup.end()) continue;
-            const auto& indices = context.data_->identities[found->second].nodes;
-            for (const auto index : indices) {
-                pairs->destinations.push_back(reference.source);
-                pairs->indices.push_back(index);
-            }
-        }
+        forEachReference(*data_, *context.data_, [&](std::int64_t source, std::int64_t index) {
+            pairs->destinations.push_back(source);
+            pairs->indices.push_back(index);
+        });
     }
     std::shared_ptr<const Pairs> immutable = std::move(pairs);
     return py::make_tuple(arrayView(immutable, immutable->destinations), arrayView(immutable, immutable->indices));
+}
+
+py::list NumericGraph::writeEvaluation(const py::buffer& buffer, const NumericGraph& context,
+                                       const std::vector<std::reference_wrapper<const NumericGraph>>& actions,
+                                       const std::vector<std::array<std::string_view, 4>>& factors) const {
+    if (actions.size() != factors.size()) throw std::invalid_argument("Numerical legal menu and factors disagree");
+    std::vector<const NumericGraphData*> menu;
+    menu.reserve(actions.size());
+    for (const auto& action : actions) menu.push_back(action.get().data_.get());
+    EvaluationWriter out(buffer);
+    writeBlock(out, "obs_", {data_.get()});
+    writeReferences(out, "obs_ref_", {data_.get()}, *context.data_);
+    writeBlock(out, "act_", menu);
+    writeReferences(out, "act_obs_", menu, *data_);
+    writeReferences(out, "act_ctx_", menu, *context.data_);
+    auto* nodes = out.array<std::int32_t>("act_nodes", menu.size());
+    for (const auto* graph : menu) *nodes++ = static_cast<std::int32_t>(graph->types.size());
+    if (!menu.empty()) writeFactorLevels(out, factors);
+    return out.header();
 }
 
 NumericGraphCompiler::NumericGraphCompiler(std::int64_t buckets, py::function lexicalIds,
