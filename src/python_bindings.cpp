@@ -98,9 +98,13 @@ struct NumericSnapshot {
 
     static NumericSnapshot scheduledAction(const game::campaign::Action* action,
             const std::string& id, const std::string& kind, const std::string& player) {
-        return {std::make_shared<const V>(V::Object{{"id", V(id)}, {"kind", V(kind)},
-            {"player", V(player)}, {"action", action ? game::campaign::actionJson(*action) : V(nullptr)}}), {},
-            action ? action->neuralSourceKey : nullptr, action == nullptr};
+        V::Object wrapped;
+        wrapped.emplace("id", id);
+        wrapped.emplace("kind", kind);
+        wrapped.emplace("player", player);
+        wrapped.emplace("action", action ? game::campaign::actionJson(*action) : V(nullptr));
+        return {std::make_shared<const V>(std::move(wrapped)), {}, action ? action->neuralSourceKey : nullptr,
+            action == nullptr};
     }
 
     std::vector<std::string> factorJson() const {
@@ -172,7 +176,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         });
     module.def("campaign_pass_snapshot", [](const std::string& id, const std::string& kind, const std::string& player) {
         return NumericSnapshot::scheduledAction(nullptr, id, kind, player);
-    }, py::call_guard<py::gil_scoped_release>());
+    });
 
     py::class_<game::neural::NumericGraph, std::shared_ptr<game::neural::NumericGraph>>(module, "CampaignNumericGraph")
         .def("arrays", &game::neural::NumericGraph::arrays)
@@ -241,8 +245,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def_readonly("decision", &game::campaign::Action::decision)
         .def("scheduled_snapshot", [](const game::campaign::Action& action,
                 const std::string& id, const std::string& kind, const std::string& player) {
+            // Far too short to hand Python's lock to another thread and wait to get it back.
             return NumericSnapshot::scheduledAction(&action, id, kind, player);
-        }, py::call_guard<py::gil_scoped_release>())
+        })
         .def_property_readonly("parameters", [](const game::campaign::Action &a) {
             return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(a.parameters));
         })

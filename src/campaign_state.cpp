@@ -330,7 +330,7 @@ NeighborIds mapNeighbors(const State& s,const Id& zone) {
     return NeighborIds::own(std::move(ids));
 }
 
-V actionJson(const Action& a) { return V(O{{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}}); }
+V actionJson(const Action& a) { return V(fields({{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}})); }
 Action actionFromJson(const V& v) { Action a; a.id=v.require("id").asString();a.kind=v.require("kind").asString();a.player=v.require("player").asString();a.nation=v.require("nation").asString();a.decision=readOptionalId(v.require("decision"));a.parameters=v.require("parameters"); return a; }
 V outcomeJson(const ChanceOutcome& o) { A a; for(const auto& faces:o.faces)a.push_back(ints(faces)); return V(O{{"faces",V(std::move(a))}}); }
 ChanceOutcome outcomeFromJson(const V& v) { ChanceOutcome o; for(const auto& faces:v.require("faces").asArray())o.faces.push_back(readInts(faces)); return o; }

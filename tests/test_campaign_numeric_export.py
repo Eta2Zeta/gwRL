@@ -128,6 +128,16 @@ class CampaignNumericExportTests(unittest.TestCase):
         self.assert_graph_equal(compiler.compile(snapshot), expected)
         self.assertGreater(calls["lexical"], warm_calls["lexical"])
 
+    def test_scheduled_snapshots_keep_every_action_and_wrapper_field(self):
+        for action in self.raw.legal_actions():
+            self.assertEqual(action.scheduled_snapshot(f"wrapper:{action.id}", "interrupt", "allies").to_python(),
+                             {"id": f"wrapper:{action.id}", "kind": "interrupt", "player": "allies",
+                              "action": {"id": action.id, "kind": action.kind, "player": action.player,
+                                         "nation": action.nation, "decision": action.decision,
+                                         "parameters": action.parameters}})
+        self.assertEqual(gwrl_cpp.campaign_pass_snapshot("pass", "pass_interrupt", "axis").to_python(),
+                         {"id": "pass", "kind": "pass_interrupt", "player": "axis", "action": None})
+
     def test_old_native_snapshot_and_buffers_outlive_mutation_environment_and_compiler(self):
         raw = self.raw.clone()
         snapshot = raw.numeric_observation()
