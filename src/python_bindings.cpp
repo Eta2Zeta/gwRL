@@ -328,7 +328,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return py::module_::import("json").attr("loads")(text);
         })
         .def("numeric_observation", [](const NativeCampaignEnv& self) {
-            return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.observationSnapshot(); }), {}};
+            return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.observationWithoutMenu(); }), {}};
         })
         .def("numeric_context", [](const NativeCampaignEnv& self) {
             return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.contextSnapshot(); }), {}};

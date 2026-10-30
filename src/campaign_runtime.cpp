@@ -372,6 +372,11 @@ std::vector<Action> Engine::legalActions() const {
     return actionMenu()->actions;
 }
 
+std::shared_ptr<const std::vector<Action>> Engine::legalActionMenu() const {
+    const auto menu = actionMenu();
+    return {menu, &menu->actions};
+}
+
 void Engine::step(const Action& action) {
     const auto proposed = canonicalJson(actionJson(action));
     const auto menu = actionMenu();

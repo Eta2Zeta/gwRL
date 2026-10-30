@@ -50,6 +50,14 @@ int main() {
             rejects([&] { json::parse(text).asInt(); });
         }
         std::cout << "PASS integer range and fractional rejection\n";
+        json::Value::Object fields;
+        fields.emplace("nested", json::Value(json::Value::Array{json::Value(1.0)}));
+        json::Value holder(std::move(fields));
+        const auto* nested = &holder.asObject().at("nested");
+        const auto moved = std::move(holder).asObject();
+        require(&moved.at("nested") == nested, "A temporary copied its object instead of giving it up");
+        rejects([] { json::Value(1.0).asObject(); });
+        std::cout << "PASS temporaries give up their objects\n";
         return 0;
     } catch (const std::exception& error) {
         std::cerr << "FAIL JSON integrity: " << error.what() << '\n';

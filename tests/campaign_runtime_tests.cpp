@@ -551,6 +551,9 @@ void decisionMenusAreReusedAndTransactional() {
     branch.legalActions();
     engine.setDiceTapeForTesting({6, 12});
     engine.legalActions();
+    const auto cached = engine.legalActionMenu();
+    require(cached == engine.legalActionMenu() && cached->size() == exposed.size() && cached->front().id == exposed.front().id,
+            "The cached menu differs from the legal actions");
     require(rules->actionCalls == 1, "Unchanged states, clones or RNG reseeding regenerated actions");
     exposed.front().parameters = V(O{{"poison", V(true)}});
     require(canonicalJson(actionJson(findAction(engine, "mark"))) == canonicalJson(actionJson(mark)),
@@ -567,6 +570,8 @@ void decisionMenusAreReusedAndTransactional() {
     const auto changed = findAction(branch, "mark");
     require(rules->actionCalls == 2 && changed.parameters.require("value").asInt() == 1,
             "Successful action retained a stale menu");
+    require(branch.legalActionMenu() != cached && cached->front().id == exposed.front().id,
+            "A move changed or reused an earlier cached menu");
     engine.legalActions();
     require(rules->actionCalls == 2 && !engine.state().flags.contains("marks"),
             "Clone mutation invalidated or changed its parent cache");

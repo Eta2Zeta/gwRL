@@ -337,11 +337,18 @@ const Value::Array& Value::asArray() const {
     return std::get<Array>(storage_);
 }
 
-const Value::Object& Value::asObject() const {
+const Value::Object& Value::asObject() const& {
     if (!isObject()) {
         throw std::runtime_error("JSON value is not an object");
     }
     return std::get<Object>(storage_);
+}
+
+Value::Object Value::asObject() && {
+    if (!isObject()) {
+        throw std::runtime_error("JSON value is not an object");
+    }
+    return std::get<Object>(std::move(storage_));
 }
 
 const Value& Value::require(const std::string& key) const {
