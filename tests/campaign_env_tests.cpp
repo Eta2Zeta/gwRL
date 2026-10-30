@@ -1,4 +1,5 @@
 #include "game/campaign_env.hpp"
+#include "game/campaign_actions.hpp"
 #include "game/campaign_audit.hpp"
 #include "game/catalog.hpp"
 #include "game/politics.hpp"
@@ -194,6 +195,29 @@ void observationsAreSharedOnlyForTheSameDecisionState() {
             "Concurrent clones rebuilt their unchanged observation snapshot");
 }
 
+void searchCopiesKeepTheirSourceEnvironment() {
+    Engine engine = Engine::start(loadScenario(scenario), trainingCampaignRules(), 77);
+    engine.setDiceTapeForTesting({1, 12, 6});
+    CampaignEnv env(std::move(engine));
+    const auto checkpoint = env.serialize();
+    const auto key = env.planningKey();
+    const auto* snapshot = &env.observation();
+    auto searched = env.cloneForSearch(456);
+    require(searched.contextSnapshot() == env.contextSnapshot() && &searched.observation() == snapshot
+            && searched.planningKey() == key, "Search copy rebuilt what its source had cached");
+    const auto random = game::json::parse(searched.serialize()).require("random");
+    const auto actual = game::json::parse(checkpoint).require("random");
+    require(random.require("active").asString() == "search" && random.require("test_tape").asArray().empty()
+            && random.require("actual").asString() == actual.require("actual").asString()
+            && random.require("training").asString() == actual.require("training").asString()
+            && random.require("search").asString() != actual.require("search").asString(),
+            "Search copy kept the wrong random streams");
+    // The copy keeps the training rules, which a restore must match.
+    searched.restore(checkpoint);
+    require(searched.serialize() == checkpoint, "Search copy lost its rules module");
+    require(env.serialize() == checkpoint && env.planningKey() == key, "Search copy changed its source");
+}
+
 void setupValuesAndNoDoubleCounting() {
     auto s = loadScenario(scenario);
     const auto initial = allianceWealth(s);
@@ -283,6 +307,7 @@ int main() {
         {"reaction and chance owner", reactionAndChanceEntitlements},
         {"planning key cache invalidation", cachedPlanningKeysTrackEveryMutation},
         {"observation snapshot reuse", observationsAreSharedOnlyForTheSameDecisionState},
+        {"search copies keep their source environment", searchCopiesKeepTheirSourceEnvironment},
         {"setup and temporary asset values", setupValuesAndNoDoubleCounting},
         {"repair/rail/neutral accounting", repairsRailAndNeutralAttribution},
         {"ordered general-sum returns", terminalThreeVector},

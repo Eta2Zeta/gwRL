@@ -44,6 +44,8 @@ class CampaignEnv {
 
   private:
     struct DecisionCache;
+    // Another engine at the source's decision state, sharing its caches.
+    CampaignEnv(Engine engine, const CampaignEnv& source);
     Engine engine_;
     bool trainingActions_ {false};
     std::shared_ptr<const json::Value> context_;

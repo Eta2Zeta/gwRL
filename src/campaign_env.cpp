@@ -45,6 +45,10 @@ CampaignEnv::CampaignEnv(Engine engine)
       context_(std::make_shared<const V>(staticContext(engine_.state(), trainingActions_))),
       decisionCache_(std::make_shared<DecisionCache>()) {}
 
+CampaignEnv::CampaignEnv(Engine engine, const CampaignEnv& source)
+    : engine_(std::move(engine)), trainingActions_(source.trainingActions_), context_(source.context_),
+      decisionCache_(source.decisionCache_) {}
+
 CampaignEnv CampaignEnv::curriculum(const std::filesystem::path& path, int calendarRounds,
                                     std::uint64_t seed, bool trainingActions) {
     auto initial = loadScenario(path);
@@ -94,11 +98,7 @@ std::shared_ptr<const V> CampaignEnv::observationSnapshot() const {
 }
 
 CampaignEnv CampaignEnv::clone() const { return *this; }
-CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const {
-    auto copy = clone();
-    copy.engine_ = engine_.cloneForSearch(seed);
-    return copy;
-}
+CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const { return CampaignEnv(engine_.cloneForSearch(seed), *this); }
 std::string CampaignEnv::planningKey() const {
     std::lock_guard lock(decisionCache_->mutex);
     if (!decisionCache_->planningKey) decisionCache_->planningKey = engine_.planningKey();
