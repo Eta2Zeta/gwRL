@@ -7,9 +7,12 @@
    "rule": "69bfbed",
    "second_review_fixes": "29f0a0f",
    "shortfall_rule": "cebfb58",
-   "no_carrier_unloads_and_submarine_port_exit": "f5aa675"
+   "no_carrier_unloads_and_submarine_port_exit": "f5aa675",
+   "owner_chooses_losses": "8f205e4",
+   "owner_chooses_after_combat": "86129b6"
   },
   "stranded_aircraft_lost": "counts aircraft removed as Combat Movement ends because no landing remains; only dice or another nation's turn leave any",
+  "owner_chooses_losses": "User ruling 2026-10-29: where some aircraft must be lost, their owner chooses which; air_failed_landing is offered for any aircraft in a smallest set of losses, attackers and continuing aircraft included, and Combat Movement ends once the rest can land as the carriers stand. After combat, where a carrier sunk in battle leaves too few seats, the landing decision offers giving the aircraft up, and where no spot keeps the others' landings it may land anywhere in reach",
   "carrier_aircraft_ruling": "User ruling 2026-10-29: a carrier never unloads aircraft; an aircraft takes off from it by flying and lands on it where it ends its move",
   "submarine_port_exit": "Enemy surface warships off a port force a screen only on surface ships; a submarine leaves without one, as the route check already allowed. In Noncombat Movement the forced screen had left no legal action",
   "remaining_gap": "A war declared during Combat Movement, by the mover or by a neutral answering a peaceful entry where a carrier's route ends, can change which zones aircraft may enter or hold a carrier in battle; no plan check follows it",
@@ -170,10 +173,10 @@
     "mean_decisions": 1650.2,
     "mean_game_seconds": 15.11
    },
-   "final": {
-    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall",
+   "before_owner_choice": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-before-owner-choice",
     "engine": "f5aa675",
-    "checks": "no legal action, engine errors, a rise in the landing shortfall between settled positions of either movement phase (no naval move or Chinese-truce battle pending) beyond the seats of carriers lost or damaged and without a new war, and aircraft lost as Combat Movement ends beyond the shortfall; explained rises and losses within the shortfall are noted",
+    "checks": "the final checks, with losses chosen by unit order",
     "games": 322,
     "completed_all_rounds": 322,
     "problems_by_kind": {},
@@ -183,8 +186,48 @@
     "mean_decisions": 1651.3,
     "mean_game_seconds": 16.12
    },
+   "owner_choice_before_review": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-owner-choice-before-review",
+    "engine": "owner choice before its review fixes",
+    "checks": "the final checks",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1652.6,
+    "mean_game_seconds": 16.71
+   },
+   "final": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-shortfall",
+    "engine": "86129b6",
+    "checks": "no legal action, engine errors, a rise in the landing shortfall between settled positions of either movement phase (no naval move or Chinese-truce battle pending) beyond the seats of carriers lost or damaged and without a new war, and aircraft lost as Combat Movement ends beyond the shortfall; explained rises and losses within the shortfall are noted",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1651.3,
+    "mean_game_seconds": 16.26
+   },
    "games_unchanged_by_second_review_fixes": 322,
    "games_unchanged_by_shortfall_rule": 315,
+   "games_unchanged_by_owner_choice": 322,
+   "owner_choice_combat_movement": {
+    "directory": "studies/campaign/runs/landing-plan-2026-10-29/fuzz-owner-choice-combat-movement",
+    "engine": "8f205e4",
+    "checks": "the final checks",
+    "games": 322,
+    "completed_all_rounds": 322,
+    "problems_by_kind": {},
+    "failing_seeds": [],
+    "notes_by_kind": {},
+    "noted_seeds": [],
+    "mean_decisions": 1651.3,
+    "mean_game_seconds": 14.32
+   },
    "games_unchanged_by_removing_carrier_unloads": 98,
    "first_attempt_causes": [
     "a landing preview kept the fuel from before its landing flight",
@@ -272,9 +315,7 @@
     "random play excused rises of any size after any carrier hit, and failed games on declarations of war",
     "random play serialized each position twice"
    ],
-   "deferred": [
-    "let the owner choose which aircraft are lost when several sets lose equally many"
-   ]
+   "deferred": []
   },
   "fifth": {
    "scope": "carriers never unload aircraft; submarine port exits",
@@ -282,6 +323,22 @@
    "pre_existing_notes": [
     "a lone raider battlecruiser leaving port past blockers must screen without the slip roll the rest of a route gives it; RB 9.4.4 and 11.5 can be read either way",
     "aircraft may land on a carrier already in port, which is how carriers in port hold aircraft"
+   ]
+  },
+  "sixth": {
+   "scope": "the owner chooses which aircraft are lost",
+   "findings": 7,
+   "verified_real": 3,
+   "fixed": [
+    "continuing (screening) aircraft could not be given up in Combat Movement",
+    "fighters could escort a bombing mission whose only bomber was given up",
+    "the give-up check repeated a failed plan search for aircraft that can land ashore",
+    "a screened aircraft left without a landing in Combat had no legal action (pre-existing)",
+    "giving up was accepted for aircraft not in the air when applied directly",
+    "aircraft that attacked earlier lost the old give-up in Noncombat Movement"
+   ],
+   "resolved_by_ruling": [
+    "after combat the owner decides who is lost when combat sinks a carrier (commit 86129b6)"
    ]
   },
   "unfixed": [
@@ -539,7 +596,7 @@
   }
  },
  "tests": {
-  "cpp": "26 of 26 ctest groups pass, with new tests for aircraft that cannot land, a medium bomber left out, port entries, multi-ship port sorties, carriers that never unload aircraft and submarine port exits; each new test fails with its fix reverted",
+  "cpp": "26 of 26 ctest groups pass, with new tests for aircraft that cannot land, a medium bomber left out, the owner choosing losses in Combat Movement and after combat, continuing and screened aircraft, bombing missions without a bomber, port entries, multi-ship port sorties, carriers that never unload aircraft and submarine port exits; each new test fails with its fix reverted",
   "python": "565 tests; the only failure was the known guardian timeout under full-suite load, which passes alone"
  }
 }

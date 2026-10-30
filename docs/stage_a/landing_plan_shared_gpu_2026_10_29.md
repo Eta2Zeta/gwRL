@@ -65,13 +65,17 @@ The rule is therefore a count. The engine counts the airborne aircraft that no
 reachable plan lands, the shortfall, and no move may raise it. With a complete
 plan the shortfall is zero and every check is the one above. An aircraft that
 flies must itself keep a landing, so one that is already lost cannot spend its
-fuel attacking, and an aircraft in flight that no such plan lands may be given
-up. Combat Movement ends once the carriers stand where they land every aircraft
-that a plan can land; the fewest aircraft that still cannot land are lost as it
-ends and counted in the game state. Noncombat Movement ends only once the
-mover's patrols can land as the carriers stand; a patrol with no landing left
-can be given up. After combat, a returning aircraft takes a spot that keeps the
-others' landings where one exists, and any spot it can reach otherwise.
+fuel attacking. Where some aircraft must be lost, their owner chooses which, as
+on the user's ruling: any aircraft whose loss loses no more than necessary may
+be given up, a decision the network makes. Combat Movement ends once the
+remaining aircraft can land as the carriers stand; should no legal move reach
+that, the phase ends when nothing else is legal and the fewest that cannot land
+are lost. Noncombat Movement ends only once the mover's patrols can land as the
+carriers stand; a patrol with no landing left can be given up. After combat, a
+returning aircraft takes a spot that keeps the others' landings. Where a carrier
+sunk in combat leaves too few seats, the owner again decides who is lost: the
+aircraft may be given up, or, where no spot keeps the others' landings, land
+anywhere in reach at the cost of aircraft still fighting should they survive.
 
 ### Carrier routes
 
@@ -103,26 +107,29 @@ move, never allowed the first half of that swap.
 
 ### Reviews
 
-Independent reviews examined the change five times, each after the previous
-one's fixes. The first found that route checks looked only where a force first
-met other units rather than wherever it can stop, that engaging could hold a
-carrier its aircraft needed, that Noncombat Movement could lose patrols without
-counting them, that flight previews missed a fighter's effect on Enemy patrols,
-that the plan search had no early failure or bound, and that aircraft launched
-by a sailing carrier could not use other carriers. The second found that the
-aircraft of a minor the mover controls, such as Dadao's, had dropped out of the
-plan; that routes were held where only Enemy patrol aircraft stood, or where a
-lone carrier left port; and that random play counted a carrier sunk in a
-reaction battle as a broken plan. The third found the blocking described above.
-The fourth found that a medium bomber, which takes two of a heavy carrier's
-three seats, could be left with no legal action, and that ending Combat Movement
-could lose two fighters where losing the bomber alone would do; that entering
-port, which freezes every other naval move and patrol return for the rest of the
+Independent reviews examined the change six times, each after the previous one's
+fixes. The first found that route checks looked only where a force first met
+other units rather than wherever it can stop, that engaging could hold a carrier
+its aircraft needed, that Noncombat Movement could lose patrols without counting
+them, that flight previews missed a fighter's effect on Enemy patrols, that the
+plan search had no early failure or bound, and that aircraft launched by a
+sailing carrier could not use other carriers. The second found that the aircraft
+of a minor the mover controls, such as Dadao's, had dropped out of the plan;
+that routes were held where only Enemy patrol aircraft stood, or where a lone
+carrier left port; and that random play counted a carrier sunk in a reaction
+battle as a broken plan. The third found the blocking described above. The
+fourth found that a medium bomber, which takes two of a heavy carrier's three
+seats, could be left with no legal action, and that ending Combat Movement could
+lose two fighters where losing the bomber alone would do; that entering port,
+which freezes every other naval move and patrol return for the rest of the
 phase, could still leave patrols without a landing; and that route checks solved
 more than before even with a complete plan. All confirmed defects are fixed
-except the war-declaration gap. When several sets of aircraft lose equally many,
-unit order rather than the player decides which are lost. The fifth, of the
-carrier and submarine changes below, found no defects.
+except the war-declaration gap. On the user's ruling the owner now chooses which
+aircraft are lost. The fifth, of the carrier and submarine changes below, found
+no defects. The sixth, of the owner's choice, found that continuing aircraft
+could not be chosen, that escorts could stay on a bombing mission whose bomber
+was given up, and an older dead end where a screened aircraft lost its landing
+in Combat; all are fixed.
 
 ### Random play
 
@@ -158,7 +165,9 @@ in Noncombat Movement and was forced to screen, a battle that phase cannot
 fight, so KMT had no legal action. The engine's route check already lets
 submarines pass Enemy surface warships, so a port exit now forces a screen only
 on surface ships. In the final run no rise needed dice or a war to explain it,
-and no aircraft was lost as Combat Movement ended.
+and no aircraft was lost as Combat Movement ended. The owner's choice of losses
+changed no random-play game, since positions where some aircraft must be lost
+are rare; unit tests cover it.
 
 The engine costs about the same. Per call, building a move list took 1.08 ms
 against 1.15 ms before the landing rule, and applying a move 1.22 ms against
