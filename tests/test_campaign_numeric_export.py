@@ -189,7 +189,8 @@ class CampaignNumericExportTests(unittest.TestCase):
     def test_finished_observation_arrays_are_reused_and_live_graphs_never_change(self):
         first, second = self.env.clone(), self.env.clone()
         second.apply_action(next(action for action in second.legal_actions() if action.kind == "pass_interrupt"))
-        compiler = numeric_compiler(BUCKETS)
+        # Its own compiler, so no other graph can reach these spare arrays first.
+        compiler = gwrl_cpp.CampaignNumericGraphCompiler(BUCKETS, lexical_ids, _string_descriptor, _numeric_features)
         scheduled = []
         for env in (first, second):
             menu = env.legal_actions()

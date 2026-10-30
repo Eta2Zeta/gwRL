@@ -348,10 +348,10 @@ struct NumericGraphCompiler::Impl {
                                                    const json::Value::Object* rootOverrides = nullptr,
                                                    const NumericGraphCompiler::Menu* menu = nullptr) {
             const bool observation = rootOverrides && rootOverrides->contains("legal_actions");
+            scheduledMenu = observation ? menu : nullptr;
             graph = observation ? SpareGraphs::take(compiler.spares) : std::make_shared<NumericGraphData>();
             graph->buckets = compiler.buckets;
             graph->tokenOffsets.push_back(0);
-            scheduledMenu = menu;
             visit(value, "$", 0, RootPath, 0, rootOverrides);
             for (const auto& reference : graph->references) {
                 const auto found = graph->identityLookup.find(reference.identity);
