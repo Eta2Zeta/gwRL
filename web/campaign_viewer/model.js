@@ -216,6 +216,46 @@ export function factionColor(id) {
   return '#7c8583';
 }
 
+const POWER_STATUS = { major: 'Major power', minor: 'Minor power', warlord: 'Warlord' };
+const ALLIANCES = ['axis', 'allies', 'comintern'];
+
+/** Alliances, wars and standing political facts at one position. */
+export function politicalStatus(state, replay) {
+  const politics = state?.politics ?? {};
+  const surrendered = politics.surrendered ?? [];
+  const names = (ids) => ids.map((id) => displayName(id, replay)).join(', ');
+  const groups = new Map([...ALLIANCES, null].map((id) => [id, { id, members: [], absorbed: [] }]));
+  const wars = new Map();
+  for (const [id, nation] of recordEntries(state?.nations ?? {})) {
+    const group = groups.get(nation.alliance ?? null) ?? groups.get(null);
+    if (nation.game_flags?.incorporated) {
+      group.absorbed.push(id);
+      continue;
+    }
+    const enemies = nation.at_war_with ?? [];
+    const controller = nation.controller_nation;
+    group.members.push({ id, status: POWER_STATUS[nation.power_status] ?? 'Status unknown', wars: enemies,
+      capital: politics.capitals?.[id] ?? null, controller: controller && controller !== id ? controller : null,
+      surrendered: surrendered.includes(id) });
+    for (const enemy of enemies) {
+      const [left, right] = [id, enemy].sort();
+      wars.set(`${left}|${right}`, { key: `${left}|${right}`, left, right });
+    }
+  }
+  const attacked = Object.entries(politics.attacked_warlords ?? {})
+    .map(([warlord, attackers]) => `${displayName(warlord, replay)} by ${names(attackers)}`);
+  const facts = [
+    { label: 'Chinese Truce', value: politics.chinese_truce ? 'In force' : politics.truce_offer_pending ? 'Offer pending'
+      : politics.truce_permanently_ended ? 'Ended for good' : 'Not in force' },
+    { label: 'Foreign invader of China', value: politics.china_invader ? displayName(politics.china_invader, replay) : 'None' },
+    { label: 'Evolved to Major power', value: names(politics.evolution_awarded ?? []) || 'None yet' },
+    { label: 'Surrendered', value: names(surrendered) || 'None' }];
+  if (attacked.length) facts.push({ label: 'Warlords attacked', value: attacked.join('; ') });
+  if (politics.alignment_queue?.length) facts.push({ label: 'Warlords choosing a side', value: names(politics.alignment_queue) });
+  return { groups: [...groups.values()].filter((group) => group.members.length || group.absorbed.length),
+    wars: [...wars.values()].sort((first, second) => first.key.localeCompare(second.key)), facts };
+}
+
 const ROLL_LABELS = {
   land_combat_roll: 'Land combat fire', land_casualty_dispute: 'Casualty dispute roll',
   naval_combat_roll: 'Naval combat fire', naval_shore_roll: 'Shore bombardment and coastal fire',

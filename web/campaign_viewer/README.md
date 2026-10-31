@@ -32,6 +32,13 @@ phase. For example, Tsinghai starts under Ma Clique; in the seed-1951 replay,
 CCP attacks it and the surviving Ma Clique joins KMT at event 12 (RB §4.9).
 Later KMT possession does not change Tsinghai's original nationality.
 
+The **Political status** panel below it follows the selected position. It lists
+each alliance's nations with their standing, wars, capital and controller, the
+warlords still unaligned or already absorbed, every war in progress, and the
+Chinese Truce, foreign invasion of China, evolution to Major power, surrenders
+and warlord alignment. A war declared at the selected event is marked new. It
+reads only the recorded state, so existing recordings show it without re-export.
+
 ## Watch a recorded run
 
 Add `--record-replay` to a **fresh** foreground training command:

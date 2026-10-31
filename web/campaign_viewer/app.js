@@ -1,6 +1,6 @@
 import { createReplayModel, displayName, eventSummary, factionColor, locationOf,
   ownerOf, recordEntries, changedLocations, territoryIdentity, possessionChanges,
-  possessionChangeText, diceReport, activeBattles, stageLabel } from './model.js';
+  possessionChangeText, diceReport, activeBattles, stageLabel, politicalStatus } from './model.js';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
@@ -97,7 +97,7 @@ function seek(position) {
   const step = UI.replay.steps[UI.position - 1];
   UI.dice = step?.kind === 'chance' ? diceReport(step, before, UI.replay) : null;
   renderClock(); renderMap(changed, before); renderInspector(); renderLedger();
-  renderPlayback(); renderCombat(); renderSearch(); renderEvents();
+  renderPlayback(); renderCombat(); renderPolitics(before); renderSearch(); renderEvents();
   if (UI.position === UI.replay.steps.length && UI.playing) stop();
 }
 function renderClock() {
@@ -323,6 +323,43 @@ function renderLedger() {
     if (!cash.childNodes.length) cash.append(element('div','','No controlled treasury recorded'));
     card.append(cash);box.append(card);
   }
+}
+function renderPolitics(before) {
+  const status=politicalStatus(UI.state,UI.replay), previous=politicalStatus(before,UI.replay);
+  const known=new Set(previous.wars.map((war)=>war.key));
+  const count=status.wars.length;
+  $('politics-tag').textContent=JSON.stringify(status)!==JSON.stringify(previous)?'CHANGED THIS EVENT':`${count} ${count===1?'WAR':'WARS'}`;
+  const box=$('politics-details');box.replaceChildren();
+  const cards=element('div','politics-alliances');
+  for (const group of status.groups) {
+    const card=element('div','politics-card');card.style.setProperty('--faction',factionColor(group.id));
+    card.append(element('h3','',group.id?human(group.id):'Unaligned'));
+    const quiet=group.id?[]:group.members.filter((member)=>!member.wars.length);
+    for (const member of group.members) {
+      if (quiet.includes(member)) continue;
+      const row=element('div','politics-member');
+      const title=element('div','politics-name');title.append(element('strong','',human(member.id)),element('span','small-tag',member.status.toUpperCase()));
+      if (member.surrendered) title.append(element('span','small-tag','SURRENDERED'));
+      row.append(title,element('p','',member.wars.length?`At war with ${member.wars.map(human).join(', ')}`:'At peace'));
+      if (member.capital) row.append(element('p','',`Capital ${human(member.capital)}`));
+      if (member.controller) row.append(element('p','',`Controlled by ${human(member.controller)}`));
+      card.append(row);
+    }
+    if (quiet.length) card.append(element('p','politics-absorbed',`At peace: ${quiet.map((member)=>human(member.id)).join(', ')}`));
+    if (group.absorbed.length) card.append(element('p','politics-absorbed',`Absorbed warlords: ${group.absorbed.map(human).join(', ')}`));
+    cards.append(card);
+  }
+  box.append(cards);
+  const wars=element('div','politics-wars');wars.append(element('h3','','Wars in progress'));
+  const list=element('div','politics-war-list');
+  for (const war of status.wars) list.append(element('span',known.has(war.key)?'politics-war':'politics-war new',`${human(war.left)} vs ${human(war.right)}${known.has(war.key)?'':' · new'}`));
+  if (!count) list.append(element('span','politics-none','No wars yet'));
+  wars.append(list);box.append(wars);
+  const facts=element('dl','politics-facts');
+  for (const fact of status.facts) {
+    const item=element('div');item.append(element('dt','',fact.label),element('dd','',fact.value));facts.append(item);
+  }
+  box.append(facts);
 }
 function renderPlayback() {
   const step=UI.replay.steps[UI.position-1];

@@ -1,7 +1,7 @@
 /** Verify the browser reducer against immutable synthetic and optional real data. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { activeBattles, applyChanges, createReplayModel, diceReport, eventSummary, initialState,
+import { activeBattles, applyChanges, createReplayModel, diceReport, eventSummary, initialState, politicalStatus,
   possessionChanges, possessionChangeText, stageLabel, stateAt, territoryIdentity, validateReplay }
   from '../web/campaign_viewer/model.js';
 
@@ -175,4 +175,32 @@ for (const path of process.argv.slice(2)) {
   }
   console.log(`${path}: ${data.steps.length} events; final and backward seeks match`);
 }
+
+const politics = politicalStatus({
+  nations: {
+    japan: { alliance: 'axis', power_status: 'major', controller_nation: 'japan', at_war_with: ['kmt'] },
+    kmt: { alliance: 'allies', power_status: 'minor', controller_nation: 'kmt', at_war_with: ['japan', 'ccp'] },
+    ccp: { alliance: 'comintern', power_status: 'minor', controller_nation: 'ccp', at_war_with: ['kmt'] },
+    mongolia: { alliance: 'comintern', power_status: 'minor', controller_nation: null, at_war_with: [] },
+    warlord_a: { alliance: 'allies', power_status: 'warlord', controller_nation: 'kmt', at_war_with: [], game_flags: { incorporated: 1 } },
+    warlord_b: { alliance: null, power_status: 'warlord', controller_nation: null, at_war_with: [] },
+  },
+  politics: { capitals: { japan: 'land_jap_tokyo' }, chinese_truce: false, truce_permanently_ended: true, surrendered: ['ccp'],
+    attacked_warlords: { warlord_b: ['ccp'] }, alignment_queue: ['warlord_b'], evolution_awarded: ['kmt'], china_invader: 'japan' },
+}, { factions: { warlord_b: { name: 'Clique B' } }, map: { nodes: { land_jap_tokyo: { name: 'Tokyo' } } } });
+assert.deepEqual(politics.groups.map((group) => group.id), ['axis', 'allies', 'comintern', null]);
+assert.deepEqual(politics.wars.map((war) => war.key), ['ccp|kmt', 'japan|kmt']);  // Each war once, either side recording it.
+assert.equal(politics.groups[0].members[0].capital, 'land_jap_tokyo');
+assert.deepEqual(politics.groups[1].absorbed, ['warlord_a']);
+assert.deepEqual(politics.groups[1].members.map((member) => member.id), ['kmt']);
+assert.equal(politics.groups[2].members.find((member) => member.id === 'ccp').surrendered, true);
+assert.equal(politics.groups[3].members[0].status, 'Warlord');
+const fact = (label) => politics.facts.find((entry) => entry.label === label)?.value;
+assert.equal(fact('Chinese Truce'), 'Ended for good');
+assert.equal(fact('Foreign invader of China'), 'Japan');
+assert.equal(fact('Evolved to Major power'), 'KMT');
+assert.equal(fact('Surrendered'), 'CCP');
+assert.equal(fact('Warlords attacked'), 'Clique B by CCP');
+assert.equal(fact('Warlords choosing a side'), 'Clique B');
+assert.deepEqual(politicalStatus({}, {}).wars, []);  // Older recordings may hold no political state.
 console.log('Campaign replay reducer checks passed');
