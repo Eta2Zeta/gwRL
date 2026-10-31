@@ -506,10 +506,6 @@ def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], buckets
 
     `play(task, evaluator)` returns a game's record and handles its own failures.
     """
-    # The coordinator stops games by closing their pipes. A signal to the process
-    # group must reach it, not end games under it.
-    for number in (signal.SIGINT, signal.SIGTERM):
-        signal.signal(number, signal.SIG_IGN)
 
     def slot(index: int, connection: Connection, name: str) -> None:
         evaluator = RemoteEvaluator(connection, name, buckets, version)
@@ -528,6 +524,14 @@ def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], buckets
     parent = multiprocessing.parent_process()
     if parent is not None and not parent.is_alive():
         results.cancel_join_thread()  # Exit must not wait for a reader that has gone.
+
+
+def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
+    # The coordinator stops games by closing their pipes. A signal to the process
+    # group must reach it, not end games under it.
+    for number in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(number, signal.SIG_IGN)
+    target(*arguments)
 
 
 def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, processes: int, games_per_process: int,
@@ -576,9 +580,9 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         receiver.start()
         for index in range(processes):
             members = range(index * games_per_process, (index + 1) * games_per_process)
-            process = context.Process(target=target, daemon=True, args=(
-                list(members), [pipes[member][1] for member in members], [memories[member].name for member in members],
-                waiting, results))
+            process = context.Process(target=_game_process_main, daemon=True, args=(
+                target, list(members), [pipes[member][1] for member in members],
+                [memories[member].name for member in members], waiting, results))
             process.start()
             spawned.append(process)
         for _, child in pipes:

@@ -92,6 +92,33 @@ The three effects were not measured one at a time. The only hint at the
 allocator's share is that eight all-CPU games took 1,314 s with `MallocNanoZone=0`
 and 1,191 s with the default allocator, about 9% less, in unmatched runs.
 
+## Real training
+
+The rates above are self-play alone, and until 31 October GPU batching existed
+only in this benchmark. Training now uses it through `--games-per-process`. These
+are complete training runs, with learning updates and the time between batches:
+
+| Eleven-round training | All CPU, night of 30 October | GPU batching, 31 October |
+| --- | ---: | ---: |
+| Processes | 11, one game each | 8 with four games each, and a coordinator |
+| Games per batch | 11 | 32 |
+| Games played / failed | 77 / 0 | 64 / 0 |
+| Games per hour while playing | 22.1 | 35.2 |
+| **Games per hour with learning** | **20.2** | **31.0** |
+| Learning steps per batch | 250 | 700 |
+| Decisions per game, mean | 1,777 | 1,727 |
+| Peak charged memory | 26.1 GB | 17.6 GB |
+
+GPU batching plays 1.5 times as many real training games per hour. That is below
+the 48.3 measured for self-play, for three reasons. Real games have grown to about
+93,000 evaluations each, against about 70,000 with the fresh networks measured
+above, and they make more decisions. A batch waits for its slowest game. Learning
+took about 7 minutes in each batch. The coordinator again set the pace, busy for
+95% of play at 907 evaluations per second.
+
+Each column is one run. The GPU run continued from the night run's networks, kept
+5% of positions against 10%, and held 8,000 positions against 4,000.
+
 ## Limits of these numbers
 
 - The comparison across dates is not controlled. The earlier all-CPU run used

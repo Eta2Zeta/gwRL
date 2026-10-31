@@ -101,6 +101,7 @@ class GameProcessEndingTests(unittest.TestCase):
         tasks, results = queue.Queue(), Mock()
         tasks.put(None)
         gone = Mock(is_alive=Mock(return_value=False))
+        handler = signal.getsignal(signal.SIGTERM)
         try:
             with patch("multiprocessing.parent_process", return_value=gone):
                 game_process(lambda *_: {}, 2048, "v", [0], [child], [memory.name], tasks, results)
@@ -109,6 +110,8 @@ class GameProcessEndingTests(unittest.TestCase):
             memory.close()
             memory.unlink()
         results.cancel_join_thread.assert_called_once_with()
+        # Only a real game process ignores stop signals, and children inherit that.
+        self.assertIs(signal.getsignal(signal.SIGTERM), handler)
 
 
 class SharedEpisodeWorkerTests(unittest.TestCase):

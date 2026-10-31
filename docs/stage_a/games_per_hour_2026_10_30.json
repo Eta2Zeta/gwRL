@@ -181,6 +181,55 @@
   }
  },
  "raw_outputs": "studies/campaign/runs/games-per-hour-2026-10-30/ and studies/campaign/runs/nine-fixes-2026-10-30/",
+ "real_training": {
+  "all_cpu_night_2026_10_30": {
+   "batches": 7,
+   "collection_seconds": 12543.825782080994,
+   "commit_config": {
+    "batch_size": 32,
+    "episode_workers": 11,
+    "epochs": 250,
+    "parallel_envs": 11,
+    "replay_capacity": 4000,
+    "sample_fraction": 0.1
+   },
+   "decisions_per_game": 1777.1688311688313,
+   "elapsed_seconds": 13698.410406875,
+   "failed_games": 0,
+   "games": 77,
+   "games_per_hour_playing": 22.098521202038977,
+   "games_per_hour_with_learning": 20.235924590263263,
+   "learning_seconds": 1041.545117583999,
+   "peak_charged_bytes": 26086860952
+  },
+  "gpu_batching_2026_10_31": {
+   "batches": 2,
+   "collection_seconds": 6539.201928707997,
+   "commit_config": {
+    "batch_size": 32,
+    "episode_workers": 8,
+    "epochs": 700,
+    "games_per_process": 4,
+    "parallel_envs": 32,
+    "replay_capacity": 8000,
+    "sample_fraction": 0.05
+   },
+   "coordinator_forward_share": 0.9489554575408449,
+   "decisions_per_game": 1727.328125,
+   "elapsed_seconds": 7435.073434541999,
+   "evaluations_per_game": 92682.0625,
+   "evaluations_per_second_playing": 907.0911197831698,
+   "failed_games": 0,
+   "games": 64,
+   "games_per_hour_playing": 35.23365733492833,
+   "games_per_hour_with_learning": 30.988261518656092,
+   "learning_seconds": 831.9993602080067,
+   "peak_charged_bytes": 17618962520
+  },
+  "gpu_run_commit": "0bef2b5",
+  "note": "One run each; the GPU run continued from the night run networks; game length changes as the networks change",
+  "purpose": "Complete training with learning updates, not self-play alone"
+ },
  "same_games_check": {
   "commit": "4e37b7f",
   "evaluation": "one position at a time on CPU",
