@@ -212,13 +212,13 @@ def _profiled_game(play):
     return wrapper
 
 
-def _instrumented_game_process(*args):
+def _instrumented_game_process(*args, **kwargs):
     """A benchmark game process with this module's accounting installed first."""
     global _overhead_ns
     from tools import benchmark_campaign_devices as benchmark
     _overhead_ns = _install()
     benchmark.play_shared_game = _profiled_game(benchmark.play_shared_game)
-    return benchmark._shared_game_process(*args)
+    return benchmark._shared_game_process(*args, **kwargs)
 
 
 def _worker(settings: Path, progress: Path) -> int:

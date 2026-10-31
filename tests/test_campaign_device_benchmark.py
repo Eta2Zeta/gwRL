@@ -14,11 +14,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from studies.campaign.shared_evaluator import EvaluatorClosed, ServerStats
+from studies.campaign.shared_evaluator import EvaluatorClosed, ServerStats, raise_descriptor_limit
 from studies.shared.multiplayer_mcts import NoLegalActionError
 from tools.benchmark_campaign_devices import (Config, TimedEvaluator, all_slots_busy, compare_selfplay, main,
-    mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, raise_descriptor_limit, selfplay,
-    setup_models, shared_summary, supervise_device)
+    mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, selfplay, setup_models,
+    shared_summary, supervise_device)
 
 
 class ToyEnv:

@@ -27,7 +27,7 @@ import torch
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
-from .episode_workers import EpisodeWorkers
+from .episode_workers import EpisodeWorkers, SharedEpisodeWorkers
 from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .model_export import load_evaluation_models, load_initial_weights, save_model_export, validate_model_export
@@ -62,6 +62,10 @@ class RunConfig:
     neural_device: str = "cpu"
     episode_workers: int = 0
     sample_fraction: float = 1.0
+    # With episode workers: games each process plays at once, their positions
+    # evaluated together in the main process on neural_device. Zero plays one
+    # game per process, evaluated there on CPU.
+    games_per_process: int = 0
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -91,6 +95,10 @@ class RunConfig:
             raise ValueError("Episode workers must be a nonnegative integer")
         if self.episode_workers and (not self.complete_episodes or self.episode_workers > self.parallel_envs):
             raise ValueError("Episode workers play complete episodes, at most one worker per game in a batch")
+        if type(self.games_per_process) is not int or self.games_per_process < 0:
+            raise ValueError("Games per process must be a nonnegative integer")
+        if self.games_per_process and not self.episode_workers:
+            raise ValueError("Games per process needs episode workers")
         if self.sample_fraction != 1.0 and not self.episode_workers:
             raise ValueError("Only episode workers keep a share of their samples")
         if self.cpu_budget is not None:
@@ -365,9 +373,13 @@ def train(args) -> int:
         if config.episode_workers:
             if learner.env is None:
                 learner.env = template  # Reference context only; workers play from their own seeds.
-            workers = EpisodeWorkers(config.episode_workers, calendar_rounds=config.calendar_rounds,
-                                     model_config=learner.model_config, learning_config=asdict(learner.config),
-                                     rules_version=learner.compatibility["rules"], numeric=learner._numeric_models())
+            settings = dict(calendar_rounds=config.calendar_rounds, model_config=learner.model_config,
+                            learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"],
+                            numeric=learner._numeric_models())
+            workers = (SharedEpisodeWorkers(config.episode_workers, config.games_per_process,
+                                            device=resolve_neural_device(config.neural_device),
+                                            runtime_policy=learner._device_runtime, **settings)
+                       if config.games_per_process else EpisodeWorkers(config.episode_workers, **settings))
         if getattr(args, "record_replay", False):
             replay_writer = ReplayTraceWriter(output / "replay.jsonl", {
                 "kind": "training", "config": asdict(config), "task": runner["task"],
@@ -423,6 +435,8 @@ def train(args) -> int:
                     update = learner.update()
                     learner.release_device_memory()
                 runner["updates"].append({"rollout": rollout, "update": update, "episodes": episodes})
+                if config.games_per_process:
+                    runner["updates"][-1]["evaluator"] = workers.report()
                 runner["batch_index"] += 1
                 export_model()
                 persist("running", recovery=recovery_checkpoint_due(

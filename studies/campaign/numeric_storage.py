@@ -16,6 +16,17 @@ import zlib
 BYTES_SCHEMA = "campaign-numeric-graph-zlib-v1"
 SCHEMA = "campaign-numeric-graph-zlib-storage-v2"
 MAX_RAW_BYTES = 256 * 1024 * 1024
+_PACK_AS_BYTES = False
+
+
+def pack_as_bytes() -> None:
+    """For a process sending graphs through a pipe, not writing a checkpoint.
+
+    A tensor crossing processes starts a PyTorch shared-memory manager, which
+    inherits the sender's open pipes and keeps them open after the sender exits.
+    """
+    global _PACK_AS_BYTES
+    _PACK_AS_BYTES = True
 
 
 def pack_graph(state: dict[str, Any]) -> dict[str, Any] | tuple[str, int, Any]:
@@ -31,6 +42,8 @@ def pack_graph(state: dict[str, Any]) -> dict[str, Any] | tuple[str, int, Any]:
     if len(raw) > MAX_RAW_BYTES:
         return state
     compressed = zlib.compress(raw, level=1)
+    if _PACK_AS_BYTES:
+        return BYTES_SCHEMA, len(raw), compressed
     try:
         import torch
     except ImportError:

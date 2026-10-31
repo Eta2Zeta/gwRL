@@ -271,6 +271,14 @@ about 1.2 MB in memory, so replay and worker memory otherwise limit full games.
 completed. `--initial-models EXPORT` starts a fresh run from an export's weights
 and nothing else of that run, even if the sources have changed since, so a run
 stopped by a bug continues from its latest networks after the fix.
+`--games-per-process N` with `--episode-workers P` plays N games in each of P
+processes for one batch and evaluates all their positions together in the main
+process on `--neural-device`, as the
+[shared GPU report](/Users/home/Desktop/gwRL/docs/stage_a/landing_plan_shared_gpu_2026_10_29.md)
+measured. A position's batch changes its outputs in the last digits, so unlike
+one-position evaluation a game need not repeat exactly from its seed. In either
+mode a game that fails costs only that game, recorded with its seed in
+`failed_games`.
 `tools/supervise_campaign_training.py --all-cores` passes the usual 12 cores when
 the owner allows it. `tools/record_campaign_games.py` plays recorded games from a
 model export, each in its own process, for the

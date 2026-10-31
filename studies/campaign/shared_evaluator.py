@@ -18,8 +18,13 @@ up to floating-point summation order.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import multiprocessing
 from multiprocessing import shared_memory
 from multiprocessing.connection import Connection, wait
+import queue
+import resource
+import signal
+import threading
 import time
 from typing import Any, Callable, Sequence
 
@@ -27,6 +32,7 @@ import numpy as np
 
 from studies.shared.multiplayer_mcts import Evaluation, PLAYERS, vector
 
+BUFFER_BYTES = 8 * 1024 * 1024  # One prepared position; 11-round inputs take about 1 MB.
 GRAPH_FIELDS = (("ids", "token_ids", np.int32), ("offsets", "token_offsets", np.int32), ("types", "types", np.int32),
                 ("numbers", "numeric", np.float32), ("sources", "sources", np.int32),
                 ("targets", "targets", np.int32), ("relations", "relations", np.int32))
@@ -471,3 +477,138 @@ class SharedEvaluatorServer:
     def close(self) -> None:
         for memory in self.memories.values():
             memory.close()
+
+
+def raise_descriptor_limit(wanted: int) -> None:
+    """Raise the soft open-file limit towards `wanted`, never lowering it."""
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    wanted = wanted if hard == resource.RLIM_INFINITY else min(wanted, hard)
+    if soft != resource.RLIM_INFINITY and soft < wanted:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (wanted, hard))
+
+
+def _next_task(tasks: Any) -> Any:
+    """A blocking get, since get_nowait can report an empty queue before queued
+    tasks reach this process. A process orphaned by its coordinator's death stops."""
+    while True:
+        try:
+            return tasks.get(timeout=5)
+        except queue.Empty:
+            parent = multiprocessing.parent_process()
+            if parent is not None and not parent.is_alive():
+                return None
+
+
+def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], buckets: int, version: str,
+                 slots: Sequence[int], connections: Sequence[Connection], buffer_names: Sequence[str],
+                 tasks: Any, results: Any) -> None:
+    """A game process: one thread per game slot, each taking tasks until its stop marker.
+
+    `play(task, evaluator)` returns a game's record and handles its own failures.
+    """
+    # The coordinator stops games by closing their pipes. A signal to the process
+    # group must reach it, not end games under it.
+    for number in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(number, signal.SIG_IGN)
+
+    def slot(index: int, connection: Connection, name: str) -> None:
+        evaluator = RemoteEvaluator(connection, name, buckets, version)
+        try:
+            while (task := _next_task(tasks)) is not None:
+                results.put({**play(task, evaluator), "slot": index})
+        finally:
+            evaluator.close()
+
+    threads = [threading.Thread(target=slot, args=arguments, name=f"campaign-game-{arguments[0]}", daemon=True)
+               for arguments in zip(slots, connections, buffer_names)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+
+def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, processes: int, games_per_process: int,
+                      models: dict[str, Any], device: Any, runtime_policy: Any = None,
+                      keep_playing: Callable[[SharedEvaluatorServer, list[Any]], bool] = lambda *_: True,
+                      exit_seconds: float = 20.0) -> tuple[list[Any], ServerStats]:
+    """Play tasks in game processes, evaluating every waiting position here.
+
+    `target(slots, connections, buffer_names, tasks, results)` is the game process,
+    normally game_process with its first arguments bound. Each process plays
+    `games_per_process` games at once, one per thread, taking tasks from one queue,
+    so a finished game's slot starts the next. `keep_playing(server, records)` runs
+    between serving rounds; returning false closes every pipe, ending the running
+    games. Returns the records that arrived and the server's statistics.
+    """
+    context = multiprocessing.get_context("spawn")
+    slots = processes * games_per_process
+    # A slot holds two pipe ends and its buffer mapped twice, and a shell's default
+    # limit of 256 stops at eight processes of six games.
+    raise_descriptor_limit(6 * slots + 64)
+    pipes = [context.Pipe() for _ in range(slots)]
+    memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(slots)]
+    waiting, results = context.Queue(), context.Queue()
+    for task in [*tasks, *[None] * slots]:  # One stop marker per game slot.
+        waiting.put(task)
+    spawned, records, server = [], [], None
+    try:
+        for index in range(processes):
+            members = range(index * games_per_process, (index + 1) * games_per_process)
+            process = context.Process(target=target, daemon=True, args=(
+                list(members), [pipes[member][1] for member in members], [memories[member].name for member in members],
+                waiting, results))
+            process.start()
+            spawned.append(process)
+        for _, child in pipes:
+            child.close()
+        server = SharedEvaluatorServer(models, device, [parent for parent, _ in pipes],
+                                       [memory.name for memory in memories], runtime_policy)
+
+        def keep_running() -> bool:
+            while True:
+                try:
+                    records.append(results.get_nowait())
+                except queue.Empty:
+                    break
+            if not all(process.is_alive() or process.exitcode == 0 for process in spawned):
+                raise ValueError("A game process exited abnormally")
+            # Every game has reported, whatever else still holds a pipe open.
+            return len(records) < len(tasks) and keep_playing(server, records)
+
+        server.serve(keep_running)
+        # The server closed every pipe still open, so a thread still waiting for
+        # an evaluation ends its game. A process exits only once its queued
+        # results reach the pipe, so collect them while all processes exit
+        # against one deadline.
+        stop = time.monotonic() + exit_seconds
+        while time.monotonic() < stop and any(process.is_alive() for process in spawned):
+            try:
+                records.append(results.get(timeout=0.1))
+            except queue.Empty:
+                pass
+        stragglers = [process for process in spawned if process.is_alive()]
+        for process in stragglers:
+            process.kill()
+        for process in stragglers:
+            process.join(timeout=1)  # Reaped, so their CPU time is counted.
+        # A process killed or crashed mid-message leaves half of it, on which a
+        # read would wait forever, so drain only after every process exited cleanly.
+        clean = all(process.exitcode == 0 for process in spawned)
+        stop = time.monotonic() + 5
+        while clean and len(records) < len(tasks) and time.monotonic() < stop:
+            try:
+                records.append(results.get(timeout=0.5))
+            except queue.Empty:
+                break
+    finally:
+        for process in spawned:
+            if process.is_alive():
+                process.kill()
+        if server is not None:
+            server.close()
+        for memory in memories:
+            memory.close()
+            memory.unlink()
+        for parent, _ in pipes:
+            parent.close()
+    return records, server.stats

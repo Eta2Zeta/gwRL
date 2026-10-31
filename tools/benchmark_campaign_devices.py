@@ -491,9 +491,6 @@ def parallel_selfplay(config, weights, deadline, *, run_group=_selfplay_group, e
     return summary, forward, evaluated
 
 
-SHARED_BUFFER_BYTES = 8 * 1024 * 1024  # One prepared position; 11-round inputs take about 1 MB.
-
-
 def play_shared_game(config, seed, evaluator, deadline_epoch):
     """One game as selfplay plays it, with a RemoteEvaluator answering searches.
 
@@ -553,44 +550,22 @@ def play_shared_game(config, seed, evaluator, deadline_epoch):
 
 def _shared_game_process(values, slots, connections, buffer_names, tasks, results, deadline_epoch, version):
     """A game process: one thread per game slot, each taking seeds until its stop marker."""
-    from studies.campaign.shared_evaluator import RemoteEvaluator
+    from studies.campaign.shared_evaluator import game_process
     config = Config(**values)
-    def slot(index, connection, name):
-        evaluator = RemoteEvaluator(connection, name, config.token_buckets, version)
+    def play(seed, evaluator):
+        started, requests = time.time(), evaluator.stats.requests
         try:
-            # A blocking get: get_nowait can report an empty queue before the
-            # coordinator's queued seeds reach this process.
-            while (seed := tasks.get()) is not None:
-                started, requests = time.time(), evaluator.stats.requests
-                try:
-                    record = play_shared_game(config, seed, evaluator, deadline_epoch)
-                except BaseException as error:
-                    # Any other defect ends only this game; the slot takes the next seed.
-                    ended = time.time()
-                    record = {"seed": seed, "terminal": False, "stop_reason": "game_exception",
-                              "started_at_epoch": started, "ended_at_epoch": ended, "game_seconds": ended - started,
-                              "evaluations": evaluator.stats.requests - requests, "terminal_returns": None,
-                              "timing_seconds": {}, "process": os.getpid(),
-                              "failure": {"error": f"{type(error).__name__}: {error}",
-                                          "traceback": traceback.format_exc()}}
-                results.put({**record, "slot": index})
-        finally:
-            evaluator.close()
-    threads = [threading.Thread(target=slot, args=arguments, name=f"campaign-game-{arguments[0]}", daemon=True)
-               for arguments in zip(slots, connections, buffer_names)]
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
-
-
-def raise_descriptor_limit(wanted):
-    """Raise the soft open-file limit towards `wanted`, never lowering it."""
-    import resource
-    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-    wanted = wanted if hard == resource.RLIM_INFINITY else min(wanted, hard)
-    if soft != resource.RLIM_INFINITY and soft < wanted:
-        resource.setrlimit(resource.RLIMIT_NOFILE, (wanted, hard))
+            return play_shared_game(config, seed, evaluator, deadline_epoch)
+        except BaseException as error:
+            # Any other defect ends only this game; the slot takes the next seed.
+            ended = time.time()
+            return {"seed": seed, "terminal": False, "stop_reason": "game_exception",
+                    "started_at_epoch": started, "ended_at_epoch": ended, "game_seconds": ended - started,
+                    "evaluations": evaluator.stats.requests - requests, "terminal_returns": None,
+                    "timing_seconds": {}, "process": os.getpid(),
+                    "failure": {"error": f"{type(error).__name__}: {error}",
+                                "traceback": traceback.format_exc()}}
+    game_process(play, config.token_buckets, version, slots, connections, buffer_names, tasks, results)
 
 
 def shared_selfplay(config, device, models, weights, deadline, persist, runtime_policy=None):
@@ -603,103 +578,39 @@ def shared_selfplay(config, device, models, weights, deadline, persist, runtime_
     report and, as parallel_selfplay does, the traffic as model forwards and
     evaluator calls.
     """
-    import multiprocessing
-    import queue
+    from functools import partial
     import resource
-    from multiprocessing import shared_memory
     import torch
     from studies.campaign.curriculum import make_env, task_manifest
-    from studies.campaign.shared_evaluator import SharedEvaluatorServer
-    context = multiprocessing.get_context("spawn")
-    slots = config.processes * config.games_per_process
-    # A slot holds two pipe ends and its buffer mapped twice, and a shell's default
-    # limit of 256 stops at eight processes of six games.
-    raise_descriptor_limit(6 * slots + 64)
-    pipes = [context.Pipe() for _ in range(slots)]
-    memories = [shared_memory.SharedMemory(create=True, size=SHARED_BUFFER_BYTES) for _ in range(slots)]
-    tasks, results = context.Queue(), context.Queue()
-    for seed in [*config.seeds, *[None] * slots]:  # One stop marker per game slot.
-        tasks.put(seed)
+    from studies.campaign.shared_evaluator import play_shared_games
     # Games stop a minute and a half before the worker's deadline: their searches
     # get half a minute to finish, then the pipes close, the processes get 20
     # seconds to exit, and the report is written before the supervisor's own
     # wall limit.
     deadline_epoch = time.time() + max(1.0, deadline - time.monotonic() - 90)
-    values, processes, games, samples = asdict(config), [], [], []
     self_before = resource.getrusage(resource.RUSAGE_SELF)
     children_before = resource.getrusage(resource.RUSAGE_CHILDREN)
-    server = None
-    try:
-        for index in range(config.processes):
-            members = range(index * config.games_per_process, (index + 1) * config.games_per_process)
-            process = context.Process(target=_shared_game_process, daemon=True, args=(
-                values, list(members), [pipes[member][1] for member in members],
-                [memories[member].name for member in members], tasks, results, deadline_epoch, weights))
-            process.start()
-            processes.append(process)
-        for _, child in pipes:
-            child.close()
-        server = SharedEvaluatorServer(models, torch.device(device), [parent for parent, _ in pipes],
-                                       [memory.name for memory in memories], runtime_policy)
-        # (epoch, requests answered) about every 10 seconds, for the rate while
-        # every slot plays.
-        samples.append((time.time(), 0))
-        last_persist = time.monotonic()
-        def keep_running():
-            nonlocal last_persist
-            while True:
-                try:
-                    games.append(results.get_nowait())
-                except queue.Empty:
-                    break
-            require(all(process.is_alive() or process.exitcode == 0 for process in processes),
-                    "A game process exited abnormally")
-            now = time.time()
-            if now - samples[-1][0] >= 10:
-                samples.append((now, server.stats.requests))
-            if time.monotonic() - last_persist > 60:
-                persist({"status": "running", "finished_games": len(games), "server_requests": server.stats.requests,
-                         "server_rounds": server.stats.rounds}); last_persist = time.monotonic()
-            # Game threads stop at the deadline; allow them half a minute to report.
-            return now < deadline_epoch + 30
-        server.serve(keep_running)
-        samples.append((time.time(), server.stats.requests))
-        # The server closed every pipe still open, so a thread still waiting for
-        # an evaluation ends its game. A process exits only once its queued
-        # results reach the pipe, so collect them while all processes exit
-        # against one deadline.
-        stop = time.monotonic() + 20
-        while time.monotonic() < stop and any(process.is_alive() for process in processes):
-            try:
-                games.append(results.get(timeout=0.1))
-            except queue.Empty:
-                pass
-        stragglers = [process for process in processes if process.is_alive()]
-        for process in stragglers:
-            process.kill()
-        for process in stragglers:
-            process.join(timeout=1)  # Reaped, so their CPU time is counted.
-        # A process killed or crashed mid-message leaves half of it, on which a
-        # read would wait forever, so drain only after every process exited cleanly.
-        clean = all(process.exitcode == 0 for process in processes)
-        stop = time.monotonic() + 5
-        while clean and len(games) < len(config.seeds) and time.monotonic() < stop:
-            try:
-                games.append(results.get(timeout=0.5))
-            except queue.Empty:
-                break
-    finally:
-        for process in processes:
-            if process.is_alive():
-                process.kill()
-        if server is not None:
-            server.close()
-        for memory in memories:
-            memory.close(); memory.unlink()
-        for parent, _ in pipes:
-            parent.close()
+    # (epoch, requests answered) about every 10 seconds, for the rate while
+    # every slot plays.
+    samples = [(time.time(), 0)]
+    last_persist = time.monotonic()
+    def keep_playing(server, games):
+        nonlocal last_persist
+        now = time.time()
+        if now - samples[-1][0] >= 10:
+            samples.append((now, server.stats.requests))
+        if time.monotonic() - last_persist > 60:
+            persist({"status": "running", "finished_games": len(games), "server_requests": server.stats.requests,
+                     "server_rounds": server.stats.rounds}); last_persist = time.monotonic()
+        # Game threads stop at the deadline; allow them half a minute to report.
+        return now < deadline_epoch + 30
+    games, stats = play_shared_games(
+        partial(_shared_game_process, asdict(config), deadline_epoch=deadline_epoch, version=weights), config.seeds,
+        processes=config.processes, games_per_process=config.games_per_process, models=models,
+        device=torch.device(device), runtime_policy=runtime_policy, keep_playing=keep_playing)
+    samples.append((time.time(), stats.requests))
     self_after, children = resource.getrusage(resource.RUSAGE_SELF), resource.getrusage(resource.RUSAGE_CHILDREN)
-    return shared_summary(config, games, server.stats, samples,
+    return shared_summary(config, games, stats, samples,
         task=task_manifest(make_env(config.seeds[0], calendar_rounds=config.calendar_rounds)),
         game_process_cpu_seconds=(children.ru_utime - children_before.ru_utime) + (children.ru_stime - children_before.ru_stime),
         coordinator_cpu_seconds=(self_after.ru_utime - self_before.ru_utime) + (self_after.ru_stime - self_before.ru_stime))
