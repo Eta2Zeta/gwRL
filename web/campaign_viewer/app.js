@@ -1,6 +1,7 @@
 import { createReplayModel, displayName, eventSummary, factionColor, locationOf,
   ownerOf, recordEntries, changedLocations, territoryIdentity, possessionChanges,
-  possessionChangeText, diceReport, activeBattles, stageLabel, politicalStatus } from './model.js';
+  possessionChangeText, diceReport, activeBattles, stageLabel, politicalStatus, movementPath,
+  movementStops } from './model.js';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
@@ -165,16 +166,21 @@ function renderMap(changed = new Set(), before = null) {
     }
   }
   if (before) {
+    const route = movementPath(UI.replay.steps[UI.position-1]);
     const movements = new Set();
     for (const [id, unit] of recordEntries(UI.state.units)) {
       const old = locationOf(before.units?.[id]); const next = locationOf(unit);
       if (old && next && old !== next && indexes.has(old) && indexes.has(next)) {
-        const key = `${old}|${next}`;
+        const stops = movementStops(route,old,next).filter((zone) => indexes.has(zone));
+        const key = stops.join('|');
         if (movements.has(key)) continue;
         movements.add(key);
-        const [x1,y1] = positionFor(old,indexes.get(old));
-        const [x2,y2] = positionFor(next,indexes.get(next));
-        map.append(svgElement('path', { d:`M ${x1} ${y1} Q ${(x1+x2)/2+15} ${(y1+y2)/2-28} ${x2} ${y2}`, class:'movement-line' }));
+        const points = stops.map((zone) => positionFor(zone,indexes.get(zone)));
+        const legs = points.slice(1).map(([x2,y2],index) => {
+          const [x1,y1] = points[index];
+          return `Q ${(x1+x2)/2+15} ${(y1+y2)/2-28} ${x2} ${y2}`;
+        });
+        map.append(svgElement('path', { d:`M ${points[0][0]} ${points[0][1]} ${legs.join(' ')}`, class:'movement-line' }));
       }
     }
   }

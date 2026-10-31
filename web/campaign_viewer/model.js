@@ -216,6 +216,20 @@ export function factionColor(id) {
   return '#7c8583';
 }
 
+/** The zones a recorded move names, in order, or null when it names no route. */
+export function movementPath(step) {
+  const parameters = step?.action?.action?.parameters ?? step?.action?.parameters;
+  const path = parameters?.path ?? parameters?.request?.path;
+  return Array.isArray(path) && path.length > 1 ? path : null;
+}
+
+/** A move's stops: its route up to where the unit actually stopped, or just its two ends. */
+export function movementStops(route, from, to) {
+  const start = route?.indexOf(from) ?? -1;
+  const end = route?.lastIndexOf(to) ?? -1;
+  return start >= 0 && end > start ? route.slice(start, end + 1) : [from, to];
+}
+
 const POWER_STATUS = { major: 'Major power', minor: 'Minor power', warlord: 'Warlord' };
 const ALLIANCES = ['axis', 'allies', 'comintern'];
 

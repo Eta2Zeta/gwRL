@@ -1,7 +1,8 @@
 /** Verify the browser reducer against immutable synthetic and optional real data. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { activeBattles, applyChanges, createReplayModel, diceReport, eventSummary, initialState, politicalStatus,
+import { activeBattles, applyChanges, createReplayModel, diceReport, eventSummary, initialState, movementPath,
+  movementStops, politicalStatus,
   possessionChanges, possessionChangeText, stageLabel, stateAt, territoryIdentity, validateReplay }
   from '../web/campaign_viewer/model.js';
 
@@ -203,4 +204,14 @@ assert.equal(fact('Surrendered'), 'CCP');
 assert.equal(fact('Warlords attacked'), 'Clique B by CCP');
 assert.equal(fact('Warlords choosing a side'), 'Clique B');
 assert.deepEqual(politicalStatus({}, {}).wars, []);  // Older recordings may hold no political state.
+const flight = { action: { action: { parameters: { path: ['formosa', 'p32', 'p14', 'rehe'], unit: 'fighter' } } } };
+const fleet = { action: { action: { parameters: { request: { path: ['p15', 'p32', 'p41'] } } } } };
+assert.deepEqual(movementPath(flight), ['formosa', 'p32', 'p14', 'rehe']);
+assert.deepEqual(movementPath(fleet), ['p15', 'p32', 'p41']);
+assert.equal(movementPath({ action: { action: { parameters: { destination: 'kyushu' } } } }), null);
+assert.equal(movementPath({ kind: 'chance' }), null);
+assert.deepEqual(movementStops(['formosa', 'p32', 'p14', 'rehe'], 'formosa', 'rehe'), ['formosa', 'p32', 'p14', 'rehe']);
+assert.deepEqual(movementStops(['p15', 'p32', 'p41'], 'p15', 'p32'), ['p15', 'p32']);  // Stopped short of its plan.
+assert.deepEqual(movementStops(['p15', 'p32'], 'tokyo', 'kyushu'), ['tokyo', 'kyushu']);  // Another unit in the event.
+assert.deepEqual(movementStops(null, 'a', 'b'), ['a', 'b']);
 console.log('Campaign replay reducer checks passed');

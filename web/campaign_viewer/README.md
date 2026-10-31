@@ -32,6 +32,9 @@ phase. For example, Tsinghai starts under Ma Clique; in the seed-1951 replay,
 CCP attacks it and the surviving Ma Clique joins KMT at event 12 (RB §4.9).
 Later KMT possession does not change Tsinghai's original nationality.
 
+The map's arrow for a move follows every zone of its recorded route, up to where
+the unit actually stopped, so a flight or fleet route shows each zone it crossed.
+
 The **Political status** panel above it follows the selected position. It lists
 each alliance's nations with their standing, wars, capital and controller, the
 warlords still unaligned or already absorbed, every war in progress, and the
