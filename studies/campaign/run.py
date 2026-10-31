@@ -30,7 +30,7 @@ from .device_runtime import runtime_policy_for_device
 from .episode_workers import EpisodeWorkers
 from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
-from .model_export import load_evaluation_models, save_model_export, validate_model_export
+from .model_export import load_evaluation_models, load_initial_weights, save_model_export, validate_model_export
 from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator, resolve_neural_device
 
 RUN_SCHEMA = "campaign-foreground-run-v1"
@@ -61,6 +61,7 @@ class RunConfig:
     cpu_budget: int | None = None
     neural_device: str = "cpu"
     episode_workers: int = 0
+    sample_fraction: float = 1.0
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -90,6 +91,8 @@ class RunConfig:
             raise ValueError("Episode workers must be a nonnegative integer")
         if self.episode_workers and (not self.complete_episodes or self.episode_workers > self.parallel_envs):
             raise ValueError("Episode workers play complete episodes, at most one worker per game in a batch")
+        if self.sample_fraction != 1.0 and not self.episode_workers:
+            raise ValueError("Only episode workers keep a share of their samples")
         if self.cpu_budget is not None:
             if type(self.cpu_budget) is not int or self.cpu_budget <= 0 or self.cpu_budget > (os.cpu_count() or 1):
                 raise ValueError("CPU budget must fit available logical cores")
@@ -141,7 +144,8 @@ def _learner(config: RunConfig, template):
     models = {player: CampaignPolicyValueNet(model_config, device=device).eval() for player in PLAYERS}
     learning = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
-        replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed)
+        replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed,
+        sample_fraction=config.sample_fraction)
     return CampaignLearner(models, model_config, learning, compatibility=compatibility(template),
                            runtime_policy=runtime_policy)
 
@@ -235,6 +239,8 @@ def train(args) -> int:
         "episode_wave_limit": config.transitions_per_batch, "budget_extensions": []}
     if loaded:
         learner.restore(loaded["learner"], env_template=template)
+    elif getattr(args, "initial_models", None) is not None:
+        runner["initial_models"] = load_initial_weights(args.initial_models, learner)
     # Restore owns its committed state. Keeping the input archive alive pins
     # every original replay row even after the learner evicts those examples.
     loaded = None
@@ -377,7 +383,9 @@ def train(args) -> int:
             # earlier recovery point. The current recovery generation, rather
             # than a possibly newer manifest/export, is authoritative here.
             export_model()
+        last_start = getattr(args, "no_new_batch_after", None)
         while (runner["batch_index"] < config.batches and not stopped
+               and (last_start is None or time.time() < last_start or learner.frozen_models is not None)
                and (config.max_episodes is None or learner.counters["episodes"] < config.max_episodes
                     or learner.frozen_models is not None)):
             if workers is not None:
@@ -557,6 +565,10 @@ def main(argv=None) -> int:
     training.add_argument("--record-replay", action="store_true",
                           help="Write real choices, search preferences and observed events to replay.jsonl (fresh runs only)")
     training.add_argument("--stop-after-waves", type=int, help="Safe bounded interruption for resume verification")
+    training.add_argument("--no-new-batch-after", type=float,
+                          help="Epoch seconds: finish the running batch, then end as completed")
+    training.add_argument("--initial-models", type=Path,
+                          help="Model export whose weights start a fresh run; nothing else of that run carries over")
     training.add_argument("--extend-episode-budget", type=int,
                           help="Explicitly increase the resumable complete-episode transition guard")
     for field in fields(RunConfig):
@@ -568,7 +580,8 @@ def main(argv=None) -> int:
             training.add_argument("--complete-episodes", action=argparse.BooleanOptionalAction, default=None,
                                   help="Freeze each batch until all games finish; a guard saves without updating")
             continue
-        kind = float if field.name in {"value_scale", "learning_rate", "checkpoint_interval_seconds"} else int
+        kind = float if field.name in {"value_scale", "learning_rate", "checkpoint_interval_seconds",
+                                       "sample_fraction"} else int
         training.add_argument("--" + field.name.replace("_", "-"), type=kind, default=None)
     training.add_argument("--full-campaign", action="store_true", help="Use the original July1936–July1941 target")
     evaluation = commands.add_parser("evaluate", help="Held-out fixed-opponent games without training noise")

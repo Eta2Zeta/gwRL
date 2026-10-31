@@ -152,6 +152,22 @@ def validate_model_export(path: str | Path, learner, runner: dict) -> dict:
             "generation": learner.generation, "model_versions": versions}
 
 
+def load_initial_weights(path: str | Path, learner) -> dict[str, Any]:
+    """Copy an export's weights into a fresh learner, and nothing else of its run.
+
+    Unlike evaluation this accepts an export from older sources, so a run stopped
+    by a bug can continue from its latest networks after the fix.
+    """
+    value = torch.load(path, map_location="cpu", weights_only=False)
+    if not isinstance(value, dict) or set(value) != _KEYS or value.get("schema") != MODEL_EXPORT_SCHEMA:
+        raise ValueError("Unsupported campaign model export")
+    if value["model_config"] != learner.model_config:
+        raise ValueError("Initial models have a different network size")
+    for player in PLAYERS:
+        learner.models[player].load_state_dict(value["models"][player])
+    return {"path": str(path), "generation": value["generation"], "model_versions": value["model_versions"]}
+
+
 def load_evaluation_models(path: str | Path, *, device: str | torch.device | None = None) -> dict[str, Any]:
     """Load policies without creating an optimizer or restoring rollout games.
 

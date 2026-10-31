@@ -155,6 +155,8 @@ class SupervisorConfig:
     poll_seconds: float = 1.0
     shutdown_seconds: float = 60.0
     max_restarts: int = 2
+    # The owner's go-ahead to pass the usual 12 cores, its poll sharing the last one.
+    all_cores: bool = False
 
     def __post_init__(self):
         for name in ("seconds", "poll_seconds", "shutdown_seconds"):
@@ -163,8 +165,9 @@ class SupervisorConfig:
                 raise ValueError(f"{name} must be finite and positive")
         if self.poll_seconds > 5:
             raise ValueError("Polling interval must be at most five seconds")
-        if type(self.cpu_budget) is not int or not 2 <= self.cpu_budget <= 12:
-            raise ValueError("CPU allowance must reserve a coordinator within the authorized 12 cores")
+        limit = (os.cpu_count() or 1) if self.all_cores else 12
+        if type(self.cpu_budget) is not int or not 2 <= self.cpu_budget <= limit:
+            raise ValueError(f"CPU allowance must reserve a coordinator within the authorized {limit} cores")
         if type(self.memory_bytes) is not int or not MEMORY_MARGIN_BYTES < self.memory_bytes <= 30_000_000_000:
             raise ValueError("Memory allowance must fit the authorized 30 GB with a safety margin")
         if type(self.max_restarts) is not int or not 0 <= self.max_restarts <= 10:
@@ -288,9 +291,13 @@ def validate_training_arguments(arguments: list[str], config: SupervisorConfig):
             values[name] = int(token.split("=", 1)[1] if "=" in token else arguments[index + 1])
         except (ValueError, IndexError) as error:
             raise ValueError(f"Invalid {flag}") from error
-    if min(values.values()) <= 0 or values["cpu-budget"] > config.cpu_budget - 1:
+    if min(values.values()) <= 0 or values["cpu-budget"] > config.cpu_budget - (0 if config.all_cores else 1):
         raise ValueError("Training CPU budget must leave one core for its supervisor")
-    if values["threads"] + values["parallel-envs"] + 1 > values["cpu-budget"]:
+    workers = [index for index, token in enumerate(arguments) if token == "--episode-workers"]
+    # Worker games and updates take turns, as the runner's own budget counts them.
+    busy = (max(int(arguments[workers[0] + 1]), values["threads"]) if workers
+            else values["threads"] + values["parallel-envs"])
+    if busy + 1 > values["cpu-budget"]:
         raise ValueError("Tensor threads, search workers and coordinator exceed training CPU budget")
 
 
@@ -530,6 +537,7 @@ def main(argv=None) -> int:
     parser.add_argument("--cpu-budget", type=int, default=12)
     parser.add_argument("--memory-bytes", type=int, default=30_000_000_000)
     parser.add_argument("--max-restarts", type=int, default=2)
+    parser.add_argument("--all-cores", action="store_true", help="The owner allowed every core for this run")
     parser.add_argument("--shutdown-seconds", type=float, default=60)
     parser.add_argument("--poll-seconds", type=float, default=1.0)
     parser.add_argument("--adopt-checkpoint", action="store_true",
@@ -541,6 +549,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     arguments = args.training_arguments[1:] if args.training_arguments[:1] == ["--"] else args.training_arguments
     config = SupervisorConfig(seconds=args.seconds, cpu_budget=args.cpu_budget, memory_bytes=args.memory_bytes,
+                              all_cores=args.all_cores,
                               max_restarts=args.max_restarts, shutdown_seconds=args.shutdown_seconds,
                               poll_seconds=args.poll_seconds)
     state = supervise(args.control_dir, args.run_dir, config, arguments, extension=args.extend_episode_budget,

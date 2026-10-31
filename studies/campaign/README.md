@@ -262,5 +262,19 @@ making strategic claims. Archived opponent leagues, broader starting-position
 curricula, direct-policy/PPO comparison and stronger settings are future
 experiments, not results established by this operational gate.
 
+## Long unattended runs
+
+`--sample-fraction F` keeps that share of a worker game's decisions as training
+samples, from its own random stream, so the games play the same. A sample takes
+about 1.2 MB in memory, so replay and worker memory otherwise limit full games.
+`--no-new-batch-after EPOCH` finishes the running batch and ends the run as
+completed. `--initial-models EXPORT` starts a fresh run from an export's weights
+and nothing else of that run, even if the sources have changed since, so a run
+stopped by a bug continues from its latest networks after the fix.
+`tools/supervise_campaign_training.py --all-cores` passes the usual 12 cores when
+the owner allows it. `tools/record_campaign_games.py` plays recorded games from a
+model export, each in its own process, for the
+[Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md).
+
 See [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md) and the
 [full plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md).

@@ -224,6 +224,8 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
     guard returns no samples: complete-episode batches never bootstrap.
     """
     search_random, policy_random = episode_streams(config.seed, environment_seed)
+    # Its own stream, so the game plays the same whatever share is kept.
+    sample_random = random.Random(f"campaign-episode-samples:{config.seed}:{environment_seed}")
     pending: list[dict[str, Any]] = []
     events: list[dict[str, Any]] = []
     counts = dict(transitions=0, decisions=0, chance_events=0)
@@ -244,6 +246,8 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
             event = _decide(env, result, pending, config=config, rng=policy_random, numeric=numeric,
                             token_buckets=token_buckets, batch_version=batch_version,
                             numeric_pool=numeric_pool, context_pool=context_pool)
+            if sample_random.random() >= config.sample_fraction:
+                pending.pop()
             counts["decisions"] += 1
         counts["transitions"] += 1
         event.update(before=before, after=env.planning_key(), terminal=env.is_terminal())
@@ -296,6 +300,9 @@ class LearningConfig:
     root_dirichlet_epsilon: float = 0.25
     seed: int = 1
     mode: str = "multiplayer"
+    # Share of a worker game's decisions kept as samples. A whole game holds over a
+    # thousand close positions of about a megabyte each.
+    sample_fraction: float = 1.0
 
     def __post_init__(self) -> None:
         for name in ("simulations", "max_depth", "batch_size", "epochs", "replay_capacity"):
@@ -309,6 +316,8 @@ class LearningConfig:
             raise ValueError("c_puct must be finite and nonnegative")
         if not 0 <= self.root_dirichlet_epsilon <= 1:
             raise ValueError("Root noise mixture must be between zero and one")
+        if not 0 < self.sample_fraction <= 1:
+            raise ValueError("Sample fraction must be above zero and at most one")
         if self.mode != "multiplayer":
             raise ValueError("Learning updates all three policies in multiplayer mode")
 
