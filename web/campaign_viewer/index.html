@@ -41,13 +41,13 @@
       <div class="playback-row"><div class="transport"><button id="first" class="icon-button" disabled title="Initial position" aria-label="Initial position">|◀</button><button id="prev" class="icon-button" disabled title="Previous event (Left arrow)" aria-label="Previous event">◀</button><button id="play" class="play-button" disabled title="Play or pause (Space)" aria-label="Play replay">▶</button><button id="next" class="icon-button" disabled title="Next event (Right arrow)" aria-label="Next event">▶</button><button id="last" class="icon-button" disabled title="Final position" aria-label="Final position">▶|</button></div><div class="event-now"><span class="stat-label" id="event-kind">INITIAL POSITION</span><strong id="event-summary">No recording loaded</strong></div><label class="speed-label" for="speed">Speed<select id="speed"><option value="1800">0.5×</option><option value="900" selected>1×</option><option value="450">2×</option><option value="180">5×</option></select></label></div>
       <label class="sr-only" for="timeline">Recorded position</label><input id="timeline" type="range" min="0" max="0" value="0" disabled><div class="timeline-labels"><span>Initial position</span><span id="timeline-help">Space to play · ← → to step · Home / End to jump</span><span>Final position</span></div><details class="event-record" id="event-record" hidden><summary>Inspect this recorded event</summary><pre id="event-record-json"></pre></details>
     </section>
-    <section class="panel combat-panel" aria-label="Combat and dice">
-      <div class="panel-heading"><div><h2>Combat &amp; dice</h2><span class="caption" id="combat-caption">Battles and dice rolls at the selected position</span></div><span class="small-tag" id="combat-tag">NO COMBAT</span></div>
-      <div id="combat-details" class="combat-body"><p class="empty-copy">Load a recording to see where fighting happens, who fights with which units, and every die rolled.</p></div>
-    </section>
     <section class="panel politics-panel" aria-label="Political status">
       <div class="panel-heading"><div><h2>Political status</h2><span class="caption">Alliances, wars and treaties at the selected position</span></div><span class="small-tag" id="politics-tag">NO RECORDING</span></div>
       <div id="politics-details" class="politics-body"><p class="empty-copy">Load a recording to see who is allied and who is at war.</p></div>
+    </section>
+    <section class="panel combat-panel" aria-label="Combat and dice">
+      <div class="panel-heading"><div><h2>Combat &amp; dice</h2><span class="caption" id="combat-caption">Battles and dice rolls at the selected position</span></div><span class="small-tag" id="combat-tag">NO COMBAT</span></div>
+      <div id="combat-details" class="combat-body"><p class="empty-copy">Load a recording to see where fighting happens, who fights with which units, and every die rolled.</p></div>
     </section>
     <div class="analysis-grid">
       <section class="panel wealth-panel"><div class="panel-heading"><h2>Alliance ledger</h2><span class="caption">At the selected position</span></div><div id="wealth-cards" class="wealth-cards"></div><p class="panel-note">Wealth follows the engine’s campaign scoring. Cash is shown separately; queued purchases are not counted twice.</p></section>
