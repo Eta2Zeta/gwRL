@@ -5,6 +5,7 @@
 ## Start here
 
 - [Stage A learning results](/Users/home/Desktop/gwRL/docs/stage_a/README.md): completed-episode training, paired held-out results and earlier pilots.
+- [Decision, rules and training review](/Users/home/Desktop/gwRL/docs/stage_a/decision_review_2026_10_31.md): the objective rewards a passive Japan; a quarter of still-searched decisions removable without rule changes, half with three rule simplifications; flat search targets on large menus.
 - [Native neural-input compiler](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md): complete feature graphs in C++, exact numerical parity and matched performance checks.
 - [AI order construction](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md): forward-only naval orders and bounded configuration/permission choices, with separate replay compatibility.
 - [Three-round learning results](/Users/home/Desktop/gwRL/docs/stage_a/three_round_2026_10_25_results.md): sixty completed games, separate Japan/Dadao possession results, saved continuation and measured checkpoint overhead.

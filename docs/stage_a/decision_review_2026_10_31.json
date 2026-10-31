@@ -1,0 +1,2829 @@
+{
+ "commit": "6522736941f0aae7be4594358e21e276d6f7229b",
+ "date": "2026-10-31",
+ "decision_census": {
+  "eleven_round_scripted_seed_1953": {
+   "axis_decisions_per_japanese_turn": 114.2,
+   "axis_naval_share": 0.59,
+   "by_owner": {
+    "allies": 500,
+    "axis": 1256,
+    "comintern": 324
+   },
+   "by_owner_kind": {
+    "allies|combat": {
+     "decisions": 72,
+     "menu_max": 4,
+     "menu_mean": 2.3,
+     "menu_ms_mean": 0.58
+    },
+    "allies|combat_movement": {
+     "decisions": 178,
+     "menu_max": 142,
+     "menu_mean": 59.9,
+     "menu_ms_mean": 2.2
+    },
+    "allies|declaration_offer": {
+     "decisions": 1,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.04
+    },
+    "allies|land_casualty": {
+     "decisions": 44,
+     "menu_max": 10,
+     "menu_mean": 2.9,
+     "menu_ms_mean": 0.13
+    },
+    "allies|land_retreat_destination": {
+     "decisions": 11,
+     "menu_max": 2,
+     "menu_mean": 1.8,
+     "menu_ms_mean": 0.21
+    },
+    "allies|land_retreat_or_continue": {
+     "decisions": 38,
+     "menu_max": 2,
+     "menu_mean": 1.9,
+     "menu_ms_mean": 0.11
+    },
+    "allies|non_combat_movement": {
+     "decisions": 23,
+     "menu_max": 165,
+     "menu_mean": 47.5,
+     "menu_ms_mean": 2.59
+    },
+    "allies|place_units": {
+     "decisions": 66,
+     "menu_max": 90,
+     "menu_mean": 28.5,
+     "menu_ms_mean": 0.89
+    },
+    "allies|politics_evolution": {
+     "decisions": 1,
+     "menu_max": 28,
+     "menu_mean": 28,
+     "menu_ms_mean": 0.64
+    },
+    "allies|production": {
+     "decisions": 66,
+     "menu_max": 233,
+     "menu_mean": 76.5,
+     "menu_ms_mean": 2.7
+    },
+    "axis|air_landing": {
+     "decisions": 8,
+     "menu_max": 6,
+     "menu_mean": 2.4,
+     "menu_ms_mean": 0.16
+    },
+    "axis|combat": {
+     "decisions": 146,
+     "menu_max": 8,
+     "menu_mean": 2.3,
+     "menu_ms_mean": 0.6
+    },
+    "axis|combat_movement": {
+     "decisions": 495,
+     "menu_max": 318,
+     "menu_mean": 74.8,
+     "menu_ms_mean": 8.02
+    },
+    "axis|land_casualty": {
+     "decisions": 53,
+     "menu_max": 7,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.13
+    },
+    "axis|land_retreat_destination": {
+     "decisions": 2,
+     "menu_max": 1,
+     "menu_mean": 1,
+     "menu_ms_mean": 0.25
+    },
+    "axis|land_retreat_or_continue": {
+     "decisions": 28,
+     "menu_max": 2,
+     "menu_mean": 2.0,
+     "menu_ms_mean": 0.13
+    },
+    "axis|naval_force_selection": {
+     "decisions": 300,
+     "menu_max": 22,
+     "menu_mean": 12.4,
+     "menu_ms_mean": 0.52
+    },
+    "axis|naval_shore_selection": {
+     "decisions": 26,
+     "menu_max": 4,
+     "menu_mean": 2.4,
+     "menu_ms_mean": 0.25
+    },
+    "axis|non_combat_movement": {
+     "decisions": 11,
+     "menu_max": 172,
+     "menu_mean": 89.6,
+     "menu_ms_mean": 7.73
+    },
+    "axis|place_units": {
+     "decisions": 82,
+     "menu_max": 40,
+     "menu_mean": 8.9,
+     "menu_ms_mean": 2.85
+    },
+    "axis|production": {
+     "decisions": 105,
+     "menu_max": 248,
+     "menu_mean": 137.6,
+     "menu_ms_mean": 4.5
+    },
+    "comintern|combat": {
+     "decisions": 72,
+     "menu_max": 3,
+     "menu_mean": 1.3,
+     "menu_ms_mean": 0.47
+    },
+    "comintern|combat_movement": {
+     "decisions": 68,
+     "menu_max": 44,
+     "menu_mean": 7.3,
+     "menu_ms_mean": 0.82
+    },
+    "comintern|land_casualty": {
+     "decisions": 27,
+     "menu_max": 3,
+     "menu_mean": 1.6,
+     "menu_ms_mean": 0.11
+    },
+    "comintern|land_retreat_destination": {
+     "decisions": 5,
+     "menu_max": 1,
+     "menu_mean": 1,
+     "menu_ms_mean": 0.21
+    },
+    "comintern|land_retreat_or_continue": {
+     "decisions": 23,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.13
+    },
+    "comintern|non_combat_movement": {
+     "decisions": 22,
+     "menu_max": 7,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.69
+    },
+    "comintern|place_units": {
+     "decisions": 60,
+     "menu_max": 5,
+     "menu_mean": 1.9,
+     "menu_ms_mean": 0.29
+    },
+    "comintern|politics_declaration_priority": {
+     "decisions": 2,
+     "menu_max": 2,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.07
+    },
+    "comintern|production": {
+     "decisions": 37,
+     "menu_max": 5,
+     "menu_mean": 2.1,
+     "menu_ms_mean": 0.41
+    },
+    "comintern|recruitment_choice": {
+     "decisions": 8,
+     "menu_max": 20,
+     "menu_mean": 11.6,
+     "menu_ms_mean": 0.21
+    }
+   },
+   "chosen_by_kind": {
+    "air_fly": 3,
+    "air_ground_attack": 14,
+    "air_land": 8,
+    "air_land_noncombat": 3,
+    "air_support": 1,
+    "economy_advance": 3,
+    "economy_finish_research": 11,
+    "economy_place": 141,
+    "economy_purchase": 139,
+    "economy_research": 11,
+    "end_phase": 221,
+    "influence_roll": 1,
+    "land_begin_battle": 109,
+    "land_continue_fighting": 79,
+    "land_progress_battle": 110,
+    "land_retreat_begin": 10,
+    "land_retreat_unit": 18,
+    "land_take_casualty": 124,
+    "movement_route": 299,
+    "naval_begin_assault": 26,
+    "naval_declare_assault": 41,
+    "naval_designate_raider": 1,
+    "naval_finish_shore_selection": 26,
+    "naval_load": 47,
+    "naval_route": 300,
+    "naval_start_move": 300,
+    "politics_choose_capital": 1,
+    "politics_declare_war": 1,
+    "politics_priority_declare": 1,
+    "politics_priority_decline": 1,
+    "recruitment_place_infantry": 8,
+    "recruitment_roll": 22
+   },
+   "decisions": 2080,
+   "decisions_with_at_least_16_options": 919,
+   "decisions_with_at_least_64_options": 495,
+   "forced_single_option": 370,
+   "games": [
+    {
+     "apply_s": 6.78,
+     "chance_events": 418,
+     "decisions": 2080,
+     "menu_s": 5.91,
+     "policy": "balanced",
+     "returns": [
+      51.3,
+      -52.3,
+      -100.7
+     ],
+     "rounds": 11,
+     "seed": 1953,
+     "terminal": true,
+     "wall_s": 46.53
+    }
+   ],
+   "menu_options_by_kind": {
+    "air_fly": 16301,
+    "air_ground_attack": 568,
+    "air_land": 19,
+    "air_land_noncombat": 95,
+    "air_start_patrol": 2438,
+    "air_support": 152,
+    "economy_advance": 4,
+    "economy_finish_research": 22,
+    "economy_lease_declare": 72,
+    "economy_lease_upgrade": 34,
+    "economy_place": 2615,
+    "economy_purchase": 18941,
+    "economy_request_rail": 146,
+    "economy_research": 176,
+    "end_phase": 956,
+    "influence_roll": 6,
+    "land_begin_battle": 190,
+    "land_continue_fighting": 86,
+    "land_progress_battle": 268,
+    "land_retreat_begin": 89,
+    "land_retreat_unit": 27,
+    "land_take_casualty": 249,
+    "movement_route": 17909,
+    "naval_begin_assault": 98,
+    "naval_declare_assault": 145,
+    "naval_designate_raider": 53,
+    "naval_enter_port": 369,
+    "naval_finish_shore_selection": 26,
+    "naval_force_add": 427,
+    "naval_load": 1232,
+    "naval_remove_raider": 313,
+    "naval_route": 3280,
+    "naval_select_bombardment": 36,
+    "naval_start_move": 10014,
+    "naval_unload": 70,
+    "pass_interrupt": 1,
+    "politics_choose_capital": 28,
+    "politics_declare_war": 1,
+    "politics_priority_declare": 1,
+    "politics_priority_decline": 2,
+    "recruitment_place_infantry": 27,
+    "recruitment_place_militia": 66,
+    "recruitment_roll": 37
+   },
+   "proposals": {
+    "P1_single_option": 370,
+    "P2_battle_bookkeeping": 134,
+    "P3_one_step_single_ship_orders": 300,
+    "P4_purchase_quantity": 88,
+    "P5_batch_placement": 29,
+    "P6_mission_complete_flights": 3,
+    "R1_automatic_casualties": 124,
+    "R2_automatic_retreat": 107,
+    "R3_static_warships": 499
+   },
+   "searched_decisions": 1710,
+   "searched_removed_by_P2_to_P6": 461,
+   "searched_removed_by_P2_to_P6_or_rules": 858,
+   "searched_with_at_least_64_options": 495,
+   "shares": {
+    "decisions_with_at_least_16_options": 0.4418,
+    "decisions_with_at_least_64_options": 0.238,
+    "proposals": {
+     "P1_single_option": 0.1779,
+     "P2_battle_bookkeeping": 0.0644,
+     "P3_one_step_single_ship_orders": 0.1442,
+     "P4_purchase_quantity": 0.0423,
+     "P5_batch_placement": 0.0139,
+     "P6_mission_complete_flights": 0.0014,
+     "R1_automatic_casualties": 0.0596,
+     "R2_automatic_retreat": 0.0514,
+     "R3_static_warships": 0.2399
+    },
+    "searched_removed_by_P2_to_P6": 0.2696,
+    "searched_removed_by_P2_to_P6_or_rules": 0.5018,
+    "searched_with_at_least_64_options": 0.2895,
+    "single_option": 0.1779,
+    "two_options": 0.1245,
+    "union_exact": 0.3995,
+    "union_exact_and_rule": 0.5904
+   },
+   "two_options": 259,
+   "union_exact": 831,
+   "union_exact_and_rule": 1228
+  },
+  "three_round_scripted_seed_1951": {
+   "axis_decisions_per_japanese_turn": 113.7,
+   "axis_naval_share": 0.5513,
+   "by_owner": {
+    "allies": 149,
+    "axis": 341,
+    "comintern": 89
+   },
+   "by_owner_kind": {
+    "allies|combat": {
+     "decisions": 18,
+     "menu_max": 4,
+     "menu_mean": 2.2,
+     "menu_ms_mean": 1.07
+    },
+    "allies|combat_movement": {
+     "decisions": 57,
+     "menu_max": 184,
+     "menu_mean": 81.2,
+     "menu_ms_mean": 2.83
+    },
+    "allies|declaration_offer": {
+     "decisions": 1,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.05
+    },
+    "allies|land_casualty": {
+     "decisions": 11,
+     "menu_max": 5,
+     "menu_mean": 2.2,
+     "menu_ms_mean": 0.12
+    },
+    "allies|land_retreat_or_continue": {
+     "decisions": 8,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.1
+    },
+    "allies|non_combat_movement": {
+     "decisions": 15,
+     "menu_max": 152,
+     "menu_mean": 56.8,
+     "menu_ms_mean": 2.33
+    },
+    "allies|place_units": {
+     "decisions": 19,
+     "menu_max": 91,
+     "menu_mean": 37.5,
+     "menu_ms_mean": 0.96
+    },
+    "allies|politics_evolution": {
+     "decisions": 1,
+     "menu_max": 28,
+     "menu_mean": 28,
+     "menu_ms_mean": 0.42
+    },
+    "allies|production": {
+     "decisions": 19,
+     "menu_max": 219,
+     "menu_mean": 113.7,
+     "menu_ms_mean": 3.43
+    },
+    "axis|air_landing": {
+     "decisions": 5,
+     "menu_max": 3,
+     "menu_mean": 1.8,
+     "menu_ms_mean": 0.11
+    },
+    "axis|combat": {
+     "decisions": 45,
+     "menu_max": 8,
+     "menu_mean": 2.8,
+     "menu_ms_mean": 0.53
+    },
+    "axis|combat_movement": {
+     "decisions": 126,
+     "menu_max": 318,
+     "menu_mean": 76,
+     "menu_ms_mean": 10.26
+    },
+    "axis|land_casualty": {
+     "decisions": 23,
+     "menu_max": 4,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.15
+    },
+    "axis|land_retreat_destination": {
+     "decisions": 1,
+     "menu_max": 1,
+     "menu_mean": 1,
+     "menu_ms_mean": 0.13
+    },
+    "axis|land_retreat_or_continue": {
+     "decisions": 14,
+     "menu_max": 2,
+     "menu_mean": 1.9,
+     "menu_ms_mean": 0.14
+    },
+    "axis|naval_force_selection": {
+     "decisions": 77,
+     "menu_max": 20,
+     "menu_mean": 12.5,
+     "menu_ms_mean": 0.41
+    },
+    "axis|naval_shore_selection": {
+     "decisions": 6,
+     "menu_max": 3,
+     "menu_mean": 2.3,
+     "menu_ms_mean": 0.17
+    },
+    "axis|non_combat_movement": {
+     "decisions": 3,
+     "menu_max": 78,
+     "menu_mean": 54,
+     "menu_ms_mean": 4.78
+    },
+    "axis|place_units": {
+     "decisions": 17,
+     "menu_max": 19,
+     "menu_mean": 6.7,
+     "menu_ms_mean": 2.44
+    },
+    "axis|production": {
+     "decisions": 24,
+     "menu_max": 220,
+     "menu_mean": 100.2,
+     "menu_ms_mean": 3.38
+    },
+    "comintern|combat": {
+     "decisions": 18,
+     "menu_max": 2,
+     "menu_mean": 1.2,
+     "menu_ms_mean": 0.5
+    },
+    "comintern|combat_movement": {
+     "decisions": 19,
+     "menu_max": 23,
+     "menu_mean": 8.1,
+     "menu_ms_mean": 0.78
+    },
+    "comintern|land_casualty": {
+     "decisions": 11,
+     "menu_max": 3,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.18
+    },
+    "comintern|land_retreat_or_continue": {
+     "decisions": 2,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.66
+    },
+    "comintern|non_combat_movement": {
+     "decisions": 6,
+     "menu_max": 6,
+     "menu_mean": 2.5,
+     "menu_ms_mean": 0.66
+    },
+    "comintern|place_units": {
+     "decisions": 17,
+     "menu_max": 5,
+     "menu_mean": 2.4,
+     "menu_ms_mean": 0.33
+    },
+    "comintern|politics_declaration_priority": {
+     "decisions": 2,
+     "menu_max": 2,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.11
+    },
+    "comintern|production": {
+     "decisions": 11,
+     "menu_max": 5,
+     "menu_mean": 2.4,
+     "menu_ms_mean": 0.3
+    },
+    "comintern|recruitment_choice": {
+     "decisions": 3,
+     "menu_max": 14,
+     "menu_mean": 11,
+     "menu_ms_mean": 0.27
+    }
+   },
+   "chosen_by_kind": {
+    "air_fly": 1,
+    "air_ground_attack": 10,
+    "air_land": 5,
+    "air_land_noncombat": 1,
+    "air_support": 1,
+    "economy_advance": 3,
+    "economy_finish_research": 3,
+    "economy_place": 34,
+    "economy_purchase": 33,
+    "economy_research": 3,
+    "end_phase": 61,
+    "influence_roll": 1,
+    "land_begin_battle": 30,
+    "land_continue_fighting": 22,
+    "land_progress_battle": 32,
+    "land_retreat_begin": 2,
+    "land_retreat_unit": 1,
+    "land_take_casualty": 45,
+    "movement_route": 90,
+    "naval_begin_assault": 6,
+    "naval_declare_assault": 10,
+    "naval_designate_raider": 1,
+    "naval_finish_shore_selection": 6,
+    "naval_load": 11,
+    "naval_route": 77,
+    "naval_start_move": 77,
+    "politics_choose_capital": 1,
+    "politics_declare_war": 1,
+    "politics_priority_declare": 1,
+    "politics_priority_decline": 1,
+    "recruitment_place_infantry": 3,
+    "recruitment_roll": 6
+   },
+   "decisions": 579,
+   "decisions_with_at_least_16_options": 256,
+   "decisions_with_at_least_64_options": 101,
+   "forced_single_option": 107,
+   "games": [
+    {
+     "apply_s": 1.62,
+     "chance_events": 116,
+     "decisions": 579,
+     "menu_s": 1.84,
+     "policy": "balanced",
+     "returns": [
+      28.1,
+      -36.9,
+      -88.3
+     ],
+     "rounds": 3,
+     "seed": 1951,
+     "terminal": true,
+     "wall_s": 12.93
+    }
+   ],
+   "menu_options_by_kind": {
+    "air_fly": 5201,
+    "air_ground_attack": 379,
+    "air_land": 9,
+    "air_land_noncombat": 23,
+    "air_start_patrol": 667,
+    "air_support": 93,
+    "economy_advance": 4,
+    "economy_finish_research": 6,
+    "economy_lease_declare": 28,
+    "economy_lease_upgrade": 12,
+    "economy_place": 832,
+    "economy_purchase": 4407,
+    "economy_request_rail": 39,
+    "economy_research": 47,
+    "end_phase": 247,
+    "influence_roll": 6,
+    "land_begin_battle": 59,
+    "land_continue_fighting": 22,
+    "land_progress_battle": 90,
+    "land_retreat_begin": 24,
+    "land_retreat_unit": 1,
+    "land_take_casualty": 76,
+    "movement_route": 5924,
+    "naval_begin_assault": 23,
+    "naval_declare_assault": 52,
+    "naval_designate_raider": 53,
+    "naval_enter_port": 72,
+    "naval_finish_shore_selection": 6,
+    "naval_force_add": 99,
+    "naval_load": 242,
+    "naval_remove_raider": 49,
+    "naval_route": 863,
+    "naval_select_bombardment": 8,
+    "naval_start_move": 2458,
+    "naval_unload": 6,
+    "pass_interrupt": 1,
+    "politics_choose_capital": 28,
+    "politics_declare_war": 1,
+    "politics_priority_declare": 1,
+    "politics_priority_decline": 2,
+    "recruitment_place_infantry": 10,
+    "recruitment_place_militia": 23,
+    "recruitment_roll": 10
+   },
+   "proposals": {
+    "P1_single_option": 107,
+    "P2_battle_bookkeeping": 39,
+    "P3_one_step_single_ship_orders": 77,
+    "P4_purchase_quantity": 16,
+    "P5_batch_placement": 4,
+    "P6_mission_complete_flights": 1,
+    "R1_automatic_casualties": 45,
+    "R2_automatic_retreat": 25,
+    "R3_static_warships": 127
+   },
+   "searched_decisions": 472,
+   "searched_removed_by_P2_to_P6": 112,
+   "searched_removed_by_P2_to_P6_or_rules": 215,
+   "searched_with_at_least_64_options": 101,
+   "shares": {
+    "decisions_with_at_least_16_options": 0.4421,
+    "decisions_with_at_least_64_options": 0.1744,
+    "proposals": {
+     "P1_single_option": 0.1848,
+     "P2_battle_bookkeeping": 0.0674,
+     "P3_one_step_single_ship_orders": 0.133,
+     "P4_purchase_quantity": 0.0276,
+     "P5_batch_placement": 0.0069,
+     "P6_mission_complete_flights": 0.0017,
+     "R1_automatic_casualties": 0.0777,
+     "R2_automatic_retreat": 0.0432,
+     "R3_static_warships": 0.2193
+    },
+    "searched_removed_by_P2_to_P6": 0.2373,
+    "searched_removed_by_P2_to_P6_or_rules": 0.4555,
+    "searched_with_at_least_64_options": 0.214,
+    "single_option": 0.1848,
+    "two_options": 0.1123,
+    "union_exact": 0.3782,
+    "union_exact_and_rule": 0.5561
+   },
+   "two_options": 65,
+   "union_exact": 219,
+   "union_exact_and_rule": 322
+  },
+  "three_round_uniform_seeds_1951_1952": {
+   "axis_decisions_per_japanese_turn": 140.2,
+   "axis_naval_share": 0.6528,
+   "by_owner": {
+    "allies": 324,
+    "axis": 841,
+    "comintern": 130
+   },
+   "by_owner_kind": {
+    "allies|combat": {
+     "decisions": 30,
+     "menu_max": 3,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.49
+    },
+    "allies|combat_movement": {
+     "decisions": 203,
+     "menu_max": 188,
+     "menu_mean": 81.5,
+     "menu_ms_mean": 2.81
+    },
+    "allies|declaration_offer": {
+     "decisions": 4,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.03
+    },
+    "allies|land_casualty": {
+     "decisions": 16,
+     "menu_max": 3,
+     "menu_mean": 1.4,
+     "menu_ms_mean": 0.06
+    },
+    "allies|land_retreat_or_continue": {
+     "decisions": 3,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.06
+    },
+    "allies|naval_shore_casualty": {
+     "decisions": 1,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.07
+    },
+    "allies|non_combat_movement": {
+     "decisions": 26,
+     "menu_max": 217,
+     "menu_mean": 29.5,
+     "menu_ms_mean": 1.46
+    },
+    "allies|place_units": {
+     "decisions": 12,
+     "menu_max": 15,
+     "menu_mean": 2.3,
+     "menu_ms_mean": 0.15
+    },
+    "allies|politics_evolution": {
+     "decisions": 2,
+     "menu_max": 28,
+     "menu_mean": 28,
+     "menu_ms_mean": 0.25
+    },
+    "allies|production": {
+     "decisions": 27,
+     "menu_max": 267,
+     "menu_mean": 113.5,
+     "menu_ms_mean": 4.96
+    },
+    "axis|air_ground_or_defend": {
+     "decisions": 1,
+     "menu_max": 1,
+     "menu_mean": 1,
+     "menu_ms_mean": 0.04
+    },
+    "axis|air_landing": {
+     "decisions": 4,
+     "menu_max": 4,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.07
+    },
+    "axis|air_scramble": {
+     "decisions": 1,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.05
+    },
+    "axis|combat": {
+     "decisions": 53,
+     "menu_max": 5,
+     "menu_mean": 2.1,
+     "menu_ms_mean": 0.38
+    },
+    "axis|combat_movement": {
+     "decisions": 392,
+     "menu_max": 308,
+     "menu_mean": 64.8,
+     "menu_ms_mean": 7.16
+    },
+    "axis|land_casualty": {
+     "decisions": 19,
+     "menu_max": 6,
+     "menu_mean": 1.4,
+     "menu_ms_mean": 0.08
+    },
+    "axis|land_retreat_or_continue": {
+     "decisions": 2,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.09
+    },
+    "axis|naval_force_selection": {
+     "decisions": 235,
+     "menu_max": 26,
+     "menu_mean": 9.9,
+     "menu_ms_mean": 0.41
+    },
+    "axis|naval_shore_selection": {
+     "decisions": 12,
+     "menu_max": 3,
+     "menu_mean": 1.8,
+     "menu_ms_mean": 0.07
+    },
+    "axis|non_combat_movement": {
+     "decisions": 64,
+     "menu_max": 52,
+     "menu_mean": 18.2,
+     "menu_ms_mean": 5.95
+    },
+    "axis|place_units": {
+     "decisions": 15,
+     "menu_max": 7,
+     "menu_mean": 1.7,
+     "menu_ms_mean": 0.26
+    },
+    "axis|production": {
+     "decisions": 43,
+     "menu_max": 225,
+     "menu_mean": 110.0,
+     "menu_ms_mean": 3.29
+    },
+    "comintern|combat": {
+     "decisions": 24,
+     "menu_max": 2,
+     "menu_mean": 1.2,
+     "menu_ms_mean": 0.41
+    },
+    "comintern|combat_movement": {
+     "decisions": 28,
+     "menu_max": 19,
+     "menu_mean": 5.9,
+     "menu_ms_mean": 0.56
+    },
+    "comintern|declaration_offer": {
+     "decisions": 2,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.02
+    },
+    "comintern|land_casualty": {
+     "decisions": 7,
+     "menu_max": 2,
+     "menu_mean": 1.4,
+     "menu_ms_mean": 0.05
+    },
+    "comintern|land_retreat_destination": {
+     "decisions": 2,
+     "menu_max": 1,
+     "menu_mean": 1,
+     "menu_ms_mean": 0.05
+    },
+    "comintern|land_retreat_or_continue": {
+     "decisions": 6,
+     "menu_max": 2,
+     "menu_mean": 2,
+     "menu_ms_mean": 0.05
+    },
+    "comintern|non_combat_movement": {
+     "decisions": 13,
+     "menu_max": 6,
+     "menu_mean": 1.8,
+     "menu_ms_mean": 0.88
+    },
+    "comintern|place_units": {
+     "decisions": 27,
+     "menu_max": 6,
+     "menu_mean": 2.2,
+     "menu_ms_mean": 0.22
+    },
+    "comintern|politics_declaration_priority": {
+     "decisions": 2,
+     "menu_max": 2,
+     "menu_mean": 1.5,
+     "menu_ms_mean": 0.04
+    },
+    "comintern|production": {
+     "decisions": 17,
+     "menu_max": 5,
+     "menu_mean": 2.1,
+     "menu_ms_mean": 0.18
+    },
+    "comintern|recruitment_choice": {
+     "decisions": 2,
+     "menu_max": 14,
+     "menu_mean": 9.5,
+     "menu_ms_mean": 0.16
+    }
+   },
+   "chosen_by_kind": {
+    "air_decline_scramble": 1,
+    "air_end_patrol": 1,
+    "air_failed_landing": 2,
+    "air_fly": 52,
+    "air_ground": 1,
+    "air_ground_attack": 9,
+    "air_land": 4,
+    "air_land_noncombat": 33,
+    "air_start_patrol": 3,
+    "economy_finish_research": 9,
+    "economy_place": 20,
+    "economy_purchase": 46,
+    "economy_research": 8,
+    "end_phase": 122,
+    "influence_roll": 1,
+    "land_begin_battle": 35,
+    "land_continue_fighting": 8,
+    "land_progress_battle": 38,
+    "land_retreat_begin": 3,
+    "land_retreat_unit": 2,
+    "land_take_casualty": 42,
+    "movement_route": 284,
+    "naval_begin_assault": 8,
+    "naval_declare_assault": 10,
+    "naval_designate_raider": 5,
+    "naval_enter_port": 56,
+    "naval_finish_shore_selection": 8,
+    "naval_force_add": 27,
+    "naval_load": 14,
+    "naval_remove_raider": 1,
+    "naval_route": 208,
+    "naval_select_bombardment": 4,
+    "naval_shore_casualty": 1,
+    "naval_start_move": 208,
+    "pass_interrupt": 2,
+    "politics_choose_capital": 2,
+    "politics_declare_war": 4,
+    "politics_priority_decline": 2,
+    "recruitment_place_infantry": 1,
+    "recruitment_place_militia": 1,
+    "recruitment_roll": 9
+   },
+   "decisions": 1295,
+   "decisions_with_at_least_16_options": 614,
+   "decisions_with_at_least_64_options": 265,
+   "forced_single_option": 194,
+   "games": [
+    {
+     "apply_s": 1.8,
+     "chance_events": 63,
+     "decisions": 660,
+     "menu_s": 2.21,
+     "policy": "uniform",
+     "returns": [
+      28.9,
+      -42.1,
+      -91.1
+     ],
+     "rounds": 3,
+     "seed": 1951,
+     "terminal": true,
+     "wall_s": 5.17
+    },
+    {
+     "apply_s": 1.43,
+     "chance_events": 62,
+     "decisions": 635,
+     "menu_s": 2.04,
+     "policy": "uniform",
+     "returns": [
+      25.5,
+      -33.9,
+      -93.7
+     ],
+     "rounds": 3,
+     "seed": 1952,
+     "terminal": true,
+     "wall_s": 4.64
+    }
+   ],
+   "menu_options_by_kind": {
+    "air_decline_scramble": 1,
+    "air_end_patrol": 20,
+    "air_failed_landing": 104,
+    "air_fly": 8615,
+    "air_ground": 1,
+    "air_ground_attack": 1601,
+    "air_land": 8,
+    "air_land_noncombat": 1927,
+    "air_scramble": 1,
+    "air_start_patrol": 666,
+    "air_support": 182,
+    "economy_advance": 135,
+    "economy_finish_research": 17,
+    "economy_place": 57,
+    "economy_purchase": 7378,
+    "economy_request_rail": 84,
+    "economy_research": 144,
+    "end_phase": 489,
+    "influence_roll": 9,
+    "land_begin_battle": 77,
+    "land_continue_fighting": 11,
+    "land_progress_battle": 62,
+    "land_retreat_begin": 11,
+    "land_retreat_unit": 2,
+    "land_take_casualty": 59,
+    "movement_route": 21213,
+    "naval_begin_assault": 20,
+    "naval_declare_assault": 326,
+    "naval_designate_raider": 191,
+    "naval_enter_port": 1029,
+    "naval_finish_shore_selection": 12,
+    "naval_force_add": 287,
+    "naval_load": 960,
+    "naval_remove_raider": 48,
+    "naval_route": 2029,
+    "naval_select_bombardment": 9,
+    "naval_shore_casualty": 2,
+    "naval_start_move": 6798,
+    "naval_unload": 22,
+    "pass_interrupt": 6,
+    "politics_choose_capital": 56,
+    "politics_declare_war": 6,
+    "politics_priority_declare": 1,
+    "politics_priority_decline": 2,
+    "recruitment_place_infantry": 6,
+    "recruitment_place_militia": 13,
+    "recruitment_roll": 15
+   },
+   "proposals": {
+    "P1_single_option": 194,
+    "P2_battle_bookkeeping": 39,
+    "P3_one_step_single_ship_orders": 184,
+    "P4_purchase_quantity": 5,
+    "P5_batch_placement": 1,
+    "P6_mission_complete_flights": 52,
+    "R1_automatic_casualties": 43,
+    "R2_automatic_retreat": 13,
+    "R3_static_warships": 419
+   },
+   "searched_decisions": 1101,
+   "searched_removed_by_P2_to_P6": 248,
+   "searched_removed_by_P2_to_P6_or_rules": 535,
+   "searched_with_at_least_64_options": 265,
+   "shares": {
+    "decisions_with_at_least_16_options": 0.4741,
+    "decisions_with_at_least_64_options": 0.2046,
+    "proposals": {
+     "P1_single_option": 0.1498,
+     "P2_battle_bookkeeping": 0.0301,
+     "P3_one_step_single_ship_orders": 0.1421,
+     "P4_purchase_quantity": 0.0039,
+     "P5_batch_placement": 0.0008,
+     "P6_mission_complete_flights": 0.0402,
+     "R1_automatic_casualties": 0.0332,
+     "R2_automatic_retreat": 0.01,
+     "R3_static_warships": 0.3236
+    },
+    "searched_removed_by_P2_to_P6": 0.2252,
+    "searched_removed_by_P2_to_P6_or_rules": 0.4859,
+    "searched_with_at_least_64_options": 0.2407,
+    "single_option": 0.1498,
+    "two_options": 0.0849,
+    "union_exact": 0.3413,
+    "union_exact_and_rule": 0.5629
+   },
+   "two_options": 110,
+   "union_exact": 442,
+   "union_exact_and_rule": 729
+  }
+ },
+ "environment": {
+  "comparability": "4-vCPU Linux container, several measurement lanes at once except the native profile; not comparable with Mac baselines",
+  "cpus": 4,
+  "engine_profile": "campaign-orders-v1 training actions; curriculum tasks of 3 and 11 rounds",
+  "extension_build": "setup.py sources compiled with g++ -O3 -std=c++20 (setup.py's -mmacosx-version-min flag is rejected on Linux)",
+  "platform": "Linux-6.18.44-fc-v185-x86_64-with-glibc2.39",
+  "python": "3.13.17"
+ },
+ "interchangeable_unit_options": {
+  "eleven_round_scripted_seed_1953": {
+   "by_kind": {
+    "air_fly": {
+     "interchangeable_units": 16154,
+     "options": 16301,
+     "plus_same_destination": 16154
+    },
+    "air_ground_attack": {
+     "interchangeable_units": 542,
+     "options": 568,
+     "plus_same_destination": 542
+    },
+    "air_land": {
+     "interchangeable_units": 19,
+     "options": 19,
+     "plus_same_destination": 19
+    },
+    "air_land_noncombat": {
+     "interchangeable_units": 95,
+     "options": 95,
+     "plus_same_destination": 95
+    },
+    "air_start_patrol": {
+     "interchangeable_units": 2431,
+     "options": 2438,
+     "plus_same_destination": 2431
+    },
+    "air_support": {
+     "interchangeable_units": 143,
+     "options": 152,
+     "plus_same_destination": 143
+    },
+    "economy_advance": {
+     "interchangeable_units": 4,
+     "options": 4,
+     "plus_same_destination": 4
+    },
+    "economy_finish_research": {
+     "interchangeable_units": 22,
+     "options": 22,
+     "plus_same_destination": 22
+    },
+    "economy_lease_declare": {
+     "interchangeable_units": 72,
+     "options": 72,
+     "plus_same_destination": 72
+    },
+    "economy_lease_upgrade": {
+     "interchangeable_units": 34,
+     "options": 34,
+     "plus_same_destination": 34
+    },
+    "economy_place": {
+     "interchangeable_units": 2615,
+     "options": 2615,
+     "plus_same_destination": 2615
+    },
+    "economy_purchase": {
+     "interchangeable_units": 18941,
+     "options": 18941,
+     "plus_same_destination": 18941
+    },
+    "economy_request_rail": {
+     "interchangeable_units": 146,
+     "options": 146,
+     "plus_same_destination": 146
+    },
+    "economy_research": {
+     "interchangeable_units": 176,
+     "options": 176,
+     "plus_same_destination": 176
+    },
+    "end_phase": {
+     "interchangeable_units": 956,
+     "options": 956,
+     "plus_same_destination": 956
+    },
+    "influence_roll": {
+     "interchangeable_units": 6,
+     "options": 6,
+     "plus_same_destination": 6
+    },
+    "land_begin_battle": {
+     "interchangeable_units": 190,
+     "options": 190,
+     "plus_same_destination": 190
+    },
+    "land_continue_fighting": {
+     "interchangeable_units": 86,
+     "options": 86,
+     "plus_same_destination": 86
+    },
+    "land_progress_battle": {
+     "interchangeable_units": 268,
+     "options": 268,
+     "plus_same_destination": 268
+    },
+    "land_retreat_begin": {
+     "interchangeable_units": 89,
+     "options": 89,
+     "plus_same_destination": 89
+    },
+    "land_retreat_unit": {
+     "interchangeable_units": 27,
+     "options": 27,
+     "plus_same_destination": 27
+    },
+    "land_take_casualty": {
+     "interchangeable_units": 169,
+     "options": 249,
+     "plus_same_destination": 169
+    },
+    "movement_route": {
+     "interchangeable_units": 8080,
+     "options": 17909,
+     "plus_same_destination": 7985
+    },
+    "naval_begin_assault": {
+     "interchangeable_units": 98,
+     "options": 98,
+     "plus_same_destination": 98
+    },
+    "naval_declare_assault": {
+     "interchangeable_units": 121,
+     "options": 145,
+     "plus_same_destination": 121
+    },
+    "naval_designate_raider": {
+     "interchangeable_units": 53,
+     "options": 53,
+     "plus_same_destination": 53
+    },
+    "naval_enter_port": {
+     "interchangeable_units": 367,
+     "options": 369,
+     "plus_same_destination": 367
+    },
+    "naval_finish_shore_selection": {
+     "interchangeable_units": 26,
+     "options": 26,
+     "plus_same_destination": 26
+    },
+    "naval_force_add": {
+     "interchangeable_units": 408,
+     "options": 427,
+     "plus_same_destination": 408
+    },
+    "naval_load": {
+     "interchangeable_units": 356,
+     "options": 1232,
+     "plus_same_destination": 356
+    },
+    "naval_remove_raider": {
+     "interchangeable_units": 313,
+     "options": 313,
+     "plus_same_destination": 313
+    },
+    "naval_route": {
+     "interchangeable_units": 3280,
+     "options": 3280,
+     "plus_same_destination": 3280
+    },
+    "naval_select_bombardment": {
+     "interchangeable_units": 36,
+     "options": 36,
+     "plus_same_destination": 36
+    },
+    "naval_start_move": {
+     "interchangeable_units": 9153,
+     "options": 10014,
+     "plus_same_destination": 9153
+    },
+    "naval_unload": {
+     "interchangeable_units": 50,
+     "options": 70,
+     "plus_same_destination": 50
+    },
+    "pass_interrupt": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "politics_choose_capital": {
+     "interchangeable_units": 28,
+     "options": 28,
+     "plus_same_destination": 28
+    },
+    "politics_declare_war": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "politics_priority_declare": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "politics_priority_decline": {
+     "interchangeable_units": 2,
+     "options": 2,
+     "plus_same_destination": 2
+    },
+    "recruitment_place_infantry": {
+     "interchangeable_units": 27,
+     "options": 27,
+     "plus_same_destination": 27
+    },
+    "recruitment_place_militia": {
+     "interchangeable_units": 66,
+     "options": 66,
+     "plus_same_destination": 66
+    },
+    "recruitment_roll": {
+     "interchangeable_units": 37,
+     "options": 37,
+     "plus_same_destination": 37
+    }
+   },
+   "totals": {
+    "decisions": 2080,
+    "interchangeable_units": 65689,
+    "options": 77589,
+    "plus_same_destination": 65594
+   }
+  },
+  "three_round_uniform_seeds_1951_1952": {
+   "by_kind": {
+    "air_decline_scramble": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "air_end_patrol": {
+     "interchangeable_units": 20,
+     "options": 20,
+     "plus_same_destination": 20
+    },
+    "air_failed_landing": {
+     "interchangeable_units": 104,
+     "options": 104,
+     "plus_same_destination": 104
+    },
+    "air_fly": {
+     "interchangeable_units": 8552,
+     "options": 8615,
+     "plus_same_destination": 8552
+    },
+    "air_ground": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "air_ground_attack": {
+     "interchangeable_units": 1586,
+     "options": 1601,
+     "plus_same_destination": 1586
+    },
+    "air_land": {
+     "interchangeable_units": 8,
+     "options": 8,
+     "plus_same_destination": 8
+    },
+    "air_land_noncombat": {
+     "interchangeable_units": 1927,
+     "options": 1927,
+     "plus_same_destination": 1927
+    },
+    "air_scramble": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "air_start_patrol": {
+     "interchangeable_units": 663,
+     "options": 666,
+     "plus_same_destination": 663
+    },
+    "air_support": {
+     "interchangeable_units": 182,
+     "options": 182,
+     "plus_same_destination": 182
+    },
+    "economy_advance": {
+     "interchangeable_units": 135,
+     "options": 135,
+     "plus_same_destination": 135
+    },
+    "economy_finish_research": {
+     "interchangeable_units": 17,
+     "options": 17,
+     "plus_same_destination": 17
+    },
+    "economy_place": {
+     "interchangeable_units": 57,
+     "options": 57,
+     "plus_same_destination": 57
+    },
+    "economy_purchase": {
+     "interchangeable_units": 7378,
+     "options": 7378,
+     "plus_same_destination": 7378
+    },
+    "economy_request_rail": {
+     "interchangeable_units": 84,
+     "options": 84,
+     "plus_same_destination": 84
+    },
+    "economy_research": {
+     "interchangeable_units": 144,
+     "options": 144,
+     "plus_same_destination": 144
+    },
+    "end_phase": {
+     "interchangeable_units": 489,
+     "options": 489,
+     "plus_same_destination": 489
+    },
+    "influence_roll": {
+     "interchangeable_units": 9,
+     "options": 9,
+     "plus_same_destination": 9
+    },
+    "land_begin_battle": {
+     "interchangeable_units": 77,
+     "options": 77,
+     "plus_same_destination": 77
+    },
+    "land_continue_fighting": {
+     "interchangeable_units": 11,
+     "options": 11,
+     "plus_same_destination": 11
+    },
+    "land_progress_battle": {
+     "interchangeable_units": 62,
+     "options": 62,
+     "plus_same_destination": 62
+    },
+    "land_retreat_begin": {
+     "interchangeable_units": 11,
+     "options": 11,
+     "plus_same_destination": 11
+    },
+    "land_retreat_unit": {
+     "interchangeable_units": 2,
+     "options": 2,
+     "plus_same_destination": 2
+    },
+    "land_take_casualty": {
+     "interchangeable_units": 52,
+     "options": 59,
+     "plus_same_destination": 52
+    },
+    "movement_route": {
+     "interchangeable_units": 15570,
+     "options": 21213,
+     "plus_same_destination": 15276
+    },
+    "naval_begin_assault": {
+     "interchangeable_units": 20,
+     "options": 20,
+     "plus_same_destination": 20
+    },
+    "naval_declare_assault": {
+     "interchangeable_units": 326,
+     "options": 326,
+     "plus_same_destination": 326
+    },
+    "naval_designate_raider": {
+     "interchangeable_units": 191,
+     "options": 191,
+     "plus_same_destination": 191
+    },
+    "naval_enter_port": {
+     "interchangeable_units": 1029,
+     "options": 1029,
+     "plus_same_destination": 1029
+    },
+    "naval_finish_shore_selection": {
+     "interchangeable_units": 12,
+     "options": 12,
+     "plus_same_destination": 12
+    },
+    "naval_force_add": {
+     "interchangeable_units": 255,
+     "options": 287,
+     "plus_same_destination": 255
+    },
+    "naval_load": {
+     "interchangeable_units": 798,
+     "options": 960,
+     "plus_same_destination": 798
+    },
+    "naval_remove_raider": {
+     "interchangeable_units": 48,
+     "options": 48,
+     "plus_same_destination": 48
+    },
+    "naval_route": {
+     "interchangeable_units": 2029,
+     "options": 2029,
+     "plus_same_destination": 2029
+    },
+    "naval_select_bombardment": {
+     "interchangeable_units": 9,
+     "options": 9,
+     "plus_same_destination": 9
+    },
+    "naval_shore_casualty": {
+     "interchangeable_units": 1,
+     "options": 2,
+     "plus_same_destination": 1
+    },
+    "naval_start_move": {
+     "interchangeable_units": 6168,
+     "options": 6798,
+     "plus_same_destination": 6168
+    },
+    "naval_unload": {
+     "interchangeable_units": 22,
+     "options": 22,
+     "plus_same_destination": 22
+    },
+    "pass_interrupt": {
+     "interchangeable_units": 6,
+     "options": 6,
+     "plus_same_destination": 6
+    },
+    "politics_choose_capital": {
+     "interchangeable_units": 56,
+     "options": 56,
+     "plus_same_destination": 56
+    },
+    "politics_declare_war": {
+     "interchangeable_units": 6,
+     "options": 6,
+     "plus_same_destination": 6
+    },
+    "politics_priority_declare": {
+     "interchangeable_units": 1,
+     "options": 1,
+     "plus_same_destination": 1
+    },
+    "politics_priority_decline": {
+     "interchangeable_units": 2,
+     "options": 2,
+     "plus_same_destination": 2
+    },
+    "recruitment_place_infantry": {
+     "interchangeable_units": 6,
+     "options": 6,
+     "plus_same_destination": 6
+    },
+    "recruitment_place_militia": {
+     "interchangeable_units": 13,
+     "options": 13,
+     "plus_same_destination": 13
+    },
+    "recruitment_roll": {
+     "interchangeable_units": 15,
+     "options": 15,
+     "plus_same_destination": 15
+    }
+   },
+   "totals": {
+    "decisions": 1295,
+    "interchangeable_units": 48156,
+    "options": 54712,
+    "plus_same_destination": 47862
+   }
+  }
+ },
+ "native_profile": {
+  "r0_japan_combat_movement": {
+   "engine_clone_ms": 0.0396,
+   "engine_menu_actions": 308,
+   "engine_menu_ms": 15.942,
+   "history_events": 52,
+   "layers": {
+    "+air": {
+     "actions": 227,
+     "cumulative_ms": 9.637,
+     "increment_ms": 9.636
+    },
+    "+land": {
+     "actions": 227,
+     "cumulative_ms": 9.807,
+     "increment_ms": 0.17
+    },
+    "+movement": {
+     "actions": 307,
+     "cumulative_ms": 12.721,
+     "increment_ms": -1.069
+    },
+    "+naval": {
+     "actions": 268,
+     "cumulative_ms": 13.79,
+     "increment_ms": 3.983
+    },
+    "+politics": {
+     "actions": 307,
+     "cumulative_ms": 12.93,
+     "increment_ms": 0.209
+    },
+    "+training": {
+     "actions": 307,
+     "cumulative_ms": 14.317,
+     "increment_ms": 1.387
+    },
+    "economy": {
+     "actions": 0,
+     "cumulative_ms": 0.001,
+     "increment_ms": 0.001
+    }
+   },
+   "menu_kinds": {
+    "air_fly": 169,
+    "air_ground_attack": 35,
+    "air_start_patrol": 23,
+    "end_phase": 1,
+    "movement_route": 39,
+    "naval_designate_raider": 1,
+    "naval_load": 16,
+    "naval_start_move": 24
+   },
+   "planning_key_ms": 0.3562,
+   "state_validate_ms": 0.0753,
+   "transition_ms": {
+    "air_fly": 0.675,
+    "air_ground_attack": 0.675,
+    "air_start_patrol": 0.634,
+    "end_phase": 0.586,
+    "movement_route": 0.64,
+    "naval_designate_raider": 0.994,
+    "naval_load": 0.628,
+    "naval_start_move": 7.641
+   },
+   "units": 97
+  },
+  "r0_japan_non_combat_movement": {
+   "engine_clone_ms": 0.0583,
+   "engine_menu_actions": 52,
+   "engine_menu_ms": 6.345,
+   "history_events": 182,
+   "layers": {
+    "+air": {
+     "actions": 0,
+     "cumulative_ms": 0.097,
+     "increment_ms": 0.096
+    },
+    "+land": {
+     "actions": 0,
+     "cumulative_ms": 0.072,
+     "increment_ms": -0.025
+    },
+    "+movement": {
+     "actions": 51,
+     "cumulative_ms": 3.508,
+     "increment_ms": -0.364
+    },
+    "+naval": {
+     "actions": 51,
+     "cumulative_ms": 3.872,
+     "increment_ms": 3.8
+    },
+    "+politics": {
+     "actions": 51,
+     "cumulative_ms": 3.378,
+     "increment_ms": -0.131
+    },
+    "+training": {
+     "actions": 51,
+     "cumulative_ms": 3.746,
+     "increment_ms": 0.369
+    },
+    "economy": {
+     "actions": 0,
+     "cumulative_ms": 0.001,
+     "increment_ms": 0.001
+    }
+   },
+   "menu_kinds": {
+    "end_phase": 1,
+    "naval_enter_port": 38,
+    "naval_start_move": 3,
+    "naval_unload": 10
+   },
+   "planning_key_ms": 0.5183,
+   "state_validate_ms": 0.1588,
+   "transition_ms": {
+    "end_phase": 0.876,
+    "naval_enter_port": 1.278,
+    "naval_start_move": 3.037,
+    "naval_unload": 0.949
+   },
+   "units": 92
+  },
+  "r1_japan_combat_movement": {
+   "engine_clone_ms": 0.0548,
+   "engine_menu_actions": 258,
+   "engine_menu_ms": 20.13,
+   "history_events": 292,
+   "layers": {
+    "+air": {
+     "actions": 192,
+     "cumulative_ms": 9.437,
+     "increment_ms": 9.436
+    },
+    "+land": {
+     "actions": 192,
+     "cumulative_ms": 12.132,
+     "increment_ms": 2.695
+    },
+    "+movement": {
+     "actions": 257,
+     "cumulative_ms": 13.307,
+     "increment_ms": -0.061
+    },
+    "+naval": {
+     "actions": 224,
+     "cumulative_ms": 13.368,
+     "increment_ms": 1.236
+    },
+    "+politics": {
+     "actions": 257,
+     "cumulative_ms": 12.504,
+     "increment_ms": -0.803
+    },
+    "+training": {
+     "actions": 257,
+     "cumulative_ms": 16.465,
+     "increment_ms": 3.96
+    },
+    "economy": {
+     "actions": 0,
+     "cumulative_ms": 0.001,
+     "increment_ms": 0.001
+    }
+   },
+   "menu_kinds": {
+    "air_fly": 141,
+    "air_ground_attack": 36,
+    "air_start_patrol": 15,
+    "end_phase": 1,
+    "movement_route": 33,
+    "naval_declare_assault": 2,
+    "naval_designate_raider": 1,
+    "naval_load": 5,
+    "naval_start_move": 24
+   },
+   "planning_key_ms": 0.5198,
+   "state_validate_ms": 0.1372,
+   "transition_ms": {
+    "air_fly": 1.242,
+    "air_ground_attack": 1.007,
+    "air_start_patrol": 0.729,
+    "end_phase": 0.698,
+    "movement_route": 0.729,
+    "naval_declare_assault": 0.76,
+    "naval_designate_raider": 1.031,
+    "naval_load": 0.731,
+    "naval_start_move": 6.094
+   },
+   "units": 90
+  },
+  "r1_japan_non_combat_movement": {
+   "engine_clone_ms": 0.1528,
+   "engine_menu_actions": 37,
+   "engine_menu_ms": 9.936,
+   "history_events": 417,
+   "layers": {
+    "+air": {
+     "actions": 2,
+     "cumulative_ms": 0.125,
+     "increment_ms": 0.123
+    },
+    "+land": {
+     "actions": 2,
+     "cumulative_ms": 0.099,
+     "increment_ms": -0.026
+    },
+    "+movement": {
+     "actions": 36,
+     "cumulative_ms": 5.802,
+     "increment_ms": 0.32
+    },
+    "+naval": {
+     "actions": 36,
+     "cumulative_ms": 5.482,
+     "increment_ms": 5.384
+    },
+    "+politics": {
+     "actions": 36,
+     "cumulative_ms": 4.391,
+     "increment_ms": -1.411
+    },
+    "+training": {
+     "actions": 36,
+     "cumulative_ms": 3.505,
+     "increment_ms": -0.886
+    },
+    "economy": {
+     "actions": 0,
+     "cumulative_ms": 0.002,
+     "increment_ms": 0.002
+    }
+   },
+   "menu_kinds": {
+    "air_end_patrol": 2,
+    "end_phase": 1,
+    "naval_enter_port": 31,
+    "naval_start_move": 2,
+    "naval_unload": 1
+   },
+   "planning_key_ms": 0.8556,
+   "state_validate_ms": 0.2776,
+   "transition_ms": {
+    "air_end_patrol": 1.704,
+    "end_phase": 0.859,
+    "naval_enter_port": 1.554,
+    "naval_start_move": 71.611,
+    "naval_unload": 0.838
+   },
+   "units": 83
+  },
+  "r2_japan_combat_movement": {
+   "engine_clone_ms": 0.0468,
+   "engine_menu_actions": 145,
+   "engine_menu_ms": 8.762,
+   "history_events": 512,
+   "layers": {
+    "+air": {
+     "actions": 86,
+     "cumulative_ms": 4.19,
+     "increment_ms": 4.189
+    },
+    "+land": {
+     "actions": 86,
+     "cumulative_ms": 4.376,
+     "increment_ms": 0.186
+    },
+    "+movement": {
+     "actions": 144,
+     "cumulative_ms": 5.802,
+     "increment_ms": 0.026
+    },
+    "+naval": {
+     "actions": 114,
+     "cumulative_ms": 5.776,
+     "increment_ms": 1.4
+    },
+    "+politics": {
+     "actions": 144,
+     "cumulative_ms": 7.044,
+     "increment_ms": 1.242
+    },
+    "+training": {
+     "actions": 144,
+     "cumulative_ms": 9.462,
+     "increment_ms": 2.418
+    },
+    "economy": {
+     "actions": 0,
+     "cumulative_ms": 0.001,
+     "increment_ms": 0.001
+    }
+   },
+   "menu_kinds": {
+    "air_fly": 72,
+    "air_ground_attack": 10,
+    "air_start_patrol": 4,
+    "end_phase": 1,
+    "movement_route": 30,
+    "naval_designate_raider": 1,
+    "naval_load": 3,
+    "naval_start_move": 24
+   },
+   "planning_key_ms": 0.3638,
+   "state_validate_ms": 0.124,
+   "transition_ms": {
+    "air_fly": 0.819,
+    "air_ground_attack": 0.81,
+    "air_start_patrol": 0.797,
+    "end_phase": 0.735,
+    "movement_route": 0.717,
+    "naval_designate_raider": 1.011,
+    "naval_load": 0.73,
+    "naval_start_move": 4.761
+   },
+   "units": 84
+  },
+  "r2_japan_non_combat_movement": {
+   "engine_clone_ms": 0.0715,
+   "engine_menu_actions": 43,
+   "engine_menu_ms": 7.373,
+   "history_events": 621,
+   "layers": {
+    "+air": {
+     "actions": 2,
+     "cumulative_ms": 0.109,
+     "increment_ms": 0.108
+    },
+    "+land": {
+     "actions": 2,
+     "cumulative_ms": 0.088,
+     "increment_ms": -0.021
+    },
+    "+movement": {
+     "actions": 42,
+     "cumulative_ms": 3.911,
+     "increment_ms": 0.088
+    },
+    "+naval": {
+     "actions": 42,
+     "cumulative_ms": 3.822,
+     "increment_ms": 3.734
+    },
+    "+politics": {
+     "actions": 42,
+     "cumulative_ms": 4.037,
+     "increment_ms": 0.126
+    },
+    "+training": {
+     "actions": 42,
+     "cumulative_ms": 3.867,
+     "increment_ms": -0.17
+    },
+    "economy": {
+     "actions": 0,
+     "cumulative_ms": 0.001,
+     "increment_ms": 0.001
+    }
+   },
+   "menu_kinds": {
+    "air_end_patrol": 2,
+    "end_phase": 1,
+    "naval_enter_port": 39,
+    "naval_start_move": 1
+   },
+   "planning_key_ms": 0.4727,
+   "state_validate_ms": 0.2008,
+   "transition_ms": {
+    "air_end_patrol": 1.084,
+    "end_phase": 1.113,
+    "naval_enter_port": 1.353,
+    "naval_start_move": 2.957
+   },
+   "units": 81
+  }
+ },
+ "objective_incentive": {
+  "eleven_rounds": [
+   {
+    "axis_policy": "attack",
+    "decisions": 1876,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 20.8,
+      "axis": 59.4,
+      "comintern": 5.6
+     },
+     "before": {
+      "allies": 14.2,
+      "axis": 59.4,
+      "comintern": 5.6
+     }
+    },
+    "returns": [
+     1.3,
+     -7.1,
+     -101.7
+    ],
+    "rounds": 11,
+    "seed": 1951,
+    "wealth": {
+     "allies": {
+      "income_rate": 21,
+      "infrastructure": 71,
+      "treasury": 21,
+      "units": 200,
+      "wealth": 50.2
+     },
+     "axis": {
+      "income_rate": 11,
+      "infrastructure": 129,
+      "treasury": 11,
+      "units": 294,
+      "wealth": 54.4
+     },
+     "comintern": {
+      "income_rate": 1,
+      "infrastructure": 4,
+      "treasury": 4,
+      "units": 9,
+      "wealth": 2.9
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 1333,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     },
+     "before": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     }
+    },
+    "returns": [
+     49.7,
+     -97.7,
+     -67.1
+    ],
+    "rounds": 11,
+    "seed": 1951,
+    "wealth": {
+     "allies": {
+      "income_rate": 5,
+      "infrastructure": 9,
+      "treasury": 5,
+      "units": 23,
+      "wealth": 8.7
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 156,
+      "treasury": 15,
+      "units": 503,
+      "wealth": 82.4
+     },
+     "comintern": {
+      "income_rate": 13,
+      "infrastructure": 39,
+      "treasury": 13,
+      "units": 58,
+      "wealth": 24
+     }
+    }
+   },
+   {
+    "axis_policy": "attack",
+    "decisions": 1987,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 22.1,
+      "axis": 61.4,
+      "comintern": 5.4
+     },
+     "before": {
+      "allies": 15.5,
+      "axis": 61.4,
+      "comintern": 5.4
+     }
+    },
+    "returns": [
+     20.8,
+     -21.8,
+     -102.6
+    ],
+    "rounds": 11,
+    "seed": 1952,
+    "wealth": {
+     "allies": {
+      "income_rate": 20,
+      "infrastructure": 56,
+      "treasury": 20,
+      "units": 133,
+      "wealth": 40.9
+     },
+     "axis": {
+      "income_rate": 13,
+      "infrastructure": 148,
+      "treasury": 13,
+      "units": 331,
+      "wealth": 62.2
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 0,
+      "units": 0,
+      "wealth": 0.5
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 1361,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 17,
+      "axis": 66,
+      "comintern": 6.3
+     },
+     "before": {
+      "allies": 17,
+      "axis": 66,
+      "comintern": 6.3
+     }
+    },
+    "returns": [
+     58.0,
+     -70.2,
+     -97.0
+    ],
+    "rounds": 11,
+    "seed": 1952,
+    "wealth": {
+     "allies": {
+      "income_rate": 9,
+      "infrastructure": 31,
+      "treasury": 9,
+      "units": 65,
+      "wealth": 19.5
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 158,
+      "treasury": 15,
+      "units": 513,
+      "wealth": 83.6
+     },
+     "comintern": {
+      "income_rate": 2,
+      "infrastructure": 7,
+      "treasury": 8,
+      "units": 26,
+      "wealth": 6.1
+     }
+    }
+   },
+   {
+    "axis_policy": "attack",
+    "decisions": 2080,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 13.9,
+      "axis": 70.4,
+      "comintern": 6.1
+     },
+     "before": {
+      "allies": 7.3,
+      "axis": 70.4,
+      "comintern": 6.1
+     }
+    },
+    "returns": [
+     51.3,
+     -52.3,
+     -100.7
+    ],
+    "rounds": 11,
+    "seed": 1953,
+    "wealth": {
+     "allies": {
+      "income_rate": 11,
+      "infrastructure": 39,
+      "treasury": 11,
+      "units": 87,
+      "wealth": 24.7
+     },
+     "axis": {
+      "income_rate": 22,
+      "infrastructure": 165,
+      "treasury": 27,
+      "units": 353,
+      "wealth": 76.5
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 2,
+      "units": 3,
+      "wealth": 0.5
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 1424,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6.6
+     },
+     "before": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6.6
+     }
+    },
+    "returns": [
+     44.8,
+     -47.6,
+     -116.2
+    ],
+    "rounds": 11,
+    "seed": 1953,
+    "wealth": {
+     "allies": {
+      "income_rate": 16,
+      "infrastructure": 48,
+      "treasury": 16,
+      "units": 133,
+      "wealth": 35.7
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 156,
+      "treasury": 15,
+      "units": 498,
+      "wealth": 81.9
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 0,
+      "units": 14,
+      "wealth": 1.4
+     }
+    }
+   },
+   {
+    "axis_policy": "attack",
+    "decisions": 1998,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 21.4,
+      "axis": 59.7,
+      "comintern": 5.4
+     },
+     "before": {
+      "allies": 14.8,
+      "axis": 59.7,
+      "comintern": 5.4
+     }
+    },
+    "returns": [
+     24.5,
+     -24.5,
+     -111.9
+    ],
+    "rounds": 11,
+    "seed": 1954,
+    "wealth": {
+     "allies": {
+      "income_rate": 17,
+      "infrastructure": 69,
+      "treasury": 17,
+      "units": 181,
+      "wealth": 43.7
+     },
+     "axis": {
+      "income_rate": 19,
+      "infrastructure": 135,
+      "treasury": 22,
+      "units": 335,
+      "wealth": 68.2
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 0,
+      "units": 0,
+      "wealth": 0
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 1558,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     },
+     "before": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     }
+    },
+    "returns": [
+     50.7,
+     -54.3,
+     -117.3
+    ],
+    "rounds": 11,
+    "seed": 1954,
+    "wealth": {
+     "allies": {
+      "income_rate": 14,
+      "infrastructure": 42,
+      "treasury": 14,
+      "units": 137,
+      "wealth": 33.3
+     },
+     "axis": {
+      "income_rate": 16,
+      "infrastructure": 158,
+      "treasury": 16,
+      "units": 524,
+      "wealth": 85.8
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 4,
+      "treasury": 0,
+      "units": 14,
+      "wealth": 1.8
+     }
+    }
+   }
+  ],
+  "three_rounds": [
+   {
+    "axis_policy": "attack",
+    "decisions": 579,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 20.8,
+      "axis": 59.4,
+      "comintern": 5.6
+     },
+     "before": {
+      "allies": 14.2,
+      "axis": 59.4,
+      "comintern": 5.6
+     }
+    },
+    "returns": [
+     28.1,
+     -36.9,
+     -88.3
+    ],
+    "rounds": 3,
+    "seed": 1951,
+    "wealth": {
+     "allies": {
+      "income_rate": 15,
+      "infrastructure": 40,
+      "treasury": 15,
+      "units": 96,
+      "wealth": 30.1
+     },
+     "axis": {
+      "income_rate": 18,
+      "infrastructure": 145,
+      "treasury": 22,
+      "units": 279,
+      "wealth": 62.6
+     },
+     "comintern": {
+      "income_rate": 1,
+      "infrastructure": 19,
+      "treasury": 4,
+      "units": 9,
+      "wealth": 4.4
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 385,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     },
+     "before": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     }
+    },
+    "returns": [
+     46.2,
+     -48.8,
+     -92.0
+    ],
+    "rounds": 3,
+    "seed": 1951,
+    "wealth": {
+     "allies": {
+      "income_rate": 12,
+      "infrastructure": 40,
+      "treasury": 12,
+      "units": 57,
+      "wealth": 22.9
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 156,
+      "treasury": 15,
+      "units": 383,
+      "wealth": 70.4
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 2,
+      "units": 11,
+      "wealth": 1.3
+     }
+    }
+   },
+   {
+    "axis_policy": "attack",
+    "decisions": 613,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 22.1,
+      "axis": 61.4,
+      "comintern": 5.4
+     },
+     "before": {
+      "allies": 15.5,
+      "axis": 61.4,
+      "comintern": 5.4
+     }
+    },
+    "returns": [
+     39.7,
+     -40.7,
+     -95.5
+    ],
+    "rounds": 3,
+    "seed": 1952,
+    "wealth": {
+     "allies": {
+      "income_rate": 14,
+      "infrastructure": 40,
+      "treasury": 14,
+      "units": 85,
+      "wealth": 27.9
+     },
+     "axis": {
+      "income_rate": 20,
+      "infrastructure": 164,
+      "treasury": 21,
+      "units": 296,
+      "wealth": 68.1
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 3,
+      "units": 0,
+      "wealth": 0.5
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 388,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 17,
+      "axis": 66,
+      "comintern": 6.3
+     },
+     "before": {
+      "allies": 17,
+      "axis": 66,
+      "comintern": 6.3
+     }
+    },
+    "returns": [
+     49.0,
+     -58.2,
+     -85.2
+    ],
+    "rounds": 3,
+    "seed": 1952,
+    "wealth": {
+     "allies": {
+      "income_rate": 9,
+      "infrastructure": 31,
+      "treasury": 10,
+      "units": 50,
+      "wealth": 18.1
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 158,
+      "treasury": 15,
+      "units": 394,
+      "wealth": 71.7
+     },
+     "comintern": {
+      "income_rate": 2,
+      "infrastructure": 7,
+      "treasury": 3,
+      "units": 16,
+      "wealth": 4.6
+     }
+    }
+   },
+   {
+    "axis_policy": "attack",
+    "decisions": 633,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 13.9,
+      "axis": 70.4,
+      "comintern": 6.1
+     },
+     "before": {
+      "allies": 7.3,
+      "axis": 70.4,
+      "comintern": 6.1
+     }
+    },
+    "returns": [
+     31.0,
+     -42.8,
+     -80.8
+    ],
+    "rounds": 3,
+    "seed": 1953,
+    "wealth": {
+     "allies": {
+      "income_rate": 12,
+      "infrastructure": 39,
+      "treasury": 12,
+      "units": 78,
+      "wealth": 24.9
+     },
+     "axis": {
+      "income_rate": 16,
+      "infrastructure": 156,
+      "treasury": 18,
+      "units": 284,
+      "wealth": 61.8
+     },
+     "comintern": {
+      "income_rate": 3,
+      "infrastructure": 9,
+      "treasury": 3,
+      "units": 17,
+      "wealth": 5.9
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 372,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6.6
+     },
+     "before": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6.6
+     }
+    },
+    "returns": [
+     48.4,
+     -55.4,
+     -85.0
+    ],
+    "rounds": 3,
+    "seed": 1953,
+    "wealth": {
+     "allies": {
+      "income_rate": 9,
+      "infrastructure": 36,
+      "treasury": 9,
+      "units": 48,
+      "wealth": 18.3
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 156,
+      "treasury": 15,
+      "units": 381,
+      "wealth": 70.2
+     },
+     "comintern": {
+      "income_rate": 2,
+      "infrastructure": 2,
+      "treasury": 2,
+      "units": 11,
+      "wealth": 3.5
+     }
+    }
+   },
+   {
+    "axis_policy": "attack",
+    "decisions": 591,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 21.4,
+      "axis": 59.7,
+      "comintern": 5.4
+     },
+     "before": {
+      "allies": 14.8,
+      "axis": 59.7,
+      "comintern": 5.4
+     }
+    },
+    "returns": [
+     46.1,
+     -53.1,
+     -88.1
+    ],
+    "rounds": 3,
+    "seed": 1954,
+    "wealth": {
+     "allies": {
+      "income_rate": 10,
+      "infrastructure": 20,
+      "treasury": 10,
+      "units": 80,
+      "wealth": 21
+     },
+     "axis": {
+      "income_rate": 23,
+      "infrastructure": 177,
+      "treasury": 24,
+      "units": 275,
+      "wealth": 70.6
+     },
+     "comintern": {
+      "income_rate": 2,
+      "infrastructure": 7,
+      "treasury": 2,
+      "units": 6,
+      "wealth": 3.5
+     }
+    }
+   },
+   {
+    "axis_policy": "passive",
+    "decisions": 371,
+    "first_japan_combat_phase_close": {
+     "after": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     },
+     "before": {
+      "allies": 16,
+      "axis": 66,
+      "comintern": 6
+     }
+    },
+    "returns": [
+     48.2,
+     -52.4,
+     -91.4
+    ],
+    "rounds": 3,
+    "seed": 1954,
+    "wealth": {
+     "allies": {
+      "income_rate": 11,
+      "infrastructure": 38,
+      "treasury": 11,
+      "units": 57,
+      "wealth": 21.6
+     },
+     "axis": {
+      "income_rate": 15,
+      "infrastructure": 158,
+      "treasury": 15,
+      "units": 396,
+      "wealth": 71.9
+     },
+     "comintern": {
+      "income_rate": 0,
+      "infrastructure": 0,
+      "treasury": 2,
+      "units": 19,
+      "wealth": 2.1
+     }
+    }
+   }
+  ]
+ },
+ "policies": {
+  "passive_axis": "scripted Axis except: end combat movement immediately and pass declaration offers",
+  "scripted": "campaign-active-baseline-v2:balanced for all alliances (argmax)",
+  "uniform": "uniform random legal option, random.Random(seed * 7919 + 17)"
+ },
+ "policy_target_flatness": {
+  "evaluator": "deterministic pseudo-random values and squared-uniform priors per state (stand-in network)",
+  "position": "Japan's first combat-movement decision, scripted play, seed 1951",
+  "searches": [
+   {
+    "distinct_children_visited": 16,
+    "largest_target_probability": 0.0625,
+    "largest_visit_counts": [
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "menu": 308,
+    "simulations": 16
+   },
+   {
+    "distinct_children_visited": 63,
+    "largest_target_probability": 0.0312,
+    "largest_visit_counts": [
+     2,
+     1,
+     1,
+     1,
+     1
+    ],
+    "menu": 308,
+    "simulations": 64
+   }
+  ]
+ },
+ "production_menus": {
+  "japan_first_purchase_menu_seed_1951": {
+   "distinct_rows": 44,
+   "options": 220,
+   "purchases": 216,
+   "round_index": 0,
+   "rows_without_site": [
+    "japan_major_air_transport",
+    "japan_major_airborne_infantry",
+    "japan_major_anti_aircraft_artillery",
+    "japan_major_artillery",
+    "japan_major_battlecruiser",
+    "japan_major_battleship",
+    "japan_major_cavalry",
+    "japan_major_destroyer",
+    "japan_major_fighter",
+    "japan_major_fleet_carrier",
+    "japan_major_heavy_cruiser",
+    "japan_major_infantry",
+    "japan_major_infantry_to_motorized_infantry",
+    "japan_major_light_armor",
+    "japan_major_light_carrier",
+    "japan_major_light_cruiser",
+    "japan_major_marine",
+    "japan_major_medium_bomber",
+    "japan_major_medium_factory_to_major_factory",
+    "japan_major_militia",
+    "japan_major_militia_to_infantry",
+    "japan_major_minor_port_to_major_port",
+    "japan_major_motorized_infantry",
+    "japan_major_mountain_infantry",
+    "japan_major_naval_transport",
+    "japan_major_seaplane",
+    "japan_major_self_propelled_artillery",
+    "japan_major_submarine",
+    "japan_major_tactical_bomber"
+   ],
+   "site_specific_purchases": 187
+  },
+  "kmt_placement_menus": {
+   "eleven_round_scripted_seed_1953": {
+    "kmt_placements": 55,
+    "largest_menu": 90
+   },
+   "three_round_scripted_seed_1951": {
+    "kmt_placements": 16,
+    "largest_menu": 91
+   }
+  },
+  "kmt_round_two_production_menu_seed_1951": {
+   "distinct_rows": 20,
+   "options": 219,
+   "purchases": 213,
+   "round_index": 1,
+   "rows_without_site": [
+    "kmt_major_infantry_to_motorized_infantry",
+    "kmt_major_militia",
+    "kmt_major_militia_to_infantry",
+    "kmt_major_minor_dockyard_to_major_dockyard"
+   ],
+   "site_specific_purchases": 209
+  }
+ },
+ "schema_version": 1,
+ "scope": "Measurement-only review of decisions, legal options, objective incentives, engine cost and search targets. No engine, rule, interface or training code was changed.",
+ "search_cost_uniform_evaluator": {
+  "axis_share_of_search_time": 0.7942,
+  "by_root_category": {
+   "battle_bookkeeping": {
+    "decisions": 17,
+    "search_s": 7.04,
+    "share_of_decisions": 0.0246,
+    "share_of_search_time": 0.0225
+   },
+   "naval_order": {
+    "decisions": 227,
+    "search_s": 139.65,
+    "share_of_decisions": 0.3285,
+    "share_of_search_time": 0.4469
+   },
+   "other": {
+    "decisions": 342,
+    "search_s": 165.37,
+    "share_of_decisions": 0.4949,
+    "share_of_search_time": 0.5292
+   },
+   "single_option": {
+    "decisions": 105,
+    "search_s": 0.41,
+    "share_of_decisions": 0.152,
+    "share_of_search_time": 0.0013
+   }
+  },
+  "decisions": 691,
+  "expanded_decision_nodes": 37961,
+  "expanded_decision_nodes_by_kind": {
+   "air_ground_or_defend": 23,
+   "air_landing": 46,
+   "combat": 860,
+   "combat_movement": 17778,
+   "declaration_offer": 187,
+   "economy_rail_permission": 14,
+   "land_casualty": 653,
+   "land_retreat_destination": 107,
+   "land_retreat_or_continue": 666,
+   "naval_force_selection": 8222,
+   "naval_shore_casualty": 25,
+   "naval_shore_selection": 161,
+   "non_combat_movement": 3486,
+   "place_units": 229,
+   "politics_declaration_priority": 14,
+   "politics_evolution": 2,
+   "production": 1564,
+   "recruitment_choice": 28,
+   "single_option": 3896
+  },
+  "expanded_share_by_kind": {
+   "air_ground_or_defend": 0.0006,
+   "air_landing": 0.0012,
+   "combat": 0.0227,
+   "combat_movement": 0.4683,
+   "declaration_offer": 0.0049,
+   "economy_rail_permission": 0.0004,
+   "land_casualty": 0.0172,
+   "land_retreat_destination": 0.0028,
+   "land_retreat_or_continue": 0.0175,
+   "naval_force_selection": 0.2166,
+   "naval_shore_casualty": 0.0007,
+   "naval_shore_selection": 0.0042,
+   "non_combat_movement": 0.0918,
+   "place_units": 0.006,
+   "politics_declaration_priority": 0.0004,
+   "politics_evolution": 0.0001,
+   "production": 0.0412,
+   "recruitment_choice": 0.0007,
+   "single_option": 0.1026
+  },
+  "max_depth": 16,
+  "rounds": 3,
+  "search_s": 312.5,
+  "seed": 1953,
+  "simulations": 64
+ }
+}
