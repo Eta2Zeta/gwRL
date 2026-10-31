@@ -405,6 +405,9 @@ def train(args) -> int:
                     exhausted = True
                     break
                 runner["training_environment_seeds"].extend(collection["seeds"])
+                if collection["failed"]:
+                    runner.setdefault("failed_games", []).extend(
+                        {"batch": runner["batch_index"], **failure} for failure in collection["failed"])
                 runner["total_waves"] += 1
                 episodes = [{"root": result["root"], "seed": result["seed"], "terminal": result["terminal"],
                              "transitions_this_batch": result["counts"]["transitions"],

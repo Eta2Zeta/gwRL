@@ -38,6 +38,11 @@ void finishNavalMovementPhase(State &);
 // serialized route continuation; removes it before resuming any remaining route.
 void continueNavalMovement(State &, const Id &completedBattle);
 
+// A designated raider attacks alone (RB 9.4.4). True when these attackers mix one
+// with other units, or would merge with a declared battle where either side has one.
+bool raiderWouldCombine(const State &, const Id &zone, const Id &attacker,
+                        const std::vector<Id> &attackers, const Id &context);
+
 // Options are serialized in BattleState.data. Contexts distinguish ordinary
 // combat from movement reactions, screening, raiders and port attacks.
 Id registerNavalBattle(State &, const Id &zone, const Id &attacker,

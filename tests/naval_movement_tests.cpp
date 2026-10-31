@@ -666,6 +666,62 @@ void optionalStationaryEngagementCommitsTheForce() {
     check(a.kind != "naval_start_move",
           "Committed attacking ship moved out before its battle");
 }
+bool offers(const Engine &e, const std::string &kind) {
+  const auto actions = e.legalActions();
+  return std::any_of(actions.begin(), actions.end(),
+                     [&](const Action &action) { return action.kind == kind; });
+}
+void raiderAttacksAlone() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  add(s, "bc", "battlecruiser", p15);
+  add(s, "dd", "destroyer", p15);
+  add(s, "dd2", "destroyer", p16);
+  add(s, "enemy", "destroyer", p15, "kmt");
+  s.units.at("bc").gameFlags["raider"] = 1;
+  // Selected together, a raider and another ship have no joint attack on offer.
+  auto together = s.clone();
+  registerNavalBattle(together, p15, "japan", {"dd"}, {{"dd", p15}});
+  const auto attack = [&](State &state, const Id &unit) {
+    return registerNavalBattle(state, p15, "japan", {unit}, {{unit, p15}});
+  };
+  check(raiderWouldCombine(s, p15, "japan", {"bc", "dd"}, "standard"),
+        "A raider joined a joint attack");
+  check(!raiderWouldCombine(s, p15, "japan", {"bc"}, "standard"),
+        "A lone raider could not attack");
+  // Once it attacks, nobody joins it and no route ends in its battle.
+  auto declared = s.clone();
+  attack(declared, "bc");
+  check(raiderWouldCombine(declared, p15, "japan", {"dd"}, "standard"),
+        "A ship joined a raider's attack");
+  Engine e(declared, rules(), 23);
+  bool routed = false;
+  for (const auto &action : e.legalActions())
+    routed |= action.kind == "naval_start_move" &&
+              action.parameters.require("unit").asString() == "dd2";
+  if (routed) {
+    choose(e, "naval_start_move", [](const Action &action) {
+      return action.parameters.require("unit").asString() == "dd2";
+    });
+    for (const auto &action : e.legalActions())
+      if (action.kind == "naval_route") {
+        const auto path = action.parameters.require("request").require("path").asArray();
+        check(path.back().asString() != p15, "A route ended in a raider's attack");
+      }
+  }
+  // Dice can still bring them together, and then they fight apart.
+  auto apart = s.clone();
+  const auto first = attack(apart, "dd"), second = attack(apart, "bc");
+  check(first != second && apart.battles.at(first).attackers == std::vector<Id>{"dd"} &&
+            apart.battles.at(second).attackers == std::vector<Id>{"bc"},
+        "A raider merged into a declared battle");
+  auto other = s.clone();
+  add(other, "dd3", "destroyer", p15);
+  const auto raiderFirst = attack(other, "bc"), follower = attack(other, "dd");
+  check(raiderFirst != follower, "A ship merged into a raider's battle");
+  check(attack(other, "dd3") == follower, "Ordinary attackers stopped merging");
+}
 void attackingRaiderSlipIsExplicitAndReplayable() {
   for (bool success : {false, true}) {
     auto s = fixture(Phase::CombatMovement);
@@ -785,6 +841,7 @@ int main() {
               defenderDeclarationQueuesCombatAndAllowsReinforcements},
              {"optional engagement commitment",
               optionalStationaryEngagementCommitsTheForce},
+             {"a raider attacks alone", raiderAttacksAlone},
              {"attacking raider opposed rolls",
               attackingRaiderSlipIsExplicitAndReplayable},
              {"Chinese gift transport withdrawal",

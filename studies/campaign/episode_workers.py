@@ -41,11 +41,16 @@ def _play(task: Mapping[str, Any]) -> dict[str, Any]:
                        evaluator=NeuralEvaluator(models, version=task["batch_version"]))
     env = make_env(task["seed"], calendar_rounds=settings["calendar_rounds"])
     started = time.perf_counter()
-    result = play_episode(env, _WORKER["evaluator"], config=LearningConfig(**settings["learning_config"]),
-                          rules_version=settings["rules_version"], numeric=settings["numeric"],
-                          token_buckets=settings["model_config"]["token_buckets"],
-                          batch_version=task["batch_version"], environment_seed=task["seed"],
-                          max_transitions=task["max_transitions"])
+    try:
+        result = play_episode(env, _WORKER["evaluator"], config=LearningConfig(**settings["learning_config"]),
+                              rules_version=settings["rules_version"], numeric=settings["numeric"],
+                              token_buckets=settings["model_config"]["token_buckets"],
+                              batch_version=task["batch_version"], environment_seed=task["seed"],
+                              max_transitions=task["max_transitions"])
+    except Exception as error:
+        # The game is lost and its batch is not; its seed and weights reproduce it.
+        return {"root": task["root"], "seed": task["seed"], "failure": f"{type(error).__name__}: {error}",
+                "seconds": time.perf_counter() - started}
     result.update(root=task["root"], seed=task["seed"], process=os.getpid(),
                   seconds=time.perf_counter() - started)
     return result

@@ -703,6 +703,10 @@ class CampaignLearner:
                    for player, model in self.frozen_models.items()}
         results = workers.play(list(enumerate(seeds)), weights=weights, batch_version=self.batch_version,
                                max_transitions=max_transitions, stop=stop)
+        failed = [result for result in results or [] if "failure" in result]
+        if len(failed) * 2 > count:
+            raise RuntimeError(f"Most of a batch's games failed, first with {failed[0]['failure']}")
+        results = None if results is None else [result for result in results if "failure" not in result]
         if results is None or not all(result["terminal"] for result in results):
             self.environment_random.setstate(before)
             self.abandon_batch()
@@ -719,7 +723,7 @@ class CampaignLearner:
             self.counters["episodes"] += 1
             self.action_history.extend({**event, "root": result["root"]} for event in result["events"])
         self._episodes_terminal = True
-        return {"seeds": seeds, "exhausted": False, "results": results}
+        return {"seeds": seeds, "exhausted": False, "results": results, "failed": failed}
 
     def finish_batch(self) -> dict[str, Any]:
         if self.frozen_models is None:

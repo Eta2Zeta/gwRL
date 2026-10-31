@@ -891,6 +891,7 @@ public:
     const auto &first = state_.units.at(selected.front());
     if (state_.clock.phase != Phase::NonCombatMovement &&
         sea(state_, first.zone) && anyEnemy(state_, first.owner, first.zone) &&
+        !raiderWouldCombine(state_, first.zone, first.owner, selected, "standard") &&
         engagementKeepsLanding(state_, selected, first.zone))
       return complete_[selected] = true;
     bool landingBlocked = false;
@@ -946,6 +947,7 @@ void routeChoices(State &s, BattleState &b) {
       action(s, b.attacker, "naval_cancel_move", {{"plan", V(b.id)}}));
   if (!selected.empty() && s.clock.phase != Phase::NonCombatMovement &&
       sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone) &&
+      !raiderWouldCombine(s, b.zone, b.attacker, selected, "standard") &&
       engagementKeepsLanding(s, selected, b.zone))
     options.push_back(
         action(s, b.attacker, "naval_engage_force", {{"plan", V(b.id)}}));
@@ -1157,6 +1159,9 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
              }))
     return fail(
         "A raiding battlecruiser cannot combine attacks with other units");
+  else if (r.combat && !blockers(s, n, r.path.back()).empty() &&
+           raiderWouldCombine(s, r.path.back(), n, r.units, "standard"))
+    return fail("A raiding battlecruiser cannot combine attacks with other units");
   else if (!r.combat) {
     // Ships in port begin in an adjacent sea zone but still enter it: exiting
     // past Enemy Surface Warships needs a screening force, which is combat

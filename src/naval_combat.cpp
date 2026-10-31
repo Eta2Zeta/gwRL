@@ -536,25 +536,43 @@ void advance(State& s, BattleState& b) {
 }
 } // namespace
 
+namespace {
+bool designatedRaider(const State& s, const Id& id) {
+    return s.units.contains(id) && s.units.at(id).type == "battlecruiser" && marked(s.units.at(id).gameFlags, "raider");
+}
+bool hasRaider(const State& s, const std::vector<Id>& units) {
+    return std::any_of(units.begin(), units.end(), [&](const Id& id) { return designatedRaider(s, id); });
+}
+bool joinsDeclaredBattle(const BattleState& existing, const Id& zone, const Id& attacker, const Id& context) {
+    return marked(existing.flags, "naval_battle") && existing.stage == "naval_declared" && existing.zone == zone &&
+           existing.attacker == attacker && string(existing, "context") == context;
+}
+} // namespace
+
+bool raiderWouldCombine(const State& s, const Id& zone, const Id& attacker,
+                        const std::vector<Id>& attackers, const Id& context) {
+    if (attackers.size() > 1 && hasRaider(s, attackers)) return true;
+    return std::any_of(s.battles.begin(), s.battles.end(), [&](const auto& entry) {
+        const auto& existing = entry.second;
+        return joinsDeclaredBattle(existing, zone, attacker, context) &&
+               (hasRaider(s, attackers) || hasRaider(s, existing.attackers));
+    });
+}
+
 Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
                        const std::vector<Id>& attackers, const std::map<Id, Id>& origins, const V& options) {
     require(s.definition->geography.require("nodes").find(zone) && s.nations.contains(attacker) && !attackers.empty(),
             "Invalid naval battle registration");
     require(options.isObject(), "Naval battle options must be an object");
-    const bool attackingRaider = std::any_of(attackers.begin(), attackers.end(), [&](const Id& id) {
-        return s.units.contains(id) && s.units.at(id).type == "battlecruiser" && marked(s.units.at(id).gameFlags, "raider");
-    });
     const bool evacuation = options.find("port_evacuation");
-    require(evacuation || !attackingRaider || attackers.size() == 1, "A designated raider cannot combine with other attackers");
     const Id context = options.find("context") ? options.require("context").asString() : "standard";
+    // Move generation keeps a raider from choosing a joint attack. Dice and forced
+    // stops can still bring one to a declared battle, and then it fights apart.
+    const bool attackingRaider = hasRaider(s, attackers);
     for (auto& [bid, existing] : s.battles)
-        if (marked(existing.flags, "naval_battle") && existing.stage == "naval_declared" &&
-            existing.zone == zone && existing.attacker == attacker && string(existing, "context") == context &&
+        if (joinsDeclaredBattle(existing, zone, attacker, context) && !attackingRaider && !hasRaider(s, existing.attackers) &&
             !evacuation && !existing.data.find("port_evacuation") &&
             (context != "port_attack" || string(existing, "facility") == (options.find("facility") ? options.require("facility").asString() : ""))) {
-            require(!attackingRaider && std::none_of(existing.attackers.begin(), existing.attackers.end(), [&](const Id& id) {
-                return s.units.contains(id) && s.units.at(id).type == "battlecruiser" && marked(s.units.at(id).gameFlags, "raider");
-            }), "A designated raider cannot combine with other attackers");
             auto oldOrigins = object(existing, "origins"); auto entries = array(existing, "naval_entry_origins");
             for (const auto& id : attackers) {
                 require(s.units.contains(id) && s.units.at(id).owner == attacker && s.units.at(id).zone == zone,

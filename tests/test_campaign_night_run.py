@@ -13,7 +13,7 @@ import torch
 from studies.campaign.curriculum import compatibility, make_env
 from studies.campaign.learning import CampaignLearner, LearningConfig, play_episode
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
-from studies.campaign.run import RunConfig, main
+from studies.campaign.run import RunConfig, _learner, main
 from studies.shared.multiplayer_mcts import PLAYERS
 from tools.record_campaign_games import game_arguments
 from tools.supervise_campaign_training import SupervisorConfig, validate_training_arguments
@@ -99,6 +99,36 @@ class RunControlTests(unittest.TestCase):
                             ("--seed", "9"), ("--initial-models", "models.pt")):
             self.assertEqual(arguments[arguments.index(flag) + 1], value)
         self.assertIn("--full-campaign", game_arguments({**config, "calendar_rounds": None}, Path("m"), 9, Path("g")))
+
+
+class FailedGameTests(unittest.TestCase):
+    GAME = {"terminal": True, "records": [], "events": [], "returns": [1.0, -1.0, 0.0], "clock": {}, "wealth": {},
+            "counts": {"transitions": 1, "decisions": 1, "chance_events": 0}, "seconds": 1.0}
+
+    def learner(self):
+        config = RunConfig(calendar_rounds=1)
+        learner = _learner(config, make_env(config.seed, calendar_rounds=1))
+        learner.env = make_env(config.seed, calendar_rounds=1)
+        return learner
+
+    def collect(self, failures: int, games: int = 3):
+        class Workers:
+            def play(_self, tasks, **_):
+                return [{"root": root, "seed": seed, "failure": "RuntimeError: rules", "seconds": 1.0} if root < failures
+                        else {**self.GAME, "root": root, "seed": seed} for root, seed in tasks]
+        learner = self.learner()
+        return learner, learner.collect_episodes(Workers(), games, 100)
+
+    def test_a_failed_game_costs_only_that_game(self):
+        learner, collection = self.collect(1)
+        self.assertEqual(learner.counters["episodes"], 2)
+        self.assertEqual([game["failure"] for game in collection["failed"]], ["RuntimeError: rules"])
+        self.assertEqual(len(collection["results"]), 2)
+        self.assertEqual(len(collection["seeds"]), 3)
+
+    def test_a_batch_of_failures_stops_the_run(self):
+        with self.assertRaisesRegex(RuntimeError, "Most of a batch"):
+            self.collect(2)
 
 
 class DeviceMemoryTests(unittest.TestCase):
