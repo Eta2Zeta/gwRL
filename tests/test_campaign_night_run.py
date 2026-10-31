@@ -6,12 +6,12 @@ import tempfile
 import time
 from pathlib import Path
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import torch
 
 from studies.campaign.curriculum import compatibility, make_env
-from studies.campaign.learning import LearningConfig, play_episode
+from studies.campaign.learning import CampaignLearner, LearningConfig, play_episode
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 from studies.campaign.run import RunConfig, main
 from studies.shared.multiplayer_mcts import PLAYERS
@@ -99,6 +99,16 @@ class RunControlTests(unittest.TestCase):
                             ("--seed", "9"), ("--initial-models", "models.pt")):
             self.assertEqual(arguments[arguments.index(flag) + 1], value)
         self.assertIn("--full-campaign", game_arguments({**config, "calendar_rounds": None}, Path("m"), 9, Path("g")))
+
+
+class DeviceMemoryTests(unittest.TestCase):
+    def test_only_a_gpu_learner_releases_memory(self):
+        learner = object.__new__(CampaignLearner)
+        learner._device_runtime = None
+        learner.release_device_memory()
+        learner._device_runtime = Mock()
+        learner.release_device_memory()
+        learner._device_runtime.reset.assert_called_once_with()
 
 
 class AllCoresTests(unittest.TestCase):

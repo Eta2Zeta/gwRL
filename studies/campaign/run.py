@@ -418,6 +418,7 @@ def train(args) -> int:
                 with measure("learning_updates"):
                     rollout = learner.finish_batch()
                     update = learner.update()
+                    learner.release_device_memory()
                 runner["updates"].append({"rollout": rollout, "update": update, "episodes": episodes})
                 runner["batch_index"] += 1
                 export_model()

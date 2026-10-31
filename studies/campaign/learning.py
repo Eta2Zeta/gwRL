@@ -802,6 +802,11 @@ class CampaignLearner:
         return {"updated": True, "samples": min(self.config.batch_size, len(self.replay)), "losses": losses,
                 "generation": self.generation, "model_versions": self.model_versions()}
 
+    def release_device_memory(self) -> None:
+        """Between phases: game processes need the memory the GPU keeps cached."""
+        if self._device_runtime is not None:
+            self._device_runtime.reset()
+
     def run_batch(self, env_factory: Callable[..., Any], max_transitions: int) -> dict[str, Any]:
         if self.env is None:
             self.env = self._new_env(env_factory)
