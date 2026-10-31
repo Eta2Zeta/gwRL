@@ -131,9 +131,11 @@ decisions (`tools/decision_census.py savings`); real trajectories will shift.
 - **P1.** The search already returns at once for a single-option root. Applying
   such positions automatically in the adapter would also remove them inside
   search trees, where they still take 10% of evaluations.
-- **P2.** During combat the attacker must choose "progress battle" for every stage
-  and again to clear a finished battle (`src/land_combat.cpp:1324-1347`). When
-  only these steps are offered, their order changes nothing.
+- **P2.** A finished battle stays on the board until the attacker chooses
+  "progress battle" to clear it, and a few stages need the same click to advance
+  (`src/land_combat.cpp:1324-1347`). In seed 1951, Japan cleared five finished
+  battles with five consecutive decisions. When only these steps are offered,
+  their order changes nothing.
 - **P3.** A one-ship move is `naval_start_move` then `naval_route`. Offering the
   route directly for a single ship removes one decision per move; multi-ship
   fleets keep the ordered construction.
