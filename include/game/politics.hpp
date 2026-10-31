@@ -30,6 +30,9 @@ void removePoliticalUnits(State&, const std::set<Id>& units);
 void incorporateNation(State&, const Id& minor, const Id& recipient);
 void ensureDadao(State&);
 void refreshPoliticalState(State&);
+// Recomputes each nation's allies list, which follows wars, alliances and the
+// Chinese Truce; refreshPoliticalState ends with it.
+void refreshAlliances(State&);
 void changePossession(State&, const Id& zone, const Id& recipient, PossessionCause,
                       const std::optional<Id>& conqueror = std::nullopt);
 // The withdrawal set is supplied by M5's route validator, never by a policy.

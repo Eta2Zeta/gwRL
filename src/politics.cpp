@@ -367,6 +367,10 @@ void refreshPoliticalState(State& s) {
         s.nations.at("ccp").gameFlags["objective_one_china"]=objective;
     }
     queueObjectiveBonus(s);
+    refreshAlliances(s);
+}
+
+void refreshAlliances(State& s) {
     for(auto& [id,n]:s.nations)n.allies.clear();
     for(auto& [id,n]:s.nations) {
         for(const auto& [other,m]:s.nations)if(id!=other&&politicallyFriendly(s,id,other))n.allies.insert(other);

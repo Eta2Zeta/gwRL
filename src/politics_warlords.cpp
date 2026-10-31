@@ -195,7 +195,10 @@ bool applyWarlordAction(State& state, const Action& action) {
             throw std::runtime_error("Chinese Truce is no longer eligible");
         popDecision(state);
         state.politics.truceOfferPending = false;
-        if (action.kind == "truce_accept") state.politics.chineseTruce = true;
+        if (action.kind == "truce_accept") {
+            state.politics.chineseTruce = true;
+            refreshAlliances(state);
+        }
         continueCombatPoliticalResolution(state);
         return true;
     }
@@ -306,6 +309,8 @@ void terminateChineseTruce(State& state, const Id& breaker, bool evolution) {
     state.politics.trucePermanentlyEnded = true;
     state.politics.truceOfferPending = false;
     queueSharedBattles(state, breaker);
+    // The two factions stop being allies now, not at the next political refresh.
+    refreshAlliances(state);
 }
 
 } // namespace game::campaign

@@ -251,6 +251,8 @@ void truceConsentAndTiming() {
     applyWarlordAction(state, option(state, "truce_accept"));
     require(state.politics.chineseTruce && state.decisions.empty() && !state.politics.truceOfferPending, "Accepted truce not activated/consumed");
     require(politicallyFriendly(state, "ccp", "kmt"), "Truce did not expose joint-defense/passage permission");
+    require(state.nations.at("ccp").allies.contains("kmt") && state.nations.at("kmt").allies.contains("ccp"),
+            "Accepted truce did not list the factions as allies at once");
     require(warlordActions(state).empty(), "Foreign active turn offered Chinese truce break");
     state.clock.nationIndex = 0;
     state.clock.phase = Phase::CombatMovement;
@@ -260,6 +262,8 @@ void truceConsentAndTiming() {
     require(warlordActions(state).size() == 1, "Own Combat did not permit truce break without prior commitment");
     applyWarlordAction(state, warlordActions(state).front());
     require(!state.politics.chineseTruce && state.politics.trucePermanentlyEnded, "Terminated treaty can be re-signed");
+    require(!state.nations.at("ccp").allies.contains("kmt") && !state.nations.at("kmt").allies.contains("ccp"),
+            "Broken truce still listed the factions as allies");
     state.clock.nationIndex = 2;
     startForeignResolution(state);
     require(state.decisions.empty(), "Terminated treaty was offered again");
