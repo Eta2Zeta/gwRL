@@ -1282,6 +1282,17 @@ std::vector<Id> blitzEligible(const State &s, const BattleState &b) {
     }
     return out;
 }
+std::vector<Action> landBattleClearing(const State &s) {
+    std::vector<Action> out;
+    if (s.chance || !s.decisions.empty() ||
+        (s.clock.phase != Phase::Combat && !marked(s.flags, "immediate_land_battles")))
+        return out;
+    for (const auto &[id, b] : s.battles)
+        if (!marked(b.flags, "air_mission") && !marked(b.flags, "naval_battle") &&
+            !marked(b.flags, "amphibious_preparation") && marked(b.flags, "finished"))
+            out.push_back(action(s, s.currentNation(), "land_progress_battle", {{"battle", V(id)}}));
+    return out;
+}
 
 LandCombatRules::LandCombatRules(std::shared_ptr<const Rules> next) : gameplay_(std::move(next)) {}
 Id LandCombatRules::id() const {
@@ -1321,10 +1332,8 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
     const bool immediate = marked(s.flags, "immediate_land_battles");
     if (s.clock.phase != Phase::Combat && !immediate)
         return out;
-    for (const auto &[id, b] : s.battles)
-        if (!marked(b.flags, "air_mission") && !marked(b.flags, "naval_battle") &&
-            !marked(b.flags, "amphibious_preparation") && marked(b.flags, "finished"))
-            out.push_back(action(s, s.currentNation(), "land_progress_battle", {{"battle", V(id)}}));
+    const auto clearing = landBattleClearing(s);
+    out.insert(out.end(), clearing.begin(), clearing.end());
     bool active = false;
     for (const auto &[id, b] : s.battles)
         if (!marked(b.flags, "finished") && b.stage != "awaiting_combat_rules" &&

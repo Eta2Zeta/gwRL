@@ -24,6 +24,10 @@ LandCombatStats landCombatStats(const State &, const BattleState &, const Id &un
 bool citySurrounded(const State &, const Id &zone, const Id &defender);
 std::set<Id> landRetreatOrigins(const State &, const BattleState &);
 std::vector<Id> blitzEligible(const State &, const BattleState &);
+// The combat menu's "progress battle" actions that clear finished land battles.
+// A finished battle stays listed until its follow-ups (aircraft landings, blitz
+// pairing, capture choices) are done, so these exist only when nothing is pending.
+std::vector<Action> landBattleClearing(const State &);
 
 class LandCombatRules final : public Rules {
   public:

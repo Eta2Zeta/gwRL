@@ -135,7 +135,8 @@ decisions (`tools/decision_census.py savings`); real trajectories will shift.
   "progress battle" to clear it, and a few stages need the same click to advance
   (`src/land_combat.cpp:1324-1347`). In seed 1951, Japan cleared five finished
   battles with five consecutive decisions. When only these steps are offered,
-  their order changes nothing.
+  their order changes nothing. The clearing part is now
+  [done automatically](battle_clearing_2026_10_31.md): 5.2% fewer decisions.
 - **P3.** A one-ship move is `naval_start_move` then `naval_route`. Offering the
   route directly for a single ship removes one decision per move; multi-ship
   fleets keep the ordered construction.

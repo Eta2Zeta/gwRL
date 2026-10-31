@@ -396,6 +396,10 @@ class Rules {
     virtual void finishTurn(State&) const = 0;
     virtual void beginTurn(State&) const {}
     virtual void finishPhase(State&) const {}
+    // Runs at the end of every action, interrupt and chance transition, before the
+    // new position is recorded. A rules profile may take steps here that offer no
+    // choice; they become part of the transition that made them possible.
+    virtual void settle(State&) const {}
 };
 
 class Engine {
@@ -453,6 +457,7 @@ class Engine {
     void invalidateDecisionCache();
     template <class Change> void transition(Change&& change);
     void commitChance(const ChanceRequest&, const ChanceOutcome&);
+    void settle();
     void endPhase();
 };
 

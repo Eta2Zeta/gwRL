@@ -3,6 +3,7 @@
 #include "game/air.hpp"
 #include "game/campaign_audit.hpp"
 #include "game/catalog.hpp"
+#include "game/land_combat.hpp"
 #include "game/naval.hpp"
 #include "game/politics.hpp"
 
@@ -137,6 +138,32 @@ V declinedRailSignature(const State& state, const Action& action) {
                {"parameters", pending.require("parameters")}});
 }
 
+bool flagged(const std::map<Id, int>& flags, const char* key) {
+    const auto found = flags.find(key);
+    return found != flags.end() && found->second != 0;
+}
+
+// The click that deletes a finished battle, if the combat menu offers one now.
+// NavalRules lists a finished naval battle's click alone and hides the land
+// combat menu while a naval battle is active or the land battles are immediate.
+std::optional<Action> battleClearing(const State& state) {
+    if (state.terminal || state.chance || !state.decisions.empty()) return std::nullopt;
+    if (!flagged(state.flags, "immediate_land_battles")) {
+        for (auto& action : navalCombatActions(state))
+            if (action.kind == "naval_finish_battle") return std::move(action);
+        const bool navalActive = flagged(state.flags, "immediate_naval_battles") ||
+            std::any_of(state.battles.begin(), state.battles.end(), [](const auto& entry) {
+                const auto& battle = entry.second;
+                return flagged(battle.flags, "naval_battle") && !flagged(battle.flags, "finished") &&
+                       battle.stage != "naval_declared";
+            });
+        if (navalActive) return std::nullopt;
+    }
+    auto land = landBattleClearing(state);
+    if (land.empty()) return std::nullopt;
+    return std::move(land.front());
+}
+
 bool preservesConstructionContext(const Action& action) {
     return action.kind == "economy_request_rail" || action.kind == "economy_decline_rail" ||
            action.kind == "naval_start_move" || action.kind == "naval_force_add" ||
@@ -206,6 +233,13 @@ class TrainingRules final : public Rules {
         core_->finishPhase(state);
         reset(state);
         forwardNavalOrderDecision(state);
+    }
+    void settle(State& state) const override {
+        core_->settle(state);
+        // A finished battle stays listed only until its follow-ups are done. Its
+        // click then only deletes the record, in any order, so the profile takes
+        // each one itself as soon as it is offered, exactly as if chosen.
+        while (const auto clearing = battleClearing(state)) apply(state, *clearing);
     }
   private:
     std::shared_ptr<const Rules> core_;

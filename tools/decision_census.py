@@ -344,8 +344,10 @@ def search(args: argparse.Namespace) -> None:
             for node in mcts.nodes.values():
                 if node.expanded and node.edges:
                     expansions["single_option" if len(node.edges) == 1 else node.kind] += 1
-            index = rng.randrange(len(result.actions))
-            chosen = raw_action(result.actions[index])["kind"]
+            # The scripted policy plays the same game on any interface that keeps its
+            # choices, so the search work of two engine versions can be compared.
+            index = scripted_index(env, actions) if args.policy == "balanced" else rng.randrange(len(actions))
+            chosen = raw_action(actions[index])["kind"]
             if len(actions) == 1:
                 category = "single_option"
             elif kinds <= {"land_progress_battle", "land_begin_battle"}:
@@ -358,9 +360,11 @@ def search(args: argparse.Namespace) -> None:
             totals[category][1] += elapsed
             handle.write(json.dumps({"menu": len(actions), "category": category, "chosen": chosen,
                                      "owner": env.current_decision_player(), "search_s": round(elapsed, 4)}) + "\n")
-            env.apply_action(result.actions[index])
-    print(json.dumps({"by_root_category": {category: {"decisions": n, "search_s": round(seconds, 1)}
+            env.apply_action(actions[index])
+    print(json.dumps({"returns": [round(x, 2) for x in env.returns()],
+                      "by_root_category": {category: {"decisions": n, "search_s": round(seconds, 1)}
                                            for category, (n, seconds) in totals.items()},
+                      "expanded_decision_nodes": sum(expansions.values()),
                       "expanded_decision_nodes_by_kind": dict(expansions.most_common())}, indent=1))
 
 
@@ -383,6 +387,7 @@ def main() -> None:
     command.add_argument("--rounds", type=int, default=3)
     command.add_argument("--simulations", type=int, default=16)
     command.add_argument("--depth", type=int, default=16)
+    command.add_argument("--policy", default="uniform", choices=["balanced", "uniform"])
     command = commands.add_parser("export")
     command.add_argument("directory")
     command.add_argument("--seed", type=int, default=1952)

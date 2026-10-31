@@ -431,6 +431,7 @@ void Engine::step(const Action& action) {
             next.rules_->apply(next.state_, chosen);
             checkHookClock(next.state_, before, terminal);
         }
+        next.settle();
         recorded.validate(next.state_);
         const auto stateKey=next.state_.planningKey();
         next.state_.history.push_back(Event{"action", actionJson(chosen), stateKey});
@@ -483,6 +484,7 @@ void Engine::interrupt(const Action& action) {
         const bool beforeTerminal=next.state_.terminal;
         next.rules_->apply(next.state_,chosen);
         checkHookClock(next.state_,before,beforeTerminal);
+        next.settle();
         recorded.validate(next.state_);
         const auto stateKey=next.state_.planningKey();
         next.state_.history.push_back(Event{"interrupt",actionJson(chosen),stateKey});
@@ -529,10 +531,18 @@ void Engine::commitChance(const ChanceRequest& request, const ChanceOutcome& out
     state_.chance.reset();
     rules_->applyChance(state_, request, outcome);
     checkHookClock(state_, before, terminal);
+    settle();
     recorded.validate(state_);
     const auto stateKey = state_.planningKey();
     state_.history.push_back(Event{"chance", V(O{{"request_id", V(request.id)}, {"outcome", outcomeJson(outcome)}}), stateKey});
     decisionCache_->stateKey = stateKey;
+}
+
+void Engine::settle() {
+    const auto before = state_.clock;
+    const bool terminal = state_.terminal;
+    rules_->settle(state_);
+    checkHookClock(state_, before, terminal);
 }
 
 void Engine::endPhase() {

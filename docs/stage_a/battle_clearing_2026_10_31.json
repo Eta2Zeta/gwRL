@@ -1,0 +1,393 @@
+{
+  "date": "2026-10-31",
+  "change": "campaign-orders-v2: the training profile clears finished battles itself",
+  "before_commit": "d93e85b",
+  "before_engine_matches": "6522736 (the decision review's measurements)",
+  "machine": "4-vCPU Linux container; Python extension compiled with g++ -O3 -std=c++20",
+  "census_matched_scripted_games": {
+    "rounds_3_seed_1951": {
+      "before": {
+        "seed": 1951,
+        "rounds": 3,
+        "policy": "balanced",
+        "decisions": 579,
+        "chance_events": 116,
+        "returns": [
+          28.1,
+          -36.9,
+          -88.3
+        ],
+        "terminal": true
+      },
+      "after": {
+        "seed": 1951,
+        "rounds": 3,
+        "policy": "balanced",
+        "decisions": 549,
+        "chance_events": 116,
+        "returns": [
+          28.1,
+          -36.9,
+          -88.3
+        ],
+        "terminal": true
+      },
+      "decision_change": -0.0518,
+      "removed_decisions": 30,
+      "removed_decisions_are_clearing_clicks": true,
+      "removed_decisions_by_menu_size": {
+        "1": 16,
+        "2": 6,
+        "3": 3,
+        "4": 3,
+        "5": 2
+      },
+      "kept_positions_left_with_one_option": 4,
+      "searched_decisions": {
+        "before": 472,
+        "after": 454
+      },
+      "other_choices_identical_in_order": true
+    },
+    "rounds_11_seed_1953": {
+      "before": {
+        "seed": 1953,
+        "rounds": 11,
+        "policy": "balanced",
+        "decisions": 2080,
+        "chance_events": 418,
+        "returns": [
+          51.3,
+          -52.3,
+          -100.7
+        ],
+        "terminal": true
+      },
+      "after": {
+        "seed": 1953,
+        "rounds": 11,
+        "policy": "balanced",
+        "decisions": 1971,
+        "chance_events": 418,
+        "returns": [
+          51.3,
+          -52.3,
+          -100.7
+        ],
+        "terminal": true
+      },
+      "decision_change": -0.0524,
+      "removed_decisions": 109,
+      "removed_decisions_are_clearing_clicks": true,
+      "removed_decisions_by_menu_size": {
+        "1": 65,
+        "2": 25,
+        "3": 10,
+        "4": 5,
+        "5": 2,
+        "6": 1,
+        "7": 1
+      },
+      "kept_positions_left_with_one_option": 16,
+      "searched_decisions": {
+        "before": 1710,
+        "after": 1650
+      },
+      "other_choices_identical_in_order": true
+    },
+    "note": "After is the final code, including the alliance-list fix. A run before that fix gave the same choices, menu sizes, dice and scores."
+  },
+  "search_matched": {
+    "before": {
+      "returns": [
+        28.1,
+        -36.9,
+        -88.3
+      ],
+      "by_root_category": {
+        "other": {
+          "decisions": 288,
+          "search_s": 119.8
+        },
+        "single_option": {
+          "decisions": 107,
+          "search_s": 0.5
+        },
+        "naval_order": {
+          "decisions": 152,
+          "search_s": 77.5
+        },
+        "battle_bookkeeping": {
+          "decisions": 32,
+          "search_s": 11.0
+        }
+      },
+      "expanded_decision_nodes": 30620,
+      "expanded_decision_nodes_by_kind": {
+        "combat_movement": 13831,
+        "naval_force_selection": 4019,
+        "single_option": 3940,
+        "production": 2212,
+        "non_combat_movement": 1690,
+        "place_units": 1388,
+        "combat": 1256,
+        "land_casualty": 917,
+        "land_retreat_or_continue": 847,
+        "naval_shore_selection": 203,
+        "air_landing": 76,
+        "recruitment_choice": 62,
+        "politics_evolution": 51,
+        "land_retreat_destination": 46,
+        "naval_shore_casualty": 40,
+        "declaration_offer": 25,
+        "economy_rail_permission": 12,
+        "politics_declaration_priority": 5
+      },
+      "root_decisions": 579,
+      "searched_root_decisions": 472,
+      "search_s": 208.8,
+      "evaluations_per_searched_decision": 64.87
+    },
+    "after": {
+      "returns": [
+        28.1,
+        -36.9,
+        -88.3
+      ],
+      "by_root_category": {
+        "other": {
+          "decisions": 293,
+          "search_s": 122.8
+        },
+        "single_option": {
+          "decisions": 95,
+          "search_s": 0.5
+        },
+        "naval_order": {
+          "decisions": 152,
+          "search_s": 78.6
+        },
+        "battle_bookkeeping": {
+          "decisions": 9,
+          "search_s": 3.3
+        }
+      },
+      "expanded_decision_nodes": 29450,
+      "expanded_decision_nodes_by_kind": {
+        "combat_movement": 13766,
+        "naval_force_selection": 4019,
+        "single_option": 3838,
+        "production": 2217,
+        "non_combat_movement": 1441,
+        "place_units": 1387,
+        "land_casualty": 845,
+        "land_retreat_or_continue": 774,
+        "combat": 635,
+        "naval_shore_selection": 219,
+        "air_landing": 77,
+        "recruitment_choice": 62,
+        "politics_evolution": 51,
+        "land_retreat_destination": 43,
+        "naval_shore_casualty": 34,
+        "declaration_offer": 25,
+        "economy_rail_permission": 12,
+        "politics_declaration_priority": 5
+      },
+      "root_decisions": 549,
+      "searched_root_decisions": 454,
+      "search_s": 205.3,
+      "evaluations_per_searched_decision": 64.87
+    },
+    "evaluation_change": -0.0382,
+    "searched_decision_change": -0.0381,
+    "search_time_change": -0.0168,
+    "after_final_code_rerun": {
+      "expanded_decision_nodes": 29450,
+      "returns": [
+        28.1,
+        -36.9,
+        -88.3
+      ],
+      "same_expansions_by_kind": true,
+      "search_s": 203.3,
+      "note": "Final code including the alliance-list fix, run alongside other jobs; the side-by-side after run predates that fix."
+    },
+    "settings": {
+      "seed": 1951,
+      "rounds": 3,
+      "simulations": 64,
+      "max_depth": 16,
+      "moves": "balanced scripted",
+      "evaluator": "UniformEvaluator",
+      "root_noise": true,
+      "note": "Each expanded decision node is one network evaluation. Both runs ran side by side."
+    }
+  },
+  "lockstep_final_code": [
+    {
+      "exit": 0,
+      "immediate": {
+        "games": 20,
+        "rounds": 3,
+        "decisions": 10777,
+        "chance_events": 1101,
+        "clearings": 326
+      },
+      "delayed": {
+        "games": 20,
+        "rounds": 3,
+        "shared_decisions": 10723,
+        "decisions_with_clearing_left": 155,
+        "declarations": 24,
+        "declarations_with_clearing_left": 6,
+        "chance_events": 1082,
+        "position_comparisons": 11469
+      },
+      "reference_player": "prefers other choices while a clearing is offered (final test)",
+      "wall_s": 484.1
+    },
+    {
+      "exit": 0,
+      "immediate": {
+        "games": 4,
+        "rounds": 11,
+        "decisions": 6660,
+        "chance_events": 652,
+        "clearings": 206
+      },
+      "delayed": {
+        "games": 4,
+        "rounds": 11,
+        "shared_decisions": 6282,
+        "decisions_with_clearing_left": 77,
+        "declarations": 6,
+        "declarations_with_clearing_left": 1,
+        "chance_events": 635,
+        "position_comparisons": 6799
+      },
+      "reference_player": "prefers other choices while a clearing is offered (final test)",
+      "wall_s": 396.6
+    }
+  ],
+  "lockstep_before_alliance_fix": {
+    "uniform_reference": [
+      {
+        "exit": 0,
+        "immediate": {
+          "games": 20,
+          "rounds": 3,
+          "decisions": 10777,
+          "chance_events": 1101,
+          "clearings": 326
+        },
+        "delayed": {
+          "games": 20,
+          "rounds": 3,
+          "shared_decisions": 11054,
+          "decisions_with_clearing_left": 126,
+          "declarations": 16,
+          "chance_events": 1182,
+          "position_comparisons": 12112
+        },
+        "reference_player": "uniform over its whole menu (earlier variant of the test)",
+        "wall_s": 503.0
+      },
+      {
+        "exit": 0,
+        "immediate": {
+          "games": 4,
+          "rounds": 11,
+          "decisions": 6660,
+          "chance_events": 652,
+          "clearings": 206
+        },
+        "delayed": {
+          "games": 4,
+          "rounds": 11,
+          "shared_decisions": 6719,
+          "decisions_with_clearing_left": 56,
+          "declarations": 4,
+          "chance_events": 672,
+          "position_comparisons": 7359
+        },
+        "reference_player": "uniform over its whole menu (earlier variant of the test)",
+        "wall_s": 416.9
+      }
+    ],
+    "reference_preferring_other_choices": [
+      {
+        "exit": 1,
+        "immediate": {
+          "games": 20,
+          "rounds": 3,
+          "decisions": 10777,
+          "chance_events": 1101,
+          "clearings": 326
+        },
+        "wall_s": 357.0
+      },
+      {
+        "exit": 0,
+        "immediate": {
+          "games": 4,
+          "rounds": 11,
+          "decisions": 6660,
+          "chance_events": 652,
+          "clearings": 206
+        },
+        "delayed": {
+          "games": 4,
+          "rounds": 11,
+          "shared_decisions": 6282,
+          "decisions_with_clearing_left": 77,
+          "declarations": 6,
+          "declarations_with_clearing_left": 1,
+          "chance_events": 635,
+          "position_comparisons": 6799
+        },
+        "reference_player": "prefers other choices while a clearing is offered (final test)",
+        "wall_s": 407.1
+      }
+    ],
+    "failure": {
+      "seed": 6005,
+      "rounds": 3,
+      "step": 190,
+      "difference": "nations.ccp.allies and nations.kmt.allies: still listed each other after truce_break until a later political refresh",
+      "cause": "truce_break and truce_accept changed the truce without recomputing the allies lists; the old clearing click ran that refresh"
+    }
+  },
+  "default_test_run": {
+    "command": "ctest -R training_battle_clearing",
+    "seconds": 17.4,
+    "settings": "1 game of 1 round for each lockstep"
+  },
+  "alliance_fix_check": "politics_warlords_tests now checks the allies lists right after truce_accept and truce_break; the check fails on the code before the fix",
+  "ctest": {
+    "summary": "96% tests passed, 1 tests failed out of 27",
+    "timed_out": [
+      "campaign_env"
+    ],
+    "campaign_env_alone_s": 32.677,
+    "campaign_env_alone_before_s": 31.7,
+    "campaign_env_alone_passes": true
+  },
+  "python_unittest": {
+    "before": {
+      "tests": 464,
+      "failures": 7,
+      "errors": 48
+    },
+    "after": {
+      "tests": 464,
+      "failures": 7,
+      "errors": 48
+    },
+    "same_failing_tests": true,
+    "causes_after": {
+      "PyTorch is not installed in this container": 33,
+      "configures more CPU cores than this 4-vCPU container has": 21,
+      "checks the macOS physical-footprint memory measure": 1
+    }
+  }
+}

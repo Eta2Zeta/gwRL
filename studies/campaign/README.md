@@ -162,11 +162,14 @@ the model architecture, input schema and learned-gradient behavior are unchanged
 Self-play now uses the versioned [AI order interface](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md)
 by default. Fleet and screening selection make forward progress; undo/cancel
 editing is kept in the ordinary game API. Unchanged role/deck configuration
-cycles and repeated declined railway requests are also bounded. Context and
-checkpoint compatibility identify `campaign-orders-v1`; old replay/optimizer
-state is not implicitly migrated. Explicit frozen model-weight transfers remain
-available for comparisons, and historical recordings select their original
-action interface for exact verification. Rebuild the native extension first.
+cycles and repeated declined railway requests are also bounded. Finished
+battles [clear themselves](/Users/home/Desktop/gwRL/docs/stage_a/battle_clearing_2026_10_31.md)
+instead of waiting for a click. Context and checkpoint compatibility identify
+`campaign-orders-v2`; old replay/optimizer state is not implicitly migrated, and
+`campaign-orders-v1` recordings are rejected. Explicit frozen model-weight
+transfers remain available for comparisons, and recordings from before the
+training interface select the ordinary game interface for exact verification.
+Rebuild the native extension first.
 
 RSS means **resident set size**: the physical memory currently occupied by a
 process. The benchmark samples and sums the supervisor and worker RSS, reporting
