@@ -169,8 +169,8 @@ class SharedEpisodeWorkers:
                                                   processes=self.processes, games_per_process=self.games_per_process,
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep_playing,
-                                                  exit_seconds=120.0)
-        if stopped:
+                                                  exit_seconds=120.0, stop_seconds=15.0)
+        if stopped or stop():
             return None
         if sorted(record["root"] for record in records) != sorted(root for root, _ in games):
             raise RuntimeError("A game process lost a game's result")

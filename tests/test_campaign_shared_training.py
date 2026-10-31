@@ -4,11 +4,17 @@ from __future__ import annotations
 from dataclasses import asdict
 import json
 import multiprocessing
+from multiprocessing.shared_memory import SharedMemory
+import os
 from pathlib import Path
+import queue
+import signal
+import struct
 import subprocess
 import tempfile
+import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import torch
 
@@ -16,6 +22,7 @@ from studies.campaign import run
 from studies.campaign.curriculum import make_env
 from studies.campaign.episode_workers import EpisodeWorkers, SharedEpisodeWorkers, _play_game
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
+from studies.campaign.shared_evaluator import game_process, play_shared_games
 from studies.shared.multiplayer_mcts import PLAYERS
 
 TINY = dict(calendar_rounds=1, simulations=2, max_depth=2, hidden_dim=16, token_buckets=2048, complete_episodes=True,
@@ -46,6 +53,62 @@ def weights(seed):
     torch.manual_seed(seed)
     config = CampaignModelConfig(hidden_dim=16, message_layers=1, token_buckets=2048)
     return {player: CampaignPolicyValueNet(config).state_dict() for player in PLAYERS}
+
+
+def dies_sending_a_record(slots, _connections, _names, _tasks, results):
+    """The other process plays on, so the coordinator keeps serving."""
+    if slots == [0]:
+        os.write(results._writer.fileno(), struct.pack("!i", 1 << 20) + b"half a message")
+        os._exit(9)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    time.sleep(60)
+
+
+def killed_while_starting(*_):
+    os.kill(os.getpid(), signal.SIGKILL)
+
+
+def stuck_in_a_game(*_):
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    time.sleep(60)
+
+
+class GameProcessEndingTests(unittest.TestCase):
+    MODELS = dict.fromkeys(PLAYERS)
+
+    def play(self, target, processes=1, **options):
+        return play_shared_games(target, [1, 2], processes=processes, games_per_process=1, models=self.MODELS,
+                                 device=torch.device("cpu"), **options)
+
+    def test_a_process_dying_mid_record_is_reported_not_waited_for(self):
+        with self.assertRaisesRegex(ValueError, "exited abnormally"):
+            self.play(dies_sending_a_record, processes=2)
+
+    def test_a_stop_outranks_a_process_it_killed_while_starting(self):
+        checks = iter([True] * 80)  # Long enough for the process to die first.
+        records, _ = self.play(killed_while_starting, keep_playing=lambda *_: next(checks, False), stop_seconds=1.0)
+        self.assertEqual(records, [])
+
+    def test_a_stop_kills_a_stuck_process_without_the_long_wait(self):
+        started = time.monotonic()
+        self.play(stuck_in_a_game, keep_playing=lambda *_: False, exit_seconds=60.0, stop_seconds=1.0)
+        self.assertLess(time.monotonic() - started, 30)
+        self.assertEqual(multiprocessing.active_children(), [])
+
+    def test_an_orphan_does_not_wait_to_flush_its_records(self):
+        parent, child = multiprocessing.Pipe()
+        memory = SharedMemory(create=True, size=1 << 16)
+        tasks, results = queue.Queue(), Mock()
+        tasks.put(None)
+        gone = Mock(is_alive=Mock(return_value=False))
+        try:
+            with patch("multiprocessing.parent_process", return_value=gone):
+                game_process(lambda *_: {}, 2048, "v", [0], [child], [memory.name], tasks, results)
+        finally:
+            parent.close()
+            memory.close()
+            memory.unlink()
+        results.cancel_join_thread.assert_called_once_with()
 
 
 class SharedEpisodeWorkerTests(unittest.TestCase):

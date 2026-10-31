@@ -525,12 +525,15 @@ def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], buckets
         thread.start()
     for thread in threads:
         thread.join()
+    parent = multiprocessing.parent_process()
+    if parent is not None and not parent.is_alive():
+        results.cancel_join_thread()  # Exit must not wait for a reader that has gone.
 
 
 def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, processes: int, games_per_process: int,
                       models: dict[str, Any], device: Any, runtime_policy: Any = None,
                       keep_playing: Callable[[SharedEvaluatorServer, list[Any]], bool] = lambda *_: True,
-                      exit_seconds: float = 20.0) -> tuple[list[Any], ServerStats]:
+                      exit_seconds: float = 20.0, stop_seconds: float = 20.0) -> tuple[list[Any], ServerStats]:
     """Play tasks in game processes, evaluating every waiting position here.
 
     `target(slots, connections, buffer_names, tasks, results)` is the game process,
@@ -538,7 +541,9 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     `games_per_process` games at once, one per thread, taking tasks from one queue,
     so a finished game's slot starts the next. `keep_playing(server, records)` runs
     between serving rounds; returning false closes every pipe, ending the running
-    games. Returns the records that arrived and the server's statistics.
+    games. Processes get `exit_seconds` to exit after the last game and
+    `stop_seconds` after a stop. Returns the records that arrived and the server's
+    statistics.
     """
     context = multiprocessing.get_context("spawn")
     slots = processes * games_per_process
@@ -550,8 +555,25 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     waiting, results = context.Queue(), context.Queue()
     for task in [*tasks, *[None] * slots]:  # One stop marker per game slot.
         waiting.put(task)
-    spawned, records, server = [], [], None
+    spawned, records, unread, server = [], [], [], None
+    finished, stopping = threading.Event(), False
+
+    def receive() -> None:
+        # A record far outgrows a pipe's buffer, and a process that dies sending one
+        # leaves half a message. Reading it would wait forever, because this process
+        # also holds the pipe's write end, so only this thread reads.
+        while not finished.is_set():
+            try:
+                records.append(results.get(timeout=0.2))
+            except queue.Empty:
+                pass
+            except Exception as error:
+                unread.append(error)
+                return
+
+    receiver = threading.Thread(target=receive, name="campaign-game-records", daemon=True)
     try:
+        receiver.start()
         for index in range(processes):
             members = range(index * games_per_process, (index + 1) * games_per_process)
             process = context.Process(target=target, daemon=True, args=(
@@ -565,42 +587,39 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
                                        [memory.name for memory in memories], runtime_policy)
 
         def keep_running() -> bool:
-            while True:
-                try:
-                    records.append(results.get_nowait())
-                except queue.Empty:
-                    break
+            nonlocal stopping
+            if unread:
+                raise unread[0]
+            # Every game has reported, whatever else still holds a pipe open.
+            if len(records) >= len(tasks):
+                return False
+            # A stop comes first: its signal may have killed processes still starting.
+            stopping = not keep_playing(server, records)
+            if stopping:
+                return False
             if not all(process.is_alive() or process.exitcode == 0 for process in spawned):
                 raise ValueError("A game process exited abnormally")
-            # Every game has reported, whatever else still holds a pipe open.
-            return len(records) < len(tasks) and keep_playing(server, records)
+            return True
 
         server.serve(keep_running)
         # The server closed every pipe still open, so a thread still waiting for
         # an evaluation ends its game. A process exits only once its queued
-        # results reach the pipe, so collect them while all processes exit
-        # against one deadline.
-        stop = time.monotonic() + exit_seconds
+        # results reach the pipe, which the receiver reads meanwhile.
+        stop = time.monotonic() + (stop_seconds if stopping else exit_seconds)
         while time.monotonic() < stop and any(process.is_alive() for process in spawned):
-            try:
-                records.append(results.get(timeout=0.1))
-            except queue.Empty:
-                pass
+            time.sleep(0.05)
         stragglers = [process for process in spawned if process.is_alive()]
         for process in stragglers:
             process.kill()
         for process in stragglers:
             process.join(timeout=1)  # Reaped, so their CPU time is counted.
-        # A process killed or crashed mid-message leaves half of it, on which a
-        # read would wait forever, so drain only after every process exited cleanly.
+        # What a clean exit flushed may still be in the pipe.
         clean = all(process.exitcode == 0 for process in spawned)
         stop = time.monotonic() + 5
         while clean and len(records) < len(tasks) and time.monotonic() < stop:
-            try:
-                records.append(results.get(timeout=0.5))
-            except queue.Empty:
-                break
+            time.sleep(0.05)
     finally:
+        finished.set()
         for process in spawned:
             if process.is_alive():
                 process.kill()
