@@ -1,0 +1,216 @@
+{
+ "allocator_note": {
+  "batch_wall_seconds_MallocNanoZone_0": 1314,
+  "batch_wall_seconds_default": 1191,
+  "games": 8,
+  "matched": false
+ },
+ "date": "2026-10-30",
+ "earlier_same_size_runs": {
+  "cpu_10x1": {
+   "batch_games_per_hour": 12.6,
+   "date": "2026-10-28",
+   "evaluations_per_game": 84928,
+   "long_run_games_per_hour": 14.6,
+   "seconds_per_game": 2461,
+   "torch": "2.11"
+  },
+  "gpu_8x4": {
+   "batch_games_per_hour": 23.2,
+   "date": "2026-10-29",
+   "evaluations_per_game": 84123,
+   "evaluations_per_second": 566,
+   "long_run_games_per_hour": 24.2,
+   "seconds_per_game": 4562,
+   "torch": "2.14"
+  },
+  "source": "docs/stage_a/landing_plan_shared_gpu_2026_10_29.md"
+ },
+ "full_runs": {
+  "full_cpu10": {
+   "batch_games_per_hour": 27.001426893655978,
+   "batch_wall_seconds": 1333.26287317276,
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "completed_games": 10,
+   "evaluations_per_game": 72826.8,
+   "evaluations_per_second_long_run": 658.9698402020796,
+   "failed_games": 0,
+   "games": 10,
+   "games_per_process": 1,
+   "long_run_games_per_hour": 32.57442898393842,
+   "long_run_method": "processes over mean game length",
+   "mean_game_seconds": 1105.1613527208915,
+   "peak_charged_bytes": 11726473952,
+   "processes": 10,
+   "seeds": [
+    1951,
+    1960
+   ],
+   "sources_unchanged": true,
+   "status": "completed"
+  },
+  "full_cpu8": {
+   "batch_games_per_hour": 24.171722221583625,
+   "batch_wall_seconds": 1191.474886894226,
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "completed_games": 8,
+   "evaluations_per_game": 70255.375,
+   "evaluations_per_second_long_run": 570.2315846126941,
+   "failed_games": 0,
+   "games": 8,
+   "games_per_process": 1,
+   "long_run_games_per_hour": 29.219596430959175,
+   "long_run_method": "processes over mean game length",
+   "mean_game_seconds": 985.6398964321561,
+   "peak_charged_bytes": 11483971584,
+   "processes": 8,
+   "seeds": [
+    1951,
+    1958
+   ],
+   "sources_unchanged": true,
+   "status": "completed"
+  },
+  "full_gpu8x4": {
+   "batch_games_per_hour": 46.37003967271585,
+   "batch_wall_seconds": 2484.3627655506134,
+   "commit": "61138bac735ed6e5396d4d969360f8736ef3b66d",
+   "completed_games": 32,
+   "coordinator_cores": 0.6591489716024075,
+   "coordinator_forward_share": 0.9420842296527053,
+   "evaluations_per_game": 69812.125,
+   "evaluations_per_second_long_run": 936.9819808810008,
+   "failed_games": 0,
+   "game_process_cores": 4.256914009760602,
+   "games": 32,
+   "games_per_process": 4,
+   "long_run_games_per_hour": 48.317324980031806,
+   "long_run_method": "all-slots-busy evaluations per second over evaluations per game",
+   "mean_game_seconds": 2266.089621852894,
+   "mean_positions_per_model_forward": 5.1348960738499425,
+   "mean_requests_per_serving_round": 12.69239247770013,
+   "peak_charged_bytes": 10790277128,
+   "processes": 8,
+   "seeds": [
+    1951,
+    1982
+   ],
+   "slots_over_mean_game_games_per_hour": 50.83647128916525,
+   "sources_unchanged": true,
+   "status": "completed"
+  },
+  "full_gpu8x6": {
+   "batch_games_per_hour": 45.414937141208036,
+   "batch_wall_seconds": 3804.9155383110046,
+   "commit": "61138bac735ed6e5396d4d969360f8736ef3b66d",
+   "completed_games": 48,
+   "coordinator_cores": 0.6363095234630947,
+   "coordinator_forward_share": 0.9381369623590593,
+   "evaluations_per_game": 70179.83333333333,
+   "evaluations_per_second_long_run": 919.9115676100204,
+   "failed_games": 0,
+   "game_process_cores": 4.70906329814448,
+   "games": 48,
+   "games_per_process": 6,
+   "long_run_games_per_hour": 47.188508238065644,
+   "long_run_method": "all-slots-busy evaluations per second over evaluations per game",
+   "mean_game_seconds": 3513.568585791676,
+   "mean_positions_per_model_forward": 7.4004725910374605,
+   "mean_requests_per_serving_round": 19.568345658071298,
+   "peak_charged_bytes": 14655492824,
+   "processes": 8,
+   "seeds": [
+    1951,
+    1998
+   ],
+   "slots_over_mean_game_games_per_hour": 49.18076758164798,
+   "sources_unchanged": true,
+   "status": "completed"
+  }
+ },
+ "opening_probes_300_seconds": {
+  "gpu10x4": {
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "decisions_per_game_reached": 103.1,
+   "evaluations_per_second": 767.9437018544406,
+   "game_process_cores": 4.493581365245405,
+   "mean_positions_per_model_forward": 11.495497736431023,
+   "mean_requests_per_serving_round": 20.37663139329806,
+   "milliseconds_per_model_forward": 13.709629070058982,
+   "peak_charged_bytes": 13130959584
+  },
+  "gpu10x6": {
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "decisions_per_game_reached": 58.733333333333334,
+   "evaluations_per_second": 595.8218740250774,
+   "game_process_cores": 4.365100687304794,
+   "mean_positions_per_model_forward": 18.273928063401748,
+   "mean_requests_per_serving_round": 30.997931747673217,
+   "milliseconds_per_model_forward": 27.75060182043982,
+   "peak_charged_bytes": 16743758920
+  },
+  "gpu8x4": {
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "decisions_per_game_reached": 131.84375,
+   "evaluations_per_second": 802.4705715215684,
+   "game_process_cores": 4.311412463003306,
+   "mean_positions_per_model_forward": 9.865886109632783,
+   "mean_requests_per_serving_round": 15.875864795414113,
+   "milliseconds_per_model_forward": 11.631709437299154,
+   "peak_charged_bytes": 11400400544
+  },
+  "gpu8x6": {
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "decisions_per_game_reached": 81.1875,
+   "evaluations_per_second": 706.6044530474779,
+   "game_process_cores": 4.432445242887444,
+   "mean_positions_per_model_forward": 14.804855989981911,
+   "mean_requests_per_serving_round": 24.032185206098248,
+   "milliseconds_per_model_forward": 19.59733499400136,
+   "peak_charged_bytes": 14115475776
+  },
+  "gpu8x8": {
+   "commit": "306523048b6c99c63a7ab24bb9df07447c4ade45",
+   "decisions_per_game_reached": 56.609375,
+   "evaluations_per_second": 604.9750741042333,
+   "game_process_cores": 4.5962099074308895,
+   "mean_positions_per_model_forward": 18.569240133914985,
+   "mean_requests_per_serving_round": 31.92099755842344,
+   "milliseconds_per_model_forward": 28.274014132887057,
+   "peak_charged_bytes": 18371380792
+  }
+ },
+ "raw_outputs": "studies/campaign/runs/games-per-hour-2026-10-30/ and studies/campaign/runs/nine-fixes-2026-10-30/",
+ "same_games_check": {
+  "commit": "4e37b7f",
+  "evaluation": "one position at a time on CPU",
+  "evaluations": 562043,
+  "fields": [
+   "trace",
+   "final state and RNG digests",
+   "decisions",
+   "transitions",
+   "returns"
+  ],
+  "games": 8,
+  "identical_to": "the one-move skip run at 4b626e8",
+  "seeds": [
+   1951,
+   1958
+  ]
+ },
+ "schema": "games_per_hour_2026_10_30",
+ "settings": {
+  "MallocNanoZone": "unset (macOS default allocator)",
+  "calendar_rounds": 11,
+  "hidden_dim": 64,
+  "learning_updates": false,
+  "max_depth": 16,
+  "message_layers": 2,
+  "search_evaluation": "per_search",
+  "simulations": 64,
+  "threads": 1,
+  "token_buckets": 16384,
+  "torch": "2.14.0"
+ }
+}

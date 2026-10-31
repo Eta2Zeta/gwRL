@@ -230,6 +230,7 @@ state.
 - [Three dead ends fixed; eleven-round self-play at 12.6 to 14.6 games per hour](dead_ends_2026_10_28.md)
 - [Reachable landing plans; shared GPU self-play at 23.2 to 24.2 games per hour](landing_plan_shared_gpu_2026_10_29.md)
 - [Where self-play game processes spend CPU: rules engine 50%, network inputs 36%, search 7%](game_process_cpu_profile_2026_10_29.md)
+- [Games per hour on the new code: 32.6 all-CPU and 48.3 with the GPU](games_per_hour_2026_10_30.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)
