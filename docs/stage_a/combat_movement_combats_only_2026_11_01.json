@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-01",
+  "change": "Combat Movement offers a land move only if it starts a combat (RB 7, 9.1, 11.1; user ruling)",
+  "before_commit": "894f88f",
+  "machine": "4-vCPU Linux container; Python extension compiled with g++ -O3 -std=c++20",
+  "matched_positions": {
+    "method": "Uniform-random 3-round games, seeds 1951-1956, on the new engine; every fourth Combat Movement and every fourth Noncombat Movement position saved; the engine before the change listed its menu at the same positions.",
+    "totals": {
+      "combat_movement_positions": 295,
+      "combat_movement_options_old": 19120,
+      "combat_movement_options_new": 13545,
+      "combat_movement_options_added": 0,
+      "non_combat_movement_positions": 151,
+      "non_combat_movement_options_old": 6405,
+      "non_combat_movement_options_new": 6405,
+      "non_combat_movement_options_added": 0
+    },
+    "removed": {
+      "combat_movement | land move into friendly land": 5575
+    },
+    "unexplained_differences": 0,
+    "examples": []
+  },
+  "scripted_games_not_matched": {
+    "note": "Trajectories differ after the change; before is the engine at 894f88f.",
+    "rounds_3_seed_1951": {
+      "before": {
+        "decisions": 549,
+        "chance_events": 116,
+        "returns": [
+          28.1,
+          -36.9,
+          -88.3
+        ],
+        "combat_movement_decisions": 202,
+        "combat_movement_options": 14357,
+        "noncombat_movement_decisions": 24,
+        "noncombat_movement_options": 1029,
+        "all_options": 22130,
+        "land_moves_in_combat_movement": 78,
+        "land_moves_in_noncombat_movement": 12
+      },
+      "after": {
+        "decisions": 517,
+        "chance_events": 107,
+        "returns": [
+          23.2,
+          -37.0,
+          -82.8
+        ],
+        "combat_movement_decisions": 174,
+        "combat_movement_options": 9448,
+        "noncombat_movement_decisions": 35,
+        "noncombat_movement_options": 1433,
+        "all_options": 15116,
+        "land_moves_in_combat_movement": 50,
+        "land_moves_in_noncombat_movement": 23
+      }
+    },
+    "rounds_11_seed_1953": {
+      "before": {
+        "decisions": 1971,
+        "chance_events": 418,
+        "returns": [
+          51.3,
+          -52.3,
+          -100.7
+        ],
+        "combat_movement_decisions": 741,
+        "combat_movement_options": 48195,
+        "noncombat_movement_decisions": 56,
+        "noncombat_movement_options": 2122,
+        "all_options": 77358,
+        "land_moves_in_combat_movement": 287,
+        "land_moves_in_noncombat_movement": 12
+      },
+      "after": {
+        "decisions": 1908,
+        "chance_events": 332,
+        "returns": [
+          28.9,
+          -29.7,
+          -109.1
+        ],
+        "combat_movement_decisions": 650,
+        "combat_movement_options": 31353,
+        "noncombat_movement_decisions": 161,
+        "noncombat_movement_options": 14011,
+        "all_options": 80647,
+        "land_moves_in_combat_movement": 217,
+        "land_moves_in_noncombat_movement": 117
+      }
+    }
+  },
+  "share_before_change": {
+    "note": "Land moves into own or friendly land among Combat Movement options, engine at 894f88f",
+    "rounds_11_seed_1953_scripted": {
+      "options": 48195,
+      "removed_by_filter": 14361
+    },
+    "rounds_3_seed_1951_scripted": {
+      "options": 14357,
+      "removed_by_filter": 4687
+    },
+    "rounds_3_seed_1951_uniform": {
+      "options": 23287,
+      "removed_by_filter": 10719
+    },
+    "rounds_3_seed_1952_uniform": {
+      "options": 20143,
+      "removed_by_filter": 7973
+    }
+  },
+  "ships_rough_measure": {
+    "game": "3-round scripted, seed 1951, lone-ship Combat Movement routes",
+    "routes": 24252,
+    "into_or_through_enemy_warships_or_patrols": 0,
+    "ending_beside_enemy_land": 13176,
+    "plain_sailing": 11076,
+    "convoy_lines_in_scenario": 0
+  },
+  "dead_end_search": {
+    "games": 60,
+    "rounds": 11,
+    "first_seed": 5000,
+    "completed_all_rounds": 60,
+    "problems": [],
+    "notes": 0,
+    "mean_decisions": 1549.3
+  },
+  "tests": {
+    "movement_tests": "combat movement only starts combats: passes; fails on the engine before the change",
+    "training_action_progress": "real-progress move is now an attack on KMT-held Hopeh",
+    "ctest": "96% tests passed, 1 tests failed out of 27",
+    "ctest_timed_out": [
+      "campaign_env"
+    ],
+    "campaign_env_alone_s": 37.5,
+    "python": {
+      "tests": 464,
+      "failures": 7,
+      "errors": 48,
+      "same_failing_tests_as_before": true
+    }
+  }
+}

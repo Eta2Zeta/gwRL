@@ -740,6 +740,46 @@ void combatTowingRegistersBothApproachesAndReplays() {
   check(replay.exactReplayIdentity() == e.exactReplayIdentity(),
         "Paired combat towing failed exact replay");
 }
+std::vector<std::vector<Id>> offeredPaths(const MovementRules &rules, const State &s, const Id &id) {
+  std::vector<std::vector<Id>> out;
+  for (const auto &a : rules.actions(s))
+    if (a.kind == "movement_route" && a.parameters.require("unit").asString() == id) {
+      std::vector<Id> path;
+      for (const auto &x : a.parameters.require("path").asArray())
+        path.push_back(x.asString());
+      out.push_back(std::move(path));
+    }
+  std::sort(out.begin(), out.end());
+  return out;
+}
+// RB 9.1: Combat Movement declares combats. A land move into the mover's own
+// or friendly land waits for Noncombat Movement.
+void combatMovementOnlyStartsCombats() {
+  Puzzle p;
+  p.link("a", "b");
+  p.link("b", "enemy");
+  p.link("a", "c");
+  MovementRules rules;
+  auto s = p.state(Phase::CombatMovement);
+  unit(s, "armor", "a", "light_armor", "japan", 2);
+  check(offeredPaths(rules, s, "armor") == std::vector<std::vector<Id>>{{"a", "b", "enemy"}},
+        "Combat Movement offered a move that starts no combat, or lost an attack through friendly land");
+  Action reposition;
+  reposition.id = "reposition";
+  reposition.kind = "movement_route";
+  reposition.nation = reposition.player = "japan";
+  reposition.parameters = V(O{{"unit", str("armor")}, {"path", V(A{str("a"), str("b")})},
+                              {"mode", V(toString(MovementMode::Ordinary))}, {"combat", V(true)}});
+  const auto before = canonicalJson(s.toJson());
+  rejects([&] { rules.apply(s, reposition); }, "A Combat Movement move into friendly land was applied");
+  check(canonicalJson(s.toJson()) == before, "A refused Combat Movement move changed the state");
+  auto later = p.state(Phase::NonCombatMovement);
+  unit(later, "armor", "a", "light_armor", "japan", 2);
+  const auto moves = offeredPaths(rules, later, "armor");
+  check(std::find(moves.begin(), moves.end(), std::vector<Id>{"a", "b"}) != moves.end() &&
+            std::find(moves.begin(), moves.end(), std::vector<Id>{"a", "c"}) != moves.end(),
+        "Noncombat Movement lost a repositioning move");
+}
 void lendLeaseDestinationException() {
   Puzzle p;
   p.sea("s0");
@@ -786,7 +826,8 @@ int main() {
              {"combat tow/replay",
               combatTowingRegistersBothApproachesAndReplays},
              {"lend-lease destination exception",
-              lendLeaseDestinationException}}) {
+              lendLeaseDestinationException},
+             {"combat movement only starts combats", combatMovementOnlyStartsCombats}}) {
       fn();
       std::cout << "PASS " << name << '\n';
     }

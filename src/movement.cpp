@@ -236,6 +236,13 @@ RouteRequest requestFrom(const Action &a) {
     r.towed = towed->asString();
   return r;
 }
+// A combat land move attacks, registering a battle, when its target has no
+// possessor or one that is neither the mover nor politically friendly to it.
+bool landRouteAttacks(const State &s, const Id &owner, const RouteRequest &r) {
+  const auto possessor = s.territories.at(r.path.back()).possessor;
+  return r.combat && (!possessor || (*possessor != owner &&
+                                     !politicallyFriendly(s, owner, *possessor)));
+}
 } // namespace
 
 std::string toString(MovementMode m) {
@@ -1168,16 +1175,21 @@ std::vector<Action> MovementRules::actions(const State &s) const {
                            blitz ? MovementMode::Blitz : MovementMode::Ordinary,
                            combat || blitz};
             if (validateRoute(s, r).allowed) {
-              out.push_back(movementAction(s, r));
-              if (u.type == "motorized_infantry" && !blitz)
-                for (const auto &[partner, towed] : s.units)
-                  if (partner != id && towed.zone == u.zone &&
-                      towed.owner == u.owner) {
-                    auto tow = r;
-                    tow.towed = partner;
-                    if (validateRoute(s, tow).allowed)
-                      out.push_back(movementAction(s, tow));
-                  }
+              // RB 9.1: Combat Movement declares combats. A move into the
+              // mover's own or friendly land waits for Noncombat Movement,
+              // but the search still passes through it to farther targets.
+              if (!combat || landRouteAttacks(s, u.owner, r)) {
+                out.push_back(movementAction(s, r));
+                if (u.type == "motorized_infantry" && !blitz)
+                  for (const auto &[partner, towed] : s.units)
+                    if (partner != id && towed.zone == u.zone &&
+                        towed.owner == u.owner) {
+                      auto tow = r;
+                      tow.towed = partner;
+                      if (validateRoute(s, tow).allowed)
+                        out.push_back(movementAction(s, tow));
+                    }
+              }
             } else
               return;
           }
@@ -1201,7 +1213,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
                              {u.zone, e.require("neighbor_id").asString()},
                              MovementMode::NarrowCrossing,
                              combat};
-              if (validateRoute(s, r).allowed)
+              if (validateRoute(s, r).allowed && (!combat || landRouteAttacks(s, u.owner, r)))
                 out.push_back(movementAction(s, r));
             }
       }
@@ -1341,6 +1353,9 @@ void MovementRules::apply(State &s, const Action &a) const {
   require(u.owner == a.nation, "Movement action owner mismatch");
   const auto owner = u.owner;
   const auto from = u.zone;
+  const bool attack = landRouteAttacks(s, owner, r);
+  require(s.clock.phase != Phase::CombatMovement || attack,
+          "Combat Movement land moves must start a combat (RB 9.1)");
   if (r.towed) {
     auto &artillery = s.units.at(*r.towed);
     const int remaining = std::min(2, u.movementRemaining.value_or(0));
@@ -1372,10 +1387,6 @@ void MovementRules::apply(State &s, const Action &a) const {
     u.commitments.insert("blitz_from:" + from);
     u.commitments.insert("blitz_to:" + target);
   }
-  const auto possessor = s.territories.at(target).possessor;
-  const bool attack =
-      r.combat && (!possessor || (*possessor != owner &&
-                                  !politicallyFriendly(s, owner, *possessor)));
   for (std::size_t i = 1; i < r.path.size(); ++i)
     u.route.push_back(r.path[i]);
   u.zone = target;

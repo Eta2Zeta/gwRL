@@ -16,7 +16,8 @@ using namespace game::campaign;
 using V = game::json::Value;
 using O = V::Object;
 using A = V::Array;
-const Id sea = "sea_p16", honshu = "land_jap_honshu", tokyo = "land_jap_tokyo";
+const Id sea = "sea_p16", honshu = "land_jap_honshu", tokyo = "land_jap_tokyo",
+         beiping = "land_china_beiping", hopeh = "land_china_hopeh";
 
 void check(bool yes, const std::string& message) { if (!yes) throw std::runtime_error(message); }
 void rejects(const std::function<void()>& callback, const std::string& message) {
@@ -75,8 +76,14 @@ Predicate landing(const Id& plane, const Id& destination) {
 
 void raiderChoicesRemainReachableAndBounceStops() {
     auto source = fixture(Phase::CombatMovement);
+    // Combat Movement land moves must start a combat (RB 9.1), so the walker's
+    // real progress is an attack on KMT-held Hopeh.
+    source.nations.at("japan").atWarWith.insert("kmt");
+    source.nations.at("kmt").atWarWith.insert("japan");
+    source.territories.at(beiping).possessor = "japan";
+    source.territories.at(hopeh).possessor = "kmt";
     add(source, "raider", "battlecruiser", sea);
-    add(source, "walker", "infantry", honshu);
+    add(source, "walker", "infantry", beiping);
     source.captureTurnStart();
     Engine engine(source, trainingCampaignRules(), 17);
     check(offers(engine, "end_phase"), "Normal stationary role cannot finish the phase");
@@ -95,7 +102,7 @@ void raiderChoicesRemainReachableAndBounceStops() {
           "Phase boundary retained an earlier role-configuration frame");
     choose(engine, "movement_route", [](const Action& action) {
         return action.parameters.require("unit").asString() == "walker" &&
-               action.parameters.require("path").asArray().back().asString() == tokyo;
+               action.parameters.require("path").asArray().back().asString() == hopeh;
     });
     check(engine.state().actionInterface.require("visited_configurations").asArray().empty(),
           "Physical movement retained stale configuration restrictions");
