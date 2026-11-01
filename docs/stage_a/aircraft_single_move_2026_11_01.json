@@ -1,0 +1,129 @@
+{
+  "date": "2026-11-01",
+  "change": "An aircraft that flew in Combat Movement makes no Noncombat move (RB 11.1)",
+  "before_commit": "3388a91",
+  "machine": "4-vCPU Linux container; Python extension compiled with g++ -O3 -std=c++20",
+  "example": {
+    "position": "Japan's first Combat Movement, scripted 3-round game, seed 1951",
+    "moves": "Tokyo fighter flies Tokyo > Honshu and lands at Kyushu, attacking nothing",
+    "noncombat_options_before": {
+      "air_fly": 14,
+      "air_land_noncombat": 8
+    },
+    "noncombat_options_after": {}
+  },
+  "scripted_games_matched": {
+    "rounds_3_seed_1951": {
+      "before": {
+        "chance_events": 116,
+        "decisions": 549,
+        "policy": "balanced",
+        "returns": [
+          28.1,
+          -36.9,
+          -88.3
+        ],
+        "rounds": 3,
+        "seed": 1951
+      },
+      "after": {
+        "chance_events": 116,
+        "decisions": 549,
+        "policy": "balanced",
+        "returns": [
+          28.1,
+          -36.9,
+          -88.3
+        ],
+        "rounds": 3,
+        "seed": 1951
+      },
+      "same_choices_in_order": true,
+      "options_before": 22130,
+      "options_after": 22130,
+      "menus_that_changed": 0
+    },
+    "rounds_11_seed_1953": {
+      "before": {
+        "chance_events": 418,
+        "decisions": 1971,
+        "policy": "balanced",
+        "returns": [
+          51.3,
+          -52.3,
+          -100.7
+        ],
+        "rounds": 11,
+        "seed": 1953
+      },
+      "after": {
+        "chance_events": 418,
+        "decisions": 1971,
+        "policy": "balanced",
+        "returns": [
+          51.3,
+          -52.3,
+          -100.7
+        ],
+        "rounds": 11,
+        "seed": 1953
+      },
+      "same_choices_in_order": true,
+      "options_before": 77358,
+      "options_after": 77358,
+      "menus_that_changed": 0
+    }
+  },
+  "random_play_matched_positions": {
+    "method": "Uniform-random 3-round games, seeds 1951-1956, on the new engine. Every movement-phase position in which some aircraft had moved in Combat Movement was saved; the engine before the change listed its menu at the same position. All Noncombat Movement positions and every fourth Combat Movement position were compared.",
+    "totals": {
+      "combat_movement_positions": 396,
+      "combat_movement_options_old": 23865,
+      "combat_movement_options_new": 23865,
+      "combat_movement_options_added": 0,
+      "non_combat_movement_positions": 338,
+      "non_combat_movement_options_old": 8537,
+      "non_combat_movement_options_new": 8527,
+      "non_combat_movement_options_added": 0
+    },
+    "removed": {
+      "non_combat_movement | air_land_noncombat | moved plane": 8,
+      "non_combat_movement | air_fly | moved plane": 2
+    },
+    "positions_with_other_changes": 0,
+    "examples": []
+  },
+  "dead_end_search": {
+    "games": 60,
+    "rounds": 11,
+    "first_seed": 5000,
+    "completed_all_rounds": 60,
+    "problems": [],
+    "notes": 0,
+    "mean_decisions": 1600.1,
+    "end_phase_bias": {
+      "0.02": 20,
+      "0.05": 20,
+      "0.1": 20
+    }
+  },
+  "air_test": {
+    "new_engine": "16 air fixture groups passed",
+    "engine_before": "fails: An aircraft that flew in Combat Movement moved again",
+    "allied_transport_test": "passes: an ally boards a transport that flew on its owner's own turn"
+  },
+  "ctest": {
+    "summary": "96% tests passed, 1 tests failed out of 27",
+    "timed_out": [
+      "campaign_env"
+    ],
+    "campaign_env_alone_s": 32.8,
+    "campaign_env_alone_passes": true
+  },
+  "python_unittest": {
+    "tests": 464,
+    "failures": 7,
+    "errors": 48,
+    "same_failing_tests_as_before": true
+  }
+}

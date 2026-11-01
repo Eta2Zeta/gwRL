@@ -104,6 +104,10 @@ int patrolRange(const State &s, const UnitState &u) {
 bool used(const State &s, const UnitState &u) {
     return flag(u.turnFlags, "air_battle_turn") == static_cast<int>(s.clock.playerTurnSerial + 1);
 }
+// RB 11.1: Noncombat Movement is for units that did not move in Combat Movement.
+bool noncombatBarred(const State &s, const UnitState &u) {
+    return s.clock.phase == Phase::NonCombatMovement && u.commitments.contains("combat_move");
+}
 void stamp(State &s, UnitState &u) {
     u.turnFlags["air_battle_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
 }
@@ -248,6 +252,10 @@ void moveFlight(State &s, const Id &id, const std::vector<Id> &path) {
     u.zone = path.back();
     *u.movementRemaining -= static_cast<int>(path.size()) - 1;
     u.turnFlags["air_in_flight"] = 1;
+    // A flight in Combat Movement is that phase's move, as for land units and
+    // ships: RB 11.1 leaves Noncombat Movement to units that did not move then.
+    if (s.clock.phase == Phase::CombatMovement)
+        u.commitments.insert("combat_move");
     for (const auto &cargo : u.cargo)
         s.units.at(cargo).zone = u.zone;
 }
@@ -831,9 +839,11 @@ bool ownLandingAshore(const State &s, const UnitState &u) {
 // Only Noncombat Movement lands cargo in its own port without a flight; in
 // Combat Movement, landing back there takes a flight out and back.
 bool mayFlyAshore(const State &s, const UnitState &u) {
+    // An aircraft that flew in Combat Movement cannot take off again in
+    // Noncombat Movement, so no plan counts on it freeing a carrier seat.
     if ((s.clock.phase != Phase::CombatMovement && s.clock.phase != Phase::NonCombatMovement) ||
         !movementController(s, u.owner) || marked(u.gameFlags, "on_map") || used(s, u) ||
-        u.commitments.contains("air_combat"))
+        u.commitments.contains("air_combat") || u.commitments.contains("combat_move"))
         return false;
     const int fuel = u.movementRemaining.value_or(0);
     if (s.clock.phase == Phase::NonCombatMovement)
@@ -1477,6 +1487,11 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                                  {{"unit", V(id)}, {"cargo", V(cargo)}}));
                 continue;
             }
+            // RB 11.1: Noncombat Movement is for units that did not move in Combat
+            // Movement. An aircraft that flew then only lands, once its carrier has
+            // sailed and left it in the air, and may still unload where it stands.
+            const bool landingOnly = noncombatBarred(s, u);
+            const bool grounded = landingOnly && !marked(u.turnFlags, "air_in_flight");
             // A patrol is the aircraft's whole combat move, into a sea zone within MAP
             // range of the land zone or Carrier it takes off from (RB 9.3.1).
             const bool takesOff = s.clock.phase == Phase::CombatMovement && u.route.empty() &&
@@ -1486,9 +1501,9 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 if (!patrolLimit) patrolLimit = patrolRange(s, u);
                 return *patrolLimit;
             };
-            auto paths = flightPaths(s, id, combat);
+            auto paths = grounded ? std::map<Id, std::vector<Id>>{} : flightPaths(s, id, combat);
             for (const auto &[zone, path] : paths) {
-                if (path.size() > 1 && validateFlight(s, id, path, combat, false).allowed &&
+                if (!landingOnly && path.size() > 1 && validateFlight(s, id, path, combat, false).allowed &&
                     flightKeepsLanding(s, id, path) &&
                     (!combat || !enemyFighter(s, u.owner, zone)))
                     out.push_back(
@@ -1573,7 +1588,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                     out.push_back(action(s, s.currentNation(), "air_assault",
                                          {{"unit", V(id)}, {"path", V(ids(path))}}));
             }
-            if ((transport(u) || has(s, u, "strategic_bomber")) && land(s, u.zone))
+            if (!landingOnly && (transport(u) || has(s, u, "strategic_bomber")) && land(s, u.zone))
                 for (const auto &[cargo, c] : s.units)
                     if (c.zone == u.zone && !c.carriedBy && has(s, c, "land") && u.owner == c.owner &&
                         c.route.empty() && !marked(c.turnFlags, "placed_this_turn") &&
@@ -1594,7 +1609,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                             out.push_back(action(s, s.currentNation(), "air_load",
                                                  {{"unit", V(id)}, {"cargo", V(cargo)}}));
                     }
-            if (!combat || marked(u.turnFlags, "air_in_flight"))
+            if ((!combat || marked(u.turnFlags, "air_in_flight")) && !grounded)
                 for (const auto &destination : airLandingSpots(s, id))
                     if (s.units.contains(destination) && landingChangesState(s, u, destination) &&
                         preservesLandingPlan(s, id, destination))
@@ -1738,6 +1753,7 @@ void AirRules::apply(State &s, const Action &a) const {
     if (a.kind == "air_fly") {
         auto id = p.require("unit").asString();
         auto path = readIds(p.require("path"));
+        require(!noncombatBarred(s, s.units.at(id)), "Aircraft flew in Combat Movement");
         require(validateFlight(s, id, path, s.clock.phase != Phase::NonCombatMovement, false).allowed,
                 "Invalid flight");
         require(flightKeepsLanding(s, id, path), "Flight leaves aircraft without any possible landing continuation");
@@ -1745,6 +1761,10 @@ void AirRules::apply(State &s, const Action &a) const {
         return;
     }
     if (a.kind == "air_load" || a.kind == "air_allied_load") {
+        // An allied transport keeps its owner's marks from that nation's turn;
+        // only the mover's own transport is bound by its Combat Movement flight.
+        require(a.kind == "air_allied_load" || !noncombatBarred(s, s.units.at(p.require("unit").asString())),
+                "Aircraft flew in Combat Movement");
         attachCargo(s, p.require("unit").asString(), p.require("cargo").asString());
         if (a.kind == "air_allied_load")
             s.units.at(p.require("cargo").asString()).gameFlags["air_allied_loaded_turn"] =
@@ -1760,6 +1780,8 @@ void AirRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "air_land_noncombat") {
         auto id = p.require("unit").asString(), z = p.require("destination").asString();
+        require(!noncombatBarred(s, s.units.at(id)) || marked(s.units.at(id).turnFlags, "air_in_flight"),
+                "Aircraft flew in Combat Movement");
         require(landingChangesState(s, s.units.at(id), z), "Aircraft is already grounded at this landing destination");
         auto paths = flightPaths(s, id, false);
         auto dest = s.units.contains(z) ? s.units.at(z).zone : z;
