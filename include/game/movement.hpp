@@ -53,6 +53,12 @@ bool aircraftFlightAccess(const State &, const Id &nation, const Id &zone,
                           bool combat);
 bool heldSinceTurnStart(const State &, const Id &nation, const Id &zone,
                         bool allowFriendly = true);
+// Land a unit may enter this turn outside combat: held since the turn began,
+// or handed over this turn by a minor's alignment (RB 4.6). RB 11.1 bars only
+// land captured this Player Turn. Strategic rail, supply and production still
+// require land held since the turn began.
+bool enterableThisTurn(const State &, const Id &nation, const Id &zone,
+                       bool allowFriendly = true);
 // Defensive scrambling refers to the defender's last own turn, rather than the
 // active attacker's turn snapshot used by supply and current-turn movement.
 bool heldSinceNationTurnStart(const State &, const Id &nation, const Id &zone,

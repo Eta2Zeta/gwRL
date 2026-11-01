@@ -145,6 +145,10 @@ void prepareTurnStart(State& state) {
         }
         unit.movementRemaining = unit.movementAllowance;
     }
+    // An alignment's mark (see incorporateNation) lasts only for its own
+    // Player Turn, so observations carry no stale marks.
+    for (auto& [id, territory] : state.territories)
+        territory.flags.erase("aligned_turn");
     state.captureTurnStart();
 }
 

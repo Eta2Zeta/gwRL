@@ -290,8 +290,10 @@ void incorporateNation(State& s,const Id& minor,const Id& recipient) {
     require(minor!="ccp"&&minor!="kmt"&&s.nations.at(minor).powerStatus!="major",
             "Chinese national factions and Major Powers retain their identities");
     require(!s.politics.surrendered.contains(recipient),"Cannot align with a surrendered nation");
+    // Aligned land is not captured land: it may be entered this turn (RB 4.6, 11.1).
     for(auto& [zone,t]:s.territories)if(t.possessor==minor) {
         t.possessor=recipient;t.flags["last_possession_change_turn"]=static_cast<int>(s.clock.playerTurnSerial);
+        t.flags["aligned_turn"]=static_cast<int>(s.clock.playerTurnSerial);
     }
     for(auto& [id,u]:s.units)if(u.owner==minor) {
         u.owner=recipient;
@@ -383,6 +385,7 @@ void changePossession(State& s,const Id& zone,const Id& recipient,PossessionCaus
     if(old==recipient)return;
     if(old&&s.politics.capitals.contains(*old)&&s.politics.capitals.at(*old)==zone&&s.nations.at(*old).treasury)s.nations.at(*old).treasury=0;
     territory.possessor=recipient;territory.flags["last_possession_change_turn"]=static_cast<int>(s.clock.playerTurnSerial);
+    territory.flags.erase("aligned_turn");  // Captured or given after aligning: no longer just aligned.
     if(old)pruneCapitalChoices(s,*old,zone);
     if(cause==PossessionCause::Capture||cause==PossessionCause::Liberation) {
         reconcileCapturedFacilities(s,zone,old.value_or(recipient),recipient);

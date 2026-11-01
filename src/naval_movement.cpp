@@ -729,7 +729,7 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
     return false;
   const auto owner = s.territories.at(destination).possessor;
   if (!owner || !politicallyFriendly(s, c.owner, *owner) ||
-      !heldSinceTurnStart(s, c.owner, destination))
+      !enterableThisTurn(s, c.owner, destination))
     return false;
   if (c.owner != t.owner &&
       value(c.gameFlags, "naval_loaded_completed_turns") >=

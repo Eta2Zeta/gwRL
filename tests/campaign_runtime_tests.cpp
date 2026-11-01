@@ -408,8 +408,13 @@ void freshCampaignStartAndRestoreBoundary() {
     unit.turnFlags["used"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
     state.nations.at("ccp").turnFlags["used"] = 1;
+    state.territories.at("land_b").flags["aligned_turn"] = 0;
+    state.territories.at("land_b").flags["kept"] = 1;
     auto engine = Engine::start(state, rules, 42);
     require(engine.state().flags.at("began:ccp") == 1, "Fresh initial nation did not begin once");
+    require(!engine.state().territories.at("land_b").flags.contains("aligned_turn")
+            && engine.state().territories.at("land_b").flags.at("kept") == 1,
+            "A new turn kept an old alignment mark or lost another territory flag");
     require(engine.state().turnStart.possessions.at("land_a") == "ccp"
             && engine.state().turnStart.units.at(unit.id).second == "land_a", "Initial snapshot followed hook effects");
     require(engine.state().territories.at("land_a").possessor == "kmt"

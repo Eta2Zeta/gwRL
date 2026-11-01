@@ -690,7 +690,9 @@ bool airLandingAvailable(const State &s, const Id &id, const Id &destination) {
     const auto &t = s.territories.at(destination);
     if (!t.possessor || !friendly(s, u.owner, *t.possessor))
         return false;
-    return heldSinceTurnStart(s, u.owner, destination, true);
+    // RB 10.10 and 11.3 bar only land captured or liberated this turn; land a
+    // minor's alignment handed over may take aircraft at once (RB 4.6).
+    return enterableThisTurn(s, u.owner, destination, true);
 }
 namespace {
 // Whether the aircraft can all land as the carriers stand, but for at most
@@ -1443,7 +1445,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 politicallyFriendly(s, s.currentNation(), t.owner))
                 for (const auto &[cid, c] : s.units)
                     if (c.owner == s.currentNation() && has(s, c, "land")) {
-                        if (c.carriedBy == tid && heldSinceTurnStart(s, c.owner, t.zone, true) &&
+                        if (c.carriedBy == tid && enterableThisTurn(s, c.owner, t.zone, true) &&
                             flag(c.gameFlags, "air_allied_loaded_turn") !=
                                 static_cast<int>(s.clock.playerTurnSerial + 1) &&
                             land(s, t.zone) && s.territories.at(t.zone).possessor &&
@@ -1511,7 +1513,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
             if (!combat && used(s, u) && !marked(u.turnFlags, "air_in_flight"))
                 continue;
             if (!combat && transport(u) && u.cargo.size() > 1) {
-                if (land(s, u.zone) && heldSinceTurnStart(s, u.owner, u.zone, true))
+                if (land(s, u.zone) && enterableThisTurn(s, u.owner, u.zone, true))
                     for (const auto &cargo : u.cargo)
                         if (s.units.at(cargo).owner == u.owner)
                             out.push_back(action(s, s.currentNation(), "air_unload",
@@ -1633,7 +1635,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         out.push_back(action(s, s.currentNation(), "air_land_noncombat",
                                              {{"unit", V(id)}, {"destination", V(destination)}}));
             if (!combat && !u.cargo.empty() && land(s, u.zone) &&
-                heldSinceTurnStart(s, u.owner, u.zone, true) && s.territories.at(u.zone).possessor &&
+                enterableThisTurn(s, u.owner, u.zone, true) && s.territories.at(u.zone).possessor &&
                 friendly(s, u.owner, *s.territories.at(u.zone).possessor))
                 for (const auto &cargo : u.cargo)
                     if(s.units.at(cargo).owner==u.owner)

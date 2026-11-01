@@ -324,6 +324,20 @@ bool heldSinceTurnStart(const State &s, const Id &nation, const Id &zone,
   return *t->second.possessor == nation ||
          (allowFriendly && logisticsFriendly(s, nation, *t->second.possessor));
 }
+bool enterableThisTurn(const State &s, const Id &nation, const Id &zone,
+                       bool allowFriendly) {
+  if (heldSinceTurnStart(s, nation, zone, allowFriendly))
+    return true;
+  const auto t = s.territories.find(zone);
+  if (t == s.territories.end() || !t->second.possessor)
+    return false;
+  const auto aligned = t->second.flags.find("aligned_turn");
+  if (aligned == t->second.flags.end() ||
+      aligned->second != static_cast<int>(s.clock.playerTurnSerial))
+    return false;
+  return *t->second.possessor == nation ||
+         (allowFriendly && logisticsFriendly(s, nation, *t->second.possessor));
+}
 bool heldSinceNationTurnStart(const State &s, const Id &nation, const Id &zone,
                               bool allowFriendly) {
   const auto t = s.territories.find(zone);
@@ -547,7 +561,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
                     "blitzing");
       if (!friendly && u.type == "militia")
         return fail("Militia cannot attack");
-      if (!r.combat && !heldSinceTurnStart(s, u.owner, b))
+      if (!r.combat && !enterableThisTurn(s, u.owner, b))
         return fail("Cannot enter land captured this turn");
       const auto approach = borderApproach(s, a, b);
       auto all = approach.nodeTerrain;

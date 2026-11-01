@@ -262,5 +262,93 @@
         "same_failing_tests_as_before": true
       }
     }
+  },
+  "aligned_land": {
+    "before_commit": "6c14847",
+    "rule": "Outside combat, land that an alignment handed to the mover or a nation friendly to it this turn may be entered at once: Noncombat land moves, aircraft landings, and cargo unloaded from aircraft and ships (RB 4.6, 10.10, 11.1, 11.3; user ruling). Captured or liberated land stays closed; strategic rail, supply and placement keep requiring possession since the turn began (RB 11.2, 1.11, 12.1). The alignment mark is cleared at the next Player Turn.",
+    "matched_positions": {
+      "method": "Uniform-random 3-round games, seeds 1951-1956, on the new engine; every second Combat Movement and every second Noncombat Movement position; the engine at 6c14847 listed its menu at the same positions.",
+      "totals": {
+        "combat_movement_positions": 428,
+        "combat_movement_options_old": 11690,
+        "combat_movement_options_new": 11690,
+        "combat_movement_options_added": 0,
+        "combat_movement_options_removed": 0,
+        "non_combat_movement_positions": 360,
+        "non_combat_movement_options_old": 20234,
+        "non_combat_movement_options_new": 20234,
+        "non_combat_movement_positions_with_land_aligned_this_turn": 36,
+        "non_combat_movement_options_added": 0,
+        "non_combat_movement_options_removed": 0
+      },
+      "differences": {},
+      "who_received_aligned_land": {
+        "non_combat_movement | japan moving | land to ccp,kmt": 17,
+        "non_combat_movement | japan moving | land to kmt": 14,
+        "non_combat_movement | ccp moving | land to kmt": 5
+      },
+      "differences_without_aligned_land": 0,
+      "examples": []
+    },
+    "targeted_random_games": {
+      "method": "Uniform-random 11-round games from seed 7000 for 720 s on the new engine. Every position where an option's path, destination or zone named land aligned this turn was saved, and such an option was played half the time. The engine at 6c14847 listed its menu at the same positions.",
+      "play": {
+        "non_combat_movement positions with land aligned this turn": 746,
+        "place_units positions with land aligned this turn": 302,
+        "politics_evolution positions with land aligned this turn": 23,
+        "politics_evolution positions offering entry": 23,
+        "politics_evolution entry options": 246,
+        "entry option kind politics_choose_capital": 246,
+        "entry options played": 19,
+        "combat positions with land aligned this turn": 50,
+        "games": 54,
+        "recruitment_choice positions with land aligned this turn": 4,
+        "non_combat_movement positions offering entry": 17,
+        "non_combat_movement entry options": 234,
+        "entry option kind air_fly": 234,
+        "naval_force_selection positions with land aligned this turn": 12
+      },
+      "compare": {
+        "totals": {
+          "politics_evolution_positions": 23,
+          "politics_evolution_options_old": 562,
+          "politics_evolution_options_new": 562,
+          "politics_evolution_options_entering_aligned_land": 246,
+          "politics_evolution_entering_options_new_to_this_engine": 0,
+          "non_combat_movement_positions": 17,
+          "non_combat_movement_options_old": 3107,
+          "non_combat_movement_options_new": 3107,
+          "non_combat_movement_options_entering_aligned_land": 234,
+          "non_combat_movement_entering_options_new_to_this_engine": 0
+        },
+        "added": {},
+        "positions_with_other_differences": 0,
+        "examples": []
+      }
+    },
+    "dead_end_search": {
+      "games": 60,
+      "rounds": 11,
+      "first_seed": 5000,
+      "completed_all_rounds": 60,
+      "problems": [],
+      "notes": 0,
+      "mean_decisions": 1326.4,
+      "same_decisions_as_run_without_turn_start_clearing": 60
+    },
+    "tests": {
+      "movement_tests": "aligned land opens at once: passes; fails on the engine before the change",
+      "campaign_runtime_tests": "fresh campaign start clears an old alignment mark and keeps other territory flags: passes; fails without the turn-start step",
+      "ctest": "96% tests passed, 1 tests failed out of 27",
+      "ctest_timed_out": [
+        "campaign_env"
+      ],
+      "campaign_env_alone_s": 34.4,
+      "python": {
+        "summary": "FAILED (failures=7, errors=48)",
+        "ran": 464,
+        "same_failing_tests_as_before": true
+      }
+    }
   }
 }

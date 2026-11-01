@@ -1,3 +1,4 @@
+#include "game/air.hpp"
 #include "game/catalog.hpp"
 #include "game/land_combat.hpp"
 #include "game/movement.hpp"
@@ -780,6 +781,36 @@ void combatMovementOnlyStartsCombats() {
             std::find(moves.begin(), moves.end(), std::vector<Id>{"a", "c"}) != moves.end(),
         "Noncombat Movement lost a repositioning move");
 }
+// RB 4.6 and 11.1: land a minor's alignment handed over this turn may be
+// entered outside combat at once; land captured this turn may not.
+void alignedLandOpensAtOnce() {
+  Puzzle p;
+  p.land("w", "warlord_suiyuan");
+  p.link("a", "w");
+  MovementRules rules;
+  const auto enters = [&](const State &s) {
+    const auto paths = offeredPaths(rules, s, "infantry");
+    return std::find(paths.begin(), paths.end(), std::vector<Id>{"a", "w"}) != paths.end();
+  };
+  auto before = p.state(Phase::NonCombatMovement);
+  unit(before, "infantry", "a");
+  unit(before, "fighter", "a", "fighter");
+  check(!enters(before) && !airLandingAvailable(before, "fighter", "w"),
+        "Noncombat Movement entered a warlord's land");
+  auto aligned = before.clone();
+  incorporateNation(aligned, "warlord_suiyuan", "japan");
+  check(enters(aligned) && airLandingAvailable(aligned, "fighter", "w"),
+        "Land that joined Japan this turn could not be entered or landed on");
+  auto captured = before.clone();
+  changePossession(captured, "w", "japan", PossessionCause::Capture, Id("japan"));
+  check(!enters(captured) && !airLandingAvailable(captured, "fighter", "w"),
+        "Land captured this turn was entered or landed on");
+  auto joinedThenCaptured = before.clone();
+  incorporateNation(joinedThenCaptured, "warlord_suiyuan", "kmt");
+  changePossession(joinedThenCaptured, "w", "japan", PossessionCause::Capture, Id("japan"));
+  check(!enters(joinedThenCaptured) && !airLandingAvailable(joinedThenCaptured, "fighter", "w"),
+        "Land captured after aligning this turn was entered or landed on");
+}
 void lendLeaseDestinationException() {
   Puzzle p;
   p.sea("s0");
@@ -827,7 +858,8 @@ int main() {
               combatTowingRegistersBothApproachesAndReplays},
              {"lend-lease destination exception",
               lendLeaseDestinationException},
-             {"combat movement only starts combats", combatMovementOnlyStartsCombats}}) {
+             {"combat movement only starts combats", combatMovementOnlyStartsCombats},
+             {"aligned land opens at once", alignedLandOpensAtOnce}}) {
       fn();
       std::cout << "PASS " << name << '\n';
     }

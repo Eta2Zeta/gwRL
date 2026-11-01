@@ -109,14 +109,76 @@ player used to reposition during Combat Movement:
 - Python: 464 tests, with the same 7 failures and 48 errors as the unchanged
   code, all from this container.
 
+## Land handed over by an alignment
+
+When a minor power aligns, all its land passes to the nation it joins (RB 4.6).
+The glossary lists alignment and capture as different ways to gain possession.
+RB 11.1 bars Noncombat Movement only from land "captured this Player Turn".
+RB 4.6's example lets the Major Power "land aircraft in the Minor Power's land
+zones in the same Player Turn".
+
+The engine required land held since the turn began for every move outside
+combat. With the Combat Movement filter above, newly aligned land could be
+entered in neither phase. For example, a warlord that Japan attacks may join
+Dadao, Japan's puppet, at the end of Japan's Combat Phase. Japan then could not
+move into that land, or land aircraft there, until its next turn.
+
+On the user's ruling, land that joined the mover, or a nation friendly to it,
+this turn may now be entered outside combat:
+
+- by Noncombat Movement land moves, including moves through it;
+- by aircraft landing, after combat and in Noncombat Movement (RB 10.10, 11.3);
+- by cargo unloaded from aircraft and ships.
+
+Unchanged:
+
+- Land captured or liberated this turn stays closed. So does land that aligned
+  and was then captured in the same turn.
+- Strategic rail (RB 11.2), supply paths (RB 1.11) and the placement of new
+  units and facilities (RB 12.1) still require land possessed since the turn
+  began, as those rules say.
+
+An alignment marks each territory it hands over. A capture, liberation or
+transfer clears the mark, and so does the start of the next Player Turn. The
+network reads the whole observation, so it sees the mark, but only during the
+turn in which it applies.
+
+Verification:
+
+- A new movement test: before the alignment, Noncombat Movement offers no move
+  into a warlord's land and no landing there. After the warlord joins Japan,
+  both are offered. Neither is offered after Japan captures the land, even land
+  that joined the KMT earlier in the turn. The test fails on the engine before
+  the change.
+- A runtime test checks that a new turn removes an old mark and keeps the
+  territory's other flags. It fails without that step.
+- Matched menus: the engine before the change listed its menu at 788
+  positions, every second Combat Movement and Noncombat Movement position of
+  six random 3-round games. Every menu was identical. Land had aligned during
+  the turn at 36 Noncombat positions, but each time it went to a side the mover
+  may not enter: to the KMT or CCP while Japan moved (31), or to the KMT while
+  the CCP moved (5).
+- 54 more random eleven-round games had 746 Noncombat positions with land
+  aligned that turn. At the 17 where some option named such land, the options
+  were Japanese flights across land that had just joined the KMT or CCP, and
+  the engine before the change listed the same menus. So random play never met
+  the new rule. It applies, for example, when a warlord that Japan attacks
+  joins Dadao.
+- The dead-end search played 60 random eleven-round games, once before and once
+  after the turn-start step. All finished all eleven rounds, with no game left
+  without a legal action and no notes; each game made the same number of
+  decisions in both runs.
+- C++: all 27 suites pass. `campaign_env` again needs about 34 s, over its
+  30-second limit. Python: 464 tests, with the same 7 failures and 48 errors as
+  before, all from this container.
+
 ## Not yet covered
 
-- **Zones that changed hands this turn without capture,** for example through
-  an alignment. Combat Movement could enter them before; Noncombat Movement
-  cannot, because it requires zones held since the turn began. RB 11.1 forbids
-  only zones "captured this Player Turn". Until that is ruled on, such moves are
-  possible in neither phase. None of the 5,575 removed land moves at the
-  matched positions passed through such a zone.
+- **Supply through land a controlled nation hands over.** RB 1.11 traces
+  supply through land "possessed by you or a controlled/Aligned nation, since
+  the beginning of the Player Turn". The engine requires the same possessor all
+  turn, so land that Dadao hands to Japan carries no Japanese supply path for
+  the rest of that turn. This was not changed.
 - **Ships** keep their full Combat Movement menus.
   - In the 3-round scripted game, none of the 24,252 lone-ship Combat Movement
     routes entered or passed a zone with enemy warships or patrol planes. 54%
