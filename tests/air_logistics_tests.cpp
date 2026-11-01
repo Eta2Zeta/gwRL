@@ -117,8 +117,10 @@ void baseMovementNeedsSupplyAndAge() {
     check(damaged.units.at("aircraft").movementRemaining == ordinary,
           "Damaged airbase granted movement bonus");
 }
+// A Combat Movement flight from a carrier is an attack or patrol; a plain
+// launch is a Noncombat move.
 void carrierAircraftCanLaunch() {
-    auto s = fixture();
+    auto s = fixture(Phase::NonCombatMovement);
     add(s, "carrier", "fleet_carrier", "sea_p16");
     add(s, "aircraft", "fighter", "sea_p16");
     attachCargo(s, "carrier", "aircraft");
@@ -243,17 +245,16 @@ void secondBomberCannotTakeTheAttackersOnlySeat() {
             return a.kind==kind&&a.parameters.require("unit").asString()=="returning"&&(kind=="air_fly"
                 ?a.parameters.require("path").asArray().back().asString()==place:a.parameters.require("destination").asString()==place);});};
         check(offeredFor("air_land_noncombat","land_manchuria_rehe"),"The second bomber lost its landing ashore");
-        check(offeredFor("air_fly","sea_p14")==swap&&airFlightKeepsLandings(s,"returning",back)==swap,
+        // Combat Movement offers no plain flight (RB 9.1); the planner still judges one.
+        check(!offeredFor("air_fly","sea_p14")&&airFlightKeepsLandings(s,"returning",back)==swap,
               swap?"The carriers could not swap zones to seat both bombers and the fighter"
                   :"A second bomber took the only seat an attacking bomber can reach");
     }
     // Once the bomber is back over P14, either carrier may begin the swap.
     auto s=fiveThousandNinety(true);
-    const auto actions=AirRules{}.actions(s);
-    const auto fly=std::find_if(actions.begin(),actions.end(),[](const auto& a){return a.kind=="air_fly"&&
-        a.parameters.require("unit").asString()=="returning"&&a.parameters.require("path").asArray().back().asString()=="sea_p14";});
-    check(fly!=actions.end(),"The swap fixture offered no flight back over P14");
-    AirRules{}.apply(s,*fly);
+    auto& returning=s.units.at("returning");
+    returning.route={"sea_p14"};returning.zone="sea_p14";returning.movementRemaining=0;
+    returning.commitments.insert("combat_move");
     check(validateNavalRoute(s,{{"light"},{"sea_p14","sea_p15"},true}).allowed&&
               validateNavalRoute(s,{{"fleet"},{"sea_p15","sea_p14"},true}).allowed,
           "Either carrier could not begin the swap that seats all three aircraft");
@@ -304,7 +305,7 @@ void aSailingCarriersAircraftMayUseAnyCarrier() {
 void aControlledMinorsAircraftKeepTheirLandings() {
     // Japan moves Dadao's units, so a Dadao fighter's flights must keep its
     // landing. It may land only on Dadao land, not Japan's.
-    auto s=fixture();ensureDadao(s);s.territories.at("land_china_hopeh").possessor="dadao";s.captureTurnStart();
+    auto s=fixture(Phase::NonCombatMovement);ensureDadao(s);s.territories.at("land_china_hopeh").possessor="dadao";s.captureTurnStart();
     add(s,"leased","fighter","land_china_hopeh","dadao");s.units.at("leased").movementRemaining=2;
     const auto actions=AirRules{}.actions(s);
     std::vector<int> fuels;

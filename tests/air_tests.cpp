@@ -131,15 +131,16 @@ void landingTimingAndCarrierCapacity() {
     attachCargo(s, "cv", "h");
     check(!airLandingAvailable(s, "f", "cv"), "Full carrier accepted extra aircraft");
 }
+// Split flights exist only in Noncombat Movement; Combat Movement flights attack.
 void ordinaryFlightsKeepALandingContinuation() {
     const Id formosa = "land_formosa", hainan = "land_hainan";
-    auto s = fixture();
+    auto s = fixture(Phase::NonCombatMovement);
     s.nations.at("japan").atWarWith.insert("warlord_kwangtung_hainan");
     s.nations.at("warlord_kwangtung_hainan").atWarWith.insert("japan");
     add(s, "b", "tactical_bomber", "japan", tokyo);
     s.units.at("b").movementAllowance = s.units.at("b").movementRemaining = 5;
     const std::vector<Id> stranded{tokyo, honshu, "sea_p15", "sea_p32", "sea_p41", hainan};
-    check(validateFlight(s, "b", stranded, true).allowed,
+    check(validateFlight(s, "b", stranded, false).allowed,
           "Stranded-flight fixture did not pass ordinary path/range checks");
     Engine e(s, rules());
     for (const auto& action : e.legalActions())
@@ -172,7 +173,7 @@ void ordinaryFlightsKeepALandingContinuation() {
     auto replay = Engine::replay(s.definition, rules(), initial, e.state().history);
     check(replay.exactReplayIdentity() == e.exactReplayIdentity(), "Split flight replay diverged");
 
-    auto culdesac = fixture();
+    auto culdesac = fixture(Phase::NonCombatMovement);
     culdesac.nations.at("japan").atWarWith.insert("warlord_kwangtung_hainan");
     culdesac.nations.at("warlord_kwangtung_hainan").atWarWith.insert("japan");
     add(culdesac, "b", "strategic_bomber", "japan", tokyo);
@@ -181,7 +182,7 @@ void ordinaryFlightsKeepALandingContinuation() {
     for (const auto& action : oneFuel.legalActions())
         check(action.kind != "air_fly" || action.parameters.require("path").asArray().back().asString() != hainan,
               "A one-fuel cul-de-sac flight had no reachable landing continuation");
-    auto atSea = fixture();
+    auto atSea = fixture(Phase::NonCombatMovement);
     add(atSea, "t", "air_transport", "japan", tokyo);
     atSea.units.at("t").movementAllowance = atSea.units.at("t").movementRemaining = 3;
     Engine noCarrier(atSea, rules());
@@ -191,7 +192,7 @@ void ordinaryFlightsKeepALandingContinuation() {
 }
 void flightMayPrecedeItsLandingCarrier() {
     const Id formosa = "land_formosa", landingSea = "sea_p41";
-    auto s = fixture();
+    auto s = fixture(Phase::NonCombatMovement);
     add(s, "f", "fighter", "japan", formosa);
     s.units.at("f").movementAllowance = s.units.at("f").movementRemaining = 1;
     add(s, "cv", "fleet_carrier", "japan", "sea_p15");
@@ -398,59 +399,61 @@ void toNoncombat(Engine &e) {
         choose(e, "end_phase");
     check(e.state().clock.phase == Phase::NonCombatMovement, "Fixture did not reach Noncombat Movement");
 }
-// RB 11.1: Noncombat Movement is for units that did not move in Combat Movement.
+bool refused(const State &source, const Action &action) {
+    auto state = source.clone();
+    const auto before = canonicalJson(state.toJson());
+    try { AirRules{}.apply(state, action); } catch (const std::runtime_error &) {
+        return canonicalJson(state.toJson()) == before;
+    }
+    return false;
+}
+Action flight(const Id &unit, const std::vector<Id> &path) {
+    Action a;
+    a.kind = "air_fly";
+    V::Array zones;
+    for (const auto &zone : path) zones.emplace_back(zone);
+    a.parameters = V(O{{"unit", V(unit)}, {"path", V(zones)}});
+    return a;
+}
+// RB 9.1 and 11.1: a Combat Movement flight attacks or patrols, and a plane
+// that moved then makes no Noncombat move.
 void combatMovementFlightIsTheTurnsMove() {
-    const Id kyushu = "land_jap_kyushu";
     auto s = fixture();
-    for (const auto &id : {"hopper", "idle", "patrol"}) {
+    for (const auto &id : {"idle", "patrol"}) {
         add(s, id, "fighter", "japan", tokyo);
         s.units.at(id).movementAllowance = s.units.at(id).movementRemaining = 5;
     }
     add(s, "deck", "fighter", "japan", "sea_p16");
     s.units.at("deck").movementAllowance = s.units.at("deck").movementRemaining = 5;
     add(s, "cv", "fleet_carrier", "japan", "sea_p16");
+    add(s, "cv2", "fleet_carrier", "japan", "sea_p16");
+    attachCargo(s, "cv", "deck");
     s.captureTurnStart();
     Engine e(s, std::make_shared<NavalRules>(rules()));
-    // Hop Tokyo > Honshu, then land at Kyushu, without attacking anything.
-    choose(e, "air_fly", [](const Action &a) {
-        return a.parameters.require("unit").asString() == "hopper" &&
-               a.parameters.require("path").asArray().size() == 2 &&
-               a.parameters.require("path").asArray().back().asString() == honshu;
-    });
-    choose(e, "air_land_noncombat", [&](const Action &a) {
-        return a.parameters.require("unit").asString() == "hopper" &&
-               a.parameters.require("destination").asString() == kyushu;
-    });
-    check(hasOrder(e, "hopper", "air_fly"), "Combat Movement no longer lets a landed aircraft fly on");
+    check(!hasOrder(e, "idle", "air_fly") && hasOrder(e, "idle", "air_ground_attack"),
+          "Combat Movement offered a fighter a flight that starts no combat, or no attack");
+    check(refused(e.state(), flight("idle", {tokyo, honshu})), "A Combat Movement flight that starts no combat was applied");
     choose(e, "air_start_patrol", [](const Action &a) { return a.parameters.require("unit").asString() == "patrol"; });
-    // Take off from the carrier and land back on it, so the carrier can later
-    // sail with an aircraft that has already moved this turn.
-    choose(e, "air_fly", [](const Action &a) {
-        return a.parameters.require("unit").asString() == "deck" &&
-               a.parameters.require("path").asArray().back().asString() == tokyo;
+    // A carrier that sails leaves its aircraft in the air over its starting zone;
+    // the fighter lands on the other carrier there, still in Combat Movement.
+    choose(e, "naval_start_move", [](const Action &a) { return a.parameters.require("unit").asString() == "cv"; });
+    choose(e, "naval_route", [](const Action &a) {
+        return a.parameters.require("request").require("path").asArray().back().asString() == "sea_p15";
     });
+    check(e.state().units.at("deck").turnFlags.contains("air_in_flight") && !hasOrder(e, "deck", "air_fly"),
+          "A sailing carrier carried its fighter along, or the fighter got a flight that starts no combat");
     choose(e, "air_land_noncombat", [](const Action &a) {
         return a.parameters.require("unit").asString() == "deck" &&
-               a.parameters.require("destination").asString() == "cv";
+               a.parameters.require("destination").asString() == "cv2";
     });
     toNoncombat(e);
-    check(unitOrders(e, "hopper").empty(), "An aircraft that flew in Combat Movement moved again");
     check(hasOrder(e, "idle", "air_fly") && hasOrder(e, "idle", "air_land_noncombat"),
           "An aircraft that did not move in Combat Movement lost its Noncombat move");
     check(hasOrder(e, "patrol", "air_end_patrol"), "A patrol could not end in Noncombat Movement");
-    check(unitOrders(e, "deck").empty(), "A carrier-landed aircraft that already moved could fly off");
-    // The authoritative application refuses the same move, leaving the state unchanged.
-    auto state = e.state().clone();
-    Action again;
-    again.kind = "air_fly";
-    again.parameters = V(O{{"unit", V("hopper")}, {"path", V(V::Array{V(kyushu), V(honshu)})}});
-    const auto before = canonicalJson(state.toJson());
-    bool rejected = false;
-    try { AirRules{}.apply(state, again); } catch (const std::runtime_error &) { rejected = true; }
-    check(rejected && canonicalJson(state.toJson()) == before, "A second flight was applied after Combat Movement");
-    // A carrier that sails leaves its aircraft in the air; the one that already
-    // moved may land but not fly elsewhere.
-    choose(e, "naval_start_move", [](const Action &a) { return a.parameters.require("unit").asString() == "cv"; });
+    check(unitOrders(e, "deck").empty(), "An aircraft that moved in Combat Movement moved again");
+    check(refused(e.state(), flight("deck", {"sea_p16", "sea_p15"})), "A second flight was applied after Combat Movement");
+    // When its carrier sails in Noncombat Movement, the aircraft may only land.
+    choose(e, "naval_start_move", [](const Action &a) { return a.parameters.require("unit").asString() == "cv2"; });
     choose(e, "naval_route", [](const Action &a) {
         return a.parameters.require("request").require("path").asArray().back().asString() == "sea_p15";
     });
@@ -462,10 +465,28 @@ void combatMovementFlightIsTheTurnsMove() {
           "An aircraft its carrier left in the air could do more than land");
     choose(e, "air_land_noncombat", [](const Action &a) {
         return a.parameters.require("unit").asString() == "deck" &&
-               a.parameters.require("destination").asString() == "cv";
+               a.parameters.require("destination").asString() == "cv2";
     });
-    check(e.state().units.at("deck").carriedBy == "cv" && unitOrders(e, "deck").empty(),
+    check(e.state().units.at("deck").carriedBy == "cv2" && unitOrders(e, "deck").empty(),
           "The launched aircraft did not land back on its carrier");
+}
+// RB 9.3.2: an air transport may stop on its way to collect airborne infantry.
+void combatMovementStopsOnlyToCollectAirborneInfantry() {
+    auto s = fixture();
+    add(s, "lift", "air_transport", "japan", tokyo);
+    add(s, "para", "airborne_infantry", "japan", honshu);
+    s.captureTurnStart();
+    Engine e(s, rules());
+    std::vector<Id> stops;
+    for (const auto &a : e.legalActions())
+        if (a.kind == "air_fly" && a.parameters.require("unit").asString() == "lift")
+            stops.push_back(a.parameters.require("path").asArray().back().asString());
+    check(stops == std::vector<Id>{honshu}, "An air transport's Combat Movement stop went elsewhere than its paratroopers");
+    choose(e, "air_fly", [](const Action &a) { return a.parameters.require("unit").asString() == "lift"; });
+    choose(e, "air_load", [](const Action &a) {
+        return a.parameters.require("unit").asString() == "lift" && a.parameters.require("cargo").asString() == "para";
+    });
+    check(e.state().units.at("para").carriedBy == "lift", "The air transport did not collect its airborne infantry");
 }
 // An allied transport keeps the marks of its owner's own turn; boarding it
 // during another player's Noncombat Movement does not move it.
@@ -503,8 +524,9 @@ int main() {
         noAircraftCapture();
         indexedGeometryPreservesAircraftMenus();
         combatMovementFlightIsTheTurnsMove();
+        combatMovementStopsOnlyToCollectAirborneInfantry();
         alliedTransportBoardsAfterItsOwnersTurn();
-        std::cout << "16 air fixture groups passed\n";
+        std::cout << "17 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

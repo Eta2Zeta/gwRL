@@ -1344,6 +1344,37 @@ void applyRailBombDamage(State &s, const Id &zone, const Id &other, int damage) 
     require(found, "No railroad on selected border");
 }
 
+namespace {
+// Whether aircraft `u` may load land unit `c` standing in `zone`: airborne
+// infantry for an airborne assault in Combat Movement (RB 9.3.2), other cargo
+// in Noncombat Movement (RB 11.3.1).
+bool loadsAt(const State &s, const UnitState &u, const Id &zone, bool combat, const UnitState &c) {
+    if (c.zone != zone || c.carriedBy || !has(s, c, "land") || u.owner != c.owner || !c.route.empty() ||
+        marked(c.turnFlags, "placed_this_turn") || marked(c.turnFlags, "air_transport_unloaded") ||
+        marked(c.turnFlags, "naval_unloaded") || c.commitments.contains("transport_unloaded") ||
+        c.commitments.contains("attrition") || c.commitments.contains("combat") ||
+        c.commitments.contains("combat_move"))
+        return false;
+    const int cap = u.type == "heavy_air_transport" && combat ? 2 : 1;
+    if (static_cast<int>(u.cargo.size()) >= cap)
+        return false;
+    return combat ? (c.type == "airborne_infantry" || c.type == "elite_airborne_infantry")
+                  : (transport(u) &&
+                     (has(s, c, "infantry_class") ||
+                      (u.type == "heavy_air_transport" &&
+                       (has(s, c, "artillery_class") || c.type == "anti_aircraft_artillery"))));
+}
+// RB 9.1 leaves Combat Movement to moves that start a combat. A flight that
+// stops short of one is allowed only for an air transport or strategic bomber
+// picking up airborne infantry on its way to an airborne assault (RB 9.3.2).
+bool collectsAirborne(const State &s, const UnitState &u, const Id &zone) {
+    if (!(transport(u) || has(s, u, "strategic_bomber")) || !land(s, zone))
+        return false;
+    return std::any_of(s.units.begin(), s.units.end(),
+                       [&](const auto &entry) { return loadsAt(s, u, zone, true, entry.second); });
+}
+} // namespace
+
 AirRules::AirRules(std::shared_ptr<const Rules> gameplay) : gameplay_(std::move(gameplay)) {}
 Id AirRules::id() const {
     return "gw36_v43_m8_air" + (gameplay_ ? "+" + gameplay_->id() : "");
@@ -1503,7 +1534,9 @@ std::vector<Action> AirRules::actions(const State &s) const {
             };
             auto paths = grounded ? std::map<Id, std::vector<Id>>{} : flightPaths(s, id, combat);
             for (const auto &[zone, path] : paths) {
-                if (!landingOnly && path.size() > 1 && validateFlight(s, id, path, combat, false).allowed &&
+                const bool stopover = s.clock.phase != Phase::CombatMovement || collectsAirborne(s, u, zone);
+                if (!landingOnly && stopover && path.size() > 1 &&
+                    validateFlight(s, id, path, combat, false).allowed &&
                     flightKeepsLanding(s, id, path) &&
                     (!combat || !enemyFighter(s, u.owner, zone)))
                     out.push_back(
@@ -1590,25 +1623,9 @@ std::vector<Action> AirRules::actions(const State &s) const {
             }
             if (!landingOnly && (transport(u) || has(s, u, "strategic_bomber")) && land(s, u.zone))
                 for (const auto &[cargo, c] : s.units)
-                    if (c.zone == u.zone && !c.carriedBy && has(s, c, "land") && u.owner == c.owner &&
-                        c.route.empty() && !marked(c.turnFlags, "placed_this_turn") &&
-                        !marked(c.turnFlags, "air_transport_unloaded") && !marked(c.turnFlags,"naval_unloaded") &&
-                        !c.commitments.contains("transport_unloaded") && !c.commitments.contains("attrition") &&
-                        !c.commitments.contains("combat") && !c.commitments.contains("combat_move")) {
-                        int cap = u.type == "heavy_air_transport" && combat ? 2 : 1;
-                        if (static_cast<int>(u.cargo.size()) >= cap)
-                            continue;
-                        bool allowed =
-                            combat
-                                ? (c.type == "airborne_infantry" || c.type == "elite_airborne_infantry")
-                                : (transport(u) &&
-                                   (has(s, c, "infantry_class") ||
-                                    (u.type == "heavy_air_transport" &&
-                                     (has(s, c, "artillery_class") || c.type == "anti_aircraft_artillery"))));
-                        if (allowed)
-                            out.push_back(action(s, s.currentNation(), "air_load",
-                                                 {{"unit", V(id)}, {"cargo", V(cargo)}}));
-                    }
+                    if (loadsAt(s, u, u.zone, combat, c))
+                        out.push_back(action(s, s.currentNation(), "air_load",
+                                             {{"unit", V(id)}, {"cargo", V(cargo)}}));
             if ((!combat || marked(u.turnFlags, "air_in_flight")) && !grounded)
                 for (const auto &destination : airLandingSpots(s, id))
                     if (s.units.contains(destination) && landingChangesState(s, u, destination) &&
@@ -1754,6 +1771,8 @@ void AirRules::apply(State &s, const Action &a) const {
         auto id = p.require("unit").asString();
         auto path = readIds(p.require("path"));
         require(!noncombatBarred(s, s.units.at(id)), "Aircraft flew in Combat Movement");
+        require(s.clock.phase != Phase::CombatMovement || (path.size() > 1 && collectsAirborne(s, s.units.at(id), path.back())),
+                "A Combat Movement flight must attack, patrol or collect airborne infantry");
         require(validateFlight(s, id, path, s.clock.phase != Phase::NonCombatMovement, false).allowed,
                 "Invalid flight");
         require(flightKeepsLanding(s, id, path), "Flight leaves aircraft without any possible landing continuation");

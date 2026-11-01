@@ -234,7 +234,7 @@ state.
 - [Decision, rules and training review: the objective rewards a passive Japan; removable decisions, search evaluations and flat targets](decision_review_2026_10_31.md)
 - [Finished battles clear themselves: 5.2% fewer decisions and 3.8% fewer search evaluations in the same games; truce changes update allies lists at once](battle_clearing_2026_10_31.md)
 - [Aircraft move once per turn: a plane that flew in Combat Movement no longer flies again in Noncombat Movement; rule verdicts on post-combat landings and repositioning](aircraft_single_move_2026_11_01.md)
-- [Combat Movement lists only land moves that start a combat: 29% shorter Combat Movement lists at matched positions; repositioning now happens after the battles](combat_movement_combats_only_2026_11_01.md)
+- [Combat Movement lists only moves that start a combat, for land units and planes: Combat Movement lists about a third of their size; repositioning and split flights happen after the battles](combat_movement_combats_only_2026_11_01.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)

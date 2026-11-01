@@ -1207,12 +1207,9 @@ void patrolsStartOnlyFromWhereAircraftTakeOff() {
         "A Fighter could not patrol the sea zone next to its land zone");
   check(!patrols(landBased, "sea_p15") && !patrols(landBased, "sea_p32"),
         "A Fighter patrolled beyond its MAP range of one");
-  choose(landBased, "air_fly", [](const Action &a) {
-    const auto &path = a.parameters.require("path").asArray();
-    return path.size() == 2 && path.back().asString() == p14;
-  });
-  check(!offered(landBased, "air_start_patrol"),
-        "An aircraft started a patrol at the end of an ordinary flight");
+  // Combat Movement offers no ordinary flight to start a patrol from (RB 9.1).
+  check(!offered(landBased, "air_fly"),
+        "Combat Movement offered an ordinary flight that starts no combat");
 
   auto c = fixture();
   add(c, "carrier", "fleet_carrier", "japan", p16);

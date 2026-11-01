@@ -1,6 +1,6 @@
 {
   "date": "2026-11-01",
-  "change": "Combat Movement offers a land move only if it starts a combat (RB 7, 9.1, 11.1; user ruling)",
+  "change": "Combat Movement offers land units and planes only moves that start a combat (RB 7, 9.1, 9.3.2, 11.1; user ruling)",
   "before_commit": "894f88f",
   "machine": "4-vCPU Linux container; Python extension compiled with g++ -O3 -std=c++20",
   "matched_positions": {
@@ -141,6 +141,126 @@
       "failures": 7,
       "errors": 48,
       "same_failing_tests_as_before": true
+    }
+  },
+  "planes": {
+    "before_commit": "60a314f",
+    "rule": "Combat Movement flights: attacks, patrol starts, and stops by an air transport or strategic bomber where it can pick up airborne infantry; planes already in the air may land",
+    "matched_positions": {
+      "method": "Uniform-random 3-round games, seeds 1951-1956, on the new engine; every fourth Combat Movement and every fourth Noncombat Movement position; the engine at 60a314f listed its menu at the same positions.",
+      "totals": {
+        "combat_movement_positions": 214,
+        "combat_movement_options_old": 10317,
+        "combat_movement_options_new": 5832,
+        "combat_movement_options_added": 0,
+        "non_combat_movement_positions": 180,
+        "non_combat_movement_options_old": 9374,
+        "non_combat_movement_options_new": 9374,
+        "non_combat_movement_options_added": 0
+      },
+      "removed": {
+        "combat_movement | air_fly | tactical_bomber": 1784,
+        "combat_movement | air_fly | fighter": 1680,
+        "combat_movement | air_fly | seaplane": 1021
+      },
+      "unexplained_differences": 0,
+      "examples": []
+    },
+    "scripted_games_not_matched": {
+      "rounds_3_seed_1951": {
+        "before": {
+          "decisions": 517,
+          "chance_events": 107,
+          "returns": [
+            23.2,
+            -37.0,
+            -82.8
+          ],
+          "combat_movement_decisions": 174,
+          "combat_movement_options": 9448,
+          "stopover_options_in_combat_movement": 5003,
+          "noncombat_movement_decisions": 35,
+          "noncombat_movement_options": 1433,
+          "all_options": 15116
+        },
+        "after": {
+          "decisions": 525,
+          "chance_events": 115,
+          "returns": [
+            28.7,
+            -43.3,
+            -80.3
+          ],
+          "combat_movement_decisions": 173,
+          "combat_movement_options": 4197,
+          "stopover_options_in_combat_movement": 0,
+          "noncombat_movement_decisions": 35,
+          "noncombat_movement_options": 1116,
+          "all_options": 9518
+        }
+      },
+      "rounds_11_seed_1953": {
+        "before": {
+          "decisions": 1908,
+          "chance_events": 332,
+          "returns": [
+            28.9,
+            -29.7,
+            -109.1
+          ],
+          "combat_movement_decisions": 650,
+          "combat_movement_options": 31353,
+          "stopover_options_in_combat_movement": 14709,
+          "noncombat_movement_decisions": 161,
+          "noncombat_movement_options": 14011,
+          "all_options": 80647
+        },
+        "after": {
+          "decisions": 1908,
+          "chance_events": 332,
+          "returns": [
+            28.9,
+            -29.7,
+            -109.1
+          ],
+          "combat_movement_decisions": 647,
+          "combat_movement_options": 16472,
+          "stopover_options_in_combat_movement": 0,
+          "noncombat_movement_decisions": 164,
+          "noncombat_movement_options": 14230,
+          "all_options": 65985
+        }
+      }
+    },
+    "dead_end_search": {
+      "games": 60,
+      "rounds": 11,
+      "completed_all_rounds": 60,
+      "problems": [],
+      "notes": 0,
+      "mean_decisions": 1326.4
+    },
+    "tests": {
+      "air_tests": "17 groups pass; the new Combat Movement flight test fails on the engine at 60a314f",
+      "moved_to_noncombat_movement": [
+        "air_tests ordinaryFlightsKeepALandingContinuation",
+        "air_tests flightMayPrecedeItsLandingCarrier",
+        "air_logistics carrierAircraftCanLaunch",
+        "air_logistics aControlledMinorsAircraftKeepTheirLandings"
+      ],
+      "planner_checked_directly": "air_logistics secondBomberCannotTakeTheAttackersOnlySeat",
+      "no_plain_flight_check": "naval_operations patrolsStartOnlyFromWhereAircraftTakeOff",
+      "ctest": "96% tests passed, 1 tests failed out of 27",
+      "ctest_timed_out": [
+        "campaign_env"
+      ],
+      "campaign_env_alone_s": 34.9,
+      "python": {
+        "tests": 464,
+        "failures": 7,
+        "errors": 48,
+        "same_failing_tests_as_before": true
+      }
     }
   }
 }
