@@ -15,12 +15,16 @@ by at most the seats of the carriers they sink or damage; so may a declaration
 of war, which the engine does not check. Such rises are noted with the game,
 which plays on, and so is every aircraft lost as Combat Movement ends. Failing
 positions are saved for inspection; replaying the seed reproduces the game.
+A game that crashes its process (a native fault) is replayed alone to confirm
+it and reported as a problem.
 Random play reaches far more unusual positions per second than search-driven
 self-play, so run it after rules changes and before long self-play runs.
 """
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
+from concurrent.futures.process import BrokenProcessPool
 import json
 import multiprocessing
 from pathlib import Path
@@ -156,16 +160,13 @@ def main(argv=None) -> int:
     seeds = range(args.first_seed, args.first_seed + args.games)
     tasks = [(seed, args.rounds, args.max_decisions, args.output) for seed in seeds]
     results = []
-    with (args.output / "results.jsonl").open("a") as log, \
-            multiprocessing.get_context("spawn").Pool(args.processes, maxtasksperchild=20) as pool:
-        for result in pool.imap_unordered(_play, tasks):
+    with (args.output / "results.jsonl").open("a") as log:
+        def record(result):
             results.append(result)
             log.write(json.dumps(result) + "\n"); log.flush()
             if result["problem"]:
                 print(json.dumps(result), flush=True)
-            if time.monotonic() > deadline:
-                pool.terminate()
-                break
+        _play_all(tasks, args.processes, deadline, args.output / "started.log", record)
     failed = [result for result in results if result["problem"]]
     noted = [result for result in results if result["notes"]]
     # Notes record dice, wars or another nation's turn, not engine defects, so they do not fail the run.
@@ -176,8 +177,53 @@ def main(argv=None) -> int:
     return 1 if failed else 0
 
 
-def _play(task):
-    return play(*task)
+def _play_logged(task, started):
+    with open(started, "a") as handle:
+        handle.write(f"start {task[0]}\n")
+    result = play(*task)
+    with open(started, "a") as handle:
+        handle.write(f"end {task[0]}\n")
+    return result
+
+
+def _pool(processes):
+    return ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("spawn"), max_tasks_per_child=20)
+
+
+def _play_all(tasks, processes, deadline, started, record):
+    """Play every task until the deadline, surviving games that crash their process."""
+    pending = {task[0]: task for task in tasks}
+    started.write_text("")
+    while pending and time.monotonic() < deadline:
+        with _pool(processes) as pool:
+            futures = {pool.submit(_play_logged, task, started): seed for seed, task in pending.items()}
+            try:
+                while futures and time.monotonic() < deadline:
+                    done, _ = wait(futures, timeout=min(5.0, max(0.0, deadline - time.monotonic())),
+                                   return_when=FIRST_COMPLETED)
+                    for future in done:
+                        record(future.result())
+                        pending.pop(futures.pop(future))
+            except BrokenProcessPool:
+                pass
+            if time.monotonic() >= deadline:
+                for future in futures:
+                    future.cancel()
+                pool.shutdown(wait=False, cancel_futures=True)
+                return
+        # Games that started but never ended were running when a process died:
+        # replay each alone to find the one that crashed it.
+        lines = started.read_text().split()
+        unfinished = {int(seed) for kind, seed in zip(lines[::2], lines[1::2]) if kind == "start"} - \
+            {int(seed) for kind, seed in zip(lines[::2], lines[1::2]) if kind == "end"}
+        for seed in sorted(unfinished & set(pending)):
+            with _pool(1) as alone:
+                try:
+                    record(alone.submit(_play_logged, pending[seed], started).result())
+                except BrokenProcessPool:
+                    record({"seed": seed, "terminal": False, "problem": "game process crashed (native fault)",
+                            "notes": [], "decisions": None, "completed_rounds": None, "bias": None, "seconds": None})
+            pending.pop(seed)
 
 
 if __name__ == "__main__":
