@@ -203,19 +203,11 @@ fully audited sea zones. Existing outside-region warnings still apply.
 
 ## Scenarios
 
-- `japan_china_1936/` contains a closed 37-node map projection (31 land, 6 sea;
-  Tannu Tuva and Hong Kong excluded)
-  and campaign specification. See its [README](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/README.md)
-  for extraction commands, scope and limitations; it is not yet a playable setup.
-  Its `m0/` data adds source-audited official setup, theatre-adjusted accounts
-  and approved decisions, with 99 deployed pieces, 3 setup factories and 19 static
-  facilities. FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
-  The [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) links the rules
-  checklist, price tables, source reconciliation and the verified M0 specification
-  frozen on 21 October 2026 (106 repository tests passed). The
-  [M2 engine foundation](/Users/home/Desktop/gwRL/docs/m2/README.md) now loads the
-  setup into shared C++ state and supplies action validation, turn/reaction
-  timing, separate RNG streams and replay. Gameplay modules remain later work;
-  current verification passes six CTest suites and 119 Python tests.
-- `china_simplified_setup.json` defines the six-zone China training environment.
-- `manual_battles/` contains deterministic battle fixtures used by the debug runner.
+- `japan_china_1936/` is the campaign scenario: a closed 37-node map projection
+  (31 land, 6 sea; Tannu Tuva and Hong Kong excluded), the source-audited official
+  setup in `m0/` with theatre-adjusted accounts and approved decisions (99 deployed
+  pieces, 3 setup factories and 19 static facilities), and the faction index in
+  `m1/`. FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
+  See its [README](scenarios/japan_china_1936/README.md) and the
+  [M0 review](../docs/m0/README.md), which links the rules checklist, price
+  tables and source reconciliation.

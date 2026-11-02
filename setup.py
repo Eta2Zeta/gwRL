@@ -13,7 +13,6 @@ ext_modules = [
     Pybind11Extension(
         "gwrl_cpp",
         [
-            "src/campaign_benchmarks.cpp",
             "src/campaign_audit.cpp",
             "src/campaign_actions.cpp",
             "src/campaign_env.cpp",
@@ -34,7 +33,6 @@ ext_modules = [
             "src/politics.cpp",
             "src/politics_influence.cpp",
             "src/politics_warlords.cpp",
-            "src/japan_training_env.cpp",
             "src/python_bindings.cpp",
             "src/simple_json.cpp",
             "src/zone_encoding.cpp",
