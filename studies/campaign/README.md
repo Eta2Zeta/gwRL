@@ -2,9 +2,9 @@
 
 This study uses the approved 1936 China campaign and the shared C++ engine.
 Three separate policy/value networks guide vector MCTS. Each reads the engine's
-fixed [zone encoding](/Users/home/Desktop/gwRL/docs/stage_a/zone_encoding_2026_11_02.md)
-of a decision: the 37 map zones answer fixed questions, and messages pass along
-the map's borders ([network](/Users/home/Desktop/gwRL/docs/stage_a/zone_network_2026_11_02.md)). A rollout
+fixed [zone encoding](../../docs/stage_a/zone_encoding_2026_11_02.md) of a
+decision: the 37 map zones answer fixed questions, and messages pass along the
+map's borders ([network](../../docs/stage_a/zone_network_2026_11_02.md)). A rollout
 batch freezes all three policies; training then updates all three together.
 Each policy learns choices made by its actual alliance, including reactions and
 controlled minors. Every value target retains `[Axis, Allies, Comintern]`.
@@ -24,7 +24,7 @@ Rebuild the extension after C++ changes:
 ./.venv/bin/python -m studies.campaign.run --help
 ```
 
-## Bounded foreground run and resume
+## Training runs and resume
 
 The defaults are a small operational smoke: one batch, two independent games,
 six real transitions per game, two simulations per search, and a small CPU model.
@@ -36,6 +36,16 @@ July 1941 campaign result.
 ```sh
 ./.venv/bin/python -m studies.campaign.run train
 ```
+
+Add `--complete-episodes` to freeze a batch until each game reaches its true
+endpoint. Each new batch creates fresh games, and every row receives an observed
+terminal target. A transition guard saves frozen pending work without
+bootstrapping or updating and exits with code 2; increase only that guard when
+resuming, with `--extend-episode-budget N`. `--calendar-rounds N` shortens the
+game to N rounds and `--full-campaign` plays all eleven. Small model exports live
+in `models/generation-000000.pt` and later generation files, starting before any
+action or update. `--max-episodes 10` with at least three batches of four games
+finishes exactly ten games, in batches of four, four and two.
 
 The final line prints the new run directory. `progress.jsonl` is flushed after
 each completed search wave and update, with counters and each game's calendar
@@ -79,109 +89,63 @@ a changed implementation needs an explicit migration or a new run. Only load
 trusted local Torch checkpoints produced by this runner. CPU thread count and
 software versions are part of exact continuation compatibility.
 
-For the authorized [three-round experiment](/Users/home/Desktop/gwRL/docs/stage_a/three_round_2026_10_24.md),
-`tools/run_three_round_experiment.py --plan PLAN.json` orchestrates initial
-evaluation, resource-supervised training and paired final evaluation. Its fixed
-deadline persists across restarts. The run uses a committed runtime snapshot,
-so edits in the main checkout do not break continuation. The lighter standalone
-`tools/supervise_campaign_training.py` also supports a fixed active-time budget,
-bounded transient retries and graceful resource/deadline stops; it reserves its
-coordinator within the configured twelve-core allowance.
+## Game processes and the GPU
 
-Native campaign calls now release Python's interpreter lock while executing
-pure C++ work. Each Python-facing environment protects its own operations with
-an independent mutex; clones get separate mutexes, so different boards can run
+`--episode-workers P` plays each complete game in one of P processes, each with
+its own interpreter lock; the main process keeps learning updates, model exports
+and checkpoints. `--games-per-process N` with `--episode-workers P` plays N games
+in each of P processes for one batch and evaluates all their positions together
+in the main process on `--neural-device` (`mps` for the Apple GPU). A position's
+batch changes its outputs in the last digits, so unlike one-position evaluation
+a game need not repeat exactly from its seed. In either mode a game that fails
+costs only that game, recorded with its seed in `failed_games`.
+
+`--cpu-budget N` checks the run's busy cores against the allowance: one per game
+process plus the coordinator, or tensor threads plus parallel search workers
+plus one coordinator without worker processes.
+
+Native campaign calls release Python's interpreter lock while executing pure C++
+work. Each Python-facing environment protects its own operations with an
+independent mutex; clones get separate mutexes, so different boards can run
 native operations concurrently. Overlapping operations on one board remain
 serialized. This is per-call protection, not a transaction across several calls
-on a shared Python adapter; search workers continue owning independent adapters.
-Python JSON conversion still requires the interpreter lock. The four-game search structure and sequential simulations within each
-individual MCTS search are unchanged. Rebuild the extension after pulling this
-binding change, as shown above.
+on a shared Python adapter; search workers own independent adapters.
 
-The [matched concurrency measurements](/Users/home/Desktop/gwRL/docs/stage_a/native_concurrency_2026_10_25.md)
-collected four complete three-round frozen-policy games in 8m 46s, versus
-11m 38s before, with identical search results and final state/dice/history hashes.
-This is collection throughput; optimizer updates and recovery saving are excluded.
+## Long unattended runs
 
-## Completed-episode Stage A pilot
+`tools/supervise_campaign_training.py` runs training under a fixed active-time
+budget, with bounded retries and graceful memory and deadline stops. It reserves
+its own core within the twelve-core allowance; `--all-cores` uses every core
+when the owner allows it.
 
-Add `--complete-episodes` to freeze a batch until each independent short game
-reaches its true endpoint. Each new batch creates fresh games. Every row in this
-mode receives an observed terminal target; a transition guard saves frozen pending
-work without bootstrapping or updating and exits with code 2. Increase only that
-execution guard explicitly when resuming with `--extend-episode-budget N`.
-Small model exports live in `models/generation-000000.pt` and subsequent
-generation files, starting before any action or update. `initial.pt` remains an
-archive of the empty initial learner for compatibility. Add `--max-episodes 10`
-with at least three batches and four parallel games to finish exactly ten games
-in batches of four, four and two. The shorter tail batch changes random-stream
-interleaving relative to four-root collection.
+`--sample-fraction F` keeps that share of a worker game's decisions as training
+samples, from its own random stream, so the games play the same.
+`--no-new-batch-after EPOCH` finishes the running batch and ends the run as
+completed. `--initial-models EXPORT` starts a fresh run from an export's weights
+and nothing else of that run, even if the sources have changed since, so a run
+stopped by a bug continues from its latest networks after the fix.
+`tools/record_campaign_games.py` plays recorded games from a model export, each in
+its own process, for the Campaign Observatory.
 
-`--cpu-budget N` conservatively checks tensor threads plus parallel search workers
-plus one coordinator against the available core budget. Set BLAS environment
-limits as shown in the [Stage A pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
-That page records the authorized core limit, exact foreground command and results.
-The first eight-game pilot completed in 346.62 seconds with 386 genuine terminal
-training rows. Complete-episode timing includes full games and optimizer steps;
-the short six-transition default smoke is not a full-game runtime estimate.
-Progress now also includes action kinds/parameters, terminal flags and real final
-return vectors for each completed root.
-
-The performance follow-up repeats that same pilot in 118.68 seconds (2.92 times
-faster) with identical actions, policy targets and final game states. It reuses
-immutable source features and skips unused policy work without reducing search.
-Manifests now separate invocation time into collection/search, learning updates,
-checkpoint saves, small model exports and reporting, and report collection transitions per second.
-Timing stays outside deterministic checkpoint state. Full results and numerical
-limits are in the [Stage A report](/Users/home/Desktop/gwRL/docs/stage_a/README.md).
-The [scaling follow-up](/Users/home/Desktop/gwRL/docs/stage_a/scaling_2026_10_23.md)
-now records 13 bounded cases: later positions, stronger search, a larger model,
-parallelism comparisons and actual one/two/eleven-round collection. A small-budget
-full campaign completes, but the 16-simulation two-round batch reaches its wall
-limit before completing. The
-[24 October decision-reuse pass](/Users/home/Desktop/gwRL/docs/stage_a/decision_reuse_2026_10_24.md)
-removes repeated legal-menu and observation work. A matched full-game invocation
-improves from 198.42 to 112.72 seconds with identical search results, choices,
-dice and scores. These are frozen-policy collection timings, excluding learning
-updates. Stronger collection still reaches its 240-second guard: 370 choices
-completed versus 234 before the fix, with no completed two-round games.
-
-`python -m studies.campaign.scaling_benchmark --help` describes the supervised
-CPU-only benchmark. Its current resource envelope is 12 cores and 30 GB, with
-separate wall/RSS guards and preserved progress on cutoff. It supports exact
-round/nation/phase/decision-kind targeting, repeated searches on unchanged roots,
-actual episodes, and explicit inference-only model-weight transfer from a
-trusted local checkpoint. It never resumes old game/replay state or updates
-weights. Fixed-root queries are not executed moves or training rows. See the
-scaling report for measured results and reproduction commands.
+## The network's input and the order interface
 
 The network's input is built in C++ by the engine's zone encoder. Reports name
-the input layout in `software.network_input`. Rebuild the extension after
-pulling; checkpoints and exports of the earlier graph-input network cannot be
-loaded.
+the input layout in `software.network_input`. Checkpoints and exports of the
+earlier graph-input network cannot be loaded.
 
-Self-play now uses the versioned [AI order interface](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md)
+Self-play uses the versioned [AI order interface](../../docs/stage_a/action_interface_2026_10_24.md)
 by default. Fleet and screening selection make forward progress; undo/cancel
 editing is kept in the ordinary game API. Unchanged role/deck configuration
 cycles and repeated declined railway requests are also bounded. Finished
-battles [clear themselves](/Users/home/Desktop/gwRL/docs/stage_a/battle_clearing_2026_10_31.md)
+battles [clear themselves](../../docs/stage_a/battle_clearing_2026_10_31.md)
 instead of waiting for a click. Context and checkpoint compatibility identify
 `campaign-orders-v2`; old replay/optimizer state is not implicitly migrated, and
-`campaign-orders-v1` recordings are rejected. Explicit frozen model-weight
-transfers remain available for comparisons, and recordings from before the
+`campaign-orders-v1` recordings are rejected. Recordings from before the
 training interface select the ordinary game interface for exact verification.
-Rebuild the native extension first.
-
-RSS means **resident set size**: the physical memory currently occupied by a
-process. The benchmark samples and sums the supervisor and worker RSS, reporting
-the highest sampled total in bytes. For example, 2.58 GB means roughly that much
-RAM was resident while the benchmark ran. Shared pages can be counted more than
-once, and sampling can miss a brief peak; this is a memory estimate, not an
-instantaneous allocation limit.
 
 ## Watch self-play
 
-The [Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md)
+The [Campaign Observatory](../../web/campaign_viewer/README.md)
 shows the actual game on a geographic schematic, with playback, location
 inspection, dice, wealth and the search alternatives behind each choice.
 Add `--record-replay` to a fresh training command, then run
@@ -198,9 +162,8 @@ play. The two baseline styles buy, move, attack and make reactions. They are
 simple controls, with no claim of expert play. Each side is evaluated separately.
 Seeds must differ from the base run seed and every logged training episode seed.
 Evaluation accepts small model exports directly, without constructing a learner
-or restoring its optimizer, replay and active games. Legacy recovery files remain
-supported through full compatibility-checked restoration. Profiling retained
-positions still uses a full recovery checkpoint.
+or restoring its optimizer, replay and active games. Profiling retained
+positions uses a full recovery checkpoint.
 
 ```sh
 ./.venv/bin/python -m studies.campaign.run evaluate \
@@ -230,63 +193,6 @@ and scalar/batched inference on actual retained states. Rule transitions use
 clones and the report checks that live state and execution RNG are unchanged.
 It includes first-use parsing and warm calls; menu size and game phase matter.
 
-## Starting a larger experiment
-
-Decision reuse, the zone encoding and bounded AI order construction are
-implemented. Next measure remaining rules/tensor costs and verify completion
-across seeds and search budgets before expanding learning. The four-minute
-16-simulation batch still reaches its guard. The order-interface report records
-4/4 two-round completions in 310.09 seconds under a longer execution guard and
-separates frozen-policy collection from actual
-eight-game learning repeats, which include network updates and checkpoint writes.
-
-The original small two-batch smoke took 14.30
-seconds across stop/resume; 100 similar batches would take roughly 12 minutes
-if position costs stayed comparable. The default larger model measured 247ms
-per same-actor batch of four inference requests, before rules/search/updates.
-These historical small-menu CPU measurements predate the performance/scaling
-follow-ups and are not a current full-game duration estimate.
-
-First inspect the smoke profile and choose a run size that fits foreground time
-and memory. For the larger settings below, initially use one batch and six
-transitions per batch (`--batches 1 --transitions-per-batch 6`), inspect the timing, then scale up
-with a fresh run. A manual experiment command, to adjust after that pilot, is:
-
-```sh
-./.venv/bin/python -m studies.campaign.run train --full-campaign \
-  --batches 10 --transitions-per-batch 32 --parallel-envs 4 \
-  --simulations 8 --max-depth 16 --hidden-dim 64 --message-layers 2 \
-  --batch-size 32 --replay-capacity 4096
-```
-
-This uses the unchanged eleven-round target. It may require many batches to
-finish an episode; bootstrap provenance remains visible until a true terminal.
-Measure completed games across held-out dice and opponent combinations before
-making strategic claims. Archived opponent leagues, broader starting-position
-curricula, direct-policy/PPO comparison and stronger settings are future
-experiments, not results established by this operational gate.
-
-## Long unattended runs
-
-`--sample-fraction F` keeps that share of a worker game's decisions as training
-samples, from its own random stream, so the games play the same. A sample takes
-about 1.2 MB in memory, so replay and worker memory otherwise limit full games.
-`--no-new-batch-after EPOCH` finishes the running batch and ends the run as
-completed. `--initial-models EXPORT` starts a fresh run from an export's weights
-and nothing else of that run, even if the sources have changed since, so a run
-stopped by a bug continues from its latest networks after the fix.
-`--games-per-process N` with `--episode-workers P` plays N games in each of P
-processes for one batch and evaluates all their positions together in the main
-process on `--neural-device`, as the
-[shared GPU report](/Users/home/Desktop/gwRL/docs/stage_a/landing_plan_shared_gpu_2026_10_29.md)
-measured. A position's batch changes its outputs in the last digits, so unlike
-one-position evaluation a game need not repeat exactly from its seed. In either
-mode a game that fails costs only that game, recorded with its seed in
-`failed_games`.
-`tools/supervise_campaign_training.py --all-cores` passes the usual 12 cores when
-the owner allows it. `tools/record_campaign_games.py` plays recorded games from a
-model export, each in its own process, for the
-[Campaign Observatory](/Users/home/Desktop/gwRL/web/campaign_viewer/README.md).
-
-See [M12 verification](/Users/home/Desktop/gwRL/docs/m12/README.md) and the
-[full plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md).
+The [project history](../../docs/history.md) records the earlier pilots, the
+three-round experiment and the performance work, and the
+[full plan](../../docs/plans/japan_china_full_rules_plan.md) the approved campaign.
