@@ -16,6 +16,7 @@ import math
 import os
 from pathlib import Path
 import signal
+import struct
 import subprocess
 import sys
 import tempfile
@@ -27,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 SCHEMA = "campaign-neural-device-benchmark-v1"
+FIXTURES = ("opening", "first_chance", "japan_combat_movement", "round2_japan_combat_movement")
 
 
 @dataclass(frozen=True)
@@ -133,6 +135,118 @@ def atomic_json(path, value):
     write(Path(path), value)
 
 
+class WorkloadLimit(RuntimeError):
+    pass
+
+
+def public_checkpoint(serialized):
+    """Keep every state/history/scheduler field; exclude only execution RNG."""
+    value = json.loads(serialized)
+    raw = json.loads(value["raw"])
+    require(set(raw) == {"schema_version", "rules_id", "state", "random"}, "Unknown native checkpoint fields")
+    del raw["random"]
+    return {**value, "raw": raw}
+
+
+def zone_digest(zone):
+    """Hash a zone input's layout version and every array's name, dtype, shape and bytes."""
+    result = hashlib.sha256()
+
+    def block(tag, data):
+        result.update(tag + struct.pack("<Q", len(data)) + data)
+
+    block(b"V", zone.version.encode())
+    for name, values in sorted(zone.arrays().items()):
+        block(b"N", name.encode()); block(b"T", values.dtype.str.encode())
+        block(b"S", struct.pack(f"<{values.ndim}Q", *values.shape)); block(b"B", values.tobytes())
+    return result.hexdigest()
+
+
+def descriptor(env, actions=None):
+    from studies.shared.multiplayer_mcts import action_key
+    actions = env.legal_actions() if actions is None else actions
+    return {"key": env.planning_key(), "actor": env.current_decision_player(), "kind": env.decision_kind(),
+            "terminal": env.is_terminal(), "action_ids": [action_key(action) for action in actions],
+            "action_features_sha256": digest([action.features() for action in actions]),
+            "clock": env.observation()["state"]["clock"]}
+
+
+def check_terminal(env, rounds=3):
+    state = env.observation()["state"]
+    clock = state["clock"]
+    require(env.is_terminal() and clock["completed_rounds"] == rounds and clock["round_index"] == rounds - 1 and
+            clock["nation_index"] == 3 and clock["phase"] == "place_units" and
+            clock["income_collected"] is True and clock["player_turn_serial"] == str(4 * rounds),
+            f"Workload did not reach the genuine {rounds}-round terminal")
+    require(state["completed_turns"] == {"ccp": rounds, "mongolia": rounds, "japan": rounds, "kmt": rounds},
+            f"{rounds}-round terminal lacks all {4 * rounds} completed national turns")
+
+
+def sampled_step(env):
+    """Prepare authoritative action/request/outcome evidence outside measured replay."""
+    from studies.campaign.baselines import baseline_distribution
+    from studies.shared.multiplayer_mcts import action_key
+    actions = env.legal_actions()
+    before = descriptor(env, actions)
+    cursor = env.raw.history_size()
+    row = {"decision": before, "chance_request": env.chance_request(), "faces": None, "selected_action": None}
+    if before["kind"] == "chance":
+        env.resolve_chance()
+        events = env.raw.history_since(cursor)
+        chance = [event for event in events if event["kind"] == "chance"]
+        require(len(chance) == 1, "Expected one recorded native chance outcome")
+        row["faces"] = chance[0]["payload"]["outcome"]["faces"]
+    else:
+        require(actions, "Nonterminal policy decision has no legal choices")
+        weights = baseline_distribution(env, actions)
+        chosen = actions[max(range(len(actions)), key=weights.__getitem__)]
+        row["selected_action"] = action_key(chosen)
+        env.apply_action(chosen)
+    row.update(after_key=env.planning_key(), history_events=env.raw.history_since(cursor), terminal=env.is_terminal())
+    return row
+
+
+def prepare(seeds, *, max_transitions, max_state_visits, factory=None, deadline=None):
+    """Play balanced-baseline three-round games, saving the real benchmark positions on the way."""
+    from studies.campaign.curriculum import make_env, task_manifest
+    factory = factory or (lambda seed: make_env(seed, calendar_rounds=3))
+    plans, fixtures, task = [], [], None
+    for seed in seeds:
+        env, steps, found = factory(seed), [], set()
+        task = task_manifest(env) if task is None else task
+        initial = env.serialize()
+        visits = Counter({env.planning_key(): 1})
+        while not env.is_terminal():
+            if deadline is not None and time.monotonic() >= deadline:
+                raise WorkloadLimit("preparation_wall_limit")
+            if len(steps) >= max_transitions or visits[env.planning_key()] > max_state_visits:
+                raise WorkloadLimit("preparation_transition_or_repetition_limit")
+            clock, kind = env.observation()["state"]["clock"], env.decision_kind()
+            labels = []
+            if not steps:
+                labels.append("opening")
+            if kind == "chance":
+                labels.append("first_chance")
+            if kind == "combat_movement" and clock["nation_index"] == 2 and clock["round_index"] in (0, 1):
+                labels.append("japan_combat_movement" if clock["round_index"] == 0 else "round2_japan_combat_movement")
+            for label in labels:
+                if label not in found:
+                    serialized = env.serialize()
+                    fixtures.append({"label": label, "seed": seed, "step": len(steps), "serialized": serialized,
+                                     "serialized_sha256": hashlib.sha256(serialized.encode()).hexdigest()})
+                    found.add(label)
+            steps.append(sampled_step(env))
+            visits[env.planning_key()] += 1
+        check_terminal(env)
+        require(found == set(FIXTURES), f"Seed {seed} did not reach all real benchmark positions: {sorted(found)}")
+        plans.append({"seed": seed, "initial": initial, "steps": steps,
+                      "steps_sha256": digest(steps), "final_public_checkpoint_sha256": digest(public_checkpoint(env.serialize())),
+                      "terminal_returns": list(env.returns())})
+    return {"schema": "campaign-backend-recorded-workload-v1", "task": task, "plans": plans, "fixtures": fixtures,
+            "selection": "campaign-active-baseline-v2:balanced, sampled preparation outside measurement",
+            "chance": "Every complete request, die face and reroll is recorded; replay uses explicit outcomes preserving execution RNG."}
+
+
 def mps_allocator_limit(memory_bytes, recommended):
     require(isinstance(recommended, int) and recommended > 0, "MPS recommended working-set memory is unavailable")
     # The allocator is bounded before any model/batch transfer. Half the
@@ -237,10 +351,9 @@ def inference(config, device, models, evaluator, forward_stats, deadline, persis
     from studies.campaign.curriculum import make_env
     from studies.campaign.features import make_zone_input
     from studies.campaign.neural import neural_device_memory, release_device_memory, synchronize_neural_device
-    from tools.benchmark_campaign_backends import Config as ReplayConfig, prepare, zone_digest
     before = time.perf_counter()
-    workload = prepare(ReplayConfig(seeds=(config.seeds[0],), max_transitions=config.max_transitions,
-        max_state_visits=config.max_state_visits), deadline=deadline)
+    workload = prepare((config.seeds[0],), max_transitions=config.max_transitions,
+                       max_state_visits=config.max_state_visits, deadline=deadline)
     fixtures = [row for row in workload["fixtures"] if row["label"] in config.position_labels]
     require(len(fixtures) == len(config.position_labels), "Not all requested real positions were reached")
     result = {"task": workload["task"], "preparation_seconds": time.perf_counter() - before,
@@ -309,7 +422,6 @@ def selfplay(config, device, models, evaluator, forward_stats, deadline, persist
     from studies.campaign.batching import BatchStats, search_many
     from studies.campaign.curriculum import make_env, task_manifest
     from studies.shared.multiplayer_mcts import MctsConfig, action_key
-    from tools.benchmark_campaign_backends import check_terminal
     before = time.perf_counter()
     envs = [make_env(seed, calendar_rounds=config.calendar_rounds) for seed in config.seeds]
     search_rngs = [random.Random(seed ^ 0x9E3779B97F4A7C15) for seed in config.seeds]
@@ -502,7 +614,6 @@ def play_shared_game(config, seed, evaluator, deadline_epoch):
     from studies.campaign.curriculum import make_env
     from studies.campaign.shared_evaluator import EvaluatorClosed
     from studies.shared.multiplayer_mcts import MctsConfig, VectorMCTS
-    from tools.benchmark_campaign_backends import check_terminal
     started_epoch, started = time.time(), time.perf_counter()
     env = make_env(seed, calendar_rounds=config.calendar_rounds)
     search_rng = random.Random(seed ^ 0x9E3779B97F4A7C15)
@@ -725,10 +836,16 @@ def compare_selfplay(before, after):
 
 
 def source_provenance():
-    from tools.benchmark_campaign_backends import provenance
-    value = provenance()
-    value["device_harness_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
-    return value
+    import gwrl_cpp
+    from studies.campaign.run import source_hashes
+    native = Path(gwrl_cpp.__file__).resolve()
+
+    def git(*args):
+        return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    return {"commit": git("rev-parse", "HEAD"), "branch": git("branch", "--show-current"),
+            "dirty": git("status", "--porcelain"), "runtime_source_sha256": source_hashes(),
+            "device_harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "native": str(native), "native_sha256": hashlib.sha256(native.read_bytes()).hexdigest()}
 
 
 def worker(config, device, progress):
@@ -783,7 +900,7 @@ def worker(config, device, progress):
                            "requests": evaluator.requests, "batch_sizes": dict(evaluator.batch_sizes)}
     ending = source_provenance()
     report["sources_unchanged"] = all(report["provenance"][key] == ending[key] for key in (
-        "commit", "runtime_source_sha256", "backend_source_sha256", "native_sha256", "device_harness_sha256"))
+        "commit", "runtime_source_sha256", "native_sha256", "device_harness_sha256"))
     if not report["weights_unchanged"] or not report["sources_unchanged"]:
         report["status"] = "changed_inputs"
     persist(); return report
@@ -880,7 +997,7 @@ def paired(config, output):
         require(reports["cpu"]["model"]["weights_sha256"] == reports["mps"]["model"]["weights_sha256"], "Initial model weights differ")
         require(reports["cpu"]["model"]["config"] == reports["mps"]["model"]["config"], "Model interpretation differs")
         require(all(reports["cpu"]["provenance"][key] == reports["mps"]["provenance"][key] for key in (
-            "commit", "runtime_source_sha256", "backend_source_sha256", "native_sha256", "device_harness_sha256")),
+            "commit", "runtime_source_sha256", "native_sha256", "device_harness_sha256")),
             "CPU/MPS source or native provenance differs")
         if config.mode == "inference":
             left, right = reports["cpu"]["result"], reports["mps"]["result"]
