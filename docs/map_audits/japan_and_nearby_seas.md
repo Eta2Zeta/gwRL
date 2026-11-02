@@ -105,13 +105,12 @@ were not added.
 
 ## Closed scenario consequences and outstanding limitations
 
-The generated scenario now selects 38 nodes: 27 China/Mongolia-area land tiles,
-five Japanese tiles, and six seas. Tannu Tuva was removed from the scenario by
-user decision after the initial 39-node extraction, but remains in the global
-map. The extraction still removes 45 outbound neighbor entries: removing Tannu
-Tuva drops its two external edges from the report and adds the two retained
-neighbors' edges into Tannu Tuva. The global map retains real outside connections
-and reciprocal data.
+The generated scenario now selects 37 nodes: 26 China/Mongolia-area land tiles,
+five Japanese tiles, and six seas. Tannu Tuva and Hong Kong were removed from the
+scenario by user decision after the initial 39-node extraction, but remain in the
+global map. The extraction removes 47 outbound neighbor entries, recorded as the
+map's boundary cuts. The global map retains real outside connections and
+reciprocal data.
 
 Hokkaido's P7 port is deliberately absent from the extracted map because P7 is
 excluded. Its outside narrow land crossings are removed too. Honshu–Hokkaido and

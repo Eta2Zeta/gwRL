@@ -1,20 +1,23 @@
 # Uncertain — complete finding register
 
+The audit's registers, data and region reports that this page cites were removed on
+2 November 2026; commit `037cb60` keeps them under `docs/map_audits/full_world/`.
+
 **Implementation, 7 October:** approved work has been applied; uncertainties remain deferred. See [implementation status](implementation.md). The before/after proposals below retain the checkpoint baseline.
 
 24 finding records. Group findings may contain multiple fields or nodes; these are not edit counts.
 
 Historical proposals. Apply neither uncertain values nor incomplete new-node records automatically. Each confidence rating applies only to the described fields. Regional reports explain dependencies and unresolved source coverage.
 
-See [overview](README.md), [mechanism proposals](mechanisms_and_schema.md), and [machine-readable register](data/all_findings.json).
+See overview, mechanism proposals, and machine-readable register.
 
-**Naval facilities were rechecked on 6 October 2026.** Start with the [corrected current-to-proposed facility roster](naval_facility_reaudit.md) for ports, dockyards, shipyards and naval bases. Earlier conditional port-ID renaming examples must not be applied as a list of real facilities.
+**Naval facilities were rechecked on 6 October 2026.** Start with the corrected current-to-proposed facility roster for ports, dockyards, shipyards and naval bases. Earlier conditional port-ID renaming examples must not be applied as a list of real facilities.
 
-This register also needs to be read with [per-node review coverage](data/review_coverage.json) and [per-edge coverage](data/edge_review_coverage.json). Those ledgers explicitly retain unverified fields even where no single ambiguous feature has a separate finding ID.
+This register also needs to be read with per-node review coverage and per-edge coverage. Those ledgers explicitly retain unverified fields even where no single ambiguous feature has a separate finding ID.
 
 ## Naval-facility source conflicts and ownership ambiguities
 
-The 6 October naval recheck retains these territory-level uncertainties. They supplement the finding register; the two Philippine rows concern the same single physical port, already discussed in WG-031/AP-095. See the [corrected facility roster](naval_facility_reaudit.md) for the proposed values.
+The 6 October naval recheck retains these territory-level uncertainties. They supplement the finding register; the two Philippine rows concern the same single physical port, already discussed in WG-031/AP-095. See the corrected facility roster for the proposed values.
 
 ### Cape Town
 
@@ -87,7 +90,7 @@ The 6 October naval recheck retains these territory-level uncertainties. They su
 
 **Field:** `convoy_lines endpoints / ordered seas / beneficiary` · **Confidence:** high_sea_path_unresolved_land_endpoint · **Severity:** major
 
-**Regional context:** [global](generation_and_integrity.md)
+**Regional context:** global
 
 **Nodes:** `land_luzon_and_the_visayas`, `land_mindanao`, `land_usa_san_francisco`, `sea_p25`, `sea_p24`, `sea_p29`, `sea_p37`, `sea_p36`, `sea_p35`, `sea_p45`, `sea_p43`, `sea_p42`, `sea_p51`, `sea_p50`
 
@@ -150,7 +153,7 @@ No production convoy layer; observed label and cap in audit register
 
 **Field:** `terrain / directional border_terrain` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_can_baffin_island`
 
@@ -182,7 +185,7 @@ Reconcile blank intrinsic glossary row with current tundra and board ice artwork
 
 **Field:** `impassable subregion / directional passage` · **Confidence:** high · **Severity:** high
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_colombia`, `land_ecuador`, `land_venezuela`, `land_peru`, `land_bolivia`, `land_brazil_amazon_jungle`
 
@@ -239,7 +242,7 @@ Trace Colombia/Ecuador/Venezuela approaches against the hatched border; do not a
 
 **Field:** `directional topology / field attribution` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_usa_upper_midwest`, `land_can_manitoba`, `land_can_alberta_saskatchewan`
 
@@ -261,7 +264,7 @@ Alberta–Pacific Northwest and Alberta–Upper Midwest finite same-image border
 
 **Field:** `directional topology / field attribution` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_usa_heartlands`, `land_usa_new_orleans`, `land_usa_midwest`, `land_usa_appalachia`, `land_usa_chicago`
 
@@ -283,7 +286,7 @@ Printed Mississippi network is present through Midwest, Chicago, Heartlands, App
 
 **Field:** `seam land adjacency and railway` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_usa_upper_midwest`, `land_usa_midwest`, `land_usa_great_plains`, `land_usa_heartlands`, `land_usa_texas`
 
@@ -334,7 +337,7 @@ Printed Mississippi network is present through Midwest, Chicago, Heartlands, App
 
 **Field:** `railway_connection semantics on land-sea entries` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_usa_pacific_northwest`, `land_usa_san_francisco`, `land_usa_southwest_united_states`, `land_usa_new_england`, `land_usa_new_york`, `land_usa_washington_dc`, `land_usa_the_carolinas`, `land_usa_texas`, `land_usa_new_orleans`, `land_peru`, `land_chile`, `land_brazil_rio_de_janeiro`, `land_uruguay`, `land_buenos_aires`, `land_patagonia`
 
@@ -360,7 +363,7 @@ Retain observed track/access artwork as evidence, but derive legal zone railway 
 
 **Field:** `terrain` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_can_baffin_island`
 
@@ -388,7 +391,7 @@ tundra
 
 **Field:** `river_crossing scope` · **Confidence:** medium · **Severity:** medium
 
-**Regional context:** [americas_atlantic](regions/americas_atlantic.md)
+**Regional context:** americas_atlantic
 
 **Nodes:** `land_brazil_amazon_jungle`, `sea_a41`, `land_colombia`, `land_ecuador`, `land_peru`
 
@@ -411,7 +414,7 @@ Apply to every legal incoming approach after determining whether the source word
 
 **Field:** `coverage` · **Confidence:** explicit_limit · **Severity:** major
 
-**Regional context:** [europe_africa_middle_east](regions/europe_africa_middle_east.md)
+**Regional context:** europe_africa_middle_east
 
 **Nodes:** `land_gbr_scotland`, `land_gbr_northern_england`, `land_gbr_southern_england`, `land_gbr_london`, `land_ireland`, `land_esp_galicia_and_leon`, `land_esp_basque_country`, `land_esp_catalonia`, `land_esp_madrid`, `land_esp_western_andalucia`, `land_esp_eastern_andalucia`, `land_esp_balearic_islands`, `land_gibraltar`, `land_portugal`, `land_fra_normandy`, `land_fra_picardy`, `land_fra_paris`, `land_fra_aquitaine`, `land_fra_southern_france`, `land_fra_alsace_lorraine`, `land_neu_belgium`, `land_neu_netherlands`, `land_ger_western_germany`, `land_ger_eastern_germany`, `land_ger_bavaria`, `land_ger_berlin`, `land_aut_austria`, `land_cze_bohemia`, `land_switzerland`, `land_ita_northern_italy`, `land_ita_rome`, `land_ita_lazio`, `land_ita_southern_italy`, `land_fra_corsica`, `land_ita_sardinia`, `land_denmark`, `land_nor_southern_norway`, `land_nor_trondelag`, `land_swe_norrland`, `land_swe_gotaland`, `land_fin_lapland`, `land_fin_southern_finland`, `land_fin_viipuri_province`, `land_estonia`, `land_latvia`, `land_lithuania`, `land_ger_konigsberg`, `land_pol_west_poland`, `land_pol_podlachia`, `land_pol_lubelskie`, `land_pol_warsaw`, `land_pol_dolnoslaskie`, `land_pol_east_poland`, `land_cze_slovakia`, `land_hun_hungary`, `land_rom_central_romania`, `land_rom_bessarabia`, `land_bulgaria`, `land_yug_western_yugoslavia`, `land_yug_eastern_yugoslavia`, `land_albania`, `land_gre_macedonia`, `land_gre_thessaly`, `land_tur_istanbul`, `land_tur_karadeniz`, `land_tur_ankara`, `land_tur_akdeniz`, `land_tur_eastern_anatolia`, `land_azerbaijan`, `land_iran_northern_iran`, `land_iran_southern_iran`, `land_northern_iraq`, `land_syria`, `land_southern_iraq`, `land_transjordan`, `land_kuwait`, `land_qatar`, `land_oman`, `land_aden`, `land_saudi_arabia`, `land_spanish_morocco`, `land_french_morocco`, `land_northern_algeria`, `land_western_algeria`, `land_southern_algeria`, `land_tunisia`, `land_tripoli`, `land_tripolitania`, `land_cyrenaica`, `land_tobruk`, `land_western_egypt`, `land_lower_egypt`, `land_upper_egypt`, `land_nubia`, `land_cyprus`, `land_french_sudan`, `land_niger`, `land_dahomey`, `land_nigeria`, `land_cameroon`, `land_chad`, `land_oubangui_chari`, `land_belgian_congo`, `land_sudan`, `land_eritrea`, `land_abyssinia`, `land_french_somaliland`, `land_british_somaliland`, `land_italian_somaliland`, `land_tanganyika`, `land_angola`, `land_rhodesia`, `land_portuguese_east_africa`, `land_southwest_africa`, `land_bechuanaland`, `land_cape_town`, `land_south_africa`, `land_madagascar`, `land_mauritius`, `land_seychelles`, `land_usr_karelia`, `land_usr_northern_russia`, `land_usr_yaroslavl`, `land_usr_leningrad`, `land_usr_western_russia`, `land_usr_northern_belorussia`, `land_usr_southern_belorussia`, `land_usr_smolensk`, `land_usr_kaluga_oblast`, `land_usr_moscow`, `land_usr_gorky`, `land_usr_orel_kursk`, `land_usr_tula_lipetsk`, `land_usr_saratov`, `land_usr_kiev`, `land_usr_western_ukraine`, `land_usr_eastern_ukraine`, `land_usr_southern_ukraine`, `land_usr_taurida`, `land_usr_crimea`, `land_usr_donets_kuban`, `land_usr_stalingrad`, `land_usr_kalmytskaya`, `land_usr_north_caucasia`, `land_usr_transcaucasia`
 
@@ -438,7 +441,7 @@ Every stored physical pair touching the reviewed regional land nodes was examine
 
 **Field:** `passable` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [europe_africa_middle_east](regions/europe_africa_middle_east.md)
+**Regional context:** europe_africa_middle_east
 
 **Nodes:** `land_western_algeria`, `land_southern_algeria`, `land_french_sudan`, `land_niger`, `land_chad`, `land_cyrenaica`, `land_western_egypt`, `land_nubia`, `land_usr_southern_belorussia`, `land_usr_western_ukraine`, `land_pol_east_poland`
 
@@ -463,7 +466,7 @@ Author map-relative passability per crossing, preserving the distinction between
 
 **Field:** `original_owner/current_owner` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [europe_africa_middle_east](regions/europe_africa_middle_east.md)
+**Regional context:** europe_africa_middle_east
 
 **Nodes:** `land_esp_madrid`, `land_esp_galicia_and_leon`, `land_esp_basque_country`, `land_esp_catalonia`, `land_esp_western_andalucia`, `land_esp_eastern_andalucia`, `land_esp_balearic_islands`, `land_spanish_morocco`
 
@@ -496,7 +499,7 @@ Use a consistent static Spanish identity and dated Nationalist/Republican setup 
 
 **Field:** `river_crossing` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [europe_africa_middle_east](regions/europe_africa_middle_east.md)
+**Regional context:** europe_africa_middle_east
 
 **Nodes:** `land_usr_karelia`
 
@@ -530,7 +533,7 @@ null
 
 **Field:** `railway_connection` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_iran_southern_iran`, `land_india_punjab`
 
@@ -554,7 +557,7 @@ Likely false; verify high-resolution endpoints and whether special rule joins th
 
 **Field:** `passable/border_terrain` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_china_sinkiang`, `land_tibet`, `land_kashmir`, `land_nepal`, `land_india_bengal`
 
@@ -609,7 +612,7 @@ Existing true defaults or incomplete endpoint edges
 
 **Field:** `neighbors/original_owner` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_mongolia_kobdo`, `land_usr_novosibirsk`, `land_mongolia_tannu_tuva`
 
@@ -634,7 +637,7 @@ Confirm the narrow boundary junction and distinguish printed Tannu Tuva roundel 
 
 **Field:** `river_crossing` · **Confidence:** high · **Severity:** major
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_usr_vyatka`, `land_usr_yugria`
 
@@ -657,7 +660,7 @@ Preserve raw citation; resolve which neighboring approach was intended by map tr
 
 **Field:** `has_river/river_crossing and named river network` · **Confidence:** high · **Severity:** moderate
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_aus_new_south_wales`, `land_aus_northern_territory`, `land_aus_queensland`, `land_aus_south_australia`, `land_aus_tasmania`, `land_aus_western_australia`, `land_india_benares`, `land_india_bengal`, `land_india_calcutta`, `land_india_ceylon`, `land_india_delhi`, `land_india_maharashtra`, `land_india_punjab`, `land_india_southern_india`, `land_nz_north_island`, `land_nz_south_island`, `land_usr_amur`, `land_usr_angara`, `land_usr_buryatia`, `land_usr_chita`, `land_usr_crimea`, `land_usr_donets_kuban`, `land_usr_eastern_kazakhstan`, `land_usr_eastern_ukraine`, `land_usr_gorky`, `land_usr_irkutsk`, `land_usr_kalmytskaya`, `land_usr_kaluga_oblast`, `land_usr_kamchatka`, `land_usr_karelia`, `land_usr_kiev`, `land_usr_kola`, `land_usr_leningrad`, `land_usr_magadan`, `land_usr_moscow`, `land_usr_north_caucasia`, `land_usr_north_sakhalin`, `land_usr_northern_belorussia`, `land_usr_northern_russia`, `land_usr_novosibirsk`, `land_usr_orel_kursk`, `land_usr_primorsky_krai`, `land_usr_saratov`, `land_usr_smolensk`, `land_usr_south_sakhalin`, `land_usr_southern_belorussia`, `land_usr_southern_ukraine`, `land_usr_southern_yakutia`, `land_usr_stalingrad`, `land_usr_stalino`, `land_usr_taurida`, `land_usr_transcaucasia`, `land_usr_tula_lipetsk`, `land_usr_turkestan`, `land_usr_vanavara`, `land_usr_western_russia`, `land_usr_western_ukraine`, `land_usr_yakutsk`, `land_usr_yaroslavl`
 
@@ -680,7 +683,7 @@ Use the complete physical, railway/gauge and directional glossary ledgers. Model
 
 **Field:** `printed symbol interpretation` · **Confidence:** high · **Severity:** moderate
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `sea_p27`
 
@@ -704,7 +707,7 @@ Retain the crop/provenance and resolve the symbol; do not invent a named island 
 
 **Field:** `original_owner versus controller` · **Confidence:** high · **Severity:** moderate
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_manchuria_northern`, `land_manchuria_western`, `land_manchuria_eastern`, `land_manchuria_rehe`
 
@@ -726,7 +729,7 @@ Preserve the Manchukuo printed roundel as original national identity; represent 
 
 **Field:** `original_owner` · **Confidence:** high · **Severity:** moderate
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_fiji`, `land_new_hebrides`, `land_solomon_islands`, `land_gilbert_islands`, `land_line_islands`, `land_pitcairn_island`
 
@@ -748,7 +751,7 @@ Retain printed roundel and resolve Great Britain versus FEC player allocation us
 
 **Field:** `physical_facility_owner/convoy_endpoint` · **Confidence:** high · **Severity:** major
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_luzon_and_the_visayas`, `land_mindanao`, `sea_p50`
 
@@ -797,7 +800,7 @@ P50 western Philippine major-port symbol; earlier draft forced it into Luzon/Vis
 
 **Field:** `sea_neighbors` · **Confidence:** medium · **Severity:** major
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `sea_p42`, `sea_p50`
 
@@ -824,7 +827,7 @@ Stored reciprocal pair
 
 **Field:** `railway_connection/gauge_change` · **Confidence:** medium · **Severity:** moderate
 
-**Regional context:** [asia_pacific](regions/asia_pacific.md)
+**Regional context:** asia_pacific
 
 **Nodes:** `land_usr_saratov`, `land_usr_ural`
 

@@ -1,5 +1,8 @@
 # Sources, method and interpretation
 
+The audit's registers, data and region reports that this page cites were removed on
+2 November 2026; commit `037cb60` keeps them under `docs/map_audits/full_world/`.
+
 Audit date: **5 October 2026**. Scope: the entire printed world, including all
 continents, seas and edge-wrap areas; not the Japan–China campaign projection.
 
@@ -20,7 +23,7 @@ continents, seas and edge-wrap areas; not the Japan–China campaign projection.
    inherited decisions. In particular, preserve user-approved Canadian seam links
    and the user's warlord names. Campaign exclusions do not delete world tiles.
 
-[input_manifest.json](data/input_manifest.json) records hashes and sizes of the
+input_manifest.json records hashes and sizes of the
 map, source image, generators, home-country file and local PDFs. The board's
 printed version and v4.3 rules/glossary are not presumed perfectly identical.
 No online map or generic real-world geography was substituted for the game board.
@@ -34,7 +37,7 @@ facility-type distinctions, and the accessible sea zones. It includes current
 facility claims, proposed additions and explicit empty results. A coast, railway,
 settlement name or convoy endpoint is not evidence of a naval facility.
 
-[The corrected roster](naval_facility_reaudit.md) is generated from three
+The corrected roster is generated from three
 source-authored regional naval ledgers. Each facility is a physical instance;
 multiple accesses do not create extra instances, and separate symbols are not
 merged just because they share a type or territory. Ambiguous symbol ownership
