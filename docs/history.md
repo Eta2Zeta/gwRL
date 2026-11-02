@@ -84,11 +84,13 @@ the graph input that is now gone. One line per record, all under `docs/stage_a`:
   with the records.
 - **28 Oct, CPU profile and scheduling** (`cpu_profile`, `cpu_scheduling`):
   idle cores and legal-move generation were the costs; scheduling changes and
-  shared menus raised self-play from 47.4 to 65.4 games per hour.
+  shared menus raised self-play from 47.4 to 65.4 three-round games per hour,
+  at 16 simulations with a small network.
 - **28 Oct, game processes** (`cpu_processes`, `training_workers`,
-  `worker_queue`): games split across processes reached 282 games per hour in
-  self-play; training with worker processes went from 53.3 to 218.7 completed
-  games per hour; ten workers and a game queue, from 32.0 to 34.9.
+  `worker_queue`): games split across processes reached 282 three-round games
+  per hour at those settings; training with worker processes went from 53.3 to
+  218.7 completed three-round games per hour. At the production settings below,
+  ten workers and a game queue went from 32.0 to 34.9 three-round games per hour.
 - **28 Oct, production benchmark** (`production_benchmark`): 64 simulations and
   a 64-wide network, the settings used since.
 - **28 Oct, move generation** (`move_generation`): move lists 7.3 times faster,
@@ -101,8 +103,9 @@ the graph input that is now gone. One line per record, all under `docs/stage_a`:
   23.2 to 24.2 games per hour.
 - **29 Oct, game-process profile** (`game_process_cpu_profile`): rules 50%,
   network inputs 36%, search 7% of a game process's CPU.
-- **30 Oct, games per hour** (`games_per_hour`): 32.6 all-CPU and 48.3 with the
-  GPU while playing; with learning, the 31 October training measured 20.2 and 31.0.
+- **30 Oct, games per hour** (`games_per_hour`): eleven-round games at the
+  production settings, 32.6 all-CPU and 48.3 with the GPU while playing; with
+  learning, the 31 October training measured 20.2 and 31.0.
 
 ## GPU and batched-rules work
 
