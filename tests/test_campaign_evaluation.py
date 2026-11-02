@@ -449,15 +449,8 @@ class CampaignEvaluationTests(unittest.TestCase):
         from studies.shared.campaign_adapter import CampaignAdapter
 
         root = Path(__file__).resolve().parents[1]
-        trace = json.loads((root / "game_content/scenarios/japan_china_1936/m10/traces/2026_10_23/mixed_seed_1936/trace.json").read_text())
         scenario = str(root / "game_content/scenarios/japan_china_1936")
-        # Historical evidence retains its original definition fingerprint; its
-        # old checkpoint must never be relabeled as a current-rule checkpoint.
-        completed = gwrl_cpp.CampaignEnv(scenario, int(trace["seed"]))
-        initial = completed.serialize()
-        with self.assertRaisesRegex(RuntimeError, "definition fingerprint mismatch"):
-            completed.restore(trace["final_checkpoint"])
-        self.assertEqual(completed.serialize(), initial)
+        completed = gwrl_cpp.CampaignEnv(scenario, 1936)
         # This reporting fixture needs a true terminal game, not a particular
         # combat history. Legally decline research and pass every phase of a
         # fresh full campaign so current rules generate the endpoint and its

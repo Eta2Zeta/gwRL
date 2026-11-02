@@ -76,8 +76,6 @@ historical snapshots. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds en
   audits, purchase-price tables, approved decisions and completed verification.
 - [M9 naval exit](/Users/home/Desktop/gwRL/docs/m9/source_exit_2026_10_23.json):
   reviewed sources and four combined voyage/landing/retreat traces.
-- [M10 integration evidence](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m10/integration_evidence_2026_10_23.json):
-  two complete campaign replays and the source-linked runtime ledger.
 - [M11 verification](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m11/verification_2026_10_23.json):
   final C++/Python results, actual campaign checkpoint restores and vector search.
 - [build_theatre_scenario.py](/Users/home/Desktop/gwRL/tools/build_theatre_scenario.py)

@@ -38,10 +38,6 @@ add_executable(campaign_benchmark tools/campaign_benchmark.cpp)
 target_link_libraries(campaign_benchmark PRIVATE gw_engine)
 target_compile_definitions(campaign_benchmark PRIVATE GWRL_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_executable(campaign_trace tools/campaign_trace.cpp)
-target_link_libraries(campaign_trace PRIVATE gw_engine)
-target_compile_definitions(campaign_trace PRIVATE GWRL_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
-
 include(CTest)
 if(BUILD_TESTING)
     foreach(test_name campaign_state campaign_runtime campaign_setup campaign_env campaign_action_interface training_action_progress training_battle_clearing campaign_reward campaign_integration catalog politics politics_influence politics_warlords movement economy land_combat land_truce air air_logistics air_integration air_mission naval_movement naval_combat naval_operations json_integrity zone_encoding)
