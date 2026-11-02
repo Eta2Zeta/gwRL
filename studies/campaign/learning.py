@@ -26,7 +26,6 @@ from torch import nn
 from studies.shared.multiplayer_mcts import (
     PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
 )
-from studies.shared.immutable_json import FrozenDict, freeze_json
 
 CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
 TARGET_SCHEMA = "campaign-raw-vector-target-v1"
@@ -56,32 +55,6 @@ class ReplayTraceWriter:
         self._handle.close()
 
 
-def _read_only(*_args, **_kwargs):
-    raise TypeError("Replay context snapshots are read-only")
-
-
-class _ReadOnlyDict(dict):
-    """JSON-compatible immutable containers; pickle retains shared references."""
-    __setitem__ = __delitem__ = clear = pop = popitem = setdefault = update = __ior__ = _read_only
-
-    def __reduce_ex__(self, _protocol):
-        return type(self), (dict(self),)
-
-
-class _ReadOnlyList(list):
-    __setitem__ = __delitem__ = append = clear = extend = insert = pop = remove = reverse = sort = _read_only
-    __iadd__ = __imul__ = _read_only
-
-    def __reduce_ex__(self, _protocol):
-        return type(self), (list(self),)
-
-
-def _read_only_snapshot(value: Any) -> Any:
-    # Retain the legacy container classes above for existing local checkpoints.
-    # New snapshots also retain their canonical source text for graph reuse.
-    return freeze_json(value)
-
-
 def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
@@ -90,62 +63,12 @@ def _fingerprint(value: Any) -> str:
     return hashlib.sha256(_canonical(value).encode()).hexdigest()
 
 
-def _intern_context(context: dict[str, Any], pool: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    key = _fingerprint(context)  # Validates every static field before retaining it.
-    if key not in pool:
-        pool[key] = _read_only_snapshot(context)
-    return pool[key]
-
-
-def _intern_numeric_context(features: dict[str, Any], pool: dict[tuple[str, int], Any]) -> None:
-    """Share immutable native buffers using source identity and vocabulary."""
-    packed = features["packed_graph"]
-    context = packed["context"]
-    key = (features["context_key"], context.token_buckets)
-    if key not in pool:
-        if len(pool) >= 8:
-            pool.clear()  # Existing replay rows retain their shared buffers.
-        pool[key] = context
-    # Detach the small wrapper; neither the caller's input nor native arrays
-    # change when two replay rows share their static context.
-    features["packed_graph"] = {**packed, "context": pool[key]}
-
-
-def _same_numeric_graph(first: Any, second: Any) -> bool:
-    if first is second:
-        return True
-    left, right = first.packed_state(), second.packed_state()
-    return (set(left) == set(right) and all(
-        (item.dtype == right[key].dtype and item.shape == right[key].shape and
-         np.array_equal(item.view(np.uint8), right[key].view(np.uint8)))
-        if isinstance(item, np.ndarray) else item == right[key]
-        for key, item in left.items()))
-
-
-def _value_only_input(features: dict[str, Any]) -> dict[str, Any]:
-    from .features import NUMERIC_SCHEMA
-    if features["schema"] == NUMERIC_SCHEMA:
-        return {**features, "packed_graph": {**features["packed_graph"], "actions": (), "action_factors": ()}}
-    return {**features, "actions": []}
-
-
 def _selected_features(action: Any) -> dict[str, Any]:
     """Materialize one selected action for diagnostics, outside neural input."""
-    if hasattr(action, "features"):
-        feature = action.features()
-    elif hasattr(action, "neural_features"):
-        feature = action.neural_features()
-    else:
-        feature = action
+    feature = action.features() if hasattr(action, "features") else action
     if not isinstance(feature, dict):
         raise TypeError("Campaign action features must be a JSON object")
     return feature
-
-
-def retained_numeric_input(features: dict[str, Any]) -> dict[str, Any]:
-    """A numeric input to keep for a run: its observation has no spare capacity."""
-    packed = features["packed_graph"]
-    return {**features, "packed_graph": {**packed, "observation": packed["observation"].compacted()}}
 
 
 def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
@@ -159,12 +82,9 @@ def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
 
 
 def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: LearningConfig,
-            rng: random.Random, numeric: bool, token_buckets: int, batch_version: str,
-            numeric_pool: dict[tuple[str, int], Any], context_pool: dict[str, dict[str, Any]],
-            replay: dict[str, Any] | None = None) -> dict[str, Any]:
+            rng: random.Random, batch_version: str, replay: dict[str, Any] | None = None) -> dict[str, Any]:
     """Sample the played move from a search result, record its sample and apply it."""
-    from .features import NUMERIC_SCHEMA, make_numeric_input, validate_numeric_input
-    from .neural import make_input
+    from .features import make_zone_input
     owner = env.current_decision_player()
     if owner not in PLAYERS:
         raise ValueError("A policy choice must belong to one of the three actors")
@@ -172,23 +92,12 @@ def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: Lea
     maximum = max(logs)
     policy = probabilities([math.exp(value - maximum) for value in logs], len(logs))
     index = _sample_index(result.actions, policy, rng)
-    features = make_numeric_input(env, result.actions, token_buckets) if numeric else make_input(env, result.actions)
-    numerical = features["schema"] == NUMERIC_SCHEMA
-    if numerical:
-        if (validate_numeric_input(features, buckets=token_buckets) != len(result.actions)
-                or features["owner"] != owner):
-            raise ValueError("Numerical replay differs from actual choice owner/menu")
-        features = retained_numeric_input(features)
-        _intern_numeric_context(features, numeric_pool)
-    else:
-        features["context"] = _intern_context(features["context"], context_pool)
+    # The decision's zone input, as search already evaluated it: immutable and small.
+    features = make_zone_input(env, result.actions)
     pending.append({"input": features, "owner": owner, "policy": policy, "rollout_version": batch_version})
     action = result.actions[index]
-    if numerical:
-        menu = [_selected_features(action) for action in result.actions] if replay is not None else None
-        selected = menu[index] if menu is not None else _selected_features(action)
-    else:
-        menu, selected = features["actions"], features["actions"][index]
+    menu = [_selected_features(choice) for choice in result.actions] if replay is not None else None
+    selected = menu[index] if menu is not None else _selected_features(action)
     raw = selected.get("action")
     raw = raw if isinstance(raw, dict) else selected
     if replay is not None:
@@ -215,9 +124,8 @@ def episode_streams(learner_seed: int, environment_seed: int) -> tuple[random.Ra
             random.Random(f"campaign-episode-policy:{learner_seed}:{environment_seed}"))
 
 
-def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_version: str, numeric: bool,
-                 token_buckets: int, batch_version: str, environment_seed: int,
-                 max_transitions: int) -> dict[str, Any]:
+def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_version: str,
+                 batch_version: str, environment_seed: int, max_transitions: int) -> dict[str, Any]:
     """Play one game to its end, or to the transition guard, with frozen policies.
 
     A finished game returns terminal-labelled samples. A game stopped by the
@@ -229,8 +137,6 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
     pending: list[dict[str, Any]] = []
     events: list[dict[str, Any]] = []
     counts = dict(transitions=0, decisions=0, chance_events=0)
-    numeric_pool: dict[tuple[str, int], Any] = {}
-    context_pool: dict[str, dict[str, Any]] = {}
     while not env.is_terminal() and counts["transitions"] < max_transitions:
         before = env.planning_key()
         if env.decision_kind() == "chance":
@@ -243,9 +149,7 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
                 root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
             result = VectorMCTS(evaluator, search).search(env, add_root_noise=config.root_noise, reuse_root=False)
-            event = _decide(env, result, pending, config=config, rng=policy_random, numeric=numeric,
-                            token_buckets=token_buckets, batch_version=batch_version,
-                            numeric_pool=numeric_pool, context_pool=context_pool)
+            event = _decide(env, result, pending, config=config, rng=policy_random, batch_version=batch_version)
             if sample_random.random() >= config.sample_fraction:
                 pending.pop()
             counts["decisions"] += 1
@@ -260,19 +164,33 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
             "returns": target, "clock": env.observation()["state"]["clock"], "wealth": env.wealth()}
 
 
-def _checkpoint_contexts(payload: dict[str, Any]):
-    """Visit sample contexts without requiring a valid checkpoint up front."""
-    groups = [payload.get(name, []) for name in ("replay", "pending", "batch_records")]
-    parallel = payload.get("parallel_pending", [])
-    if isinstance(parallel, list):
-        groups.extend(parallel)
-    for group in groups:
-        if isinstance(group, list):
-            for sample in group:
-                if isinstance(sample, dict) and isinstance(sample.get("input"), dict):
-                    context = sample["input"].get("context")
-                    if isinstance(context, dict):
-                        yield context
+def validate_sample(sample: Any, *, labeled: bool, spec: Any) -> None:
+    """Check one replay row against the zone layout `spec` its networks read.
+
+    The input must be a zone input of that layout listing one option per policy
+    entry and naming the row's owner as the deciding player. Labelled rows also
+    need a complete value target with its provenance.
+    """
+    from .features import validate_zone_input, zone_owner
+    required = {"input", "owner", "policy", "rollout_version"}
+    if labeled:
+        required |= {"values", "target_source", "target_schema"}
+    if not isinstance(sample, dict) or set(sample) != required or sample["owner"] not in PLAYERS:
+        raise ValueError("Invalid replay sample")
+    if not isinstance(sample["rollout_version"], str) or not sample["rollout_version"]:
+        raise ValueError("Replay sample lacks policy version")
+    action_count = validate_zone_input(sample["input"], spec.version)
+    if not action_count:
+        raise ValueError("Replay sample must list its legal options")
+    if zone_owner(sample["input"], spec) != sample["owner"]:
+        raise ValueError("Replay owner differs from the deciding player its input names")
+    normalized = probabilities(sample["policy"], action_count)
+    if any(abs(a-b) > 1e-9 for a,b in zip(normalized, sample["policy"])):
+        raise ValueError("Replay policy must already be normalized")
+    if labeled:
+        vector(sample["values"])
+        if sample["target_source"] not in {"terminal", "bootstrap"} or sample["target_schema"] != TARGET_SCHEMA:
+            raise ValueError("Invalid replay value target provenance")
 
 
 def _model_digest(model: nn.Module) -> str:
@@ -300,8 +218,8 @@ class LearningConfig:
     root_dirichlet_epsilon: float = 0.25
     seed: int = 1
     mode: str = "multiplayer"
-    # Share of a worker game's decisions kept as samples. A whole game holds over a
-    # thousand close positions of about a megabyte each.
+    # Share of a worker game's decisions kept as samples: a whole game holds over a
+    # thousand close, strongly correlated positions.
     sample_fraction: float = 1.0
 
     def __post_init__(self) -> None:
@@ -398,6 +316,13 @@ class CampaignLearner:
             raise ValueError("Actor policies must be separate model instances")
         if any(asdict(getattr(model, "config", None)) != self.model_config for model in self.models.values()):
             raise ValueError("Every actor model configuration must match the learner model configuration")
+        layouts = {getattr(getattr(model, "spec", None), "version", None) for model in self.models.values()}
+        if len(layouts) != 1 or None in layouts:
+            raise ValueError("Every actor model must read the same zone layout")
+        self.zone_spec = self.models[PLAYERS[0]].spec
+        self.layout_version = self.zone_spec.version
+        if self.compatibility.get("network_input", self.layout_version) != self.layout_version:
+            raise ValueError("The models read another zone layout than the environment writes")
         from .device_runtime import runtime_policy_for_device
         self._mps_actor_count = sum(next(model.parameters()).device.type == "mps"
                                     for model in self.models.values())
@@ -412,10 +337,6 @@ class CampaignLearner:
         self.parallel_envs: list[Any] = []
         self.parallel_pending: list[list[dict[str, Any]]] = []
         self.replay: list[dict[str, Any]] = []
-        # Source JSON or immutable native buffers can be shared. Neither pool
-        # contains learned tensors or changes the model/schema meaning.
-        self._context_pool: dict[str, dict[str, Any]] = {}
-        self._numeric_context_pool: dict[tuple[str, int], Any] = {}
         self.pending: list[dict[str, Any]] = []
         self.batch_records: list[dict[str, Any]] = []
         self.frozen_models: dict[str, nn.Module] | None = None
@@ -523,16 +444,10 @@ class CampaignLearner:
             root_dirichlet_alpha=self.config.root_dirichlet_alpha,
             root_dirichlet_epsilon=self.config.root_dirichlet_epsilon)
 
-    def _numeric_models(self) -> bool:
-        from .neural import CampaignPolicyValueNet
-        return all(isinstance(model, CampaignPolicyValueNet) for model in self.models.values())
-
     def _apply_search_result(self, env: Any, result: Any, pending: list[dict[str, Any]],
                              replay: dict[str, Any] | None = None) -> dict[str, Any]:
         event = _decide(env, result, pending, config=self.config, rng=self.policy_random,
-                        numeric=self._numeric_models(), token_buckets=self.model_config["token_buckets"],
-                        batch_version=self.batch_version, numeric_pool=self._numeric_context_pool,
-                        context_pool=self._context_pool, replay=replay)
+                        batch_version=self.batch_version, replay=replay)
         self.counters["decisions"] += 1
         return event
 
@@ -690,7 +605,6 @@ class CampaignLearner:
         rewinds the environment-seed stream, so the batch replays exactly later.
         Returns None when stopped.
         """
-        from .features import NUMERIC_SCHEMA
         if type(count) is not int or count <= 0 or type(max_transitions) is not int or max_transitions <= 0:
             raise ValueError("Episode count and transition guard must be positive integers")
         if self.frozen_models is None:
@@ -713,10 +627,7 @@ class CampaignLearner:
             return None if results is None else {"seeds": seeds, "exhausted": True, "results": results}
         for result in results:
             for record in result["records"]:
-                if record["input"]["schema"] == NUMERIC_SCHEMA:
-                    _intern_numeric_context(record["input"], self._numeric_context_pool)
-                else:
-                    record["input"]["context"] = _intern_context(record["input"]["context"], self._context_pool)
+                self._validate_sample(record, labeled=True)
             self.batch_records.extend(result["records"])
             for name in ("transitions", "decisions", "chance_events"):
                 self.counters[name] += result["counts"][name]
@@ -771,11 +682,10 @@ class CampaignLearner:
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
                 # Every position trains the value head, while only its owner
-                # has a policy target. State values do not read action graphs,
-                # so avoid encoding other actors' unused policy menus. Keep
-                # replay and the complete observation/context unchanged.
+                # has a policy target. Values do not read the options, so the
+                # other actors' rows are passed without them.
                 inputs = [sample["input"] if sample["owner"] == player
-                          else _value_only_input(sample["input"]) for sample in samples]
+                          else sample["input"].without_actions() for sample in samples]
                 logits, predicted = model.forward_batch(inputs)
                 target = torch.as_tensor([sample["values"] for sample in samples], dtype=predicted.dtype,
                                          device=predicted.device) / self.config.value_scale
@@ -838,7 +748,7 @@ class CampaignLearner:
                 "counters": self.counters.copy()}
 
     def _metadata(self) -> dict[str, Any]:
-        return {"config": asdict(self.config), "model_config": self.model_config,
+        return {"config": asdict(self.config), "model_config": self.model_config, "input_layout": self.layout_version,
                 "compatibility": self.compatibility, "players": list(PLAYERS), "target_schema": TARGET_SCHEMA,
                 "software": {"python": platform.python_version(), "numpy": np.__version__, "torch": torch.__version__,
                              "torch_threads": torch.get_num_threads(),
@@ -867,57 +777,12 @@ class CampaignLearner:
                     "replay": self.replay_random.getstate(), "environment": self.environment_random.getstate()},
         })
 
-    @staticmethod
-    def _validate_sample(sample: Any, *, labeled: bool, buckets: int | None = None) -> None:
-        from .features import SCHEMA as INPUT_SCHEMA, NUMERIC_SCHEMA, validate_numeric_input
-        required = {"input", "owner", "policy", "rollout_version"}
-        if labeled:
-            required |= {"values", "target_source", "target_schema"}
-        if not isinstance(sample, dict) or set(sample) != required or sample["owner"] not in PLAYERS:
-            raise ValueError("Invalid replay sample")
-        if not isinstance(sample["rollout_version"], str) or not sample["rollout_version"]:
-            raise ValueError("Replay sample lacks policy version")
-        features = sample["input"]
-        if isinstance(features, dict) and features.get("schema") == NUMERIC_SCHEMA:
-            action_count = validate_numeric_input(features, buckets=buckets)
-            if features["owner"] != sample["owner"]:
-                raise ValueError("Replay owner differs from actual numerical input owner")
-        elif (not isinstance(features, dict) or set(features) != {"schema", "observation", "context", "actions"}
-                or features["schema"] != INPUT_SCHEMA or not isinstance(features["observation"], dict)
-                or not isinstance(features["context"], dict)):
-            raise ValueError("Unsupported replay input schema")
-        else:
-            if features["observation"].get("current_decision_player") != sample["owner"]:
-                raise ValueError("Replay owner differs from actual observation owner")
-            # Validate changing source JSON without serializing the shared
-            # registry once per trajectory row during checkpoint restoration.
-            _canonical({key: item for key, item in features.items() if key != "context"})
-            if isinstance(features["context"], FrozenDict):
-                features["context"].canonical_json
-            elif not isinstance(features["context"], _ReadOnlyDict):
-                _canonical(features["context"])
-            if not isinstance(features.get("actions"), list):
-                raise ValueError("Replay sample must contain legal action features")
-            action_count = len(features["actions"])
-        if not action_count:
-            raise ValueError("Replay sample must contain legal action features")
-        normalized = probabilities(sample["policy"], action_count)
-        if any(abs(a-b) > 1e-9 for a,b in zip(normalized, sample["policy"])):
-            raise ValueError("Replay policy must already be normalized")
-        if labeled:
-            vector(sample["values"])
-            if sample["target_source"] not in {"terminal", "bootstrap"} or sample["target_schema"] != TARGET_SCHEMA:
-                raise ValueError("Invalid replay value target provenance")
+    def _validate_sample(self, sample: Any, *, labeled: bool) -> None:
+        validate_sample(sample, labeled=labeled, spec=self.zone_spec)
 
     def restore(self, payload: Mapping[str, Any], *, env_template: Any = None) -> None:
         """Validate staged replacements before changing models, environment or RNG."""
-        incoming = dict(payload)
-        context_pool: dict[str, dict[str, Any]] = {}
-        memo = {}
-        for context in _checkpoint_contexts(incoming):
-            if id(context) not in memo:
-                memo[id(context)] = _intern_context(context, context_pool)
-        value = copy.deepcopy(incoming, memo)
+        value = copy.deepcopy(dict(payload))  # Zone inputs are immutable and copy as themselves.
         expected = {"schema", "metadata", "models", "model_versions", "optimizers", "frozen_models",
                     "frozen_versions", "batch_version", "replay", "pending", "batch_records", "generation",
                     "counters", "action_history", "env", "env_context", "rng", "parallel_envs", "parallel_pending"}
@@ -931,7 +796,7 @@ class CampaignLearner:
             if not isinstance(value[name], list):
                 raise ValueError("Invalid replay container")
             for sample in value[name]:
-                self._validate_sample(sample, labeled=name != "pending", buckets=self.model_config["token_buckets"])
+                self._validate_sample(sample, labeled=name != "pending")
         if len(value["replay"]) > self.config.replay_capacity:
             raise ValueError("Replay exceeds configured capacity")
         if value["counters"]["updates"] != value["generation"]:
@@ -1009,7 +874,7 @@ class CampaignLearner:
             if _fingerprint(replacement.context()) != item["context"]:
                 raise ValueError("Parallel environment context differs after restore")
             for sample in samples:
-                self._validate_sample(sample, labeled=False, buckets=self.model_config["token_buckets"])
+                self._validate_sample(sample, labeled=False)
                 if frozen is None or sample["rollout_version"] != value["batch_version"]:
                     raise ValueError("Parallel pending sample lacks the frozen batch policy")
             parallel.append(replacement)
@@ -1021,29 +886,6 @@ class CampaignLearner:
         samples.extend(sample for rows in value["parallel_pending"] for sample in rows)
         if samples and env is None:
             raise ValueError("Replay requires an environment with a verified static context")
-        context_keys = {id(context): key for key, context in context_pool.items()}
-        numeric_context_pool: dict[tuple[str, int], Any] = {}
-        checked_numeric_contexts: set[int] = set()
-        expected_numeric = None
-        from .features import NUMERIC_SCHEMA, make_numeric_input
-        for sample in samples:
-            features = sample["input"]
-            if features["schema"] == NUMERIC_SCHEMA:
-                if features["context_key"] != value["env_context"]:
-                    raise ValueError("Numerical replay context differs from campaign compatibility context")
-                context = features["packed_graph"]["context"]
-                if id(context) not in checked_numeric_contexts:
-                    if expected_numeric is None:
-                        expected_numeric = make_numeric_input(env, (), self.model_config["token_buckets"])
-                        if expected_numeric["schema"] != NUMERIC_SCHEMA:
-                            raise ValueError("Numerical replay requires a compatible numerical environment template")
-                    if (expected_numeric["context_key"] != value["env_context"] or
-                            not _same_numeric_graph(context, expected_numeric["packed_graph"]["context"])):
-                        raise ValueError("Numerical replay graph differs from campaign compatibility context")
-                    checked_numeric_contexts.add(id(context))
-                _intern_numeric_context(features, numeric_context_pool)
-            elif context_keys[id(features["context"])] != value["env_context"]:
-                raise ValueError("Replay sample context differs from campaign compatibility context")
         rng = value["rng"]
         if set(rng) != {"python", "numpy", "torch", "cuda", "mps", "policy", "search", "replay", "environment"}:
             raise ValueError("Incomplete random-generator checkpoint")
@@ -1069,8 +911,6 @@ class CampaignLearner:
         if self._device_runtime is not None:
             self._device_runtime.reset()
         self.models, self.optimizers, self.env = models, optimizers, env
-        self._context_pool = context_pool
-        self._numeric_context_pool = numeric_context_pool
         self.parallel_envs, self.parallel_pending = parallel, value["parallel_pending"]
         self.frozen_models, self.frozen_versions, self.batch_version = frozen, value["frozen_versions"], value["batch_version"]
         self.replay, self.pending, self.batch_records = value["replay"], value["pending"], value["batch_records"]

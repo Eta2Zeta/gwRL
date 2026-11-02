@@ -8,7 +8,8 @@ For every decision it encodes the position and its options, then checks that
   * options of one position with the same encoding lead to positions with the
     same encoding: otherwise two different moves look alike.
 It also reports names that fell into an "other" column, and the stored size
-and build time of the zone input against the graph input it replaces.
+and build time of the zone input. The comparison with the graph input it
+replaced is recorded in docs/stage_a/zone_encoding_2026_11_02.md.
 
 Run from the repository root:
 
@@ -71,13 +72,6 @@ def successor_key(env, action) -> str:
     return _digest(state, sorted(options))
 
 
-def graph_input_bytes(env, actions) -> int:
-    from studies.campaign.features import make_numeric_input
-    item = make_numeric_input(env, tuple(actions), 16384)
-    packed = item["packed_graph"]
-    return packed["observation"].compacted().nbytes + sum(graph.nbytes for graph in packed["actions"])
-
-
 def check(args) -> dict:
     gwrl_cpp.zone_encoding_unknowns(True)
     seen: dict[str, tuple[list[str], str]] = {}
@@ -85,7 +79,7 @@ def check(args) -> dict:
     duplicate_groups = nonequivalent = 0
     nonequivalent_examples = []
     positions = chance_positions = 0
-    zone_bytes, graph_bytes, zone_ms, graph_ms = [], [], [], []
+    zone_bytes, zone_ms = [], []
     version = None
     for seed in args.seeds:
         env = make_env(seed, calendar_rounds=args.rounds)
@@ -105,9 +99,6 @@ def check(args) -> dict:
             chance_positions += kind == "chance"
             if step % args.size_stride == 0:
                 zone_bytes.append(zone.nbytes)
-                started = time.perf_counter()
-                graph_bytes.append(graph_input_bytes(env, actions))
-                graph_ms.append((time.perf_counter() - started) * 1000)
             state, options = keys(zone)
             menu = sorted(options)
             label = f"seed {seed} step {step} {kind}"
@@ -172,8 +163,7 @@ def check(args) -> dict:
         "identical_options_with_different_successors": nonequivalent,
         "nonequivalent_examples": nonequivalent_examples,
         "names_in_other_columns": dict(sorted(unknowns.items(), key=lambda item: -item[1])),
-        "zone_input_bytes": summary(zone_bytes), "graph_input_bytes": summary(graph_bytes),
-        "zone_input_ms": summary(zone_ms), "graph_input_ms": summary(graph_ms),
+        "zone_input_bytes": summary(zone_bytes), "zone_input_ms": summary(zone_ms),
     }
 
 
@@ -183,7 +173,7 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=3)
     parser.add_argument("--seeds", type=int, nargs="+", default=[1951])
     parser.add_argument("--policy", choices=("uniform", "balanced"), default="uniform")
-    parser.add_argument("--size-stride", type=int, default=10, help="compare sizes at every n-th position")
+    parser.add_argument("--size-stride", type=int, default=10, help="record sizes at every n-th position")
     parser.add_argument("--successor-stride", type=int, default=5, help="check identical options at every n-th position")
     parser.add_argument("--groups-per-position", type=int, default=2)
     parser.add_argument("--examples", type=int, default=8)

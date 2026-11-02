@@ -6,7 +6,7 @@
 
 - [Stage A learning results](/Users/home/Desktop/gwRL/docs/stage_a/README.md): completed-episode training, paired held-out results and earlier pilots.
 - [Decision, rules and training review](/Users/home/Desktop/gwRL/docs/stage_a/decision_review_2026_10_31.md): the objective rewards a passive Japan; a quarter of still-searched decisions removable without rule changes, half with three rule simplifications; flat search targets on large menus.
-- [Native neural-input compiler](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md): complete feature graphs in C++, exact numerical parity and matched performance checks.
+- [Zone encoding](/Users/home/Desktop/gwRL/docs/stage_a/zone_encoding_2026_11_02.md) and [zone network](/Users/home/Desktop/gwRL/docs/stage_a/zone_network_2026_11_02.md): the network's fixed input, 37 zones answering fixed questions, its completeness checks and the network that reads it. It replaced the [graph input](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md).
 - [AI order construction](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md): forward-only naval orders and bounded configuration/permission choices, with separate replay compatibility.
 - [Three-round learning results](/Users/home/Desktop/gwRL/docs/stage_a/three_round_2026_10_25_results.md): sixty completed games, separate Japan/Dadao possession results, saved continuation and measured checkpoint overhead.
 - [Checkpoint saving pilot](/Users/home/Desktop/gwRL/docs/stage_a/checkpoint_pilot_2026_10_25.md): small model exports, thirty-minute recovery saves and ten three-round games in 30m 51s; matched first-eight elapsed time reduced by 10.8%.
@@ -38,7 +38,7 @@ game_content/
 include/game/    C++ public headers and game rules
 src/             C++ implementation and Python bindings
 studies/
-  campaign/      Entity-graph models, batched search, self-play and evaluation
+  campaign/      Zone-graph networks, batched search, self-play and evaluation
   composition/   Trainer, search and preserved composition results
   mini_japan_two_turn/  Trainer, search, tools and results
   shared/        Neural helpers, explicit campaign adapter and vector MCTS

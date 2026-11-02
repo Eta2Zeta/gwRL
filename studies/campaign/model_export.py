@@ -31,8 +31,7 @@ _KEYS = {"schema", "config", "task", "training_environment_seeds", "model_config
 
 def _expected_model_config(config) -> dict:
     return asdict(CampaignModelConfig(hidden_dim=config.hidden_dim,
-        message_layers=config.message_layers, token_buckets=config.token_buckets,
-        value_scale=config.value_scale))
+        message_layers=config.message_layers, value_scale=config.value_scale))
 
 
 @contextmanager

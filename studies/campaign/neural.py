@@ -1,4 +1,17 @@
-"""Campaign entity-graph policy/value model and actor-routed batched inference.
+"""Campaign policy/value network over the fixed zone encoding, and batched evaluation.
+
+The network reads the engine's zone encoding (features.py). Each of the map's
+37 zones answers fixed questions; their answers, the zone's fixed map facts and
+a learned vector for the zone itself make one vector per zone. Messages then
+pass along the map's 160 directed borders, while a position vector built from
+the position's own answers reads every zone and is read by every zone. The
+value head reads the position vector and the zones' mean and maximum. Each
+legal option is a vector built from its own answers and the vectors of the
+zones it acts from, travels through and acts on; the policy scores every option
+of the legal menu, nothing padded and nothing dropped.
+
+An answer adds its column's learned vector, weighted by sign(a) * log(1 + |a|).
+Every column has its own vector: a column means one thing in every position.
 
 Values returned by the network are in raw-return/value_scale units. The linear
 three-component head is unbounded; NeuralEvaluator multiplies by value_scale
@@ -6,22 +19,18 @@ before handing predictions to MCTS. The default scale is 100 IPP wealth units.
 """
 from __future__ import annotations
 
-import inspect
 import math
 import os
-import threading
-from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
+import numpy as np
 import torch
+import torch.nn.functional as F
 from torch import Tensor, nn
 
 from studies.shared.multiplayer_mcts import Evaluation, PLAYERS, vector
-from .features import (EXTERNAL_REFERENCE, NODE_TYPES, NUMERIC_DIM, RELATIONS, SCHEMA,
-                       Graph, action_factors, cached_action, cached_context, cached_observation, canonical, context_source_key, make_input)
-
-NUMERIC_SCHEMA = "campaign-numeric-input-v1"
+from .features import GROUP_LEVELS, ZoneBatch, ZoneSpec, default_zone_spec, make_zone_input, pack_zone_inputs
 
 
 def _require_no_mps_fallback() -> None:
@@ -86,11 +95,21 @@ def neural_device_memory(device: str | torch.device = "cpu") -> dict[str, Any]:
     return result
 
 
+def release_device_memory(device: str | torch.device) -> None:
+    """Explicit cold-benchmark cleanup: return cached accelerator memory."""
+    target = resolve_neural_device(device)
+    synchronize_neural_device(target)
+    if target.type == "mps":
+        torch.mps.empty_cache()
+    elif target.type == "cuda":
+        with torch.cuda.device(target):
+            torch.cuda.empty_cache()
+
+
 @dataclass(frozen=True)
 class CampaignModelConfig:
     hidden_dim: int = 64
     message_layers: int = 2
-    token_buckets: int = 16384
     value_scale: float = 100.0
     policy_factorization: bool = True
 
@@ -99,700 +118,182 @@ class CampaignModelConfig:
             raise ValueError("hidden_dim must be at least four")
         if type(self.message_layers) is not int or self.message_layers < 1:
             raise ValueError("message_layers must be positive")
-        if type(self.token_buckets) is not int or self.token_buckets < 2:
-            raise ValueError("token_buckets must be at least two")
         if not math.isfinite(self.value_scale) or self.value_scale <= 0:
             raise ValueError("value_scale must be positive and finite")
         if type(self.policy_factorization) is not bool:
             raise ValueError("policy_factorization must be a boolean")
 
 
-@dataclass
-class _EncodedGraph:
-    graph: Any
-    nodes: Tensor
-    pooled: Tensor
+def batch_tensors(batch: ZoneBatch, device: torch.device, *, non_blocking: bool = False) -> dict[str, Tensor]:
+    """The batch's arrays as tensors on `device`.
 
-
-@dataclass
-class _GraphTensors:
-    graph: Any
-    tokens: Tensor
-    offsets: Tensor
-    types: Tensor
-    numbers: Tensor
-    sources: Tensor
-    targets: Tensor
-    relations: Tensor
-    retained_bytes: int = 0
-
-
-def _graph_source_bytes(graph: Any) -> int:
-    """Conservatively count source storage pinned by a cache's strong refs."""
-    if hasattr(graph, "nbytes"):
-        return int(graph.nbytes) + 256
-    # Reference Graph stores boxed scalars, tuples and strings. Bounds include
-    # per-element pointers/objects, containers, identity and reference strings;
-    # overcounting shared objects is preferable to hiding retained observations.
-    return (512 * graph.node_count + 36 * len(graph.token_ids) + 192 * len(graph.edges) + 512
-            + sum(160 + len(key.encode("utf-8")) * 4 + 36 * len(indices)
-                  for key, indices in graph.identities.items())
-            + sum(160 + len(identity.encode("utf-8")) * 4 for _, identity in graph.references))
-
-
-# These tensors contain only source data, never model outputs or gradients.
-# Sharing them across actor models is safe; the byte limit also bounds large
-# observation/menu entries independently of the source-graph entry limits.
-_GRAPH_TENSORS: OrderedDict[tuple, _GraphTensors] = OrderedDict()
-_GRAPH_TENSOR_BYTES = 0
-_GRAPH_TENSOR_LIMIT = 32 * 1024 * 1024
-_GRAPH_TENSOR_LOCK = threading.RLock()
-
-
-def _graph_tensors(graph: Any, device: torch.device, dtype: torch.dtype) -> _GraphTensors:
-    global _GRAPH_TENSOR_BYTES
-    key = (id(graph), device, dtype)
-    with _GRAPH_TENSOR_LOCK:
-        if key in _GRAPH_TENSORS:
-            _GRAPH_TENSORS.move_to_end(key)
-            return _GRAPH_TENSORS[key]
-    long = lambda values: torch.tensor(values, dtype=torch.long, device=device)
-    # An inference-mode tensor cannot subsequently be saved for backward.
-    # Construct ordinary constant tensors even when called during inference.
-    with torch.inference_mode(False):
-        if hasattr(graph, "arrays"):
-            arrays = graph.arrays()
-            # Copy read-only native buffers in compiled code. The tensors must
-            # never provide a writable alias to an immutable source graph.
-            result = _GraphTensors(graph, long(arrays["token_ids"]), long(arrays["token_offsets"]),
-                                   long(arrays["types"]), torch.tensor(arrays["numeric"], dtype=dtype, device=device),
-                                   long(arrays["sources"]), long(arrays["targets"]), long(arrays["relations"]))
-        else:
-            sources, targets, relations = zip(*graph.edges) if graph.edges else ((), (), ())
-            result = _GraphTensors(graph, long(graph.token_ids), long(graph.token_offsets), long(graph.types),
-                                   torch.tensor(graph.numeric, dtype=dtype, device=device),
-                                   long(sources), long(targets), long(relations))
-    size = _graph_source_bytes(graph) + sum(value.numel() * value.element_size() for value in vars(result).values()
-                                           if isinstance(value, Tensor))
-    result.retained_bytes = size
-    if size <= _GRAPH_TENSOR_LIMIT:
-        with _GRAPH_TENSOR_LOCK:
-            if key in _GRAPH_TENSORS:
-                _GRAPH_TENSORS.move_to_end(key)
-                return _GRAPH_TENSORS[key]
-            while _GRAPH_TENSORS and _GRAPH_TENSOR_BYTES + size > _GRAPH_TENSOR_LIMIT:
-                _, old = _GRAPH_TENSORS.popitem(last=False)
-                _GRAPH_TENSOR_BYTES -= old.retained_bytes
-            _GRAPH_TENSORS[key] = result
-            _GRAPH_TENSOR_BYTES += size
-    return result
-
-
-class _SourceCache:
-    """Byte- and entry-bounded immutable preparation, with strong source refs."""
-    def __init__(self, limit: int, entries: int) -> None:
-        self.limit, self.entries, self.bytes = limit, entries, 0
-        self.values: OrderedDict[tuple, tuple[Any, int]] = OrderedDict()
-        self.source_refs: dict[int, tuple[Any, int, int]] = {}
-        self.entry_sources: dict[tuple, tuple[int, ...]] = {}
-        self._lock = threading.RLock()
-
-    def __getstate__(self) -> dict:
-        # Caches are process-local preparation, not checkpoint contents. Model
-        # deepcopy and pickle retain all learned state while starting these cold.
-        return {"limit": self.limit, "entries": self.entries}
-
-    def __setstate__(self, state: dict) -> None:
-        self.__init__(state["limit"], state["entries"])
-
-    def get(self, key: tuple) -> Any:
-        with self._lock:
-            found = self.values.get(key)
-            if found is not None:
-                self.values.move_to_end(key)
-                return found[0]
-        return None
-
-    def _remove(self, key: tuple) -> None:
-        _, size = self.values.pop(key)
-        self.bytes -= size
-        for identity in self.entry_sources.pop(key):
-            source, count, source_size = self.source_refs[identity]
-            if count == 1:
-                self.bytes -= source_size
-                del self.source_refs[identity]
-            else:
-                self.source_refs[identity] = source, count - 1, source_size
-
-    def put(self, key: tuple, value: Any, size: int, *, sources: Sequence[Any] = ()) -> Any:
-        unique = {id(source): source for source in sources}
-        source_sizes = {identity: _graph_source_bytes(source) for identity, source in unique.items()}
-        with self._lock:
-            if size + sum(source_sizes.values()) <= self.limit and self.entries:
-                if key in self.values:
-                    self._remove(key)
-                def addition() -> int:
-                    return size + sum(source_size for identity, source_size in source_sizes.items()
-                                      if identity not in self.source_refs)
-                while self.values and (self.bytes + addition() > self.limit or len(self.values) >= self.entries):
-                    self._remove(next(iter(self.values)))
-                self.values[key] = value, size
-                self.bytes += size
-                self.entry_sources[key] = tuple(unique)
-                for identity, source in unique.items():
-                    if identity in self.source_refs:
-                        old_source, count, source_size = self.source_refs[identity]
-                        self.source_refs[identity] = old_source, count + 1, source_size
-                    else:
-                        self.source_refs[identity] = source, 1, source_sizes[identity]
-                        self.bytes += source_sizes[identity]
-        return value
-
-    def clear(self) -> None:
-        with self._lock:
-            self.values.clear()
-            self.source_refs.clear()
-            self.entry_sources.clear()
-            self.bytes = 0
-
-
-@dataclass
-class _ReferenceIndices:
-    graph: Any
-    context: Any
-    destinations: Tensor
-    indices: Tensor
-
-
-_REFERENCE_INDICES = _SourceCache(64 * 1024 * 1024, 4096)
-
-
-@dataclass
-class _ReferenceMetadata:
-    identities: dict[str, tuple[int, ...]]
-    references: tuple[tuple[int, str], ...]
-
-
-_REFERENCE_METADATA = _SourceCache(64 * 1024 * 1024, 256)
-
-
-def _reference_metadata(graph: Any) -> Any:
-    if isinstance(graph, Graph):
-        return graph
-    key = (id(graph),)
-    cached = _REFERENCE_METADATA.get(key)
-    if cached is not None:
-        return cached
-    # Packed arrays are zero-copy native views. Keep only reference metadata;
-    # mixed legacy/numeric replay must not box every graph scalar for matching.
-    fields = graph.packed_state() if hasattr(graph, "packed_state") else graph.debug_graph()
-    if isinstance(fields, Graph):
-        result = _ReferenceMetadata(fields.identities, fields.references)
-    else:
-        result = _ReferenceMetadata(fields["identities"], fields["references"])
-    size = 256 + sum(128 + 4 * len(name.encode()) + 48 * len(indices)
-                     for name, indices in result.identities.items())
-    size += sum(128 + 4 * len(name.encode()) for _, name in result.references)
-    return _REFERENCE_METADATA.put(key, result, size, sources=(graph,))
-
-
-def _reference_indices(graph: Any, context: Any, device: torch.device) -> _ReferenceIndices:
-    key = (id(graph), id(context), device)
-    cached = _REFERENCE_INDICES.get(key)
-    if cached is not None:
-        return cached
-    with torch.inference_mode(False):
-        if hasattr(graph, "external_references") and hasattr(context, "arrays"):
-            destinations, indices = graph.external_references(context)
-        else:
-            # A continued learner can legitimately mix historical JSON rows
-            # with new native rows while retaining the same registry encoding.
-            reference, registry = _reference_metadata(graph), _reference_metadata(context)
-            destinations, indices = [], []
-            for destination, identity in reference.references:
-                for index in registry.identities.get(identity, ()):
-                    indices.append(index)
-                    destinations.append(destination)
-        result = _ReferenceIndices(graph, context,
-                                   torch.tensor(destinations, dtype=torch.long, device=device),
-                                   torch.tensor(indices, dtype=torch.long, device=device))
-    size = (result.indices.numel() + result.destinations.numel()) * 8 + 256
-    return _REFERENCE_INDICES.put(key, result, size, sources=(graph, context))
-
-
-@dataclass
-class _EncoderLayout:
-    graphs: tuple[Any, ...]
-    contexts: tuple[tuple[Any, ...], ...]
-    starts: tuple[int, ...]
-    ids: Tensor
-    offsets: Tensor
-    types: Tensor
-    numbers: Tensor
-    sources: Tensor
-    targets: Tensor
-    relations: Tensor
-    degree: Tensor
-    owners: Tensor
-    counts: Tensor
-    external: tuple[tuple[int, int, Tensor], ...]
-    external_banks: tuple[tuple[int, int], ...] = ()
-    external_joined_indices: Tensor | None = None
-
-
-_ENCODER_LAYOUTS = _SourceCache(64 * 1024 * 1024, 256)
-
-
-def _reference_encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
-                              device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
-    contexts = tuple(tuple(context.graph for context in row) for row in external) if external is not None else ()
-    key = (tuple(map(id, graphs)), tuple(tuple(map(id, row)) for row in contexts), device, dtype)
-    cached = _ENCODER_LAYOUTS.get(key)
-    if cached is not None:
-        return cached
-    packs = [_graph_tensors(graph, device, dtype) for graph in graphs]
-    starts, token_starts = [0], [0]
-    for graph, pack in zip(graphs, packs, strict=True):
-        starts.append(starts[-1] + graph.node_count)
-        token_starts.append(token_starts[-1] + pack.tokens.numel())
-    long = lambda values: torch.tensor(values, dtype=torch.long, device=device)
-    cat = lambda values: values[0] if len(values) == 1 else torch.cat(values)
-    node_count = starts[-1]
-    # This is the original batching/edge order. Only constant preparation is
-    # reused; every message, pooling and gradient operation remains unchanged.
-    with torch.inference_mode(False):
-        ids = cat([pack.tokens for pack in packs])
-        offsets = (packs[0].offsets if len(packs) == 1 else
-                   torch.cat([*(pack.offsets[:-1] + start for pack, start in zip(packs, token_starts)),
-                              long([token_starts[-1]])]))
-        types = cat([pack.types for pack in packs])
-        numbers = cat([pack.numbers for pack in packs])
-        sources = [pack.sources + start for pack, start in zip(packs, starts)]
-        targets = [pack.targets + start for pack, start in zip(packs, starts)]
-        relations = [pack.relations for pack in packs]
-        external_count, external_indices = 0, []
-        rows = enumerate(zip(graphs, contexts, strict=True)) if contexts else ()
-        for row, (graph, registries) in rows:
-            for column, context in enumerate(registries):
-                match = _reference_indices(graph, context, device)
-                count = match.indices.numel()
-                if count:
-                    external_indices.append((row, column, match.indices))
-                    offset = node_count + external_count
-                    sources.append(torch.arange(offset, offset + count, device=device))
-                    targets.append(match.destinations + starts[row])
-                    relations.append(torch.full((count,), EXTERNAL_REFERENCE, dtype=torch.long, device=device))
-                    external_count += count
-        source_ids, target_ids, relation_ids = cat(sources), cat(targets), cat(relations)
-        degree = torch.bincount(target_ids, minlength=node_count).clamp_min(1).to(dtype).unsqueeze(1)
-        owners = torch.repeat_interleave(torch.arange(len(graphs), device=device),
-                                         long([graph.node_count for graph in graphs]))
-        counts = torch.tensor([graph.node_count for graph in graphs], device=device, dtype=dtype).unsqueeze(1)
-    result = _EncoderLayout(tuple(graphs), contexts, tuple(starts), ids, offsets, types, numbers,
-                            source_ids, target_ids, relation_ids, degree, owners, counts, tuple(external_indices))
-    size = sum(value.numel() * value.element_size() for value in vars(result).values() if isinstance(value, Tensor))
-    size += sum(indices.numel() * indices.element_size() for _, _, indices in result.external)
-    sources = (*graphs, *(graph for row in contexts for graph in row))
-    return _ENCODER_LAYOUTS.put(key, result, size + 256 + 32 * (len(graphs) + len(contexts)), sources=sources)
-
-
-def _gpu_encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
-                        device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
-    """Pack unchanged topology on CPU and transfer combined arrays once.
-
-    External banks are identified by encoded-object aliasing, not source graph
-    identity: two rows can encode the same graph into different learned vectors.
-    Cached layouts contain indices only; fresh learned nodes are read each call.
+    Off the CPU every index array travels in one copy and every weight array in
+    another: each separate host-to-device copy costs a fixed overhead, larger
+    than moving the data. A non-blocking copy may still be reading its host
+    buffer when this returns; the buffers stay referenced by the batch, so a
+    caller asking for one must keep the batch until it has read the outputs.
     """
-    contexts = tuple(tuple(item.graph for item in row) for row in external) if external is not None else ()
-    aliases, representatives, pattern = {}, [], []
-    for row, values in enumerate(external or ()):
-        row_pattern = []
-        for column, value in enumerate(values):
-            identity = id(value)
-            if identity not in aliases:
-                aliases[identity] = len(representatives)
-                representatives.append((row, column))
-            row_pattern.append(aliases[identity])
-        pattern.append(tuple(row_pattern))
-    key = ("gpu_bulk", tuple(map(id, graphs)), tuple(tuple(map(id, row)) for row in contexts),
-           tuple(pattern), device, dtype)
-    cached = _ENCODER_LAYOUTS.get(key)
-    if cached is not None:
-        return cached
-    cpu = _reference_encoder_layout(graphs, external, torch.device("cpu"), dtype)
-    offsets, offset = [], 0
-    for row, column in representatives:
-        offsets.append(offset)
-        offset += external[row][column].nodes.shape[0]
-    with torch.inference_mode(False):
-        joined = (torch.cat([indices + offsets[pattern[row][column]] for row, column, indices in cpu.external]).to(device)
-                  if cpu.external else None)
-        fields = {name: getattr(cpu, name).to(device) for name in (
-            "ids", "offsets", "types", "numbers", "sources", "targets", "relations", "degree", "owners", "counts")}
-    result = _EncoderLayout(cpu.graphs, cpu.contexts, cpu.starts, **fields, external=(),
-                            external_banks=tuple(representatives), external_joined_indices=joined)
-    size = sum(value.numel() * value.element_size() for value in vars(result).values() if isinstance(value, Tensor))
-    sources = (*graphs, *(graph for row in contexts for graph in row))
-    return _ENCODER_LAYOUTS.put(key, result, size + 512 + 64 * (len(graphs) + len(representatives)), sources=sources)
-
-
-def _encoder_layout(graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None,
-                    device: torch.device, dtype: torch.dtype) -> _EncoderLayout:
     if device.type == "cpu":
-        return _reference_encoder_layout(graphs, external, device, dtype)
-    return _gpu_encoder_layout(graphs, external, device, dtype)
+        return {name: torch.from_numpy(values) for parts in (batch.integers, batch.floats)
+                for name, values in parts.items()}
+    out: dict[str, Tensor] = {}
+    hosts = []
+    for parts, dtype in ((batch.integers, np.int64), (batch.floats, np.float32)):
+        if not parts:
+            continue
+        host = torch.from_numpy(np.concatenate([values.ravel() for values in parts.values()]).astype(dtype, copy=False))
+        hosts.append(host)
+        joined = host.to(device, non_blocking=non_blocking)
+        offset = 0
+        for name, values in parts.items():
+            out[name] = joined[offset:offset + values.size].view(values.shape)
+            offset += values.size
+    batch.host_buffers = hosts
+    return out
 
 
-@dataclass
-class _FactorLevel:
-    count: int
-    parent_count: int
-    owners: Tensor
-    counts: Tensor
-    parents: Tensor
+def _conditional_log_softmax(scores: Tensor, owners: Tensor, count: int) -> Tensor:
+    """Log-softmax of each score among the scores sharing its owner."""
+    maximum = scores.new_full((count,), -torch.inf)
+    maximum.scatter_reduce_(0, owners, scores, reduce="amax", include_self=True)
+    shifted = scores - maximum.index_select(0, owners)
+    totals = scores.new_zeros((count,))
+    totals.index_add_(0, owners, shifted.exp())
+    return shifted - totals.log().index_select(0, owners)
 
 
-@dataclass
-class _BatchedFactorLevel:
-    count: int
-    parent_count: int
-    owners: Tensor
-    counts: Tensor
-    parents: Tensor
-    state_rows: Tensor
+def _bag(table: Tensor, columns: Tensor, weights: Tensor, rows: Tensor, count: int) -> Tensor:
+    """Sum of weighted column vectors per row: one vector per zone, position or option."""
+    vectors = table.index_select(0, columns) * weights.unsqueeze(1)
+    return vectors.new_zeros((count, table.shape[1])).index_add_(0, rows, vectors)
 
 
-_ACTION_FACTORS = _SourceCache(4 * 1024 * 1024, 4096)
-_FACTOR_LAYOUTS = _SourceCache(8 * 1024 * 1024, 512)
+def _block(inputs: int, dim: int) -> nn.Sequential:
+    return nn.Sequential(nn.Linear(inputs, dim), nn.GELU(), nn.LayerNorm(dim))
 
 
-def _factors_for_action(graph: Any, feature: dict) -> tuple[str, ...]:
-    key = (id(graph),)
-    cached = _ACTION_FACTORS.get(key)
-    if cached is not None:
-        return cached[1]
-    factors = action_factors(feature)
-    _ACTION_FACTORS.put(key, (graph, factors), 256 + sum(len(value.encode("utf-8")) for value in factors), sources=(graph,))
-    return factors
-
-
-def _factor_layout(factors: Sequence[tuple[str, ...]], device: torch.device,
-                   dtype: torch.dtype) -> tuple[_FactorLevel, ...]:
-    factors = tuple(factors)
-    key = (factors, device, dtype)
-    cached = _FACTOR_LAYOUTS.get(key)
-    if cached is not None:
-        return cached
-    levels = []
-    with torch.inference_mode(False):
-        for level in range(1, 5):
-            prefixes = sorted({factor[:level] for factor in factors})
-            lookup = {prefix: index for index, prefix in enumerate(prefixes)}
-            owners = torch.tensor([lookup[factor[:level]] for factor in factors], dtype=torch.long, device=device)
-            counts = torch.bincount(owners, minlength=len(prefixes)).to(dtype).unsqueeze(1)
-            parents = {prefix: index for index, prefix in enumerate(sorted({prefix[:-1] for prefix in prefixes}))}
-            parent_ids = torch.tensor([parents[prefix[:-1]] for prefix in prefixes], dtype=torch.long, device=device)
-            levels.append(_FactorLevel(len(prefixes), len(parents), owners, counts, parent_ids))
-    result = tuple(levels)
-    size = sum(value.numel() * value.element_size() for item in result for value in vars(item).values()
-               if isinstance(value, Tensor))
-    size += 512 + sum(64 + len(value.encode("utf-8")) for factor in factors for value in factor)
-    return _FACTOR_LAYOUTS.put(key, result, size)
-
-
-def _batched_factor_layout(factors: Sequence[Sequence[tuple[str, ...]]], device: torch.device,
-                           dtype: torch.dtype) -> tuple[_BatchedFactorLevel, ...]:
-    factors = tuple(tuple(tuple(value) for value in row) for row in factors)
-    key = ("gpu_batch", factors, device, dtype)
-    cached = _FACTOR_LAYOUTS.get(key)
-    if cached is not None:
-        return cached
-    rows = [(index, _factor_layout(row, torch.device("cpu"), dtype))
-            for index, row in enumerate(factors) if row]
-    levels = []
-    with torch.inference_mode(False):
-        for level in range(4):
-            owners, counts, parents, state_rows = [], [], [], []
-            group_offset = parent_offset = 0
-            for row, layouts in rows:
-                item = layouts[level]
-                owners.append(item.owners + group_offset)
-                counts.append(item.counts)
-                parents.append(item.parents + parent_offset)
-                state_rows.append(torch.full((item.count,), row, dtype=torch.long, device="cpu"))
-                group_offset += item.count
-                parent_offset += item.parent_count
-            require_rows = bool(rows)
-            if not require_rows:
-                raise ValueError("Batched policy factors require at least one legal action")
-            levels.append(_BatchedFactorLevel(group_offset, parent_offset,
-                torch.cat(owners).to(device), torch.cat(counts).to(device),
-                torch.cat(parents).to(device), torch.cat(state_rows).to(device)))
-    result = tuple(levels)
-    size = sum(value.numel() * value.element_size() for item in result for value in vars(item).values()
-               if isinstance(value, Tensor))
-    size += 512 + sum(64 + len(value.encode("utf-8")) for row in factors for factor in row for value in factor)
-    return _FACTOR_LAYOUTS.put(key, result, size)
-
-
-def _clear_static_after_load(module: nn.Module, incompatible_keys: Any) -> None:
-    module.clear_inference_cache()
-
-
-class _GraphEncoder(nn.Module):
-    def __init__(self, config: CampaignModelConfig) -> None:
-        super().__init__()
-        dim = config.hidden_dim
-        self.tokens = nn.EmbeddingBag(config.token_buckets, dim, mode="mean", include_last_offset=True)
-        self.types = nn.Embedding(len(NODE_TYPES), dim)
-        self.numbers = nn.Linear(NUMERIC_DIM, dim)
-        self.relations = nn.Embedding(RELATIONS, dim)
-        self.input_norm = nn.LayerNorm(dim)
-        self.messages = nn.ModuleList(nn.Linear(dim, dim) for _ in range(config.message_layers))
-        self.updates = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.LayerNorm(dim))
-                                     for _ in range(config.message_layers))
-        self.pool = nn.Sequential(nn.Linear(dim * 2 + 1, dim), nn.GELU(), nn.LayerNorm(dim))
-
-    def forward(self, graphs: Sequence[Any], external: Sequence[Sequence[_EncodedGraph]] | None = None) -> list[_EncodedGraph]:
-        if not graphs:
-            return []
-        device, dtype = self.tokens.weight.device, self.tokens.weight.dtype
-        layout = _encoder_layout(graphs, external, device, dtype)
-        encoded = self.tokens(layout.ids, layout.offsets) + self.types(layout.types)
-        encoded = self.input_norm(encoded + self.numbers(layout.numbers))
-        # External vectors are always read from this forward's learned state.
-        if layout.external_joined_indices is not None:
-            bank = torch.cat([external[row][column].nodes for row, column in layout.external_banks])
-            external_nodes = bank.index_select(0, layout.external_joined_indices)
-        else:
-            external_chunks = ([external[row][column].nodes.index_select(0, indices)
-                                for row, column, indices in layout.external] if external is not None else [])
-            external_nodes = torch.cat(external_chunks) if external_chunks else None
-        for message, update in zip(self.messages, self.updates, strict=True):
-            bank = torch.cat((encoded, external_nodes)) if external_nodes is not None else encoded
-            gathered = bank.index_select(0, layout.sources) + self.relations(layout.relations)
-            aggregate = torch.zeros_like(encoded)
-            aggregate.index_add_(0, layout.targets, message(gathered))
-            encoded = encoded + update(torch.cat((encoded, aggregate / layout.degree), dim=1))
-        summed = encoded.new_zeros((len(graphs), encoded.shape[1]))
-        summed.index_add_(0, layout.owners, encoded)
-        maximum = encoded.new_full(summed.shape, -torch.inf)
-        maximum.scatter_reduce_(0, layout.owners.unsqueeze(1).expand_as(encoded), encoded, reduce="amax", include_self=True)
-        pooled = self.pool(torch.cat((summed / layout.counts, maximum, layout.counts.log1p()), dim=1))
-        return [_EncodedGraph(graph, encoded[layout.starts[row]:layout.starts[row + 1]], pooled[row])
-                for row, graph in enumerate(graphs)]
+def _head(inputs: int, dim: int, outputs: int) -> nn.Sequential:
+    return nn.Sequential(nn.Linear(inputs, dim), nn.GELU(), nn.Linear(dim, outputs))
 
 
 class CampaignPolicyValueNet(nn.Module):
-    """Complete registry/state/action graph model with variable legal menus.
+    """Zone-graph policy/value network for one alliance.
 
-    Static token/topology preparation is reused. Training recomputes all learned
-    embeddings; explicitly versioned frozen inference can reuse registry vectors.
-    Within a batch a shared context is encoded once; its state-independent vectors
-    are safely reused inside that autograd graph.
-    Actions read their own complete parameters plus referenced state/registry
-    entities. All actual legal actions are scored; padded actions never exist.
+    `spec` is the zone layout the inputs must carry; by default the campaign
+    scenario's. The layout's fixed map facts and borders are buffers outside the
+    state dict: the layout version identifies them, and inputs of another
+    layout are refused.
     """
-    def __init__(self, config: CampaignModelConfig, *, device: str | torch.device = "cpu") -> None:
+
+    def __init__(self, config: CampaignModelConfig, *, spec: ZoneSpec | None = None,
+                 device: str | torch.device = "cpu") -> None:
         super().__init__()
         target = resolve_neural_device(device)
-        self.config = config
-        dim = config.hidden_dim
+        spec = default_zone_spec() if spec is None else spec
+        self.config, self.spec = config, spec
+        dim, layers, zones = config.hidden_dim, config.message_layers, len(spec.zones)
         # Identical CPU initialization keeps matched CPU/GPU experiments on the
         # same initial parameters and consumes the same CPU RNG sequence.
         with torch.device("cpu"):
-            self.encoder = _GraphEncoder(config)
-            self.state_encoder = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.LayerNorm(dim))
-            self.policy_head = nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
-            self.factor_heads = nn.ModuleList(nn.Sequential(nn.Linear(dim * 2, dim), nn.GELU(), nn.Linear(dim, 1))
-                                             for _ in range(4))
-            self.value_head = nn.Sequential(nn.Linear(dim, dim), nn.GELU(), nn.Linear(dim, 3))
-        self._static_contexts = _SourceCache(64 * 1024 * 1024, 8)
-        self._static_signature: tuple | None = None
-        self.register_load_state_dict_post_hook(_clear_static_after_load)
+            self.zone_columns = nn.Embedding(spec.zone_columns, dim)
+            self.global_columns = nn.Embedding(spec.global_columns, dim)
+            self.option_columns = nn.Embedding(spec.action_columns, dim)
+            self.zone_identity = nn.Embedding(zones, dim)
+            self.map_facts = nn.Linear(spec.zone_static.shape[1], dim)
+            self.zone_norm, self.global_norm, self.option_norm = nn.LayerNorm(dim), nn.LayerNorm(dim), nn.LayerNorm(dim)
+            self.messages = nn.ModuleList(nn.Linear(dim, dim) for _ in range(layers))
+            self.border_facts = nn.ModuleList(nn.Linear(spec.edge_static.shape[1], dim) for _ in range(layers))
+            self.zone_updates = nn.ModuleList(_block(dim * 3, dim) for _ in range(layers))
+            self.position_updates = nn.ModuleList(_block(dim * 2, dim) for _ in range(layers))
+            self.state_encoder = _block(dim * 3, dim)
+            self.no_zone = nn.Parameter(torch.zeros(dim))
+            self.option_encoder = _block(dim * 4, dim)
+            self.policy_head = _head(dim * 2, dim, 1)
+            self.factor_heads = nn.ModuleList(_head(dim * 2, dim, 1) for _ in range(GROUP_LEVELS))
+            self.value_head = _head(dim, dim, 3)
+        degree = np.maximum(np.bincount(spec.edge_target, minlength=zones), 1).astype(np.float32)[:, None]
+        for name, values in (("zone_static", spec.zone_static), ("edge_source", spec.edge_source),
+                             ("edge_target", spec.edge_target), ("edge_static", spec.edge_static),
+                             ("in_degree", degree)):
+            self.register_buffer(name, torch.from_numpy(np.array(values)), persistent=False)
         self.to(target)
 
-    def clear_inference_cache(self) -> None:
-        self._static_contexts.clear()
-        self._static_signature = None
+    @property
+    def layout_version(self) -> str:
+        return self.spec.version
 
-    def _encode_contexts(self, contexts: Sequence[Any], model_version: str | None) -> list[_EncodedGraph]:
-        # An ordinary no_grad forward is deliberately insufficient: the caller
-        # must supply a frozen policy version, eval mode and inference mode.
-        if model_version is None or self.training or not torch.is_inference_mode_enabled():
-            return self.encoder(contexts)
-        tensors = (*self.parameters(), *self.buffers())
-        try:
-            signature = (model_version, tuple((id(value), value._version, value.device, value.dtype)
-                                              for value in tensors))
-        except RuntimeError:
-            # Inference tensors do not have version counters; do not guess at
-            # whether a parameter created under inference_mode is unchanged.
-            return self.encoder(contexts)
-        if signature != self._static_signature:
-            self.clear_inference_cache()
-            self._static_signature = signature
-        # Preserve the complete ordered context batch. Encoding a context alone
-        # can select a different floating-point matrix kernel from the original
-        # batch, so individual-context learned caches would weaken exact parity.
-        key = (tuple(map(id, contexts)),)
-        cached = self._static_contexts.get(key)
-        if cached is not None:
-            return cached
-        result = self.encoder(contexts)
-        size = sum((item.nodes.numel() + item.pooled.numel()) * item.nodes.element_size() for item in result)
-        return self._static_contexts.put(key, result, size + 256 * len(result), sources=contexts)
-
-    @staticmethod
-    def _conditional_log_softmax(scores: Tensor, owners: Tensor, count: int) -> Tensor:
-        maximum = scores.new_full((count,), -torch.inf)
-        maximum.scatter_reduce_(0, owners, scores, reduce="amax", include_self=True)
-        shifted = scores - maximum.index_select(0, owners)
-        totals = scores.new_zeros((count,))
-        totals.index_add_(0, owners, shifted.exp())
-        return shifted - totals.log().index_select(0, owners)
-
-    def _factored_logits(self, state: Tensor, latent: Tensor, scores: Tensor,
-                         factors: Sequence[tuple[str, ...]]) -> Tensor:
-        """Normalize family -> source/group -> path -> target -> exact action.
-
-        These are neural conditional readouts of the same complete legal menu.
-        No game action is inserted/reordered, no group is declared equivalent,
-        and no leaf is pruned. All sibling scores are evaluated in batches.
-        """
-        levels = _factor_layout(factors, scores.device, latent.dtype)
-        joint = torch.zeros_like(scores)
-        for level, head in zip(levels, self.factor_heads, strict=True):
-            means = latent.new_zeros((level.count, latent.shape[1]))
-            means.index_add_(0, level.owners, latent)
-            group_scores = head(torch.cat((state.expand(level.count, -1), means / level.counts), dim=1)).squeeze(1)
-            conditional = self._conditional_log_softmax(group_scores, level.parents, level.parent_count)
-            joint = joint + conditional.index_select(0, level.owners)
-        return joint + self._conditional_log_softmax(scores, level.owners, level.count)
-
-    def _factored_logits_batch(self, states: Tensor, latent: Tensor, scores: Tensor,
-                               lengths: Sequence[int], factors: Sequence[Sequence[tuple[str, ...]]]) -> Tensor:
-        """The same four conditional heads with disjoint groups across rows."""
-        if len(lengths) != len(factors) or any(count != len(row) for count, row in zip(lengths, factors)):
-            raise ValueError("Batched policy factors differ from complete legal menus")
-        levels = _batched_factor_layout(factors, scores.device, latent.dtype)
-        joint = torch.zeros_like(scores)
-        for level, head in zip(levels, self.factor_heads, strict=True):
-            means = latent.new_zeros((level.count, latent.shape[1]))
-            means.index_add_(0, level.owners, latent)
-            group_scores = head(torch.cat((states.index_select(0, level.state_rows), means / level.counts), dim=1)).squeeze(1)
-            conditional = self._conditional_log_softmax(group_scores, level.parents, level.parent_count)
-            joint = joint + conditional.index_select(0, level.owners)
-        return joint + self._conditional_log_softmax(scores, level.owners, level.count)
-
-    def forward_batch(self, inputs: Sequence[dict[str, Any]], *,
-                      model_version: str | None = None) -> tuple[list[Tensor], Tensor]:
-        if self.value_head[-1].weight.device.type == "mps":
-            # Also covers callers using the normal PyTorch model.to('mps') API.
-            _require_no_mps_fallback()
+    def forward_batch(self, inputs: Sequence[Any]) -> tuple[list[Tensor], Tensor]:
+        """Logits for every listed option of each input, and its three values."""
         if not inputs:
             return [], self.value_head[-1].weight.new_empty((0, 3))
-        contexts, context_rows, context_lookup = [], [], {}
-        observations, action_graphs, action_rows, lengths, factors = [], [], [], [], []
-        for row, item in enumerate(inputs):
-            if item.get("schema") == NUMERIC_SCHEMA:
-                if set(item) != {"schema", "owner", "context_key", "packed_graph"}:
-                    raise ValueError("Unsupported campaign numerical input schema")
-                packed = item["packed_graph"]
-                if not isinstance(packed, dict) or set(packed) != {"context", "observation", "actions", "action_factors"}:
-                    raise ValueError("Numerical inputs need complete context, observation, actions and factors")
-                context_key = item["context_key"]
-                context, observation, menu = packed["context"], packed["observation"], packed["actions"]
-                if any(getattr(graph, "token_buckets", self.config.token_buckets) != self.config.token_buckets
-                       for graph in (context, observation, *menu)):
-                    raise ValueError("Numerical graphs do not match the model's lexical vocabulary")
-                row_factors = tuple(tuple(factor) for factor in packed["action_factors"])
-                if len(row_factors) != len(menu) or any(len(factor) != 4 or any(not isinstance(value, str) for value in factor)
-                                                       for factor in row_factors):
-                    raise ValueError("Each numerical action needs its four exact policy factors")
-            elif item.get("schema") == SCHEMA:
-                if set(item) != {"schema", "observation", "context", "actions"}:
-                    raise ValueError("Unsupported campaign neural input schema")
-                if not isinstance(item["observation"], dict) or not isinstance(item["context"], dict) or not isinstance(item["actions"], list):
-                    raise ValueError("Neural inputs need observation/context objects and an action list")
-                context_text = canonical(item["context"])
-                context_key = context_source_key(context_text)
-                context = cached_context(context_text, self.config.token_buckets)
-                observation = cached_observation(canonical(item["observation"]), self.config.token_buckets)
-                menu, row_factors = [], []
-                for action in item["actions"]:
-                    if not isinstance(action, dict):
-                        raise ValueError("Each legal action needs a complete feature object")
-                    graph = cached_action(canonical(action), self.config.token_buckets)
-                    menu.append(graph)
-                    row_factors.append(_factors_for_action(graph, action))
-            else:
-                raise ValueError("Unsupported campaign neural input schema")
-            if context_key not in context_lookup:
-                context_lookup[context_key] = len(contexts)
-                contexts.append(context)
-            context_rows.append(context_lookup[context_key])
-            observations.append(observation)
-            lengths.append(len(menu))
-            factors.append(row_factors)
-            for graph in menu:
-                action_graphs.append(graph)
-                action_rows.append(row)
-        static = self._encode_contexts(contexts, model_version)
-        dynamic = self.encoder(observations, [[static[index]] for index in context_rows])
-        states = self.state_encoder(torch.stack([torch.cat((dynamic[row].pooled, static[index].pooled))
-                                                for row, index in enumerate(context_rows)]))
-        values = self.value_head(states)  # Unbounded, in raw-value/value_scale units.
-        if not action_graphs:
-            return [values.new_empty((0,)) for _ in inputs], values
-        actions = self.encoder(action_graphs, [[dynamic[row], static[context_rows[row]]] for row in action_rows])
-        owners = torch.tensor(action_rows, dtype=torch.long, device=states.device)
-        joint = torch.cat((states.index_select(0, owners), torch.stack([action.pooled for action in actions])), dim=1)
-        all_logits = self.policy_head(joint).squeeze(1)
-        logits = list(all_logits.split(lengths))
-        if self.config.policy_factorization:
-            action_latent = torch.stack([action.pooled for action in actions])
-            if states.device.type != "cpu":
-                logits = list(self._factored_logits_batch(states, action_latent, all_logits, lengths, factors).split(lengths))
-            else:
-                offset = 0
-                for row, count in enumerate(lengths):
-                    if count:
-                        logits[row] = self._factored_logits(states[row], action_latent[offset:offset + count],
-                                                           logits[row], factors[row])
-                    offset += count
-        return logits, values
+        batch = pack_zone_inputs(inputs, self.spec)
+        scores, values = self.forward_packed(batch)
+        return list(scores.split(batch.option_counts)), values
 
-    def forward(self, inputs: Sequence[dict[str, Any]]) -> tuple[list[Tensor], Tensor]:
+    def forward(self, inputs: Sequence[Any]) -> tuple[list[Tensor], Tensor]:
         return self.forward_batch(inputs)
 
+    def forward_packed(self, batch: ZoneBatch, *, non_blocking: bool = False) -> tuple[Tensor, Tensor]:
+        """Every listed option's logit, in position order, and each position's values.
 
-def clear_neural_caches(models: Sequence[CampaignPolicyValueNet] = (), *,
-                        device: str | torch.device | None = None, release_allocator: bool = False) -> None:
-    """Explicit cold-benchmark cleanup; never called automatically per decision.
+        The pass for decisions already laid out by features.pack_zone_arrays.
+        With non_blocking, keep `batch` until the outputs are read (batch_tensors).
+        """
+        device = self.value_head[-1].weight.device
+        if device.type == "mps":
+            # Also covers callers using the normal PyTorch model.to('mps') API.
+            _require_no_mps_fallback()
+        t = batch_tensors(batch, device, non_blocking=non_blocking)
+        positions, zones, dim = batch.positions, batch.zones, self.config.hidden_dim
+        nodes = positions * zones
+        local = _bag(self.zone_columns.weight, t["zone_column"], t["zone_weight"], t["zone_rows"], nodes)
+        local = local.view(positions, zones, dim) + self.zone_identity.weight + self.map_facts(self.zone_static)
+        h = self.zone_norm(local).reshape(nodes, dim)
+        u = self.global_norm(_bag(self.global_columns.weight, t["global_column"], t["global_weight"],
+                                  t["global_rows"], positions))
+        shift = torch.arange(positions, device=device).repeat_interleave(len(self.edge_source)) * zones
+        sources, targets = self.edge_source.repeat(positions) + shift, self.edge_target.repeat(positions) + shift
+        degree = self.in_degree.repeat(positions, 1)
+        for message, border, zone_update, position_update in zip(
+                self.messages, self.border_facts, self.zone_updates, self.position_updates, strict=True):
+            sent = F.gelu(message(h).index_select(0, sources) + border(self.edge_static).repeat(positions, 1))
+            received = h.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
+            h = h + zone_update(torch.cat((h, received, u.repeat_interleave(zones, 0)), dim=1))
+            u = u + position_update(torch.cat((u, h.view(positions, zones, dim).mean(1)), dim=1))
+        grid = h.view(positions, zones, dim)
+        states = self.state_encoder(torch.cat((u, grid.mean(1), grid.amax(1)), dim=1))
+        values = self.value_head(states)  # Unbounded, in raw-value/value_scale units.
+        if not batch.options:
+            return values.new_empty((0,)), values
+        options = self.option_norm(_bag(self.option_columns.weight, t["action_column"], t["action_weight"],
+                                        t["action_rows"], batch.options))
+        bank = torch.cat((h, self.no_zone.unsqueeze(0)))
+        path = h.new_zeros((batch.options, dim)).index_add_(
+            0, t["path_option"], bank.index_select(0, t["path_zone"])) * t["path_scale"]
+        latent = self.option_encoder(torch.cat((options, bank.index_select(0, t["action_source"]),
+                                                bank.index_select(0, t["action_target"]), path), dim=1))
+        scores = self.policy_head(torch.cat((states.index_select(0, t["action_position"]), latent), dim=1)).squeeze(1)
+        if self.config.policy_factorization:
+            scores = self._factored(states, latent, scores, t, batch)
+        return scores, values
 
-    Clear source/device tensors and supplied models' learned inference caches.
-    Live caller references, model weights and optimizer state remain allocated.
-    """
-    global _GRAPH_TENSOR_BYTES
-    if release_allocator and device is None:
-        raise ValueError("Allocator release requires an explicit neural device")
-    target = resolve_neural_device(device) if device is not None else None
-    with _GRAPH_TENSOR_LOCK:
-        _GRAPH_TENSORS.clear()
-        _GRAPH_TENSOR_BYTES = 0
-    for cache in (_REFERENCE_INDICES, _REFERENCE_METADATA, _ENCODER_LAYOUTS, _ACTION_FACTORS, _FACTOR_LAYOUTS):
-        cache.clear()
-    for model in models:
-        model.clear_inference_cache()
-    if release_allocator:
-        synchronize_neural_device(target)
-        if target.type == "mps":
-            torch.mps.empty_cache()
-        elif target.type == "cuda":
-            with torch.cuda.device(target):
-                torch.cuda.empty_cache()
+    def _factored(self, states: Tensor, latent: Tensor, scores: Tensor, t: dict[str, Tensor],
+                  batch: ZoneBatch) -> Tensor:
+        """Normalize kind -> what acts -> how it travels -> what it acts on -> exact option.
+
+        These are neural conditional readouts of the same complete legal menu.
+        No option is inserted, reordered, merged or pruned; each level scores
+        a group from the mean vector of its options.
+        """
+        joint = torch.zeros_like(scores)
+        parents = batch.positions
+        for level, head in enumerate(self.factor_heads):
+            owners, count = t[f"group{level}_owners"], batch.group_counts[level]
+            means = latent.new_zeros((count, latent.shape[1])).index_add_(0, owners, latent) / t[f"group{level}_counts"]
+            group_scores = head(torch.cat((states.index_select(0, t[f"group{level}_rows"]), means), dim=1)).squeeze(1)
+            joint = joint + _conditional_log_softmax(group_scores, t[f"group{level}_parents"], parents).index_select(0, owners)
+            parents = count
+        return joint + _conditional_log_softmax(scores, t[f"group{GROUP_LEVELS - 1}_owners"], parents)
 
 
 def _gpu_evaluation_outputs(logits: Sequence[Tensor], values: Tensor, counts: Sequence[int],
@@ -839,17 +340,6 @@ class NeuralEvaluator:
             raise ValueError("Neural evaluator needs a nonempty version")
         self.models, self.version = dict(models), version
         self.runtime_policy = runtime_policy
-        self._versioned_forward: dict[str, bool] = {}
-        for player, model in self.models.items():
-            try:
-                parameters = inspect.signature(model.forward_batch).parameters.values()
-                supported = any(parameter.kind == inspect.Parameter.VAR_KEYWORD or
-                                (parameter.name == "model_version" and parameter.kind in
-                                 {inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY})
-                                for parameter in parameters)
-            except (TypeError, ValueError):
-                supported = False
-            self._versioned_forward[player] = isinstance(model, CampaignPolicyValueNet) and supported
 
     @property
     def concurrent_evaluation(self) -> bool:
@@ -862,7 +352,7 @@ class NeuralEvaluator:
 
     def evaluate_batch(self, requests: Sequence[tuple[Any, Sequence[Any]]]) -> list[Evaluation]:
         results: list[Evaluation | None] = [None] * len(requests)
-        groups: dict[str, list[tuple[int, dict[str, Any]]]] = {player: [] for player in PLAYERS}
+        groups: dict[str, list[tuple[int, Any]]] = {player: [] for player in PLAYERS}
         chance_values: dict[int, list[tuple[float, float, float]]] = {}
         for row, (env, actions) in enumerate(requests):
             if env.is_terminal():
@@ -871,32 +361,15 @@ class NeuralEvaluator:
                 results[row] = Evaluation([], vector(env.returns()))
                 continue
             actor = env.current_decision_player()
-            prepared: dict[int | None, dict] = {}
-
-            def input_for(player: str) -> dict:
-                model = self.models[player]
-                buckets = model.config.token_buckets if self._versioned_forward[player] else None
-                if buckets not in prepared:
-                    if buckets is None:
-                        prepared[buckets] = make_input(env, actions)
-                    else:
-                        # Portable environments and old replays retain the raw
-                        # fallback. Distinct actor vocabularies stay independent.
-                        try:
-                            from .features import make_numeric_input
-                        except ImportError:
-                            prepared[buckets] = make_input(env, actions)
-                        else:
-                            prepared[buckets] = make_numeric_input(env, actions, buckets)
-                return prepared[buckets]
             if actor is None:
                 if env.decision_kind() != "chance" or actions:
                     raise ValueError("An ownerless nonterminal evaluation must be a chance cutoff")
+                item = make_zone_input(env, ())
                 chance_values[row] = []
                 for player in PLAYERS:
-                    groups[player].append((row, input_for(player)))
+                    groups[player].append((row, item))
             elif actor in PLAYERS:
-                groups[actor].append((row, input_for(actor)))
+                groups[actor].append((row, make_zone_input(env, actions)))
             else:
                 raise ValueError(f"Unknown campaign decision player: {actor}")
         for player in PLAYERS:
@@ -909,15 +382,11 @@ class NeuralEvaluator:
             try:
                 with torch.inference_mode():
                     batch = [item for _, item in groups[player]]
-                    if self._versioned_forward[player]:
-                        logits, values = model.forward_batch(batch, model_version=self.version)
-                    else:
-                        logits, values = model.forward_batch(batch)
-                    if values.shape != (len(groups[player]), 3) or len(logits) != len(groups[player]):
+                    logits, values = model.forward_batch(batch)
+                    if values.shape != (len(batch), 3) or len(logits) != len(batch):
                         raise ValueError("Neural model returned an invalid batch shape")
+                    counts = [item.action_count for item in batch]
                     if values.device.type != "cpu":
-                        counts = [len(item["packed_graph"]["actions"]) if item["schema"] == NUMERIC_SCHEMA
-                                  else len(item["actions"]) for _, item in groups[player]]
                         host_priors, host_values = _gpu_evaluation_outputs(logits, values, counts, model.config.value_scale)
                         for index, (row, _) in enumerate(groups[player]):
                             if row in chance_values:
@@ -925,11 +394,10 @@ class NeuralEvaluator:
                             else:
                                 results[row] = Evaluation(host_priors[index], host_values[index])
                         completed_mps_forward = values.device.type == "mps"
-                        continue  # The existing finally still restores model.train(training).
-                    for index, (row, item) in enumerate(groups[player]):
+                        continue  # The finally still restores model.train(training).
+                    for index, (row, _) in enumerate(groups[player]):
                         scores = logits[index]
-                        count = len(item["packed_graph"]["actions"]) if item["schema"] == NUMERIC_SCHEMA else len(item["actions"])
-                        if scores.shape != (count,) or not torch.isfinite(scores).all():
+                        if scores.shape != (counts[index],) or not torch.isfinite(scores).all():
                             raise ValueError("Neural policy must contain one finite logit per legal action")
                         raw = vector((values[index] * model.config.value_scale).tolist())
                         if row in chance_values:

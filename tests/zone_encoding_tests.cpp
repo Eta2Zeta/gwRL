@@ -33,13 +33,29 @@ bool sameInput(const ZoneInput& a, const ZoneInput& b) {
            a.globalColumn == b.globalColumn && a.globalValue == b.globalValue && a.actionOffsets == b.actionOffsets &&
            a.actionColumn == b.actionColumn && a.actionValue == b.actionValue && a.actionSource == b.actionSource &&
            a.actionTarget == b.actionTarget && a.pathOffsets == b.pathOffsets && a.pathZone == b.pathZone &&
-           a.factors == b.factors;
+           a.factorGroups == b.factorGroups;
 }
 
 // Every stored answer is nonzero, in range and listed once, in sorted order.
 void requireWellFormed(const ZoneEncodingSpec& spec, const ZoneInput& z, std::size_t options) {
     const auto zones = static_cast<int>(spec.zones.size());
-    require(z.actionCount() == options && z.factors.size() == options, "Every option is encoded once");
+    require(z.actionCount() == options && z.factorGroups.size() == 4 * options, "Every option is encoded once");
+    // Policy groups: numbered from zero in order of first appearance, each
+    // group inside one group of the level above.
+    std::vector<int> above(options, 0);
+    for (std::size_t level = 0; level < 4; ++level) {
+        std::map<int, int> parent;
+        int next = 0;
+        for (std::size_t a = 0; a < options; ++a) {
+            const int group = z.factorGroups[4 * a + level];
+            if (!parent.contains(group)) {
+                require(group == next++, "Policy groups are numbered in order of first appearance");
+                parent[group] = above[a];
+            }
+            require(parent[group] == above[a], "Policy groups are nested");
+        }
+        for (std::size_t a = 0; a < options; ++a) above[a] = z.factorGroups[4 * a + level];
+    }
     for (std::size_t i = 0; i < z.zoneIndex.size(); ++i) {
         require(z.zoneIndex[i] >= 0 && z.zoneIndex[i] < zones, "Zone index out of range");
         require(z.zoneColumn[i] >= 0 && z.zoneColumn[i] < spec.zoneColumns, "Zone column out of range");

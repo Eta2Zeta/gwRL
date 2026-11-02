@@ -37,10 +37,8 @@ def _play_game(settings: Mapping[str, Any], evaluator: Any, task: Mapping[str, A
     try:
         env = make_env(task["seed"], calendar_rounds=settings["calendar_rounds"])
         result = play_episode(env, evaluator, config=LearningConfig(**settings["learning_config"]),
-                              rules_version=settings["rules_version"], numeric=settings["numeric"],
-                              token_buckets=settings["model_config"]["token_buckets"],
-                              batch_version=task["batch_version"], environment_seed=task["seed"],
-                              max_transitions=task["max_transitions"])
+                              rules_version=settings["rules_version"], batch_version=task["batch_version"],
+                              environment_seed=task["seed"], max_transitions=task["max_transitions"])
     except Exception as error:
         # Its seed and weights reproduce it.
         return {"root": task["root"], "seed": task["seed"], "failure": f"{type(error).__name__}: {error}",
@@ -70,10 +68,8 @@ def _play_shared(settings: Mapping[str, Any], task: Mapping[str, Any], evaluator
 
 
 def _shared_process(settings: Mapping[str, Any], batch_version: str, *arguments: Any) -> None:
-    from .numeric_storage import pack_as_bytes
     from .shared_evaluator import game_process
-    pack_as_bytes()
-    game_process(partial(_play_shared, settings), settings["model_config"]["token_buckets"], batch_version, *arguments)
+    game_process(partial(_play_shared, settings), batch_version, *arguments)
 
 
 class EpisodeWorkers:
@@ -84,12 +80,12 @@ class EpisodeWorkers:
     """
 
     def __init__(self, processes: int, *, calendar_rounds: int | None, model_config: Mapping[str, Any],
-                 learning_config: Mapping[str, Any], rules_version: str, numeric: bool):
+                 learning_config: Mapping[str, Any], rules_version: str):
         if type(processes) is not int or processes <= 0:
             raise ValueError("Episode workers must be a positive integer")
         self.processes = processes
         settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
-                    "learning_config": dict(learning_config), "rules_version": rules_version, "numeric": numeric}
+                    "learning_config": dict(learning_config), "rules_version": rules_version}
         self._executor = ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("spawn"),
                                              initializer=_initialize, initargs=(settings,))
 
@@ -128,24 +124,21 @@ class SharedEpisodeWorkers:
     """Game processes for one batch at a time, with their positions evaluated here.
 
     Several games share each process, one per thread, so the evaluator's batches
-    fill. Processes last one batch: a batch's context encodings and the record of
-    contexts already sent belong to its weights, and a batch is long enough that
-    starting them costs little.
+    fill. Processes last one batch, which is long enough that starting them
+    costs little.
     """
 
     def __init__(self, processes: int, games_per_process: int, *, device: Any, runtime_policy: Any = None,
                  calendar_rounds: int | None, model_config: Mapping[str, Any], learning_config: Mapping[str, Any],
-                 rules_version: str, numeric: bool):
+                 rules_version: str):
         from studies.shared.multiplayer_mcts import PLAYERS
         from .neural import CampaignModelConfig, CampaignPolicyValueNet
         if type(processes) is not int or processes <= 0 or type(games_per_process) is not int or games_per_process <= 0:
             raise ValueError("Shared episode workers need positive process and game counts")
-        if not numeric:
-            raise ValueError("The shared evaluator needs native numerical inputs")
         self.processes, self.games_per_process = processes, games_per_process
         self.device, self.runtime_policy = device, runtime_policy
         self.settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
-                         "learning_config": dict(learning_config), "rules_version": rules_version, "numeric": numeric}
+                         "learning_config": dict(learning_config), "rules_version": rules_version}
         config = CampaignModelConfig(**model_config)
         self.models = {player: CampaignPolicyValueNet(config, device=device).eval() for player in PLAYERS}
         self.serving = None

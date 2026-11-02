@@ -808,7 +808,7 @@ class Builder {
             factors[2] += "|";
             for (const int zone : path_) factors[2] += std::to_string(zone) + ",";
         }
-        out.factors.push_back(std::move(factors));
+        factorText_.push_back(std::move(factors));
         option_.clear();
         for (auto& group : groups_) group.clear();
         path_.clear();
@@ -832,6 +832,23 @@ class Builder {
         }
     }
 
+    // Numbers the options' policy groups, level by level.
+    void finishGroups(ZoneInput& out) {
+        std::unordered_map<std::string, int> first;
+        std::array<std::map<std::pair<int, std::string>, int>, 3> deeper;
+        out.factorGroups.reserve(factorText_.size() * 4);
+        for (auto& text : factorText_) {
+            int id = first.try_emplace(std::move(text[0]), static_cast<int>(first.size())).first->second;
+            out.factorGroups.push_back(id);
+            for (std::size_t level = 0; level < deeper.size(); ++level) {
+                auto& groups = deeper[level];
+                id = groups.try_emplace({id, std::move(text[level + 1])}, static_cast<int>(groups.size())).first->second;
+                out.factorGroups.push_back(id);
+            }
+        }
+        factorText_.clear();
+    }
+
   private:
     static void merge(std::vector<std::pair<int, int>>& entries) {
         std::sort(entries.begin(), entries.end());
@@ -848,6 +865,7 @@ class Builder {
     std::vector<std::array<int, 3>> zones_;
     std::vector<std::pair<int, int>> globals_, option_;
     std::array<std::vector<std::pair<int, int>>, 3> groups_;
+    std::vector<std::array<std::string, 4>> factorText_;
     std::vector<int> path_;
     int source_{-1}, target_{-1}, other_{-1};
 };
@@ -1460,9 +1478,7 @@ std::size_t ZoneInput::bytes() const {
     for (const auto* v : {&zoneIndex, &zoneColumn, &zoneValue, &globalColumn, &globalValue, &actionOffsets,
                           &actionColumn, &actionValue, &actionSource, &actionTarget, &pathOffsets, &pathZone})
         total += v->size() * sizeof(std::int32_t);
-    for (const auto& f : factors)
-        for (const auto& text : f) total += text.size();
-    return total;
+    return total + factorGroups.size() * sizeof(std::int32_t);
 }
 
 std::shared_ptr<const ZoneEncodingSpec> zoneEncodingSpec(const State& s) {
@@ -1504,6 +1520,7 @@ ZoneInput encodeZoneInput(const State& s, const ZoneSchedule& schedule, const st
         }
         b.finishOption(out, kind);
     }
+    b.finishGroups(out);
     return out;
 }
 

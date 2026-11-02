@@ -15,11 +15,11 @@ from tests.test_campaign_neural import PublicEnv, action
 class ConstantDeviceNet(nn.Module):
     def __init__(self, device):
         super().__init__()
-        self.config = CampaignModelConfig(hidden_dim=8, token_buckets=64)
+        self.config = CampaignModelConfig(hidden_dim=8)
         self.value = nn.Parameter(torch.tensor([.25, -.1, .7], device=device))
 
     def forward_batch(self, items):
-        return [torch.arange(len(item["actions"]), device=self.value.device, dtype=self.value.dtype) for item in items], \
+        return [torch.arange(item.action_count, device=self.value.device, dtype=self.value.dtype) for item in items], \
             self.value.expand(len(items), -1)
 
 

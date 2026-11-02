@@ -30,7 +30,7 @@ class CampaignRunTests(unittest.TestCase):
 
     flags = ["--batches", "2", "--transitions-per-batch", "2", "--parallel-envs", "2",
              "--simulations", "1", "--max-depth", "2", "--hidden-dim", "8",
-             "--message-layers", "1", "--token-buckets", "128", "--batch-size", "4",
+             "--message-layers", "1", "--batch-size", "4",
              "--epochs", "1", "--replay-capacity", "32", "--threads", "1",
              "--seed", "1947", "--checkpoint-every-waves", "1", "--calendar-rounds", "1"]
 

@@ -29,7 +29,7 @@ class CampaignModelExportTests(unittest.TestCase):
         self.old_threads = torch.get_num_threads()
         self.old_random = random.getstate(), np.random.get_state(), torch.get_rng_state()
         torch.set_num_threads(1)
-        self.config = RunConfig(calendar_rounds=3, hidden_dim=8, token_buckets=128, threads=1)
+        self.config = RunConfig(calendar_rounds=3, hidden_dim=8, threads=1)
         self.env = make_env(self.config.seed, calendar_rounds=3)
         self.learner = _learner(self.config, self.env)
         self.runner = {"config": asdict(self.config), "task": task_manifest(self.env),
@@ -63,7 +63,10 @@ class CampaignModelExportTests(unittest.TestCase):
         self.assertEqual(set(value["models"]), set(PLAYERS))
         self.assertEqual(manifest["model_versions"], self.learner.model_versions())
         self.assertEqual(manifest["bytes"], self.path.stat().st_size)
-        self.assertLess(manifest["bytes"], 200_000)
+        # The three networks and small metadata: no replay, optimizer or game state.
+        tensors = sum(tensor.numel() * tensor.element_size() for model in value["models"].values()
+                      for tensor in model.values())
+        self.assertLess(manifest["bytes"], tensors + 200_000)
 
     def test_model_only_loading_never_constructs_a_learner_or_optimizer(self):
         save_model_export(self.path, self.learner, self.runner)

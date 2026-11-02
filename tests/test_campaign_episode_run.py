@@ -17,11 +17,19 @@ from unittest.mock import patch
 import numpy as np
 import torch
 
+import gwrl_cpp
 from studies.campaign import run
 from studies.campaign.learning import CampaignLearner, LearningConfig
 from studies.campaign.neural import CampaignModelConfig
 from studies.shared.multiplayer_mcts import PLAYERS
 from test_campaign_learning import LearningToyEnv, TinyNet
+
+
+EPISODE_COLUMN = 4
+
+
+def episode_tag(seed):
+    return seed % 1_000_003 + 1
 
 
 class EpisodeRunEnv(LearningToyEnv):
@@ -51,6 +59,15 @@ class EpisodeRunEnv(LearningToyEnv):
     def planning_key(self):
         return json.dumps([super().planning_key(), self.finish_at])
 
+    def zone_input(self, actions):
+        # One more position answer tags the episode, so replay rows can be
+        # matched with their own episode's terminal returns.
+        zone = super().zone_input(actions)
+        arrays = zone.arrays()
+        arrays["global_column"] = np.append(arrays["global_column"], EPISODE_COLUMN).astype(np.int32)
+        arrays["global_value"] = np.append(arrays["global_value"], episode_tag(self.episode_seed)).astype(np.int32)
+        return gwrl_cpp.campaign_zone_input(zone.version, arrays)
+
     def wealth(self):
         return {player: {"income_rate": amount, "units": 0, "treasury": 0,
                          "infrastructure": 0, "paid_construction": 0, "wealth": amount}
@@ -78,7 +95,7 @@ class CampaignEpisodeRunTests(unittest.TestCase):
 
     config = {"seed": 1947, "calendar_rounds": 1, "batches": 2,
               "transitions_per_batch": 10, "parallel_envs": 4, "simulations": 2,
-              "max_depth": 6, "hidden_dim": 8, "message_layers": 1, "token_buckets": 128,
+              "max_depth": 6, "hidden_dim": 8, "message_layers": 1,
               "batch_size": 8, "epochs": 1, "replay_capacity": 128, "threads": 1,
               "checkpoint_every_waves": None, "complete_episodes": True}
 
@@ -119,8 +136,7 @@ class CampaignEpisodeRunTests(unittest.TestCase):
         random.seed(config.seed)
         np.random.seed(config.seed % 2**32)
         torch.manual_seed(config.seed)
-        model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
-            token_buckets=config.token_buckets, value_scale=config.value_scale)
+        model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers, value_scale=config.value_scale)
         learning_config = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
             batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
             replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed)
@@ -218,8 +234,12 @@ class CampaignEpisodeRunTests(unittest.TestCase):
         self.assertTrue(all(row["target_source"] == "terminal" for row in learner["replay"]))
         terminal_values = {episode["seed"]: episode["observed_terminal_returns"]
                            for batch in runner["updates"] for episode in batch["episodes"]}
+        by_tag = {episode_tag(seed): values for seed, values in terminal_values.items()}
+        self.assertEqual(len(by_tag), len(terminal_values))
         for row in learner["replay"]:
-            self.assertEqual(row["values"], terminal_values[row["input"]["observation"]["state"]["episode_seed"]])
+            arrays = row["input"].arrays()
+            tag = int(arrays["global_value"][list(arrays["global_column"]).index(EPISODE_COLUMN)])
+            self.assertEqual(row["values"], by_tag[tag])
         self.assertEqual({row["owner"] for row in learner["replay"]}, set(PLAYERS))
         self.assertIsNone(learner["frozen_models"])
         self.assertTrue(all(not pending for pending in learner["parallel_pending"]))

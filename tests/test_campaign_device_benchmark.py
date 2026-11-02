@@ -160,7 +160,6 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         self.assertEqual(first[3]["weights_sha256"], second[3]["weights_sha256"])
         self.assertEqual(first[3]["config"]["hidden_dim"], 16)
         self.assertEqual(first[3]["config"]["message_layers"], 1)
-        self.assertEqual(first[3]["config"]["token_buckets"], 2048)
         self.assertTrue(all(parameter.device.type == "cpu" for model in first[0].values() for parameter in model.parameters()))
 
     def run_toy(self, steps=1, cap=5000, seeds=(7,), choose=lambda env: "move", fail=None):

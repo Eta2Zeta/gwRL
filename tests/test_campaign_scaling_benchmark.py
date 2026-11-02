@@ -35,7 +35,7 @@ class ScalingBenchmarkTests(unittest.TestCase):
             command = [sys.executable, "-m", "studies.campaign.scaling_benchmark", "--output", str(output),
                        "--mode", "episode", "--roots", "1", "--threads", "1", "--simulations", "1",
                        "--max-depth", "2", "--max-transitions", "2", "--seconds", "30",
-                       "--hidden-dim", "8", "--message-layers", "1", "--token-buckets", "128", "--record-replay"]
+                       "--hidden-dim", "8", "--message-layers", "1", "--record-replay"]
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=40)
             self.assertEqual(result.returncode, 0, result.stderr[-3000:])
             report = json.loads(output.read_text())
@@ -57,7 +57,7 @@ class ScalingBenchmarkTests(unittest.TestCase):
             command = [sys.executable, "-m", "studies.campaign.scaling_benchmark", "--output", str(output),
                        "--mode", "episode", "--roots", "1", "--threads", "1", "--simulations", "1",
                        "--max-depth", "2", "--max-transitions", "30", "--seconds", "60",
-                       "--hidden-dim", "8", "--message-layers", "1", "--token-buckets", "128", "--record-replay"]
+                       "--hidden-dim", "8", "--message-layers", "1", "--record-replay"]
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=70)
             self.assertEqual(result.returncode, 0, result.stderr[-3000:])
             report = json.loads(output.read_text())
@@ -157,7 +157,7 @@ class ScalingBenchmarkTests(unittest.TestCase):
             output = Path(temporary) / "result.json"
             command = [sys.executable, "-m", "studies.campaign.scaling_benchmark", "--output", str(output),
                        "--roots", "2", "--threads", "1", "--simulations", "1", "--max-depth", "2",
-                       "--waves", "1", "--hidden-dim", "8", "--token-buckets", "128", "--seconds", "30"]
+                       "--waves", "1", "--hidden-dim", "8", "--seconds", "30"]
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=40)
             self.assertEqual(result.returncode, 0, result.stderr)
             report = json.loads(output.read_text())
@@ -204,7 +204,7 @@ class ScalingBenchmarkTests(unittest.TestCase):
                        "--roots", "1", "--threads", "1", "--start-nation-index", "2",
                        "--start-phase", "combat_movement", "--start-decision-kind", "combat_movement",
                        "--simulations", "1", "--max-depth", "1",
-                       "--waves", "1", "--seconds", "30", "--hidden-dim", "8", "--token-buckets", "128"]
+                       "--waves", "1", "--seconds", "30", "--hidden-dim", "8"]
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=40)
             self.assertEqual(result.returncode, 0, result.stderr)
             report = json.loads(output.read_text())
@@ -228,7 +228,7 @@ class ScalingBenchmarkTests(unittest.TestCase):
         from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
         from dataclasses import asdict
 
-        config = CampaignModelConfig(hidden_dim=8, message_layers=1, token_buckets=128)
+        config = CampaignModelConfig(hidden_dim=8, message_layers=1)
         models = {player: CampaignPolicyValueNet(config).state_dict() for player in PLAYERS}
         with tempfile.TemporaryDirectory() as temporary:
             checkpoint = Path(temporary) / "trusted.pt"

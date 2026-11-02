@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from studies.campaign.backends import CPUBatchBackend, create_backend
 from studies.campaign.curriculum import make_env
-from studies.campaign.features import make_numeric_input
+from studies.campaign.features import make_zone_input
 from studies.shared.campaign_adapter import ScheduledAction
 from tests.test_campaign_action_interface import ship_fixture
 
@@ -62,7 +62,7 @@ class CampaignBackendParityTests(unittest.TestCase):
     def pair(self, original):
         return original.clone(), CPUBatchBackend([original.clone()])
 
-    def assert_lane(self, reference, backend, lane=0, *, numeric=False):
+    def assert_lane(self, reference, backend, lane=0, *, zone=False):
         self.assertEqual(backend.inspect_states((lane,)), (reference.serialize(),))
         batch = backend.decision_batch((lane,))
         inspection, = backend.inspect_decisions(batch)
@@ -79,21 +79,13 @@ class CampaignBackendParityTests(unittest.TestCase):
         self.assertEqual(tuple(scalar.returns()), tuple(reference.returns()))
         self.assertEqual([action.features() for action in scalar.legal_actions()],
                          [action.features() for action in actions])
-        if numeric:
-            actual, = backend.inspect_numeric(backend.numeric_inputs(batch, buckets=128))
-            expected = make_numeric_input(reference, actions, 128)
-            self.assertEqual(set(actual), set(expected))
-            for key in ("schema", "owner", "context_key"):
-                self.assertEqual(actual[key], expected[key])
-            a, b = actual["packed_graph"], expected["packed_graph"]
-            self.assertEqual(a["context"], b["context"])
-            self.assertEqual(a["observation"], b["observation"])
-            self.assertEqual(tuple(a["actions"]), tuple(b["actions"]))
-            self.assertEqual(tuple(a["action_factors"]), tuple(b["action_factors"]))
+        if zone:
+            actual, = backend.inspect_zone_inputs(backend.zone_inputs(batch))
+            self.assertTrue(actual == make_zone_input(reference, actions))
         return batch
 
-    def apply_kind(self, reference, backend, kind, *, numeric=False):
-        batch = self.assert_lane(reference, backend, numeric=numeric)
+    def apply_kind(self, reference, backend, kind, *, zone=False):
+        batch = self.assert_lane(reference, backend, zone=zone)
         action = next(action for action in reference.legal_actions() if action_kind(action) == kind)
         backend.apply_actions(batch, (action.id,))
         reference.apply_action(action)
@@ -102,35 +94,35 @@ class CampaignBackendParityTests(unittest.TestCase):
     def test_initial_offer_and_pass_preserve_owner_menu_and_every_state_field(self):
         reference, backend = self.pair(make_env(1951, calendar_rounds=2))
         self.assertEqual(reference.decision_kind(), "declaration_offer")
-        self.assert_lane(reference, backend, numeric=True)
+        self.assert_lane(reference, backend, zone=True)
         before = reference.raw.serialize()
-        self.apply_kind(reference, backend, "pass_interrupt", numeric=True)
+        self.apply_kind(reference, backend, "pass_interrupt", zone=True)
         self.assertEqual(reference.raw.serialize(), before)
-        self.assert_lane(reference, backend, numeric=True)
+        self.assert_lane(reference, backend, zone=True)
 
     def test_actual_land_movement_matches_ordered_menu_and_native_input(self):
         reference, backend = self.pair(land_fixture())
         self.assertEqual(reference.decision_kind(), "combat_movement")
-        self.apply_kind(reference, backend, "movement_route", numeric=True)
-        self.assert_lane(reference, backend, numeric=True)
+        self.apply_kind(reference, backend, "movement_route", zone=True)
+        self.assert_lane(reference, backend, zone=True)
 
     def test_pending_naval_force_add_and_route_retain_complete_state(self):
         original = ship_fixture()
         pass_offers(original)
         reference, backend = self.pair(original)
         for kind in ("naval_start_move", "naval_force_add", "naval_route"):
-            self.apply_kind(reference, backend, kind, numeric=True)
-        self.assert_lane(reference, backend, numeric=True)
+            self.apply_kind(reference, backend, kind, zone=True)
+        self.assert_lane(reference, backend, zone=True)
 
     def test_sampled_chance_matches_direct_execution_rng_and_history(self):
         reference, backend = self.pair(chance_fixture())
-        batch = self.assert_lane(reference, backend, numeric=True)
+        batch = self.assert_lane(reference, backend, zone=True)
         request, = backend.inspect_chance_requests(batch)
         self.assertEqual(request, reference.observation()["state"]["chance"])
         self.assertEqual(backend.inspect_states(), (reference.serialize(),))
         backend.resolve_chance(batch)
         reference.resolve_chance()
-        self.assert_lane(reference, backend, numeric=True)
+        self.assert_lane(reference, backend, zone=True)
 
     def test_explicit_outcome_matches_sampled_rule_state_but_preserves_execution_rng(self):
         original = chance_fixture(51)
@@ -222,7 +214,7 @@ class CampaignBackendParityTests(unittest.TestCase):
 
     def test_terminal_snapshot_has_no_owner_or_actions_and_exact_return_vector(self):
         reference, backend = self.pair(terminal_fixture())
-        batch = self.assert_lane(reference, backend, numeric=True)
+        batch = self.assert_lane(reference, backend, zone=True)
         inspection, = backend.inspect_decisions(batch)
         self.assertTrue(inspection.terminal)
         self.assertIsNone(inspection.actor)

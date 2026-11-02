@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import replace
+from functools import lru_cache
 import random
 import unittest
 from unittest.mock import patch
@@ -13,21 +14,35 @@ from studies.campaign.learning import TARGET_SCHEMA
 from studies.shared.multiplayer_mcts import PLAYERS
 from tools.benchmark_campaign_device_updates import (
     COMMON_LOGIT_BIASES, FIXTURE_SCHEMA, RecordingReplayRandom, UpdateConfig, compare_functional_weights,
-    compare_updates, functional_row_indices, perform_update, validate_fixture,
+    compare_updates, functional_row_indices, perform_update, validate_fixture, validate_sample,
 )
 
 
+@lru_cache(maxsize=1)
+def owned_decisions():
+    """Each actor's first decision with two or more options in a random game, cut to two options."""
+    from studies.campaign.curriculum import make_env
+    from studies.campaign.features import make_zone_input
+    env, rng, found = make_env(1951, calendar_rounds=3), random.Random(5), {}
+    while len(found) < len(PLAYERS) and not env.is_terminal():
+        if env.decision_kind() == "chance":
+            env.resolve_chance()
+            continue
+        actions, owner = tuple(env.legal_actions()), env.current_decision_player()
+        if len(actions) > 1 and owner not in found:
+            found[owner] = make_zone_input(env, actions).select([0, 1])
+        env.apply_action(actions[rng.randrange(len(actions))])
+    return found
+
+
 def test_samples():
-    # This small synthetic fixture is exclusively a unit-test workload. The CLI
-    # requires a real three-round terminal game with native numerical inputs.
+    # This small fixture of three real decisions, each repeated, is exclusively
+    # a unit-test workload. The CLI requires a real three-round terminal game.
+    decisions = owned_decisions()
     rows = []
     for index in range(36):
         owner = PLAYERS[index % 3]
-        features = {"schema": "campaign-neural-input-v1", "context": {"registry": {"retained": [1, 2]}},
-                    "observation": {"current_decision_player": owner, "state": {"step": index % 3}},
-                    "actions": [{"id": str(choice), "kind": "play", "player": owner,
-                                 "action": {"kind": "choose", "parameters": {"choice": choice}}} for choice in range(2)]}
-        rows.append({"input": features, "owner": owner, "policy": [.25, .75], "rollout_version": "unit-test-only",
+        rows.append({"input": decisions[owner], "owner": owner, "policy": [.25, .75], "rollout_version": "unit-test-only",
                      "values": [10., -3., -7.], "target_source": "terminal", "target_schema": TARGET_SCHEMA})
     return rows
 
@@ -44,9 +59,9 @@ class CampaignDeviceUpdateTests(unittest.TestCase):
 
     def test_workload_preserves_actual_model_batch_and_epoch_settings(self):
         config = UpdateConfig(devices=("cpu",))
-        self.assertEqual((config.batch_size, config.epochs, config.hidden_dim, config.message_layers,
-                          config.token_buckets), (32, 16, 16, 1, 2048))
-        for change in ({"batch_size": 8}, {"epochs": 1}, {"hidden_dim": 8}, {"token_buckets": 128},
+        self.assertEqual((config.batch_size, config.epochs, config.hidden_dim, config.message_layers),
+                         (32, 16, 16, 1))
+        for change in ({"batch_size": 8}, {"epochs": 1}, {"hidden_dim": 8}, {"replay_capacity": 8192},
                        {"message_layers": 2}, {"devices": ("auto",)}, {"memory_bytes": 31_000_000_000},
                        {"threads": 10}, {"seconds": 3601}, {"game_seed": True}):
             with self.subTest(change=change), self.assertRaises(ValueError):
@@ -97,13 +112,23 @@ class CampaignDeviceUpdateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "changed"):
             validate_fixture(fixture, config)
 
+    def test_rows_are_checked_as_the_learner_checks_replay(self):
+        rows = test_samples()
+        for row in rows[:3]:
+            validate_sample(row, labeled=True)
+            validate_sample({key: row[key] for key in ("input", "owner", "policy", "rollout_version")}, labeled=False)
+        wrong_owner = {**rows[0], "owner": rows[1]["owner"]}
+        for invalid in (wrong_owner, {**rows[0], "policy": [1.]}, {**rows[0], "target_source": "invented"}):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                validate_sample(invalid, labeled=True)
+
     @staticmethod
     def final_weights():
         from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
         with torch.random.fork_rng(devices=[]):
             torch.manual_seed(91)
             return {player: {name: tensor.detach().clone() for name, tensor in
-                             CampaignPolicyValueNet(CampaignModelConfig(hidden_dim=16, message_layers=1, token_buckets=2048)).state_dict().items()}
+                             CampaignPolicyValueNet(CampaignModelConfig(hidden_dim=16, message_layers=1)).state_dict().items()}
                     for player in PLAYERS}
 
     @staticmethod

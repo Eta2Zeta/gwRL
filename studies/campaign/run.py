@@ -28,7 +28,6 @@ from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
 from .episode_workers import EpisodeWorkers, SharedEpisodeWorkers
-from .features import graph_compiler_backend
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
 from .model_export import load_evaluation_models, load_initial_weights, save_model_export, validate_model_export
 from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator, resolve_neural_device
@@ -47,7 +46,6 @@ class RunConfig:
     max_depth: int = 4
     hidden_dim: int = 16
     message_layers: int = 1
-    token_buckets: int = 2048
     value_scale: float = 100.0
     batch_size: int = 8
     epochs: int = 1
@@ -72,7 +70,7 @@ class RunConfig:
                 self.neural_device.startswith("cuda:") and self.neural_device[5:].isdigit()):
             raise ValueError("Neural device must be cpu, mps or an explicit CUDA device")
         positive = ("batches", "transitions_per_batch", "parallel_envs", "simulations", "max_depth",
-                    "hidden_dim", "message_layers", "token_buckets", "batch_size", "epochs",
+                    "hidden_dim", "message_layers", "batch_size", "epochs",
                     "replay_capacity", "threads")
         if any(type(getattr(self, key)) is not int or getattr(self, key) <= 0 for key in positive):
             raise ValueError("Run counts and dimensions must be positive integers")
@@ -148,7 +146,7 @@ def _learner(config: RunConfig, template):
     np.random.seed(config.seed % (2 ** 32))
     torch.manual_seed(config.seed)
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
-        token_buckets=config.token_buckets, value_scale=config.value_scale)
+        value_scale=config.value_scale)
     models = {player: CampaignPolicyValueNet(model_config, device=device).eval() for player in PLAYERS}
     learning = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
@@ -163,8 +161,8 @@ def _save(path: Path, learner: CampaignLearner, runner: dict, *, backup_current=
     descriptor, temporary = tempfile.mkstemp(prefix=".checkpoint-", suffix=".pt", dir=path.parent)
     try:
         with os.fdopen(descriptor, "wb") as handle:
-            # Protocol 5 writes graph frame bytes directly; protocol 2 creates
-            # Latin-1 text copies that inflate mature replay snapshots.
+            # Protocol 5 writes replay arrays' bytes directly; protocol 2 creates
+            # Latin-1 text copies of them.
             torch.save(payload, handle, pickle_protocol=5)
             handle.flush()
             os.fsync(handle.fileno())
@@ -333,7 +331,7 @@ def train(args) -> int:
                 "replay_trace": replay_writer.path.name if replay_writer else None,
                 "software": {"torch": torch.__version__, "device": config.neural_device, "threads": config.threads,
                              "rules_device": "cpu", "search_device": "cpu",
-                             "graph_compiler": graph_compiler_backend()},
+                             "network_input": learner.layout_version},
                 "resources": {"logical_cores": os.cpu_count(), "cpu_budget": config.cpu_budget,
                               "conservative_thread_budget": busy_cores(config),
                               "episode_workers": config.episode_workers,
@@ -374,8 +372,7 @@ def train(args) -> int:
             if learner.env is None:
                 learner.env = template  # Reference context only; workers play from their own seeds.
             settings = dict(calendar_rounds=config.calendar_rounds, model_config=learner.model_config,
-                            learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"],
-                            numeric=learner._numeric_models())
+                            learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"])
             workers = (SharedEpisodeWorkers(config.episode_workers, config.games_per_process,
                                             device=resolve_neural_device(config.neural_device),
                                             runtime_policy=learner._device_runtime, **settings)

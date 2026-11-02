@@ -1,7 +1,10 @@
 # Regional campaign learning
 
 This study uses the approved 1936 China campaign and the shared C++ engine.
-Three separate entity-graph policy/value networks guide vector MCTS. A rollout
+Three separate policy/value networks guide vector MCTS. Each reads the engine's
+fixed [zone encoding](/Users/home/Desktop/gwRL/docs/stage_a/zone_encoding_2026_11_02.md)
+of a decision: the 37 map zones answer fixed questions, and messages pass along
+the map's borders ([network](/Users/home/Desktop/gwRL/docs/stage_a/zone_network_2026_11_02.md)). A rollout
 batch freezes all three policies; training then updates all three together.
 Each policy learns choices made by its actual alliance, including reactions and
 controlled minors. Every value target retains `[Axis, Allies, Comintern]`.
@@ -91,8 +94,7 @@ an independent mutex; clones get separate mutexes, so different boards can run
 native operations concurrently. Overlapping operations on one board remain
 serialized. This is per-call protection, not a transaction across several calls
 on a shared Python adapter; search workers continue owning independent adapters.
-Python JSON conversion and graph-compiler callbacks still require the interpreter
-lock. The four-game search structure and sequential simulations within each
+Python JSON conversion still requires the interpreter lock. The four-game search structure and sequential simulations within each
 individual MCTS search are unchanged. Rebuild the extension after pulling this
 binding change, as shown above.
 
@@ -153,11 +155,10 @@ trusted local checkpoint. It never resumes old game/replay state or updates
 weights. Fixed-root queries are not executed moves or training rows. See the
 scaling report for measured results and reproduction commands.
 
-The [native input compiler](/Users/home/Desktop/gwRL/docs/stage_a/neural_input_2026_10_24.md)
-now constructs the same complete source graph in C++, retaining Python's exact
-Unicode tokenization and numerical features. Reports identify the backend in
-`software.graph_compiler`. Rebuild the extension after pulling this change;
-the model architecture, input schema and learned-gradient behavior are unchanged.
+The network's input is built in C++ by the engine's zone encoder. Reports name
+the input layout in `software.network_input`. Rebuild the extension after
+pulling; checkpoints and exports of the earlier graph-input network cannot be
+loaded.
 
 Self-play now uses the versioned [AI order interface](/Users/home/Desktop/gwRL/docs/stage_a/action_interface_2026_10_24.md)
 by default. Fleet and screening selection make forward progress; undo/cancel
@@ -231,7 +232,7 @@ It includes first-use parsing and warm calls; menu size and game phase matter.
 
 ## Starting a larger experiment
 
-Decision reuse, native graph construction and bounded AI order construction are
+Decision reuse, the zone encoding and bounded AI order construction are
 implemented. Next measure remaining rules/tensor costs and verify completion
 across seeds and search budgets before expanding learning. The four-minute
 16-simulation batch still reaches its guard. The order-interface report records
@@ -255,7 +256,7 @@ with a fresh run. A manual experiment command, to adjust after that pilot, is:
 ./.venv/bin/python -m studies.campaign.run train --full-campaign \
   --batches 10 --transitions-per-batch 32 --parallel-envs 4 \
   --simulations 8 --max-depth 16 --hidden-dim 64 --message-layers 2 \
-  --token-buckets 16384 --batch-size 32 --replay-capacity 4096
+  --batch-size 32 --replay-capacity 4096
 ```
 
 This uses the unchanged eleven-round target. It may require many batches to

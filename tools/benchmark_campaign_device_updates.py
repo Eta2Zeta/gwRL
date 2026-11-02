@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bounded CPU/GPU comparison of the actual three-policy learning update.
 
-One fresh balanced-baseline game supplies complete numerical menus and genuinely
+One fresh balanced-baseline game supplies complete zone-input menus and genuinely
 terminal three-round value labels. Its policy targets are baseline supervision,
 not MCTS targets or evidence of learning strength. Preparation is outside update
 timing. Each fresh device worker runs CampaignLearner.update unchanged, with the
@@ -76,7 +76,6 @@ class UpdateConfig:
     epochs: int = 16
     hidden_dim: int = 16
     message_layers: int = 1
-    token_buckets: int = 2048
     replay_capacity: int = 16384
     learning_rate: float = .001
     value_scale: float = 100.0
@@ -96,23 +95,30 @@ class UpdateConfig:
         require(type(self.memory_bytes) is int and 2_000_000_000 < self.memory_bytes <= 30_000_000_000,
                 "Aggregate benchmark memory must fit thirty GB with a reserve")
         require(all(type(getattr(self, name)) is int for name in (
-            "batch_size", "epochs", "hidden_dim", "message_layers", "token_buckets", "replay_capacity")),
+            "batch_size", "epochs", "hidden_dim", "message_layers", "replay_capacity")),
             "Model and update counts must be integers")
-        require((self.batch_size, self.epochs, self.hidden_dim, self.message_layers, self.token_buckets,
-                 self.replay_capacity, self.learning_rate, self.value_scale) == (32, 16, 16, 1, 2048, 16384, .001, 100.0),
-                "This comparison preserves the campaign's actual batch32/epochs16/model16x1/2048 settings")
+        require((self.batch_size, self.epochs, self.hidden_dim, self.message_layers,
+                 self.replay_capacity, self.learning_rate, self.value_scale) == (32, 16, 16, 1, 16384, .001, 100.0),
+                "This comparison preserves the campaign's actual batch32/epochs16/model16x1 settings")
         for name in ("seconds", "atol", "rtol"):
             value = getattr(self, name)
             require(type(value) in (int, float) and math.isfinite(value) and value > 0, f"Invalid {name}")
         require(self.seconds <= 3600, "The update microbenchmark must be bounded to one hour")
 
 
+def validate_sample(sample, *, labeled):
+    """The learner's own replay-row check, for the campaign scenario's zone layout."""
+    from studies.campaign.features import default_zone_spec
+    from studies.campaign.learning import validate_sample as validate_replay_sample
+    validate_replay_sample(sample, labeled=labeled, spec=default_zone_spec())
+
+
 def prepare_fixture(config, *, factory=None, deadline=None):
     """Save every decision and label it only after a genuine terminal game."""
     from studies.campaign.baselines import scripted_policy
     from studies.campaign.curriculum import compatibility, make_env, task_manifest
-    from studies.campaign.features import NUMERIC_SCHEMA, make_numeric_input
-    from studies.campaign.learning import CampaignLearner, TARGET_SCHEMA, retained_numeric_input
+    from studies.campaign.features import make_zone_input
+    from studies.campaign.learning import TARGET_SCHEMA
     from studies.campaign.run import source_hashes
     from studies.shared.multiplayer_mcts import PLAYERS, OpponentPolicy, action_key, probabilities, vector
     from tools.benchmark_campaign_backends import check_terminal
@@ -136,11 +142,9 @@ def prepare_fixture(config, *, factory=None, deadline=None):
             actions, owner = env.legal_actions(), env.current_decision_player()
             require(owner in PLAYERS and actions, "A real decision lacks an actor or legal menu")
             desired = probabilities(policy.distribution(env, actions), len(actions))
-            features = make_numeric_input(env, actions, config.token_buckets)
-            require(features["schema"] == NUMERIC_SCHEMA, "Real fixture requires direct complete numerical inputs")
-            features = retained_numeric_input(features)
-            sample = {"input": features, "owner": owner, "policy": desired, "rollout_version": policy.version}
-            CampaignLearner._validate_sample(sample, labeled=False, buckets=config.token_buckets)
+            sample = {"input": make_zone_input(env, actions), "owner": owner, "policy": desired,
+                      "rollout_version": policy.version}
+            validate_sample(sample, labeled=False)
             # The same standard sampler consumes the already computed complete
             # distribution instead of regenerating baseline observations twice.
             chosen = OpponentPolicy(policy.version, lambda _env, _actions: desired).sample(env, actions, policy_rng)
@@ -169,8 +173,6 @@ def prepare_fixture(config, *, factory=None, deadline=None):
 
 def validate_fixture(fixture, config):
     from studies.campaign.curriculum import compatibility, make_env, task_manifest
-    from studies.campaign.features import NUMERIC_SCHEMA
-    from studies.campaign.learning import CampaignLearner
     from studies.campaign.run import source_hashes
     from studies.shared.multiplayer_mcts import PLAYERS
     from tools.benchmark_campaign_backends import check_terminal
@@ -189,8 +191,8 @@ def validate_fixture(fixture, config):
             and len(fixture["selected_indices"]) == len(samples), "Incomplete fixture decision records")
     require(set(row["owner"] for row in samples) == set(PLAYERS), "Fixture lacks an actor")
     for row, menu, selected in zip(samples, fixture["menus"], fixture["selected_indices"], strict=True):
-        CampaignLearner._validate_sample(row, labeled=True, buckets=config.token_buckets)
-        require(row["input"]["schema"] == NUMERIC_SCHEMA and row["target_source"] == "terminal" and
+        validate_sample(row, labeled=True)
+        require(row["target_source"] == "terminal" and
                 row["values"] == fixture["terminal_returns"] and len(menu) == len(row["policy"])
                 and len(set(menu)) == len(menu) and type(selected) is int and 0 <= selected < len(menu),
                 "Fixture dropped menu information or contains a nonterminal/mismatched label")
@@ -217,8 +219,8 @@ def perform_update(fixture, device, config):
     """Call actual update once; return small CPU weights for matched comparison."""
     import torch
     from studies.campaign.learning import CampaignLearner, LearningConfig
-    from studies.campaign.neural import (CampaignModelConfig, CampaignPolicyValueNet, clear_neural_caches,
-        neural_device_memory, resolve_neural_device, synchronize_neural_device)
+    from studies.campaign.neural import (CampaignModelConfig, CampaignPolicyValueNet, neural_device_memory,
+        release_device_memory, resolve_neural_device, synchronize_neural_device)
     from studies.shared.multiplayer_mcts import PLAYERS
     from tools.benchmark_campaign_devices import model_digest, mps_allocator_limit
     started = time.perf_counter()
@@ -229,10 +231,10 @@ def perform_update(fixture, device, config):
         torch.mps.set_per_process_memory_fraction(allocator["per_process_fraction"])
     torch.set_num_threads(config.threads)
     samples = validate_fixture(fixture, config)
-    clear_neural_caches(device=target, release_allocator=True)
+    release_device_memory(target)
     torch.manual_seed(config.model_seed)
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
-                                       token_buckets=config.token_buckets, value_scale=config.value_scale)
+                                       value_scale=config.value_scale)
     models = {player: CampaignPolicyValueNet(model_config, device=target).eval() for player in PLAYERS}
     learning = LearningConfig(simulations=16, max_depth=16, batch_size=config.batch_size, epochs=config.epochs,
         learning_rate=config.learning_rate, replay_capacity=config.replay_capacity, value_scale=config.value_scale,
@@ -266,7 +268,7 @@ def perform_update(fixture, device, config):
               "interop_threads": torch.get_num_interop_threads(),
               "runtime_source_sha256": fixture["runtime_source_sha256"], "tool_sha256": fixture["tool_sha256"],
               "allocator": allocator, "settings": asdict(config),
-              "timing_scope": "Actual CampaignLearner.update including first-use device tensor assembly, all three forward/backward/Adam loops, loss host reads and model-version digests; fixture/loading/model setup excluded",
+              "timing_scope": "Actual CampaignLearner.update including every minibatch's zone-input packing and device transfer, all three forward/backward/Adam loops, loss host reads and model-version digests; fixture/loading/model setup excluded",
               "limitation": "Baseline-policy supervised update workload; no self-play throughput or improved play claim"}
     return report, weights
 
@@ -343,8 +345,7 @@ def compare_functional_weights(fixture, first_weights, second_weights, config):
     every model also predicts all three values at every selected position.
     """
     import torch
-    from studies.campaign.learning import _value_only_input
-    from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, clear_neural_caches
+    from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
     from studies.campaign.run import source_hashes
     from studies.shared.multiplayer_mcts import PLAYERS
     from tools.benchmark_campaign_devices import numerical_comparison
@@ -355,7 +356,7 @@ def compare_functional_weights(fixture, first_weights, second_weights, config):
     indices, counts = functional_row_indices(samples)
     selected = [samples[index] for index in indices]
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
-                                       token_buckets=config.token_buckets, value_scale=config.value_scale)
+                                       value_scale=config.value_scale)
     require(set(first_weights) == set(second_weights) == set(PLAYERS), "Functional comparison requires all three models")
     gauge_weights = {}
     for player in PLAYERS:
@@ -381,7 +382,7 @@ def compare_functional_weights(fixture, first_weights, second_weights, config):
                         bool(torch.isfinite(value).all()) for name, value in weights[player].items()),
                         "Functional diagnostics require complete finite CPU weights without dtype conversion")
                 model.load_state_dict(weights[player], strict=True)
-                inputs = [sample["input"] if sample["owner"] == player else _value_only_input(sample["input"])
+                inputs = [sample["input"] if sample["owner"] == player else sample["input"].without_actions()
                           for sample in selected]
                 with torch.inference_mode():
                     logits, values = model.forward_batch(inputs)
@@ -390,7 +391,6 @@ def compare_functional_weights(fixture, first_weights, second_weights, config):
                         "priors": logit.softmax(0).tolist() if logit.numel() else [],
                         "values": value.tolist(), "logits": logit.tolist()}
                         for index, sample, logit, value in zip(indices, selected, logits, raw_values, strict=True)]
-                clear_neural_caches([model], device="cpu")
                 del model, inputs, logits, values, raw_values, expected
             variants[variant] = {"cpu_seconds": time.perf_counter() - before, "by_model": by_model}
     comparisons = {}

@@ -28,8 +28,7 @@ def tiny_learner():
 
 def workers_for(learner, processes):
     return EpisodeWorkers(processes, calendar_rounds=1, model_config=learner.model_config,
-                          learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"],
-                          numeric=learner._numeric_models())
+                          learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"])
 
 
 def outcome(learner):

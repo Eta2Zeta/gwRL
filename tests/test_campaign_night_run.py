@@ -19,7 +19,7 @@ from tools.record_campaign_games import game_arguments
 from tools.supervise_campaign_training import SupervisorConfig, validate_training_arguments
 
 SMALL = ["--calendar-rounds", "1", "--batches", "1", "--transitions-per-batch", "4", "--parallel-envs", "1",
-         "--simulations", "2", "--max-depth", "2", "--hidden-dim", "16", "--token-buckets", "2048"]
+         "--simulations", "2", "--max-depth", "2", "--hidden-dim", "16"]
 
 
 def manifest(run_dir: Path) -> dict:
@@ -28,13 +28,12 @@ def manifest(run_dir: Path) -> dict:
 
 class SampleFractionTests(unittest.TestCase):
     def play(self, fraction: float) -> dict:
-        config = CampaignModelConfig(hidden_dim=16, message_layers=1, token_buckets=2048)
+        config = CampaignModelConfig(hidden_dim=16, message_layers=1)
         torch.manual_seed(5)
         evaluator = NeuralEvaluator({player: CampaignPolicyValueNet(config).eval() for player in PLAYERS}, version="v")
         env = make_env(91, calendar_rounds=1)
         return play_episode(env, evaluator, config=LearningConfig(simulations=2, max_depth=2, sample_fraction=fraction),
-                            rules_version=compatibility(env)["rules"], numeric=True, token_buckets=2048,
-                            batch_version="v", environment_seed=91, max_transitions=2000)
+                            rules_version=compatibility(env)["rules"], batch_version="v", environment_seed=91, max_transitions=2000)
 
     def test_keeping_fewer_samples_plays_the_same_game(self):
         everything, some = self.play(1.0), self.play(.25)
@@ -91,12 +90,10 @@ class RunControlTests(unittest.TestCase):
             self.train("other", "--hidden-dim", "32", "--initial-models", str(source / "models/generation-000001.pt"))
 
     def test_recorded_games_copy_the_exports_game_search_and_network(self):
-        config = {"calendar_rounds": 11, "simulations": 64, "max_depth": 16, "hidden_dim": 64, "message_layers": 2,
-                  "token_buckets": 16384, "value_scale": 100.0}
+        config = {"calendar_rounds": 11, "simulations": 64, "max_depth": 16, "hidden_dim": 64, "message_layers": 2, "value_scale": 100.0}
         arguments = game_arguments(config, Path("models.pt"), 9, Path("game"))
         for flag, value in (("--calendar-rounds", "11"), ("--simulations", "64"), ("--max-depth", "16"),
-                            ("--hidden-dim", "64"), ("--message-layers", "2"), ("--token-buckets", "16384"),
-                            ("--seed", "9"), ("--initial-models", "models.pt")):
+                            ("--hidden-dim", "64"), ("--message-layers", "2"), ("--seed", "9"), ("--initial-models", "models.pt")):
             self.assertEqual(arguments[arguments.index(flag) + 1], value)
         self.assertIn("--full-campaign", game_arguments({**config, "calendar_rounds": None}, Path("m"), 9, Path("g")))
 

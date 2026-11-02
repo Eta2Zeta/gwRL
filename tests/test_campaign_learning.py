@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import io
 import json
 import random
 import tempfile
@@ -15,14 +14,29 @@ import numpy as np
 import torch
 from torch import nn
 
+import gwrl_cpp
+from studies.campaign.features import default_zone_spec
 from studies.campaign.learning import CampaignLearner, LearningConfig, ReplayTraceCapture, ReplayTraceWriter
-from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, make_input
+from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
 from studies.shared.campaign_adapter import CampaignAdapter
-from studies.shared.multiplayer_mcts import PLAYERS
+from studies.shared.multiplayer_mcts import PLAYERS, action_key
 
 
 def _tuples(value):
     return tuple(_tuples(item) for item in value) if isinstance(value, list) else value
+
+
+def toy_zone(node, score, options, owner, version=None):
+    """A real zone input for a toy position: its node, score and deciding player, one answer per option."""
+    owners = {player: column for column, player in default_zone_spec().owner_columns}
+    arrays = {"zone_index": [0, 1], "zone_column": [node + 1, 7], "zone_value": [1, score + 1],
+              "global_column": [2, owners[owner]], "global_value": [node + 1, 1],
+              "action_offsets": list(range(options + 1)), "action_column": [10 + i for i in range(options)],
+              "action_value": [1] * options, "action_source": [0] * options, "action_target": [-1] * options,
+              "path_offsets": [0] * (options + 1), "path_zone": [],
+              "factor_groups": [value for i in range(options) for value in (0, 0, i, i)]}
+    return gwrl_cpp.campaign_zone_input(version or default_zone_spec().version,
+                                        {name: np.asarray(values, dtype=np.int32) for name, values in arrays.items()})
 
 
 class LearningToyEnv:
@@ -75,6 +89,9 @@ class LearningToyEnv:
     def planning_key(self):
         return json.dumps([self.context_version, self.node, self.score])
 
+    def zone_input(self, actions):
+        return toy_zone(self.node, self.score, len(tuple(actions)), self.current_decision_player())
+
     def clone(self):
         return copy.deepcopy(self)
 
@@ -102,11 +119,12 @@ class TinyNet(nn.Module):
     def __init__(self, config, values=(0.2, 0.3, -0.5)):
         super().__init__()
         self.config = config
+        self.spec = default_zone_spec()
         self.logits = nn.Parameter(torch.tensor([0.15, -0.1]))
         self.values = nn.Parameter(torch.tensor(values))
 
     def forward_batch(self, inputs):
-        return [self.logits[:len(item["actions"])] for item in inputs], self.values.unsqueeze(0).expand(len(inputs), -1)
+        return [self.logits[:item.action_count] for item in inputs], self.values.unsqueeze(0).expand(len(inputs), -1)
 
 
 class SchedulingToyRaw(LearningToyEnv):
@@ -128,6 +146,10 @@ class SchedulingToyRaw(LearningToyEnv):
 
     def planning_key(self):
         return json.dumps([super().planning_key(), self.declared])
+
+    def zone_input(self, owner, decision_kind, offered, passed, order, options):
+        # The adapter's own entry point: the scheduled decision with every option.
+        return toy_zone(self.node + 2 * self.declared + (4 if offered else 0), self.score, len(options), owner)
 
     def serialize(self):
         return json.dumps({"raw": super().serialize(), "declared": self.declared}, sort_keys=True)
@@ -162,7 +184,7 @@ class CampaignLearningTests(unittest.TestCase):
         random.seed(23)
         np.random.seed(29)
         torch.manual_seed(31)
-        self.model_config = CampaignModelConfig(hidden_dim=8, message_layers=1, token_buckets=128)
+        self.model_config = CampaignModelConfig(hidden_dim=8, message_layers=1)
         self.config = LearningConfig(simulations=8, max_depth=6, batch_size=32, epochs=2,
                                      replay_capacity=64, root_noise=False, seed=37)
         self.compatibility = {"scenario": "toy-scenario-v1", "rules": "toy-rules-v1", "schema": "toy-schema-v1"}
@@ -319,7 +341,7 @@ class CampaignLearningTests(unittest.TestCase):
     def test_policy_loss_routes_only_to_actual_owner_and_scale_is_applied_once(self):
         learner = self.learner(config=replace(self.config, epochs=1))
         env = LearningToyEnv()
-        learner.replay = [{"input": make_input(env, env.legal_actions()), "owner": "axis", "policy": [1.0, 0.0],
+        learner.replay = [{"input": env.zone_input(env.legal_actions()), "owner": "axis", "policy": [1.0, 0.0],
                            "values": [20.0, 30.0, -50.0], "rollout_version": "exact-fixture",
                            "target_source": "terminal", "target_schema": "campaign-raw-vector-target-v1"}]
         before = {p: copy.deepcopy(model.state_dict()) for p, model in learner.models.items()}
@@ -336,7 +358,7 @@ class CampaignLearningTests(unittest.TestCase):
             env = LearningToyEnv()
             env.node, env.score = node, index * 3
             learner.replay.append({
-                "input": make_input(env, env.legal_actions()),
+                "input": env.zone_input(env.legal_actions()),
                 "owner": env.current_decision_player(), "policy": [.8, .2],
                 "values": [350. + index, -70. - index / 4, -280. - index * 3 / 4],
                 "rollout_version": "unfiltered-reference", "target_source": "terminal",
@@ -347,8 +369,8 @@ class CampaignLearningTests(unittest.TestCase):
         samples = baseline.replay_random.sample(baseline.replay, len(baseline.replay))
         inputs = [sample["input"] for sample in samples]
         expected = {}
-        # Reference the original computation: all actors encode every action
-        # menu, although only the actual owner's policy contributes to loss.
+        # Reference: every actor reads every option, although only the actual
+        # owner's policy contributes to the loss.
         for player in PLAYERS:
             model, optimizer = baseline.models[player], baseline.optimizers[player]
             model.train()
@@ -375,9 +397,10 @@ class CampaignLearningTests(unittest.TestCase):
         for player in PLAYERS:
             forwarded = calls[player].call_args.args[0]
             for item, sample in zip(forwarded, samples, strict=True):
-                self.assertEqual(item["observation"], sample["input"]["observation"])
-                self.assertEqual(item["context"], sample["input"]["context"])
-                self.assertEqual(item["actions"], sample["input"]["actions"] if sample["owner"] == player else [])
+                if sample["owner"] == player:
+                    self.assertTrue(item == sample["input"])
+                else:
+                    self.assertTrue(item == sample["input"].without_actions())
             actual = result["losses"][player][0]
             self.assertEqual(actual["policy_samples"], expected[player]["policy_samples"])
             for name in ("policy", "value", "total"):
@@ -564,126 +587,64 @@ class CampaignLearningTests(unittest.TestCase):
                 learner.restore(broken, env_template=LearningToyEnv())
             self.assert_tree_equal(checkpoint, learner.checkpoint())
 
-    def test_context_snapshots_are_complete_interned_read_only_and_detached(self):
-        env = MutableContextToyEnv()
-        original = json.loads(json.dumps(env.context()))
-        learner = self.learner()
-        learner.begin_batch(env)
-        learner.collect(2)
-        first, second = [sample["input"]["context"] for sample in learner.pending]
-        self.assertIs(first, second)
-        self.assertIsNot(first, env.context())
-        self.assertEqual(first, original)
-        self.assertEqual(json.loads(json.dumps(first)), original)
-        with self.assertRaisesRegex(TypeError, "read-only"):
-            first["schema"] = "changed"
-        with self.assertRaisesRegex(TypeError, "read-only"):
-            first["opaque_registry"]["entries"].append({"name": "injected"})
-        with self.assertRaisesRegex(TypeError, "read-only"):
-            first["opaque_registry"]["entries"][0]["name"] = "changed"
-        env.context()["opaque_registry"]["entries"][0]["name"] = "caller changed"
-        env.context()["geography"]["zones"].append({"id": "later"})
-        self.assertEqual(first, original)
-
-    def test_checkpoint_and_restore_deduplicate_context_across_replay_and_pending(self):
+    def test_zone_replay_survives_saving_and_restoring_unchanged(self):
         learner = self.learner()
         learner.run_batch(LearningToyEnv, 5)
         learner.begin_batch()
         learner.collect(2, LearningToyEnv)
-        original = learner.replay[0]["input"]["context"]
-        self.assertIs(original, learner.pending[0]["input"]["context"])
         payload = learner.checkpoint()
-        saved_context = payload["replay"][0]["input"]["context"]
-        self.assertEqual(saved_context, original)
-        # An immutable source context may safely survive deepcopy by identity.
-        with self.assertRaisesRegex(TypeError, "read-only"):
-            saved_context["schema"] = "checkpoint mutation"
-        self.assertTrue(all(sample["input"]["context"] is saved_context
+        self.assertTrue(all(type(sample["input"]).__name__ == "CampaignZoneInput"
                             for sample in payload["replay"] + payload["pending"]))
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "shared-context.pt"
+            path = Path(directory) / "zone-replay.pt"
             torch.save(payload, path)
             loaded = torch.load(path, weights_only=False)
-        loaded_context = loaded["replay"][0]["input"]["context"]
-        self.assertTrue(all(sample["input"]["context"] is loaded_context
-                            for sample in loaded["replay"] + loaded["pending"]))
         resumed = self.learner()
         resumed.restore(loaded, env_template=LearningToyEnv())
-        restored_context = resumed.replay[0]["input"]["context"]
-        self.assertEqual(restored_context, loaded_context)
-        with self.assertRaisesRegex(TypeError, "read-only"):
-            restored_context["geography"]["zones"].append({"id": "restored mutation"})
-        self.assertTrue(all(sample["input"]["context"] is restored_context
-                            for sample in resumed.replay + resumed.pending))
+        for name in ("replay", "pending"):
+            for restored, original in zip(getattr(resumed, name), payload[name], strict=True):
+                self.assertTrue(restored["input"] == original["input"])
         self.assert_tree_equal(payload, resumed.checkpoint())
 
-    def test_large_context_is_serialized_once_instead_of_once_per_sample(self):
-        env = MutableContextToyEnv()
-        blob = "complete-static-source:" + "x" * 128_000
-        env.context()["full_registry_payload"] = blob
+    def test_restore_refuses_replay_rows_of_another_layout_or_menu(self):
         learner = self.learner()
-        learner.begin_batch(env)
-        learner.collect(2)
-        shared = learner.checkpoint()
-        legacy = copy.deepcopy(shared)
-        contexts = []
-        for sample in legacy["pending"]:
-            sample["input"]["context"] = json.loads(json.dumps(sample["input"]["context"]))
-            contexts.append(sample["input"]["context"])
-        self.assertIsNot(contexts[0]["full_registry_payload"], contexts[1]["full_registry_payload"])
-        compact_file, repeated_file = io.BytesIO(), io.BytesIO()
-        torch.save(shared, compact_file)
-        torch.save(legacy, repeated_file)
-        self.assertGreater(repeated_file.tell() - compact_file.tell(), len(blob) * 0.9)
-        restored = self.learner()
-        template = MutableContextToyEnv()
-        template.context()["full_registry_payload"] = blob
-        restored.restore(legacy, env_template=template)
-        self.assertIs(restored.pending[0]["input"]["context"], restored.pending[1]["input"]["context"])
+        learner.run_batch(LearningToyEnv, 5)
+        snapshot = learner.checkpoint()
 
-    def test_restore_interns_legacy_distinct_context_objects_without_mutating_caller(self):
-        learner = self.learner()
-        learner.begin_batch_many([LearningToyEnv(), LearningToyEnv(seed=47)])
-        learner.collect_many(1)
-        payload = learner.checkpoint()
-        copies = []
-        for group in payload["parallel_pending"]:
-            for sample in group:
-                sample["input"]["context"] = json.loads(json.dumps(sample["input"]["context"]))
-                copies.append(sample["input"]["context"])
-        self.assertIsNot(copies[0], copies[1])
-        resumed = self.learner()
-        resumed.restore(payload, env_template=LearningToyEnv())
-        first, second = [group[0]["input"]["context"] for group in resumed.parallel_pending]
-        self.assertIs(first, second)
-        self.assertIsNot(first, copies[0])
-        copies[0]["geography"]["zones"].append({"id": "caller mutation"})
-        self.assertEqual(len(first["geography"]["zones"]), 1)
-        self.assertEqual(len(copies[0]["geography"]["zones"]), 2)
+        def other_layout(payload):
+            payload["replay"][0]["input"] = toy_zone(0, 0, 2, "axis", version="campaign-zone-v0-other")
+
+        def other_menu(payload):
+            payload["replay"][0]["input"] = toy_zone(0, 0, 3, "axis")
+
+        def other_owner(payload):
+            payload["replay"][0]["input"] = toy_zone(0, 0, 2, "comintern")
+
+        def json_input(payload):
+            payload["replay"][0]["input"] = {"schema": "campaign-neural-input-v1", "actions": [{}, {}]}
+
+        for mutation in (other_layout, other_menu, other_owner, json_input):
+            with self.subTest(mutation=mutation.__name__):
+                broken = copy.deepcopy(snapshot)
+                mutation(broken)
+                with self.assertRaises(ValueError):
+                    learner.restore(broken, env_template=LearningToyEnv())
+                self.assert_tree_equal(snapshot, learner.checkpoint())
 
     def test_selected_action_diagnostics_preserve_raw_kind_parameters_and_sampling(self):
         for env in (LearningToyEnv(), CampaignAdapter(SchedulingToyRaw())):
+            menu = {action_key(choice): choice.features() if hasattr(choice, "features") else choice
+                    for choice in env.legal_actions()}
             learner = self.learner()
             learner.begin_batch(env)
             learner.collect(1)
             event = learner.action_history[-1]
-            features = learner.pending[0]["input"]["actions"]
-            chosen = next(feature for feature in features if feature["id"] == event["action"])
+            chosen = menu[event["action"]]
             raw = chosen.get("action") or chosen
             self.assertEqual(event["action_kind"], raw["kind"])
             self.assertEqual(event["action_parameters"], raw.get("parameters", {}))
             before = copy.deepcopy(event["action_parameters"])
-            # Campaign source actions are now immutable and shared safely by
-            # inference/replay. A caller can replace a replay entry with its own
-            # mutable copy; neither operation may change the recorded event.
-            from studies.shared.immutable_json import FrozenDict
-            if isinstance(chosen, FrozenDict):
-                with self.assertRaises(TypeError):
-                    raw.setdefault("parameters", {})["caller_only"] = True
-                index = features.index(chosen)
-                chosen = json.loads(json.dumps(chosen))
-                features[index] = chosen
-                raw = chosen.get("action") or chosen
+            # A caller changing its own copy of the option cannot change the record.
             raw.setdefault("parameters", {})["caller_only"] = True
             self.assertEqual(event["action_parameters"], before)
 
@@ -710,19 +671,17 @@ class CampaignLearningTests(unittest.TestCase):
         def wrong_replay_owner(payload):
             payload["pending"][0]["owner"] = "comintern"
 
-        def wrong_input_schema(payload):
-            payload["replay"][0]["input"]["schema"] = "older-input-schema"
+        def wrong_input_layout(payload):
+            payload["replay"][0]["input"] = toy_zone(0, 0, 2, "axis", version="campaign-zone-v0-other")
 
-        def wrong_context(payload):
-            features = payload["replay"][0]["input"]
-            features["context"] = json.loads(json.dumps(features["context"]))
-            features["context"]["schema"] = "other-scenario"
+        def wrong_input_type(payload):
+            payload["replay"][0]["input"] = {"schema": "older-input-schema"}
 
         def wrong_optimizer_hyperparameters(payload):
             payload["optimizers"]["axis"]["param_groups"][0]["betas"] = (0.1, 0.2)
 
         for mutation in (wrong_metadata, wrong_model, wrong_optimizer, wrong_rng, wrong_replay_owner,
-                         wrong_input_schema, wrong_context, wrong_optimizer_hyperparameters):
+                         wrong_input_layout, wrong_input_type, wrong_optimizer_hyperparameters):
             with self.subTest(mutation=mutation.__name__):
                 broken = copy.deepcopy(snapshot)
                 mutation(broken)
@@ -733,7 +692,7 @@ class CampaignLearningTests(unittest.TestCase):
             learner.restore(snapshot, env_template=LearningToyEnv(context_version="different-world"))
         self.assert_tree_equal(snapshot, learner.checkpoint())
 
-    def test_graph_network_real_gradient_update_and_resume(self):
+    def test_zone_network_real_gradient_update_and_resume(self):
         learner = self.learner(real=True, config=replace(self.config, simulations=2, max_depth=3, epochs=1))
         before = learner.model_versions()
         result = learner.run_batch(LearningToyEnv, 5)

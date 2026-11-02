@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Prove a legacy campaign checkpoint is compatible before operational migration.
 
-This trusted-local tool never executes a game action or draws game dice. Past
-public states are rehydrated with synthetic RNG/history solely to regenerate
-menus; only original serialized active games are eligible for continuation.
-The large checkpoint load must run under the caller's process-tree memory guard.
+This trusted-local tool never executes a game action or draws game dice. Saved
+rows keep only their decisions' zone inputs, not the public states, so each row
+is checked as the current runtime reads it; unchanged encoder sources and a
+legacy-runtime witness of every active game show that the current engine
+encodes decisions as the legacy one did. Only original serialized active games
+are eligible for continuation. The large checkpoint load must run under the
+caller's process-tree memory guard.
 """
 from __future__ import annotations
 
@@ -24,18 +27,19 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "campaign-exact-continuation-proof-v1"
-FEATURE_BINDINGS = {"SCHEMA", "NODE_TYPES", "NUMERIC_DIM", "RELATIONS", "PARENT_TO_CHILD",
-                    "CHILD_TO_PARENT", "IDENTITY_REFERENCE", "REFERENCE_BACK", "ADJACENT",
-                    "EXTERNAL_REFERENCE", "ENTITY_COLLECTIONS", "LEXEMES"}
-FEATURE_FUNCTIONS = ("canonical", "lexical_ids", "compile_graph_python", "_string_descriptor",
-                     "_cached_numeric_features", "_numeric_features", "make_input", "action_factors")
+# How the network reads its input: the zone layout, fetching a decision's
+# encoding, the weight of an answer and the layout of a batch. The engine's
+# encoder itself must be byte-identical (audit_sources).
+FEATURE_BINDINGS = {"ZoneInput", "GROUP_LEVELS"}
+FEATURE_FUNCTIONS = ("zone_spec", "make_zone_input", "_signed_log", "pack_zone_arrays")
+ENCODER_SOURCES = ("src/zone_encoding.cpp", "include/game/zone_encoding.hpp")
 PERFORMANCE_SOURCE_CHANGES = {
     "include/game/campaign.hpp", "include/game/campaign_env.hpp", "src/air.cpp",
     "src/campaign_env.cpp", "src/campaign_runtime.cpp", "src/campaign_state.cpp",
-    "src/python_bindings.cpp", "src/numeric_graph.cpp", "include/game/numeric_graph.hpp",
+    "src/python_bindings.cpp",
     "studies/campaign/features.py", "studies/campaign/neural.py", "studies/campaign/learning.py",
     "studies/campaign/run.py", "studies/campaign/evaluation.py", "studies/campaign/model_export.py",
-    "studies/campaign/numeric_storage.py", "studies/campaign/scaling_benchmark.py",
+    "studies/campaign/scaling_benchmark.py",
     "studies/shared/campaign_adapter.py",
 }
 
@@ -134,10 +138,10 @@ def audit_sources(runner, legacy_runtime, current_hashes):
                 f"Legacy runtime differs from checkpoint source: {name}")
     legacy_functions = ast_functions(legacy_runtime / "studies/campaign/features.py", FEATURE_FUNCTIONS)
     current_functions = ast_functions(ROOT / "studies/campaign/features.py", FEATURE_FUNCTIONS)
-    require(legacy_functions == current_functions, "Raw neural feature semantics changed")
+    require(legacy_functions == current_functions, "Network input semantics changed")
     require(ast_feature_bindings(legacy_runtime / "studies/campaign/features.py") ==
-            ast_feature_bindings(ROOT / "studies/campaign/features.py"), "Neural feature constants changed")
-    for name in ("studies/shared/multiplayer_mcts.py", "src/neural_graph.cpp",
+            ast_feature_bindings(ROOT / "studies/campaign/features.py"), "Network input constants changed")
+    for name in ("studies/shared/multiplayer_mcts.py", *ENCODER_SOURCES,
                  "studies/campaign/baselines.py", "studies/campaign/curriculum.py"):
         require(old.get(name) == current_hashes.get(name), f"Required unchanged semantics changed: {name}")
     changed = sorted(name for name in set(old) | set(current_hashes) if old.get(name) != current_hashes.get(name))
@@ -145,7 +149,7 @@ def audit_sources(runner, legacy_runtime, current_hashes):
     require(not unexpected, f"Unreviewed continuation source changes: {sorted(unexpected)}")
     return {"legacy_frozen_runtime_manifest": frozen_manifest, "legacy_files_verified": len(old), "feature_function_ast_identical": list(FEATURE_FUNCTIONS),
             "feature_constant_ast_identical": sorted(FEATURE_BINDINGS),
-            "unchanged_search_and_raw_native_compiler": True,
+            "unchanged_search_and_native_zone_encoder": True,
             "changed_reviewed_source_paths": changed,
             "current_runtime_source_sha256": current_hashes,
             "scope": "Explicit reviewed performance/serialization/evidence changes; every saved row and active game is separately verified."}
@@ -203,12 +207,19 @@ def active_snapshots(learner):
     return result
 
 
+def zone_digest(zone):
+    """Bit-exact digest of a zone input: its layout version and every array."""
+    return core_digest({"version": zone.version, "arrays": zone.arrays()})
+
+
 def environment_record(env):
-    from studies.campaign.features import make_input
+    from studies.campaign.features import make_zone_input
     actions = env.legal_actions() if env.decision_kind() not in {"chance", "terminal"} else []
     return {"serialized": env.serialize(), "planning_key": env.planning_key(),
             "owner": env.current_decision_player(), "kind": env.decision_kind(),
-            "context_sha256": source_fingerprint(env.context()), "input": make_input(env, actions)}
+            "context_sha256": source_fingerprint(env.context()),
+            "observation_sha256": source_fingerprint(env.observation()),
+            "input_sha256": zone_digest(make_zone_input(env, actions))}
 
 
 def legacy_worker(runtime, request_path, output_path):
@@ -229,37 +240,31 @@ def legacy_worker(runtime, request_path, output_path):
         "native_sha256": digest_file(gwrl_cpp.__file__)})
 
 
-def rehydrate_public_state(template, observation, context_by_order, *, base_engine=None):
-    """Synthetic RNG/history are used ONLY to inspect an old row's legal menu."""
-    from studies.shared.campaign_adapter import CampaignAdapter, SCHEMA as SCHEDULER_SCHEMA
-    from studies.shared.multiplayer_mcts import PLAYERS
-    state = observation["state"]
-    require("history" not in state and "definition_fingerprint" not in state,
-            "Past neural input unexpectedly contains execution history/fingerprint")
-    scheduler = observation["interrupt_scheduler"]
-    require(scheduler.get("schema") == SCHEDULER_SCHEMA, "Invalid saved scheduler schema")
-    order, passed = tuple(scheduler["order"]), scheduler["passed"]
-    require(len(order) == 3 and set(order) == set(PLAYERS), "Invalid saved scheduler order")
-    require(len(set(passed)) == len(passed) and set(passed).issubset(PLAYERS), "Invalid saved scheduler passes")
-    base_engine = json.loads(template.raw.serialize()) if base_engine is None else base_engine
-    encoded = {**base_engine, "state": {**state,
-        "definition_fingerprint": base_engine["state"]["definition_fingerprint"], "history": []}}
-    raw = template.raw.clone(); raw.restore(canonical(encoded))
-    env = CampaignAdapter(raw, interrupt_order=order)
-    # Scheduler data was explicitly validated above. Cache only its immutable
-    # context; never cache/replace any pending choices or board fields.
-    env._passed = set(passed)
-    if order not in context_by_order:
-        context_by_order[order] = env.neural_context()
-    env._neural_context, env._context_order = context_by_order[order], order
-    return env
+def verify_sample(sample, spec, where):
+    """One saved row as the current runtime reads it; returns its saved and rebuilt input digests.
+
+    A row keeps its decision's zone input but not the public state, so the input
+    cannot be regenerated from the game. The current native validation must
+    rebuild it unchanged, every index in it must fit the current layout, and it
+    must name the row's owner and list one option per policy entry.
+    """
+    import gwrl_cpp
+    from studies.campaign.features import ZoneInput, pack_zone_inputs, zone_owner
+    item = sample.get("input") if isinstance(sample, dict) else None
+    require(isinstance(item, ZoneInput) and item.version == spec.version, f"Unsupported past policy input at {where}")
+    require(isinstance(sample.get("policy"), list) and len(sample["policy"]) == item.action_count > 0,
+            f"Policy does not cover the complete legal menu at {where}")
+    require(zone_owner(item, spec) == sample.get("owner"), f"Decision ownership changed at {where}")
+    rebuilt = gwrl_cpp.campaign_zone_input(item.version, item.arrays())
+    require(rebuilt == item, f"Saved zone input changed when rebuilt at {where}")
+    pack_zone_inputs([rebuilt], spec)
+    return zone_digest(item), zone_digest(rebuilt)
 
 
 def verify_payload(payload, legacy_runtime, progress=None, row_limit=None):
     from studies.campaign.curriculum import compatibility, make_env, task_manifest
-    from studies.campaign.features import SCHEMA as INPUT_SCHEMA, make_input
+    from studies.campaign.features import default_zone_spec
     from studies.campaign.run import RUN_SCHEMA, RunConfig, source_hashes
-    from studies.shared.multiplayer_mcts import PLAYERS
     require(isinstance(payload, dict) and set(payload) == {"schema", "runner", "learner"}
             and payload["schema"] == RUN_SCHEMA, "Unsupported legacy foreground checkpoint")
     runner, learner = payload["runner"], payload["learner"]
@@ -268,7 +273,11 @@ def verify_payload(payload, legacy_runtime, progress=None, row_limit=None):
     require(config.calendar_rounds == 3 and config.complete_episodes, "Continuation requires genuine three-round self-play")
     template = make_env(config.seed, calendar_rounds=3)
     require(runner["task"] == task_manifest(template), "Scenario/task changed")
-    require(learner["metadata"]["compatibility"] == compatibility(template), "Learner rules/scenario changed")
+    compatible = compatibility(template)
+    require(learner["metadata"]["compatibility"] == compatible, "Learner rules/scenario changed")
+    spec = default_zone_spec()
+    require(learner["metadata"].get("input_layout") == spec.version == compatible["network_input"],
+            "Learner models read another zone-input layout")
     snapshots = active_snapshots(learner)
     with tempfile.TemporaryDirectory(prefix="campaign-active-witness-") as temporary:
         request, output = Path(temporary) / "request.json", Path(temporary) / "witness.json"
@@ -288,48 +297,18 @@ def verify_payload(payload, legacy_runtime, progress=None, row_limit=None):
         require(actual["serialized"] == item["state"] and actual["context_sha256"] == item["context"],
                 f"Original active state/RNG/history changed: {item['name']}")
         active.append({"name": item["name"], "serialized_sha256": hashlib.sha256(item["state"].encode()).hexdigest(),
-                       "planning_key": actual["planning_key"], "observation_and_menu_sha256": source_fingerprint(actual["input"])})
-    history_keys = {event["before"] for event in learner["action_history"] if event.get("owner") in PLAYERS}
-    contexts, context_by_order, generated_contexts, counts = {}, {}, {}, Counter()
-    base_engine = json.loads(template.raw.serialize())
-    old_inputs, current_inputs, sample_digest = hashlib.sha256(), hashlib.sha256(), hashlib.sha256()
-    ordered_menus = True
+                       "planning_key": actual["planning_key"], "observation_and_menu_sha256": actual["observation_sha256"],
+                       "zone_input_sha256": actual["input_sha256"]})
+    counts = Counter()
+    saved_inputs, rebuilt_inputs, sample_digest = hashlib.sha256(), hashlib.sha256(), hashlib.sha256()
     for group, rows in sample_groups(learner):
         counts[group] += 0
         for index, sample in enumerate(rows):
             if row_limit is not None and sum(counts.values()) >= row_limit:
                 return {"schema": SCHEMA, "status": "partial", "audit": audit, "active_environments": active,
                         "rows_verified": dict(counts), "scope": "Partial diagnostic proof; migration forbidden"}
-            item = sample["input"]
-            require(item.get("schema") == INPUT_SCHEMA and set(item) == {"schema", "observation", "context", "actions"},
-                    f"Unsupported past policy input at {group}[{index}]")
-            context = item["context"]
-            if id(context) not in contexts:
-                value = source_fingerprint(context)
-                require(value == learner["env_context"], f"Past source context differs at {group}[{index}]")
-                contexts[id(context)] = value
-            observation = item["observation"]
-            env = rehydrate_public_state(template, observation, context_by_order, base_engine=base_engine)
-            order = tuple(observation["interrupt_scheduler"]["order"])
-            if order not in generated_contexts:
-                generated_contexts[order] = source_fingerprint(context_by_order[order])
-            require(generated_contexts[order] == contexts[id(context)], "Rehydrated context differs")
-            require(env.current_decision_player() == sample["owner"] == observation["current_decision_player"],
-                    f"Decision ownership changed at {group}[{index}]")
-            actions = env.legal_actions()
-            by_id = {action.id: action for action in actions}
-            saved = item["actions"]
-            saved_ids = [action["id"] for action in saved]
-            require(len(saved_ids) == len(set(saved_ids)) == len(by_id) and set(saved_ids) == set(by_id),
-                    f"Complete legal menu changed at {group}[{index}]: saved={len(saved_ids)}, current={len(by_id)}, "
-                    f"missing={sorted(set(saved_ids) - set(by_id))[:8]}, extra={sorted(set(by_id) - set(saved_ids))[:8]}")
-            ordered_menus &= saved_ids == [action.id for action in actions]
-            regenerated = make_input(env, [by_id[identity] for identity in saved_ids])
-            first = canonical({key: value for key, value in item.items() if key != "context"})
-            second = canonical({key: value for key, value in regenerated.items() if key != "context"})
-            require(first == second, f"Full public state/interrupt/menu/action features changed at {group}[{index}]")
-            require(env.planning_key() in history_keys, f"Past state key absent from original real action history at {group}[{index}]")
-            old_inputs.update(first.encode()); current_inputs.update(second.encode())
+            saved, rebuilt = verify_sample(sample, spec, f"{group}[{index}]")
+            saved_inputs.update(saved.encode()); rebuilt_inputs.update(rebuilt.encode())
             sample_digest.update(canonical({key: value for key, value in sample.items() if key != "input"}).encode())
             counts[group] += 1
             if progress and sum(counts.values()) % 100 == 0:
@@ -338,20 +317,21 @@ def verify_payload(payload, legacy_runtime, progress=None, row_limit=None):
     return {"schema": SCHEMA, "status": "verified", "audit": audit, "active_environments": active,
             "original_generation": learner.get("generation"), "original_counters": learner.get("counters"),
             "original_parallel_pending_rows": [len(rows) for rows in learner["parallel_pending"]],
-            "rows_verified": dict(counts), "saved_input_sha256": old_inputs.hexdigest(),
-            "regenerated_input_sha256": current_inputs.hexdigest(), "sample_labels_policy_versions_sha256": sample_digest.hexdigest(),
+            "rows_verified": dict(counts), "input_layout": spec.version, "saved_input_sha256": saved_inputs.hexdigest(),
+            "rebuilt_input_sha256": rebuilt_inputs.hexdigest(), "sample_labels_policy_versions_sha256": sample_digest.hexdigest(),
             "non_sample_learner_bitwise_sha256": core_digest({k: v for k, v in learner.items() if k not in excluded}),
-            "all_saved_action_orders_equal_native_order": ordered_menus,
-            "stored_action_order_retained": True, "legacy_witness_native_sha256": witness["native_sha256"],
-            "no_actions_or_dice_executed": True,
-            "synthetic_past_state_scope": "Menu/observation proof only; original active serialized games alone continue."}
+            "legacy_witness_native_sha256": witness["native_sha256"], "no_actions_or_dice_executed": True,
+            "saved_row_scope": "Rows keep zone inputs without public states and are not regenerated from games: each is "
+                               "rebuilt by the current native validation and read against the current layout. Unchanged "
+                               "encoder sources and the legacy witness of every active game cover the encoding itself; "
+                               "original active serialized games alone continue."}
 
 
 def migrated_payload(payload, proof, current_hashes, *, additional_games=60):
     """Change operational runner limits only, retaining the original learner."""
     from dataclasses import asdict
     from studies.campaign.run import RunConfig
-    require(proof.get("status") == "verified" and proof["saved_input_sha256"] == proof["regenerated_input_sha256"],
+    require(proof.get("status") == "verified" and proof["saved_input_sha256"] == proof["rebuilt_input_sha256"],
             "Exhaustive compatibility proof required before migration")
     require(proof["audit"]["current_runtime_source_sha256"] == current_hashes, "Sources changed after verification")
     require(type(additional_games) is int and additional_games > 0 and additional_games % 4 == 0,

@@ -12,6 +12,11 @@ from dataclasses import dataclass, field, replace
 from operator import is_
 from typing import Any
 
+try:
+    from gwrl_cpp import CampaignAction as _NativeAction
+except ImportError:  # JSON test environments need no extension.
+    _NativeAction = None
+
 from .immutable_json import FrozenDict, freeze_json
 from .multiplayer_mcts import PLAYERS, action_key
 
@@ -37,28 +42,27 @@ class ScheduledAction:
     _source: Any = field(repr=False, compare=False)
     _raw: Any = field(repr=False, compare=False)
     _features: Any = field(repr=False, compare=False)
-    _numeric_snapshot: Any = field(repr=False, compare=False)
 
     def __init__(self, id: str, kind: str, player: str, raw: Any = None):
         object.__setattr__(self, "id", id)
         object.__setattr__(self, "kind", kind)
         object.__setattr__(self, "player", player)
-        native = getattr(raw, "scheduled_snapshot", None)
-        object.__setattr__(self, "_source", raw if native is not None else None)
-        object.__setattr__(self, "_raw", None if native is not None else
+        native = _NativeAction is not None and type(raw) is _NativeAction
+        object.__setattr__(self, "_source", raw if native else None)
+        object.__setattr__(self, "_raw", None if native else
                            (freeze_json(_raw_features(raw)) if raw is not None else None))
         object.__setattr__(self, "_features", None)
-        object.__setattr__(self, "_numeric_snapshot", native(id, kind, player) if native is not None else None)
 
     @property
     def raw(self) -> Any:
-        # Public inspection remains immutable. Native self-play does not create
-        # this Python action tree unless a trace/debug caller actually needs it.
+        # Public inspection remains immutable. Self-play does not create this
+        # Python action tree unless a trace or inspection caller needs it.
         if self._source is not None and self._raw is None:
             object.__setattr__(self, "_raw", freeze_json(_raw_features(self._source)))
         return self._raw
 
-    def neural_features(self) -> FrozenDict:
+    def frozen_features(self) -> FrozenDict:
+        """The option as immutable JSON, for observations, traces and replays."""
         if self._features is None:
             object.__setattr__(self, "_features", freeze_json({
                 "id": self.id, "kind": self.kind, "player": self.player, "action": self.raw,
@@ -66,20 +70,14 @@ class ScheduledAction:
         return self._features
 
     def features(self) -> dict[str, Any]:
-        return json.loads(self.neural_features().canonical_json)
-
-    def numeric_snapshot(self) -> Any:
-        if self._numeric_snapshot is None and self.kind == "pass_interrupt":
-            from gwrl_cpp import campaign_pass_snapshot
-            object.__setattr__(self, "_numeric_snapshot", campaign_pass_snapshot(self.id, self.kind, self.player))
-        return self._numeric_snapshot
+        return json.loads(self.frozen_features().canonical_json)
 
     def __deepcopy__(self, memo):
         return self
 
     def __reduce__(self):
         # Public action pickles retain their portable immutable feature payload;
-        # learning checkpoints store numerical inputs, not native action handles.
+        # learning checkpoints store zone inputs, not native action handles.
         return type(self), (self.id, self.kind, self.player, self.raw)
 
 
@@ -92,7 +90,6 @@ class _DecisionCache:
     actions: tuple[ScheduledAction, ...] | None = None
     raw_actions: tuple[Any, ...] | None = None
     observation: FrozenDict | None = None
-    numeric: dict[int, Any] = field(default_factory=dict)
     zone: Any = None
 
 
@@ -110,13 +107,12 @@ class CampaignAdapter:
         self.interrupt_order = tuple(interrupt_order)
         self._anchor = raw.planning_key()
         self._passed: set[str] = set()
-        self._neural_context: FrozenDict | None = None
+        self._frozen_context: FrozenDict | None = None
         self._context_order = self.interrupt_order
         self._raw_interrupts: tuple[Any, ...] | None = None
         self._raw_actions: tuple[Any, ...] | None = None
         self._raw_observation: FrozenDict | None = None
         self._decision: _DecisionCache | None = None
-        self._numeric_contexts: dict[Any, Any] = {}
 
     def _invalidate_raw(self) -> None:
         self._raw_interrupts = self._raw_actions = None
@@ -268,7 +264,7 @@ class CampaignAdapter:
     def wealth(self) -> Any:
         return self.raw.wealth()
 
-    def neural_observation(self) -> FrozenDict:
+    def frozen_observation(self) -> FrozenDict:
         """Complete immutable observation reused for one scheduled decision."""
         decision = self._decision_cache()
         if decision.observation is None:
@@ -277,74 +273,28 @@ class CampaignAdapter:
             observation = dict(self._raw_observation)
             observation.update({"current_decision_player": decision.owner,
                                 "decision_kind": decision.kind,
-                                "legal_actions": [action.neural_features() for action in self._legal_actions(decision)],
+                                "legal_actions": [action.frozen_features() for action in self._legal_actions(decision)],
                                 "interrupt_scheduler": {"schema": SCHEMA, "order": list(self.interrupt_order),
                                                         "passed": sorted(self._passed)}})
             decision.observation = freeze_json(observation)
         return decision.observation
 
-    def numeric_input(self, actions: tuple[ScheduledAction, ...], buckets: int) -> Any:
-        """Compile the unchanged complete decision directly from native trees."""
-        if not hasattr(self.raw, "numeric_observation"):
-            return None
-        from studies.campaign.features import (NUMERIC_SCHEMA, cached_numeric_action,
-                                              cached_numeric_context, compile_numeric)
-        decision = self._decision_cache()
-        menu = self._legal_actions(decision)
-        indices = None
-        if len(actions) != len(menu) or not all(map(is_, actions, menu)):
-            lookup = {action.id: index for index, action in enumerate(menu)}
-            try:
-                indices = tuple(lookup[action.id] for action in actions)
-            except KeyError as error:
-                raise ValueError("Numerical input contains a stale/foreign action") from error
-            if any(menu[index] is not action for index, action in zip(indices, actions)):
-                # Equal external wrappers still require the authoritative public
-                # validation path; they cannot inject a numerical feature payload.
-                return None
-        context_key = (buckets, self.interrupt_order)
-        if context_key not in self._numeric_contexts:
-            context = self.raw.numeric_context().scheduled_context(SCHEMA, self.interrupt_order)
-            # This source fingerprint is evaluated once, and is the same context
-            # compatibility key used by existing recovery checkpoints.
-            source_key = hashlib.sha256(json.dumps(self.context(), sort_keys=True,
-                separators=(",", ":"), allow_nan=False).encode()).hexdigest()
-            if len(self._numeric_contexts) >= 8:
-                self._numeric_contexts.clear()
-            self._numeric_contexts[context_key] = (source_key, cached_numeric_context(context, buckets, source_key))
-        source_key, context_graph = self._numeric_contexts[context_key]
-        if buckets not in decision.numeric:
-            snapshots = [action.numeric_snapshot() for action in menu]
-            if not all(snapshots):
-                return None
-            observation = self.raw.numeric_observation().scheduled_observation(
-                decision.owner, decision.kind, snapshots, SCHEMA, self.interrupt_order, sorted(self._passed))
-            prepared = [cached_numeric_action(snapshot, buckets) for snapshot in snapshots]
-            graphs, factors = tuple([item[0] for item in prepared]), tuple([item[1] for item in prepared])
-            if len(decision.numeric) >= 8:
-                decision.numeric.clear()
-            decision.numeric[buckets] = (compile_numeric(observation, buckets), graphs, factors)
-        observation_graph, graphs, factors = decision.numeric[buckets]
-        if indices is not None:
-            graphs, factors = tuple(graphs[index] for index in indices), tuple(factors[index] for index in indices)
-        return {"schema": NUMERIC_SCHEMA, "owner": decision.owner, "context_key": source_key,
-                "packed_graph": {"context": context_graph, "observation": observation_graph,
-                                 "actions": graphs, "action_factors": factors}}
-
     def zone_input(self, actions: tuple[ScheduledAction, ...] | None = None) -> Any:
-        """The unchanged decision in the fixed zone encoding, built once.
+        """This decision in the fixed zone encoding: the network's input.
 
-        `actions` must be this decision's own option objects, in any order and
-        any subset; the result lists exactly those options. None means all.
+        The decision is encoded once; `actions` picks options from it by their
+        content-derived IDs, in any order and any subset, and None means every
+        option. An option not on this decision's menu is refused.
         """
         if not hasattr(self.raw, "zone_input"):
             return None
         decision = self._decision_cache()
         menu = () if self.raw.is_terminal() else self._legal_actions(decision)
         if decision.zone is None:
-            options = [(action.kind, action.player, action._source) for action in menu]
-            if any(action.kind != "pass_interrupt" and action._source is None for action in menu):
-                return None  # Only native options can be described.
+            # The engine encodes its own action objects and refuses anything
+            # else; a pass has none. JSON test environments get their raw form.
+            options = [(action.kind, action.player, action._source if action._source is not None else action.raw)
+                       for action in menu]
             decision.zone = self.raw.zone_input(decision.owner, decision.kind, decision.offered,
                                                 sorted(self._passed), list(self.interrupt_order), options)
         if actions is None or (len(actions) == len(menu) and all(map(is_, actions, menu))):
@@ -353,73 +303,69 @@ class CampaignAdapter:
         try:
             indices = [lookup[action.id] for action in actions]
         except KeyError as error:
-            raise ValueError("Zone input requested for a stale/foreign action") from error
-        if any(menu[index] is not action for index, action in zip(indices, actions)):
-            return None  # Equal outside wrappers take the validated public path.
+            raise ValueError("Zone input requested for an option not on this decision's menu") from error
         return decision.zone.select(indices)
 
     def observation(self) -> dict[str, Any]:
         # Public callers may edit a detached mutable observation; inference
         # retains the immutable source directly and avoids repeated conversion.
-        return json.loads(self.neural_observation().canonical_json)
+        return json.loads(self.frozen_observation().canonical_json)
 
     def context(self) -> dict[str, Any]:
-        # Public callers retain the detached, mutable JSON contract. Inference
-        # uses the immutable snapshot instead of retranslating the registry on
-        # every searched position.
-        return json.loads(self.neural_context_key())
+        # Public callers retain the detached, mutable JSON contract. Replays and
+        # inspection use the immutable snapshot instead of retranslating the
+        # registry each time.
+        return json.loads(self.context_json())
 
-    def neural_context(self) -> FrozenDict:
+    def frozen_context(self) -> FrozenDict:
         """Return the immutable definition shared by this environment's clones.
 
         Campaign context contains the scenario/rules definition, never changing
         game state or execution RNG. Restore replaces this cache transactionally.
         """
         if self._context_order != self.interrupt_order:
-            self._neural_context = None
+            self._frozen_context = None
             self._context_order = self.interrupt_order
-        if self._neural_context is None:
+        if self._frozen_context is None:
             context = dict(self.raw.context())
             context["interrupt_scheduler"] = {"schema": SCHEMA, "order": list(self.interrupt_order)}
             snapshot = freeze_json(context)
             # Validate the entire plain JSON definition before publishing it.
             snapshot.canonical_json
-            self._neural_context = snapshot
-        return self._neural_context
+            self._frozen_context = snapshot
+        return self._frozen_context
 
-    def neural_context_key(self) -> str:
-        return self.neural_context().canonical_json
+    def context_json(self) -> str:
+        return self.frozen_context().canonical_json
 
     def clone(self) -> CampaignAdapter:
         self._sync()
         result = CampaignAdapter(self.raw.clone(), interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
-        result._neural_context = self._neural_context
+        result._frozen_context = self._frozen_context
         result._context_order = self._context_order
-        result._numeric_contexts = self._numeric_contexts
         # Copy lazy cache containers while sharing their immutable source data.
         # Neither real-play nor search RNG is stored in these snapshots.
         if result._anchor == self._anchor:
             result._raw_interrupts = self._raw_interrupts
             result._raw_actions = self._raw_actions
             result._raw_observation = self._raw_observation
-            result._decision = replace(self._decision, numeric=self._decision.numeric.copy()) if self._decision is not None else None
+            result._decision = replace(self._decision) if self._decision is not None else None
         return result
 
     def clone_for_search(self, seed: int) -> CampaignAdapter:
         self._sync()
         result = CampaignAdapter(self.raw.clone_for_search(seed), interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
-        result._neural_context = self._neural_context
+        result._frozen_context = self._frozen_context
         result._context_order = self._context_order
-        result._numeric_contexts = self._numeric_contexts
         # Copy lazy cache containers while sharing their immutable source data.
         # Neither real-play nor search RNG is stored in these snapshots.
         if result._anchor == self._anchor:
             result._raw_interrupts = self._raw_interrupts
             result._raw_actions = self._raw_actions
             result._raw_observation = self._raw_observation
-            result._decision = replace(self._decision, numeric=self._decision.numeric.copy()) if self._decision is not None else None
+            result._decision = replace(self._decision) if self._decision is not None else None
         return result
 
     def planning_key(self) -> str:

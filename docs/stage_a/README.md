@@ -236,6 +236,7 @@ state.
 - [Aircraft move once per turn: a plane that flew in Combat Movement no longer flies again in Noncombat Movement; rule verdicts on post-combat landings and repositioning](aircraft_single_move_2026_11_01.md)
 - [Combat Movement lists only moves that start a combat, for land units and planes: Combat Movement lists about a third of their size; repositioning and split flights happen after the battles; land handed over by an alignment may be entered the same turn](combat_movement_combats_only_2026_11_01.md)
 - [A fixed zone encoding of campaign decisions: 37 zones answer fixed questions; no look-alike positions or options in 30,259 positions; 49 to 64 times smaller and 5 to 6 times faster to build than the graph input](zone_encoding_2026_11_02.md)
+- [The network reads the zone encoding: the graph input is removed; on the same positions a single forward pass is 7.4 times faster, batched passes 59 times, a training step 43 times, and a stored decision 66 times smaller; the network has 4.6 times more parameters](zone_network_2026_11_02.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)

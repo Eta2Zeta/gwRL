@@ -33,7 +33,8 @@ def compatibility(env: CampaignAdapter) -> dict[str, str]:
     result = {"scenario": state["state"]["definition_fingerprint"],
             "rules": hashlib.sha256(encoded.encode()).hexdigest(),
             "schema": f"{gwrl_cpp.CAMPAIGN_SCHEMA}+{ADAPTER_SCHEMA}",
-            "curriculum": CURRICULUM_VERSION}
+            "curriculum": CURRICULUM_VERSION,
+            "network_input": env.raw.zone_encoding_spec()["version"]}
     if "action_interface" in context:
         result["actions"] = context["action_interface"]
     return result

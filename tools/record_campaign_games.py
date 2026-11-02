@@ -32,7 +32,7 @@ def game_arguments(config: dict, models: Path, seed: int, run_dir: Path) -> list
     arguments = ["-m", "studies.campaign.run", "train", "--run-dir", str(run_dir), "--record-replay",
                  "--initial-models", str(models), "--seed", str(seed), "--complete-episodes", "--batches", "1",
                  "--parallel-envs", "1", "--max-episodes", "1", "--transitions-per-batch", "20000"]
-    for name in ("simulations", "max_depth", "hidden_dim", "message_layers", "token_buckets", "value_scale"):
+    for name in ("simulations", "max_depth", "hidden_dim", "message_layers", "value_scale"):
         arguments += ["--" + name.replace("_", "-"), str(config[name])]
     if config["calendar_rounds"] is None:
         return [*arguments, "--full-campaign"]

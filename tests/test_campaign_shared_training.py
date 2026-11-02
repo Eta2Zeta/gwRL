@@ -25,11 +25,11 @@ from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
 from studies.campaign.shared_evaluator import game_process, play_shared_games
 from studies.shared.multiplayer_mcts import PLAYERS
 
-TINY = dict(calendar_rounds=1, simulations=2, max_depth=2, hidden_dim=16, token_buckets=2048, complete_episodes=True,
+TINY = dict(calendar_rounds=1, simulations=2, max_depth=2, hidden_dim=16, complete_episodes=True,
             parallel_envs=2, episode_workers=2, batch_size=4)
 ARGUMENTS = ["--calendar-rounds", "1", "--complete-episodes", "--batches", "2", "--parallel-envs", "4",
              "--episode-workers", "2", "--games-per-process", "2", "--transitions-per-batch", "2000",
-             "--simulations", "2", "--max-depth", "2", "--hidden-dim", "16", "--token-buckets", "2048",
+             "--simulations", "2", "--max-depth", "2", "--hidden-dim", "16",
              "--batch-size", "4", "--epochs", "2"]
 
 
@@ -42,7 +42,7 @@ def tiny_learner():
 
 def settings(learner):
     return dict(calendar_rounds=1, model_config=learner.model_config, learning_config=asdict(learner.config),
-                rules_version=learner.compatibility["rules"], numeric=learner._numeric_models())
+                rules_version=learner.compatibility["rules"])
 
 
 def shared_workers(learner, processes=1, games_per_process=1):
@@ -51,7 +51,7 @@ def shared_workers(learner, processes=1, games_per_process=1):
 
 def weights(seed):
     torch.manual_seed(seed)
-    config = CampaignModelConfig(hidden_dim=16, message_layers=1, token_buckets=2048)
+    config = CampaignModelConfig(hidden_dim=16, message_layers=1)
     return {player: CampaignPolicyValueNet(config).state_dict() for player in PLAYERS}
 
 
@@ -104,7 +104,7 @@ class GameProcessEndingTests(unittest.TestCase):
         handler = signal.getsignal(signal.SIGTERM)
         try:
             with patch("multiprocessing.parent_process", return_value=gone):
-                game_process(lambda *_: {}, 2048, "v", [0], [child], [memory.name], tasks, results)
+                game_process(lambda *_: {}, "v", [0], [child], [memory.name], tasks, results)
         finally:
             parent.close()
             memory.close()
@@ -168,11 +168,6 @@ class SharedEpisodeWorkerTests(unittest.TestCase):
         learner = tiny_learner()
         task = {"root": 3, "seed": 91, "batch_version": "v", "max_transitions": 100}
         self.assertEqual(_play_game(settings(learner), Broken(), task)["failure"], "RuntimeError: rules")
-
-    def test_numeric_inputs_are_required(self):
-        with self.assertRaisesRegex(ValueError, "native numerical inputs"):
-            SharedEpisodeWorkers(1, 1, device=torch.device("cpu"), calendar_rounds=1, model_config={},
-                                 learning_config={}, rules_version="r", numeric=False)
 
 
 class SharedTrainingRunTests(unittest.TestCase):

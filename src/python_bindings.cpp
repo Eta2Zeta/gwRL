@@ -5,8 +5,6 @@
 #include "game/mdp.hpp"
 #include "game/campaign_env.hpp"
 #include "game/campaign_actions.hpp"
-#include "game/neural_graph.hpp"
-#include "game/numeric_graph.hpp"
 #include "game/zone_encoding.hpp"
 
 #include <pybind11/numpy.h>
@@ -20,6 +18,7 @@
 #include <stdexcept>
 #include <string>
 #include <memory>
+#include <unordered_map>
 #include <mutex>
 #include <utility>
 
@@ -54,97 +53,6 @@ class NativeCampaignEnv {
 };
 
 using CampaignEnv = game::campaign::CampaignEnv;
-
-// Immutable owning views outlive an environment mutation without copying its
-// state tree. Only small scheduler fields overlay the complete native document.
-struct NumericSnapshot {
-    using V = game::json::Value;
-    std::shared_ptr<const V> source;
-    V::Object overrides;
-    std::shared_ptr<const std::string> actionSourceKey;
-    bool passAction {false};
-    // An observation's legal_actions elements, shared with the actions' own
-    // snapshots; the array in `overrides` stays empty.
-    game::neural::NumericGraphCompiler::Menu menu;
-
-    py::object cacheKey() const {
-        if (!overrides.empty() || (!actionSourceKey && !passAction)) return py::none();
-        const auto& fields = source->asObject();
-        return py::make_tuple(fields.at("id").asString(), fields.at("kind").asString(),
-            fields.at("player").asString(), actionSourceKey ? py::object(py::str(*actionSourceKey)) : py::object(py::none()));
-    }
-
-    V materialize() const {
-        if (overrides.empty()) return *source;
-        auto result = source->asObject();
-        for (const auto& [key, value] : overrides) result.insert_or_assign(key, value);
-        if (!menu.empty()) {
-            V::Array elements;
-            for (const auto& element : menu) elements.push_back(*element);
-            result.insert_or_assign("legal_actions", V(std::move(elements)));
-        }
-        return V(std::move(result));
-    }
-
-    NumericSnapshot scheduledContext(const std::string& schema, const std::vector<std::string>& order) const {
-        auto result = *this;
-        V::Array sequence;
-        for (const auto& owner : order) sequence.emplace_back(owner);
-        result.overrides["interrupt_scheduler"] = V(V::Object{{"schema", V(schema)}, {"order", V(std::move(sequence))}});
-        return result;
-    }
-
-    NumericSnapshot scheduledObservation(const std::optional<std::string>& owner, const std::string& kind,
-            const std::vector<std::reference_wrapper<const NumericSnapshot>>& actions, const std::string& schema,
-            const std::vector<std::string>& order, const std::vector<std::string>& passed) const {
-        auto result = scheduledContext(schema, order);
-        result.overrides["current_decision_player"] = owner ? V(*owner) : V(nullptr);
-        result.overrides["decision_kind"] = V(kind);
-        result.overrides["legal_actions"] = V(V::Array{});
-        result.menu.clear();
-        result.menu.reserve(actions.size());
-        for (const NumericSnapshot& action : actions) {
-            result.menu.push_back(action.overrides.empty() ? action.source : std::make_shared<const V>(action.materialize()));
-        }
-        V::Array passSequence;
-        for (const auto& player : passed) passSequence.emplace_back(player);
-        auto scheduler = result.overrides.at("interrupt_scheduler").asObject();
-        scheduler["passed"] = V(std::move(passSequence));
-        result.overrides["interrupt_scheduler"] = V(std::move(scheduler));
-        return result;
-    }
-
-    static NumericSnapshot scheduledAction(const game::campaign::Action* action,
-            const std::string& id, const std::string& kind, const std::string& player) {
-        V::Object wrapped;
-        wrapped.emplace("id", id);
-        wrapped.emplace("kind", kind);
-        wrapped.emplace("player", player);
-        wrapped.emplace("action", action ? game::campaign::actionJson(*action) : V(nullptr));
-        return {std::make_shared<const V>(std::move(wrapped)), {}, action ? action->neuralSourceKey : nullptr,
-            action == nullptr};
-    }
-
-    std::vector<std::string> factorJson() const {
-        const auto& wrapped = source->asObject();
-        const auto* action = source->find("action");
-        const auto& raw = action && action->isObject() ? *action : *source;
-        const auto* kind = raw.find("kind");
-        const auto* parameters = raw.find("parameters");
-        const std::vector<std::vector<std::string>> groups{
-            {"source", "from", "origin", "source_zone", "unit", "units", "group", "force", "transport", "carrier", "facility", "battle"},
-            {"path", "route", "sea_route", "land_route"},
-            {"target", "destination", "to", "zone", "recipient", "endpoint"}};
-        std::vector<std::string> result{game::campaign::canonicalJson(kind ? *kind : wrapped.at("kind"))};
-        for (const auto& fields : groups) {
-            V::Object group;
-            if (parameters && parameters->isObject()) for (const auto& field : fields)
-                if (const auto* value = parameters->find(field)) group.emplace(field, *value);
-            result.push_back(game::campaign::canonicalJson(V(std::move(group))));
-        }
-        return result;
-    }
-};
 
 std::string describeAction(const game::Action& action) {
     std::string description(game::toString(action.kind));
@@ -182,18 +90,21 @@ struct ZoneInputHandle {
     std::string version;
 };
 
-constexpr std::array<const char*, 12> zoneArrayNames{
+constexpr std::array<const char*, 13> zoneArrayNames{
     "zone_index", "zone_column", "zone_value", "global_column", "global_value", "action_offsets",
-    "action_column", "action_value", "action_source", "action_target", "path_offsets", "path_zone"};
+    "action_column", "action_value", "action_source", "action_target", "path_offsets", "path_zone",
+    "factor_groups"};
 
-std::array<const std::vector<std::int32_t>*, 12> zoneFields(const ZoneInput& z) {
+std::array<const std::vector<std::int32_t>*, 13> zoneFields(const ZoneInput& z) {
     return {&z.zoneIndex, &z.zoneColumn, &z.zoneValue, &z.globalColumn, &z.globalValue, &z.actionOffsets,
-            &z.actionColumn, &z.actionValue, &z.actionSource, &z.actionTarget, &z.pathOffsets, &z.pathZone};
+            &z.actionColumn, &z.actionValue, &z.actionSource, &z.actionTarget, &z.pathOffsets, &z.pathZone,
+            &z.factorGroups};
 }
 
-std::array<std::vector<std::int32_t>*, 12> zoneFields(ZoneInput& z) {
+std::array<std::vector<std::int32_t>*, 13> zoneFields(ZoneInput& z) {
     return {&z.zoneIndex, &z.zoneColumn, &z.zoneValue, &z.globalColumn, &z.globalValue, &z.actionOffsets,
-            &z.actionColumn, &z.actionValue, &z.actionSource, &z.actionTarget, &z.pathOffsets, &z.pathZone};
+            &z.actionColumn, &z.actionValue, &z.actionSource, &z.actionTarget, &z.pathOffsets, &z.pathZone,
+            &z.factorGroups};
 }
 
 py::array_t<std::int32_t> int32Array(const std::vector<std::int32_t>& values) {
@@ -208,37 +119,62 @@ std::vector<std::int32_t> int32Vector(const py::handle& value) {
     return {array.data(), array.data() + array.size()};
 }
 
+// What the network relies on: fields that fit together, zones in order, and
+// policy groups numbered densely, each group inside one group of the level above.
 void validateZoneInput(const ZoneInput& z) {
     const auto offsets = [](const std::vector<std::int32_t>& o, std::size_t entries, std::size_t count) {
         if (o.size() != count + 1 || o.front() != 0 || static_cast<std::size_t>(o.back()) != entries ||
             !std::is_sorted(o.begin(), o.end()))
             throw std::invalid_argument("Zone input offsets are inconsistent");
     };
+    const auto options = z.actionSource.size();
     if (z.zoneIndex.size() != z.zoneColumn.size() || z.zoneIndex.size() != z.zoneValue.size() ||
         z.globalColumn.size() != z.globalValue.size() || z.actionColumn.size() != z.actionValue.size() ||
-        z.actionSource.size() != z.actionTarget.size() || z.factors.size() != z.actionSource.size())
+        z.actionSource.size() != z.actionTarget.size() || z.factorGroups.size() != 4 * options)
         throw std::invalid_argument("Zone input fields differ in length");
-    offsets(z.actionOffsets, z.actionColumn.size(), z.actionSource.size());
-    offsets(z.pathOffsets, z.pathZone.size(), z.actionSource.size());
+    if (!std::is_sorted(z.zoneIndex.begin(), z.zoneIndex.end()))
+        throw std::invalid_argument("Zone input entries are not in zone order");
+    offsets(z.actionOffsets, z.actionColumn.size(), options);
+    offsets(z.pathOffsets, z.pathZone.size(), options);
+    std::vector<std::int32_t> above(options, 0), parent;
+    for (std::size_t level = 0; level < 4; ++level) {
+        std::int32_t groups = 0;
+        for (std::size_t i = 0; i < options; ++i) groups = std::max(groups, z.factorGroups[4 * i + level] + 1);
+        parent.assign(static_cast<std::size_t>(groups), -1);
+        for (std::size_t i = 0; i < options; ++i) {
+            const auto group = z.factorGroups[4 * i + level];
+            if (group < 0) throw std::invalid_argument("Zone policy groups must be nonnegative");
+            auto& seen = parent[static_cast<std::size_t>(group)];
+            if (seen != -1 && seen != above[i]) throw std::invalid_argument("Zone policy groups are not nested");
+            seen = above[i];
+        }
+        if (std::find(parent.begin(), parent.end(), -1) != parent.end())
+            throw std::invalid_argument("Zone policy groups are not numbered densely");
+        for (std::size_t i = 0; i < options; ++i) above[i] = z.factorGroups[4 * i + level];
+    }
 }
 
-ZoneInput zoneFromParts(const py::dict& arrays, const py::list& factors) {
+ZoneInput zoneFromArrays(const py::dict& arrays) {
     ZoneInput z;
     const auto fields = zoneFields(z);
     for (std::size_t i = 0; i < fields.size(); ++i) {
         if (!arrays.contains(zoneArrayNames[i])) throw std::invalid_argument(std::string("Zone input lacks ") + zoneArrayNames[i]);
         *fields[i] = int32Vector(arrays[zoneArrayNames[i]]);
     }
-    for (const auto& item : factors) {
-        const auto parts = item.cast<std::vector<std::string>>();
-        if (parts.size() != 4) throw std::invalid_argument("Each zone option needs four policy groups");
-        z.factors.push_back({parts[0], parts[1], parts[2], parts[3]});
-    }
+    if (arrays.size() != fields.size()) throw std::invalid_argument("Zone input has unknown fields");
     validateZoneInput(z);
     return z;
 }
 
-// The same position with only the listed options, in the listed order.
+py::dict zoneArrays(const ZoneInput& z) {
+    py::dict out;
+    const auto fields = zoneFields(z);
+    for (std::size_t i = 0; i < fields.size(); ++i) out[zoneArrayNames[i]] = int32Array(*fields[i]);
+    return out;
+}
+
+// The same position with only the listed options, in the listed order. Policy
+// groups are renumbered from zero in order of first appearance.
 ZoneInput selectZoneOptions(const ZoneInput& z, const std::vector<int>& indices) {
     ZoneInput out;
     out.zoneIndex = z.zoneIndex;
@@ -246,6 +182,7 @@ ZoneInput selectZoneOptions(const ZoneInput& z, const std::vector<int>& indices)
     out.zoneValue = z.zoneValue;
     out.globalColumn = z.globalColumn;
     out.globalValue = z.globalValue;
+    std::array<std::unordered_map<std::int32_t, std::int32_t>, 4> renumbered;
     for (const int index : indices) {
         if (index < 0 || static_cast<std::size_t>(index) >= z.actionCount())
             throw std::invalid_argument("Zone option index out of range");
@@ -259,7 +196,11 @@ ZoneInput selectZoneOptions(const ZoneInput& z, const std::vector<int>& indices)
         out.actionTarget.push_back(z.actionTarget[i]);
         for (auto k = z.pathOffsets[i]; k < z.pathOffsets[i + 1]; ++k) out.pathZone.push_back(z.pathZone[static_cast<std::size_t>(k)]);
         out.pathOffsets.push_back(static_cast<std::int32_t>(out.pathZone.size()));
-        out.factors.push_back(z.factors[i]);
+        for (std::size_t level = 0; level < 4; ++level) {
+            auto& map = renumbered[level];
+            const auto next = static_cast<std::int32_t>(map.size());
+            out.factorGroups.push_back(map.try_emplace(z.factorGroups[4 * i + level], next).first->second);
+        }
     }
     return out;
 }
@@ -268,7 +209,7 @@ bool sameZoneInput(const ZoneInput& a, const ZoneInput& b) {
     const auto left = zoneFields(a), right = zoneFields(b);
     for (std::size_t i = 0; i < left.size(); ++i)
         if (*left[i] != *right[i]) return false;
-    return a.factors == b.factors;
+    return true;
 }
 
 }  // namespace
@@ -278,18 +219,10 @@ PYBIND11_MODULE(gwrl_cpp, module) {
 
     py::class_<ZoneInputHandle>(module, "CampaignZoneInput",
         "One campaign decision in the fixed zone encoding: nonzero answers to fixed per-zone, "
-        "per-position and per-option questions. Immutable; copies share the native arrays.")
-        .def("arrays", [](const ZoneInputHandle& self) {
-            py::dict out;
-            const auto fields = zoneFields(*self.input);
-            for (std::size_t i = 0; i < fields.size(); ++i) out[zoneArrayNames[i]] = int32Array(*fields[i]);
-            return out;
-        })
-        .def("factors", [](const ZoneInputHandle& self) {
-            py::list out;
-            for (const auto& f : self.input->factors) out.append(py::make_tuple(f[0], f[1], f[2], f[3]));
-            return out;
-        })
+        "per-position and per-option questions, and each option's four policy groups. "
+        "Immutable; copies share the native arrays.")
+        .def("arrays", [](const ZoneInputHandle& self) { return zoneArrays(*self.input); },
+             "Fresh int32 copies of every field; factor_groups holds four ids per option.")
         .def("select", [](const ZoneInputHandle& self, const std::vector<int>& indices) {
             return ZoneInputHandle{std::make_shared<const ZoneInput>(selectZoneOptions(*self.input, indices)), self.version};
         }, py::arg("indices"))
@@ -302,75 +235,23 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("__eq__", [](const ZoneInputHandle& self, const ZoneInputHandle& other) {
             return self.version == other.version && sameZoneInput(*self.input, *other.input);
         }, py::is_operator())
-        .def("__deepcopy__", [](const ZoneInputHandle& self, py::dict) { return self; })
+        // Immutable: a copy is the object itself, as for a tuple.
+        .def("__copy__", [](py::object self) { return self; })
+        .def("__deepcopy__", [](py::object self, py::dict) { return self; })
         .def(py::pickle(
-            [](const ZoneInputHandle& self) {
-                py::dict arrays;
-                const auto fields = zoneFields(*self.input);
-                for (std::size_t i = 0; i < fields.size(); ++i) arrays[zoneArrayNames[i]] = int32Array(*fields[i]);
-                py::list factors;
-                for (const auto& f : self.input->factors) factors.append(py::make_tuple(f[0], f[1], f[2], f[3]));
-                return py::make_tuple(self.version, arrays, factors);
-            },
+            [](const ZoneInputHandle& self) { return py::make_tuple(self.version, zoneArrays(*self.input)); },
             [](const py::tuple& state) {
-                if (state.size() != 3) throw std::invalid_argument("Invalid zone input pickle");
-                return ZoneInputHandle{std::make_shared<const ZoneInput>(
-                    zoneFromParts(state[1].cast<py::dict>(), state[2].cast<py::list>())), state[0].cast<std::string>()};
+                if (state.size() != 2) throw std::invalid_argument("Invalid zone input pickle");
+                return ZoneInputHandle{std::make_shared<const ZoneInput>(zoneFromArrays(state[1].cast<py::dict>())),
+                                       state[0].cast<std::string>()};
             }));
-    module.def("campaign_zone_input", [](const std::string& version, const py::dict& arrays, const py::list& factors) {
-        return ZoneInputHandle{std::make_shared<const ZoneInput>(zoneFromParts(arrays, factors)), version};
-    }, py::arg("version"), py::arg("arrays"), py::arg("factors"),
-       "Rebuild a zone input from its arrays, checking only that its fields fit together.");
+    module.def("campaign_zone_input", [](const std::string& version, const py::dict& arrays) {
+        return ZoneInputHandle{std::make_shared<const ZoneInput>(zoneFromArrays(arrays)), version};
+    }, py::arg("version"), py::arg("arrays"),
+       "Rebuild a zone input from its arrays, checking that its fields fit together.");
     module.def("zone_encoding_unknowns", [](bool reset) { return game::campaign::zoneEncodingUnknowns(reset); },
                py::arg("reset") = false,
                "Names counted in an \"other\" column of the zone encoding since the last reset.");
-
-    module.def("compile_campaign_graph", &game::neural::compileCampaignGraph,
-               py::arg("value"), py::arg("buckets"), py::arg("lexical_ids"),
-               py::arg("string_descriptor"), py::arg("numeric_features"),
-               "Compile complete public JSON features without engine state or learned tensors.");
-
-    py::class_<NumericSnapshot>(module, "CampaignNumericSnapshot")
-        .def_property_readonly("cache_key", &NumericSnapshot::cacheKey)
-        .def("scheduled_context", &NumericSnapshot::scheduledContext, py::call_guard<py::gil_scoped_release>())
-        .def("scheduled_observation", &NumericSnapshot::scheduledObservation)
-        .def("factor_json", &NumericSnapshot::factorJson, py::call_guard<py::gil_scoped_release>())
-        .def("to_python", [](const NumericSnapshot& snapshot) {
-            return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(snapshot.materialize()));
-        });
-    module.def("campaign_pass_snapshot", [](const std::string& id, const std::string& kind, const std::string& player) {
-        return NumericSnapshot::scheduledAction(nullptr, id, kind, player);
-    });
-
-    py::class_<game::neural::NumericGraph, std::shared_ptr<game::neural::NumericGraph>>(module, "CampaignNumericGraph")
-        .def("arrays", &game::neural::NumericGraph::arrays)
-        .def("__eq__", &game::neural::NumericGraph::equals, py::is_operator(), py::call_guard<py::gil_scoped_release>())
-        .def("debug_graph", &game::neural::NumericGraph::debugGraph)
-        .def("external_references", &game::neural::NumericGraph::externalReferences)
-        .def("write_evaluation", &game::neural::NumericGraph::writeEvaluation)
-        .def_property_readonly("node_count", &game::neural::NumericGraph::nodeCount)
-        .def_property_readonly("leaf_count", &game::neural::NumericGraph::leafCount)
-        .def_property_readonly("token_buckets", &game::neural::NumericGraph::bucketCount)
-        .def_property_readonly("nbytes", &game::neural::NumericGraph::retainedBytes)
-        .def("packed_state", &game::neural::NumericGraph::packedState)
-        .def("compacted", &game::neural::NumericGraph::compacted)
-        .def_static("from_packed", &game::neural::NumericGraph::fromPacked)
-        .def("__deepcopy__", [](const std::shared_ptr<game::neural::NumericGraph>& graph, py::dict) { return graph; })
-        .def(py::pickle(
-            [](const game::neural::NumericGraph& graph) -> py::object {
-                return py::module_::import("studies.campaign.numeric_storage").attr("pack_graph")(graph.packedState());
-            },
-            [](const py::object& state) {
-                const auto packed = py::module_::import("studies.campaign.numeric_storage").attr("unpack_graph")(state);
-                return game::neural::NumericGraph::fromPacked(packed.cast<py::dict>());
-            }));
-    py::class_<game::neural::NumericGraphCompiler>(module, "CampaignNumericGraphCompiler")
-        .def(py::init<std::int64_t, py::function, py::function, py::function>())
-        .def("compile", [](game::neural::NumericGraphCompiler& compiler, const NumericSnapshot& snapshot) {
-            return compiler.compile(*snapshot.source, snapshot.overrides, snapshot.menu);
-        })
-        .def("clear_caches", &game::neural::NumericGraphCompiler::clearCaches)
-        .def("cache_stats", &game::neural::NumericGraphCompiler::cacheStats);
 
     py::enum_<game::UnitKind>(module, "UnitKind")
         .value("Infantry", game::UnitKind::Infantry)
@@ -409,11 +290,6 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def_readonly("nation", &game::campaign::Action::nation)
         .def_readonly("player", &game::campaign::Action::player)
         .def_readonly("decision", &game::campaign::Action::decision)
-        .def("scheduled_snapshot", [](const game::campaign::Action& action,
-                const std::string& id, const std::string& kind, const std::string& player) {
-            // Far too short to hand Python's lock to another thread and wait to get it back.
-            return NumericSnapshot::scheduledAction(&action, id, kind, player);
-        })
         .def_property_readonly("parameters", [](const game::campaign::Action &a) {
             return py::module_::import("json").attr("loads")(game::campaign::canonicalJson(a.parameters));
         })
@@ -497,12 +373,6 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("observation", [](const NativeCampaignEnv& self) {
             auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.observation()); });
             return py::module_::import("json").attr("loads")(text);
-        })
-        .def("numeric_observation", [](const NativeCampaignEnv& self) {
-            return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.observationWithoutMenu(); }), {}};
-        })
-        .def("numeric_context", [](const NativeCampaignEnv& self) {
-            return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.contextSnapshot(); }), {}};
         })
         .def("zone_encoding_spec", [](const NativeCampaignEnv& self) {
             const auto spec = self.call([](const CampaignEnv& env) {

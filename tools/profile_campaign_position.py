@@ -72,7 +72,7 @@ def worker(args) -> dict:
     from studies.campaign.baselines import BASELINE_VERSION, baseline_distribution, raw_action
     from studies.campaign.curriculum import make_env, task_manifest
     from studies.campaign.evaluation import profile
-    from studies.campaign.features import graph_compiler_backend
+    from studies.campaign.features import default_zone_spec
     from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
     from studies.campaign.run import source_hashes
     from studies.shared.multiplayer_mcts import MctsConfig, PLAYERS, VectorMCTS
@@ -82,8 +82,9 @@ def worker(args) -> dict:
     random.seed(args.seed)
     np.random.seed(args.seed % 2**32)
     torch.manual_seed(args.seed)
+    layout = default_zone_spec().version
     report["software"] = {"python": sys.version.split()[0], "torch": torch.__version__, "device": "cpu",
-                          "graph_compiler": graph_compiler_backend()}
+                          "network_input": layout}
     report["resources"]["interop_threads"] = torch.get_num_interop_threads()
     report["runtime_source_sha256"] = source_hashes()
     report["diagnostic_source_sha256"] = digest(Path(__file__).resolve())
@@ -143,8 +144,10 @@ def worker(args) -> dict:
     if payload.get("schema") != "campaign-foreground-run-v1":
         raise ValueError("Expected a trusted local foreground-run checkpoint")
     model_config = CampaignModelConfig(**payload["learner"]["metadata"]["model_config"])
-    if (model_config.hidden_dim, model_config.message_layers, model_config.token_buckets) != (16, 1, 2048):
-        raise ValueError("Pilot checkpoint must contain the intended 16-wide, one-layer, 2048-bucket architecture")
+    if (model_config.hidden_dim, model_config.message_layers) != (16, 1):
+        raise ValueError("Pilot checkpoint must contain the intended 16-wide, one-layer architecture")
+    if payload["learner"]["metadata"].get("input_layout") != layout:
+        raise ValueError("Pilot checkpoint models must read the current zone-input layout")
     weights = payload["learner"]["models"]
     if set(weights) != set(PLAYERS):
         raise ValueError("Checkpoint must contain exactly the three campaign players")
@@ -188,7 +191,7 @@ def worker(args) -> dict:
                         search_forced_root=True)
     report["status"] = "profiling_serial_search"
     report["serial_search"] = {"config": asdict(config), "add_root_noise": True,
-                              "cache_scope": "Root features warmed by three operation-profile repeats; descendants first-use",
+                              "cache_scope": "Root zone input built by the operation-profile repeats; descendants build theirs on first use",
                               "note": "Serial cProfile timings include profiler overhead and are not batched throughput estimates"}
     write_json(progress, report)
     profiler = cProfile.Profile()
@@ -225,7 +228,7 @@ def worker(args) -> dict:
     write_json(progress, report)
 
     torch.manual_seed(args.seed)
-    large_config = CampaignModelConfig(hidden_dim=64, message_layers=2, token_buckets=16384)
+    large_config = CampaignModelConfig(hidden_dim=64, message_layers=2)
     large_models = {player: CampaignPolicyValueNet(large_config).eval() for player in PLAYERS}
     large_evaluator, large_versions = make_evaluator(large_models)
     report["models"]["larger"] = {"config": asdict(large_config), "versions": large_versions,
@@ -241,7 +244,7 @@ def worker(args) -> dict:
         raise RuntimeError("Diagnostics mutated actual state, execution RNG, frozen weights or source checkpoint")
     report["status"] = "completed"
     report["limits"] = ["Frozen inference-only timing, not training or a claim of strategic strength.",
-                        "Operation profile compares the same real menu; first calls include token parsing.",
+                        "Operation profile compares the same real menu; first calls include building its zone input.",
                         "Cumulative profiler rows overlap and must not be added together.",
                         "Native engine/PyTorch internals appear at their Python-call boundaries.",
                         "Single-root serial profiling does not measure independent-root batching efficiency."]

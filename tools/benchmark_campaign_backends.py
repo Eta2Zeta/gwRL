@@ -36,7 +36,6 @@ class Config:
     seeds: tuple[int, ...] = (1951,)
     repetitions: int = 2
     warmups: int = 1
-    buckets: int = 2048
     max_transitions: int = 5000
     max_state_visits: int = 20
     seconds: float = 120.0
@@ -51,11 +50,9 @@ class Config:
         if not self.seeds or len(set(self.seeds)) != len(self.seeds) or any(
                 type(seed) is not int or not 0 <= seed < 2**64 for seed in self.seeds):
             raise ValueError("Seeds must be distinct unsigned 64-bit integers")
-        for name in ("repetitions", "warmups", "buckets", "max_transitions", "max_state_visits"):
+        for name in ("repetitions", "warmups", "max_transitions", "max_state_visits"):
             if type(getattr(self, name)) is not int or getattr(self, name) <= 0:
                 raise ValueError(f"{name} must be a positive integer")
-        if self.buckets < 2:
-            raise ValueError("Numerical vocabulary needs at least two buckets")
         if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(12, os.cpu_count() or 1):
             raise ValueError("CPU allowance must fit three reserved processes and at most 12 available cores")
         if type(self.memory_bytes) is not int or not 1_000_000_000 < self.memory_bytes <= 30_000_000_000:
@@ -95,43 +92,17 @@ def public_checkpoint(serialized):
     return {**value, "raw": raw}
 
 
-def numeric_digest(value):
-    """Hash full numerical arrays and reference metadata, without a JSON round trip."""
+def zone_digest(zone):
+    """Hash a zone input's layout version and every array's name, dtype, shape and bytes."""
     result = hashlib.sha256()
 
     def block(tag, data):
         result.update(tag + struct.pack("<Q", len(data)) + data)
 
-    def visit(item):
-        if hasattr(item, "arrays") and hasattr(item, "packed_state"):
-            packed = item.packed_state()
-            visit({"arrays": item.arrays(), "identities": packed["identities"],
-                   "references": packed["references"], "leaf_count": item.leaf_count,
-                   "buckets": item.token_buckets})
-        elif hasattr(item, "dtype") and hasattr(item, "shape") and hasattr(item, "tobytes"):
-            block(b"A", str(item.dtype).encode()); visit(tuple(item.shape)); block(b"B", item.tobytes())
-        elif isinstance(item, dict):
-            result.update(b"D")
-            for key in sorted(item):
-                visit(key); visit(item[key])
-            result.update(b"d")
-        elif isinstance(item, (tuple, list)):
-            result.update(b"L" + struct.pack("<Q", len(item)))
-            for child in item:
-                visit(child)
-        elif item is None:
-            result.update(b"N")
-        elif isinstance(item, bool):
-            result.update(b"Y" if item else b"Z")
-        elif isinstance(item, int):
-            block(b"I", str(item).encode())
-        elif isinstance(item, float):
-            result.update(b"F" + struct.pack("<d", item))
-        elif isinstance(item, str):
-            block(b"S", item.encode())
-        else:
-            raise TypeError(f"Unknown numerical input component {type(item).__name__}")
-    visit(value)
+    block(b"V", zone.version.encode())
+    for name, values in sorted(zone.arrays().items()):
+        block(b"N", name.encode()); block(b"T", values.dtype.str.encode())
+        block(b"S", struct.pack(f"<{values.ndim}Q", *values.shape)); block(b"B", values.tobytes())
     return result.hexdigest()
 
 
@@ -235,9 +206,9 @@ class PlainDriver:
                           "action_ids": [action_key(action) for action in menu]}
                          for lane, menu in zip(lanes, actions)]
 
-    def numeric(self, lanes, batch):
-        from studies.campaign.features import make_numeric_input
-        return [make_numeric_input(self.envs[lane], actions, self.buckets) for lane, actions in zip(lanes, batch)]
+    def zone_inputs(self, lanes, batch):
+        from studies.campaign.features import make_zone_input
+        return [make_zone_input(self.envs[lane], actions) for lane, actions in zip(lanes, batch)]
 
     def apply(self, lanes, batch, selected):
         from studies.shared.multiplayer_mcts import action_key
@@ -271,11 +242,11 @@ class WrappedDriver:
                  "action_ids": list(row.action_ids)} for row in self.backend.inspect_decisions(batch)]
         return batch, rows
 
-    def numeric(self, _lanes, batch):
-        return self.backend.numeric_inputs(batch, buckets=self.buckets)
+    def zone_inputs(self, _lanes, batch):
+        return self.backend.zone_inputs(batch)
 
-    def inspect_numeric(self, buffer):
-        return self.backend.inspect_numeric(buffer)
+    def inspect_zone_inputs(self, buffer):
+        return self.backend.inspect_zone_inputs(buffer)
 
     def apply(self, _lanes, batch, selected):
         self.backend.apply_actions(batch, tuple(selected))
@@ -297,10 +268,9 @@ def replay(config, cases, *, wrapped, whole_games, factory=None, deadline=None):
         env.restore(case["initial"])
     initial_random = [json.loads(json.loads(env.serialize())["raw"])["random"] for env in envs]
     driver = WrappedDriver(envs, config.backend) if wrapped else PlainDriver(envs)
-    driver.buckets = config.buckets
     setup_seconds = time.perf_counter() - setup_started
-    offsets, transcripts, numeric = [0] * len(cases), [[] for _ in cases], [[] for _ in cases]
-    timings = {name: 0.0 for name in ("decisions", "numeric_export", "actions", "chance")}
+    offsets, transcripts, zones = [0] * len(cases), [[] for _ in cases], [[] for _ in cases]
+    timings = {name: 0.0 for name in ("decisions", "zone_input_export", "actions", "chance")}
     started = time.perf_counter()
     while any(offset < len(case["steps"]) for offset, case in zip(offsets, cases)):
         if deadline is not None and time.monotonic() >= deadline:
@@ -319,13 +289,13 @@ def replay(config, cases, *, wrapped, whole_games, factory=None, deadline=None):
                         f"Backend decision/menu mismatch at lane {lane}, step {offsets[lane]}")
                 require(descriptor(driver.scalar(lane)) == reference, "Full host state/menu witness differs")
             if not whole_games:
-                before = time.perf_counter(); buffer = driver.numeric(lanes, batch)
-                timings["numeric_export"] += time.perf_counter() - before
+                before = time.perf_counter(); buffer = driver.zone_inputs(lanes, batch)
+                timings["zone_input_export"] += time.perf_counter() - before
                 # This is an explicit diagnostic host inspection, outside timed
                 # backend operations. Future device buffers need not expose it in training.
-                inspected = driver.inspect_numeric(buffer) if wrapped else buffer
+                inspected = driver.inspect_zone_inputs(buffer) if wrapped else buffer
                 for lane, item in zip(lanes, inspected):
-                    numeric[lane].append(numeric_digest(item))
+                    zones[lane].append(zone_digest(item))
             cursors = [driver.scalar(lane).raw.history_size() for lane in lanes]
             if chance:
                 requests = driver.requests(lanes, batch)
@@ -358,7 +328,7 @@ def replay(config, cases, *, wrapped, whole_games, factory=None, deadline=None):
                     "Full final public state/history/scheduler differs")
         final.append({"seed": case["seed"], "steps": offsets[lane], "terminal": env.is_terminal(),
                       "execution_rng_unchanged": True,
-                      "trace_sha256": digest(transcripts[lane]), "numeric_input_sha256": numeric[lane]})
+                      "trace_sha256": digest(transcripts[lane]), "zone_input_sha256": zones[lane]})
     return {"path": "wrapped_cpu" if wrapped else "plain_cpu", "setup_seconds": setup_seconds,
             "audited_replay_wall_seconds": elapsed, "operations_seconds": timings,
             "final_state_audit_seconds": time.perf_counter() - final_audit_started,
@@ -399,7 +369,7 @@ def run_case(config, output, workload_output):
               "measurements": [], "timing_scope": "Rules replay only. Policy selection and sampled-dice preparation are outside measurement. Timed operations use actual backend calls; audited replay wall also includes disclosed host witness checks and driver overhead.",
               "limits": ["No GPU implementation, neural search, self-play or training is measured.",
                          "Explicit outcome replay preserves execution RNG; only that RNG field is excluded from public-state parity.",
-                         "Numerical export is included only in positions mode. Scripted games measure rules/interface replay without neural input generation.",
+                         "Zone-input export is included only in positions mode. Scripted games measure rules/interface replay without neural input generation.",
                          "Whole-game throughput includes step witness auditing and Python driver overhead; final full-state verification and environment construction are timed separately.",
                          "Small defaults establish a benchmark scaffold, not training feasibility or strategic strength."]}
     atomic_json(output, report)
@@ -427,7 +397,7 @@ def run_case(config, output, workload_output):
             reference = replay(config, cases, wrapped=False, whole_games=config.mode == "scripted_games", deadline=deadline)
             actual = replay(config, cases, wrapped=True, whole_games=config.mode == "scripted_games", deadline=deadline)
             parity = compare_results(reference, actual)
-            require(parity["matched"], "Plain/wrapped CPU numerical or replay parity failed")
+            require(parity["matched"], "Plain/wrapped CPU zone-input or replay parity failed")
             report["measurements"].append({"repetition": repetition, "plain_cpu": reference, "wrapped_cpu": actual, "parity": parity})
             atomic_json(output, report)
         report["status"] = "completed"

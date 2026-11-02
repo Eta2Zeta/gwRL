@@ -8,12 +8,14 @@ from pathlib import Path
 import tempfile
 import unittest
 
+import gwrl_cpp
 from studies.campaign.curriculum import make_env
-from studies.campaign.features import make_input
+from studies.campaign.features import default_zone_spec, make_zone_input
 from studies.campaign.run import RunConfig
-from tools.verify_campaign_continuation import (FEATURE_FUNCTIONS, ast_functions, canonical,
-    audit_legacy_runtime_manifest, core_digest, digest_file, migrated_payload, rehydrate_public_state,
-    sample_groups, validate_output_paths)
+from studies.shared.multiplayer_mcts import PLAYERS
+from tools.verify_campaign_continuation import (FEATURE_FUNCTIONS, ROOT, ast_feature_bindings, ast_functions,
+    canonical, audit_legacy_runtime_manifest, core_digest, digest_file, environment_record, migrated_payload,
+    sample_groups, validate_output_paths, verify_sample, zone_digest)
 
 
 class ContinuationProofTests(unittest.TestCase):
@@ -21,34 +23,39 @@ class ContinuationProofTests(unittest.TestCase):
     def setUpClass(cls):
         cls.template = make_env(17, calendar_rounds=3)
 
-    def test_rehydration_matches_full_public_input_and_scheduler_without_borrowing_execution_rng(self):
+    def test_active_record_digests_the_zone_input_without_changing_the_game(self):
         env = make_env(1951, calendar_rounds=3)
-        actions = env.legal_actions()
-        passes = [action for action in actions if action.kind == "pass_interrupt"]
+        passes = [action for action in env.legal_actions() if action.kind == "pass_interrupt"]
         self.assertTrue(passes)
         env.apply_action(passes[0])
-        features = make_input(env, env.legal_actions())
         original = env.serialize()
-        base = json.loads(self.template.raw.serialize())
-        synthetic = rehydrate_public_state(self.template, features["observation"], {}, base_engine=base)
-        self.assertEqual(make_input(synthetic, synthetic.legal_actions()), features)
-        self.assertEqual(synthetic.planning_key(), env.planning_key())
-        self.assertNotEqual(json.loads(synthetic.raw.serialize())["random"],
-                            json.loads(env.raw.serialize())["random"])
+        record = environment_record(env)
         self.assertEqual(env.serialize(), original)
-        self.assertEqual(base, json.loads(self.template.raw.serialize()))
+        self.assertEqual(json.loads(canonical(record)), record)  # The legacy witness sends it as JSON.
+        self.assertEqual(record["input_sha256"], zone_digest(make_zone_input(env, env.legal_actions())))
+        restored = self.template.clone(); restored.restore(original)
+        self.assertEqual(canonical(environment_record(restored)), canonical(record))
+        opening = environment_record(make_env(1951, calendar_rounds=3))
+        self.assertNotEqual(opening["input_sha256"], record["input_sha256"])
+        self.assertNotEqual(opening["observation_sha256"], record["observation_sha256"])
 
-    def test_rehydration_rejects_stale_scheduler_and_execution_fields(self):
-        observation = make_input(self.template, self.template.legal_actions())["observation"]
-        for mutation in (
-            lambda value: value["interrupt_scheduler"].update(passed=["axis", "axis"]),
-            lambda value: value["interrupt_scheduler"].update(order=["axis"] * 3),
-            lambda value: value["state"].update(history=[]),
-            lambda value: value["state"].update(definition_fingerprint="borrowed"),
-        ):
-            value = json.loads(canonical(observation)); mutation(value)
-            with self.assertRaises(ValueError):
-                rehydrate_public_state(self.template, value, {})
+    def test_saved_rows_are_read_against_the_current_layout_owner_and_menu(self):
+        spec, env = default_zone_spec(), self.template.clone()
+        actions = env.legal_actions()
+        zone = make_zone_input(env, actions)
+        sample = {"input": zone, "owner": env.current_decision_player(), "policy": [1 / len(actions)] * len(actions),
+                  "rollout_version": "unit-test"}
+        self.assertEqual(verify_sample(sample, spec, "replay[0]"), (zone_digest(zone), zone_digest(zone)))
+        other = next(player for player in PLAYERS if player != sample["owner"])
+        broken = zone.arrays(); broken["zone_column"][0] = spec.zone_columns
+        for changed, message in (({**sample, "owner": other}, "ownership changed at replay"),
+                                 ({**sample, "policy": sample["policy"][:-1]}, "complete legal menu"),
+                                 ({**sample, "input": {"schema": "campaign-neural-input-v1"}}, "Unsupported"),
+                                 ({**sample, "input": gwrl_cpp.campaign_zone_input("another-layout", zone.arrays())},
+                                  "Unsupported"),
+                                 ({**sample, "input": gwrl_cpp.campaign_zone_input(zone.version, broken)}, "out of range")):
+            with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
+                verify_sample(changed, spec, "replay[0]")
 
     def test_operational_migration_preserves_learner_and_every_nonoperational_runner_field(self):
         config = asdict(RunConfig(seed=1951, calendar_rounds=3, batches=10000, complete_episodes=True,
@@ -63,7 +70,7 @@ class ContinuationProofTests(unittest.TestCase):
                               "updates": [{"kept": True}], "total_waves": 6000}}
         before = copy.deepcopy(payload)
         hashes = {"new": "hash"}
-        proof = {"status": "verified", "saved_input_sha256": "same", "regenerated_input_sha256": "same",
+        proof = {"status": "verified", "saved_input_sha256": "same", "rebuilt_input_sha256": "same",
                  "audit": {"current_runtime_source_sha256": hashes}}
         migrated = migrated_payload(payload, proof, hashes)
         self.assertIs(migrated["learner"], learner)
@@ -74,7 +81,7 @@ class ContinuationProofTests(unittest.TestCase):
         self.assertEqual(migrated["runner"]["config"]["checkpoint_interval_seconds"], 1800.)
         for name in set(payload["runner"]) - {"config", "runtime_source_sha256"}:
             self.assertEqual(migrated["runner"][name], payload["runner"][name])
-        for invalid in ({**proof, "status": "partial"}, {**proof, "regenerated_input_sha256": "changed"}):
+        for invalid in ({**proof, "status": "partial"}, {**proof, "rebuilt_input_sha256": "changed"}):
             with self.assertRaises(ValueError): migrated_payload(payload, invalid, hashes)
         with self.assertRaises(ValueError): migrated_payload(payload, proof, {"new": "changed"})
 
@@ -127,6 +134,11 @@ class ContinuationProofTests(unittest.TestCase):
             self.assertEqual(first, ast_functions(path, FEATURE_FUNCTIONS))
             path.write_text(path.read_text().replace("return x + 1", "return x + 2", 1))
             self.assertNotEqual(first, ast_functions(path, FEATURE_FUNCTIONS))
+
+    def test_audit_pins_definitions_the_current_input_module_has(self):
+        path = ROOT / "studies/campaign/features.py"
+        self.assertEqual(set(ast_functions(path, FEATURE_FUNCTIONS)), set(FEATURE_FUNCTIONS))
+        self.assertTrue(ast_feature_bindings(path))
 
 
 if __name__ == "__main__":

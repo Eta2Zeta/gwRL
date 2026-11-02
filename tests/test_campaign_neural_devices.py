@@ -8,12 +8,11 @@ from unittest.mock import patch
 
 import torch
 
-from studies.campaign import neural
 from studies.campaign.neural import (CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator,
-                                    clear_neural_caches, make_input, neural_device_memory,
+                                    neural_device_memory, release_device_memory,
                                     resolve_neural_device, synchronize_neural_device)
 from studies.shared.multiplayer_mcts import PLAYERS
-from tests.test_campaign_neural import PublicEnv, action
+from tests.test_campaign_neural import PublicEnv, action, synthetic_zone
 
 
 class CampaignNeuralDeviceTests(unittest.TestCase):
@@ -27,12 +26,8 @@ class CampaignNeuralDeviceTests(unittest.TestCase):
         torch.set_num_threads(cls.previous_threads)
 
     def setUp(self):
-        self.config = CampaignModelConfig(hidden_dim=8, message_layers=1, token_buckets=128)
-        self.item = make_input(PublicEnv(), [action("a"), action("b", target="land_b")])
-        clear_neural_caches()
-
-    def tearDown(self):
-        clear_neural_caches()
+        self.config = CampaignModelConfig(hidden_dim=8, message_layers=1)
+        self.item = synthetic_zone(3)
 
     def model(self, device="cpu"):
         torch.manual_seed(81)
@@ -82,22 +77,14 @@ class CampaignNeuralDeviceTests(unittest.TestCase):
             forced_cpu = self.model("cpu")
         self.assertTrue(all(parameter.device.type == "cpu" for parameter in forced_cpu.parameters()))
 
-    def test_explicit_cache_release_preserves_parameters_and_cpu_memory_is_external(self):
+    def test_memory_release_preserves_parameters_and_cpu_memory_is_external(self):
         model = self.model().eval()
         saved = copy.deepcopy(model.state_dict())
         with torch.inference_mode():
-            model.forward_batch([self.item], model_version="frozen")
-        self.assertGreater(neural._GRAPH_TENSOR_BYTES, 0)
-        self.assertTrue(model._static_contexts.values)
-        clear_neural_caches((model,), device="cpu", release_allocator=True)
-        self.assertEqual(neural._GRAPH_TENSOR_BYTES, 0)
-        self.assertFalse(neural._GRAPH_TENSORS)
-        self.assertFalse(neural._ENCODER_LAYOUTS.values)
-        self.assertFalse(model._static_contexts.values)
+            model.forward_batch([self.item])
+        release_device_memory("cpu")
         for name, value in model.state_dict().items():
             self.assertTrue(torch.equal(value, saved[name]), name)
-        with self.assertRaisesRegex(ValueError, "explicit"):
-            clear_neural_caches(release_allocator=True)
         self.assertIsNone(neural_device_memory("cpu")["allocated_bytes"])
         synchronize_neural_device("cpu")
 
@@ -137,18 +124,18 @@ class CampaignNeuralDeviceTests(unittest.TestCase):
         self.assertGreater(stats["recommended_max_bytes"], 0)
 
     @unittest.skipUnless(torch.backends.mps.is_available(), "MPS hardware unavailable")
-    def test_mps_static_caches_do_not_survive_weight_device_changes(self):
+    def test_moving_weights_between_devices_keeps_outputs(self):
         model = self.model().eval()
         with torch.inference_mode():
-            before_logits, before_values = model.forward_batch([self.item], model_version="same-weights")
+            before_logits, before_values = model.forward_batch([self.item])
             model.to("mps")
-            mps_logits, _ = model.forward_batch([self.item], model_version="same-weights")
+            mps_logits, _ = model.forward_batch([self.item])
             torch.testing.assert_close(mps_logits[0].cpu(), before_logits[0], rtol=2e-4, atol=2e-5)
             with patch.dict(os.environ, {"PYTORCH_ENABLE_MPS_FALLBACK": "1"}):
                 with self.assertRaisesRegex(ValueError, "fallback"):
-                    model.forward_batch([self.item], model_version="same-weights")
+                    model.forward_batch([self.item])
             model.to("cpu")
-            after_logits, after_values = model.forward_batch([self.item], model_version="same-weights")
+            after_logits, after_values = model.forward_batch([self.item])
         self.assertTrue(torch.equal(before_logits[0], after_logits[0]))
         self.assertTrue(torch.equal(before_values, after_values))
 

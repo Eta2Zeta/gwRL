@@ -12,9 +12,9 @@ calls is counted once, in the inner one:
   search logic          VectorMCTS's tree code: everything in a search not below
   adapter               CampaignAdapter's Python layer around the engine
   rules engine          gwrl_cpp.CampaignEnv calls: legal moves, moves, dice, clones, keys
-  input: graph compile  native graph compiles, including their Python token callbacks
-  input: native         numeric snapshots, graph array exports and the evaluation's arrays
-  input: python         shared_evaluator.prepare_into and the adapter's numeric_input
+  input: encode         the engine's zone encoding of each decision (CampaignEnv.zone_input)
+  input: native         choosing options from an encoding and exporting its arrays
+  input: python         shared_evaluator.prepare_into and the adapter's zone_input
   messaging             the evaluator's own code and the pipe's CPU
   game loop             play_shared_game outside searches
 
@@ -52,13 +52,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 SCHEMA = "campaign-game-process-cpu-profile-v1"
-CATEGORIES = ("search logic", "adapter", "rules engine", "input: graph compile", "input: native",
+CATEGORIES = ("search logic", "adapter", "rules engine", "input: encode", "input: native",
               "input: python", "messaging", "game loop")
 # studies/campaign/runs/shared-gpu-2026-10-29/command.sh
 SETTINGS = dict(mode="selfplay", devices=("mps",), search_evaluation="per_search", threads=1, calendar_rounds=11,
                 simulations=64, max_depth=16, max_transitions=20000, max_state_visits=20, hidden_dim=64,
-                message_layers=2, token_buckets=16384, value_scale=100.0, model_seed=1951,
-                memory_bytes=30_000_000_000, cpu_budget=12)
+                message_layers=2, value_scale=100.0, model_seed=1951, memory_bytes=30_000_000_000, cpu_budget=12)
 
 _clock = time.thread_time_ns
 _local = threading.local()
@@ -157,16 +156,12 @@ def _install() -> float:
     wrap(gwrl_cpp.CampaignEnv, ("planning_key", "decision_kind", "current_decision_player", "is_terminal",
                                 "legal_actions", "legal_interrupts", "apply_action", "apply_interrupt",
                                 "resolve_chance", "clone", "clone_for_search", "returns"), "rules engine")
-    wrap(gwrl_cpp.CampaignEnv, ("numeric_observation", "numeric_context"), "input: native")
-    wrap(gwrl_cpp.CampaignNumericSnapshot, ("scheduled_observation", "scheduled_context", "factor_json"),
-         "input: native")
-    wrap(gwrl_cpp.CampaignAction, ("scheduled_snapshot",), "input: native")
-    wrap(gwrl_cpp.CampaignNumericGraph, ("arrays", "external_references", "write_evaluation"), "input: native")
-    wrap(gwrl_cpp.CampaignNumericGraphCompiler, ("compile",), "input: graph compile")
+    wrap(gwrl_cpp.CampaignEnv, ("zone_input",), "input: encode")
+    wrap(gwrl_cpp.CampaignZoneInput, ("select", "arrays"), "input: native")
     wrap(campaign_adapter.CampaignAdapter, ("planning_key", "decision_kind", "current_decision_player",
                                             "is_terminal", "legal_actions", "apply_action", "resolve_chance",
                                             "clone", "clone_for_search", "returns"), "adapter")
-    wrap(campaign_adapter.CampaignAdapter, ("numeric_input",), "input: python")
+    wrap(campaign_adapter.CampaignAdapter, ("zone_input",), "input: python")
     wrap(shared_evaluator, ("prepare_into",), "input: python")
     wrap(Connection, ("send", "recv"), "messaging")
     shared_evaluator.RemoteEvaluator.evaluate = _evaluations(shared_evaluator.RemoteEvaluator.evaluate)

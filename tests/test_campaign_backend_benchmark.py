@@ -5,12 +5,13 @@ import copy
 import errno
 import json
 from pathlib import Path
+import pickle
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from tools.benchmark_campaign_backends import (Config, WorkloadLimit, compare_results, descriptor,
-    numeric_digest, prepare, public_checkpoint, replay, run_case, sampled_step, supervise)
+    prepare, public_checkpoint, replay, run_case, sampled_step, supervise, zone_digest)
 
 
 class BackendBenchmarkTests(unittest.TestCase):
@@ -30,21 +31,26 @@ class BackendBenchmarkTests(unittest.TestCase):
         raw["state"]["history"][0]["face"] = 4; value["raw"] = json.dumps(raw)
         self.assertNotEqual(first, public_checkpoint(json.dumps(value)))
 
-    def test_numeric_fingerprint_tracks_array_bits_shape_dtype_and_metadata(self):
-        import numpy as np
-        left = {"array": np.array([1, 2], dtype=np.int64), "references": ((0, "a"),)}
-        self.assertEqual(numeric_digest(left), numeric_digest(copy.deepcopy(left)))
-        for changed in ({**left, "array": np.array([1, 3], dtype=np.int64)},
-                        {**left, "array": np.array([1, 2], dtype=np.int32)},
-                        {**left, "array": left["array"].reshape(1, 2)},
-                        {**left, "references": ((0, "b"),)}):
-            self.assertNotEqual(numeric_digest(left), numeric_digest(changed))
+    def test_zone_fingerprint_tracks_layout_version_and_every_array(self):
+        import gwrl_cpp
+        from studies.campaign.curriculum import make_env
+        from studies.campaign.features import make_zone_input
+        env = make_env(1951, calendar_rounds=3)
+        zone = make_zone_input(env, env.legal_actions())
+        self.assertGreater(zone.action_count, 1)
+        self.assertEqual(zone_digest(zone), zone_digest(gwrl_cpp.campaign_zone_input(zone.version, zone.arrays())))
+        self.assertEqual(zone_digest(zone), zone_digest(pickle.loads(pickle.dumps(zone))))
+        changed = zone.arrays(); changed["zone_value"][0] += 1
+        for other in (gwrl_cpp.campaign_zone_input("another-layout", zone.arrays()),
+                      gwrl_cpp.campaign_zone_input(zone.version, changed),
+                      zone.select(list(range(zone.action_count))[::-1]), zone.select([0]), zone.without_actions()):
+            self.assertNotEqual(zone_digest(zone), zone_digest(other))
 
     def test_empty_or_changed_measurements_never_establish_matched_throughput(self):
         self.assertFalse(compare_results({}, {})["matched"])
-        good = {"lanes": [{"trace_sha256": "a", "numeric_input_sha256": ["b"]}], "completed_three_round_games": 0}
+        good = {"lanes": [{"trace_sha256": "a", "zone_input_sha256": ["b"]}], "completed_three_round_games": 0}
         self.assertTrue(compare_results(good, copy.deepcopy(good))["matched"])
-        bad = copy.deepcopy(good); bad["lanes"][0]["numeric_input_sha256"] = ["c"]
+        bad = copy.deepcopy(good); bad["lanes"][0]["zone_input_sha256"] = ["c"]
         self.assertFalse(compare_results(good, bad)["matched"])
 
     @staticmethod
@@ -58,14 +64,14 @@ class BackendBenchmarkTests(unittest.TestCase):
             sampled_step(env)
         raise AssertionError("Real opening never reached its expected chance request")
 
-    def test_actual_cpu_wrapper_is_used_and_opening_numerical_state_matches(self):
+    def test_actual_cpu_wrapper_is_used_and_opening_zone_input_matches(self):
         from studies.campaign.backends import CPUBatchBackend
-        calls = {"decision": 0, "numeric": 0, "apply": 0}
+        calls = {"decision": 0, "zone": 0, "apply": 0}
         class Counted(CPUBatchBackend):
             def decision_batch(self, lanes=None):
                 calls["decision"] += 1; return super().decision_batch(lanes)
-            def numeric_inputs(self, batch, buckets=2048):
-                calls["numeric"] += 1; return super().numeric_inputs(batch, buckets)
+            def zone_inputs(self, batch):
+                calls["zone"] += 1; return super().zone_inputs(batch)
             def apply_actions(self, batch, selections):
                 calls["apply"] += 1; return super().apply_actions(batch, selections)
         case = self._one_step()

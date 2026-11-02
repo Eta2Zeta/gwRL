@@ -16,7 +16,11 @@ def option_rows(zone, index):
     lo, hi = a["action_offsets"][index], a["action_offsets"][index + 1]
     plo, phi = a["path_offsets"][index], a["path_offsets"][index + 1]
     return (a["action_column"][lo:hi].tolist(), a["action_value"][lo:hi].tolist(), int(a["action_source"][index]),
-            int(a["action_target"][index]), a["path_zone"][plo:phi].tolist(), zone.factors()[index])
+            int(a["action_target"][index]), a["path_zone"][plo:phi].tolist())
+
+
+def groups(zone):
+    return zone.arrays()["factor_groups"].reshape(-1, 4)
 
 
 def position_rows(zone):
@@ -54,6 +58,13 @@ class ZoneEncodingTests(unittest.TestCase):
         self.assertEqual(position_rows(subset), position_rows(full))
         for row, index in enumerate(chosen):
             self.assertEqual(option_rows(subset, row), option_rows(full, index))
+        # Policy groups are renumbered from zero but keep which options share them.
+        whole, part = groups(full), groups(subset)
+        for level in range(4):
+            seen = {}
+            for row, index in enumerate(chosen):
+                self.assertEqual(seen.setdefault(int(whole[index, level]), int(part[row, level])), part[row, level])
+            self.assertEqual(sorted(set(part[:, level].tolist())), list(range(len(seen))))
         value_only = full.without_actions()
         self.assertEqual(value_only.action_count, 0)
         self.assertEqual(position_rows(value_only), position_rows(full))
@@ -64,16 +75,23 @@ class ZoneEncodingTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.env.zone_input(tuple(other.legal_actions()[:1]) + actions[:1])
 
+    def test_equal_options_of_a_copy_select_the_same_encoding(self):
+        actions = tuple(self.env.legal_actions())
+        clone = self.env.clone_for_search(5)
+        self.assertTrue(clone.zone_input(actions[::-1]) == self.env.zone_input(actions).select(list(range(len(actions)))[::-1]))
+
     def test_pickles_and_rebuilds_without_change(self):
         zone = self.env.zone_input(tuple(self.env.legal_actions()))
         restored = pickle.loads(pickle.dumps(zone))
         self.assertTrue(restored == zone)
-        rebuilt = gwrl_cpp.campaign_zone_input(zone.version, zone.arrays(), zone.factors())
+        rebuilt = gwrl_cpp.campaign_zone_input(zone.version, zone.arrays())
         self.assertTrue(rebuilt == zone)
-        broken = zone.arrays()
-        broken["action_offsets"] = broken["action_offsets"][:-1]
-        with self.assertRaises(ValueError):
-            gwrl_cpp.campaign_zone_input(zone.version, broken, zone.factors())
+        for name, change in (("action_offsets", lambda a: a[:-1]), ("zone_index", lambda a: a[::-1]),
+                             ("factor_groups", lambda a: a + 1), ("factor_groups", lambda a: a[:-1])):
+            broken = zone.arrays()
+            broken[name] = change(broken[name])
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                gwrl_cpp.campaign_zone_input(zone.version, broken)
 
     def test_a_new_decision_gets_a_new_encoding(self):
         actions = tuple(self.env.legal_actions())

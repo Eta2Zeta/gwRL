@@ -136,7 +136,6 @@ def worker(args):
     sys.path.insert(0, str(args.runtime.resolve()))
     import studies.campaign.batching as batching
     import studies.campaign.curriculum as curriculum
-    import studies.campaign.features as features
     import studies.campaign.neural as neural
     from studies.campaign.scaling_benchmark import BenchmarkConfig, _write, run_case
     from studies.shared.multiplayer_mcts import action_key
@@ -158,19 +157,15 @@ def worker(args):
     curriculum.make_env = factory
 
     if args.instrument:
-        neural.make_input = timers.wrap(neural.make_input, "input.prepare")
-        if hasattr(features, "make_numeric_input"):
-            features.make_numeric_input = timers.wrap(features.make_numeric_input, "input.prepare")
-        if hasattr(features, "compile_numeric"):
-            features.compile_numeric = timers.wrap(features.compile_numeric, "input.compile_numeric")
-        neural._graph_tensors = timers.wrap(neural._graph_tensors, "input.graph_tensors")
-        if features._native_compile_graph is not None:
-            features._native_compile_graph = timers.wrap(features._native_compile_graph, "input.compile_graph")
+        # The names the evaluator and the network look up in their own module.
+        neural.make_zone_input = timers.wrap(neural.make_zone_input, "input.prepare")
+        neural.pack_zone_inputs = timers.wrap(neural.pack_zone_inputs, "input.pack")
+        neural.batch_tensors = timers.wrap(neural.batch_tensors, "input.batch_tensors")
         original_forward = neural.CampaignPolicyValueNet.forward_batch
-        def forward(self, inputs, **kwargs):
+        def forward(self, inputs):
             model_batch_sizes[len(inputs)] += 1
-            with timers.measure("network.forward_with_input_graphs"):
-                return original_forward(self, inputs, **kwargs)
+            with timers.measure("network.forward_with_input_packing"):
+                return original_forward(self, inputs)
         neural.CampaignPolicyValueNet.forward_batch = forward
         neural.NeuralEvaluator.evaluate_batch = timers.wrap(
             neural.NeuralEvaluator.evaluate_batch, "inference.total")
@@ -206,7 +201,7 @@ def worker(args):
         "fingerprinting_seconds": fingerprint_seconds,
         "final_engine_state_and_rng_sha256": [hashlib.sha256(env.serialize().encode()).hexdigest() for env in roots],
         "instrumentation": accounting, "per_model_forward_batch_sizes": dict(model_batch_sizes),
-        "scope": "Diagnostic counters start at first searched wave and include later progress/execution calls. Engine-call wall sums can overlap across workers; never divide them by total wall time. Model forward includes graph preparation, whose nested timers are reported separately. Instrumented timings are not throughput claims."}
+        "scope": "Diagnostic counters start at first searched wave and include later progress/execution calls. Engine-call wall sums can overlap across workers; never divide them by total wall time. Model forward includes zone-input packing and transfer, whose nested timers are reported separately. Instrumented timings are not throughput claims."}
     if args.native_repeats and config.mode == "search" and report["status"] == "completed":
         report["concurrency_measurement"]["native_probe"] = native_probe(roots, args.native_repeats)
     _write(args.output, report)

@@ -31,6 +31,11 @@ class TinyRaw:
     def is_terminal(self):
         return False
 
+    def zone_input(self, owner, decision_kind, offered, passed, order, options):
+        from tests.test_campaign_neural import synthetic_zone
+        self.calls["zone"] = self.calls.get("zone", 0) + 1
+        return synthetic_zone(len(options))
+
     def legal_actions(self):
         self.calls["actions"] += 1
         return [] if self.phase == "chance" else [
@@ -128,26 +133,24 @@ class CampaignBackendBoundaryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             CPUBatchBackend([env, CampaignAdapter(env.raw)])
 
-    def test_numerical_export_is_reused_and_host_inspection_cannot_poison_it(self):
+    def test_zone_inputs_are_built_once_per_decision_and_buffers_are_checked(self):
         backend = CPUBatchBackend([lane()])
         batch = backend.decision_batch()
-        with patch("studies.campaign.features.make_numeric_input", return_value={
-                "schema": "test", "nested": {"retained": [None, "蒙古"]}}) as export:
-            first = backend.numeric_inputs(batch, buckets=128)
-            second = backend.numeric_inputs(backend.decision_batch(), buckets=128)
-            self.assertEqual(export.call_count, 1)
-        inspected = backend.inspect_numeric(first)
-        inspected[0]["nested"]["retained"].append("caller edit")
-        self.assertEqual(backend.inspect_numeric(second)[0]["nested"]["retained"], [None, "蒙古"])
+        first = backend.zone_inputs(batch)
+        second = backend.zone_inputs(backend.decision_batch())
+        (zone,), (again,) = backend.inspect_zone_inputs(first), backend.inspect_zone_inputs(second)
+        self.assertIs(zone, again)
+        self.assertEqual(zone.action_count, len(backend.inspect_decisions(batch)[0].action_ids))
+        self.assertEqual(backend._envs[0].raw.calls["zone"], 1)
         backend.apply_actions(batch, (0,))
-        self.assertEqual(backend.inspect_numeric(first)[0]["schema"], "test")
+        self.assertIs(backend.inspect_zone_inputs(first)[0], zone)  # Inputs are immutable.
         with self.assertRaises(ValueError):
-            backend.numeric_inputs(batch)
+            backend.zone_inputs(batch)
         other = CPUBatchBackend([lane()])
         with self.assertRaises(ValueError):
-            other.inspect_numeric(first)
+            other.inspect_zone_inputs(first)
         with self.assertRaises(ValueError):
-            backend.inspect_numeric(replace(first, lanes=(999,)))
+            backend.inspect_zone_inputs(replace(first, lanes=(999,)))
 
     def test_invalid_later_selection_does_not_mutate_any_lane(self):
         backend = CPUBatchBackend([lane(), lane(2)])

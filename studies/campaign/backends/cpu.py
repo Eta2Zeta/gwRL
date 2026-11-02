@@ -2,7 +2,7 @@
 
 The reference executes lanes sequentially. It establishes the backend boundary;
 it does not claim that a Python loop is parallel or GPU execution. Canonical
-menus and numerical inputs are reused for each complete unchanged decision.
+menus and zone inputs are reused for each complete unchanged decision.
 """
 from __future__ import annotations
 
@@ -23,7 +23,6 @@ class _DecisionRow:
     inspection: DecisionInspection
     actions: tuple[ScheduledAction, ...]
     action_indices: dict[str, int] = field(compare=False)
-    numeric: dict[int, Any] = field(default_factory=dict, compare=False)
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,7 +32,7 @@ class _DecisionPayload:
 
 
 @dataclass(frozen=True, slots=True)
-class _NumericPayload:
+class _ZonePayload:
     owner: object
     lanes: tuple[int, ...]
     values: tuple[Any, ...]
@@ -178,28 +177,19 @@ class CPUBatchBackend:
             replacements[row.lane] = replacement
         self._replace(replacements)
 
-    def numeric_inputs(self, batch, buckets=2048) -> BackendBuffer:
-        if type(buckets) is not int or buckets <= 0:
-            raise ValueError("Numerical input vocabulary size must be a positive integer")
-        from studies.campaign.features import make_numeric_input
+    def zone_inputs(self, batch) -> BackendBuffer:
+        """Each decision's zone input; the adapter builds it once per decision."""
+        from studies.campaign.features import make_zone_input
         rows = self._check_batch(batch)
-        values = []
-        for row in rows:
-            if buckets not in row.numeric:
-                if len(row.numeric) >= 8:
-                    row.numeric.clear()
-                row.numeric[buckets] = make_numeric_input(row.env, row.actions, buckets)
-            values.append(row.numeric[buckets])
-        return BackendBuffer(self.name, batch.lanes, _NumericPayload(self._owner, batch.lanes, tuple(values)))
+        values = tuple(make_zone_input(row.env, row.actions) for row in rows)
+        return BackendBuffer(self.name, batch.lanes, _ZonePayload(self._owner, batch.lanes, values))
 
-    def inspect_numeric(self, buffer) -> tuple[Any, ...]:
+    def inspect_zone_inputs(self, buffer) -> tuple[Any, ...]:
         if not isinstance(buffer, BackendBuffer) or buffer.backend != self.name or not isinstance(
-                buffer.payload, _NumericPayload) or buffer.payload.owner is not self._owner or buffer.lanes != \
+                buffer.payload, _ZonePayload) or buffer.payload.owner is not self._owner or buffer.lanes != \
                 buffer.payload.lanes or len(buffer.lanes) != len(buffer.payload.values):
-            raise ValueError("Foreign CPU numerical buffer")
-        # Mutable dictionaries/lists are detached; immutable native graph
-        # handles and frozen context trees retain their existing shared storage.
-        return copy.deepcopy(buffer.payload.values)
+            raise ValueError("Foreign CPU zone input buffer")
+        return buffer.payload.values  # Immutable native handles.
 
     def inspect_states(self, lanes=None) -> tuple[str, ...]:
         return tuple(self._envs[lane].serialize() for lane in self._lanes(lanes))

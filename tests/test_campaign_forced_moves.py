@@ -46,8 +46,7 @@ class ForcedMoveGameTests(unittest.TestCase):
         env, evaluator = make_env(SEED, calendar_rounds=1), PositionEvaluator()
         with patch.object(learning, "MctsConfig", functools.partial(MctsConfig, search_forced_root=searched)):
             played = play_episode(env, evaluator, config=LearningConfig(simulations=4, max_depth=4, seed=11),
-                                  rules_version="forced-move-test", numeric=True, token_buckets=2048,
-                                  batch_version="frozen", environment_seed=SEED, max_transitions=2000)
+                                  rules_version="forced-move-test", batch_version="frozen", environment_seed=SEED, max_transitions=2000)
         return played, env.serialize(), evaluator
 
     def test_training_games_keep_every_move_sample_and_random_stream(self):

@@ -64,7 +64,7 @@ def snapshot(env) -> dict:
     """Detached full observable state, plus entitled actor and actual wealth."""
     observation = env.observation()
     result = copy.deepcopy(observation["state"])
-    order = env.neural_context()["rules"].get("campaign", {}).get("national_turn_order")
+    order = env.frozen_context()["rules"].get("campaign", {}).get("national_turn_order")
     if order is None:
         order = ["ccp", "mongolia", "japan", "kmt"]
     index = result["clock"]["nation_index"]
@@ -179,8 +179,8 @@ def _search(env, result: dict, config: dict) -> dict:
     _require(all(isinstance(row, list) and len(row) == 3 and
                  all(isinstance(x, (float, int)) and not isinstance(x, bool) and math.isfinite(x) for x in row)
                  for row in vectors), "Invalid three-alliance search value vector")
-    context = env.neural_context()
-    state = env.neural_observation()["state"]
+    context = env.frozen_context()
+    state = env.frozen_observation()["state"]
     return {"actions": [{"id": action["id"], "label": action_label(action, context, state),
                          "kind": _raw(action)["kind"], "parameters": _raw(action).get("parameters", {}),
                          "visits": result["visit_counts"][index], "prior": result["priors"][index],
@@ -245,7 +245,7 @@ def _transition(replay: dict, env, event: dict, *, search: dict | None = None,
     nation = (_raw(action).get("nation") if action else None) or before["current_nation"]
     step = {"index": len(replay["steps"]), "kind": "chance" if chance else "action",
             "actor": owner, "nation": nation, "action": action,
-            "summary": "Resolve dice" if chance else action_label(action, env.neural_context(), before),
+            "summary": "Resolve dice" if chance else action_label(action, env.frozen_context(), before),
             "clock": before["clock"], "changes": changes, "search": search,
             "verification": {"before": before_hash, "after": after_hash, "kind": verification}}
     if sequence is not None:

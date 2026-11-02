@@ -58,7 +58,6 @@ class Config:
     calendar_rounds: int = 3
     hidden_dim: int = 16
     message_layers: int = 1
-    token_buckets: int = 2048
     value_scale: float = 100.0
     atol: float = .002
     rtol: float = .0002
@@ -78,10 +77,10 @@ class Config:
                 "opening", "first_chance", "japan_combat_movement", "round2_japan_combat_movement"}:
             raise ValueError("Unknown or repeated real position label")
         for name in ("cold_repeats", "warm_repeats", "warmups", "threads", "simulations", "max_depth",
-                     "max_transitions", "max_state_visits", "hidden_dim", "message_layers", "token_buckets"):
+                     "max_transitions", "max_state_visits", "hidden_dim", "message_layers"):
             if type(getattr(self, name)) is not int or getattr(self, name) <= 0:
                 raise ValueError(f"{name} must be a positive integer")
-        if self.hidden_dim < 4 or self.token_buckets < 2:
+        if self.hidden_dim < 4:
             raise ValueError("Model dimensions violate the current model contract")
         if type(self.calendar_rounds) is not int or not 1 <= self.calendar_rounds <= 11:
             raise ValueError("Self-play horizon must be between one and eleven rounds")
@@ -207,10 +206,10 @@ def setup_models(config, device):
     stats = {"seconds": 0.0, "calls": 0, "batch_sizes": Counter()}
     stats_lock = threading.Lock()
     class MeasuredModel(CampaignPolicyValueNet):
-        def forward_batch(self, inputs, **kwargs):
+        def forward_batch(self, inputs):
             synchronize_neural_device(target)
             before = time.perf_counter()
-            result = super().forward_batch(inputs, **kwargs)
+            result = super().forward_batch(inputs)
             synchronize_neural_device(target)
             elapsed = time.perf_counter() - before
             with stats_lock:
@@ -218,7 +217,7 @@ def setup_models(config, device):
                 stats["calls"] += 1; stats["batch_sizes"][len(inputs)] += 1
             return result
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
-        token_buckets=config.token_buckets, value_scale=config.value_scale)
+        value_scale=config.value_scale)
     models = {player: MeasuredModel(model_config, device=target).eval() for player in PLAYERS}
     require(all(parameter.device.type == device for model in models.values() for parameter in model.parameters()),
             "A model parameter is on a different device; fallback is forbidden")
@@ -236,8 +235,9 @@ def outputs(evaluations):
 
 def inference(config, device, models, evaluator, forward_stats, deadline, persist):
     from studies.campaign.curriculum import make_env
-    from studies.campaign.neural import clear_neural_caches, neural_device_memory, synchronize_neural_device
-    from tools.benchmark_campaign_backends import Config as ReplayConfig, prepare
+    from studies.campaign.features import make_zone_input
+    from studies.campaign.neural import neural_device_memory, release_device_memory, synchronize_neural_device
+    from tools.benchmark_campaign_backends import Config as ReplayConfig, prepare, zone_digest
     before = time.perf_counter()
     workload = prepare(ReplayConfig(seeds=(config.seeds[0],), max_transitions=config.max_transitions,
         max_state_visits=config.max_state_visits), deadline=deadline)
@@ -249,27 +249,28 @@ def inference(config, device, models, evaluator, forward_stats, deadline, persis
     for fixture in fixtures:
         env = make_env(fixture["seed"], calendar_rounds=3); env.restore(fixture["serialized"])
         actions = tuple(env.legal_actions()); initial = env.serialize()
-        # Prepare the complete host numerical graphs once. Cold measurements
-        # clear device/layout/model caches, not these immutable source graphs.
-        from studies.campaign.features import make_numeric_input
-        input_started = time.perf_counter(); numeric = make_numeric_input(env, actions, config.token_buckets)
+        # Build the decision's zone input once; the adapter keeps it for every
+        # later request. The model keeps no inference caches, so a cold
+        # measurement only releases the device's cached memory.
+        input_started = time.perf_counter(); zone = make_zone_input(env, actions)
         input_seconds = time.perf_counter() - input_started
+        source = zone_digest(zone)
         for size in config.batch_sizes:
             case = {"position": fixture["label"], "seed": fixture["seed"], "batch_size": size,
                     "request_population": "replicas of one real frozen position; ideal shared source/cache reuse, not independent games",
                     "state_sha256": fixture["serialized_sha256"], "action_ids": [action.id for action in actions],
-                    "host_numeric_preparation_seconds": input_seconds,
-                    "source_numeric_sha256": __import__("tools.benchmark_campaign_backends", fromlist=["numeric_digest"]).numeric_digest(numeric),
-                    "cold_scope": "Model/device tensor caches cleared; prepared host source graphs and Metal executable caches may remain",
-                    "cache_reset_seconds": [], "cold_seconds": [], "warm_seconds": []}
+                    "host_zone_input_seconds": input_seconds, "source_zone_input_sha256": source,
+                    "cold_scope": "Only cached device memory released (the model keeps no inference caches); "
+                                  "the host zone input and Metal executable caches may remain",
+                    "memory_release_seconds": [], "cold_seconds": [], "warm_seconds": []}
             requests = [(env, actions)] * size
             try:
                 for _ in range(config.cold_repeats):
                     require(time.monotonic() < deadline, "inference_wall_limit")
-                    reset_started = time.perf_counter()
-                    clear_neural_caches(tuple(models.values()), device=device, release_allocator=True)
+                    release_started = time.perf_counter()
+                    release_device_memory(device)
                     synchronize_neural_device(device)
-                    case["cache_reset_seconds"].append(time.perf_counter() - reset_started)
+                    case["memory_release_seconds"].append(time.perf_counter() - release_started)
                     synchronize_neural_device(device); before = time.perf_counter()
                     values = evaluator.evaluate_batch(requests)
                     synchronize_neural_device(device)
@@ -565,7 +566,7 @@ def _shared_game_process(values, slots, connections, buffer_names, tasks, result
                     "timing_seconds": {}, "process": os.getpid(),
                     "failure": {"error": f"{type(error).__name__}: {error}",
                                 "traceback": traceback.format_exc()}}
-    game_process(play, config.token_buckets, version, slots, connections, buffer_names, tasks, results)
+    game_process(play, version, slots, connections, buffer_names, tasks, results)
 
 
 def shared_selfplay(config, device, models, weights, deadline, persist, runtime_policy=None):
@@ -888,8 +889,8 @@ def paired(config, output):
                     "Incomplete inference case inventory")
             comparisons = []
             for a, b in zip(left["cases"], right["cases"]):
-                require((a["position"], a["batch_size"], a["source_numeric_sha256"], a["action_ids"]) ==
-                        (b["position"], b["batch_size"], b["source_numeric_sha256"], b["action_ids"]), "Inference cases differ")
+                require((a["position"], a["batch_size"], a["source_zone_input_sha256"], a["action_ids"]) ==
+                        (b["position"], b["batch_size"], b["source_zone_input_sha256"], b["action_ids"]), "Inference cases differ")
                 comparisons.append({"position": a["position"], "batch_size": a["batch_size"],
                     "warm_numerical": numerical_comparison(a["outputs"], b["outputs"], atol=config.atol, rtol=config.rtol),
                     "cold_numerical": numerical_comparison(a["cold_outputs"], b["cold_outputs"], atol=config.atol, rtol=config.rtol),

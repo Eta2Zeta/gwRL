@@ -1,0 +1,557 @@
+{
+  "date": "2026-11-02",
+  "change": "The campaign network reads the fixed zone encoding; the JSON graph input is removed",
+  "machine": "4-vCPU Linux container, CPU only; torch 2.14.0; one benchmark at a time",
+  "protocol": "tools/benchmark_campaign_network.py ROOT OUT --threads N, run on a checkout of d411d24 for the graph input and on this change for the zone input. Both play the same two scripted 11-round games (seeds 3101 and 3102, the repository's balanced baseline) and keep every twelfth decision: 316 positions, identical by their planning keys. Inputs are built fresh for each pass from new copies of the positions. Forward passes run in inference mode after a 40-position warm-up, one timed pass per batch size. Training steps follow CampaignLearner.update: 32 rows, each model reading its own rows in full and the others' without options, then backward and one Adam step; two warm-up steps, then twelve timed steps per model. Hidden size 64 and two message layers for both networks, 16,384 token buckets for the graph input.",
+  "runs": {
+    "old_t1": {
+      "input": "graph",
+      "source": {
+        "commit": "d411d248b6f0a9e3a72ee2766845930ead29aed6",
+        "modified": false,
+        "sha256": {
+          "studies/campaign/neural.py": "25736092920ea7e5488ca19936a32b414b90c9f49330e9d4fcfe14c16421f045",
+          "studies/campaign/features.py": "2fb4962b2546c8c0f29d14038842ab8da6aa180487071f3514419a44d24abbe6",
+          "studies/campaign/learning.py": "587b33d7e8250d0497d93af253f11b751f5a196f61ce6127e47915f32636d165",
+          "src/python_bindings.cpp": "2e6fb0e5b17ff1b7bf27cae5cf6b2250c776c5dc84560b158d30633bb94551d5",
+          "src/zone_encoding.cpp": "64e6ec38702297060df645abe7ad1594ad35fc3a9360c6f4ec3ce3fc0b8f1c3f",
+          "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+          "src/numeric_graph.cpp": "a0dbef9fe1e228f80c1c252d9c5b651257aa01fb1780c1c601b4d53d6584f82f"
+        }
+      },
+      "threads": 1,
+      "config": {
+        "hidden_dim": 64,
+        "message_layers": 2,
+        "token_buckets": 16384
+      },
+      "seeds": [
+        3101,
+        3102
+      ],
+      "rounds": 11,
+      "stride": 12,
+      "positions": 316,
+      "planning_keys_sha": "4dd25dcd37b6e7972191b94b0306142234a95a95b588bbc36ef0a264a46735df",
+      "options_per_position": {
+        "median": 13.0,
+        "mean": 32.9051,
+        "p90": 91,
+        "max": 321,
+        "count": 316
+      },
+      "parameters": 1137928,
+      "state_dict_bytes": 4551712,
+      "stored_bytes_per_decision": {
+        "median": 747833.0,
+        "mean": 919032.9114,
+        "p90": 1357944,
+        "max": 3490483,
+        "count": 316
+      },
+      "prepare_ms_first_build": {
+        "median": 2.7559,
+        "mean": 3.8243,
+        "p90": 6.0124,
+        "max": 101.396,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_1": {
+        "median": 17.8733,
+        "mean": 25.2408,
+        "p90": 45.1636,
+        "max": 134.1884,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_16": {
+        "median": 36.5383,
+        "mean": 37.6918,
+        "p90": 52.6445,
+        "max": 60.2406,
+        "count": 20
+      },
+      "train_step_ms_per_model_32_rows": {
+        "median": 3253.9292,
+        "mean": 3382.9838,
+        "p90": 4678.4781,
+        "max": 5164.6175,
+        "count": 36
+      },
+      "seconds": 248.9
+    },
+    "new_t1": {
+      "input": "zone",
+      "source": {
+        "commit": "d411d248b6f0a9e3a72ee2766845930ead29aed6",
+        "modified": true,
+        "sha256": {
+          "studies/campaign/neural.py": "da2fc7bae2a41adf3ea0ca0974734dc164343ab2b9561b1b525fc0dd7fa721a8",
+          "studies/campaign/features.py": "eaa9b0d8d8c25da66b800a5a7f23c75c1197aba8fe385a677f03e7254d6bba49",
+          "studies/campaign/learning.py": "427adce50548533e87818f22703bd460548b2ce39a1991813cda13a4dfd7d1f7",
+          "src/python_bindings.cpp": "960fe420fc9b4db10ca4eb9255e6a7b20796cc7276ad2ba4a90ba814444bc183",
+          "src/zone_encoding.cpp": "ae30c0a85b0505dd949f50e323ea014c9723bae16c536153c52fe633f807412c"
+        }
+      },
+      "threads": 1,
+      "config": {
+        "hidden_dim": 64,
+        "message_layers": 2
+      },
+      "seeds": [
+        3101,
+        3102
+      ],
+      "rounds": 11,
+      "stride": 12,
+      "positions": 316,
+      "planning_keys_sha": "4dd25dcd37b6e7972191b94b0306142234a95a95b588bbc36ef0a264a46735df",
+      "options_per_position": {
+        "median": 13.0,
+        "mean": 32.9051,
+        "p90": 91,
+        "max": 321,
+        "count": 316
+      },
+      "parameters": 5196808,
+      "state_dict_bytes": 20787232,
+      "stored_bytes_per_decision": {
+        "median": 11388.0,
+        "mean": 14136.7975,
+        "p90": 25272,
+        "max": 55380,
+        "count": 316
+      },
+      "prepare_ms_first_build": {
+        "median": 0.3961,
+        "mean": 0.5932,
+        "p90": 0.7682,
+        "max": 34.649,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_1": {
+        "median": 2.4287,
+        "mean": 2.5835,
+        "p90": 3.3502,
+        "max": 6.8255,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_16": {
+        "median": 0.6225,
+        "mean": 0.6192,
+        "p90": 0.7066,
+        "max": 0.8248,
+        "count": 20
+      },
+      "train_step_ms_per_model_32_rows": {
+        "median": 75.4492,
+        "mean": 76.2217,
+        "p90": 85.8293,
+        "max": 102.78,
+        "count": 36
+      },
+      "seconds": 86.1
+    },
+    "old_t4": {
+      "input": "graph",
+      "source": {
+        "commit": "d411d248b6f0a9e3a72ee2766845930ead29aed6",
+        "modified": false,
+        "sha256": {
+          "studies/campaign/neural.py": "25736092920ea7e5488ca19936a32b414b90c9f49330e9d4fcfe14c16421f045",
+          "studies/campaign/features.py": "2fb4962b2546c8c0f29d14038842ab8da6aa180487071f3514419a44d24abbe6",
+          "studies/campaign/learning.py": "587b33d7e8250d0497d93af253f11b751f5a196f61ce6127e47915f32636d165",
+          "src/python_bindings.cpp": "2e6fb0e5b17ff1b7bf27cae5cf6b2250c776c5dc84560b158d30633bb94551d5",
+          "src/zone_encoding.cpp": "64e6ec38702297060df645abe7ad1594ad35fc3a9360c6f4ec3ce3fc0b8f1c3f",
+          "src/neural_graph.cpp": "862efb9001278779c29978b1804cf70d54c585ae123c1a92f7842442fc21f460",
+          "src/numeric_graph.cpp": "a0dbef9fe1e228f80c1c252d9c5b651257aa01fb1780c1c601b4d53d6584f82f"
+        }
+      },
+      "threads": 4,
+      "config": {
+        "hidden_dim": 64,
+        "message_layers": 2,
+        "token_buckets": 16384
+      },
+      "seeds": [
+        3101,
+        3102
+      ],
+      "rounds": 11,
+      "stride": 12,
+      "positions": 316,
+      "planning_keys_sha": "4dd25dcd37b6e7972191b94b0306142234a95a95b588bbc36ef0a264a46735df",
+      "options_per_position": {
+        "median": 13.0,
+        "mean": 32.9051,
+        "p90": 91,
+        "max": 321,
+        "count": 316
+      },
+      "parameters": 1137928,
+      "state_dict_bytes": 4551712,
+      "stored_bytes_per_decision": {
+        "median": 747833.0,
+        "mean": 919032.9114,
+        "p90": 1357944,
+        "max": 3490483,
+        "count": 316
+      },
+      "prepare_ms_first_build": {
+        "median": 2.9607,
+        "mean": 4.2303,
+        "p90": 6.5944,
+        "max": 93.201,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_1": {
+        "median": 13.0074,
+        "mean": 19.8049,
+        "p90": 41.5378,
+        "max": 118.2722,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_16": {
+        "median": 19.5438,
+        "mean": 21.8023,
+        "p90": 30.2785,
+        "max": 39.4658,
+        "count": 20
+      },
+      "train_step_ms_per_model_32_rows": {
+        "median": 1575.659,
+        "mean": 1587.0458,
+        "p90": 2178.9515,
+        "max": 2499.8518,
+        "count": 36
+      },
+      "seconds": 163.8
+    },
+    "new_t4": {
+      "input": "zone",
+      "source": {
+        "commit": "d411d248b6f0a9e3a72ee2766845930ead29aed6",
+        "modified": true,
+        "sha256": {
+          "studies/campaign/neural.py": "da2fc7bae2a41adf3ea0ca0974734dc164343ab2b9561b1b525fc0dd7fa721a8",
+          "studies/campaign/features.py": "eaa9b0d8d8c25da66b800a5a7f23c75c1197aba8fe385a677f03e7254d6bba49",
+          "studies/campaign/learning.py": "427adce50548533e87818f22703bd460548b2ce39a1991813cda13a4dfd7d1f7",
+          "src/python_bindings.cpp": "960fe420fc9b4db10ca4eb9255e6a7b20796cc7276ad2ba4a90ba814444bc183",
+          "src/zone_encoding.cpp": "ae30c0a85b0505dd949f50e323ea014c9723bae16c536153c52fe633f807412c"
+        }
+      },
+      "threads": 4,
+      "config": {
+        "hidden_dim": 64,
+        "message_layers": 2
+      },
+      "seeds": [
+        3101,
+        3102
+      ],
+      "rounds": 11,
+      "stride": 12,
+      "positions": 316,
+      "planning_keys_sha": "4dd25dcd37b6e7972191b94b0306142234a95a95b588bbc36ef0a264a46735df",
+      "options_per_position": {
+        "median": 13.0,
+        "mean": 32.9051,
+        "p90": 91,
+        "max": 321,
+        "count": 316
+      },
+      "parameters": 5196808,
+      "state_dict_bytes": 20787232,
+      "stored_bytes_per_decision": {
+        "median": 11388.0,
+        "mean": 14136.7975,
+        "p90": 25272,
+        "max": 55380,
+        "count": 316
+      },
+      "prepare_ms_first_build": {
+        "median": 0.347,
+        "mean": 0.5006,
+        "p90": 0.6446,
+        "max": 32.6408,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_1": {
+        "median": 2.5632,
+        "mean": 2.8587,
+        "p90": 4.0774,
+        "max": 10.5547,
+        "count": 316
+      },
+      "forward_ms_per_position_batch_16": {
+        "median": 0.425,
+        "mean": 0.4354,
+        "p90": 0.4995,
+        "max": 0.7637,
+        "count": 20
+      },
+      "train_step_ms_per_model_32_rows": {
+        "median": 40.6604,
+        "mean": 42.9899,
+        "p90": 56.2779,
+        "max": 62.6519,
+        "count": 36
+      },
+      "seconds": 83.3
+    }
+  },
+  "speedups_old_over_new": {
+    "forward_batch_1_median": {
+      "1": 7.36,
+      "4": 5.07
+    },
+    "forward_batch_16_median": {
+      "1": 58.7,
+      "4": 45.99
+    },
+    "train_step_median": {
+      "1": 43.13,
+      "4": 38.75
+    },
+    "input_build_median": {
+      "1": 6.96,
+      "4": 8.53
+    },
+    "stored_bytes_median": 65.7
+  },
+  "parameters": {
+    "zone_hidden_64_layers_2": 5196808,
+    "zone_hidden_64_layers_2_column_tables": 5063424,
+    "graph_hidden_64_layers_2_buckets_16384": 1137928,
+    "zone_hidden_16_layers_1": 1274152,
+    "graph_hidden_16_layers_1_buckets_2048": 38152
+  },
+  "column_usage": {
+    "games": "seeds 2201 and 2203 random, 2202 and 2204 scripted, 11 rounds each",
+    "positions": 7008,
+    "zone_columns_used": 1312,
+    "zone_columns": 59322,
+    "position_columns_used": 508,
+    "position_columns": 6763,
+    "option_columns_used": 1149,
+    "option_columns": 13031
+  },
+  "tests": {
+    "python_reporting_12_cores": {
+      "tests": 574,
+      "seconds": 1056.022,
+      "status": "FAILED",
+      "counts": "failures=1, errors=1, skipped=7",
+      "problems": [
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_episode_run.CampaignEpisodeRunTests.test_two_batches_use_fresh_seeds_and_eight_genuine_terminal_episodes",
+          "error": "TypeError: 'gwrl_cpp.CampaignZoneInput' object is not subscriptable"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_deadline_guardian.CampaignGuardianTests.test_compressed_footprint_triggers_independent_guard_even_when_rss_is_small",
+          "error": "AssertionError: 'physical footprint' not found in 'sum of per-process RSS'"
+        }
+      ]
+    },
+    "python_actual_4_cores": {
+      "tests": 574,
+      "seconds": 996.979,
+      "status": "FAILED",
+      "counts": "failures=8, errors=28, skipped=7",
+      "problems": [
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_a_failing_game_keeps_its_position_and_spares_the_others",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_configuration_validates_search_budget_horizon_and_resource_allowance",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_parallel_selfplay_merges_games_in_seed_order_and_requires_identical_weights",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_real_game_processes_reproduce_single_process_games_exactly",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_searching_forced_roots_is_an_explicit_switch",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_selfplay_comparison_reports_divergence_without_claiming_exact_workload",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_selfplay_requires_real_terminal_clock_and_preserves_search_settings",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_shared_games_stop_at_a_closed_pipe_and_fail_at_a_false_terminal",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_shared_summary_rates_use_played_slots_and_need_a_complete_cohort",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_benchmark.CampaignDeviceBenchmarkTests.test_truncated_selfplay_has_no_completed_cohort_throughput_or_fake_returns",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_updates.CampaignDeviceUpdateTests.test_actual_three_model_update_uses_sixteen_matched_minibatches",
+          "error": "ValueError: Tensor threads and benchmark coordinators must fit twelve CPU cores"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_updates.CampaignDeviceUpdateTests.test_common_logit_bias_drift_retains_raw_failure_and_checks_function",
+          "error": "ValueError: Tensor threads and benchmark coordinators must fit twelve CPU cores"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_updates.CampaignDeviceUpdateTests.test_fixture_rejects_bootstraps_or_changed_runtime_before_update",
+          "error": "ValueError: Tensor threads and benchmark coordinators must fit twelve CPU cores"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_updates.CampaignDeviceUpdateTests.test_meaningful_parameter_corruption_fails_functional_check",
+          "error": "ValueError: Tensor threads and benchmark coordinators must fit twelve CPU cores"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_device_updates.CampaignDeviceUpdateTests.test_workload_preserves_actual_model_batch_and_epoch_settings",
+          "error": "ValueError: Tensor threads and benchmark coordinators must fit twelve CPU cores"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_episode_run.CampaignEpisodeRunTests.test_two_batches_use_fresh_seeds_and_eight_genuine_terminal_episodes",
+          "error": "TypeError: 'gwrl_cpp.CampaignZoneInput' object is not subscriptable"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_episode_workers.EpisodeWorkerTests.test_configuration_requires_complete_episodes_and_enough_games",
+          "error": "ValueError: CPU budget must fit available logical cores"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_forced_moves.ForcedMoveGameTests.test_real_selfplay_reproduces_its_trace_and_final_state_and_rng_digests",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_forced_moves.ForcedMoveGameTests.test_shared_games_end_in_the_same_position_with_fewer_evaluations",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_authorized_resource_envelope_includes_both_coordinators",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_external_watchdog_stops_worker_before_it_can_finish_initializing",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_memory_guard_checks_aggregate_rss_and_retains_result",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_task_and_collection_limits_are_distinct",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_watchdog_retains_latest_per_root_progress_on_mid_search_cutoff",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_shared_evaluator.SharedGameSlotTests.test_an_unexpected_exception_fails_only_its_game",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_shared_evaluator.SharedModeConfigTests.test_paired_runs_need_one_process_for_trace_comparison",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_shared_evaluator.SharedModeConfigTests.test_several_games_per_process_need_process_parallel_mps_self_play",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_shared_evaluator.SharedModeConfigTests.test_shared_self_play_needs_a_game_for_every_slot",
+          "error": "ValueError: Tensor threads, search workers and coordinators must fit the 12-core allowance"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_deadline_guardian.CampaignGuardianTests.test_compressed_footprint_triggers_independent_guard_even_when_rss_is_small",
+          "error": "AssertionError: 'physical footprint' not found in 'sum of per-process RSS'"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_episode_replay_records_only_executed_choices_and_current_search_results",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_episodes_play_forced_moves_at_once_and_count_only_real_searches",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_preparation_cutoff_does_not_claim_to_have_reached_a_later_round",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_preparation_reaches_real_first_round_japan_phase",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_real_two_root_search_reports_actual_menus_clocks_and_frozen_models",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_record_replay_rejects_fixed_searches_and_preserves_existing_prefix",
+          "error": "AssertionError: \"episode mode\" does not match \"CPU budget exceeds the authorized 12 cores or available hardware\""
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_campaign_scaling_benchmark.ScalingBenchmarkTests.test_weights_transfer_imports_only_models_and_preserves_checkpoint",
+          "error": "ValueError: CPU budget exceeds the authorized 12 cores or available hardware"
+        }
+      ]
+    },
+    "cpp": {
+      "tests": 28,
+      "passed": 27,
+      "failed": [
+        "campaign_env: passes in 33 to 35 s against its 30 s limit on this container, also on d411d24"
+      ]
+    },
+    "after_the_runs": {
+      "test_campaign_episode_run": "The one failing test read the removed JSON observation; after tagging each toy episode in its zone input the module passes 11 of 11"
+    },
+    "core_checks": "Tests whose configurations need more cores than this 4-vCPU container reports; the 12-core run reports 12 cores to every process through sitecustomize"
+  }
+}

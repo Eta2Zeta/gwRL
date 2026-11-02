@@ -139,7 +139,8 @@ class CampaignEnvironmentTests(unittest.TestCase):
         calls = {"is_terminal": (), "current_decision_player": (), "current_nation": (), "decision_kind": (),
                  "legal_actions": (), "legal_interrupts": (), "apply_action": (option,), "apply_interrupt": (option,),
                  "resolve_chance": (), "chance_request": (), "apply_chance_outcome": (key, ()), "returns": (),
-                 "wealth": (), "observation": (), "numeric_observation": (), "numeric_context": (), "context": (),
+                 "wealth": (), "observation": (), "zone_encoding_spec": (),
+                 "zone_input": (None, "chance", None, [], ["axis", "allies", "comintern"], []), "context": (),
                  "clone": (), "clone_for_search": (1,), "planning_key": (), "landing_plan_reachable": (),
                  "landing_shortfall": (), "serialize": (), "history_size": (), "history_since": (0,),
                  "restore": (checkpoint,)}

@@ -47,14 +47,13 @@ class BenchmarkConfig:
     memory_bytes: int = 30_000_000_000
     hidden_dim: int = 16
     message_layers: int = 1
-    token_buckets: int = 2048
     checkpoint_weights: str | None = None
 
     def __post_init__(self):
         for name in ("roots", "simulations", "max_depth", "waves", "start_round",
                      "preparation_transitions", "max_transitions", "max_state_visits",
                      "threads", "cpu_budget", "memory_bytes", "hidden_dim",
-                     "message_layers", "token_buckets"):
+                     "message_layers"):
             if type(getattr(self, name)) is not int or getattr(self, name) <= 0:
                 raise ValueError(f"{name} must be a positive integer")
         if self.cpu_budget > min(12, os.cpu_count() or 1):
@@ -82,7 +81,7 @@ class BenchmarkConfig:
             raise ValueError("Seed and derived root seeds must fit unsigned 64-bit integers")
         if isinstance(self.seconds, bool) or not math.isfinite(self.seconds) or self.seconds <= 0:
             raise ValueError("Wall limit must be finite and positive")
-        if self.hidden_dim < 4 or self.token_buckets < 2:
+        if self.hidden_dim < 4:
             raise ValueError("Model dimensions do not meet the neural model contract")
         if self.checkpoint_weights is not None and (not isinstance(self.checkpoint_weights, str) or not Path(self.checkpoint_weights).is_file()):
             raise ValueError("Weights source must be an existing trusted local runner checkpoint")
@@ -138,7 +137,6 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
     from .baselines import BASELINE_VERSION, baseline_distribution
     from .batching import BatchStats, search_many
     from .curriculum import SCENARIO, make_env, task_manifest
-    from .features import graph_compiler_backend
     from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
     from .run import source_hashes
     from .learning import ReplayTraceCapture, ReplayTraceWriter
@@ -166,8 +164,7 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
                     "source_compatibility": payload["learner"]["metadata"]["compatibility"],
                     "purpose": "inference-only transfer into fresh current-rule environments; not a training resume"}
     else:
-        model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
-                                           token_buckets=config.token_buckets)
+        model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers)
     models = {player: CampaignPolicyValueNet(model_config).eval() for player in PLAYERS}
     if weights is not None:
         if set(weights) != set(PLAYERS):
@@ -184,7 +181,7 @@ def run_case(config: BenchmarkConfig, progress_path: Path | None = None, *,
               "initialization": "checkpoint weights transfer" if transfer else "fresh seeded weights",
               "weights_transfer": transfer, "frozen": True, "training_updates": 0},
               "runtime_source_sha256": source_hashes(), "software": {"python": sys.version.split()[0],
-              "torch": torch.__version__, "device": "cpu", "graph_compiler": graph_compiler_backend()},
+              "torch": torch.__version__, "device": "cpu", "network_input": models[PLAYERS[0]].layout_version},
               "resources": {"cpu_budget": config.cpu_budget, "tensor_threads": torch.get_num_threads(),
               "interop_threads": torch.get_num_interop_threads(), "search_workers": config.roots,
               "coordinators": 2, "conservative_thread_budget": config.threads + config.roots + 2,

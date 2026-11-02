@@ -179,19 +179,19 @@ class PositionEvaluator:
 
 
 class CampaignContextTransportTests(unittest.TestCase):
-    def test_neural_context_translates_once_and_clones_share_definition(self):
+    def test_frozen_context_translates_once_and_clones_share_definition(self):
         env = CampaignAdapter(ContextRaw())
         self.assertEqual(env.raw.context_calls, 0)
-        context = env.neural_context()
-        self.assertIs(context, env.neural_context())
+        context = env.frozen_context()
+        self.assertIs(context, env.frozen_context())
         self.assertEqual(env.raw.context_calls, 1)
         for clone in (env.clone(), env.clone_for_search(23)):
-            self.assertIs(clone.neural_context(), context)
+            self.assertIs(clone.frozen_context(), context)
             self.assertEqual(clone.raw.context_calls, 0)
             clone.raw.state = 1
-            self.assertIs(clone.neural_context(), context)
+            self.assertIs(clone.frozen_context(), context)
             self.assertEqual(env.raw.state, 0)
-        self.assertEqual(json.loads(env.neural_context_key()), env.context())
+        self.assertEqual(json.loads(env.context_json()), env.context())
         self.assertEqual(env.raw.context_calls, 1)
 
     def test_public_context_returns_fresh_mutable_detached_json(self):
@@ -204,70 +204,50 @@ class CampaignContextTransportTests(unittest.TestCase):
         first["players"].append("caller alliance")
         first["interrupt_scheduler"]["order"].reverse()
         self.assertEqual(second, env.context())
-        self.assertEqual(env.neural_context()["opaque_registry"]["entries"][0]["label"], "蒙古")
+        self.assertEqual(env.frozen_context()["opaque_registry"]["entries"][0]["label"], "蒙古")
         self.assertEqual(env.raw.context_calls, 1)
 
-    def test_neural_input_and_inference_share_complete_immutable_context_across_clones(self):
-        import torch
-        from studies.campaign.features import canonical, make_input
-        from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
-
+    def test_frozen_context_is_shared_by_copies_and_read_once(self):
         env = CampaignAdapter(ContextRaw())
         expected = copy.deepcopy(env.raw.definition)
         expected["interrupt_scheduler"] = {"schema": "campaign-interrupt-scheduler-v1",
                                            "order": ["axis", "allies", "comintern"]}
-        original = make_input(env, env.legal_actions())
-        context = original["context"]
+        context = env.frozen_context()
         self.assertEqual(context, expected)
-        self.assertIs(context, env.neural_context())
-        self.assertIs(canonical(context), context.canonical_json)
         clones = [env.clone(), env.clone_for_search(23)]
-        inputs = [original, *(make_input(clone, clone.legal_actions()) for clone in clones)]
-        self.assertTrue(all(item["context"] is context for item in inputs))
-        self.assertEqual(json.loads(json.dumps(original))["context"], expected)
+        self.assertTrue(all(clone.frozen_context() is context for clone in clones))
         with self.assertRaises(TypeError):
             context["opaque_registry"]["entries"][0]["extra"].append(4)
-
-        previous_threads = torch.get_num_threads()
-        try:
-            torch.set_num_threads(1)
-            model = CampaignPolicyValueNet(CampaignModelConfig(hidden_dim=8, message_layers=1, token_buckets=64))
-            with torch.inference_mode():
-                logits, values = model.forward_batch(inputs)
-            self.assertEqual(tuple(values.shape), (3, 3))
-            self.assertEqual([tuple(row.shape) for row in logits], [(1,), (1,), (1,)])
-            # Cached source tensors first created under inference must still
-            # permit a subsequent optimizer update and fresh learned outputs.
-            optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-            train_logits, train_values = model.forward_batch(inputs)
-            loss = train_values.square().sum() + sum(row.square().sum() for row in train_logits)
-            loss.backward()
-            optimizer.step()
-            with torch.inference_mode():
-                _, updated = model.forward_batch(inputs)
-            self.assertFalse(torch.equal(values, updated))
-        finally:
-            torch.set_num_threads(previous_threads)
-
+        env.raw.state = 2
+        self.assertIs(env.frozen_context(), context)
         self.assertEqual(env.raw.context_calls, 1)
         self.assertEqual([clone.raw.context_calls for clone in clones], [0, 0])
-        env.raw.state = 2
-        later = make_input(env, env.legal_actions())
-        self.assertIs(later["context"], context)
-        self.assertEqual(original["observation"]["state"]["step"], 0)
-        self.assertEqual(later["observation"]["state"]["step"], 2)
-        self.assertEqual(env.raw.context_calls, 1)
+
+    def test_zone_input_is_built_once_per_decision_and_shared_by_copies(self):
+        from studies.campaign.curriculum import make_env
+        env = make_env(23, calendar_rounds=1)
+        while env.decision_kind() == "chance":
+            env.resolve_chance()
+        first = env.zone_input()
+        self.assertIs(env.zone_input(), first)
+        self.assertIs(env.zone_input(tuple(env.legal_actions())), first)
+        clones = [env.clone(), env.clone_for_search(23)]
+        self.assertTrue(all(clone.zone_input() is first for clone in clones))
+        env.apply_action(env.legal_actions()[0])
+        later = env.zone_input(() if env.decision_kind() == "chance" else None)
+        self.assertFalse(later == first)
+        self.assertTrue(all(clone.zone_input() is first for clone in clones))
 
     def test_restore_invalidates_cache_including_scheduler_order(self):
         env = CampaignAdapter(ContextRaw())
-        previous = env.neural_context()
+        previous = env.frozen_context()
         checkpoint = json.loads(env.serialize())
         checkpoint["order"].reverse()
         raw = json.loads(checkpoint["raw"])
         raw["definition"]["opaque_registry"]["entries"][0]["extra"].append(4)
         checkpoint["raw"] = json.dumps(raw)
         env.restore(json.dumps(checkpoint))
-        current = env.neural_context()
+        current = env.frozen_context()
         self.assertIsNot(current, previous)
         self.assertEqual(current["interrupt_scheduler"]["order"], checkpoint["order"])
         self.assertEqual(current["opaque_registry"]["entries"][0]["extra"], [1, 2, 3, 4])
@@ -275,12 +255,12 @@ class CampaignContextTransportTests(unittest.TestCase):
 
     def test_rejected_restore_preserves_cached_snapshot(self):
         env = CampaignAdapter(ContextRaw())
-        previous = env.neural_context()
+        previous = env.frozen_context()
         checkpoint = json.loads(env.serialize())
         checkpoint["passed"] = ["axis", "axis"]
         with self.assertRaises(ValueError):
             env.restore(json.dumps(checkpoint))
-        self.assertIs(env.neural_context(), previous)
+        self.assertIs(env.frozen_context(), previous)
         self.assertEqual(env.raw.context_calls, 1)
 
     def test_frozen_snapshot_detaches_nested_values_and_roundtrips(self):
@@ -325,25 +305,25 @@ class CampaignDecisionReuseTests(unittest.TestCase):
         env = CampaignAdapter(DecisionRaw())
         first = env.legal_actions()
         expected = first[0].features()
-        snapshot = env.neural_observation()
+        snapshot = env.frozen_observation()
         for _ in range(4):
             self.assertEqual(env.current_decision_player(), "axis")
             self.assertEqual(env.decision_kind(), "choose")
             self.assertEqual(env.legal_actions()[0].features(), expected)
-            self.assertIs(env.neural_observation(), snapshot)
+            self.assertIs(env.frozen_observation(), snapshot)
             self.assertEqual(env.observation(), snapshot)
         self.assertEqual(env.raw.calls, {"legal_actions": 1, "legal_interrupts": 0, "observation": 1})
         self.assertEqual(snapshot["unknown_future_field"], {"retained": [False, None, "蒙古"]})
         env.apply_action(first[0])
         self.assertEqual(env.raw.calls, {"legal_actions": 1, "legal_interrupts": 0, "observation": 1})
         self.assertEqual(env.raw.applied, expected["action"])
-        self.assertEqual(env.neural_observation()["state"]["step"], 1)
+        self.assertEqual(env.frozen_observation()["state"]["step"], 1)
         self.assertEqual(env.raw.calls, {"legal_actions": 2, "legal_interrupts": 0, "observation": 2})
 
-    def test_public_payloads_cannot_poison_canonical_actions_or_neural_observation(self):
+    def test_public_payloads_cannot_poison_canonical_actions_or_frozen_observation(self):
         env = CampaignAdapter(DecisionRaw())
         action = env.legal_actions()[0]
-        snapshot = env.neural_observation()
+        snapshot = env.frozen_observation()
         public = env.observation()
         public["state"]["pending"]["opaque"].append("poison")
         public["legal_actions"][0]["action"]["parameters"]["step"] = -1
@@ -353,8 +333,8 @@ class CampaignDecisionReuseTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             action.raw["parameters"]["step"] = -1
         with self.assertRaises(TypeError):
-            action.neural_features()["action"]["parameters"]["retained"].append("poison")
-        self.assertIs(snapshot, env.neural_observation())
+            action.frozen_features()["action"]["parameters"]["retained"].append("poison")
+        self.assertIs(snapshot, env.frozen_observation())
         self.assertEqual(env.observation()["state"]["pending"]["opaque"], [1, 2, 3])
         self.assertEqual(action.features()["action"]["parameters"]["retained"], ["蒙古", {"opaque": True}])
         forged = ScheduledAction(action.id, action.kind, action.player,
@@ -367,12 +347,12 @@ class CampaignDecisionReuseTests(unittest.TestCase):
         env = CampaignAdapter(DecisionRaw(offers=("allies", "comintern"), phase="production"))
         raw_key = env.raw.planning_key()
         first_key = env.planning_key()
-        first = env.neural_observation()
+        first = env.frozen_observation()
         self.assertEqual(first["current_decision_player"], "allies")
         for player in ("allies", "comintern"):
             self.assertEqual(env.current_decision_player(), player)
             env.apply_action(next(action for action in env.legal_actions() if action.kind == "pass_interrupt"))
-            current = env.neural_observation()
+            current = env.frozen_observation()
             self.assertIsNot(current, first)
             self.assertEqual(env.raw.planning_key(), raw_key)
             self.assertNotEqual(env.planning_key(), first_key)
@@ -383,67 +363,67 @@ class CampaignDecisionReuseTests(unittest.TestCase):
         # Reordering offers changes the scheduled identity, even when the raw
         # board and already-passed actors are unchanged.
         env.interrupt_order = tuple(reversed(env.interrupt_order))
-        reordered = env.neural_observation()
+        reordered = env.frozen_observation()
         self.assertIsNot(reordered, current)
         self.assertEqual(reordered["interrupt_scheduler"]["order"], list(env.interrupt_order))
         self.assertEqual(env.raw.calls["observation"], 1)
 
     def test_clones_share_snapshots_but_invalidate_independently_on_actions_and_offers(self):
         env = CampaignAdapter(DecisionRaw(offers=("allies", "comintern"), phase="production"))
-        original = env.neural_observation()
+        original = env.frozen_observation()
         original_actions = env.legal_actions()
         for clone in (env.clone(), env.clone_for_search(71)):
-            self.assertIs(clone.neural_observation(), original)
+            self.assertIs(clone.frozen_observation(), original)
             self.assertIs(clone.legal_actions()[0], original_actions[0])
             self.assertEqual(clone.raw.calls, dict.fromkeys(clone.raw.calls, 0))
             clone.apply_action(next(action for action in clone.legal_actions() if action.kind == "pass_interrupt"))
             self.assertEqual(clone.current_decision_player(), "comintern")
             self.assertEqual(env.current_decision_player(), "allies")
-            self.assertIsNot(clone.neural_observation(), original)
+            self.assertIsNot(clone.frozen_observation(), original)
             clone.apply_action(next(action for action in clone.legal_actions() if action.kind == "interrupt"))
-            self.assertEqual(clone.neural_observation()["state"]["step"], 1)
-            self.assertEqual(env.neural_observation()["state"]["step"], 0)
+            self.assertEqual(clone.frozen_observation()["state"]["step"], 1)
+            self.assertEqual(env.frozen_observation()["state"]["step"], 0)
             self.assertEqual(clone.raw.calls["observation"], 1)
-        self.assertIs(env.neural_observation(), original)
+        self.assertIs(env.frozen_observation(), original)
         self.assertEqual(env.raw.calls["observation"], 1)
 
     def test_chance_and_external_raw_changes_invalidate_complete_decision(self):
         env = CampaignAdapter(DecisionRaw(phase="chance"))
-        chance = env.neural_observation()
+        chance = env.frozen_observation()
         self.assertEqual(chance["legal_actions"], [])
         self.assertEqual(env.raw.draws, 0)
         clone = env.clone_for_search(99)
-        self.assertIs(clone.neural_observation(), chance)
+        self.assertIs(clone.frozen_observation(), chance)
         clone.resolve_chance()
         self.assertEqual(clone.raw.draws, 1)
         self.assertEqual(env.raw.draws, 0)
-        self.assertEqual(clone.neural_observation()["state"]["step"], 1)
+        self.assertEqual(clone.frozen_observation()["state"]["step"], 1)
         env.resolve_chance()
         selected = env.legal_actions()[0]
-        normal = env.neural_observation()
+        normal = env.frozen_observation()
         env.raw.state += 1
         with self.assertRaises(ValueError):
             env.apply_action(selected)
-        self.assertIsNot(env.neural_observation(), normal)
-        self.assertEqual(env.neural_observation()["state"]["step"], 2)
+        self.assertIsNot(env.frozen_observation(), normal)
+        self.assertEqual(env.frozen_observation()["state"]["step"], 2)
         # A rules change is also part of the raw API's complete planning key.
-        current = env.neural_observation()
+        current = env.frozen_observation()
         env.raw.rule_version = "rules-v2"
-        self.assertIsNot(env.neural_observation(), current)
+        self.assertIsNot(env.frozen_observation(), current)
 
     def test_successful_restore_replaces_cache_and_rejected_restore_preserves_it(self):
         env = CampaignAdapter(DecisionRaw(offers=("allies", "comintern"), phase="production"))
         checkpoint = env.serialize()
-        first = env.neural_observation()
+        first = env.frozen_observation()
         env.apply_action(next(action for action in env.legal_actions() if action.kind == "pass_interrupt"))
-        changed = env.neural_observation()
+        changed = env.frozen_observation()
         invalid = json.loads(checkpoint)
         invalid["passed"] = ["allies", "allies"]
         with self.assertRaises(ValueError):
             env.restore(json.dumps(invalid))
-        self.assertIs(env.neural_observation(), changed)
+        self.assertIs(env.frozen_observation(), changed)
         env.restore(checkpoint)
-        restored = env.neural_observation()
+        restored = env.frozen_observation()
         self.assertEqual(restored, first)
         self.assertIsNot(restored, changed)
         self.assertEqual(env.current_decision_player(), "allies")

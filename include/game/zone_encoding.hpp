@@ -74,8 +74,11 @@ struct ZoneInput {
     std::vector<std::int32_t> actionSource, actionTarget;
     // Zones an option's path passes through; option i owns [pathOffsets[i], pathOffsets[i + 1]).
     std::vector<std::int32_t> pathOffsets{0}, pathZone;
-    // Policy groups: kind, what acts, how it travels, what it acts on.
-    std::vector<std::array<std::string, 4>> factors;
+    // Policy groups, four per option: its kind, then what acts, how it travels
+    // and what it acts on. Group ids are numbered per level from zero in order of
+    // first appearance; options share a level's id exactly when they agree on
+    // that level and every level before it.
+    std::vector<std::int32_t> factorGroups;
     std::size_t actionCount() const { return actionSource.size(); }
     std::size_t bytes() const;
 };

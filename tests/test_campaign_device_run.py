@@ -48,7 +48,7 @@ class DeviceRunTests(unittest.TestCase):
 
     @unittest.skipUnless(torch.backends.mps.is_available() and mps_graph_cache_supported(), "Long GPU runtime unavailable")
     def test_actual_cpu_gpu_runner_initialization_has_identical_weights(self):
-        config = RunConfig(hidden_dim=8, token_buckets=128, threads=1)
+        config = RunConfig(hidden_dim=8, threads=1)
         template = make_env(config.seed, calendar_rounds=1)
         cpu = _learner(config, template)
         rng = torch.get_rng_state().clone()
@@ -61,7 +61,7 @@ class DeviceRunTests(unittest.TestCase):
 
     @unittest.skipUnless(torch.backends.mps.is_available() and mps_graph_cache_supported(), "Long GPU runtime unavailable")
     def test_actual_gpu_adam_and_unfinished_rollout_survive_cpu_storage_roundtrip(self):
-        config = CampaignModelConfig(hidden_dim=8, message_layers=1, token_buckets=128)
+        config = CampaignModelConfig(hidden_dim=8, message_layers=1)
         learning = LearningConfig(simulations=2, max_depth=3, batch_size=4, epochs=1,
                                   replay_capacity=16, root_noise=False, seed=37)
         def learner():
@@ -115,7 +115,7 @@ class DeviceRunTests(unittest.TestCase):
 
     @unittest.skipUnless(torch.backends.mps.is_available() and mps_graph_cache_supported(), "Long GPU runtime unavailable")
     def test_gpu_export_can_evaluate_on_cpu_without_migrating_training(self):
-        config = RunConfig(hidden_dim=8, token_buckets=128, neural_device="mps", threads=1)
+        config = RunConfig(hidden_dim=8, neural_device="mps", threads=1)
         env = make_env(config.seed, calendar_rounds=1)
         learner = _learner(config, env)
         runner = {"config": asdict(config), "task": task_manifest(env),

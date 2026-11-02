@@ -387,6 +387,10 @@ class CampaignBatchingTests(unittest.TestCase):
             def apply_action(self, action):
                 super().apply_action(action["id"])
 
+            def zone_input(self, actions):
+                from tests.test_campaign_neural import synthetic_zone
+                return synthetic_zone(len(tuple(actions)))
+
         class CountedModel(CampaignPolicyValueNet):
             def __init__(self, config):
                 super().__init__(config)
@@ -401,8 +405,7 @@ class CampaignBatchingTests(unittest.TestCase):
         try:
             with torch.random.fork_rng():
                 torch.manual_seed(83)
-                models = {actor: CountedModel(CampaignModelConfig(hidden_dim=8, message_layers=1,
-                                                                 token_buckets=128, value_scale=scale))
+                models = {actor: CountedModel(CampaignModelConfig(hidden_dim=8, message_layers=1, value_scale=scale))
                           for actor, scale in zip(PLAYERS, (10.0, 100.0, 1000.0))}
                 with torch.no_grad():
                     for model in models.values():
