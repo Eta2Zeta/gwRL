@@ -16,8 +16,8 @@ import unittest
 from unittest.mock import Mock, patch
 
 from tools.supervise_campaign_training import (
-    SupervisorConfig, aggregate_rss, exclusive_lock, supervise, training_command,
-    validate_training_arguments, process_group_alive,
+    PROFILE_SCHEMA, SupervisorConfig, aggregate_rss, exclusive_lock, keep_awake, load_profile, main,
+    profile_arguments, supervise, training_command, validate_training_arguments, process_group_alive,
     process_memory_charge, _darwin_physical_footprint, monitor_error_details,
 )
 
@@ -433,6 +433,86 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
             self.assertEqual(aggregate_rss(123), 100 * 1024 + 4)
             self.assertEqual(charge.call_count, 4)
             self.assertEqual({call.args[0] for call in charge.call_args_list}, {parent, 123, 124, 125})
+
+
+class MachineProfileTests(unittest.TestCase):
+    PROFILE = {"schema": PROFILE_SCHEMA, "supervisor": {"cpu_budget": 6, "memory_bytes": 9_000_000_000},
+               "training": {"episode_workers": 4, "parallel_envs": 4, "threads": 1, "cpu_budget": 5},
+               "unset_environment": ["MallocNanoZone"], "keep_awake": True}
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix="campaign-profile-test-")
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+
+    def flag(self, arguments, name):
+        indices = [index for index, token in enumerate(arguments) if token == name]
+        self.assertEqual(len(indices), 1, (name, arguments))
+        return arguments[indices[0] + 1]
+
+    def test_the_mac_profile_is_a_valid_execution_layout(self):
+        profile = load_profile("mac")
+        arguments = profile_arguments(profile, ["--full-campaign", "--simulations", "64"])
+        validate_training_arguments(arguments, SupervisorConfig(seconds=2, **profile["supervisor"]))
+        self.assertEqual((self.flag(arguments, "--neural-device"), self.flag(arguments, "--games-per-process")), ("cpu", "4"))
+        self.assertEqual(self.flag(arguments, "--simulations"), "64")
+        self.assertEqual(profile["unset_environment"], ["MallocNanoZone"])
+
+    def test_command_line_flags_win_over_the_profile(self):
+        arguments = profile_arguments(self.PROFILE, ["--threads", "2", "--parallel-envs=8"])
+        self.assertEqual(self.flag(arguments, "--threads"), "2")
+        self.assertNotIn("--parallel-envs", arguments)
+        self.assertEqual(self.flag(arguments, "--episode-workers"), "4")
+
+    def test_an_unknown_profile_names_the_known_ones(self):
+        with self.assertRaisesRegex(ValueError, "known profiles: .*mac"):
+            load_profile("no-such-machine")
+
+    def test_the_child_runs_without_the_profiles_unset_variables_and_keeps_the_name(self):
+        script = self.directory / "environment.py"
+        script.write_text("import json, os, pathlib, sys\nrun = pathlib.Path(sys.argv[1]); run.mkdir(parents=True)\n"
+                          "(run / 'environment.json').write_text(json.dumps(dict(os.environ)))\n"
+                          "(run / 'manifest.json').write_text(json.dumps({'status': 'completed'}))\n")
+        control, run = self.directory / "control", self.directory / "training"
+        config = SupervisorConfig(seconds=2, cpu_budget=4, poll_seconds=0.02, shutdown_seconds=0.15)
+        with patch.dict(os.environ, {"MallocNanoZone": "0"}):
+            state = supervise(control, run, config, ARGUMENTS, profile="mac", unset_environment=("MallocNanoZone",),
+                              command_factory=lambda python, run_dir, *_: [python, str(script), str(run_dir)],
+                              rss_sampler=lambda _pid: 1_000_000)
+        environment = json.loads((run / "environment.json").read_text())
+        self.assertNotIn("MallocNanoZone", environment)
+        self.assertEqual(environment["OMP_NUM_THREADS"], "1")
+        self.assertEqual(state["identity"]["profile"], "mac")
+        with self.assertRaisesRegex(ValueError, "identity"):
+            supervise(control, run, config, ARGUMENTS, rss_sampler=lambda _pid: 1_000_000)
+
+    def test_keep_awake_only_holds_a_mac_awake(self):
+        with patch("tools.supervise_campaign_training.sys.platform", "linux"):
+            self.assertIsNone(keep_awake())
+        with patch("tools.supervise_campaign_training.sys.platform", "darwin"), \
+             patch("tools.supervise_campaign_training.subprocess.Popen") as popen:
+            keep_awake()
+        self.assertEqual(popen.call_args.args[0], ["caffeinate", "-i", "-s", "-w", str(os.getpid())])
+
+    def test_main_takes_limits_and_settings_from_the_profile_unless_given(self):
+        def run(*extra):
+            with patch("tools.supervise_campaign_training.load_profile", return_value=self.PROFILE), \
+                 patch("tools.supervise_campaign_training.keep_awake") as awake, \
+                 patch("tools.supervise_campaign_training.supervise", return_value={"status": "completed"}) as call, \
+                 patch("builtins.print"):
+                main(["--profile", "test", "--control-dir", str(self.directory / "c"), "--run-dir",
+                      str(self.directory / "r"), "--seconds", "1", *extra, "--", "--full-campaign"])
+            awake.assert_called_once_with()
+            awake.return_value.terminate.assert_called_once_with()
+            return call.call_args
+        called = run()
+        config, arguments = called.args[2], called.args[3]
+        self.assertEqual((config.cpu_budget, config.memory_bytes), (6, 9_000_000_000))
+        self.assertEqual(self.flag(arguments, "--episode-workers"), "4")
+        self.assertIn("--full-campaign", arguments)
+        self.assertEqual((called.kwargs["profile"], called.kwargs["unset_environment"]), ("test", ("MallocNanoZone",)))
+        self.assertEqual(called.kwargs["python"], sys.executable)
+        self.assertEqual(run("--cpu-budget", "5").args[2].cpu_budget, 5)
 
 
 if __name__ == "__main__":

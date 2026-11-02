@@ -19,6 +19,16 @@ Repeat exactly that command to resume, including the original --seconds value.
 The runner validates source/binary/checkpoint compatibility. An exhausted episode
 guard requires an explicit --extend-episode-budget N on a subsequent invocation;
 the supervisor does not change the learning configuration or horizon.
+
+``--profile NAME`` applies a machine's measured execution settings from
+studies/campaign/profiles/NAME.json: its Python, game processes, evaluation
+device, core and memory allowance and environment. Flags given after ``--``
+still win; the learning settings stay on the command line::
+
+    .venv/bin/python tools/supervise_campaign_training.py --profile mac \
+      --control-dir studies/campaign/runs/example-control \
+      --run-dir studies/campaign/runs/example --seconds 28800 -- \
+      --calendar-rounds 11 --complete-episodes --batches 1000 --simulations 64 ...
 """
 from __future__ import annotations
 
@@ -42,6 +52,8 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "campaign-training-supervisor-v1"
+PROFILES = ROOT / "studies/campaign/profiles"
+PROFILE_SCHEMA = "campaign-machine-profile-v1"
 MEMORY_MARGIN_BYTES = 1_000_000_000
 # Source/configuration errors normally exit 1 and must stop for inspection.
 RETRYABLE_RETURNCODES = {-signal.SIGKILL, -signal.SIGSEGV, -signal.SIGBUS, 75}
@@ -262,6 +274,39 @@ def _runner_status(run_dir: Path):
     return value.get("status")
 
 
+def load_profile(name: str) -> dict:
+    """One machine's measured execution settings, by file name."""
+    path = PROFILES / f"{name}.json"
+    if not path.is_file():
+        known = ", ".join(sorted(item.stem for item in PROFILES.glob("*.json")))
+        raise ValueError(f"Unknown machine profile {name!r}; known profiles: {known}")
+    profile = json.loads(path.read_text())
+    if profile.get("schema") != PROFILE_SCHEMA:
+        raise ValueError(f"Machine profile {name!r} is not a {PROFILE_SCHEMA} file")
+    return profile
+
+
+def profile_arguments(profile: dict, arguments: list[str]) -> list[str]:
+    """The profile's training flags, except those the command gives itself."""
+    given = {token.split("=", 1)[0] for token in arguments if token.startswith("--")}
+    added = []
+    for name, value in profile.get("training", {}).items():
+        if isinstance(value, bool):
+            raise ValueError("Profile training settings take values, not switches")
+        flag = "--" + name.replace("_", "-")
+        if flag not in given:
+            added += [flag, str(value)]
+    return added + arguments
+
+
+def keep_awake():
+    """Hold off idle and system sleep on a Mac until this process exits."""
+    if sys.platform != "darwin":
+        return None
+    return subprocess.Popen(["caffeinate", "-i", "-s", "-w", str(os.getpid())], stdin=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 def training_command(python: str, run_dir: Path, arguments: list[str], resume: bool | Path,
                      extension: int | None = None) -> list[str]:
     command = [python, "-m", "studies.campaign.run", "train", "--run-dir", str(run_dir)]
@@ -306,6 +351,7 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
               resume_previous: bool = False,
               adopt_checkpoint: bool = False,
               working_directory: Path = ROOT,
+              profile: str | None = None, unset_environment: tuple[str, ...] = (),
               command_factory=training_command, rss_sampler=aggregate_rss) -> dict:
     """Run/restart the same job. Injectable child construction supports tiny tests."""
     control_dir, run_dir, working_directory = control_dir.resolve(), run_dir.resolve(), working_directory.resolve()
@@ -319,6 +365,8 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
     identity = {"run_dir": str(run_dir), "python": str(Path(python).resolve()),
                 "working_directory": str(working_directory), "training_arguments": arguments,
                 "adopt_checkpoint": adopt_checkpoint, "config": asdict(config)}
+    if profile:
+        identity["profile"] = profile
     # The location lock also excludes a second control directory targeting the
     # same output. Both locks survive a coordinator crash in the running child.
     run_lock_path = run_dir.parent / ("." + run_dir.name + ".training.lock")
@@ -388,7 +436,8 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                 resume = (run_dir / "checkpoint.pt.previous") if resume_previous else checkpoint if checkpoint.exists() else False
                 attempt = len(state["attempts"]) + 1
                 command = command_factory(python, run_dir, arguments, resume, extension)
-                environment = {**os.environ, "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
+                environment = {**{key: value for key, value in os.environ.items() if key not in unset_environment},
+                               "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
                                "OPENBLAS_NUM_THREADS": "1", "VECLIB_MAXIMUM_THREADS": "1",
                                "NUMEXPR_NUM_THREADS": "1", "PYTHONHASHSEED": "0"}
                 stdout_path, stderr_path = control_dir / f"attempt-{attempt:03d}.stdout.log", control_dir / f"attempt-{attempt:03d}.stderr.log"
@@ -534,8 +583,9 @@ def main(argv=None) -> int:
     parser.add_argument("--working-directory", type=Path, default=ROOT,
                         help="Frozen runtime checkout used by the child; fixed across resumes")
     parser.add_argument("--seconds", type=float, required=True, help="Original fixed active-wall allowance; never reset on resume")
-    parser.add_argument("--cpu-budget", type=int, default=12)
-    parser.add_argument("--memory-bytes", type=int, default=30_000_000_000)
+    parser.add_argument("--profile", help="Machine profile in studies/campaign/profiles, such as mac")
+    parser.add_argument("--cpu-budget", type=int, help="Default 12, or the profile's")
+    parser.add_argument("--memory-bytes", type=int, help="Default 30,000,000,000, or the profile's")
     parser.add_argument("--max-restarts", type=int, default=2)
     parser.add_argument("--all-cores", action="store_true", help="The owner allowed every core for this run")
     parser.add_argument("--shutdown-seconds", type=float, default=60)
@@ -548,13 +598,30 @@ def main(argv=None) -> int:
     parser.add_argument("training_arguments", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
     arguments = args.training_arguments[1:] if args.training_arguments[:1] == ["--"] else args.training_arguments
-    config = SupervisorConfig(seconds=args.seconds, cpu_budget=args.cpu_budget, memory_bytes=args.memory_bytes,
+    profile = load_profile(args.profile) if args.profile else {}
+    limits = profile.get("supervisor", {})
+    python = sys.executable
+    if "python" in profile:
+        python = str(ROOT / profile["python"])
+        if not Path(python).is_file():
+            raise SystemExit(f"Profile {args.profile!r} needs its Python at {python}")
+    config = SupervisorConfig(seconds=args.seconds,
+                              cpu_budget=args.cpu_budget if args.cpu_budget is not None else limits.get("cpu_budget", 12),
+                              memory_bytes=args.memory_bytes if args.memory_bytes is not None
+                              else limits.get("memory_bytes", 30_000_000_000),
                               all_cores=args.all_cores,
                               max_restarts=args.max_restarts, shutdown_seconds=args.shutdown_seconds,
                               poll_seconds=args.poll_seconds)
-    state = supervise(args.control_dir, args.run_dir, config, arguments, extension=args.extend_episode_budget,
-                      resume_previous=args.resume_previous_checkpoint, adopt_checkpoint=args.adopt_checkpoint,
-                      working_directory=args.working_directory)
+    awake = keep_awake() if profile.get("keep_awake") else None
+    try:
+        state = supervise(args.control_dir, args.run_dir, config, profile_arguments(profile, arguments),
+                          python=python, extension=args.extend_episode_budget,
+                          resume_previous=args.resume_previous_checkpoint, adopt_checkpoint=args.adopt_checkpoint,
+                          working_directory=args.working_directory, profile=args.profile,
+                          unset_environment=tuple(profile.get("unset_environment", ())))
+    finally:
+        if awake is not None:
+            awake.terminate()
     print(json.dumps({key: state.get(key) for key in ("status", "charged_seconds", "remaining_seconds", "aggregate_sampled_peak_rss_bytes")}), flush=True)
     return 0 if state["status"] in {"completed", "time_budget_exhausted", "interrupted"} else 2
 

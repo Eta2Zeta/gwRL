@@ -118,6 +118,31 @@ budget, with bounded retries and graceful memory and deadline stops. It reserves
 its own core within the twelve-core allowance; `--all-cores` uses every core
 when the owner allows it.
 
+### Training on the Mac
+
+`--profile mac` gives the supervisor the setup measured on this Mac, kept in
+[profiles/mac.json](profiles/mac.json): PyTorch 2.14 from `tmp/gpu-mps-env`
+(built from `requirements-gpu-mps.txt`), eight game processes of four games
+each, whose positions one coordinating process evaluates on the CPU, 11 of the
+12 allowed cores for training and one for the supervisor, the 30 GB memory
+limit, the faster memory allocator and keeping the Mac awake. On 2 November 2026
+that played 124 eleven-round games per hour with learning, twice the same layout
+evaluating on the GPU (58.7): the zone network is so cheap per position that the
+GPU's cost per call outweighs its speed. Flags after `--` win over the profile,
+and the learning settings stay there:
+
+```sh
+./.venv/bin/python tools/supervise_campaign_training.py --profile mac \
+  --control-dir studies/campaign/runs/NAME-control --run-dir studies/campaign/runs/NAME \
+  --seconds 28800 -- --calendar-rounds 11 --complete-episodes --batches 1000 \
+  --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 \
+  --batch-size 32 --epochs 700 --replay-capacity 8000 --sample-fraction 0.05 \
+  --transitions-per-batch 20000
+```
+
+These learning settings are the speed test's, not tuned values. Repeat the same
+command to resume. Another machine gets its own file beside `mac.json`.
+
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.
 `--no-new-batch-after EPOCH` finishes the running batch and ends the run as
