@@ -1,6 +1,6 @@
 # M3 source coverage
 
-Reviewed 21 October 2026 against the [M3 acceptance inventory](../plans/japan_china_full_rules_plan.md#m3-implement-complete-unit-and-facility-definitions). The catalog adds definitions and queries; the campaign still requires the later politics, movement, economy and combat milestones.
+Reviewed 21 October 2026 against the M3 acceptance inventory, which the full-campaign plan held at commit `037cb60`. The catalog adds definitions and queries; the politics, movement, economy and combat rules are later milestones.
 
 ## Inventory and sources
 
