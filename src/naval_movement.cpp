@@ -557,6 +557,15 @@ void encounter(State &s, const Id &id) {
   }
   continueRoute(s, id);
 }
+// Militia may end their move in this land zone from a ship: in their Home
+// Country, friendly and enterable this turn (RB).
+bool militiaLandsAt(const State &s, const UnitState &militia, const Id &zone) {
+  const auto t = s.territories.find(zone);
+  return t != s.territories.end() && t->second.possessor &&
+         politicallyFriendly(s, militia.owner, *t->second.possessor) &&
+         enterableThisTurn(s, militia.owner, zone) &&
+         militiaAllowedIn(s, militia, zone);
+}
 bool strategicPickup(State &s, BattleState &b) {
   const auto r = readRequest(b.data.require("request"));
   std::vector<Action> options;
@@ -564,7 +573,11 @@ bool strategicPickup(State &s, BattleState &b) {
       strategicNavalCapacity(s, b.attacker))
     for (const auto &ship : r.units)
       for (const auto &[cargo, c] : s.units)
-        if (c.owner == b.attacker && canLoad(s, ship, cargo)) {
+        // Cargo lands only at the destination port, so militia need it home.
+        if (c.owner == b.attacker && canLoad(s, ship, cargo) &&
+            (c.type != "militia" ||
+             (r.destinationFacility &&
+              militiaLandsAt(s, c, s.facilities.at(*r.destinationFacility).zone)))) {
           bool facility = false;
           for (const auto &[id, f] : s.facilities)
             if (f.zone == c.zone && navalFacilityUsable(s, b.attacker, id) &&
@@ -705,6 +718,21 @@ bool canLoad(const State &s, const Id &ship, const Id &cargo) {
     return false;
   if (s.clock.phase != Phase::NonCombatMovement && c.owner != t.owner)
     return false;
+  // Militia start and end each movement phase in their Home Country (RB), and
+  // only Noncombat Movement unloads, from their own nation's ships the same turn.
+  // A ship that ended a strategic move unloads only at its destination port.
+  if (c.type == "militia") {
+    if (s.clock.phase != Phase::NonCombatMovement || c.owner != t.owner ||
+        !militiaAllowedIn(s, c, c.zone))
+      return false;
+    for (const auto &[key, v] : t.turnFlags)
+      if (v && key.rfind("naval_strategic_destination:", 0) == 0 &&
+          !militiaLandsAt(s, c,
+                          s.facilities
+                              .at(key.substr(Id("naval_strategic_destination:").size()))
+                              .zone))
+        return false;
+  }
   if (port(t).empty()) {
     if (!adjacent(s, c.zone, t.zone))
       return false;
@@ -714,6 +742,7 @@ bool canLoad(const State &s, const Id &ship, const Id &cargo) {
   load.push_back(cargo);
   return navalCargoFits(s, ship, load);
 }
+const char *const militiaStranded = "Militia aboard could not land in their Home Country";
 bool canUnload(const State &s, const Id &ship, const Id &cargo,
                const Id &destination) {
   if (!s.units.contains(ship) || !s.units.contains(cargo) ||
@@ -731,13 +760,8 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
   if (!owner || !politicallyFriendly(s, c.owner, *owner) ||
       !enterableThisTurn(s, c.owner, destination))
     return false;
-  // Militia start and end their movement in their Home Country (RB).
-  if (c.type == "militia") {
-    const auto faction = s.definition->factions.find(c.owner);
-    if (faction == s.definition->factions.end() ||
-        !faction->second.homeCountry.contains(destination))
-      return false;
-  }
+  if (!militiaAllowedIn(s, c, destination))
+    return false;
   if (c.owner != t.owner &&
       value(c.gameFlags, "naval_loaded_completed_turns") >=
           navalCompletedTurns(s, c.owner))
@@ -785,7 +809,8 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
             // final-position constraint cannot prune the route's extensions.
             if (landingBlocked)
               *landingBlocked = true;
-          } else {
+          } else if (valid.reason != militiaStranded) {
+            // Militia may likewise reach their Home Country's coast further on.
             return false;
           }
         }
@@ -967,6 +992,28 @@ void routeChoices(State &s, BattleState &b) {
   decision(s, b, b.attacker, "naval_force_selection", std::move(options));
 }
 } // namespace
+
+bool militiaAllowedIn(const State &s, const UnitState &unit, const Id &zone) {
+  if (unit.type != "militia")
+    return true;
+  const auto faction = s.definition->factions.find(unit.owner);
+  return faction != s.definition->factions.end() &&
+         faction->second.homeCountry.contains(zone);
+}
+bool militiaCanLandFrom(const State &s, const std::vector<Id> &ships,
+                        const std::vector<Id> &zones) {
+  for (const auto &ship : ships)
+    for (const auto &cargo : s.units.at(ship).cargo) {
+      const auto &c = s.units.at(cargo);
+      if (c.type == "militia" &&
+          (s.clock.phase != Phase::NonCombatMovement ||
+           std::none_of(zones.begin(), zones.end(), [&](const Id &zone) {
+             return militiaLandsAt(s, c, zone);
+           })))
+        return false;
+    }
+  return true;
+}
 
 std::vector<Action> forwardNavalOrderActions(const State &s,
                                             std::vector<Action> actions) {
@@ -1276,6 +1323,17 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
             "Carrier movement leaves aircraft without a joint landing plan");
     }
   }
+  // Militia aboard must still be able to land in their Home Country from where
+  // the move ends: the port's land zone, or the land beside the final sea.
+  std::vector<Id> shore;
+  if (r.destinationFacility)
+    shore.push_back(s.facilities.at(*r.destinationFacility).zone);
+  else
+    for (const auto &zone : mapNeighbors(s, r.path.back()))
+      if (s.territories.contains(zone))
+        shore.push_back(zone);
+  if (!militiaCanLandFrom(s, r.units, shore))
+    return fail(militiaStranded);
   RouteResult result;
   result.allowed = true;
   result.cost = totalCost;
@@ -1628,6 +1686,11 @@ bool navalMovementPhaseComplete(const State &s) {
         b.stage == "naval_screen_selection" || b.stage == "naval_moving" ||
         (b.data.find("naval_movement") && b.stage != "naval_declared"))
       return false;
+  // Militia end Noncombat Movement ashore in their Home Country (RB).
+  if (s.clock.phase == Phase::NonCombatMovement)
+    for (const auto &[id, u] : s.units)
+      if (u.type == "militia" && u.carriedBy && movementController(s, u.owner))
+        return false;
   return true;
 }
 void beginNavalMovementTurn(State &s) {

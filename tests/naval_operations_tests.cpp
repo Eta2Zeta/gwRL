@@ -1286,12 +1286,94 @@ void militiaNeitherAttackNorLeaveHomeBySea() {
   check(unloadsTo("i", beiping) && !unloadsTo("m", beiping),
         "Militia were carried out of their Home Country");
 }
+void militiaEndEachMovementAshoreAtHome() {
+  // Militia start and end their movement in their Home Country (RB): they do
+  // not board in Combat Movement, a ship carrying them may end its move or
+  // berth only where they can land at home, and Noncombat Movement waits for
+  // them to be ashore.
+  auto s = fixture();
+  for (const auto &[id, f] : loadScenario(std::filesystem::path(GWRL_SOURCE_DIR) /
+                                          "game_content/scenarios/japan_china_1936").facilities)
+    if (f.zone == honshu || f.zone == "land_manchuria_rehe")
+      s.facilities[id] = f;
+  add(s, "t", "naval_transport", "japan", "sea_p15");
+  add(s, "m", "militia", "japan", honshu);
+  check(!navalLoadAllowed(s, "t", "m"), "Militia boarded in Combat Movement");
+  s.clock.phase = Phase::NonCombatMovement;
+  check(navalLoadAllowed(s, "t", "m"), "Militia could not board in Noncombat Movement");
+  attachCargo(s, "t", "m");
+  check(validateNavalRoute(s, {{"t"}, {"sea_p15", p16}, false, false, std::nullopt, std::nullopt}).allowed,
+        "A ship could not carry militia along their Home Country's coast");
+  check(!validateNavalRoute(s, {{"t"}, {"sea_p15", p14}, false, false, std::nullopt, std::nullopt}).allowed,
+        "A ship carried militia to where they cannot land at home");
+  const auto berths = [](const State &state) {
+    std::set<Id> zones;
+    for (const auto &a : navalOperationActions(state))
+      if (a.kind == "naval_enter_port")
+        zones.insert(state.facilities.at(a.parameters.require("facility").asString()).zone);
+    return zones;
+  };
+  check(berths(s).contains(honshu), "Militia aboard could not berth at home");
+  // Rehe's major port opens onto P14, where no Japanese Home Country coast lies.
+  auto rehe = s.clone();
+  rehe.units.at("t").zone = rehe.units.at("m").zone = p14;
+  check(!berths(rehe).contains("land_manchuria_rehe"), "Militia aboard berthed abroad");
+  auto empty = rehe.clone();
+  empty.units.at("t").cargo.clear();
+  empty.units.at("m").carriedBy.reset();
+  empty.units.at("m").zone = honshu;
+  check(berths(empty).contains("land_manchuria_rehe"), "Fixture lacks the foreign port to refuse");
+  Engine e(s, rules());
+  check(!offered(e, "end_phase"), "Noncombat Movement ended with militia aboard");
+  choose(e, "naval_unload", [](const Action &a) { return a.parameters.require("unit").asString() == "m"; });
+  check(offered(e, "end_phase"), "Militia ashore at home still held the phase");
+  // A ship that ended a strategic move unloads only at its destination port.
+  auto bound = s.clone();
+  bound.units.at("t").cargo.clear();
+  bound.units.at("m").carriedBy.reset();
+  bound.units.at("m").zone = honshu;
+  bound.units.at("t").turnFlags["naval_strategic_destination:facility_rehe_major_port"] = 1;
+  check(!navalLoadAllowed(bound, "t", "m"), "Militia boarded a ship bound abroad");
+  bound.units.at("t").turnFlags.clear();
+  bound.units.at("t").turnFlags["naval_strategic_destination:facility_honshu_major_port"] = 1;
+  check(navalLoadAllowed(bound, "t", "m"), "Militia could not board a ship bound home");
+}
+void militiaStepAshoreWhenTheirShipBerths() {
+  // Entering port ends the ship's move, so militia aboard land in the port's
+  // land zone, which port entry requires to be at home, while other cargo may
+  // stay aboard. Other ships' militia may still unload once berthing begins.
+  auto s = fixture(Phase::NonCombatMovement);
+  for (const auto &[id, f] : loadScenario(std::filesystem::path(GWRL_SOURCE_DIR) /
+                                          "game_content/scenarios/japan_china_1936").facilities)
+    if (f.zone == honshu)
+      s.facilities[id] = f;
+  add(s, "t", "naval_transport", "japan", "sea_p15");
+  add(s, "m", "militia", "japan", honshu);
+  add(s, "i", "infantry", "japan", honshu);
+  add(s, "u", "naval_transport", "japan", "sea_p15");
+  add(s, "n", "militia", "japan", honshu);
+  attachCargo(s, "t", "m");
+  attachCargo(s, "t", "i");
+  attachCargo(s, "u", "n");
+  Engine e(s, rules());
+  choose(e, "naval_enter_port", [](const Action &a) {
+    return a.parameters.require("unit").asString() == "t" && !a.parameters.require("unload").asBool();
+  });
+  const auto &after = e.state().units;
+  check(!after.at("m").carriedBy && after.at("m").zone == honshu, "Militia stayed aboard a berthed ship");
+  check(after.at("i").carriedBy == "t", "Berthing without unloading landed other cargo");
+  check(!offered(e, "end_phase"), "Noncombat Movement ended with militia aboard");
+  choose(e, "naval_unload", [](const Action &a) { return a.parameters.require("unit").asString() == "n"; });
+  check(offered(e, "end_phase"), "Militia ashore at home still held the phase");
+}
 int main() {
   try {
     for (const auto &[name, test] :
          std::vector<std::pair<std::string, std::function<void()>>>{
              {"uncontested assault and replay", uncontestedAssaultAndReplay},
              {"militia stay home at sea", militiaNeitherAttackNorLeaveHomeBySea},
+             {"militia end movement ashore at home", militiaEndEachMovementAshoreAtHome},
+             {"militia land when their ship berths", militiaStepAshoreWhenTheirShipBerths},
              {"sea clearance", seaMustBeClearedBeforeAssault},
              {"waiting second wave", waitingArmorRemainsAboardUntilFoothold},
              {"shore and coastal fire", shoreBombardmentAndCoastalFirstStrike},

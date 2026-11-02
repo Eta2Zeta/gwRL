@@ -137,6 +137,7 @@ void randomPlayStaysWellFormedAndDeterministic() {
             continue;
         }
         const auto actions = env.legalActions();
+        require(!actions.empty(), "A decision before the end has a legal action");
         const auto options = optionsOf(actions);
         const auto first = encodeZoneInput(env.engine().state(), scheduleOf(env), options);
         requireWellFormed(*spec, first, actions.size());

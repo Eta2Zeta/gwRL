@@ -337,6 +337,37 @@ void airTransportsUnloadOnlyWhereTheyStand() {
     for (const auto &a : navalMovementActions(s))
         check(a.kind != "naval_unload", "Air transport cargo unloaded by sea");
 }
+void airliftKeepsMilitiaHome() {
+    // Militia start and end every move in their Home Country (RB): an air
+    // transport loads them only there, carries them only to a land zone there,
+    // and they step off as it lands.
+    auto s = fixture(Phase::NonCombatMovement);
+    add(s, "t", "air_transport", "japan", honshu);
+    add(s, "m", "militia", "japan", honshu);
+    add(s, "u", "air_transport", "japan", beiping);
+    add(s, "abroad", "militia", "japan", beiping);
+    Engine e(s, rules());
+    for (const auto &a : e.legalActions())
+        check(a.kind != "air_load" || a.parameters.require("cargo").asString() != "abroad",
+              "Militia abroad boarded an air transport");
+    choose(e, "air_load", [](const auto &a) { return a.parameters.require("cargo").asString() == "m"; });
+    bool withinHome = false;
+    for (const auto &a : e.legalActions())
+        if ((a.kind == "air_fly" || a.kind == "air_land_noncombat") && a.parameters.require("unit").asString() == "t") {
+            const auto end = a.kind == "air_fly" ? a.parameters.require("path").asArray().back().asString()
+                                                 : a.parameters.require("destination").asString();
+            check(s.definition->factions.at("japan").homeCountry.contains(end),
+                  "Militia were flown out of their Home Country");
+            withinHome = withinHome || end == tokyo;
+        }
+    check(withinHome, "Militia could not be flown within their Home Country");
+    choose(e, "air_land_noncombat", [](const auto &a) {
+        return a.parameters.require("unit").asString() == "t" &&
+               a.parameters.require("destination").asString() == tokyo;
+    });
+    const auto &m = e.state().units.at("m");
+    check(!m.carriedBy && m.zone == tokyo && m.movementRemaining == 0, "Militia stayed aboard a landed transport");
+}
 void failedLanding() {
     // Combat Movement too: a flight that waited for a Carrier that never came
     // cannot be rescued by a patrol, because a patrol cannot follow a flight.
@@ -509,8 +540,13 @@ void alliedTransportBoardsAfterItsOwnersTurn() {
     add(s, "lift", "air_transport", "ccp", hopeh);
     s.units.at("lift").commitments.insert("combat_move");  // From CCP's own Combat Movement.
     add(s, "infantry", "infantry", "kmt", hopeh);
+    add(s, "militia", "militia", "kmt", hopeh);
     s.captureTurnStart();
     Engine e(s, rules());
+    // Cargo from an allied load lands only on the ally's turn; militia must land on their own.
+    for (const auto &a : e.legalActions())
+        check(a.kind != "air_allied_load" || a.parameters.require("cargo").asString() != "militia",
+              "Militia boarded an allied transport");
     choose(e, "air_allied_load", [](const Action &a) {
         return a.parameters.require("unit").asString() == "lift" &&
                a.parameters.require("cargo").asString() == "infantry";
@@ -551,6 +587,7 @@ int main() {
         improvedConstructionPerPlayerTurn();
         airliftHeavyCapacityAndContinuation();
         airTransportsUnloadOnlyWhereTheyStand();
+        airliftKeepsMilitiaHome();
         failedLanding();
         strandedAttackersStillEndCombatMovement();
         noAircraftCapture();
@@ -559,7 +596,7 @@ int main() {
         combatMovementStopsOnlyToCollectAirborneInfantry();
         alliedTransportBoardsAfterItsOwnersTurn();
         aRaidOnAVanishedProjectDoesNothing();
-        std::cout << "19 air fixture groups passed\n";
+        std::cout << "20 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

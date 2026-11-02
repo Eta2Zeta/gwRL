@@ -72,7 +72,13 @@ std::vector<Action> NavalRules::actions(const State &s) const {
                   u.turnFlags.contains("must_withdraw_from_chinese_gift") &&
                   u.turnFlags.at("must_withdraw_from_chinese_gift") &&
                   (a.kind == "movement_route" || a.kind == "naval_load");
-              return !landing && !withdrawal;
+              // Militia aboard must still land in their Home Country (RB).
+              const auto *cargo = a.parameters.find("cargo");
+              const bool militia =
+                  (a.kind == "naval_unload" && u.type == "militia") ||
+                  (a.kind == "air_unload" && cargo &&
+                   s.units.at(cargo->asString()).type == "militia");
+              return !landing && !withdrawal && !militia;
             }),
         out.end());
   return out;

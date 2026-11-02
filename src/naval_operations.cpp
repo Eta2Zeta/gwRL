@@ -569,12 +569,12 @@ void berthShip(State &s, const Id &id, const Id &facility, bool unload) {
   u.commitments.erase("raider");
   for (const auto &c : u.cargo)
     s.units.at(c).zone = u.zone;
-  if (!unload)
-    return;
+  // Militia end their move ashore in their Home Country (RB), as port entry
+  // requires of this port, so they land even when the rest of the cargo stays.
   auto cargo = u.cargo;
   for (const auto &c : cargo) {
     auto &v = s.units.at(c);
-    if (v.owner != u.owner)
+    if (v.owner != u.owner || (!unload && v.type != "militia"))
       continue;
     detachCargo(s, id, c, u.zone);
     v.movementRemaining = 0;
@@ -741,7 +741,8 @@ std::vector<Action> navalOperationActions(const State &s) {
     for (const auto &[id, u] : s.units)
       if (movementController(s, u.owner))
         for (const auto &[fid, f] : s.facilities)
-          if (canBerth(s, u, fid) && berthKeepsLandings(s, id, fid)) {
+          if (canBerth(s, u, fid) && berthKeepsLandings(s, id, fid) &&
+              militiaCanLandFrom(s, {id}, {f.zone})) {
             out.push_back(action(
                 s, s.currentNation(), "naval_enter_port",
                 {{"unit", V(id)}, {"facility", V(fid)}, {"unload", V(false)}}));
@@ -935,6 +936,8 @@ bool applyNavalOperationAction(State &s, const Action &a) {
                f = a.parameters.require("facility").asString();
     require(canBerth(s, s.units.at(id), f), "Ship cannot enter this port");
     require(berthKeepsLandings(s, id, f), "Entering port leaves aircraft without a landing");
+    require(militiaCanLandFrom(s, {id}, {s.facilities.at(f).zone}),
+            "Entering port leaves militia unable to land in their Home Country");
     berthShip(s, id, f, a.parameters.require("unload").asBool());
     return true;
   }

@@ -15,6 +15,12 @@ struct NavalRouteRequest {
 };
 
 RouteResult validateNavalRoute(const State &, const NavalRouteRequest &);
+// Militia start and end every move in their Home Country (RB): whether this
+// unit may start or end one in this zone on that account. Other units may.
+bool militiaAllowedIn(const State &, const UnitState &unit, const Id &zone);
+// Whether these ships can still put every militia aboard ashore in its Home
+// Country, from these land zones, in this Noncombat Movement.
+bool militiaCanLandFrom(const State &, const std::vector<Id> &ships, const std::vector<Id> &zones);
 // Sea zones where a ship can still end this phase's movement, its own zone
 // included, by a route that meets no unfriendly unit before its last zone, so
 // that no encounter, screen or peace entry can stop it short.

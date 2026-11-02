@@ -94,7 +94,9 @@ class SharedBufferTests(unittest.TestCase):
             if step % 40 == 0:
                 for menu in (actions, (), tuple(reversed(actions[::2])), tuple(reversed(actions))):
                     self.assertTravelsExactly(env, menu)
-            if step >= next_search:  # The first decision at or after every 150th step.
+            # The first decision with over 20 choices at or after every 150th step,
+            # so searches meet large menus whichever path random play takes.
+            if step >= next_search and len(actions) > 20:
                 VectorMCTS(Checking(), MctsConfig(simulations=8, max_depth=8, seed=step)).search(env)
                 searches, next_search = searches + 1, next_search + 150
             env.apply_action(rng.choice(actions))

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <stdexcept>
 namespace {
 using namespace game::campaign;
@@ -233,6 +234,30 @@ void alliedShipsLeaveCarrierReach() {
   add(s, "c", "fleet_carrier", p32);
   add(s, "d", "naval_transport", p15, "dadao");
   check(navalEndZones(s, "c").contains(p16), "A Dadao transport stopped a Japanese carrier");
+}
+void strategicPickupKeepsMilitiaHome() {
+  // Strategic cargo lands only at the destination port, so militia, who end
+  // every move in their Home Country (RB), board only a voyage bound there.
+  auto s = fixture();
+  add(s, "m", "militia", honshu);
+  add(s, "i", "infantry", honshu);
+  const auto offers = [](Engine &e) {
+    std::set<Id> units;
+    for (const auto &a : e.legalActions())
+      if (a.kind == "naval_strategic_pickup")
+        units.insert(a.parameters.require("unit").asString());
+    return units;
+  };
+  auto abroad = s.clone();
+  add(abroad, "t", "naval_transport", p16);
+  Engine away(abroad, rules());
+  move(away, "t", {p16, p15, p14}, true, "facility_beiping_minor_port");
+  check(offers(away) == std::set<Id>{"i"}, "Militia were picked up for a voyage abroad");
+  auto home = s.clone();
+  add(home, "t", "naval_transport", p14);
+  Engine back(home, rules());
+  move(back, "t", {p14, p15, p16}, true, "facility_tokyo_major_shipyard");
+  check(offers(back) == std::set<Id>{"i", "m"}, "Militia missed a voyage bound home");
 }
 void strategicAndNoncombatBlockers() {
   auto s = fixture();
@@ -825,6 +850,7 @@ int main() {
              {"strategic capacity/endpoints",
               strategicCapacityEndpointsAndUnloading},
              {"strategic pickup", strategicPickupAlongRoute},
+             {"strategic pickup keeps militia home", strategicPickupKeepsMilitiaHome},
              {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
              {"naval blockers", strategicAndNoncombatBlockers},
              {"carrier independent flight", carrierMovementGivesNoAircraftRide},

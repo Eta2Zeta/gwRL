@@ -1355,7 +1355,7 @@ bool loadsAt(const State &s, const UnitState &u, const Id &zone, bool combat, co
         marked(c.turnFlags, "placed_this_turn") || marked(c.turnFlags, "air_transport_unloaded") ||
         marked(c.turnFlags, "naval_unloaded") || c.commitments.contains("transport_unloaded") ||
         c.commitments.contains("attrition") || c.commitments.contains("combat") ||
-        c.commitments.contains("combat_move"))
+        c.commitments.contains("combat_move") || !militiaAllowedIn(s, c, zone))
         return false;
     const int cap = u.type == "heavy_air_transport" && combat ? 2 : 1;
     if (static_cast<int>(u.cargo.size()) >= cap)
@@ -1365,6 +1365,16 @@ bool loadsAt(const State &s, const UnitState &u, const Id &zone, bool combat, co
                      (has(s, c, "infantry_class") ||
                       (u.type == "heavy_air_transport" &&
                        (has(s, c, "artillery_class") || c.type == "anti_aircraft_artillery"))));
+}
+// Militia start and end every move in their Home Country (RB): militia aboard
+// may be carried only to a land zone there where they could step off.
+bool militiaCanAlight(const State &s, const UnitState &u, const Id &zone) {
+    return std::all_of(u.cargo.begin(), u.cargo.end(), [&](const Id &cargo) {
+        const auto &c = s.units.at(cargo);
+        return c.type != "militia" ||
+               (land(s, zone) && militiaAllowedIn(s, c, zone) && enterableThisTurn(s, c.owner, zone, true) &&
+                s.territories.at(zone).possessor && friendly(s, c.owner, *s.territories.at(zone).possessor));
+    });
 }
 // RB 9.1 leaves Combat Movement to moves that start a combat. A flight that
 // stops short of one is allowed only for an air transport or strategic bomber
@@ -1457,6 +1467,8 @@ std::vector<Action> AirRules::actions(const State &s) const {
                             !marked(c.turnFlags,"naval_unloaded") && !c.commitments.contains("transport_unloaded") &&
                             !c.commitments.contains("attrition") && !c.commitments.contains("combat") &&
                             !c.commitments.contains("combat_move") && t.cargo.empty() &&
+                            // Militia must land again this turn, which an allied load forbids.
+                            c.type != "militia" &&
                             (has(s, c, "infantry_class") ||
                              (t.type == "heavy_air_transport" &&
                               (has(s, c, "artillery_class") || c.type == "anti_aircraft_artillery"))))
@@ -1515,7 +1527,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
             if (!combat && transport(u) && u.cargo.size() > 1) {
                 if (land(s, u.zone) && enterableThisTurn(s, u.owner, u.zone, true))
                     for (const auto &cargo : u.cargo)
-                        if (s.units.at(cargo).owner == u.owner)
+                        if (s.units.at(cargo).owner == u.owner && militiaAllowedIn(s, s.units.at(cargo), u.zone))
                             out.push_back(action(s, s.currentNation(), "air_unload",
                                                  {{"unit", V(id)}, {"cargo", V(cargo)}}));
                 continue;
@@ -1539,13 +1551,13 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 const bool stopover = s.clock.phase != Phase::CombatMovement || collectsAirborne(s, u, zone);
                 if (!landingOnly && stopover && path.size() > 1 &&
                     validateFlight(s, id, path, combat, false).allowed &&
-                    flightKeepsLanding(s, id, path) &&
+                    flightKeepsLanding(s, id, path) && militiaCanAlight(s, u, zone) &&
                     (!combat || !enemyFighter(s, u.owner, zone)))
                     out.push_back(
                         action(s, s.currentNation(), "air_fly", {{"unit", V(id)}, {"path", V(ids(path))}}));
                 if (!combat || marked(u.turnFlags, "air_in_flight")) {
                     if (landingChangesState(s, u, zone) && airLandingAvailable(s, id, zone) &&
-                        preservesLandingPlan(s, id, zone))
+                        militiaCanAlight(s, u, zone) && preservesLandingPlan(s, id, zone))
                         out.push_back(action(s, s.currentNation(), "air_land_noncombat",
                                              {{"unit", V(id)}, {"destination", V(zone)}}));
                     if (!combat)
@@ -1631,6 +1643,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
             if ((!combat || marked(u.turnFlags, "air_in_flight")) && !grounded)
                 for (const auto &destination : airLandingSpots(s, id))
                     if (s.units.contains(destination) && landingChangesState(s, u, destination) &&
+                        militiaCanAlight(s, u, s.units.at(destination).zone) &&
                         preservesLandingPlan(s, id, destination))
                         out.push_back(action(s, s.currentNation(), "air_land_noncombat",
                                              {{"unit", V(id)}, {"destination", V(destination)}}));
@@ -1638,7 +1651,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 enterableThisTurn(s, u.owner, u.zone, true) && s.territories.at(u.zone).possessor &&
                 friendly(s, u.owner, *s.territories.at(u.zone).possessor))
                 for (const auto &cargo : u.cargo)
-                    if(s.units.at(cargo).owner==u.owner)
+                    if(s.units.at(cargo).owner==u.owner && militiaAllowedIn(s, s.units.at(cargo), u.zone))
                         out.push_back(action(s, s.currentNation(), "air_unload", {{"unit", V(id)}, {"cargo", V(cargo)}}));
         }
     return out;
@@ -1778,6 +1791,8 @@ void AirRules::apply(State &s, const Action &a) const {
         require(validateFlight(s, id, path, s.clock.phase != Phase::NonCombatMovement, false).allowed,
                 "Invalid flight");
         require(flightKeepsLanding(s, id, path), "Flight leaves aircraft without any possible landing continuation");
+        require(militiaCanAlight(s, s.units.at(id), path.back()),
+                "Militia aboard could not land in their Home Country");
         moveFlight(s, id, path);
         return;
     }
@@ -1807,8 +1822,17 @@ void AirRules::apply(State &s, const Action &a) const {
         auto paths = flightPaths(s, id, false);
         auto dest = s.units.contains(z) ? s.units.at(z).zone : z;
         require(paths.contains(dest) && airLandingAvailable(s, id, z), "Invalid landing");
+        require(militiaCanAlight(s, s.units.at(id), dest), "Militia aboard could not land in their Home Country");
         moveFlight(s, id, paths.at(dest));
         s.units.at(id).turnFlags.erase("air_in_flight");
+        // Militia aboard step off as their transport lands, ending their move.
+        const auto cargo = s.units.at(id).cargo;
+        for (const auto &c : cargo)
+            if (s.units.at(c).type == "militia") {
+                detachCargo(s, id, c, dest);
+                s.units.at(c).movementRemaining = 0;
+                s.units.at(c).turnFlags["air_transport_unloaded"] = 1;
+            }
         if (marked(s.units.at(id).turnFlags, "air_screening_ready")) {
             s.units.at(id).turnFlags.erase("air_screening_ready");stamp(s, s.units.at(id));
         }
