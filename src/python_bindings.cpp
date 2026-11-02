@@ -7,10 +7,15 @@
 #include "game/campaign_actions.hpp"
 #include "game/neural_graph.hpp"
 #include "game/numeric_graph.hpp"
+#include "game/zone_encoding.hpp"
 
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <algorithm>
+#include <array>
+#include <cstring>
 #include <functional>
 #include <stdexcept>
 #include <string>
@@ -169,10 +174,156 @@ std::string describeAction(const game::Action& action) {
     return description;
 }
 
+using ZoneInput = game::campaign::ZoneInput;
+
+// One encoded decision, immutable and shared between Python objects.
+struct ZoneInputHandle {
+    std::shared_ptr<const ZoneInput> input;
+    std::string version;
+};
+
+constexpr std::array<const char*, 12> zoneArrayNames{
+    "zone_index", "zone_column", "zone_value", "global_column", "global_value", "action_offsets",
+    "action_column", "action_value", "action_source", "action_target", "path_offsets", "path_zone"};
+
+std::array<const std::vector<std::int32_t>*, 12> zoneFields(const ZoneInput& z) {
+    return {&z.zoneIndex, &z.zoneColumn, &z.zoneValue, &z.globalColumn, &z.globalValue, &z.actionOffsets,
+            &z.actionColumn, &z.actionValue, &z.actionSource, &z.actionTarget, &z.pathOffsets, &z.pathZone};
+}
+
+std::array<std::vector<std::int32_t>*, 12> zoneFields(ZoneInput& z) {
+    return {&z.zoneIndex, &z.zoneColumn, &z.zoneValue, &z.globalColumn, &z.globalValue, &z.actionOffsets,
+            &z.actionColumn, &z.actionValue, &z.actionSource, &z.actionTarget, &z.pathOffsets, &z.pathZone};
+}
+
+py::array_t<std::int32_t> int32Array(const std::vector<std::int32_t>& values) {
+    py::array_t<std::int32_t> out(static_cast<py::ssize_t>(values.size()));
+    if (!values.empty()) std::memcpy(out.mutable_data(), values.data(), values.size() * sizeof(std::int32_t));
+    return out;
+}
+
+std::vector<std::int32_t> int32Vector(const py::handle& value) {
+    const auto array = py::array_t<std::int32_t, py::array::c_style | py::array::forcecast>::ensure(value);
+    if (!array || array.ndim() != 1) throw std::invalid_argument("Zone input fields must be one-dimensional integer arrays");
+    return {array.data(), array.data() + array.size()};
+}
+
+void validateZoneInput(const ZoneInput& z) {
+    const auto offsets = [](const std::vector<std::int32_t>& o, std::size_t entries, std::size_t count) {
+        if (o.size() != count + 1 || o.front() != 0 || static_cast<std::size_t>(o.back()) != entries ||
+            !std::is_sorted(o.begin(), o.end()))
+            throw std::invalid_argument("Zone input offsets are inconsistent");
+    };
+    if (z.zoneIndex.size() != z.zoneColumn.size() || z.zoneIndex.size() != z.zoneValue.size() ||
+        z.globalColumn.size() != z.globalValue.size() || z.actionColumn.size() != z.actionValue.size() ||
+        z.actionSource.size() != z.actionTarget.size() || z.factors.size() != z.actionSource.size())
+        throw std::invalid_argument("Zone input fields differ in length");
+    offsets(z.actionOffsets, z.actionColumn.size(), z.actionSource.size());
+    offsets(z.pathOffsets, z.pathZone.size(), z.actionSource.size());
+}
+
+ZoneInput zoneFromParts(const py::dict& arrays, const py::list& factors) {
+    ZoneInput z;
+    const auto fields = zoneFields(z);
+    for (std::size_t i = 0; i < fields.size(); ++i) {
+        if (!arrays.contains(zoneArrayNames[i])) throw std::invalid_argument(std::string("Zone input lacks ") + zoneArrayNames[i]);
+        *fields[i] = int32Vector(arrays[zoneArrayNames[i]]);
+    }
+    for (const auto& item : factors) {
+        const auto parts = item.cast<std::vector<std::string>>();
+        if (parts.size() != 4) throw std::invalid_argument("Each zone option needs four policy groups");
+        z.factors.push_back({parts[0], parts[1], parts[2], parts[3]});
+    }
+    validateZoneInput(z);
+    return z;
+}
+
+// The same position with only the listed options, in the listed order.
+ZoneInput selectZoneOptions(const ZoneInput& z, const std::vector<int>& indices) {
+    ZoneInput out;
+    out.zoneIndex = z.zoneIndex;
+    out.zoneColumn = z.zoneColumn;
+    out.zoneValue = z.zoneValue;
+    out.globalColumn = z.globalColumn;
+    out.globalValue = z.globalValue;
+    for (const int index : indices) {
+        if (index < 0 || static_cast<std::size_t>(index) >= z.actionCount())
+            throw std::invalid_argument("Zone option index out of range");
+        const auto i = static_cast<std::size_t>(index);
+        for (auto k = z.actionOffsets[i]; k < z.actionOffsets[i + 1]; ++k) {
+            out.actionColumn.push_back(z.actionColumn[static_cast<std::size_t>(k)]);
+            out.actionValue.push_back(z.actionValue[static_cast<std::size_t>(k)]);
+        }
+        out.actionOffsets.push_back(static_cast<std::int32_t>(out.actionColumn.size()));
+        out.actionSource.push_back(z.actionSource[i]);
+        out.actionTarget.push_back(z.actionTarget[i]);
+        for (auto k = z.pathOffsets[i]; k < z.pathOffsets[i + 1]; ++k) out.pathZone.push_back(z.pathZone[static_cast<std::size_t>(k)]);
+        out.pathOffsets.push_back(static_cast<std::int32_t>(out.pathZone.size()));
+        out.factors.push_back(z.factors[i]);
+    }
+    return out;
+}
+
+bool sameZoneInput(const ZoneInput& a, const ZoneInput& b) {
+    const auto left = zoneFields(a), right = zoneFields(b);
+    for (std::size_t i = 0; i < left.size(); ++i)
+        if (*left[i] != *right[i]) return false;
+    return a.factors == b.factors;
+}
+
 }  // namespace
 
 PYBIND11_MODULE(gwrl_cpp, module) {
     module.doc() = "C++ training environment bindings for gwRL";
+
+    py::class_<ZoneInputHandle>(module, "CampaignZoneInput",
+        "One campaign decision in the fixed zone encoding: nonzero answers to fixed per-zone, "
+        "per-position and per-option questions. Immutable; copies share the native arrays.")
+        .def("arrays", [](const ZoneInputHandle& self) {
+            py::dict out;
+            const auto fields = zoneFields(*self.input);
+            for (std::size_t i = 0; i < fields.size(); ++i) out[zoneArrayNames[i]] = int32Array(*fields[i]);
+            return out;
+        })
+        .def("factors", [](const ZoneInputHandle& self) {
+            py::list out;
+            for (const auto& f : self.input->factors) out.append(py::make_tuple(f[0], f[1], f[2], f[3]));
+            return out;
+        })
+        .def("select", [](const ZoneInputHandle& self, const std::vector<int>& indices) {
+            return ZoneInputHandle{std::make_shared<const ZoneInput>(selectZoneOptions(*self.input, indices)), self.version};
+        }, py::arg("indices"))
+        .def("without_actions", [](const ZoneInputHandle& self) {
+            return ZoneInputHandle{std::make_shared<const ZoneInput>(selectZoneOptions(*self.input, {})), self.version};
+        })
+        .def_property_readonly("version", [](const ZoneInputHandle& self) { return self.version; })
+        .def_property_readonly("action_count", [](const ZoneInputHandle& self) { return self.input->actionCount(); })
+        .def_property_readonly("nbytes", [](const ZoneInputHandle& self) { return self.input->bytes(); })
+        .def("__eq__", [](const ZoneInputHandle& self, const ZoneInputHandle& other) {
+            return self.version == other.version && sameZoneInput(*self.input, *other.input);
+        }, py::is_operator())
+        .def("__deepcopy__", [](const ZoneInputHandle& self, py::dict) { return self; })
+        .def(py::pickle(
+            [](const ZoneInputHandle& self) {
+                py::dict arrays;
+                const auto fields = zoneFields(*self.input);
+                for (std::size_t i = 0; i < fields.size(); ++i) arrays[zoneArrayNames[i]] = int32Array(*fields[i]);
+                py::list factors;
+                for (const auto& f : self.input->factors) factors.append(py::make_tuple(f[0], f[1], f[2], f[3]));
+                return py::make_tuple(self.version, arrays, factors);
+            },
+            [](const py::tuple& state) {
+                if (state.size() != 3) throw std::invalid_argument("Invalid zone input pickle");
+                return ZoneInputHandle{std::make_shared<const ZoneInput>(
+                    zoneFromParts(state[1].cast<py::dict>(), state[2].cast<py::list>())), state[0].cast<std::string>()};
+            }));
+    module.def("campaign_zone_input", [](const std::string& version, const py::dict& arrays, const py::list& factors) {
+        return ZoneInputHandle{std::make_shared<const ZoneInput>(zoneFromParts(arrays, factors)), version};
+    }, py::arg("version"), py::arg("arrays"), py::arg("factors"),
+       "Rebuild a zone input from its arrays, checking only that its fields fit together.");
+    module.def("zone_encoding_unknowns", [](bool reset) { return game::campaign::zoneEncodingUnknowns(reset); },
+               py::arg("reset") = false,
+               "Names counted in an \"other\" column of the zone encoding since the last reset.");
 
     module.def("compile_campaign_graph", &game::neural::compileCampaignGraph,
                py::arg("value"), py::arg("buckets"), py::arg("lexical_ids"),
@@ -353,6 +504,63 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("numeric_context", [](const NativeCampaignEnv& self) {
             return NumericSnapshot{self.call([](const CampaignEnv& env) { return env.contextSnapshot(); }), {}};
         })
+        .def("zone_encoding_spec", [](const NativeCampaignEnv& self) {
+            const auto spec = self.call([](const CampaignEnv& env) {
+                return game::campaign::zoneEncodingSpec(env.engine().state());
+            });
+            const auto floats = [](const std::vector<float>& values, int columns) {
+                const auto rows = columns ? static_cast<py::ssize_t>(values.size() / static_cast<std::size_t>(columns)) : 0;
+                py::array_t<float> out({rows, static_cast<py::ssize_t>(columns)});
+                if (!values.empty()) std::memcpy(out.mutable_data(), values.data(), values.size() * sizeof(float));
+                return out;
+            };
+            py::dict out;
+            out["version"] = spec->version;
+            out["zones"] = spec->zones;
+            out["nations"] = spec->nations;
+            out["unit_types"] = spec->unitTypes;
+            out["facility_types"] = spec->facilityTypes;
+            out["technologies"] = spec->technologies;
+            out["project_types"] = spec->projectTypes;
+            out["rows"] = spec->rows;
+            out["zone_columns"] = spec->zoneColumns;
+            out["global_columns"] = spec->globalColumns;
+            out["action_columns"] = spec->actionColumns;
+            out["zone_static"] = floats(spec->zoneStatic, spec->staticFeatures);
+            out["edge_source"] = int32Array(spec->edgeSource);
+            out["edge_target"] = int32Array(spec->edgeTarget);
+            out["edge_static"] = floats(spec->edgeStatic, spec->edgeFeatures);
+            out["zone_column_names"] = spec->zoneColumnNames;
+            out["global_column_names"] = spec->globalColumnNames;
+            out["action_column_names"] = spec->actionColumnNames;
+            out["static_feature_names"] = spec->staticFeatureNames;
+            out["edge_feature_names"] = spec->edgeFeatureNames;
+            return out;
+        })
+        .def("zone_input", [](const NativeCampaignEnv& self, const std::optional<std::string>& owner,
+                              const std::string& decisionKind, const std::optional<std::string>& offered,
+                              const std::vector<std::string>& passed, const std::vector<std::string>& order,
+                              const py::list& options) {
+            // Options stay owned by the caller's list, which outlives the native call.
+            std::vector<game::campaign::ZoneOption> converted;
+            converted.reserve(options.size());
+            for (const auto& item : options) {
+                const auto tuple = item.cast<py::tuple>();
+                if (tuple.size() != 3) throw std::invalid_argument("Each zone option is (kind, player, action or None)");
+                game::campaign::ZoneOption option;
+                option.kind = tuple[0].cast<std::string>();
+                option.player = tuple[1].is_none() ? std::string() : tuple[1].cast<std::string>();
+                if (!tuple[2].is_none()) option.action = &tuple[2].cast<const game::campaign::Action&>();
+                converted.push_back(std::move(option));
+            }
+            const game::campaign::ZoneSchedule schedule{owner, decisionKind, offered, passed, order};
+            return self.call([&](const CampaignEnv& env) {
+                const auto& state = env.engine().state();
+                auto input = std::make_shared<const ZoneInput>(game::campaign::encodeZoneInput(state, schedule, converted));
+                return ZoneInputHandle{std::move(input), game::campaign::zoneEncodingSpec(state)->version};
+            });
+        }, py::arg("owner"), py::arg("decision_kind"), py::arg("offered"), py::arg("passed"), py::arg("order"),
+           py::arg("options"))
         .def("context", [](const NativeCampaignEnv& self) {
             auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.context()); });
             return py::module_::import("json").attr("loads")(text);

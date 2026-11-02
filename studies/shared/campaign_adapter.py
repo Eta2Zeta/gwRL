@@ -93,6 +93,7 @@ class _DecisionCache:
     raw_actions: tuple[Any, ...] | None = None
     observation: FrozenDict | None = None
     numeric: dict[int, Any] = field(default_factory=dict)
+    zone: Any = None
 
 
 def _canonical_raw(action: Any) -> Any:
@@ -329,6 +330,33 @@ class CampaignAdapter:
         return {"schema": NUMERIC_SCHEMA, "owner": decision.owner, "context_key": source_key,
                 "packed_graph": {"context": context_graph, "observation": observation_graph,
                                  "actions": graphs, "action_factors": factors}}
+
+    def zone_input(self, actions: tuple[ScheduledAction, ...] | None = None) -> Any:
+        """The unchanged decision in the fixed zone encoding, built once.
+
+        `actions` must be this decision's own option objects, in any order and
+        any subset; the result lists exactly those options. None means all.
+        """
+        if not hasattr(self.raw, "zone_input"):
+            return None
+        decision = self._decision_cache()
+        menu = () if self.raw.is_terminal() else self._legal_actions(decision)
+        if decision.zone is None:
+            options = [(action.kind, action.player, action._source) for action in menu]
+            if any(action.kind != "pass_interrupt" and action._source is None for action in menu):
+                return None  # Only native options can be described.
+            decision.zone = self.raw.zone_input(decision.owner, decision.kind, decision.offered,
+                                                sorted(self._passed), list(self.interrupt_order), options)
+        if actions is None or (len(actions) == len(menu) and all(map(is_, actions, menu))):
+            return decision.zone
+        lookup = {action.id: index for index, action in enumerate(menu)}
+        try:
+            indices = [lookup[action.id] for action in actions]
+        except KeyError as error:
+            raise ValueError("Zone input requested for a stale/foreign action") from error
+        if any(menu[index] is not action for index, action in zip(indices, actions)):
+            return None  # Equal outside wrappers take the validated public path.
+        return decision.zone.select(indices)
 
     def observation(self) -> dict[str, Any]:
         # Public callers may edit a detached mutable observation; inference

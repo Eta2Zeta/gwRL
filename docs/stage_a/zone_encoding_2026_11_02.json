@@ -1,0 +1,385 @@
+{
+  "date": "2026-11-02",
+  "change": "A fixed zone encoding of campaign decisions, built in C++ from the engine state",
+  "machine": "4-vCPU Linux container, four checks running at once; Python extension compiled with g++ -O3 -std=c++20",
+  "method": "tools/check_zone_encoding.py plays complete games. Every decision is encoded. Positions with equal encodings must offer equal options (compared by their encodings). At every fifth decision (every second in the dense runs) up to two (three) groups of options with equal encodings are played on copies, and the resulting positions must encode equally. Sizes and build times are compared with the graph input at every tenth decision; build times are first builds of a decision.",
+  "runs": {
+    "random_3_rounds_seeds_1951_1952": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        1951,
+        1952
+      ],
+      "rounds": 3,
+      "policy": "uniform",
+      "size_stride": 10,
+      "successor_stride": 5,
+      "groups_per_position": 2,
+      "positions": 1336,
+      "chance_positions": 182,
+      "distinct_encodings": 1335,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 18,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 12775,
+        "mean": 15009.564,
+        "max": 48680,
+        "count": 133
+      },
+      "graph_input_bytes": {
+        "median": 712969,
+        "mean": 795258.932,
+        "max": 2429376,
+        "count": 133
+      },
+      "zone_input_ms": {
+        "median": 0.481,
+        "mean": 0.55,
+        "max": 4.458,
+        "count": 1336
+      },
+      "graph_input_ms": {
+        "median": 2.953,
+        "mean": 6.005,
+        "max": 244.199,
+        "count": 133
+      }
+    },
+    "scripted_3_rounds_seed_1951": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        1951
+      ],
+      "rounds": 3,
+      "policy": "balanced",
+      "size_stride": 10,
+      "successor_stride": 5,
+      "groups_per_position": 2,
+      "positions": 640,
+      "chance_positions": 115,
+      "distinct_encodings": 640,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 8,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 10588.5,
+        "mean": 13743.438,
+        "max": 49668,
+        "count": 64
+      },
+      "graph_input_bytes": {
+        "median": 649441.0,
+        "mean": 771012.688,
+        "max": 2299010,
+        "count": 64
+      },
+      "zone_input_ms": {
+        "median": 0.499,
+        "mean": 0.574,
+        "max": 2.356,
+        "count": 640
+      },
+      "graph_input_ms": {
+        "median": 2.704,
+        "mean": 5.429,
+        "max": 120.953,
+        "count": 64
+      }
+    },
+    "random_11_rounds_seed_1953": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        1953
+      ],
+      "rounds": 11,
+      "policy": "uniform",
+      "size_stride": 10,
+      "successor_stride": 5,
+      "groups_per_position": 2,
+      "positions": 1702,
+      "chance_positions": 131,
+      "distinct_encodings": 1702,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 22,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 16160.0,
+        "mean": 20791.659,
+        "max": 86251,
+        "count": 170
+      },
+      "graph_input_bytes": {
+        "median": 784793.0,
+        "mean": 981108.412,
+        "max": 3588611,
+        "count": 170
+      },
+      "zone_input_ms": {
+        "median": 0.642,
+        "mean": 0.716,
+        "max": 3.669,
+        "count": 1702
+      },
+      "graph_input_ms": {
+        "median": 3.662,
+        "mean": 5.499,
+        "max": 138.506,
+        "count": 170
+      }
+    },
+    "scripted_11_rounds_seed_1953": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        1953
+      ],
+      "rounds": 11,
+      "policy": "balanced",
+      "size_stride": 10,
+      "successor_stride": 5,
+      "groups_per_position": 2,
+      "positions": 2240,
+      "chance_positions": 332,
+      "distinct_encodings": 2240,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 64,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 12615.0,
+        "mean": 15744.71,
+        "max": 61167,
+        "count": 224
+      },
+      "graph_input_bytes": {
+        "median": 764543.0,
+        "mean": 922673.491,
+        "max": 3162835,
+        "count": 224
+      },
+      "zone_input_ms": {
+        "median": 0.591,
+        "mean": 0.705,
+        "max": 4.703,
+        "count": 2240
+      },
+      "graph_input_ms": {
+        "median": 3.198,
+        "mean": 4.324,
+        "max": 90.871,
+        "count": 224
+      }
+    },
+    "random_11_rounds_seeds_2101_2103_dense": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        2101,
+        2102,
+        2103
+      ],
+      "rounds": 11,
+      "policy": "uniform",
+      "size_stride": 10,
+      "successor_stride": 2,
+      "groups_per_position": 3,
+      "positions": 5362,
+      "chance_positions": 580,
+      "distinct_encodings": 5353,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 324,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 14473.0,
+        "mean": 17667.242,
+        "max": 86859,
+        "count": 534
+      },
+      "graph_input_bytes": {
+        "median": 746720.0,
+        "mean": 878659.011,
+        "max": 3244530,
+        "count": 534
+      },
+      "zone_input_ms": {
+        "median": 0.594,
+        "mean": 0.701,
+        "max": 12.075,
+        "count": 5362
+      },
+      "graph_input_ms": {
+        "median": 3.452,
+        "mean": 4.871,
+        "max": 180.727,
+        "count": 534
+      }
+    },
+    "random_11_rounds_seeds_2104_2106_dense": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        2104,
+        2105,
+        2106
+      ],
+      "rounds": 11,
+      "policy": "uniform",
+      "size_stride": 10,
+      "successor_stride": 2,
+      "groups_per_position": 3,
+      "positions": 5401,
+      "chance_positions": 577,
+      "distinct_encodings": 5393,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 276,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 13834,
+        "mean": 17083.976,
+        "max": 128156,
+        "count": 539
+      },
+      "graph_input_bytes": {
+        "median": 719898,
+        "mean": 857935.236,
+        "max": 4447112,
+        "count": 539
+      },
+      "zone_input_ms": {
+        "median": 0.548,
+        "mean": 0.666,
+        "max": 13.41,
+        "count": 5401
+      },
+      "graph_input_ms": {
+        "median": 3.295,
+        "mean": 4.64,
+        "max": 143.853,
+        "count": 539
+      }
+    },
+    "scripted_11_rounds_seeds_2101_2103_dense": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        2101,
+        2102,
+        2103
+      ],
+      "rounds": 11,
+      "policy": "balanced",
+      "size_stride": 10,
+      "successor_stride": 2,
+      "groups_per_position": 3,
+      "positions": 6585,
+      "chance_positions": 1156,
+      "distinct_encodings": 6554,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 583,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 11274.5,
+        "mean": 14367.816,
+        "max": 144905,
+        "count": 656
+      },
+      "graph_input_bytes": {
+        "median": 712748.0,
+        "mean": 832909.447,
+        "max": 5123130,
+        "count": 656
+      },
+      "zone_input_ms": {
+        "median": 0.613,
+        "mean": 0.745,
+        "max": 8.721,
+        "count": 6585
+      },
+      "graph_input_ms": {
+        "median": 3.273,
+        "mean": 4.059,
+        "max": 89.715,
+        "count": 656
+      }
+    },
+    "scripted_11_rounds_seeds_2104_2106_dense": {
+      "encoding_version": "campaign-zone-v1-11dda95a8ed9de22",
+      "seeds": [
+        2104,
+        2105,
+        2106
+      ],
+      "rounds": 11,
+      "policy": "balanced",
+      "size_stride": 10,
+      "successor_stride": 2,
+      "groups_per_position": 3,
+      "positions": 6993,
+      "chance_positions": 1171,
+      "distinct_encodings": 6854,
+      "positions_whose_encoding_matched_an_earlier_one_with_different_options": 0,
+      "collision_examples": [],
+      "identical_option_groups_checked": 676,
+      "identical_options_with_different_successors": 0,
+      "nonequivalent_examples": [],
+      "names_in_other_columns": {},
+      "zone_input_bytes": {
+        "median": 11549.0,
+        "mean": 15127.297,
+        "max": 88867,
+        "count": 698
+      },
+      "graph_input_bytes": {
+        "median": 733937.0,
+        "mean": 878075.628,
+        "max": 3705261,
+        "count": 698
+      },
+      "zone_input_ms": {
+        "median": 0.637,
+        "mean": 0.784,
+        "max": 9.044,
+        "count": 6993
+      },
+      "graph_input_ms": {
+        "median": 3.519,
+        "mean": 4.449,
+        "max": 131.235,
+        "count": 698
+      }
+    }
+  },
+  "totals": {
+    "positions": 30259,
+    "collisions": 0,
+    "groups": 1971,
+    "nonequivalent": 0
+  },
+  "layout": {
+    "version": "campaign-zone-v1-11dda95a8ed9de22",
+    "zones": 37,
+    "zone_columns": 59322,
+    "global_columns": 6763,
+    "option_columns": 13031,
+    "map_facts_per_zone": 39,
+    "borders": 160,
+    "facts_per_border": 22
+  }
+}

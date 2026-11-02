@@ -235,6 +235,7 @@ state.
 - [Finished battles clear themselves: 5.2% fewer decisions and 3.8% fewer search evaluations in the same games; truce changes update allies lists at once](battle_clearing_2026_10_31.md)
 - [Aircraft move once per turn: a plane that flew in Combat Movement no longer flies again in Noncombat Movement; rule verdicts on post-combat landings and repositioning](aircraft_single_move_2026_11_01.md)
 - [Combat Movement lists only moves that start a combat, for land units and planes: Combat Movement lists about a third of their size; repositioning and split flights happen after the battles; land handed over by an alignment may be entered the same turn](combat_movement_combats_only_2026_11_01.md)
+- [A fixed zone encoding of campaign decisions: 37 zones answer fixed questions; no look-alike positions or options in 30,259 positions; 49 to 64 times smaller and 5 to 6 times faster to build than the graph input](zone_encoding_2026_11_02.md)
 - [Native neural-input compilation and matched measurements](neural_input_2026_10_24.md)
 - [Bounded AI orders, configuration choices and compatibility](action_interface_2026_10_24.md)
 - [Thirteen bounded scaling cases](scaling_2026_10_23.json)

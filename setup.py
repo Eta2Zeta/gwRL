@@ -39,6 +39,7 @@ ext_modules = [
             "src/japan_training_env.cpp",
             "src/python_bindings.cpp",
             "src/simple_json.cpp",
+            "src/zone_encoding.cpp",
         ],
         define_macros=[("GWRL_SOURCE_DIR", chr(34) + str(ROOT) + chr(34))],
         include_dirs=[str(ROOT / "include")],
