@@ -327,6 +327,16 @@ void airliftHeavyCapacityAndContinuation() {
     check(e.state().units.at("t").movementRemaining.value() > 0 && offered(e, "air_fly"),
           "Transport cannot continue after unloading");
 }
+void airTransportsUnloadOnlyWhereTheyStand() {
+    // Seed 20147 of the 2 November random games unloaded an air transport by sea
+    // into a neighbouring zone, as Tokyo neighbours Honshu here.
+    auto s = fixture(Phase::NonCombatMovement);
+    add(s, "t", "air_transport", "japan", honshu);
+    add(s, "i", "infantry", "japan", honshu);
+    attachCargo(s, "t", "i");
+    for (const auto &a : navalMovementActions(s))
+        check(a.kind != "naval_unload", "Air transport cargo unloaded by sea");
+}
 void failedLanding() {
     // Combat Movement too: a flight that waited for a Carrier that never came
     // cannot be rescued by a patrol, because a patrol cannot follow a flight.
@@ -540,6 +550,7 @@ int main() {
         cityPermanentIPPAndDestruction();
         improvedConstructionPerPlayerTurn();
         airliftHeavyCapacityAndContinuation();
+        airTransportsUnloadOnlyWhereTheyStand();
         failedLanding();
         strandedAttackersStillEndCombatMovement();
         noAircraftCapture();
@@ -548,7 +559,7 @@ int main() {
         combatMovementStopsOnlyToCollectAirborneInfantry();
         alliedTransportBoardsAfterItsOwnersTurn();
         aRaidOnAVanishedProjectDoesNothing();
-        std::cout << "18 air fixture groups passed\n";
+        std::cout << "19 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

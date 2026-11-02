@@ -723,9 +723,9 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
   const auto &t = s.units.at(ship);
   const auto &c = s.units.at(cargo);
   // Aircraft never unload from a carrier: they take off from it by flying, and
-  // land on it where it ends its move.
-  if (c.carriedBy != ship || !movementController(s, c.owner) || isAircraft(s, c) ||
-      marked(t.turnFlags, "naval_combat_unloaded"))
+  // land on it where it ends its move. Air transports unload where they stand.
+  if (c.carriedBy != ship || !has(s, t, "naval") || !movementController(s, c.owner) ||
+      isAircraft(s, c) || marked(t.turnFlags, "naval_combat_unloaded"))
     return false;
   const auto owner = s.territories.at(destination).possessor;
   if (!owner || !politicallyFriendly(s, c.owner, *owner) ||
