@@ -507,6 +507,27 @@ void alliedTransportBoardsAfterItsOwnersTurn() {
     });
     check(e.state().units.at("infantry").carriedBy == "lift", "An ally could not board a transport that flew on its own turn");
 }
+void aRaidOnAVanishedProjectDoesNothing() {
+    // Capturing the zone or an earlier raid may remove the targeted project
+    // before the damage roll (seed 8215 of the 2 November random games).
+    auto s = fixture();
+    add(s, "b", "medium_bomber", "japan", beiping);
+    s.construction["project"] = BuildProject{"project", "kmt", "medium_factory", hopeh, 1, 3, {3}};
+    Engine e(s, rules(), 4);
+    choose(e, "air_bomb",
+           [](const auto &a) { return a.parameters.require("target").asString() == "project"; });
+    choose(e, "end_phase");
+    choose(e, "air_begin_bombing");
+    check(e.state().chance && e.state().chance->purpose == "air_bomb_damage", "Construction raid rolled no damage");
+    auto vanished = e.state().clone();
+    vanished.construction.erase("project");
+    Engine after(vanished, rules(), 4);
+    after.setDiceTapeForTesting({6});
+    after.resolveChance();
+    check(!after.state().chance || after.state().chance->purpose != "air_bomb_damage",
+          "A raid on a removed project did not move on");
+    check(after.state().units.contains("b"), "The raid lost its bomber");
+}
 int main() {
     try {
         flightPermissionAndRange();
@@ -526,7 +547,8 @@ int main() {
         combatMovementFlightIsTheTurnsMove();
         combatMovementStopsOnlyToCollectAirborneInfantry();
         alliedTransportBoardsAfterItsOwnersTurn();
-        std::cout << "17 air fixture groups passed\n";
+        aRaidOnAVanishedProjectDoesNothing();
+        std::cout << "18 air fixture groups passed\n";
         return 0;
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

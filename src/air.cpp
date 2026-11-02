@@ -2037,8 +2037,12 @@ void AirRules::applyChance(State &s, const ChanceRequest &r, const ChanceOutcome
         auto kind = str(b, "target_kind");
         if (kind == "facility")
             applyFacilityBombDamage(s, str(b, "target"), damage);
-        else if (kind == "construction")
-            damageConstruction(s, str(b, "target"), damage);
+        else if (kind == "construction") {
+            // Capturing the zone or an earlier raid this combat phase may have
+            // removed the project; the raid then has nothing left to damage.
+            if (s.construction.contains(str(b, "target")))
+                damageConstruction(s, str(b, "target"), damage);
+        }
         else if (kind == "city") {
             bool before = marked(s.territories.at(b.zone).flags, "city_destroyed");
             applyCityBombDamage(s, b.zone, damage);
