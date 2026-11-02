@@ -223,6 +223,17 @@ void strategicPickupAlongRoute() {
                 "strategic_naval_used") == 2,
         "Intermediate pickup lost cargo or capacity");
 }
+void alliedShipsLeaveCarrierReach() {
+  // Units of the carrier's own alliance neither fight it nor raise a peace
+  // entry, so a transport of Dadao under Japanese control does not stop a
+  // Japanese carrier (seed 20411 of the 2 November random games stranded a
+  // fighter when the transport sailed into the carrier's way).
+  auto s = fixture();
+  ensureDadao(s);
+  add(s, "c", "fleet_carrier", p32);
+  add(s, "d", "naval_transport", p15, "dadao");
+  check(navalEndZones(s, "c").contains(p16), "A Dadao transport stopped a Japanese carrier");
+}
 void strategicAndNoncombatBlockers() {
   auto s = fixture();
   s.nations.at("japan").atWarWith.insert("kmt");
@@ -814,6 +825,7 @@ int main() {
              {"strategic capacity/endpoints",
               strategicCapacityEndpointsAndUnloading},
              {"strategic pickup", strategicPickupAlongRoute},
+             {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
              {"naval blockers", strategicAndNoncombatBlockers},
              {"carrier independent flight", carrierMovementGivesNoAircraftRide},
              {"zero-cost port exit", portExitCostsZero},

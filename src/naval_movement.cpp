@@ -1297,11 +1297,15 @@ std::set<Id> navalEndZones(const State &s, const Id &ship) {
       return out;
     // A route ends early wherever an encounter can stop it. Enemy units may
     // wait only in a Combat Movement route's last zone, where its battle is
-    // fought; neutral units, which raise a peace entry, nowhere.
+    // fought; neutral units, which raise a peace entry, nowhere. Units of the
+    // ship's own alliance do neither, as with Dadao's under Japanese control.
+    const auto &alliance = s.nations.at(u.owner).alliance;
     const auto unfriendly = [&](const Id &zone, bool enemiesAllowed) {
       for (const auto &[id, other] : s.units)
         if (other.zone == zone && !other.carriedBy && other.owner != u.owner &&
             !politicallyFriendly(s, u.owner, other.owner) &&
+            (hostile(s, u.owner, other.owner) || !alliance ||
+             s.nations.at(other.owner).alliance != alliance) &&
             (!enemiesAllowed || !hostile(s, u.owner, other.owner)))
           return true;
       return false;
