@@ -229,7 +229,7 @@ if __name__ == "__main__":
         if row["status"]=="inactive_in_frozen_profile": detail=row["reason"]
         else:
             refs=row["handlers"]+row["fixtures"]
-            detail="; ".join(f"[{x['symbol']}]({ROOT/x['file']}:{x['line']})" for x in refs)
+            detail="; ".join(f"[{x['symbol']}](../../{x['file']}#L{x['line']})" for x in refs)
         lines.append(f"| {row['id']} | {row['status']} | {detail.replace('|','/')} |")
     (OUT/"runtime_coverage_ledger.md").write_text("\n".join(lines)+"\n")
     print(json.dumps(counts))

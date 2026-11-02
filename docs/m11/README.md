@@ -1,8 +1,7 @@
 # M11: multi-agent environment and stochastic vector search
 
-**Status: correctness exit complete, 23 October 2026.** The adapter, wealth and
-search checks pass alongside M10's two full campaign replays. Search correctness
-on small exact fixtures does not establish full campaign playing strength.
+**Status: correctness exit complete, 23 October 2026.** Search correctness on
+small exact fixtures does not establish full campaign playing strength.
 
 `gwrl_cpp.CampaignEnv` exposes the complete shared engine. The actual decision
 owner, decision kind, legal actions, declaration interrupts, explicit chance,
@@ -45,20 +44,13 @@ asset's current owner. Intermediate returns are zero.
 
 ## Verification and use
 
-The [search verification](search_verification.json) records 16 exact-oracle,
-stochastic, reaction, action-order, cache, RNG and interrupt-scheduler tests with
-stated budgets and tolerances. Additional C++ and Python binding checks exercise
-the actual 99-piece campaign and wealth accounting. The
-[integrated verification](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m11/verification_2026_10_23.json)
-records all 23 passing C++ suites and 156 Python tests. Both M10 traces restore
-their initial and terminal checkpoints exactly through the Python API; terminal
-wealth and all three returns match the exported results and approved formula.
-
-Batched neural inference, model/action-generation profiling, further factorization
-of large action menus and learned policy/value heads remain follow-ups with M12.
-This milestone supplies the synchronous,
-versioned evaluator interface, complete-state transpositions and exact observed
-root reuse required to test those optimizations against a correct search.
+The search tests check exact-oracle, stochastic, reaction, action-order, cache,
+RNG and interrupt-scheduler behavior with stated budgets and tolerances.
+Additional C++ and Python binding checks exercise the actual 99-piece campaign
+and wealth accounting. This milestone supplies the synchronous, versioned
+evaluator interface, complete-state transpositions and exact observed root
+reuse; batched neural evaluation and the learned networks build on it in the
+[campaign study](/Users/home/Desktop/gwRL/studies/campaign/README.md).
 
 ```sh
 ./.venv/bin/python -m unittest discover -s tests -p 'test_multiplayer_mcts.py' -v
@@ -76,5 +68,5 @@ result = search.search(env)  # Default evaluator is untrained and returns zero v
 env.apply_action(result.best_action())
 ```
 
-This example checks API wiring. Neural learning, held-out policy evaluation and
-interruptible training operations belong to M12; no training run is launched.
+This example checks API wiring. Training, held-out evaluation and resume are in
+the [campaign study](/Users/home/Desktop/gwRL/studies/campaign/README.md).

@@ -40,8 +40,7 @@ order so a third-party active player gets no discretionary ordering choice.
 That ordering is an explicit implementation convention because these battles
 were not declared through Combat Movement and the source supplies no event order.
 
-M7 replaces the prototype's single-call land combat with serialized battle
-progress. Each first-strike volley, ordinary attack volley, defensive return
+Land combat is serialized battle progress. Each first-strike volley, ordinary attack volley, defensive return
 volley, casualty choice, pairing choice, retreat destination, and disputed
 joint-defense choice is part of the campaign state and event history.
 
@@ -112,12 +111,6 @@ blitz capacity, joint-defense disputes, and the retained Dadao identity in
 Japan's calendar slot. Multi-turn ground movement, capture, collection and
 counterattack are replayed through the composed campaign modules.
 
-The original [M7 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m7/verification.json)
-and earlier correction records remain historical snapshots.
-The [shared truce Low Morale verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m7/shared_truce_morale_2026_10_22.json)
-records the corrected behavior and current integrated checks.
-
 The M10 source audit adds Strategic Rocket regressions: Rockets cannot roll or
 absorb casualties; surviving Enemy land units destroy unsupported Rockets.
-Aircraft-only raids and remote attrition preserve them. The dated M7 records
-remain unchanged; the current M10 checkpoint records this correction.
+Aircraft-only raids and remote attrition preserve them.

@@ -30,11 +30,7 @@ screening success/failure, source-specific rocket cases, and adopted bombardment
 M9 adds naval targets and port/MAP engagement rather than substituting dummy
 naval outcomes. Damaged-port evacuation can suspend and resume bombing.
 
-The [M8 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m8/verification.json)
-records the source and artifact hashes and final checks. Earlier milestone records
-remain historical snapshots. M9 and M10 are not certified by this air-layer gate.
-
 On 23 October, RCL-001 was updated to the developer’s v4.4 correction at the
 user’s request: both sides’ Fighters and AAA resolve in step 4, surviving
 transports land in step 5, and transport/cargo casualties stay linked through
-steps 3–4. The [dated correction record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m8/airborne_correction_2026_10_23.json) supplements the original verification.
+steps 3–4.

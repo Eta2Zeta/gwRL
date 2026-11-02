@@ -1,7 +1,6 @@
 # M1: world-to-theatre bridge
 
-Status: **complete and verified on 21 October 2026**. All **119 repository Python
-tests pass**, including **52 bridge, geographic-feature and faction tests**.
+Completed on 21 October 2026.
 
 The bridge extracts the approved closed Japan–China theatre from the world map
 and supplies canonical faction identities for later state loading. It preserves
@@ -14,8 +13,6 @@ the M0 scenario decisions. No user decision is required for this milestone.
   and [generated map](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/map.json).
 - [Faction identity bridge](/Users/home/Desktop/gwRL/tools/scenario_factions.py)
   and [generated faction index](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m1/faction_index.json).
-- [Verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m1/verification.json),
-  including artifact hashes and checks against the historical M0 baseline.
 
 The map contains **37 nodes** (31 land and 6 sea), **160 directed internal
 edges**, **19 physical map facilities** and **47 recorded boundary cuts**.
@@ -60,11 +57,9 @@ From the repository root:
 ./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
 ```
 
-The [M0 baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
-remains the historical freeze record. M1 adds an identity sidecar and updates
-milestone progress in the implementation plan. It does not change the frozen
-scenario contract, setup, manifest or map. The M1 verification record distinguishes
-these progress notes from a change to the approved M0 specification.
+M1 adds an identity sidecar. It does not change the frozen scenario contract,
+setup, manifest or map recorded by the
+[M0 baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json).
 
 This milestone establishes the static map and identity bridge. Source-unknown
 rail-region membership and navigable river routes remain explicitly marked as

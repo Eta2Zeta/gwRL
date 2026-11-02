@@ -1,7 +1,6 @@
 # M3: unit, facility and technology catalog
 
-Status: **complete and verified on 21 October 2026**. All seven CTest suites and
-all 128 repository Python tests pass. No M3 user decision remains.
+Completed on 21 October 2026.
 
 M3 supplies the definitions used by the shared campaign engine: what each piece
 is, its values and abilities, and which printed purchase options apply to each
@@ -90,7 +89,4 @@ git diff --check
 
 The acceptance checks cover every printed row, setup type and surviving unit
 state, alongside independent source-hash, source-page and chart-coverage checks.
-See [source coverage](/Users/home/Desktop/gwRL/docs/m3/source_coverage.md) and the
-[M3 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m3/verification.json)
-for final results. Historical M0, M1 and M2 verification records are preserved;
-M3 records the later changes to the implementation and progress documents.
+See [source coverage](/Users/home/Desktop/gwRL/docs/m3/source_coverage.md).

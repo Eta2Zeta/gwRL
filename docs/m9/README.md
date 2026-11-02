@@ -41,20 +41,14 @@ inactive under the frozen campaign profile.
 
 Current targeted coverage: **21 naval-movement groups, 17 naval-combat groups,
 and 27 naval-operations groups**, with shared land-combat and air-integration
-checks. The [source exit record](source_exit_2026_10_23.json) records the source
-findings, test commands and evidence hashes before the RCL-014 role correction;
-its provisional-role statements are historical. The
-[checkpoint record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m9/checkpoint_2026_10_22.json)
-preserves the earlier 22 October partial checkpoint.
+checks.
 
-Four durable traces verify complete sequences and exact replay:
+On 23 October four complete sequences were verified with exact replay: a clear
+Japan-to-China voyage and landing; contested screening followed by reinforcement
+and landing; failed screening and retreat with linked cargo; and one combined
+overland/amphibious battle with an overland-only retreat.
 
-- [Clear Japan-to-China voyage and landing](evidence/combined_clear_2026_10_23.json).
-- [Contested screening followed by reinforcement and landing](evidence/combined_contested_2026_10_23.json).
-- [Failed screening and retreat with linked cargo](evidence/combined_retreat_2026_10_23.json).
-- [One combined overland/amphibious battle with an overland-only retreat](evidence/combined_overland_amphibious_2026_10_23.json).
-
-The last trace resolves shore fire before the merged land battle. Separate
+The combined battle resolves shore fire before the merged land battle. Separate
 ordinary land battles remain available; a same-nation attack on the assault's
 target waits for its amphibious preparation. Naval air declarations remain
 committed until Combat, and an attack on ships in port does not let those ships

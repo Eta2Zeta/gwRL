@@ -1,7 +1,6 @@
 # M4: politics, warlords and national turns
 
-Status: **complete and verified on 21 October 2026**. All ten CTest suites and
-all 128 Python tests pass. The three political suites cover 34 fixture groups.
+Completed on 21 October 2026.
 No M4 user decision remains open.
 
 M4 adds the political rule layer to the shared campaign engine. It covers
@@ -137,7 +136,5 @@ ctest --test-dir build/m4 --output-on-failure
 git diff --check
 ```
 
-The [M4 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m4/verification.json)
-records final counts, checked artifacts and preservation of historical milestone
-records. The new political suites cover evolution/capture/surrender and replay,
+The political suites cover evolution/capture/surrender and replay,
 whole-warlord/truce timelines, and influence/recruitment boundaries.

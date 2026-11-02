@@ -41,7 +41,7 @@ The engine does not restore cropped routes or open impassable Himalayan borders.
 
 The immutable M5 source profile overlays individually reviewed gauge, river and
 region values on the retained map. It is included in the definition fingerprint;
-the frozen M0 map and older verification records are unchanged. See
+the frozen M0 map is unchanged. See
 [source coverage](source_coverage.md).
 
 `movement_tests` contains 14 fixture groups covering the M5 exit cases, both
@@ -67,7 +67,3 @@ Whenever infrastructure is damaged, the damage handler stamps
 New rail construction stamps `logistics_rail_created_turn:<id>` the same way.
 These stamps prevent a repair or new construction from satisfying a requirement
 that the infrastructure was undamaged throughout the active turn.
-
-The dated [M5 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m5/verification.json)
-records source/artifact hashes, completed fixtures and the integrated test results.
-Earlier milestone records remain unchanged historical snapshots.

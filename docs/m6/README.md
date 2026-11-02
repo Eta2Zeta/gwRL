@@ -1,6 +1,6 @@
 # M6 — economy, production, construction and research
 
-Implemented on 2026-10-22. The milestone's accounting and production gate is covered by fourteen behavioral fixture groups in `tests/economy_tests.cpp`; the root milestone verification record captures the final integrated checks. M0–M4 frozen records are preserved.
+Implemented on 22 October 2026. The milestone's accounting and production gate is covered by fourteen behavioral fixture groups in `tests/economy_tests.cpp`.
 
 The implementation uses `include/game/economy.hpp`, `src/economy.cpp` and `src/economy_lendlease.cpp`, backed by `game_content/rules/gw36_economy_v43.json`. The source profile contains 22 rules and six sources. Catalog national rows remain the authority for prices, dates, technologies and purchase limits. M5 supplies typed supply routes, held-since-start checks, blockades, facility coasts and the special final-recipient lend-lease route.
 
@@ -33,10 +33,6 @@ See `source_coverage.md` for page-level coverage and the remaining milestone bou
 
 ## Verification
 
-`cmake --build build/m5-m8 -j4` and `build/m5-m8/economy_tests` pass. The fourteen fixture groups cover current income and capital loss; two-turn opening-queue accounting; repaired factory capacity; decentralized production and finite militia purchases; research date/attempt/conversion rules; construction setbacks and factory recapture; permanent city loss and selected-side rail repairs; supplied Dadao delivery; shared shipyard repair slots; upgrades and discount alternatives; foreign rail consent; recipient upgrade/repair timing; exact checkpoint/replay; the explicit Elite Airborne exception; and replacement targeting after the originally available unit is lost.
+The fourteen fixture groups cover current income and capital loss; two-turn opening-queue accounting; repaired factory capacity; decentralized production and finite militia purchases; research date/attempt/conversion rules; construction setbacks and factory recapture; permanent city loss and selected-side rail repairs; supplied Dadao delivery; shared shipyard repair slots; upgrades and discount alternatives; foreign rail consent; recipient upgrade/repair timing; exact checkpoint/replay; the explicit Elite Airborne exception; and replacement targeting after the originally available unit is lost.
 
 An accounting-only fixture advances all 44 national turns with unchanged territory, ending with Japan 180 IPP, KMT 72 IPP and CCP 24 IPP, while the unadvanced opening queues retain ten paid IPP. This verifies collection and the full final round. It does not claim naval combat, transport/amphibious operations or training have been implemented by M6.
-
-The dated [M6 verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m6/verification.json)
-records source/artifact hashes, completed fixtures and the integrated test results.
-Earlier milestone records remain unchanged historical snapshots.

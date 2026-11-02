@@ -1,7 +1,6 @@
 # M2: shared engine state and execution foundation
 
-Status: **complete and verified on 21 October 2026**. All six CTest suites and
-all 119 repository Python tests pass. No user decision remains for M2.
+Completed on 21 October 2026.
 
 M2 implements the C++ foundation for the approved Japan–China campaign. It loads
 the actual starting setup, represents mutable game state, validates actions at
@@ -97,16 +96,7 @@ git diff --check
 | Deterministic replay | Checkpoint plus recorded actions/chance events reproduces state and RNG exactly; mismatched rules and divergent events fail. |
 | Decision ownership | Defender reactions route to the defender's player while preserving the active national turn; Mongolia routes directly to Comintern. |
 | Complete deadline | All four nations receive eleven start hooks and finish eleven turns. Final collection can queue work without collecting twice or ending early. |
-| Throughput baseline | Real setup clone, legal-action, planning-key and synthetic-transition rates are recorded in the benchmark artifact. |
 
-The six CTest suites cover campaign state, campaign runtime, actual setup loading,
-JSON integrity, prototype API boundaries and existing combat regressions. The
-Python suite retains 119 tests. The prototype's clone now avoids disk reads, and
-its public action execution rejects choices absent from its legal-action list.
-The existing Python API and encoder shapes are preserved during migration.
-
-See the [verification record](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m2/verification.json)
-and [benchmark results](/Users/home/Desktop/gwRL/docs/m2/benchmark.json).
-The historical M0/M1 records remain intact; this implementation does not change
-the approved scenario data. M3 adds the executable unit/facility catalog, and
-subsequent milestones implement the game-rule modules on this foundation.
+This implementation does not change the approved scenario data. M3 adds the
+executable unit/facility catalog, and later milestones implement the game-rule
+modules on this foundation.

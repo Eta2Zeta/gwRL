@@ -2,10 +2,9 @@
 
 This directory keeps source material and authored game data separate from engine and training code.
 
-Current implementation status (23 October 2026): M0–M12 implementation gates are complete,
-including naval source review, two full 44-turn campaign traces and the explicit
-multi-agent API/vector search. Reviewed rule profiles supplement the frozen M0
-map. [M12](/Users/home/Desktop/gwRL/docs/m12/README.md) adds the verified learning/resume/evaluation pipeline; the first [Stage A pilot](/Users/home/Desktop/gwRL/docs/stage_a/README.md) is complete, with broader playing strength still unestablished. RCL-012 is
+The campaign's rules are implemented (milestones M0–M11), including the naval
+source review, complete 44-turn campaigns and the multi-agent API and vector
+search. Reviewed rule profiles supplement the frozen M0 map. RCL-012 is
 closed; RCL-013 is adopted. RCL-014 is closed following developer clarification:
 evacuating ships defend and the enemy fleet already at sea attacks. RCL-015
 remains provisionally adopted. Consult the shared
