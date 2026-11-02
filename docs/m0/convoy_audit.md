@@ -2,7 +2,7 @@
 
 Status: **source reference only; convoy play and interdiction are excluded from this campaign by user choice**. This audit checks the six selected sea zones against the original `game_content/maps/gw36map.png`. Diagnostic crops were used for inspection; the original map was not edited. The approved 37-node profile has no active convoy actions, losses or income. Normal MAP and blockades remain active.
 
-Machine-readable source evidence: [convoy_audit.json](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/convoy_audit.json). These routes are not an active M0 dependency.
+Machine-readable source evidence: [convoy_audit.json](../../game_content/scenarios/japan_china_1936/m0/convoy_audit.json). These routes are not an active M0 dependency.
 
 ## Source finding: one printed convoy is geographically local
 

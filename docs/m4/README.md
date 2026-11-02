@@ -8,10 +8,10 @@ warlord alignment, influence and recruitment, the Chinese Truce, Chinese
 major-power evolution, capture/liberation notifications and surrender. Movement,
 combat resolution and final economy rules remain the following milestones.
 
-The public interface is [politics.hpp](/Users/home/Desktop/gwRL/include/game/politics.hpp).
+The public interface is [politics.hpp](../../include/game/politics.hpp).
 The implementation is split between common political events, warlords/truce,
-and influence/recruitment. The [source profile](/Users/home/Desktop/gwRL/game_content/rules/gw36_politics_v43.json)
-and [source coverage](/Users/home/Desktop/gwRL/docs/m4/source_coverage.md) retain
+and influence/recruitment. The [source profile](../../game_content/rules/gw36_politics_v43.json)
+and [source coverage](source_coverage.md) retain
 rulebook pages, national-sheet conditions, adopted rulings and campaign choices.
 
 ## Political transitions

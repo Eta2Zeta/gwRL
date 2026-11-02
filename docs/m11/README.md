@@ -50,7 +50,7 @@ Additional C++ and Python binding checks exercise the actual 99-piece campaign
 and wealth accounting. This milestone supplies the synchronous, versioned
 evaluator interface, complete-state transpositions and exact observed root
 reuse; batched neural evaluation and the learned networks build on it in the
-[campaign study](/Users/home/Desktop/gwRL/studies/campaign/README.md).
+[campaign study](../../studies/campaign/README.md).
 
 ```sh
 ./.venv/bin/python -m unittest discover -s tests -p 'test_multiplayer_mcts.py' -v
@@ -69,4 +69,4 @@ env.apply_action(result.best_action())
 ```
 
 This example checks API wiring. Training, held-out evaluation and resume are in
-the [campaign study](/Users/home/Desktop/gwRL/studies/campaign/README.md).
+the [campaign study](../../studies/campaign/README.md).

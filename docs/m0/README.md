@@ -6,12 +6,12 @@ full-rules game. No campaign choices or rule-clarification questions remain open
 for M0.
 
 **Revision scope:** this README records the approved campaign decisions; the shared
-[rule clarification register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
+[rule clarification register](../../game_content/rules/clarifications.md)
 records adopted and closed official-rule interpretations. The setup inventories,
 scenario contract, manifest, extracted map, detailed audits, milestone plan and
 data tests now agree with these decisions. Excluded FEC and convoy records remain
 as clearly labeled source evidence. The
-[frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
+[frozen baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
 records the verified files and their SHA-256 hashes. Later changes to the approved
 specification should explicitly revise this baseline. No full-rules engine or
 training was implemented in this work.
@@ -203,7 +203,7 @@ choices in this review. Completed units already use full catalog value.
 
 Mongolia scheduling, paid-construction scoring and whole-warlord alignment are
 settled above. **The decision-review checklist item is complete.** The
-[source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md)
+[source reconciliation](source_reconciliation.md)
 confirms the initial queue amounts: Heavy Cruiser **5 IPP paid / 5 remaining**;
 Fleet Carrier **5 paid / 10 remaining**. Both are national queues with no initial
 tile. Their already-paid total is **10 IPP**, separate from the **23 IPP** opening
@@ -212,7 +212,7 @@ cash. Placement still requires an eligible retained shipyard.
 ## Shared official-rule clarifications
 
 The canonical list is now
-[Rule clarifications and open questions](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md),
+[Rule clarifications and open questions](../../game_content/rules/clarifications.md),
 not a second set of rulings embedded in this scenario README.
 
 - **RCL-001 adopted:** airborne step 4 fires attacking AAA (with both sides'
@@ -266,17 +266,17 @@ they do not activate those mechanics in this scenario.
 
 | File | Purpose / revision status |
 | --- | --- |
-| [Scenario contract](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/scenario_contract.json) | Frozen machine-readable scope, scoring, accounts and decisions; no pending decisions |
-| [Japan setup data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/japan_setup.json) / [audit](/Users/home/Desktop/gwRL/docs/m0/japan_setup_audit.md) | 48 deployed units, three factories, carrier assignments, setup-only values and two reconciled national queues |
-| [China/minor setup data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/china_minor_setup.json) / [audit](/Users/home/Desktop/gwRL/docs/m0/china_minor_setup_audit.md) | 51 retained units, direct Comintern control of Mongolia, preserved owner names and separately excluded FEC records |
-| [Core rules ledger](/Users/home/Desktop/gwRL/docs/m0/core_rules_ledger.md) | Source-linked coverage and campaign applicability, including the settled clarification register |
-| [Asset price audit](/Users/home/Desktop/gwRL/docs/m0/asset_price_audit.md) | Published catalog/repair costs, confirmed setup-only values and city/rail scoring |
-| [Convoy audit](/Users/home/Desktop/gwRL/docs/m0/convoy_audit.md) / [data](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/convoy_audit.json) | Reference only for a future expanded profile; no longer required for this campaign |
-| [Manifest](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/manifest.json) / [extracted map](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/map.json) | 37 nodes, 19 static facilities, no active convoy lines; deterministic extraction from the reviewed world map |
-| [Source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md) / [catalog source checks](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json) | Queue payments, research chart and rule/price source checks, with later catalog work identified |
-| [M0 data tests](/Users/home/Desktop/gwRL/tests/test_m0_spec.py) | Verified setup, scope, provenance, accounts, queues, carrier assignments, scoring and exclusions |
-| [Full milestone plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md) | M0 closed; subsequent state, catalog and rule implementation work remains |
-| [Frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json) | Versioned file hashes and verification record for this completed M0 specification |
+| [Scenario contract](../../game_content/scenarios/japan_china_1936/m0/scenario_contract.json) | Frozen machine-readable scope, scoring, accounts and decisions; no pending decisions |
+| [Japan setup data](../../game_content/scenarios/japan_china_1936/m0/japan_setup.json) / [audit](japan_setup_audit.md) | 48 deployed units, three factories, carrier assignments, setup-only values and two reconciled national queues |
+| [China/minor setup data](../../game_content/scenarios/japan_china_1936/m0/china_minor_setup.json) / [audit](china_minor_setup_audit.md) | 51 retained units, direct Comintern control of Mongolia, preserved owner names and separately excluded FEC records |
+| [Core rules ledger](core_rules_ledger.md) | Source-linked coverage and campaign applicability, including the settled clarification register |
+| [Asset price audit](asset_price_audit.md) | Published catalog/repair costs, confirmed setup-only values and city/rail scoring |
+| [Convoy audit](convoy_audit.md) / [data](../../game_content/scenarios/japan_china_1936/m0/convoy_audit.json) | Reference only for a future expanded profile; no longer required for this campaign |
+| [Manifest](../../game_content/scenarios/japan_china_1936/manifest.json) / [extracted map](../../game_content/scenarios/japan_china_1936/map.json) | 37 nodes, 19 static facilities, no active convoy lines; deterministic extraction from the reviewed world map |
+| [Source reconciliation](source_reconciliation.md) / [catalog source checks](../../game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json) | Queue payments, research chart and rule/price source checks, with later catalog work identified |
+| [M0 data tests](../../tests/test_m0_spec.py) | Verified setup, scope, provenance, accounts, queues, carrier assignments, scoring and exclusions |
+| [Full milestone plan](../plans/japan_china_full_rules_plan.md) | M0 closed; subsequent state, catalog and rule implementation work remains |
+| [Frozen baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json) | Versioned file hashes and verification record for this completed M0 specification |
 
 The original setup audit inspected embedded setup-table images as well as text;
 row-level citations and PDF hashes are in the JSON. It inherited geography from

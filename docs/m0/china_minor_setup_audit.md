@@ -2,9 +2,9 @@
 
 Status: **M0 specification verified and frozen on 21 October 2026**; not a playable full-rules game state. Scope is July 1936 on the approved 37-node closed theatre (31 land, 6 sea), with Tannu Tuva and Hong Kong excluded. FEC and USSR are not participants. No engine changes are made by this audit.
 
-**21 October 2026 synchronization:** the [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md)
+**21 October 2026 synchronization:** the [M0 review](README.md)
 records the approved campaign scope and scoring decisions. The
-[shared rule register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
+[shared rule register](../../game_content/rules/clarifications.md)
 is canonical for RCL-002 influence, RCL-003 whole-warlord alignment and RCL-004
 CCP railroad access. RCL-003 is an adopted user decision. RCL-004 is closed:
 on 17 October 2026 the user reported that the developers fixed the wording for
@@ -12,7 +12,7 @@ the next version. No publication or version number has been independently checke
 The existing railroad mechanic remains intact. Excluded FEC evidence is retained
 below as source provenance only.
 
-The machine-readable counterpart is [china_minor_setup.json](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/china_minor_setup.json). It includes canonical node IDs, ownership/control separately, row-level provenance, source SHA-256 hashes, explicit empty setup rows and cross-check totals. Japanese forces are audited separately.
+The machine-readable counterpart is [china_minor_setup.json](../../game_content/scenarios/japan_china_1936/m0/china_minor_setup.json). It includes canonical node IDs, ownership/control separately, row-level provenance, source SHA-256 hashes, explicit empty setup rows and cross-check totals. Japanese forces are audited separately.
 
 ## Sources and method
 
@@ -20,14 +20,14 @@ The setup tables are embedded images, so text extraction alone misses the KMT, C
 
 | Key | Source | Relevant pages |
 | --- | --- | --- |
-| KMT | [KMT NRS v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - KMT v4.3.pdf>) | PDF 1-3: nation rules; 4-7: major-power build prices; 7: KMT and warlord setup |
-| CCP | [CCP NRS v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - CCP v4.3.pdf>) | PDF 1-3: nation rules; 4-7: major-power build prices; 7: setup |
-| FEC | [FEC NRS v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - FEC v4.3.pdf>) | PDF 1: income and Commonwealth status; 2: militia/colonial prices; 6: setup |
-| Japan | [Japan NRS v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - Japan v4.3.pdf>) | PDF 9: black land vs blue sea aircraft-count cross-check |
-| USSR | [USSR NRS v4.3.1](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - USSR v4.3.1.pdf>) | PDF 1-2: Mongolia control, Soviet income restrictions |
-| Neutral | [Neutrals setup v4.3](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf>) | PDF 1: Mongolia rows |
-| RB | [Rulebook v4.3](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>) | Printed/PDF pages and sections cited below |
-| Map | [Audited global map](/Users/home/Desktop/gwRL/game_content/maps/gw36_manual_map.json) | Existing printed-facility and territorial IPP data; not newly re-audited here |
+| KMT | [KMT NRS v4.3](<../../game_content/rules/GW36 - NRS - KMT v4.3.pdf>) | PDF 1-3: nation rules; 4-7: major-power build prices; 7: KMT and warlord setup |
+| CCP | [CCP NRS v4.3](<../../game_content/rules/GW36 - NRS - CCP v4.3.pdf>) | PDF 1-3: nation rules; 4-7: major-power build prices; 7: setup |
+| FEC | [FEC NRS v4.3](<../../game_content/rules/GW36 - NRS - FEC v4.3.pdf>) | PDF 1: income and Commonwealth status; 2: militia/colonial prices; 6: setup |
+| Japan | [Japan NRS v4.3](<../../game_content/rules/GW36 - NRS - Japan v4.3.pdf>) | PDF 9: black land vs blue sea aircraft-count cross-check |
+| USSR | [USSR NRS v4.3.1](<../../game_content/rules/GW36 - NRS - USSR v4.3.1.pdf>) | PDF 1-2: Mongolia control, Soviet income restrictions |
+| Neutral | [Neutrals setup v4.3](<../../game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf>) | PDF 1: Mongolia rows |
+| RB | [Rulebook v4.3](<../../game_content/rules/Global War 1936 v4.3 Rulebook.pdf>) | Printed/PDF pages and sections cited below |
+| Map | [Audited global map](../../game_content/maps/gw36_manual_map.json) | Existing printed-facility and territorial IPP data; not newly re-audited here |
 
 Exact source hashes are in the JSON `sources` object. Source rules are evidence, not instructions to expand this closed theatre or implement future milestones.
 

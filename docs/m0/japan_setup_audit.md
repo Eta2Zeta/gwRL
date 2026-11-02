@@ -2,9 +2,9 @@
 
 Status: **M0 specification verified and frozen on 21 October 2026**; not a playable full-rules state. Scope: the July 1936 Japan setup projected onto the approved 37-node China/Japan theatre. No game engine or training behavior is changed by this audit.
 
-**21 October 2026 synchronization:** see the [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md)
+**21 October 2026 synchronization:** see the [M0 review](README.md)
 for approved setup/scope decisions and the
-[shared rule register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
+[shared rule register](../../game_content/rules/clarifications.md)
 for the adopted/closed rule interpretations. The carrier-footnote, ship-placement
 and Kamikaze misreadings below have been corrected. The M0 review records the
 completed verification and freeze.
@@ -97,7 +97,7 @@ chosen to retain both ships with normal eligible-shipyard placement. The earlier
 suggestion to exclude them for lacking a printed starting tile was an unnecessary
 project restriction, not an official-rule requirement.
 
-The Heavy Cruiser costs 5/5 IPP and Fleet Carrier 5/5/5 (NRS page 7). The user has adopted **cumulative already-paid amounts** as the unfinished ships' scoring value. Source reconciliation establishes **5 IPP already paid for each ship**: the Heavy Cruiser in #2 has one 5-IPP payment remaining; the Fleet Carrier in #3 has two 5-IPP payments remaining. The printed construction track advances #3 -> #2 -> #1 Place Unit, and these setup entries are already in their first paid stage (NRS pp7,9; RB §§2.3,7.3,8.3). Do not debit those historic payments from starting cash. On completion, remove the construction entry and use the full completed catalog value (10 and 15 IPP respectively), counting each ship once. See [source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md) for the evidence chain. There is no executable queue in M0.
+The Heavy Cruiser costs 5/5 IPP and Fleet Carrier 5/5/5 (NRS page 7). The user has adopted **cumulative already-paid amounts** as the unfinished ships' scoring value. Source reconciliation establishes **5 IPP already paid for each ship**: the Heavy Cruiser in #2 has one 5-IPP payment remaining; the Fleet Carrier in #3 has two 5-IPP payments remaining. The printed construction track advances #3 -> #2 -> #1 Place Unit, and these setup entries are already in their first paid stage (NRS pp7,9; RB §§2.3,7.3,8.3). Do not debit those historic payments from starting cash. On completion, remove the construction entry and use the full completed catalog value (10 and 15 IPP respectively), counting each ship once. See [source reconciliation](source_reconciliation.md) for the evidence chain. There is no executable queue in M0.
 
 ## Theatre-adjusted treasury and income
 
@@ -174,6 +174,6 @@ exclusion and Kido Butai exclusion. Those are no longer unanswered questions.
 Paid-queue valuation is decided: score cumulative paid amounts until completion,
 then substitute full completed catalog value. Source reconciliation establishes
 the initial payments at 5 IPP each. The M0 specification is verified and frozen;
-the [baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
+the [baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
 records the frozen artifacts. Neither this audit nor the shared register
 implements mechanics.

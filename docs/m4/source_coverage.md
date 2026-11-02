@@ -1,6 +1,6 @@
 # M4 political source coverage
 
-The source profile is [gw36_politics_v43.json](/Users/home/Desktop/gwRL/game_content/rules/gw36_politics_v43.json).
+The source profile is [gw36_politics_v43.json](../../game_content/rules/gw36_politics_v43.json).
 It records printed v4.3 rules separately from adopted clarifications and the
 frozen closed-campaign contract. This document reports source findings; it does
 not certify that every corresponding handler has been implemented or tested.

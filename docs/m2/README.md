@@ -12,7 +12,7 @@ milestones listed in the implementation plan.
 
 - One shared C++ engine library, `gw_engine`, containing the campaign foundation
   and the prototype code during migration. The new API is
-  [campaign.hpp](/Users/home/Desktop/gwRL/include/game/campaign.hpp).
+  [campaign.hpp](../../include/game/campaign.hpp).
 - A shared immutable definition retaining the complete extracted geography,
   source warnings, campaign contract and faction identities. Clones copy mutable
   state in memory; they do not reload files or duplicate the map.

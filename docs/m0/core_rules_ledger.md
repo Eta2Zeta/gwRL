@@ -6,11 +6,11 @@ stable and can become a fixture identifier; none denotes a test run completed in
 M0. The current tiny environment must eventually use the same corrected engine.
 
 **21 October 2026 synchronization:** the canonical interpretation/status
-register is now [Rule clarifications and open questions](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md).
+register is now [Rule clarifications and open questions](../../game_content/rules/clarifications.md).
 All RCL items are adopted or closed. The **M0 specification was verified and frozen
 on 21 October 2026**, with 106 repository tests passing. The
-[M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md) and
-[frozen baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
+[M0 review](README.md) and
+[frozen baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
 record the result; this does not certify a playable full-rules engine.
 
 ## Contract, sources and notation
@@ -28,12 +28,12 @@ engine with a reason to omit it from the future shared engine.
 Source abbreviations below use printed/PDF pages for **RB** (they coincide), and
 one-based PDF pages for national sheets:
 
-- **RB**: [Global War 1936 v4.3 Rulebook](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>), chapters 0-15, pp5-107.
-- **J**: [Japan v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - Japan v4.3.pdf>).
-- **K**: [KMT v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - KMT v4.3.pdf>).
-- **C**: [CCP v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - CCP v4.3.pdf>).
-- **F**: [FEC v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - FEC v4.3.pdf>).
-- **S**: [USSR v4.3.1](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - USSR v4.3.1.pdf>).
+- **RB**: [Global War 1936 v4.3 Rulebook](<../../game_content/rules/Global War 1936 v4.3 Rulebook.pdf>), chapters 0-15, pp5-107.
+- **J**: [Japan v4.3](<../../game_content/rules/GW36 - NRS - Japan v4.3.pdf>).
+- **K**: [KMT v4.3](<../../game_content/rules/GW36 - NRS - KMT v4.3.pdf>).
+- **C**: [CCP v4.3](<../../game_content/rules/GW36 - NRS - CCP v4.3.pdf>).
+- **F**: [FEC v4.3](<../../game_content/rules/GW36 - NRS - FEC v4.3.pdf>).
+- **S**: [USSR v4.3.1](<../../game_content/rules/GW36 - NRS - USSR v4.3.1.pdf>).
 
 Classification: **R** required for the current profile; **C** conditionally
 reachable after legal local changes; **I** inactive because a required location,
@@ -196,7 +196,7 @@ Module labels are proposed responsibility boundaries, not files already present:
 
 ## 13-15. Catalog-specific and national capability inventory
 
-The [asset price audit](/Users/home/Desktop/gwRL/docs/m0/asset_price_audit.md)
+The [asset price audit](asset_price_audit.md)
 lists all catalog-priced types and the two retained setup-only types with approved
 reference values (Torpedo Boat Destroyer 5 IPP, Coastal Submarine 4 IPP). Catalog tests
 must cover every row, not just currently buyable early-game units.
@@ -233,7 +233,7 @@ must cover every row, not just currently buyable early-game units.
 
 ## Shared clarifications versus scenario and transcription work
 
-Use the [shared register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
+Use the [shared register](../../game_content/rules/clarifications.md)
 for the full question, evidence, authority, adopted wording and future test cases.
 There is no blanket invented precedence hierarchy between rulebook and sheets.
 
@@ -256,7 +256,7 @@ Japan setup/Kamikaze readings. Do not reopen those as unidentified conflicts.
 RCL-004's closure records the user's developer communication, not an independently
 checked publication or version number.
 
-The [source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md)
+The [source reconciliation](source_reconciliation.md)
 records exact research thresholds and initial queue payments. Full damaged-ship
 battle-board transcription belongs to M3 catalog certification; rail repair and
 ownership handlers belong to the later movement/economy/combat milestones. These

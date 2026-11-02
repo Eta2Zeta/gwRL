@@ -7,8 +7,8 @@ is, its values and abilities, and which printed purchase options apply to each
 nation. The catalog is shared game data; the closed campaign adds its approved
 setup and exclusions.
 
-The public interface is [catalog.hpp](/Users/home/Desktop/gwRL/include/game/catalog.hpp).
-The source data lives in [gw36_v43](/Users/home/Desktop/gwRL/game_content/catalog/gw36_v43):
+The public interface is [catalog.hpp](../../include/game/catalog.hpp).
+The source data lives in [gw36_v43](../../game_content/catalog/gw36_v43):
 
 | File | Coverage |
 | --- | --- |
@@ -89,4 +89,4 @@ git diff --check
 
 The acceptance checks cover every printed row, setup type and surviving unit
 state, alongside independent source-hash, source-page and chart-coverage checks.
-See [source coverage](/Users/home/Desktop/gwRL/docs/m3/source_coverage.md).
+See [source coverage](source_coverage.md).

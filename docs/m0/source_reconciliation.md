@@ -6,10 +6,10 @@ does not implement a construction queue, technology system or combat catalog.
 
 ## Evidence and method
 
-- [Rulebook v4.3](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>): full relevant pages 18, 44-45, 50-51, 67, 79-80, 89-91, 96 and 98-99 were read. The embedded technology chart on page 45 was inspected at its native image resolution; pages 50-51 were also rendered and inspected.
-- [Japan NRS v4.3](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - Japan v4.3.pdf>): full build-chart pages 5-8 were read, and the complete image-based setup page 9 was rendered and inspected. Page numbers are one-based PDF pages.
-- [Map artwork](/Users/home/Desktop/gwRL/game_content/maps/gw36map.png): the bottom-right build queue was inspected from the original image, crop bounds `(8620, 4510, 9900, 4888)`. Its printed version is v4.0; it supplies the stage layout referenced by the v4.3 rulebook, not an independent replacement for v4.3 prices or setup. The layout agrees with the v4.3 setup labels and construction example.
-- [Machine-readable source checks](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json) retain source hashes, queue derivations, research thresholds and the limited capital-ship damage statements checked here.
+- [Rulebook v4.3](<../../game_content/rules/Global War 1936 v4.3 Rulebook.pdf>): full relevant pages 18, 44-45, 50-51, 67, 79-80, 89-91, 96 and 98-99 were read. The embedded technology chart on page 45 was inspected at its native image resolution; pages 50-51 were also rendered and inspected.
+- [Japan NRS v4.3](<../../game_content/rules/GW36 - NRS - Japan v4.3.pdf>): full build-chart pages 5-8 were read, and the complete image-based setup page 9 was rendered and inspected. Page numbers are one-based PDF pages.
+- [Map artwork](../../game_content/maps/gw36map.png): the bottom-right build queue was inspected from the original image, crop bounds `(8620, 4510, 9900, 4888)`. Its printed version is v4.0; it supplies the stage layout referenced by the v4.3 rulebook, not an independent replacement for v4.3 prices or setup. The layout agrees with the v4.3 setup labels and construction example.
+- [Machine-readable source checks](../../game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json) retain source hashes, queue derivations, research thresholds and the limited capital-ship damage statements checked here.
 
 ## Initial Japanese queue payments: resolved
 

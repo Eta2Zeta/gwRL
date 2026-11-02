@@ -2,12 +2,12 @@
 
 The approved target, scenario decisions and wealth objective of the regional
 campaign, the recorded rule decisions, the verification policy and the open work.
-Milestones M0–M11 implemented the rules: see the [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md)
-and the milestone pages linked from the [README](/Users/home/Desktop/gwRL/README.md). The
-[project history](/Users/home/Desktop/gwRL/docs/history.md) records how; commit `037cb60` keeps this
+Milestones M0–M11 implemented the rules: see the [M0 review](../m0/README.md)
+and the milestone pages linked from the [README](../../README.md). The
+[project history](../history.md) records how; commit `037cb60` keeps this
 plan's earlier milestone narrative and status notes. Reusable official-rule
 decisions live in the
-[shared rule clarification register](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
+[shared rule clarification register](../../game_content/rules/clarifications.md)
 with stable RCL IDs. Record future rule conflicts there for the user's developer
 reports.
 
@@ -87,7 +87,7 @@ reduces cash while increasing its net value. Do not substitute historical income
 or pay the full wealth score repeatedly every turn. The adopted construction
 policy scores cumulative already-paid amounts while a project is unfinished.
 At completion, replace that entry with the full completed catalog value; do not
-count both. The [source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md)
+count both. The [source reconciliation](../m0/source_reconciliation.md)
 establishes 5 IPP already paid for each setup queue ship; do not debit these past
 payments from initial cash. Shared facility IDs and rail borders are
 valued once, not once per directed access edge. Purchase-price tables for setup-only
@@ -355,7 +355,7 @@ Use these layers of verification throughout:
 - **Playing strength.** No run has yet shown robust strength. Expand learning and
   held-out evaluation across training and dice seeds, starting positions,
   horizons and opponent pairs before claiming it (section 2).
-- **Objective.** The [decision review](/Users/home/Desktop/gwRL/docs/stage_a/decision_review_2026_10_31.md)
+- **Objective.** The [decision review](../stage_a/decision_review_2026_10_31.md)
   found that the approved terminal wealth-gap objective rewards a passive Japan.
   How to address that is open.
 - **Opponents and algorithms.** Add archived opponents if evaluation shows
@@ -368,18 +368,18 @@ Use these layers of verification throughout:
 
 Rule sources in `game_content/rules/`:
 
-- [Global War 1936 v4.3 Rulebook](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>): pp. 5-7 definitions/home country; pp. 10-17
+- [Global War 1936 v4.3 Rulebook](<../../game_content/rules/Global War 1936 v4.3 Rulebook.pdf>): pp. 5-7 definitions/home country; pp. 10-17
   geography, movement and supply; pp. 18-19 setup and July 1936 start; pp. 26-31
   relations/warlords; pp. 35-44 war, truce and sequence; pp. 45-82 production,
   combat, movement and placement; pp. 83-99 units/facilities; p. 101 Chinese Civil
   War/evolution; national special abilities in chapter 15.
-- [Japan national sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - Japan v4.3.pdf>): overview, income, objectives, national abilities,
+- [Japan national sheet](<../../game_content/rules/GW36 - NRS - Japan v4.3.pdf>): overview, income, objectives, national abilities,
   build charts and setup.
-- [KMT national sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - KMT v4.3.pdf>): evolution, Burma/Ledo roads, low morale, production,
+- [KMT national sheet](<../../game_content/rules/GW36 - NRS - KMT v4.3.pdf>): evolution, Burma/Ledo roads, low morale, production,
   minor/major build charts and setup.
-- [CCP national sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - CCP v4.3.pdf>): evolution, recruitment, influence, Soviet connection,
+- [CCP national sheet](<../../game_content/rules/GW36 - NRS - CCP v4.3.pdf>): evolution, recruitment, influence, Soviet connection,
   minor/major build charts and setup.
-- [Neutrals setup chart](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf>): neutral/Mongolian setup details
+- [Neutrals setup chart](<../../game_content/rules/Global War 1936 v4.3 Neutrals setup chart.pdf>): neutral/Mongolian setup details
   where applicable; cross-check against the Chinese national setup sheets.
 - FEC/USSR national sheets where relevant to included territory identity/minor
   control or the applicability ledger, not to create outside interfaces or agents.

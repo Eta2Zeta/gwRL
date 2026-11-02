@@ -29,14 +29,14 @@ answered by the sources; their earlier records remain in
 national build definitions used by the campaign engine. It covers every printed
 Japanese/Chinese build-chart row and preserves conditional abilities, surviving
 damage states and source-only unbuildable types. See the
-[M3 record](/Users/home/Desktop/gwRL/docs/m3/README.md) for queries and verification.
+[M3 record](../docs/m3/README.md) for queries and verification.
 
 ## Political rules
 
 `rules/gw36_politics_v43.json` records the source-backed M4 political rules,
 explicit retained Home Country memberships, adopted clarifications and the
 closed-campaign Dadao controller ruling. The
-[M4 implementation record](/Users/home/Desktop/gwRL/docs/m4/README.md) describes
+[M4 implementation record](../docs/m4/README.md) describes
 the executable transitions and their boundaries with later rule modules.
 
 ## Maps
@@ -176,7 +176,7 @@ Run the focused map regression checks from the repository root:
 ## Japan and nearby sea audit (12 September 2026)
 
 The five requested Japanese tiles and P14/P15/P16/P32/P33/P41 are reviewed in
-[the audit report](/Users/home/Desktop/gwRL/docs/map_audits/japan_and_nearby_seas.md).
+[the audit report](../docs/map_audits/japan_and_nearby_seas.md).
 Corrections include Tokyo/Kyushu IPP, mountain terrain, Japanese coast/rail/port
 data, Honshu's two distinct P15 shipyards, the capacity-2 Honshu–Hokkaido narrow
 crossing, missing P16 sea borders and Annam-Tonkin's P41 port.
@@ -195,7 +195,7 @@ fully audited sea zones. Existing outside-region warnings still apply.
 - `Global War 1936 v4.3 Rulebook.pdf` is the main source rulebook.
 - `Global War 1936 v4.3 Neutrals setup chart.pdf` contains neutral-power setup material.
 - `GW36 - NRS - *.pdf` are the national reference sheets, including FEC, KMT and CCP.
-- [Rule clarifications and open questions](/Users/home/Desktop/gwRL/game_content/rules/clarifications.md)
+- [Rule clarifications and open questions](rules/clarifications.md)
   is the shared register for unclear official wording, adopted project readings,
   and corrected audit mistakes. It is not publisher-issued errata. Scenario
   choices stay in the campaign documentation, not in this register.

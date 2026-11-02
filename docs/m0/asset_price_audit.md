@@ -4,7 +4,7 @@ Original audit: 12 September 2026; campaign synchronization: 21 October 2026.
 **M0 specification verified and frozen on 21 October 2026**; no reward evaluator
 or unit catalog has been implemented by this document.
 
-**5 October 2026 accounting update:** the [M0 review](/Users/home/Desktop/gwRL/docs/m0/README.md)
+**5 October 2026 accounting update:** the [M0 review](README.md)
 records the adopted setup-only values (Torpedo Boat Destroyer 5 IPP; Coastal
 Submarine 4), full catalog valuation for completed assets, and cumulative
 already-paid value for unfinished construction. The retained inventory below
@@ -42,11 +42,11 @@ when normalizing definitions; do not value both names as separate assets.
 
 ## Sources and review method
 
-- **RB**: [Global War 1936 v4.3 Rulebook](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>), printed pages (which match PDF page numbers), particularly §§8.2-8.6, 12.2-12.3 and 13.
-- **J**: [Japan v4.3 national reference sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - Japan v4.3.pdf>), PDF pp5-8 build charts; p9 setup.
-- **K**: [KMT v4.3 national reference sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - KMT v4.3.pdf>), PDF pp3-7 build charts/setup.
-- **C**: [CCP v4.3 national reference sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - CCP v4.3.pdf>), PDF pp3-7 build charts/setup.
-- **F**: [FEC v4.3 national reference sheet](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - FEC v4.3.pdf>), PDF p6 setup.
+- **RB**: [Global War 1936 v4.3 Rulebook](<../../game_content/rules/Global War 1936 v4.3 Rulebook.pdf>), printed pages (which match PDF page numbers), particularly §§8.2-8.6, 12.2-12.3 and 13.
+- **J**: [Japan v4.3 national reference sheet](<../../game_content/rules/GW36 - NRS - Japan v4.3.pdf>), PDF pp5-8 build charts; p9 setup.
+- **K**: [KMT v4.3 national reference sheet](<../../game_content/rules/GW36 - NRS - KMT v4.3.pdf>), PDF pp3-7 build charts/setup.
+- **C**: [CCP v4.3 national reference sheet](<../../game_content/rules/GW36 - NRS - CCP v4.3.pdf>), PDF pp3-7 build charts/setup.
+- **F**: [FEC v4.3 national reference sheet](<../../game_content/rules/GW36 - NRS - FEC v4.3.pdf>), PDF p6 setup.
 
 Text extraction was cross-checked against rendered purchase tables; setup counts
 are cross-checked with the companion M0 setup audits. A numeric price is not a
@@ -195,7 +195,7 @@ access, ownership or movement permissions.
    that ledger entry with full completed catalog value at completion. Official
    setup queues identify the correct stage and paid amount: the Heavy Cruiser in
    #2 and Fleet Carrier in #3 each begin with 5 IPP paid, as documented in the
-   [source reconciliation](/Users/home/Desktop/gwRL/docs/m0/source_reconciliation.md).
+   [source reconciliation](source_reconciliation.md).
    These past payments do not debit starting cash. Japan's
    USA-triggered Light Carrier queue entries are excluded from this campaign.
    The later economy/reward implementation must represent pending repairs and

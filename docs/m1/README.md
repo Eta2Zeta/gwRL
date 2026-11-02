@@ -8,11 +8,11 @@ the M0 scenario decisions. No user decision is required for this milestone.
 
 ## Outputs
 
-- [Map builder](/Users/home/Desktop/gwRL/tools/build_theatre_scenario.py),
-  [manifest](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/manifest.json)
-  and [generated map](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/map.json).
-- [Faction identity bridge](/Users/home/Desktop/gwRL/tools/scenario_factions.py)
-  and [generated faction index](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m1/faction_index.json).
+- [Map builder](../../tools/build_theatre_scenario.py),
+  [manifest](../../game_content/scenarios/japan_china_1936/manifest.json)
+  and [generated map](../../game_content/scenarios/japan_china_1936/map.json).
+- [Faction identity bridge](../../tools/scenario_factions.py)
+  and [generated faction index](../../game_content/scenarios/japan_china_1936/m1/faction_index.json).
 
 The map contains **37 nodes** (31 land and 6 sea), **160 directed internal
 edges**, **19 physical map facilities** and **47 recorded boundary cuts**.
@@ -41,11 +41,11 @@ An explicit starting-owner override does not rewrite original nationality.
 | Canonical faction identities | All 31 land owners map to the approved canonical factions. Compact legacy names resolve consistently; unknown and conflicting aliases fail. |
 
 The existing bridge checks are in
-[test_theatre_extractor.py](/Users/home/Desktop/gwRL/tests/test_theatre_extractor.py),
-[test_theatre_scenario.py](/Users/home/Desktop/gwRL/tests/test_theatre_scenario.py)
-and [test_world_map_features.py](/Users/home/Desktop/gwRL/tests/test_world_map_features.py).
+[test_theatre_extractor.py](../../tests/test_theatre_extractor.py),
+[test_theatre_scenario.py](../../tests/test_theatre_scenario.py)
+and [test_world_map_features.py](../../tests/test_world_map_features.py).
 The identity checks are in
-[test_scenario_factions.py](/Users/home/Desktop/gwRL/tests/test_scenario_factions.py).
+[test_scenario_factions.py](../../tests/test_scenario_factions.py).
 
 ## Verification and scope
 
@@ -59,10 +59,10 @@ From the repository root:
 
 M1 adds an identity sidecar. It does not change the frozen scenario contract,
 setup, manifest or map recorded by the
-[M0 baseline](/Users/home/Desktop/gwRL/game_content/scenarios/japan_china_1936/m0/frozen_baseline.json).
+[M0 baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json).
 
 This milestone establishes the static map and identity bridge. Source-unknown
 rail-region membership and navigable river routes remain explicitly marked as
 unknown. It does not implement movement, supply, production, combat, mutable
 game state or training. Those belong to M2 and later milestones in the
-[implementation plan](/Users/home/Desktop/gwRL/docs/plans/japan_china_full_rules_plan.md).
+[implementation plan](../plans/japan_china_full_rules_plan.md).
