@@ -205,6 +205,23 @@
       "reference_url": "../clarifications.md#rcl-015-neutral-relocation-with-no-friendly-destination",
       "reference_label": "Rule register",
       "authority_detail": "The user adopted the proposed no-destination consequence for now on 23 October 2026. The source permits neutral co-occupants but does not specify this elimination consequence; developer clarification is still pending."
+    },
+    {
+      "id": "RCL-016",
+      "category": "project",
+      "title": "Low Morale with no legal retreat",
+      "body": "Project ruling: an attacking minor-KMT regular Infantry or Cavalry unit that rolls 10+ but cannot retreat to the zone it attacked from, such as one landed in an amphibious assault, is eliminated. A unit that can retreat to its attack origin still does so.",
+      "section_ids": [
+        "rb-15-7",
+        "rb-10-8-3",
+        "gw36_nrs_kmt_v4_3-p003"
+      ],
+      "date": "2026-11-02",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-016-kmt-low-morale-with-no-legal-retreat",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted this on 2 November 2026. The source does not say what happens when the Low Morale retreat is impossible; the ruling follows the city and tundra/ice rules, which eliminate attackers that must retreat but cannot."
     }
   ]
 }

@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 23 October 2026.
+Updated: 2 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -56,6 +56,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-013 | Does artillery city bombing use attrition's range and movement restrictions? | Adopted: use the same starting-adjacency and no-movement conditions |
 | RCL-014 | Combat roles when ships evacuate into a third party's fleet | Closed: evacuating fleet defends; fleet already at sea attacks; developer clarification |
 | RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
+| RCL-016 | KMT Low Morale 10+ with no legal retreat, such as after an amphibious assault | Adopted: the unit is eliminated |
 
 ## Pilot discussion review
 
@@ -271,6 +272,26 @@ relocate to the nearest Friendly land, but none remains. CCP never surrenders. W
 relocation destination exists. Otherwise use the printed nearest-Friendly-land
 relocation rule. The elimination consequence is a provisional project
 interpretation, not a developer-confirmed rule.
+
+## RCL-016: KMT Low Morale with no legal retreat
+
+**Status: adopted by the user, 2 November 2026.**
+
+**Sources:** RB §15.7 p107 and KMT reference sheet p3 (Low Morale); §10.3 p62
+and §10.8.3 p71 (no retreat from an amphibious assault); §§1.7.5 and 1.7.7
+pp12-13 (city and tundra/ice round limits); §6.6 p42.
+
+**Problem:** an attacking minor-KMT regular Infantry or Cavalry unit that rolls
+10+ must retreat to the zone it attacked from. A unit that landed in an
+amphibious assault attacked from a sea zone, and land units cannot retreat from
+an amphibious assault. The Low Morale text does not say what happens when that
+retreat is impossible.
+
+**Adopted ruling:** the unit is eliminated. This follows the city and
+tundra/ice rules, which eliminate attackers that must retreat but cannot, and
+matches the 10+ elimination under the Chinese Truce (RCL-012). A unit that can
+retreat to the zone it attacked from still does so, it still cannot be taken as
+a casualty, and Major-Power KMT remains exempt.
 
 ## Maintenance
 

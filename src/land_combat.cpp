@@ -1599,13 +1599,17 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
                 // to automatic truce termination, without an extra die.
                 eraseUnit(s, unit);
             } else {
+                // A unit that cannot retreat to the zone it attacked from, such
+                // as one landed from the sea (RB 10.8.3), is eliminated, as are
+                // attackers that must retreat but cannot in RB 1.7.5 and 1.7.7
+                // (user ruling RCL-016).
                 const auto from = approach(b, unit);
-                require(s.territories.contains(from) && passableLandBorder(s, b.zone, from) &&
-                            s.territories.at(from).possessor &&
-                            politicallyFriendly(s, s.units.at(unit).owner,
-                                                *s.territories.at(from).possessor),
-                        "Unsupported rule state: KMT Low Morale has no legal attack-origin retreat");
-                retreatUnit(s, b, unit, from);
+                if (s.territories.contains(from) && passableLandBorder(s, b.zone, from) &&
+                    s.territories.at(from).possessor &&
+                    politicallyFriendly(s, s.units.at(unit).owner, *s.territories.at(from).possessor))
+                    retreatUnit(s, b, unit, from);
+                else
+                    eraseUnit(s, unit);
             }
             continue;
         }

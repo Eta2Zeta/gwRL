@@ -95,6 +95,15 @@
       "scope": "Low Morale consequence; developer confirmation separately covers third-party combat roles."
     },
     {
+      "id": "user_low_morale_no_retreat_2026_11_02",
+      "kind": "user_ruling",
+      "date": "2026-11-02",
+      "question": "KMT Low Morale attackers that roll 10+ must retreat to where they attacked from, but land units cannot retreat from an amphibious assault. What should happen to those units when there's nowhere legal to retreat?",
+      "quote": "Yeah they just die.",
+      "ruling": "An attacking minor KMT regular Infantry/Cavalry unit that rolls 10+ and cannot retreat to the zone it attacked from, such as one landed from the sea, is eliminated.",
+      "scope": "Ordinary Low Morale without a legal attack-origin retreat; recorded as RCL-016."
+    },
+    {
       "id": "developer_airborne_correction_2026_10_06",
       "kind": "developer_correction_reported_by_user_and_inspected_in_discord",
       "date": "2026-10-06",
@@ -323,12 +332,26 @@
     },
     {
       "id": "LC020",
-      "rule": "KMT minor Infantry/Cavalry roll even against an empty target; raw 10-12 retreat to their individual attack origins and cannot be selected as casualties. Evolution removes Low Morale.",
+      "rule": "KMT minor Infantry/Cavalry roll even against an empty target; raw 10-12 retreat to their individual attack origins and cannot be selected as casualties. A unit that cannot retreat to its attack origin, such as one landed from the sea, is eliminated instead. Evolution removes Low Morale.",
       "source_refs": [
         {
           "source_id": "kmt_nrs",
           "pdf_page": 3,
           "section": "Low Morale"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 62,
+          "section": "10.3 amphibiously assaulting units are forced to remain"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 13,
+          "section": "1.7.5-1.7.7 attackers unable to retreat are eliminated"
+        },
+        {
+          "source_id": "user_low_morale_no_retreat_2026_11_02",
+          "clarification": "RCL-016"
         }
       ]
     },

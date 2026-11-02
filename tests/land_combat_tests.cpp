@@ -309,22 +309,26 @@ void lowMoraleUnitsCannotBeCasualties() {
             check(a.parameters.require("unit").asString() != "a",
                   "Retreating Low Morale unit offered as casualty");
 }
-void ordinaryLowMoraleWithoutAnOriginIsUnsupported() {
+void lowMoraleWithoutALegalRetreatIsEliminated() {
+    // RCL-016: a unit that cannot retreat to the zone it attacked from, here
+    // the sea it landed from, is eliminated; the others retreat or fight on.
     auto s = fixture("kmt");
     clearTerrain(s, hopeh);
     s.territories.at(hopeh).possessor = "japan";
+    s.territories.at(beiping).possessor = "kmt";
     add(s, "a", "kmt", hopeh);
-    battle(s, {"a"}, {{"a", ""}}, hopeh, "kmt");
+    add(s, "b", "kmt", hopeh);
+    add(s, "c", "kmt", hopeh);
+    auto id = battle(s, {"a", "b", "c"}, {{"a", "sea_p14"}, {"b", beiping}, {"c", beiping}}, hopeh, "kmt");
     Engine e(s, rules());
-    e.setDiceTapeForTesting({10});
+    e.setDiceTapeForTesting({10, 11, 3});
     begin(e);
-    const auto before = e.serialize();
-    bool rejected = false;
-    try { e.resolveChance(); } catch (const std::runtime_error& error) {
-        rejected = std::string(error.what()).find("Unsupported rule state: KMT Low Morale") != std::string::npos;
-    }
-    check(rejected, "Ordinary Low Morale inherited the shared-Truce elimination exception");
-    check(e.serialize() == before, "Unsupported ordinary Low Morale changed units, events or RNG");
+    e.resolveChance();
+    check(!e.state().units.contains("a"), "Low Morale unit without a legal retreat survived");
+    check(e.state().units.at("b").zone == beiping, "Low Morale unit with a legal retreat did not retreat");
+    drain(e);
+    check(e.state().battles.at(id).flags.at("finished"), "Battle stuck after a Low Morale elimination");
+    check(e.state().territories.at(hopeh).possessor == "kmt", "The remaining attacker did not take the empty land");
 }
 void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
     const Id counterOrigin = "land_china_suiyuan";
@@ -1174,7 +1178,7 @@ int main() {
                  {"target selection fallback", targetSelectionAndFallback},
                  {"KMT empty origins", kmtLowMoraleEmptyAndOrigins},
                  {"KMT protected retreaters", lowMoraleUnitsCannotBeCasualties},
-                 {"ordinary KMT missing origin", ordinaryLowMoraleWithoutAnOriginIsUnsupported},
+                 {"KMT without a legal retreat", lowMoraleWithoutALegalRetreatIsEliminated},
                  {"KMT retreat and later defense", lowMoraleRetreatersDefendBeforeTheirNextTurn},
                  {"artillery pairs", artilleryPairingAndSurvivorRecalculation},
                  {"land retreat entry source", onlyLandEntriesCreateRetreatDestinations},
