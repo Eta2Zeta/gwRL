@@ -568,6 +568,41 @@ void pendingGiftsShareTheSameTransportCapacity() {
   check(std::none_of(actions.begin(), actions.end(), [](const Action &a) { return a.kind == "naval_start_move"; }),
         "Optional ship movement could abandon the only mandatory withdrawal transport");
 }
+void giftWithdrawalsKeepEachOthersTransportPlaces() {
+  // Two units with no movement left need both places of the only transport; a
+  // third can walk out. Boarding it would strand one of the others (seed
+  // 1115574949320731536 of the 2 November speed test reached that dead end).
+  Puzzle p;
+  p.sea("s0");
+  p.link("a", "s0"); p.link("a", "b");
+  auto s = p.state(Phase::NonCombatMovement);
+  unit(s, "stuck1", "a"); unit(s, "stuck2", "a"); unit(s, "walker", "a", "infantry", "japan", 1);
+  unit(s, "ship", "s0", "naval_transport");
+  for (const auto &id : {"stuck1", "stuck2", "walker"}) {
+    s.units.at(id).commitments.insert("combat_move");
+    s.units.at(id).turnFlags["must_withdraw_from_chinese_gift"] = 1;
+  }
+  s.units.at("stuck1").movementRemaining = s.units.at("stuck2").movementRemaining = 0;
+  s.territories.at("a").possessor = "ccp";
+  MovementRules rules(std::make_shared<NavalRules>());
+  const auto offers = [&](const State &state, const Id &kind, const Id &unit) {
+    const auto actions = rules.actions(state);
+    return std::any_of(actions.begin(), actions.end(), [&](const Action &a) {
+      return a.kind == kind && a.parameters.require("unit").asString() == unit;
+    });
+  };
+  check(offers(s, "naval_load", "stuck1") && offers(s, "naval_load", "stuck2"),
+        "Withdrawals that need the transport were hidden");
+  check(!offers(s, "naval_load", "walker"), "A unit that can walk out took another withdrawal's transport place");
+  check(offers(s, "movement_route", "walker"), "The walking withdrawal was hidden");
+  const auto actions = rules.actions(s);
+  rules.apply(s, *std::find_if(actions.begin(), actions.end(), [](const Action &a) {
+    return a.kind == "naval_load" && a.parameters.require("unit").asString() == "stuck1";
+  }));
+  check(offers(s, "naval_load", "stuck2") && !offers(s, "naval_load", "walker") &&
+            offers(s, "movement_route", "walker"),
+        "The remaining transport place went to the unit that can walk");
+}
 void pairedBlitz() {
   Puzzle p;
   p.link("a", "enemy");
@@ -849,6 +884,7 @@ int main() {
              {"cargo withdrawal", cargoAndWithdrawal},
              {"gift executable loading", giftWithdrawalRequiresExecutableSharedLoading},
              {"gift shared reservations", pendingGiftsShareTheSameTransportCapacity},
+             {"gift withdrawals keep transport places", giftWithdrawalsKeepEachOthersTransportPlaces},
              {"paired blitz", pairedBlitz},
              {"factory relocation", factoryRelocation},
              {"paired towing", pairedTowingMovesWithoutChangingCatalogStats},

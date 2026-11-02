@@ -1296,7 +1296,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
       return movementController(s, item.second.owner) &&
              flag(item.second.turnFlags, "must_withdraw_from_chinese_gift");
     });
-    if (withdrawalPending)
+    if (withdrawalPending) {
       out.erase(std::remove_if(out.begin(), out.end(), [&](const Action &a) {
         // Finish mandatory withdrawals before optional moves can consume their
         // proven transport capacity. Required aircraft returns remain available.
@@ -1306,6 +1306,21 @@ std::vector<Action> MovementRules::actions(const State &s) const {
         return !unit || !s.units.contains(unit->asString()) ||
                !flag(s.units.at(unit->asString()).turnFlags, "must_withdraw_from_chinese_gift");
       }), out.end());
+      // Nor may one withdrawal take what another needs, such as a unit that can
+      // walk out boarding the last transport place of one that cannot: the gift
+      // proved every unit can leave, and each withdrawal must keep that true.
+      out.erase(std::remove_if(out.begin(), out.end(), [&](const Action &a) {
+        if (a.kind != "movement_route" && a.kind != "naval_load") return false;
+        const auto &moved = s.units.at(a.parameters.require("unit").asString());
+        State after = s.clone();
+        apply(after, a);
+        const bool remaining = std::any_of(after.units.begin(), after.units.end(), [&](const auto &item) {
+          return item.second.owner == moved.owner &&
+                 flag(item.second.turnFlags, "must_withdraw_from_chinese_gift");
+        });
+        return remaining && withdrawalEligibleRecipients(after, moved.owner, moved.zone).empty();
+      }), out.end());
+    }
   }
   return out;
 }
