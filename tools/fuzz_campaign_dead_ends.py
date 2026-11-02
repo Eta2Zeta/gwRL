@@ -187,7 +187,7 @@ def _play_logged(task, started):
 
 
 def _pool(processes):
-    return ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("spawn"), max_tasks_per_child=20)
+    return ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("spawn"))
 
 
 def _play_all(tasks, processes, deadline, started, record):
@@ -195,8 +195,11 @@ def _play_all(tasks, processes, deadline, started, record):
     pending = {task[0]: task for task in tasks}
     started.write_text("")
     while pending and time.monotonic() < deadline:
+        # A fresh pool for each batch of about 20 games per process bounds the
+        # workers' lifetime; Python 3.13's max_tasks_per_child hangs the pool.
+        batch = list(pending.items())[:20 * processes]
         with _pool(processes) as pool:
-            futures = {pool.submit(_play_logged, task, started): seed for seed, task in pending.items()}
+            futures = {pool.submit(_play_logged, task, started): seed for seed, task in batch}
             try:
                 while futures and time.monotonic() < deadline:
                     done, _ = wait(futures, timeout=min(5.0, max(0.0, deadline - time.monotonic())),
