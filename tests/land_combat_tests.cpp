@@ -1141,6 +1141,28 @@ void replayableGroundCampaignAndCounterattack() {
 }
 
 } // namespace
+void aBattleNeitherSideCanWinFailsClearly() {
+    // Amphibious militia can neither retreat nor hit, and a lone anti-aircraft
+    // gun fires only at aircraft. The rounds used to recurse until the stack
+    // overflowed (seed 8131 of the 2 November random games).
+    auto s = fixture();
+    clearTerrain(s, hopeh);
+    for (const auto *id : {"m1", "m2"}) {
+        add(s, id, "japan", hopeh, "militia");
+        s.units.at(id).commitments.insert("amphibious_assault");
+    }
+    add(s, "gun", "kmt", hopeh, "anti_aircraft_artillery");
+    battle(s, {"m1", "m2"}, {{"m1", beiping}, {"m2", beiping}});
+    Engine e(s, rules(), 3);
+    try {
+        begin(e);
+    } catch (const std::runtime_error &error) {
+        check(std::string(error.what()).find("cannot end") != std::string::npos,
+              std::string("Wrong failure: ") + error.what());
+        return;
+    }
+    throw std::runtime_error("A battle neither side can win did not stop");
+}
 int main() {
     try {
         for (const auto &[name, test] : std::vector<std::pair<std::string, std::function<void()>>>{
@@ -1176,7 +1198,8 @@ int main() {
                  {"blitz pairing", blitzPairingIsAnExplicitChoice},
                  {"joint defender dispute", jointDefendersConsentAndDiceDispute},
                  {"Dadao calendar slot", directAxisDadaoUsesJapanCalendarSlot},
-                 {"ground campaign replay", replayableGroundCampaignAndCounterattack}}) {
+                 {"ground campaign replay", replayableGroundCampaignAndCounterattack},
+                 {"unwinnable battle stops", aBattleNeitherSideCanWinFailsClearly}}) {
             test();
             std::cout << "PASS " << name << '\n';
         }

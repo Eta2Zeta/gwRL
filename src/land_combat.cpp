@@ -364,6 +364,11 @@ std::vector<Id> eligibleHits(const State &s, const BattleState &b, const V &hit)
     return v;
 }
 void advance(State &, BattleState &);
+// Rounds that one call begins with no dice or choice since the last: such a
+// round changes nothing, so the battle could never end (seed 8131 of the
+// 2 November random games recursed until the stack overflowed).
+thread_local int advanceDepth = 0, roundsWithoutPause = 0;
+thread_local Id roundsBattle;
 void chooseHit(State &s, BattleState &b) {
     auto hits = array(b, "hits");
     int index = integer(b, "hit_index");
@@ -790,6 +795,11 @@ void retreatDecision(State &s, BattleState &b, bool forced) {
                     eraseUnit(s, id);
             finishBattle(s, b, "forced_retreat");
         } else {
+            if (roundsBattle != b.id)
+                roundsBattle = b.id, roundsWithoutPause = 0;
+            if (++roundsWithoutPause > 3)
+                throw std::runtime_error("Land battle " + b.id + " in " + b.zone +
+                                         " cannot end: rounds pass with no dice and no choice");
             put(b, "round", num(integer(b, "round", 1) + 1));
             put(b, "after_pairing", V(std::string("attacker_fire")));
             put(b, "attack_pairs", V(O{}));
@@ -867,6 +877,10 @@ void finishRetreat(State &s, BattleState &b) {
 }
 
 void advance(State &s, BattleState &b) {
+    if (advanceDepth == 0)
+        roundsWithoutPause = 0;
+    ++advanceDepth;
+    struct Leave { ~Leave() { --advanceDepth; } } leave;
     if (s.chance || !s.decisions.empty() || marked(b.flags, "finished"))
         return;
     eliminateUnsupportedRockets(s,b);
