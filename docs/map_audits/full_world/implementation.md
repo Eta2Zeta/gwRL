@@ -1,5 +1,8 @@
 # World-map implementation — 7 October 2026
 
+The audit's registers, data, region reports and scripts that this page cites were
+removed on 2 November 2026; commit `037cb60` keeps them under `docs/map_audits/full_world/`.
+
 The approved map changes are implemented. The checkpoint before implementation
 is [`eeb5e90`](https://github.com/Eta2Zeta/gwRL/commit/eeb5e9028d0f9efde087b3009d7f9613ce92f958).
 Images are ignored by Git and remain local. The original proposal registers and
