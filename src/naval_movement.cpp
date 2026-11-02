@@ -731,6 +731,13 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
   if (!owner || !politicallyFriendly(s, c.owner, *owner) ||
       !enterableThisTurn(s, c.owner, destination))
     return false;
+  // Militia start and end their movement in their Home Country (RB).
+  if (c.type == "militia") {
+    const auto faction = s.definition->factions.find(c.owner);
+    if (faction == s.definition->factions.end() ||
+        !faction->second.homeCountry.contains(destination))
+      return false;
+  }
   if (c.owner != t.owner &&
       value(c.gameFlags, "naval_loaded_completed_turns") >=
           navalCompletedTurns(s, c.owner))

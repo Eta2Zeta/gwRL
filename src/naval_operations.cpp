@@ -700,8 +700,9 @@ std::vector<Action> navalOperationActions(const State &s) {
           !sea(s, u.zone) || occupiedForAssault(s, u.owner, u.zone))
         continue;
       for (const auto &c : u.cargo) {
+        // Militia may not be used by the Attacker (RB), from the sea either.
         if (!s.units.contains(c) || s.units.at(c).owner != u.owner ||
-            !unitClass(s, s.units.at(c), "land") ||
+            !unitClass(s, s.units.at(c), "land") || s.units.at(c).type == "militia" ||
             s.units.at(c).commitments.contains("assault_declared") ||
             u.commitments.contains("unloaded_noncombat"))
           continue;
@@ -807,6 +808,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
             "Clear the launching sea before declaring the amphibious assault");
     require(s.units.at(c).carriedBy == t,
             "Assault cargo is not aboard transport");
+    require(s.units.at(c).type != "militia", "Militia cannot attack");
     transport.movementRemaining = 0;
     transport.commitments.insert("unloaded_combat");
     transport.turnFlags["naval_combat_unloaded"] = 1;

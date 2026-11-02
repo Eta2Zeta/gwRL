@@ -1257,11 +1257,41 @@ void patrollingAircraftAttackOnlyInTheirOwnSeaZone() {
         "A patrol could not attack Enemy ships in its own sea zone");
 }
 } // namespace
+void militiaNeitherAttackNorLeaveHomeBySea() {
+  // Militia may not be used by the Attacker and start and end their movement
+  // in their Home Country (RB); land moves already enforced both.
+  auto s = fixture();
+  add(s, "t", "naval_transport", "japan", p14);
+  add(s, "i", "infantry", "japan", p14);
+  add(s, "m", "militia", "japan", p14);
+  attachCargo(s, "t", "i");
+  attachCargo(s, "t", "m");
+  Engine e(s, rules());
+  const auto actions = e.legalActions();
+  const auto declares = [&](const Id &cargo) {
+    return std::any_of(actions.begin(), actions.end(), [&](const Action &a) {
+      return a.kind == "naval_declare_assault" && a.parameters.require("cargo").asString() == cargo;
+    });
+  };
+  check(declares("i") && !declares("m"), "Militia were offered an amphibious assault");
+  auto noncombat = s.clone();
+  noncombat.clock.phase = Phase::NonCombatMovement;
+  const auto unloads = navalMovementActions(noncombat);
+  const auto unloadsTo = [&](const Id &cargo, const Id &zone) {
+    return std::any_of(unloads.begin(), unloads.end(), [&](const Action &a) {
+      return a.kind == "naval_unload" && a.parameters.require("unit").asString() == cargo &&
+             a.parameters.require("zone").asString() == zone;
+    });
+  };
+  check(unloadsTo("i", beiping) && !unloadsTo("m", beiping),
+        "Militia were carried out of their Home Country");
+}
 int main() {
   try {
     for (const auto &[name, test] :
          std::vector<std::pair<std::string, std::function<void()>>>{
              {"uncontested assault and replay", uncontestedAssaultAndReplay},
+             {"militia stay home at sea", militiaNeitherAttackNorLeaveHomeBySea},
              {"sea clearance", seaMustBeClearedBeforeAssault},
              {"waiting second wave", waitingArmorRemainsAboardUntilFoothold},
              {"shore and coastal fire", shoreBombardmentAndCoastalFirstStrike},
