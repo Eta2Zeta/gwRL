@@ -729,6 +729,16 @@ std::vector<Action> navalOperationActions(const State &s) {
     for (const auto &[id, u] : s.units)
       if (movementController(s, u.owner) && flag(u.gameFlags, "on_map") &&
           !u.commitments.contains("naval_combat")) {
+        // A declared patrol attack waits for its battle to begin. Declaring it
+        // again would join the same battle and change nothing, so it is not
+        // offered twice.
+        if (std::any_of(s.battles.begin(), s.battles.end(),
+                        [&](const auto &entry) {
+                          const auto &attackers = entry.second.attackers;
+                          return std::find(attackers.begin(), attackers.end(),
+                                           id) != attackers.end();
+                        }))
+          continue;
         bool enemy = false;
         for (const auto &[other, v] : s.units)
           if (v.zone == u.zone && ship(s, v) && hostile(s, u.owner, v.owner))

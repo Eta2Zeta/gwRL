@@ -1282,6 +1282,40 @@ void patrollingAircraftAttackOnlyInTheirOwnSeaZone() {
   check(offered(e, "naval_patrol_attack"),
         "A patrol could not attack Enemy ships in its own sea zone");
 }
+// A declared patrol attack waits for its battle to begin. Declaring it again
+// joined the same battle and changed nothing, so search could repeat that move
+// until the game stalled; another patrol in the sea zone may still join.
+void declaredPatrolAttacksAreNotOfferedAgain() {
+  auto s = fixture(Phase::Combat);
+  for (const auto &id : {Id("first"), Id("second")}) {
+    add(s, id, "fighter", "japan", "sea_p15");
+    auto &plane = s.units.at(id);
+    plane.gameFlags["on_map"] = 1;
+    plane.gameFlags["map_range"] = 1;
+    plane.turnFlags["on_map"] = 1;
+    plane.commitments.insert("maritime_air_patrol");
+  }
+  add(s, "ship", "destroyer", "kmt", "sea_p15");
+  Engine e(s, rules());
+  const auto attacks = [&](const Id &unit) {
+    const auto actions = e.legalActions();
+    return std::any_of(actions.begin(), actions.end(), [&](const Action &a) {
+      return a.kind == "naval_patrol_attack" &&
+             a.parameters.require("unit").asString() == unit;
+    });
+  };
+  choose(e, "naval_patrol_attack", [](const Action &a) {
+    return a.parameters.require("unit").asString() == "first";
+  });
+  check(!attacks("first") && attacks("second") &&
+            offered(e, "naval_begin_battle"),
+        "A declared patrol attack was offered again, or blocked another "
+        "patrol or its battle");
+  choose(e, "naval_patrol_attack");
+  check(!attacks("second") && e.state().battles.size() == 1 &&
+            e.state().battles.begin()->second.attackers.size() == 2,
+        "A second patrol attack did not join the declared battle once");
+}
 } // namespace
 void militiaNeitherAttackNorLeaveHomeBySea() {
   // Militia may not be used by the Attacker and start and end their movement
@@ -1449,7 +1483,9 @@ int main() {
               actualNavalAirDeclarationsKeepContextAndCombatPhase},
              {"patrol take-off range", patrolsStartOnlyFromWhereAircraftTakeOff},
              {"patrol attacks stay in their sea zone",
-              patrollingAircraftAttackOnlyInTheirOwnSeaZone}}) {
+              patrollingAircraftAttackOnlyInTheirOwnSeaZone},
+             {"declared patrol attacks are not offered again",
+              declaredPatrolAttacksAreNotOfferedAgain}}) {
       test();
       std::cout << "PASS " << name << '\n';
     }
