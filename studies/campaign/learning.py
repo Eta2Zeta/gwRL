@@ -674,6 +674,7 @@ class CampaignLearner:
             raise ValueError("Cannot update policies while a rollout batch is frozen")
         if not self.replay:
             return {"updated": False, "samples": 0, "losses": {}}
+        from .neural import _conditional_log_softmax
         losses: dict[str, list[dict[str, float]]] = {player: [] for player in PLAYERS}
         for _ in range(self.config.epochs):
             samples = self.replay_random.sample(self.replay, min(self.config.batch_size, len(self.replay)))
@@ -690,19 +691,32 @@ class CampaignLearner:
                 target = torch.as_tensor([sample["values"] for sample in samples], dtype=predicted.dtype,
                                          device=predicted.device) / self.config.value_scale
                 value_loss = torch.mean((predicted - target) ** 2)
-                terms = []
-                for index, sample in enumerate(samples):
-                    if sample["owner"] == player:
-                        desired = torch.as_tensor(sample["policy"], dtype=logits[index].dtype,
-                                                  device=logits[index].device)
-                        terms.append(-(desired * torch.log_softmax(logits[index], dim=0)).sum())
-                policy_loss = torch.stack(terms).mean() if terms else value_loss.new_zeros(())
+                owned = [index for index, sample in enumerate(samples) if sample["owner"] == player]
+                if owned:
+                    # Each owned position's cross-entropy against its own menu,
+                    # as one log-softmax per menu over all of them at once
+                    # rather than one small device call per position.
+                    counts = [len(logits[index]) for index in owned]
+                    desired = np.concatenate([np.asarray(samples[index]["policy"], dtype=np.float64)
+                                              for index in owned])
+                    if len(desired) != sum(counts):
+                        raise ValueError("A policy target does not match its legal menu")
+                    scores = torch.cat([logits[index] for index in owned])
+                    rows = torch.as_tensor(np.repeat(np.arange(len(owned)), counts), device=scores.device)
+                    picked = _conditional_log_softmax(scores, rows, len(owned))
+                    policy_loss = -(torch.as_tensor(desired, dtype=scores.dtype, device=scores.device)
+                                    * picked).sum() / len(owned)
+                else:
+                    policy_loss = value_loss.new_zeros(())
                 loss = value_loss + policy_loss
-                if not torch.isfinite(loss):
+                # One device read for the check and the record.
+                policy_value, value_value, total = torch.stack(
+                    (policy_loss.detach(), value_loss.detach(), loss.detach())).tolist()
+                if not math.isfinite(total):
                     raise ValueError("Nonfinite learning loss")
                 loss.backward()
-                losses[player].append({"policy": float(policy_loss.detach()), "value": float(value_loss.detach()),
-                                       "total": float(loss.detach()), "policy_samples": len(terms)})
+                losses[player].append({"policy": policy_value, "value": value_value,
+                                       "total": total, "policy_samples": len(owned)})
             # No actor changes until gradients for all three have been formed.
             for player in PLAYERS:
                 self.optimizers[player].step()
