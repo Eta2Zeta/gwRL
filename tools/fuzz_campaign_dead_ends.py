@@ -4,11 +4,12 @@
 Each game plays the campaign through the environment that search uses, choosing
 uniformly among legal actions and ending a phase with extra probability (2%, 5%
 or 10% by seed) so games reach later rounds. A game stops at a nonterminal
-decision with no legal action, at an engine error, at its end or decision cap,
-or when the landing rule fails. That rule counts the airborne aircraft that no
-reachable joint landing plan lands (the engine's landing shortfall): no move in
-either movement phase may raise it, and ending Combat Movement may lose only
-that many aircraft (the "stranded_aircraft_lost" count). The shortfall is
+decision with no legal action, at an engine error, at a move that leaves the
+position unchanged, at its end or decision cap, or when the landing rule fails.
+That rule counts the airborne aircraft that no reachable joint landing plan
+lands (the engine's landing shortfall): no move in either movement phase may
+raise it, and ending Combat Movement may lose only that many aircraft (the
+"stranded_aircraft_lost" count). The shortfall is
 compared between settled positions, with no naval move or Chinese-truce battle
 pending. Dice may raise it, as when a reaction sinks a carrier while it sails,
 by at most the seats of the carriers they sink or damage; so may a declaration
@@ -119,6 +120,7 @@ def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
         ending = [action for action in options if action.id.endswith(":play:end_phase")]
         choice = ending[0] if ending and rng.random() < bias else rng.choice(options)
         before = current if current is not None else env.raw.serialize()
+        key = env.planning_key()
         moment = turn_phase(before)
         # Ending Combat Movement may lose only the aircraft that no plan lands.
         allowed = env.raw.landing_shortfall() if choice in ending and moment[2] == "combat_movement" else 0
@@ -129,6 +131,12 @@ def play(seed: int, rounds: int, max_decisions: int, output: Path) -> dict:
             (output / f"error-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
             break
         decisions += 1
+        if env.planning_key() == key:
+            # Search takes an unchanged position for the same node, so it may
+            # choose such a move forever, as it did a repeated patrol attack.
+            problem = {"kind": "no_op_action", "action": choice.id}
+            (output / f"no-op-{seed}.json").write_text(json.dumps({"seed": seed, **problem, "state": before}) + "\n")
+            break
         # After an ending, this sets the new phase's first settled position.
         problem = check_settled(choice.id)
         lost = stranded(current) - stranded(before) if choice in ending else 0
