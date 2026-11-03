@@ -537,6 +537,34 @@
       },
       "status": "implemented",
       "test_suite": "movement"
+    },
+    {
+      "id": "unevolved_chinese_boundary",
+      "source_id": "rulebook",
+      "pages": [
+        101
+      ],
+      "sections": [
+        "14.3.1"
+      ],
+      "parameters": {
+        "nations": [
+          "ccp",
+          "kmt"
+        ],
+        "until": "evolution to Major Power",
+        "land": "Chinese Home Country",
+        "sea": "sea zones adjacent to Chinese Home Country",
+        "covers": [
+          "land and rail routes",
+          "naval routes",
+          "naval unloading",
+          "amphibious assault targets",
+          "flights"
+        ]
+      },
+      "status": "implemented",
+      "test_suite": "movement, naval_movement, naval_operations"
     }
   ]
 }

@@ -259,6 +259,22 @@ void strategicPickupKeepsMilitiaHome() {
   move(back, "t", {p14, p15, p16}, true, "facility_tokyo_major_shipyard");
   check(offers(back) == std::set<Id>{"i", "m"}, "Militia missed a voyage bound home");
 }
+void unevolvedChinaKeepsToChineseWaters() {
+  // RB 14.3.1: until it evolves, KMT sails only in sea zones next to Chinese
+  // Home Country, here P14, P32 and P41; P33 touches only Okinawa and P15
+  // only Japan and Korea (seed 9487 of the 2 November random games sailed a
+  // captured KMT transport to P16).
+  auto s = fixture();
+  s.clock.nationIndex = 3;
+  s.completedTurns["japan"] = 1;
+  s.captureTurnStart();
+  add(s, "t", "naval_transport", p32, "kmt");
+  const auto sails = [&](std::vector<Id> path) { return validateNavalRoute(s, {{"t"}, path}).allowed; };
+  check(sails({p32, p41}) && sails({p32, p14}), "KMT transport could not sail beside China");
+  check(!sails({p32, p33}) && !sails({p32, p15}), "Unevolved KMT transport left Chinese waters");
+  s.nations.at("kmt").powerStatus = "major";
+  check(sails({p32, p33}) && sails({p32, p15}), "Evolved KMT transport still kept to Chinese waters");
+}
 void strategicAndNoncombatBlockers() {
   auto s = fixture();
   s.nations.at("japan").atWarWith.insert("kmt");
@@ -852,6 +868,7 @@ int main() {
              {"strategic pickup", strategicPickupAlongRoute},
              {"strategic pickup keeps militia home", strategicPickupKeepsMilitiaHome},
              {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
+             {"unevolved China keeps to Chinese waters", unevolvedChinaKeepsToChineseWaters},
              {"naval blockers", strategicAndNoncombatBlockers},
              {"carrier independent flight", carrierMovementGivesNoAircraftRide},
              {"zero-cost port exit", portExitCostsZero},

@@ -710,7 +710,8 @@ std::vector<Action> navalOperationActions(const State &s) {
           const auto land = e.require("neighbor_id").asString();
           if (!s.territories.contains(land) ||
               !s.territories.at(land).possessor ||
-              !hostile(s, u.owner, *s.territories.at(land).possessor))
+              !hostile(s, u.owner, *s.territories.at(land).possessor) ||
+              !chineseMovementAllowed(s, u.owner, land))
             continue;
           out.push_back(action(
               s, s.currentNation(), "naval_declare_assault",
@@ -810,6 +811,8 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     require(s.units.at(c).carriedBy == t,
             "Assault cargo is not aboard transport");
     require(s.units.at(c).type != "militia", "Militia cannot attack");
+    require(chineseMovementAllowed(s, transport.owner, zone),
+            "Unevolved CCP and KMT attack only within Chinese Home Country");
     transport.movementRemaining = 0;
     transport.commitments.insert("unloaded_combat");
     transport.turnFlags["naval_combat_unloaded"] = 1;

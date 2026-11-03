@@ -23,6 +23,10 @@ bool controlledBy(const State&, const Id& minor, const Id& controller);
 bool atWarWithMajor(const State&, const Id& nation);
 bool politicallyFriendly(const State&, const Id& first, const Id& second);
 bool chineseHomeCountry(const State&, const Id& zone);
+// Until they evolve, CCP and KMT may only move or attack within Chinese Home
+// Country and the sea zones adjacent to it (RB 14.3.1): whether this nation may
+// enter this zone on that account. Every other nation may.
+bool chineseMovementAllowed(const State&, const Id& nation, const Id& zone);
 bool decentralizedProduction(const State&, const Id& nation);
 Id politicalPlayer(const State&, const Id& nation);
 void addPoliticalUnit(State&, const Id& nation, const Id& type, const Id& zone, int count = 1);

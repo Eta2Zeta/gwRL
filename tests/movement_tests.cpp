@@ -478,6 +478,33 @@ void sourceOverlayAndClosedBoundary() {
             inSupply(s, "japan", "land_korea"),
         "Retained Japanese home/coastal supply failed");
 }
+void unevolvedChinaStaysHome() {
+  // RB 14.3.1: until it evolves, KMT moves and attacks only within Chinese
+  // Home Country and the sea zones next to it. Korea and P15 are outside it.
+  auto s = baseline().clone();
+  s.units.clear();
+  s.clock.phase = Phase::CombatMovement;
+  s.clock.nationIndex = 3;
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  s.territories.at("land_manchuria_rehe").possessor = "kmt";
+  s.territories.at("land_manchuria_eastern").possessor = "japan";
+  s.territories.at("land_korea").possessor = "japan";
+  s.captureTurnStart();
+  unit(s, "i", "land_manchuria_rehe", "infantry", "kmt");
+  const auto attack = [&](const Id &zone) {
+    return validateRoute(s, {"i", {"land_manchuria_rehe", zone}, MovementMode::Ordinary, true});
+  };
+  check(attack("land_manchuria_eastern").allowed, "KMT could not attack within Chinese Home Country");
+  check(attack("land_korea").reason == "Unevolved CCP and KMT stay within Chinese Home Country",
+        "Unevolved KMT attacked Korea");
+  check(aircraftFlightAccess(s, "kmt", "sea_p14", true) && !aircraftFlightAccess(s, "kmt", "sea_p15", true),
+        "Unevolved KMT aircraft were not kept beside Chinese Home Country");
+  check(aircraftFlightAccess(s, "japan", "sea_p15", true), "The limit applied beyond CCP and KMT");
+  s.nations.at("kmt").powerStatus = "major";
+  check(attack("land_korea").allowed && aircraftFlightAccess(s, "kmt", "sea_p15", true),
+        "Evolved KMT still kept to Chinese Home Country");
+}
 void cargoAndWithdrawal() {
   Puzzle p;
   p.sea("s0");
@@ -871,6 +898,7 @@ int main() {
     for (const auto &[name, fn] :
          std::vector<std::pair<std::string, std::function<void()>>>{
              {"directional terrain", directionalTerrain},
+             {"unevolved China stays home", unevolvedChinaStaysHome},
              {"hostile stops and origins", hostileStopsAndOrigins},
              {"rail gauge damage capacity", railGaugeDamageCapacity},
              {"immobile rail possession timing",

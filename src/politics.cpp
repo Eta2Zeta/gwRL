@@ -248,6 +248,15 @@ bool politicallyFriendly(const State& s,const Id& a,const Id& b) {
 bool chineseHomeCountry(const State& s,const Id& zone) {
     const auto& f=s.definition->factions.at("ccp");return f.homeCountryKnown&&f.homeCountry.contains(zone);
 }
+bool chineseMovementAllowed(const State& s,const Id& nation,const Id& zone) {
+    if(nation!="ccp"&&nation!="kmt")return true;
+    const auto n=s.nations.find(nation);
+    if(n==s.nations.end()||n->second.powerStatus=="major"||chineseHomeCountry(s,zone))return true;
+    const auto* node=s.definition->geography.require("nodes").find(zone);
+    if(!node||node->require("type").asString()!="sea")return false;
+    for(const auto& edge:node->require("neighbors").asArray())if(chineseHomeCountry(s,edge.require("neighbor_id").asString()))return true;
+    return false;
+}
 bool decentralizedProduction(const State& s,const Id& nation) {
     if(nation!="ccp"&&nation!="kmt")return false;
     const auto& n=s.nations.at(nation);if(n.powerStatus!="major")return true;

@@ -760,7 +760,7 @@ bool canUnload(const State &s, const Id &ship, const Id &cargo,
   if (!owner || !politicallyFriendly(s, c.owner, *owner) ||
       !enterableThisTurn(s, c.owner, destination))
     return false;
-  if (!militiaAllowedIn(s, c, destination))
+  if (!militiaAllowedIn(s, c, destination) || !chineseMovementAllowed(s, c.owner, destination))
     return false;
   if (c.owner != t.owner &&
       value(c.gameFlags, "naval_loaded_completed_turns") >=
@@ -1133,6 +1133,9 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
   for (const auto &z : r.path)
     if (!sea(s, z))
       return fail("Naval path must remain in retained sea zones");
+  for (const auto &z : r.path)
+    if (!chineseMovementAllowed(s, n, z))
+      return fail("Unevolved CCP and KMT stay next to Chinese Home Country");
   for (std::size_t i = 1; i < r.path.size(); ++i)
     if (!adjacent(s, r.path[i - 1], r.path[i]))
       return fail("Nonadjacent naval path");

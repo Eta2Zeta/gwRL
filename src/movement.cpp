@@ -295,6 +295,8 @@ bool landAccess(const State &s, const Id &nation, const Id &zone, bool combat) {
 }
 bool aircraftFlightAccess(const State &s, const Id &nation, const Id &zone,
                           bool combat) {
+  if (!chineseMovementAllowed(s, nation, zone))
+    return false;
   if (!s.territories.contains(zone)) {
     if (node(s, zone).require("type").asString() != "sea")
       return false;
@@ -525,6 +527,8 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
     const auto &b = r.path[i];
     if (!s.territories.contains(a) || !s.territories.contains(b))
       return fail("Land route left the selected map");
+    if (!chineseMovementAllowed(s, u.owner, b))
+      return fail("Unevolved CCP and KMT stay within Chinese Home Country");
     if (!seen.insert(b).second)
       return fail("Land routes cannot contain loops");
     const auto *e = edge(s, a, b);

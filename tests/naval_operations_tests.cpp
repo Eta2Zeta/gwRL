@@ -10,6 +10,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <stdexcept>
 
 namespace {
@@ -137,6 +138,31 @@ void uncontestedAssaultAndReplay() {
   check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
                 .exactReplayIdentity() == e.exactReplayIdentity(),
         "Amphibious assault replay differs");
+}
+void unevolvedChinaLandsOnlyInChina() {
+  // RB 14.3.1: until it evolves, KMT attacks only within Chinese Home
+  // Country, so from P14 it may land on Japanese-held Beiping but not Korea.
+  auto s = fixture();
+  s.clock.nationIndex = 3;
+  s.completedTurns["japan"] = 1;
+  s.territories.at("land_korea").possessor = "japan";
+  s.captureTurnStart();
+  add(s, "t", "naval_transport", "kmt", p14);
+  add(s, "i", "infantry", "kmt", p14);
+  attachCargo(s, "t", "i");
+  const auto targets = [](const State &state) {
+    Engine e(state, rules());
+    std::set<Id> zones;
+    for (const auto &a : e.legalActions())
+      if (a.kind == "naval_declare_assault")
+        zones.insert(a.parameters.require("zone").asString());
+    return zones;
+  };
+  const auto minor = targets(s);
+  check(minor.contains(beiping) && !minor.contains("land_korea"),
+        "Unevolved KMT could land outside Chinese Home Country");
+  s.nations.at("kmt").powerStatus = "major";
+  check(targets(s).contains("land_korea"), "Evolved KMT could not land on Korea");
 }
 void seaMustBeClearedBeforeAssault() {
   auto s = fixture();
@@ -1371,6 +1397,7 @@ int main() {
     for (const auto &[name, test] :
          std::vector<std::pair<std::string, std::function<void()>>>{
              {"uncontested assault and replay", uncontestedAssaultAndReplay},
+             {"unevolved China lands only in China", unevolvedChinaLandsOnlyInChina},
              {"militia stay home at sea", militiaNeitherAttackNorLeaveHomeBySea},
              {"militia end movement ashore at home", militiaEndEachMovementAshoreAtHome},
              {"militia land when their ship berths", militiaStepAshoreWhenTheirShipBerths},
