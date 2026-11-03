@@ -20,6 +20,14 @@ def mps_graph_cache_supported(version: str | None = None) -> bool:
     return matched is not None and tuple(map(int, matched.groups())) >= (2, 13, 0)
 
 
+# Network calls between cache releases. A release synchronizes and drops every
+# compiled graph and cached buffer, which the next calls rebuild. Releasing
+# every 32 calls, three or four times a second with 120 shared games, cost 17%
+# of a 128x4 network's evaluations in the 2 November 2026 probes; about every
+# 2,048 calls the rebuilding is negligible and the cache still stays bounded.
+DEFAULT_CLEAR_EVERY = 2048
+
+
 class MPSGraphCachePolicy:
     """One persistent counter shared by a learner's successive evaluators.
 
@@ -29,7 +37,7 @@ class MPSGraphCachePolicy:
     derived process-local state and must not enter learning checkpoints. A fresh
     controller or explicit restore reset starts with an empty compilation cache.
     """
-    def __init__(self, *, clear_every: int = 32):
+    def __init__(self, *, clear_every: int = DEFAULT_CLEAR_EVERY):
         if type(clear_every) is not int or clear_every <= 0:
             raise ValueError("MPS cache interval must be a positive integer")
         if not mps_graph_cache_supported():
@@ -80,7 +88,7 @@ class MPSGraphCachePolicy:
                 "checkpoint_scope": "Derived process-local cache state; counters reset on fresh construction and pending count resets after restore"}
 
 
-def runtime_policy_for_device(device, *, clear_every: int = 32) -> MPSGraphCachePolicy | None:
+def runtime_policy_for_device(device, *, clear_every: int = DEFAULT_CLEAR_EVERY) -> MPSGraphCachePolicy | None:
     target = torch.device(device)
     if target.type in {"cpu", "cuda"}:
         return None
