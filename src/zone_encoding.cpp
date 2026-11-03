@@ -257,12 +257,30 @@ class Vocabulary {
 };
 
 // A column list made of named families, each a grid over a few vocabularies.
+// A family given an `allowed` rule keeps only the cells it allows: the others
+// are combinations the rules of the game never produce. They share one
+// "~impossible" column, and any that occurs is reported (zoneEncodingUnknowns)
+// rather than dropped.
 class Layout {
   public:
-    int add(const std::string& name, std::vector<const Vocabulary*> axes) {
+    using Allowed = std::function<bool(const std::vector<int>&)>;
+    int add(const std::string& name, std::vector<const Vocabulary*> axes, const Allowed& allowed = {}) {
+        Family f{name, size_, std::move(axes), {}, -1};
         int count = 1;
-        for (const auto* axis : axes) count *= axis->size();
-        families_.push_back({name, size_, std::move(axes)});
+        for (const auto* axis : f.axes) count *= axis->size();
+        if (allowed) {
+            f.cells.assign(static_cast<std::size_t>(count), -1);
+            std::vector<int> index(f.axes.size(), 0);
+            int kept = 0;
+            for (auto& cell : f.cells) {
+                if (allowed(index)) cell = f.base + kept++;
+                std::size_t i = f.axes.size();
+                while (i > 0 && ++index[i - 1] == f.axes[i - 1]->size()) index[--i] = 0;
+            }
+            f.impossible = f.base + kept;
+            count = kept + 1;
+        }
+        families_.push_back(std::move(f));
         size_ += count;
         return static_cast<int>(families_.size()) - 1;
     }
@@ -276,7 +294,16 @@ class Layout {
             if (x < 0 || x >= size) throw std::logic_error("Zone encoding coordinate out of range: " + f.name);
             column = column * size + x;
         }
-        return f.base + column;
+        if (f.cells.empty()) return f.base + column;
+        if (const int kept = f.cells[static_cast<std::size_t>(column)]; kept >= 0) return kept;
+        std::string cell;
+        axis = 0;
+        for (const int x : coordinates) {
+            if (axis) cell += ':';
+            cell += f.axes[axis++]->names()[static_cast<std::size_t>(x)];
+        }
+        noteUnknown("impossible_" + f.name, cell);
+        return f.impossible;
     }
     int size() const { return size_; }
     std::vector<std::string> names() const {
@@ -284,14 +311,17 @@ class Layout {
         out.reserve(static_cast<std::size_t>(size_));
         for (const auto& f : families_) {
             std::vector<int> index(f.axes.size(), 0);
-            while (true) {
-                std::string name = f.name;
-                for (std::size_t i = 0; i < f.axes.size(); ++i) name += ":" + f.axes[i]->names()[index[i]];
-                out.push_back(std::move(name));
+            for (std::size_t cell = 0;; ++cell) {
+                if (f.cells.empty() || f.cells[cell] >= 0) {
+                    std::string name = f.name;
+                    for (std::size_t i = 0; i < f.axes.size(); ++i) name += ":" + f.axes[i]->names()[index[i]];
+                    out.push_back(std::move(name));
+                }
                 std::size_t i = f.axes.size();
                 while (i > 0 && ++index[i - 1] == f.axes[i - 1]->size()) index[--i] = 0;
                 if (i == 0) break;
             }
+            if (!f.cells.empty()) out.push_back(f.name + ":~impossible");
         }
         return out;
     }
@@ -301,6 +331,8 @@ class Layout {
         std::string name;
         int base;
         std::vector<const Vocabulary*> axes;
+        std::vector<int> cells;  // Column of each grid cell, -1 if ruled out; empty when all are kept.
+        int impossible;
     };
     std::vector<Family> families_;
     int size_{0};
@@ -508,6 +540,89 @@ std::shared_ptr<const Context> buildContext(const State& s) {
                                   "zone", "zones"})
         c->roleOfKey[key] = 2;
 
+    // Cells the rules of the whole game rule out, whatever the scenario; a rare
+    // situation keeps its column. A type the rulebook reserves for some nations
+    // (its national_exclusive_type rule) belongs to them alone: Japan never
+    // fields a Tiger I, while Germany would.
+    const int typeCount = c->unitTypes.size(), nationCount = c->nations.size();
+    const auto cell = [&](int a, int b) { return static_cast<std::size_t>(a * typeCount + b); };
+    std::vector<char> ownable(static_cast<std::size_t>(nationCount * typeCount), 1);
+    for (const auto& [id, unit] : catalog.units())
+        if (unit.rules.isArray())
+            for (const auto& rule : unit.rules.asArray())
+                if (const auto* name = rule.find("id"); name && name->asString() == "national_exclusive_type") {
+                    std::set<std::string> owners;
+                    for (const auto& nation : rule.require("parameters").require("nations").asArray())
+                        owners.insert(nation.asString());
+                    for (int n = 0; n < nationCount; ++n)
+                        ownable[cell(n, c->unitTypes.find(id))] = owners.contains(c->nations.names()[n]);
+                }
+    std::vector<char> owned(static_cast<std::size_t>(typeCount), 0);  // Some nation here may own the type.
+    for (int t = 0; t < typeCount; ++t)
+        for (int n = 0; n < nationCount; ++n) owned[t] |= ownable[cell(n, t)];
+    // Which types may carry which (navalCargoFits, carrierEligible and the
+    // catalog's cargo rules): naval transports take land units, Japan's
+    // destroyers a Marine, carriers fighters and tactical bombers (medium
+    // bombers on heavy fleet carriers), air transports and strategic bombers the
+    // cargo their rules accept.
+    std::vector<char> carries(static_cast<std::size_t>(typeCount * typeCount), 0);
+    const auto allow = [&](int carrier, const std::function<bool(const UnitDefinition&)>& cargo) {
+        for (const auto& [id, unit] : catalog.units())
+            if (cargo(unit)) carries[cell(carrier, c->unitTypes.find(id))] = 1;
+    };
+    const auto named = [](const V& list) {
+        std::set<std::string> out;
+        for (const auto& name : list.asArray()) out.insert(name.asString());
+        return out;
+    };
+    for (const auto& [id, unit] : catalog.units()) {
+        const int carrier = c->unitTypes.find(id);
+        if (unit.classes.contains("naval_transport"))
+            allow(carrier, [](const UnitDefinition& u) { return u.classes.contains("land") || u.classes.contains("rocket"); });
+        if (unit.classes.contains("carrier"))
+            allow(carrier, [&](const UnitDefinition& u) {
+                return u.classes.contains("fighter") || u.id == "tactical_bomber" ||
+                       (u.id == "medium_bomber" && id == "heavy_fleet_carrier");
+            });
+        if (!unit.rules.isArray()) continue;
+        for (const auto& rule : unit.rules.asArray()) {
+            const auto* name = rule.find("id");
+            const auto* p = rule.find("parameters");
+            if (!name || !p) continue;
+            std::set<std::string> types, classes;
+            if (name->asString() == "japanese_destroyer_marine_transport") types = named(p->require("unit_types"));
+            else if (name->asString() == "strategic_bomber_airborne_cargo") types = named(p->require("accepted_cargo"));
+            else if (name->asString() == "air_transport_cargo") {
+                types = named(p->require("combat_cargo_types"));
+                types.merge(named(p->require("noncombat_extra_cargo_types")));
+                classes = named(p->require("noncombat_cargo_classes"));
+            }
+            allow(carrier, [&](const UnitDefinition& u) {
+                return types.contains(u.id) ||
+                       std::any_of(classes.begin(), classes.end(), [&](const auto& k) { return u.classes.contains(k); });
+            });
+        }
+    }
+    std::vector<char> canCarry(static_cast<std::size_t>(typeCount), 0), canBeCarried(canCarry);
+    for (int a = 0; a < typeCount; ++a)
+        for (int b = 0; b < typeCount; ++b)
+            if (carries[cell(a, b)] && owned[a] && owned[b]) canCarry[a] = canBeCarried[b] = 1;
+    // Units point at facilities only from ships (in port, repairing, scrambling,
+    // a strategic move's destination) and aircraft (scramble sources), and only
+    // naval facilities, which face the sea, have borders a unit can see.
+    const int landClass = c->unitClasses.find("land");
+    const auto atFacility = [&](int t) { return owned[t] && c->unitClassOfType[static_cast<std::size_t>(t)] != landClass; };
+    std::vector<char> sea(static_cast<std::size_t>(c->zones.size()), 0);
+    for (int zone = 0; zone < c->zones.size(); ++zone)
+        if (const auto* type = nodes.at(c->zones.names()[zone]).find("type"); type && type->isString())
+            sea[zone] = type->asString() == "sea";
+    // Projects of a unit type follow its owners; facility projects are open to all.
+    const auto projectOf = [&](int n, int p) {
+        const int t = c->unitTypes.find(c->projectTypes.names()[static_cast<std::size_t>(p)]);
+        return t < 0 || (n < 0 ? owned[t] != 0 : ownable[cell(n, t)] != 0);
+    };
+    using Cell = std::vector<int>;
+
     auto& z = c->zone;
     c->zPossessor = z.add("possessor", {&c->nationOrNone});
     c->zStartPossessor = z.add("turn_start_possessor", {&c->nationOrNone});
@@ -516,21 +631,29 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->zTerritoryFlag = z.add("territory_flag", {&c->recordFlags});
     c->zCapitalOf = z.add("capital_of", {&c->nations});
     c->zDeclinedRail = z.add("declined_rail_request", {});
-    c->zUnitNationType = z.add("units", {&c->nations, &c->unitTypes});
-    c->zUnitStat = z.add("unit_stat", {&c->playerOrNone, &c->unitTypes, &c->unitStats});
+    c->zUnitNationType = z.add("units", {&c->nations, &c->unitTypes},
+                               [&](const Cell& x) { return ownable[cell(x[0], x[1])] != 0; });
+    c->zUnitStat = z.add("unit_stat", {&c->playerOrNone, &c->unitTypes, &c->unitStats},
+                         [&](const Cell& x) { return owned[x[1]] != 0; });
     c->zUnitClassFlag = z.add("unit_flag", {&c->playerOrNone, &c->unitClasses, &c->actorFlags});
-    c->zUnitRef = z.add("unit_reference_here", {&c->playerOrNone, &c->unitTypes, &c->refKinds});
-    c->zCarried = z.add("carried", {&c->playerOrNone, &c->unitTypes, &c->unitTypes});
-    c->zUnitAtFacility = z.add("unit_facility", {&c->playerOrNone, &c->unitTypes, &c->facilityTypes});
-    c->zUnitFacilityBorder = z.add("unit_facility_border", {&c->playerOrNone, &c->unitTypes, &c->zones});
+    c->zUnitRef = z.add("unit_reference_here", {&c->playerOrNone, &c->unitTypes, &c->refKinds},
+                        [&](const Cell& x) { return owned[x[1]] != 0; });
+    c->zCarried = z.add("carried", {&c->playerOrNone, &c->unitTypes, &c->unitTypes},
+                        [&](const Cell& x) { return carries[cell(x[1], x[2])] && owned[x[1]] && owned[x[2]]; });
+    c->zUnitAtFacility = z.add("unit_facility", {&c->playerOrNone, &c->unitTypes, &c->facilityTypes},
+                               [&](const Cell& x) { return atFacility(x[1]); });
+    c->zUnitFacilityBorder = z.add("unit_facility_border", {&c->playerOrNone, &c->unitTypes, &c->zones},
+                                   [&](const Cell& x) { return atFacility(x[1]) && sea[x[2]]; });
     c->zNationHere = z.add("nation_flag_here", {&c->nations, &c->actorFlags});
     c->zFacility = z.add("facility", {&c->facilityTypes, &c->facilityStats});
     c->zFacilityFlag = z.add("facility_flag", {&c->facilityTypes, &c->recordFlags});
     c->zFacilityBorder = z.add("facility_border", {&c->facilityTypes, &c->zones});
     c->zFacilityOriginalOwner = z.add("facility_original_owner", {&c->facilityTypes, &c->nations});
     c->zFacilityOriginalType = z.add("facility_original_type", {&c->facilityTypes, &c->facilityTypes});
-    c->zProject = z.add("project", {&c->nations, &c->projectTypes});
-    c->zProjectStat = z.add("project_stat", {&c->projectTypes, &c->projectStats});
+    c->zProject = z.add("project", {&c->nations, &c->projectTypes},
+                        [&](const Cell& x) { return projectOf(x[0], x[1]); });
+    c->zProjectStat = z.add("project_stat", {&c->projectTypes, &c->projectStats},
+                            [&](const Cell& x) { return projectOf(-1, x[0]); });
     c->zProjectFlag = z.add("project_flag", {&c->projectClasses, &c->recordFlags});
     c->zProjectRow = z.add("project_row", {&c->rows});
     c->zProjectBorder = z.add("project_border", {&c->zones});
@@ -544,7 +667,8 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->zBattleDefender = z.add("battle_defender", {&c->nationOrNone});
     c->zBattleFlag = z.add("battle_flag", {&c->recordFlags});
     c->zBattleData = z.add("battle_data", {&c->dataKeys});
-    c->zBattleDataUnit = z.add("battle_data_unit", {&c->dataKeys, &c->unitTypes});
+    c->zBattleDataUnit = z.add("battle_data_unit", {&c->dataKeys, &c->unitTypes},
+                               [&](const Cell& x) { return owned[x[1]] != 0; });
     c->zBattleDataRank = z.add("battle_data_unit_rank", {&c->dataKeys, &c->ranks});
     c->zBattleDataZone = z.add("battle_data_zone", {&c->dataKeys, &c->zones});
     c->zBattleHits = z.add("battle_pending_hits", {});
@@ -604,8 +728,10 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gStateFlagNation = g.add("state_flag_nation", {&c->recordFlags, &c->nations});
     c->gVisited = g.add("visited_configurations", {});
     c->gDeclinedRails = g.add("declined_rail_requests", {});
-    c->gUnsitedProject = g.add("unsited_project", {&c->nations, &c->projectTypes});
-    c->gUnsitedProjectStat = g.add("unsited_project_stat", {&c->projectTypes, &c->projectStats});
+    c->gUnsitedProject = g.add("unsited_project", {&c->nations, &c->projectTypes},
+                               [&](const Cell& x) { return projectOf(x[0], x[1]); });
+    c->gUnsitedProjectStat = g.add("unsited_project_stat", {&c->projectTypes, &c->projectStats},
+                                   [&](const Cell& x) { return projectOf(-1, x[0]); });
     c->gUnsitedProjectRow = g.add("unsited_project_row", {&c->rows});
     c->gUnsitedProjectFlag = g.add("unsited_project_flag", {&c->projectClasses, &c->recordFlags});
 
@@ -616,33 +742,40 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->aNation = a.add("nation", {&c->nations});
     c->aDecision = a.add("answers_decision", {});
     c->aKey = a.add("parameter", {&c->parameterKeys});
-    c->aUnitNationType = a.add("unit", {&c->roleGroups, &c->nations, &c->unitTypes});
+    c->aUnitNationType = a.add("unit", {&c->roleGroups, &c->nations, &c->unitTypes},
+                               [&](const Cell& x) { return ownable[cell(x[1], x[2])] != 0; });
     c->aUnitStat = a.add("unit_stat", {&c->roleGroups, &c->unitStats});
     c->aUnitZone = a.add("unit_zone", {&c->roleGroups, &c->zones});
     c->aUnitRank = a.add("unit_rank", {&c->roleGroups, &c->ranks});
     c->aUnitOrigin = a.add("unit_turn_origin", {&c->roleGroups, &c->zones});
     c->aUnitRefPlace = a.add("unit_reference_place", {&c->roleGroups, &c->refKinds, &c->zones});
     c->aUnitRefFacility = a.add("unit_facility", {&c->roleGroups, &c->facilityTypes});
-    c->aUnitRefBorder = a.add("unit_facility_border", {&c->roleGroups, &c->zones});
-    c->aUnitCargo = a.add("unit_cargo", {&c->roleGroups, &c->unitTypes});
+    c->aUnitRefBorder = a.add("unit_facility_border", {&c->roleGroups, &c->zones},
+                              [&](const Cell& x) { return sea[x[1]] != 0; });
+    c->aUnitCargo = a.add("unit_cargo", {&c->roleGroups, &c->unitTypes},
+                          [&](const Cell& x) { return canBeCarried[x[1]] != 0; });
     c->aUnitCargoOrigin = a.add("unit_cargo_turn_origin", {&c->roleGroups, &c->zones});
     c->aUnitCargoFlag = a.add("unit_cargo_flag", {&c->roleGroups, &c->actorFlags});
-    c->aUnitLaterPeers = a.add("unit_later_peers", {&c->roleGroups, &c->unitTypes});
+    c->aUnitLaterPeers = a.add("unit_later_peers", {&c->roleGroups, &c->unitTypes},
+                               [&](const Cell& x) { return owned[x[1]] != 0; });
     c->aProjectStat = a.add("project_stat", {&c->roleGroups, &c->projectStats});
     c->aProjectBorder = a.add("project_border", {&c->roleGroups, &c->zones});
     c->aProjectFlag = a.add("project_flag", {&c->roleGroups, &c->recordFlags});
     c->aFacilityBorder = a.add("facility_border", {&c->roleGroups, &c->zones});
     c->aFacilityFlag = a.add("facility_flag", {&c->roleGroups, &c->recordFlags});
     c->aFacilityDamage = a.add("facility_damage", {&c->roleGroups});
-    c->aUnitCarrier = a.add("unit_carried_by", {&c->roleGroups, &c->unitTypes});
+    c->aUnitCarrier = a.add("unit_carried_by", {&c->roleGroups, &c->unitTypes},
+                            [&](const Cell& x) { return canCarry[x[1]] != 0; });
     c->aBattleAttacker = a.add("battle_attacker", {&c->roleGroups, &c->nations});
     c->aBattleDefender = a.add("battle_defender", {&c->roleGroups, &c->nationOrNone});
     c->aBattleZone = a.add("battle_place", {&c->roleGroups, &c->zones});
-    c->aBattleUnits = a.add("battle_units", {&c->roleGroups, &c->unitTypes});
+    c->aBattleUnits = a.add("battle_units", {&c->roleGroups, &c->unitTypes},
+                            [&](const Cell& x) { return owned[x[1]] != 0; });
     c->aZone = a.add("zone", {&c->roleGroups, &c->zones});
     c->aFacility = a.add("facility", {&c->roleGroups, &c->facilityTypes});
     c->aBattleStage = a.add("battle_stage", {&c->roleGroups, &c->battleStages});
-    c->aProject = a.add("project", {&c->roleGroups, &c->projectTypes});
+    c->aProject = a.add("project", {&c->roleGroups, &c->projectTypes},
+                        [&](const Cell& x) { return projectOf(-1, x[1]); });
     c->aProjectOwner = a.add("project_owner", {&c->roleGroups, &c->nations});
     c->aRow = a.add("row", {&c->rows});
     c->aNationRef = a.add("nation_named", {&c->roleGroups, &c->nations});
