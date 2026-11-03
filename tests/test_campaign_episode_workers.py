@@ -9,12 +9,14 @@ import tempfile
 import unittest
 from dataclasses import asdict, fields
 from pathlib import Path
+from unittest import mock
 
 import torch
 
 from studies.campaign import run
 from studies.campaign.curriculum import make_env
-from studies.campaign.episode_workers import EpisodeWorkers
+from studies.campaign.episode_workers import EpisodeWorkers, _play_game
+from studies.shared.multiplayer_mcts import NoLegalActionError
 
 TINY = {"calendar_rounds": 1, "simulations": 2, "max_depth": 4, "complete_episodes": True, "parallel_envs": 2}
 
@@ -78,6 +80,28 @@ class EpisodeWorkerTests(unittest.TestCase):
         self.assertIsNone(learner.frozen_models)
         self.assertEqual(learner.environment_random.getstate(), start)
         self.assertEqual((learner.counters["transitions"], learner.counters["episodes"]), (0, 0))
+
+    def test_a_dead_end_keeps_its_position_beside_the_run(self):
+        learner = tiny_learner()
+        settings = dict(calendar_rounds=1, model_config=learner.model_config,
+                        learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"])
+        imagined = make_env(7, calendar_rounds=1)
+
+        def dead_end(*args, **kwargs):
+            raise NoLegalActionError(imagined)
+
+        with mock.patch("studies.campaign.learning.play_episode", dead_end):
+            failure = _play_game(settings, None, {"root": 3, "seed": 7, "batch_version": "v", "max_transitions": 9})
+        self.assertEqual((failure["failure"], failure["state"]),
+                         ("NoLegalActionError: Nonterminal decision has no legal action", imagined.serialize()))
+        runner = {"batch_index": 2}
+        with tempfile.TemporaryDirectory() as directory:
+            run._record_failed_games(Path(directory), runner, [failure, {"root": 4, "seed": 8, "failure": "E: x"}])
+            saved = (Path(directory) / "failed-positions" / "batch-2-seed-7.json").read_text()
+        self.assertEqual(saved, imagined.serialize())
+        self.assertEqual([(game["seed"], game.get("position")) for game in runner["failed_games"]],
+                         [(7, "failed-positions/batch-2-seed-7.json"), (8, None)])
+        self.assertTrue(all("state" not in game and game["batch"] == 2 for game in runner["failed_games"]))
 
     def test_configuration_requires_complete_episodes_and_enough_games(self):
         for values in ({"episode_workers": 2, "complete_episodes": False, "parallel_envs": 2},

@@ -137,6 +137,18 @@ def _json(path: Path, value):
             os.unlink(temporary)
 
 
+def _record_failed_games(output: Path, runner: dict, failed: list[dict]) -> None:
+    """Note each failed game; a failed position is saved beside the run, not in its checkpoint."""
+    for failure in failed:
+        state = failure.pop("state", None)
+        if state is not None:
+            position = Path("failed-positions") / f"batch-{runner['batch_index']}-seed-{failure['seed']}.json"
+            (output / position).parent.mkdir(exist_ok=True)
+            (output / position).write_text(state)
+            failure["position"] = str(position)
+        runner.setdefault("failed_games", []).append({"batch": runner["batch_index"], **failure})
+
+
 def _learner(config: RunConfig, template):
     device = resolve_neural_device(config.neural_device)
     runtime_policy = runtime_policy_for_device(device)
@@ -413,9 +425,7 @@ def train(args) -> int:
                     exhausted = True
                     break
                 runner["training_environment_seeds"].extend(collection["seeds"])
-                if collection["failed"]:
-                    runner.setdefault("failed_games", []).extend(
-                        {"batch": runner["batch_index"], **failure} for failure in collection["failed"])
+                _record_failed_games(output, runner, collection["failed"])
                 runner["total_waves"] += 1
                 episodes = [{"root": result["root"], "seed": result["seed"], "terminal": result["terminal"],
                              "transitions_this_batch": result["counts"]["transitions"],

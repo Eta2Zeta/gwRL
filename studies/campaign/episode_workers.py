@@ -40,9 +40,14 @@ def _play_game(settings: Mapping[str, Any], evaluator: Any, task: Mapping[str, A
                               rules_version=settings["rules_version"], batch_version=task["batch_version"],
                               environment_seed=task["seed"], max_transitions=task["max_transitions"])
     except Exception as error:
-        # Its seed and weights reproduce it.
-        return {"root": task["root"], "seed": task["seed"], "failure": f"{type(error).__name__}: {error}",
-                "seconds": time.perf_counter() - started}
+        # Its seed and weights reproduce it in EpisodeWorkers. A shared evaluator
+        # need not repeat a game, so a dead end also keeps its position, which
+        # may be one that search imagined.
+        failure = {"root": task["root"], "seed": task["seed"], "failure": f"{type(error).__name__}: {error}",
+                   "seconds": time.perf_counter() - started}
+        if getattr(error, "state", None) is not None:
+            failure["state"] = error.state
+        return failure
     result.update(root=task["root"], seed=task["seed"], process=os.getpid(),
                   seconds=time.perf_counter() - started)
     return result
