@@ -198,6 +198,10 @@ class CampaignPolicyValueNet(nn.Module):
             self.zone_columns = nn.Embedding(spec.zone_columns, dim)
             self.global_columns = nn.Embedding(spec.global_columns, dim)
             self.option_columns = nn.Embedding(spec.action_columns, dim)
+            # A row adds in only where its question is answered, so one that
+            # training has not yet reached starts at zero and adds nothing.
+            for table in (self.zone_columns, self.global_columns, self.option_columns):
+                nn.init.zeros_(table.weight)
             self.zone_identity = nn.Embedding(zones, dim)
             self.map_facts = nn.Linear(spec.zone_static.shape[1], dim)
             self.zone_norm, self.global_norm, self.option_norm = nn.LayerNorm(dim), nn.LayerNorm(dim), nn.LayerNorm(dim)

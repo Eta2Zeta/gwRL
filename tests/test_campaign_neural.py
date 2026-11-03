@@ -200,10 +200,23 @@ class CampaignNeuralTests(unittest.TestCase):
         option = arrays.copy()
         option["action_value"] = option["action_value"].copy()
         option["action_value"][0] += 1
+        zone_input = gwrl_cpp.campaign_zone_input(item.version, zone)
+        option_input = gwrl_cpp.campaign_zone_input(item.version, option)
+        # Input rows start at zero: an answer no training has reached adds nothing.
         with torch.inference_mode():
             (base,), base_values = model.forward_batch([item])
-            (_,), zone_values = model.forward_batch([gwrl_cpp.campaign_zone_input(item.version, zone)])
-            (changed,), option_values = model.forward_batch([gwrl_cpp.campaign_zone_input(item.version, option)])
+            (_,), zone_values = model.forward_batch([zone_input])
+            (changed,), _ = model.forward_batch([option_input])
+        torch.testing.assert_close(base_values, zone_values)
+        torch.testing.assert_close(base, changed)
+        # Once rows are trained, every answer reaches the outputs.
+        with torch.no_grad():
+            for table in (model.zone_columns, model.global_columns, model.option_columns):
+                torch.nn.init.normal_(table.weight)
+        with torch.inference_mode():
+            (base,), base_values = model.forward_batch([item])
+            (_,), zone_values = model.forward_batch([zone_input])
+            (changed,), option_values = model.forward_batch([option_input])
         self.assertFalse(torch.allclose(base_values, zone_values))
         self.assertFalse(torch.allclose(base, changed))
         torch.testing.assert_close(base_values, option_values)

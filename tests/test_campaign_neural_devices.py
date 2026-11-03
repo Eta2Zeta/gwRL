@@ -96,6 +96,15 @@ class CampaignNeuralDeviceTests(unittest.TestCase):
         self.assertTrue(torch.equal(rng, torch.get_rng_state()))
         for name, value in cpu.state_dict().items():
             self.assertTrue(torch.equal(value, mps.state_dict()[name].cpu()), name)
+        # Input rows start at zero. Compare the devices with the same trained-like
+        # rows: all-zero rows leave some gradients so small that Adam's first step
+        # turns last-digit device differences into whole steps.
+        generator = torch.Generator().manual_seed(0)
+        with torch.no_grad():
+            for name in ("zone_columns", "global_columns", "option_columns"):
+                rows = torch.randn(getattr(cpu, name).weight.shape, generator=generator)
+                getattr(cpu, name).weight.copy_(rows)
+                getattr(mps, name).weight.copy_(rows.to("mps"))
         cpu_logits, cpu_values = cpu([self.item])
         mps_logits, mps_values = mps([self.item])
         self.assertEqual(mps_logits[0].device.type, "mps")

@@ -220,3 +220,48 @@ cmake --build build && ctest --test-dir build -R zone_encoding --output-on-failu
 ./.venv/bin/python tools/check_zone_encoding.py out.json --rounds 11 --seeds 2101 2102 2103 \
     --policy balanced --successor-stride 2 --groups-per-position 3
 ```
+
+## Update, 3 November 2026: impossible columns removed, rows start at zero
+
+**Impossible columns.** A column is kept unless the rules of the whole game rule
+it out; a rare situation keeps its column. Three rules remove 24,974 columns:
+zone columns fall from 59,322 to 35,407, position columns from 6,763 to 6,621,
+and option columns from 13,031 to 12,114. The layout is now
+`campaign-zone-v1-edcfe0583896a5da`.
+
+- **Other nations' special units.** A type the rulebook reserves for some nations
+  (its catalog `national_exclusive_type` rule) belongs to them alone. Tiger I and
+  Panzergrenadier are German, T-34 and Katyusha Soviet, B-29 American, Gurkha
+  FEC; Foreign Legion and colonial infantry belong to the French and Commonwealth
+  nations and Italy. No nation of this scenario may own one, so their columns go.
+  A scenario with Germany would keep Germany's. The coastal defense ship is
+  reserved for nobody and ships change hands by capture, so it stays.
+- **Carried units.** Only pairs the rules allow remain: naval transports carry
+  land units, a Japanese destroyer one Marine, carriers fighters and tactical
+  bombers (medium bombers on heavy fleet carriers), and air transports and
+  strategic bombers the cargo their catalog rules accept. 69 of 2,809 pairs.
+- **Units in facilities.** Only ships and aircraft point at facilities, and only
+  naval facilities, which face the sea, have borders a unit sees. Land units
+  leave the facility columns, and land zones the facility-border columns.
+
+Each family with removed columns keeps one `~impossible` column. A removed
+combination that occurs anyway is counted there and reported by
+`gwrl_cpp.zone_encoding_unknowns()`, never dropped. Encoding every decision of
+240 random 11-round games (372,935 decisions) met none, and the look-alike
+check above found no collisions in three 3-round games. The network shrinks
+from 5.20 M to 3.60 M parameters at width 64 with 2 layers, and from 24.67 M to
+18.27 M at width 256 with 8 layers.
+
+That longer random check found 31 names missing from the fixed lists, which
+still fall into "other" columns: battle-data fields such as `map_attack` and
+`naval_submarine_choices`, rail identifiers passed as option values, a `damage`
+parameter and a zone named as a repair target. The short checks above meet none.
+
+**Rows start at zero.** The zone, position and option rows now start at zero,
+so a question no training has reached adds nothing; before, every row started
+as a random vector as large as a trained one. On fixed data (32 training and 8
+held-out three-round games played by search with a uniform prior, width 128
+with 4 layers, 600 steps of 64 positions), the held-out value error over the
+last 300 steps averaged 0.0076 against 0.0081 with random rows, and the policy
+loss was the same (1.779). One seed on small data: no harm shown, not a
+strength result.
