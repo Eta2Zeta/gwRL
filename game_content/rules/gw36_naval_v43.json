@@ -235,11 +235,15 @@
       ],
       "status": "implemented",
       "handlers": [
-        "src/naval_operations.cpp"
+        "src/naval_operations.cpp",
+        "src/naval.cpp",
+        "src/land_combat.cpp",
+        "src/campaign_runtime.cpp"
       ],
       "test_suites": [
         "naval_operations"
-      ]
+      ],
+      "clarification": "RCL-018 adopted: an assault whose sea zone is not cleared, or whose transports all retreat, is called off as Combat ends; its cargo stays aboard"
     },
     {
       "id": "amphibious_land_and_casualties",
@@ -339,6 +343,14 @@
       "ruling": "The fleet evacuating the damaged port defends; the enemy fleet already at sea attacks, including combat during a third nation calendar turn.",
       "authority": "The Warden developer clarification in a user-provided Discord screenshot, 2026-10-23; supersedes the provisional user ruling.",
       "authority_detail": "The developer example is Commonwealth evacuation into Italian ships during German bombing. Applying these roles to KMT evacuation into CCP ships during Japan's turn extends the same principle to three alliances; that exact example was not in the message."
+    },
+    {
+      "id": "RCL-018",
+      "status": "adopted",
+      "date": "2026-11-03",
+      "ruling": "An amphibious assault whose sea zone still holds Enemy surface ships or aircraft after its naval combat, for example ships scrambled into it, is called off, and its land units stay aboard their transports for the rest of the turn. A transport that retreats takes its cargo out of the assault, which goes ahead with any cargo still in the cleared sea zone.",
+      "authority": "User ruling in chat, 2026-11-03: \"Yes, adopt it\", to the proposal that an assault from an uncleared sea is called off with the infantry staying aboard.",
+      "authority_detail": "RB 10.8.1 requires those units to be eliminated first and lets defenders scramble, but does not say what happens when they survive. Found as a self-play dead end on the night of 2 November 2026 (seed 4238465544019468396), where the engine could neither start nor drop the assault."
     }
   ]
 }

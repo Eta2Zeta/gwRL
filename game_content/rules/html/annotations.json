@@ -238,6 +238,23 @@
       "reference_url": "../clarifications.md#rcl-017-a-patrol-planes-second-chance-against-ships-it-let-pass",
       "reference_label": "Rule register",
       "authority_detail": "Found in random-play seed 9487 on 2 November 2026. The user has not ruled; RB 9.4.2 and 10.8.1 treat an aircraft on MAP that declined combat as out of the fight, which supports one decision per turn."
+    },
+    {
+      "id": "RCL-018",
+      "category": "project",
+      "title": "Amphibious assault from an uncleared sea zone",
+      "body": "Project ruling: if Enemy surface ships or aircraft remain in the assault's sea zone after its naval combat, such as ships scrambled into it, or its transports retreat, the amphibious assault is called off and its land units stay aboard for the rest of the turn. The assault still goes ahead with any cargo whose transports remain in the cleared sea zone.",
+      "section_ids": [
+        "rb-10-8-1",
+        "rb-10-4",
+        "rb-10-8-3"
+      ],
+      "date": "2026-11-03",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-018-an-amphibious-assault-whose-sea-zone-is-not-cleared",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted this on 3 November 2026. RB 10.8.1 requires those units to be eliminated first and lets defenders scramble, but does not say what happens when they survive; found as a self-play dead end on 2 November 2026."
     }
   ]
 }

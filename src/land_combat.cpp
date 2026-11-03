@@ -218,7 +218,7 @@ void refreshImmediateBattles(State& s) {
 bool pendingAmphibiousPreparation(const State& s, const BattleState& land) {
     return std::any_of(s.battles.begin(), s.battles.end(), [&](const auto& entry) {
         const auto& prep = entry.second;
-        return marked(prep.flags, "amphibious_preparation") &&
+        return marked(prep.flags, "amphibious_preparation") && !assaultCalledOff(s, prep) &&
                prep.zone == land.zone && prep.attacker == land.attacker;
     });
 }
@@ -1237,6 +1237,9 @@ Id registerAttritionBattle(State &s, const Id &zone, const Id &attacker, const s
     return id;
 }
 void beginLandBattle(State &s, const Id &id) {
+    // Assaults that can no longer go ahead are called off before a land battle
+    // begins, so a combined battle neither waits for nor later meets them (RCL-018).
+    callOffUnclearedAssaults(s);
     const auto& pending = s.battles.at(id);
     require(!pendingAmphibiousPreparation(s, pending),
             "Resolve the same nation's amphibious preparation before its combined land battle");
@@ -1379,7 +1382,7 @@ std::vector<Action> LandCombatRules::interrupts(const State &s) const {
 bool LandCombatRules::phaseComplete(const State &s) const {
     if (s.clock.phase == Phase::Combat)
         for (const auto &[id, b] : s.battles)
-            if (!marked(b.flags, "finished"))
+            if (!marked(b.flags, "finished") && !assaultCalledOff(s, b))
                 return false;
     return !gameplay_ || gameplay_->phaseComplete(s);
 }

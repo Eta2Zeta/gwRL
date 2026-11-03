@@ -177,11 +177,25 @@ bool activeBattle(const State &s) {
       return true;
   return false;
 }
+// Declared assault cargo still aboard a transport in the assault's sea zone. A
+// transport that retreats takes its cargo out of the assault (RCL-018).
+std::vector<Id> assaultCargo(const State &s, const BattleState &b) {
+  const auto water = b.data.require("sea").asString();
+  std::vector<Id> out;
+  for (const auto &c : readIds(b.data.require("cargo"))) {
+    const auto unit = s.units.find(c);
+    if (unit != s.units.end() && unit->second.carriedBy &&
+        s.units.contains(*unit->second.carriedBy) &&
+        s.units.at(*unit->second.carriedBy).zone == water)
+      out.push_back(c);
+  }
+  return out;
+}
 std::vector<Id> shoreCandidates(const State &s, const BattleState &b) {
   const auto water = b.data.require("sea").asString();
   std::vector<Id> out;
   const auto selected = readIds(b.data.require("bombarding"));
-  const auto count = b.data.require("cargo").asArray().size();
+  const auto count = assaultCargo(s, b).size();
   if (selected.size() >= count)
     return out;
   for (const auto &[id, u] : s.units) {
@@ -205,7 +219,7 @@ void shoreChoice(State &s, BattleState &b) {
 }
 void beginAssaultLand(State &s, const Id &id) {
   const auto prep = s.battles.at(id);
-  const auto cargo = readIds(prep.data.require("cargo"));
+  const auto cargo = assaultCargo(s, prep);
   const auto water = prep.data.require("sea").asString();
   std::vector<Id> attackers;
   std::vector<Id> waiting;
@@ -358,9 +372,8 @@ void rollShore(State &s, BattleState &b) {
             {"owner", V(b.defender)},
             {"eligible", ids(defenders)}});
   }
-  for (const auto &c : b.data.require("cargo").asArray())
-    if (s.units.contains(c.asString()) && s.units.at(c.asString()).carriedBy)
-      attackingShips.insert(*s.units.at(c.asString()).carriedBy);
+  for (const auto &c : assaultCargo(s, b))
+    attackingShips.insert(*s.units.at(c).carriedBy);
   std::vector<Id> targets(attackingShips.begin(), attackingShips.end());
   for (auto &[id, f] : s.facilities)
     if (f.zone == b.zone && f.type == "coastal_artillery" && !f.damage) {
@@ -722,8 +735,7 @@ std::vector<Action> navalOperationActions(const State &s) {
   }
   if (s.clock.phase == Phase::Combat && !active) {
     for (const auto &[id, b] : s.battles)
-      if (b.stage == "amphibious_declared" &&
-          !occupiedForAssault(s, b.attacker, b.data.require("sea").asString()))
+      if (b.stage == "amphibious_declared" && !assaultCalledOff(s, b))
         out.push_back(action(s, s.currentNation(), "naval_begin_assault",
                              {{"battle", V(id)}}));
     for (const auto &[id, u] : s.units)
@@ -1050,11 +1062,33 @@ bool applyNavalOperationChance(State &s, const ChanceRequest &r,
   }
   return false;
 }
+bool assaultCalledOff(const State &s, const BattleState &b) {
+  return s.clock.phase == Phase::Combat && b.stage == "amphibious_declared" &&
+         flag(b.flags, "amphibious_preparation") &&
+         (occupiedForAssault(s, b.attacker, b.data.require("sea").asString()) ||
+          assaultCargo(s, b).empty());
+}
+// Runs as a land battle begins, and first as the phase ends, before scrambled
+// ships and aircraft return and clear the sea zone they held. The transports
+// keep their assault markers, so the cargo stays aboard this turn.
+void callOffUnclearedAssaults(State &s) {
+  std::vector<Id> calledOff;
+  for (const auto &[id, b] : s.battles)
+    if (assaultCalledOff(s, b))
+      calledOff.push_back(id);
+  for (const auto &id : calledOff) {
+    s.battles.erase(id);
+    s.battleOrder.erase(
+        std::remove(s.battleOrder.begin(), s.battleOrder.end(), id),
+        s.battleOrder.end());
+  }
+}
 bool navalOperationPhaseComplete(const State &s) {
   for (const auto &[id, b] : s.battles)
     if (flag(b.flags, "amphibious_preparation")) {
-      if (s.clock.phase == Phase::CombatMovement &&
-          b.stage == "amphibious_declared")
+      if ((s.clock.phase == Phase::CombatMovement &&
+           b.stage == "amphibious_declared") ||
+          assaultCalledOff(s, b))
         continue;
       return false;
     }

@@ -1316,6 +1316,139 @@ void declaredPatrolAttacksAreNotOfferedAgain() {
             e.state().battles.begin()->second.attackers.size() == 2,
         "A second patrol attack did not join the declared battle once");
 }
+// RCL-018 (RB 10.8.1): an amphibious assault waits on its sea zone being
+// cleared. When a ship scrambled into it stays after its naval battle, or every
+// transport retreats, the assault cannot go ahead; Combat used to be unable to
+// end (a self-play dead end). Now Combat ends and calls the assault off with the
+// cargo aboard. A transport that retreats takes its cargo out of an assault that
+// goes ahead without it.
+void unclearedAssaultsAreCalledOffAsCombatEnds() {
+  for (const bool occupied : {false, true})
+    for (const int retreating : {0, 1, 2}) {
+      const auto name = std::string(occupied ? "occupied" : "clear") + " sea, " +
+                        std::to_string(retreating) + " transports retreated";
+      auto s = fixture();
+      for (const auto &n : {Id("1"), Id("2")}) {
+        add(s, "transport" + n, "naval_transport", "japan", p14);
+        add(s, "infantry" + n, "infantry", "japan", p14);
+        attachCargo(s, "transport" + n, "infantry" + n);
+      }
+      Engine declaring(s, rules(), 2);
+      for (int n = 0; n < 2; ++n)
+        choose(declaring, "naval_declare_assault", [](const Action &a) {
+          return a.parameters.require("zone").asString() == shantung;
+        });
+      choose(declaring, "end_phase");
+      // As the naval battle in p14 could leave things: a destroyer scrambled
+      // from Shantung's port stays, and transports retreated to p15.
+      auto t = declaring.state().clone();
+      if (occupied) {
+        add(t, "destroyer", "destroyer", "kmt", p14);
+        t.units.at("destroyer").commitments.insert("naval_scramble_origin:port");
+        t.facilities["port"] = {
+            "port", "major_port", shantung, 0, {{"border:" + p14, 1}}};
+      }
+      for (int n = 1; n <= retreating; ++n) {
+        auto &transport = t.units.at("transport" + std::to_string(n));
+        transport.zone = t.units.at("infantry" + std::to_string(n)).zone =
+            "sea_p15";
+        transport.turnFlags["naval_retreated"] = 1;
+        transport.commitments.insert("retreated");
+      }
+      Engine e(t, rules(), 2);
+      e.setDiceTapeForTesting(std::vector<int>(80, 1));
+      const bool calledOff = occupied || retreating == 2;
+      std::string kinds;
+      for (const auto &a : e.legalActions())
+        kinds += " " + a.kind;
+      check(offered(e, "end_phase") == calledOff &&
+                offered(e, "naval_begin_assault") != calledOff,
+            name + ": the assault's options are wrong:" + kinds);
+      if (calledOff) {
+        choose(e, "end_phase");
+        // Political resolution (dice, a truce offer) follows before the phase
+        // moves on.
+        for (int step = 0;
+             step < 20 && e.state().clock.phase == Phase::Combat; ++step) {
+          if (e.state().chance)
+            e.resolveChance();
+          else
+            choose(e, offered(e, "truce_decline_offer") ? "truce_decline_offer"
+                                                        : "end_phase");
+        }
+        check(e.state().battles.empty() &&
+                  e.state().clock.phase == Phase::NonCombatMovement &&
+                  e.state().units.at("infantry1").carriedBy == "transport1" &&
+                  e.state().units.at("infantry2").carriedBy == "transport2" &&
+                  (!occupied || e.state().units.at("destroyer").zone == shantung),
+              name + ": Combat did not end with the assault called off");
+        for (const auto &a : e.legalActions()) {
+          for (const auto *key : {"unit", "cargo"})
+            if (const auto *unit = a.parameters.find(key))
+              check(!unit->isString() ||
+                        unit->asString().rfind("infantry", 0) != 0,
+                    name + ": called-off cargo may debark (" + a.kind + ")");
+          const auto *unload = a.parameters.find("unload");
+          check(!unload || !unload->asBool(),
+                name + ": called-off cargo may be unloaded in port");
+        }
+        continue;
+      }
+      choose(e, "naval_begin_assault");
+      finishBattles(e);
+      check(e.state().territories.at(shantung).possessor == "japan" &&
+                e.state().units.at("infantry2").zone == shantung &&
+                (retreating == 0
+                     ? e.state().units.at("infantry1").zone == shantung
+                     : e.state().units.at("infantry1").carriedBy ==
+                           "transport1"),
+            name + ": the assault landed the wrong cargo");
+    }
+}
+// A land battle in the assault's zone waits for a declared landing, but not for
+// one called off; beginning it drops that assault, so the landing cannot join
+// later (RCL-018). Waiting for it was a random-play dead end.
+void calledOffAssaultsDoNotHoldUpLandBattles() {
+  auto s = fixture();
+  const Id origin = "land_china_hopeh";
+  s.territories.at(origin).possessor = "japan";
+  add(s, "transport", "naval_transport", "japan", p14);
+  add(s, "amphibious", "infantry", "japan", p14);
+  add(s, "overland", "infantry", "japan", origin);
+  attachCargo(s, "transport", "amphibious");
+  s.captureTurnStart();
+  Engine declaring(s, rules(), 2);
+  choose(declaring, "movement_route", [&](const Action &a) {
+    return a.parameters.require("unit").asString() == "overland" &&
+           canonicalJson(a.parameters.require("path")) ==
+               canonicalJson(V(V::Array{V(origin), V(shantung)}));
+  });
+  choose(declaring, "naval_declare_assault", [](const Action &a) {
+    return a.parameters.require("zone").asString() == shantung;
+  });
+  choose(declaring, "end_phase");
+  // The transport has since retreated from p14 with its cargo.
+  auto t = declaring.state().clone();
+  t.units.at("transport").zone = t.units.at("amphibious").zone = "sea_p15";
+  t.units.at("transport").turnFlags["naval_retreated"] = 1;
+  t.units.at("transport").commitments.insert("retreated");
+  Engine e(t, rules(), 2);
+  e.setDiceTapeForTesting(std::vector<int>(80, 1));
+  check(offered(e, "land_begin_battle") && !offered(e, "naval_begin_assault") &&
+            !offered(e, "end_phase"),
+        "A called-off assault held up the land battle in its zone");
+  choose(e, "land_begin_battle");
+  check(std::none_of(e.state().battles.begin(), e.state().battles.end(),
+                     [](const auto &entry) {
+                       return entry.second.flags.contains(
+                           "amphibious_preparation");
+                     }) &&
+            e.state().units.at("amphibious").carriedBy == "transport",
+        "Beginning the land battle did not call off the assault");
+  finishBattles(e);
+  check(offered(e, "end_phase"),
+        "Combat could not end after the land battle");
+}
 } // namespace
 void militiaNeitherAttackNorLeaveHomeBySea() {
   // Militia may not be used by the Attacker and start and end their movement
@@ -1485,7 +1618,11 @@ int main() {
              {"patrol attacks stay in their sea zone",
               patrollingAircraftAttackOnlyInTheirOwnSeaZone},
              {"declared patrol attacks are not offered again",
-              declaredPatrolAttacksAreNotOfferedAgain}}) {
+              declaredPatrolAttacksAreNotOfferedAgain},
+             {"uncleared assaults are called off as Combat ends",
+              unclearedAssaultsAreCalledOffAsCombatEnds},
+             {"called-off assaults do not hold up land battles",
+              calledOffAssaultsDoNotHoldUpLandBattles}}) {
       test();
       std::cout << "PASS " << name << '\n';
     }

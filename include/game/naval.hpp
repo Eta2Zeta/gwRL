@@ -65,6 +65,13 @@ bool applyNavalOperationAction(State &, const Action &);
 bool applyNavalOperationChance(State &, const ChanceRequest &, const ChanceOutcome &);
 bool navalOperationPhaseComplete(const State &);
 void finishNavalOperationPhase(State &);
+// RCL-018: a declared amphibious assault that cannot go ahead in the Combat
+// Phase, because Enemy surface ships or aircraft hold its sea zone or no cargo
+// is still aboard a transport there. Neither the phase's end nor a land battle
+// in the same zone waits for it; beginning a land battle or ending the phase
+// calls it off with its cargo left aboard.
+bool assaultCalledOff(const State &, const BattleState &);
+void callOffUnclearedAssaults(State &);
 void preparePortLandDefence(State &, const Id &battle);
 void resolveCapturedPorts(State &, const Id &landZone, const Id &captor);
 void queueDamagedPortEvacuation(State &, const Id &facility);

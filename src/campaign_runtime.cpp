@@ -1,6 +1,7 @@
 #include "game/air.hpp"
 #include "game/campaign.hpp"
 #include "game/catalog.hpp"
+#include "game/naval.hpp"
 #include "game/politics.hpp"
 #include "game/position_facts.hpp"
 
@@ -74,7 +75,14 @@ bool phaseWorkClear(const State& state) {
     const auto naval = state.flags.find("immediate_naval_battles");
     if (naval != state.flags.end() && naval->second) return false;
     if (workClear(state)) return true;
-    if (state.clock.phase != Phase::CombatMovement || !state.decisions.empty() || state.chance) return false;
+    if (!state.decisions.empty() || state.chance) return false;
+    // Assaults that can no longer go ahead are called off as Combat ends (RCL-018).
+    if (state.clock.phase == Phase::Combat)
+        return std::all_of(state.battles.begin(), state.battles.end(),
+                           [&](const auto& entry) { return assaultCalledOff(state, entry.second); }) &&
+               std::all_of(state.battleOrder.begin(), state.battleOrder.end(),
+                           [&](const Id& id) { return state.battles.contains(id); });
+    if (state.clock.phase != Phase::CombatMovement) return false;
     for (const auto& [id,battle] : state.battles)
         if (battle.stage != "awaiting_combat_rules" && battle.stage != "air_declared"
                 && battle.stage != "naval_declared" && battle.stage != "amphibious_declared") return false;

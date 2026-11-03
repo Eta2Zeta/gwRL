@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 2 November 2026.
+Updated: 3 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -58,6 +58,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
 | RCL-016 | KMT Low Morale 10+ with no legal retreat, such as after an amphibious assault | Adopted: the unit is eliminated |
 | RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Open: the engine currently allows a second chance |
+| RCL-018 | Amphibious assault whose sea zone is not cleared, or whose transports retreat | Adopted: the assault is called off; the cargo stays aboard |
 
 ## Pilot discussion review
 
@@ -323,6 +324,31 @@ Japan accepted and scrambled a destroyer from Honshu's port, both missed, and
 the transport retreated to P15.
 
 **Until ruled:** the engine keeps the two-chance reading.
+
+## RCL-018: An amphibious assault whose sea zone is not cleared
+
+**Status: adopted by the user, 3 November 2026; found in self-play on the night
+of 2 November (seed 4238465544019468396).**
+
+**Sources:** RB §10.8.1 p70 (naval combat by the screening force); §10.4 p63
+(scrambling); §10.8.3 pp70-71.
+
+**Problem:** all Enemy Surface Ships and aircraft (except aircraft on MAP that
+declined combat) in the sea zone an amphibious assault starts from must first be
+eliminated, and defending players may scramble units into that sea zone. The
+rules do not say what happens when they are not eliminated, for example when
+the screening force retreats or ships scrambled into the sea zone survive.
+
+**Adopted ruling:** the amphibious assault is called off. Its land units stay
+aboard their transports for the rest of the turn. A transport that retreats
+takes its cargo out of the assault, which still goes ahead with any cargo whose
+transports remain in the cleared sea zone.
+
+**Example:** a captured KMT transport carrying one Infantry sailed from P41 into
+P32, where only Japanese submarines were, and declared an assault on Formosa.
+In the naval battle in P32 Japan scrambled a light carrier and a destroyer from
+Formosa's port, and the transport retreated to P41. Before this ruling the
+engine could neither start nor drop the assault, and KMT had no legal move.
 
 ## Maintenance
 

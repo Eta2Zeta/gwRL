@@ -137,6 +137,7 @@ void NavalRules::beginTurn(State &s) const {
           navalCompletedTurns(s, unit.owner) + 1;
 }
 void NavalRules::finishPhase(State &s) const {
+  callOffUnclearedAssaults(s);
   finishNavalMovementPhase(s);
   if (gameplay_)
     gameplay_->finishPhase(s);
