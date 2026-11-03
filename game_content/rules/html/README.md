@@ -58,7 +58,7 @@ Annotations are a separate JSON document:
 Categories are `clarification` (blue text), `fix` (green text), `unresolved`
 (amber text), and `project` (gray text for campaign choices without a verified
 publisher ruling). They have distinct visible labels as well as colors. This
-pilot found no qualifying new issues; the 13 existing reference notes are
+pilot found no qualifying new issues; the 14 existing reference notes are
 explicitly marked as outside the pilot window. Their stable RCL IDs are visible
 and searchable. Repeated placement beside relevant rules does not create new
 issues: the reader reports both placements and unique notes.

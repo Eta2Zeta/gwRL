@@ -57,6 +57,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-014 | Combat roles when ships evacuate into a third party's fleet | Closed: evacuating fleet defends; fleet already at sea attacks; developer clarification |
 | RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
 | RCL-016 | KMT Low Morale 10+ with no legal retreat, such as after an amphibious assault | Adopted: the unit is eliminated |
+| RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Open: the engine currently allows a second chance |
 
 ## Pilot discussion review
 
@@ -292,6 +293,36 @@ tundra/ice rules, which eliminate attackers that must retreat but cannot, and
 matches the 10+ elimination under the Chinese Truce (RCL-012). A unit that can
 retreat to the zone it attacked from still does so, it still cannot be taken as
 a casualty, and Major-Power KMT remains exempt.
+
+## RCL-017: A patrol plane's second chance against ships it let pass
+
+**Status: open, 2 November 2026; found in random-play seed 9487.**
+
+**Sources:** RB §9.3.1 pp55-56; §9.4 p57; §9.4.2 p58; §10.4 p63; §10.8.1 p70.
+
+**Question:** surface ships with no attacking aircraft enter a sea zone where an
+enemy aircraft is on Maritime Air Patrol. The plane may fight them or let them
+pass, and it lets them pass. Later in the same Combat Movement, may those ships
+still offer the plane a battle, which it may then accept with scrambled support?
+
+**Readings:**
+
+- **One decision per turn:** the refusal settles combat with those ships for
+  the turn. Ships without aircraft that can attack cannot force combat on a
+  patrol plane (§§9.3.1 and 9.4), and §§9.4.2 and 10.8.1 treat an aircraft on
+  MAP "which declined combat" as out of the fight for the rest of the turn.
+- **Two chances (current engine):** §9.3.1's single round during movement and
+  §9.4's Combat-phase battle are separate. The engine offers the single round
+  when the ships enter; if the plane declines, the ships may still engage it,
+  the plane chooses again in the Combat phase, and its side may scramble units
+  under §10.4.
+
+**Example:** in seed 9487 a captured KMT transport entered P16, where a Japanese
+tactical bomber on patrol let it pass. Random play then engaged the bomber;
+Japan accepted and scrambled a destroyer from Honshu's port, both missed, and
+the transport retreated to P15.
+
+**Until ruled:** the engine keeps the two-chance reading.
 
 ## Maintenance
 

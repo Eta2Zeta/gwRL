@@ -122,7 +122,8 @@
       ],
       "test_suites": [
         "naval_movement"
-      ]
+      ],
+      "clarification": "RCL-017 open: ships may still engage a patrol plane that let them pass earlier that turn"
     },
     {
       "id": "raider_slip_and_discovery",

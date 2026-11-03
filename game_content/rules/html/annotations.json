@@ -222,6 +222,22 @@
       "reference_url": "../clarifications.md#rcl-016-kmt-low-morale-with-no-legal-retreat",
       "reference_label": "Rule register",
       "authority_detail": "The user adopted this on 2 November 2026. The source does not say what happens when the Low Morale retreat is impossible; the ruling follows the city and tundra/ice rules, which eliminate attackers that must retreat but cannot."
+    },
+    {
+      "id": "RCL-017",
+      "category": "unresolved",
+      "title": "Patrol plane's second chance against ships it let pass",
+      "body": "Open: when a patrol plane lets ships without attacking aircraft pass, it is unsettled whether those ships may still offer it a battle later that turn, which it could then accept with scrambled support. The engine currently allows this second chance; the other reading treats the refusal as settling combat with them for the turn.",
+      "section_ids": [
+        "rb-9-3-1",
+        "rb-9-4"
+      ],
+      "date": "2026-11-02",
+      "authority": "Open project question",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-017-a-patrol-planes-second-chance-against-ships-it-let-pass",
+      "reference_label": "Rule register",
+      "authority_detail": "Found in random-play seed 9487 on 2 November 2026. The user has not ruled; RB 9.4.2 and 10.8.1 treat an aircraft on MAP that declined combat as out of the fight, which supports one decision per turn."
     }
   ]
 }
