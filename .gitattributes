@@ -1,0 +1,3 @@
+# Keep LF line endings on every machine. The engine fingerprints its data files,
+# so a checkout that converts them to CRLF (Git for Windows' default) reads as stale.
+* text=auto eol=lf
