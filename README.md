@@ -9,6 +9,8 @@ has yet shown robust playing strength.
 
 ## Start here
 
+- [How gwRL learns](docs/design/README.md): the central design document, from
+  the big picture down to the network's input, in plain words.
 - [Campaign learning](studies/campaign/README.md): training, resume, evaluation,
   recorded games and the measured settings.
 - [Campaign Observatory](web/campaign_viewer/README.md): local map viewer for

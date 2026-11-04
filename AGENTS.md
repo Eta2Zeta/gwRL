@@ -57,6 +57,26 @@
   the best learning method or that this campaign can train to useful strength on
   the available hardware; keep those claims subject to measured evaluation.
 
+## Design documentation
+
+- `docs/design/README.md` is the central design document of the learning
+  system: the game interface, search, the network's input, the network,
+  training, runs, evaluation and their data structures. It explains the design
+  from the top down, layer by layer, in plain words for a reader who is not a
+  reinforcement learning specialist, with real examples from the engine.
+- When the user asks how or why something in the learning design works, put the
+  explanation in the design document, then answer in chat briefly with a link to
+  the section. Do not leave a design explanation only in chat.
+- When a question digs into a detail of an existing explanation, revise that
+  section in place: rewrite, merge or reorganize it so the document stays
+  layered and readable, instead of appending another layer of explanation.
+- Verify statements against the code and say what is measured, what is inferred
+  and what is open. When a change alters something the document describes,
+  update the document in the same commit.
+- Keep measurements and the reasons for past changes in dated records such as
+  `docs/stage_a/`, and link to them from the design document rather than
+  copying them.
+
 ## References
 
 For STEM questions, especially mathematics and physics, first look for references
