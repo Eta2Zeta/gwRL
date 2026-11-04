@@ -196,18 +196,57 @@ next.
 
 ### Roles
 
-Many questions carry a role, the `0_source`, `1_path`, `2_target` or `3_other` in
-`zone:1_path:land_china_hopeh`. The role says how the move relates to the unit or
-zone that a detail names:
+**Reading a move question's name.** Most move questions have three parts:
+
+```text
+unit_stat : 0_source : move_4
+family      role       which fact
+```
+
+- **The family** says what kind of fact it is: `unit` is a named unit's nation
+  and type, `unit_stat` its condition, `unit_zone` where it stands, `zone` a
+  named zone, and so on.
+- **The role** says through which detail the move names that unit or zone. It
+  comes from that detail's label, and every question written about the detail's
+  value carries it.
+- **The rest** says which fact: `count` is how many units, `move_4` "4 moves
+  left".
+
+So `unit_stat:0_source:count = 1` reads: "the unit named by a source detail is
+one unit". In the fighter's attack above, that detail is `unit = ...`, and its
+label `unit` is a source label. `unit_stat` is not a label; it is the family.
+
+**The four roles** say how the move relates to the unit or zone a detail names:
 
 - `0_source`: what acts, or where the move starts;
 - `1_path`: the route the move travels;
 - `2_target`: what the move acts on, or where it goes;
 - `3_other`: the move mentions it, but the encoder cannot say how.
 
-The encoder cannot understand what a label means: to it, `endpoint` is just a
-string of letters. So the role comes from a fixed table in `src/zone_encoding.cpp`
-that pairs labels with roles:
+**One move, two units, two roles.** A Japanese tactical bomber lands on a light
+carrier (game seed 7004):
+
+```text
+air_land_noncombat   unit        = japan_tactical_bomber_p15_fleet_carrier_1
+                     destination = japan_light_carrier_p15_setup_1
+```
+
+Both details name a unit, so both produce the same families, each with its own
+detail's role:
+
+| Detail | Label and role | Some of its answers |
+| --- | --- | --- |
+| `unit = japan_tactical_bomber_p15_fleet_carrier_1` | `unit`: `0_source` | `unit:0_source:japan:tactical_bomber = 1`, `unit_stat:0_source:count = 1`, `unit_stat:0_source:move_4 = 1`, `unit_stat:0_source:aboard = 1`, `unit_zone:0_source:sea_p41 = 1` |
+| `destination = japan_light_carrier_p15_setup_1` | `destination`: `2_target` | `unit:2_target:japan:light_carrier = 1`, `unit_stat:2_target:count = 1`, `unit_stat:2_target:move_3 = 1`, `unit_zone:2_target:sea_p14 = 1` |
+
+Without roles, the bomber's and the carrier's facts would land in the same
+questions, and the network could not tell which unit has 4 moves left or which
+one is in P41.
+
+**How the role is chosen.** The encoder cannot understand what a label means: to
+it, `endpoint` is just a string of letters. So the role comes from a fixed table
+in `src/zone_encoding.cpp` that pairs labels with roles. The table lists labels,
+the words on the left of a move's details, not families:
 
 | Label | Role |
 | --- | --- |
@@ -215,6 +254,14 @@ that pairs labels with roles:
 | path | `1_path` |
 | beneficiary, border, border2, declaring_nation, destination, destination_facility, neighbor, recipient, sea, target, technology, zone, zones | `2_target` |
 | any label not in the table | `3_other` |
+
+Some labels that name units are missing from the table. When a Japanese air
+transport loads a mountain infantry (`air_load`, game seed 7006), the infantry is
+named by `cargo = setup_japan_land_manchuria_northern_mountain_infantry_1`.
+`cargo` is not in the table, so the infantry's answers read
+`unit:3_other:japan:mountain_infantry = 1`, `unit_stat:3_other:count = 1` and so
+on. `towed` (a unit towed along a move) and `endpoint` (the railroad repair below)
+are other such labels.
 
 The role changes three things:
 
