@@ -7,15 +7,39 @@ section 4 summarizes it. The encoder is C++ (`src/zone_encoding.cpp`);
 `studies/campaign/neural.py` reads them. Measurements and the reasons for the
 design are in the [zone encoding record](../stage_a/zone_encoding_2026_11_02.md).
 
-## 1. When the input is built
+## 1. When and how the input is built
 
 Whenever the search reaches a decision it has not seen, it asks the deciding
 alliance's network about it (see [search](README.md#3-choosing-a-move-search)).
 Before that, the engine encodes the position once. Search copies of the same
-position share that encoding, and a kept training sample stores it.
+position share that encoding, and a kept training sample stores it. The input
+describes one decision: both the state of the game and the moves on offer.
 
-The input describes one decision, and it covers both the state of the game and
-the moves on offer.
+**The encoder reads the engine's memory directly.** It is C++ code inside the
+engine. It reads the live game state and receives the legal moves as the
+engine's own move objects. Nothing is written out as text or parsed on the way.
+
+**But the engine identifies everything by name.** Its state is not stored as
+numbers:
+
+- a unit's type, owner and zone are names: `cavalry`, `ccp`, `land_china_shensi`;
+- a unit's marks are a table of names and numbers, such as `repairing` → 1;
+- a battle's notes, and a legal move's details, are small trees of named
+  entries, such as `target` → `rail_land_manchuria_northern__land_manchuria_western`
+  and `damage` → 1.
+
+So the encoder translates each name into a question number, using fixed lists of
+the names it knows ([section 7](#7-names-the-encoder-doesnt-know)). That
+translation is where "names" and "missing names" come from.
+[Section 10](#10-why-the-encoder-translates-names) explains why the engine works
+with names and what the alternatives are.
+
+**Encoding is cheap.** In three random eleven-round games (4,786 decisions,
+measured on 3 November 2026 on the M4 Max), encoding a decision took 0.17 ms on
+average, against 0.64 ms to list its legal moves and 0.80 ms to play a move. A
+self-play game encodes about 60,000 positions, one per network evaluation. That
+is about 10 seconds of the roughly 260 CPU-seconds a game process spent per game
+in the 2 November profile: about 4%, a rough estimate.
 
 ## 2. Three parts
 
@@ -139,10 +163,10 @@ For each detail, the encoder records that a detail with this label exists
 | a number | `number:<label>` = the number |
 | true, false, nothing | `true:<label>`, `false:<label>`, `null:<label>` = 1 |
 | a list | `list_length:<label>` = its length, then each item as a value |
-| text naming a unit | what the unit is: `unit:<role>:<nation>:<type>`, its condition (`unit_stat:<role>:...`), its zone, its rank among identical units, the units after it, its cargo, ... |
-| text naming a zone | `zone:<role>:<zone>` = 1 |
-| text naming a facility, battle, construction project, build-chart row, nation or technology | that thing's own families: `facility:<role>:<type>`, `battle_stage:<role>:<stage>`, ... |
-| other text | `value:<label>:<text>` if the text is on the list of known values, otherwise `value:<label>:other` |
+| a unit's name | what the unit is: `unit:<role>:<nation>:<type>`, its condition (`unit_stat:<role>:...`), its zone, its rank among identical units, the units after it, its cargo, ... |
+| a zone's name | `zone:<role>:<zone>` = 1 |
+| the name of a facility, battle, construction project, build-chart row, nation or technology | that thing's own families: `facility:<role>:<type>`, `battle_stage:<role>:<stage>`, ... |
+| any other name | `value:<label>:<name>` if the name is on the list of known values, otherwise `value:<label>:other` |
 
 Like units, every named thing is replaced by what it is; its name never reaches
 the network.
@@ -263,7 +287,7 @@ The engine calls each side of the border an `endpoint`. The move's details mean:
 | `parameter:endpoint` | 1 | and one labelled `endpoint` |
 | `parameter:other` | 1 | and one whose label, `damage`, is not on the list of known labels |
 | `zone:3_other:land_manchuria_northern` | 1 | it mentions Manchuria Northern, in a way the encoder cannot classify |
-| `value:target:other` | 1 | its target is text the encoder does not recognise |
+| `value:target:other` | 1 | its target is a name the encoder does not recognise |
 | `number:other` | 1 | a number, 1, under an unrecognised label |
 
 **Line by line:**
@@ -275,7 +299,7 @@ The engine calls each side of the border an `endpoint`. The move's details mean:
   it gets the leftover role `3_other`.
 - `value:target:other = 1`: the railroad's name is not a unit, zone, facility or
   any other known thing, and no railroad name is on the list of known values. So
-  it is filed as unknown text, and which railroad the move repairs is lost.
+  it is filed as an unknown value, and which railroad the move repairs is lost.
 - `number:other = 1`: every number in a move is filed under its label, so the
   amount should arrive as `number:damage = 1`. Because `damage` is not a known
   label, it is filed under `other`. The amount still arrives, under a heading that
@@ -413,3 +437,45 @@ Facts that never change come with the layout, not with each position:
 The layout version, now `campaign-zone-v1-edcfe0583896a5da`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change.
+
+## 10. Why the encoder translates names
+
+The engine came first. It was written (milestones M0 to M11) to follow the
+rulebook, and many parts of the project use it: the Python interface, the tests,
+saved games and replays, the map viewer, and training checkpoints, which store
+the whole game as JSON. Names keep all of these readable, let the engine load its
+units, map and rules from JSON files, and let a rule add a new mark or battle
+note without changing a shared format. The networks came later.
+
+The first network input, used until 2 November 2026, really did read text: it
+printed each position as JSON, cut every name into word pieces and hashed the
+pieces into 16,384 slots. The zone encoding replaced it with a fixed list of
+questions built straight from the engine's memory: 49 to 64 times smaller and 5
+to 6 times faster to build ([record](../stage_a/zone_encoding_2026_11_02.md)). It
+left the engine's names as they were and translates them instead.
+
+Reading a move's named details also lets one piece of code describe all 142
+kinds of move, and kinds added later. Without it, every kind of move would need
+its own encoder code, kept in step with its rule by hand.
+
+**What names cost:**
+
+- **Speed: little.** Encoding is about 4% of a game process's work (section 1),
+  and the name lookups are only part of encoding.
+- **Correctness: the real cost.** The engine and the encoder agree only through
+  names. A rule can write a name the encoder's lists lack, and nothing fails: the
+  name falls into an "other" question and is only counted. That is how the 31
+  missing names arose.
+
+**The alternatives:**
+
+| Option | What it means | Assessment |
+| --- | --- | --- |
+| The engine writes the network's numbers itself | every rules module also fills input questions as it plays | Spreads learning code through the rules: every rule change becomes an input change, and the rules get harder to check against the rulebook. Not recommended. |
+| The engine stores numbers instead of names | unit types, nations, zones and marks become numbered constants | A rewrite of every rules module, with risk to rule correctness, for at most the few percent of speed above. The measurements do not justify it. |
+| Keep the names, but check them | a test scans the engine's source for the names it writes and compares them with the encoder's lists, and full random games fail on any unknown name | Closes the missing-names gap without touching the rules. Recommended; not built yet. |
+
+A stricter form of the last option is one register of names, each declared once
+with its meaning and used by both the engine and the encoder, so that the engine
+cannot write an undeclared name. It is a larger change and has not been
+designed.

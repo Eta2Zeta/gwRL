@@ -159,6 +159,12 @@ also linked to the zones it starts from, passes through and acts on, so the
 network can read those zones' board answers with the move. Facts that never
 change, such as terrain and borders, come with the layout once.
 
+The encoder reads the engine's memory directly; no text is written or parsed.
+But the engine identifies everything by name (unit types, marks on units, battle
+notes, a move's details), so the encoder translates names into question numbers
+through fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
+game process's work.
+
 The details, with worked examples, are in [The network's input](network_input.md).
 
 ## 5. What a network computes
@@ -293,6 +299,8 @@ controls, not expert play.
 - **31 names missing from the encoder's lists.** They fall into shared "other"
   questions, so the network cannot tell them apart. See
   [names the encoder doesn't know](network_input.md#7-names-the-encoder-doesnt-know).
+  The recommended fix keeps the engine's names and checks them against the
+  encoder's lists ([why](network_input.md#10-why-the-encoder-translates-names)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
   replays in builds with memory checks did not reproduce it. Two crashes close
