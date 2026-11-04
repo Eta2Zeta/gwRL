@@ -120,13 +120,18 @@ in a tree, which the next simulation reads.
 **One simulation, step by step:**
 
 1. Copy the game at the current position (`clone_for_search`).
-2. At a decision the search has already evaluated, pick a move by a score that
-   adds two terms, then play it on the copy:
-   - how well the move has done so far in earlier simulations, for the alliance
-     that is choosing. A move no simulation has tried yet counts as good as the
-     best result so far, so untried moves usually come first;
-   - how promising the network said the move was (its prior), shrinking as the
-     move gets tried more often. The weight of this term is `c_puct` (1.5).
+2. At a decision the search has already evaluated, give every legal move a
+   score and play the move with the highest score on the copy; a tie is broken
+   at random. The score adds two terms:
+   - **what earlier simulations found:** the move's average result so far for
+     the alliance that is choosing, rescaled so that the worst and best move
+     averages seen in this search become 0 and 1. A simulation's result is the
+     network's value of the position where it stopped, or the true final scores
+     at the end of the game. A move no simulation has tried yet gets 1, as good
+     as the best, so untried moves usually come first;
+   - **what the network expected:** `c_puct` (1.5) × the move's prior × √(visits
+     of all moves here + 1) ÷ (this move's visits + 1). It is large for a move the
+     network likes that has been tried little.
 3. At a chance event, roll the dice on the copy.
 4. At a decision no simulation has evaluated yet, ask the deciding alliance's
    network for the position's value for all three alliances and a prior for each
@@ -154,10 +159,18 @@ simulation 3   R --C--> RC                  RC is new: ask the network, stop    
 simulation 4   R --A--> RA --x--> RAx       RAx is new: ask the network, stop   depth 2
 ```
 
-Simulations 1 to 3 each try a move nobody has tried. Simulation 4 chooses A again,
-because A did best; RA has been evaluated, so it picks one of RA's moves, x, and
-stops at the new position RAx. Each simulation adds one new position to the tree,
-so the lines the search keeps choosing are explored deeper and deeper.
+Simulations 1 to 3 each try a move nobody has tried. Simulation 4 scores the three
+moves again. Say the network's priors are A 0.5, B 0.3 and C 0.2, and the results
+so far rescale to A 1, C 0.5 and B 0. Each move has one visit of three, so its
+second term is 1.5 × prior × √4 ÷ 2: A scores 1 + 0.75 = 1.75, B 0 + 0.45 = 0.45
+and C 0.5 + 0.3 = 0.8, and the simulation plays A. At RA no move has been tried, so
+every first term is 1 and the move with the highest prior, x, wins. RAx is new, so
+the simulation stops there.
+
+So a simulation chooses its path one step at a time, by these scores, at every
+position it passes. It does not look for the deepest branch: it goes deep only
+where the scores keep sending it. Each simulation adds one new position to the
+tree, so the lines the scores keep choosing are explored deeper and deeper.
 
 **What the search remembers, and why it plays moves again.** The tree holds, for
 every position the search has met, identified by its planning key, the moves
@@ -189,8 +202,17 @@ keeps a branch per outcome; the real game's dice are untouched. Copying is cheap
 under a tenth of a millisecond, but playing the moves is not. In six measured
 searches it took 8% to 53% of the search's time, and in whole self-play games it
 was about half of the time the game threads spent not waiting for the network:
-their largest single cost. Keeping a copy of the game at each tree position would
-save most of this work, for the memory of the copies; that is untested.
+their largest single cost.
+
+**Saving copies instead, an untested idea.** If the tree kept a copy of the game
+at every position it holds, a simulation would choose its path by exactly the same
+scores but would not play the moves on the way. It would take the copy saved at
+the last position of its own path that the tree already knows, the tip of the
+branch the scores chose, which need not be the tree's deepest branch, and play
+only the new move from there. In the toy example, simulation 4 would start from
+the copy saved at RA and play only x. Dice on the path would still be rolled, on
+a copy of the position before the roll, because each simulation draws its own.
+That would save most of the replaying, for the memory of the copies.
 
 **After all simulations**, the number of times each first move was tried shows the
 search's preference. The move actually played is drawn at random in proportion to

@@ -97,7 +97,9 @@ simulation that followed the same branch played them all again.
   networks.
 - **Inferred:** trained networks prefer fewer moves, so their trees go deeper
   and each simulation plays more moves again. Keeping a copy of the game at
-  each tree position would let a simulation start from the deepest copy instead
-  of the root, saving most of this work for the cost of the copies' memory.
+  each tree position would let a simulation, choosing its path by the same
+  scores, start from the copy saved at the last known position of that path
+  instead of the current position. That would save most of this work for the
+  cost of the copies' memory; dice on the path would still be rolled.
 - **Open:** that change is untested, and how much memory its copies need is
   unmeasured.
