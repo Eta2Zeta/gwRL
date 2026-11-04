@@ -46,10 +46,10 @@ in the 2 November profile: about 4%, a rough estimate.
 The input for one decision is one bundle with three parts:
 
 1. **The board:** each of the 37 zones (31 land and 6 sea) answers the same list
-   of 42,520 zone questions.
-2. **The position as a whole:** 6,634 questions about the round, the phase,
+   of 42,737 zone questions.
+2. **The position as a whole:** 6,637 questions about the round, the phase,
    whose turn it is, treasuries, wars and so on.
-3. **Each legal move:** every move on the menu answers the same list of 12,667
+3. **Each legal move:** every move on the menu answers the same list of 12,673
    move questions about itself.
 
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
@@ -114,9 +114,9 @@ The largest zone families:
 | Family | Columns | Asks, for one zone |
 | --- | ---: | --- |
 | `unit_stat` | 13,321 | how many units of an alliance and type have a condition: damaged, moved, moves left, ... |
-| `battle_data_unit`, `battle_data_zone` | 8,201 | what a battle's notes say about unit types and zones |
+| `battle_data_unit`, `battle_data_zone` | 8,365 | what a battle's notes say about unit types and zones |
 | `unit_reference_here` | 4,501 | how many units, by alliance and type, point at this zone, and why: a blitz destination, an assault target, a route, ... |
-| `battle_data_word` | 3,672 | which words a battle's notes hold, such as its next step or its situation |
+| `battle_data_word` | 3,706 | which words a battle's notes hold, such as its next step or its situation |
 | `unit_flag` | 2,000 | how many units carry each mark, such as "landed after combat" |
 | `facility_flag` | 1,792 | marks on a facility here |
 | `unit_facility` | 1,601 | units inside a facility, by type and facility type |
@@ -167,7 +167,7 @@ nation_present:<nation> = 1     one answer per nation in the game
 
 ### Every move has the same format
 
-Every legal move answers the same fixed list of 12,667 move questions. So every
+Every legal move answers the same fixed list of 12,673 move questions. So every
 move is a row of the same length, almost all zeros, and only its non-zero answers
 are stored. A move fills in only the questions that apply to it: the fighter
 attacking Hunan fills in 17, the airbase purchase 10.
@@ -670,9 +670,11 @@ Facts that never change come with the layout, not with each position:
 - the 160 directed borders, with 22 facts each, such as rivers, narrow crossings,
   railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-a44069d0dfe2c7c0`, is a hash of every
+The layout version, now `campaign-zone-v1-1d3c25d19abf2937`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
-and a run cannot resume across a layout change.
+and a run cannot resume across a layout change. It last changed on 4 November
+2026, for a patrol plane's own choice in a sea battle
+([record](../stage_a/patrol_choice_2026_11_04.md)).
 
 ## 10. Why the encoder translates names
 
@@ -690,7 +692,7 @@ questions built straight from the engine's memory: 49 to 64 times smaller and 5
 to 6 times faster to build ([record](../stage_a/zone_encoding_2026_11_02.md)). It
 left the engine's names as they were and translates them instead.
 
-Reading a move's named details also lets one piece of code describe all 142
+Reading a move's named details also lets one piece of code describe all 144
 kinds of move, and kinds added later. Without it, every kind of move would need
 its own encoder code, kept in step with its rule by hand.
 

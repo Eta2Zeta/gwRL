@@ -296,6 +296,18 @@ bool engageable(const State &s, const Id &n, const Id &z,
       return true;
   return false;
 }
+// The units a battle with these ships fights in this zone: the blockers,
+// without a patrol plane that let them pass (RCL-017). One that fought them
+// for a single round as they entered is among them and chooses again whether
+// to fight (RCL-020).
+std::vector<Id> fightingBlockers(const State &s, const Id &n, const Id &z,
+                                 const std::vector<Id> &ships) {
+  auto out = blockers(s, n, z);
+  std::erase_if(out, [&](const Id &unit) {
+    return patrolLetPass(s, s.units.at(unit), ships);
+  });
+  return out;
+}
 bool passage(const State &s, const UnitState &u, const Id &from, const Id &to,
              bool strategic) {
   const auto *e = mapEdge(s, from, to);
@@ -456,7 +468,20 @@ void reaction(State &s, BattleState &b, const std::vector<Id> &candidates,
   put(b, "reaction_context", V(context));
   std::vector<Action> options{
       action(s, n, "naval_reaction_engage", {{"plan", V(b.id)}})};
-  if (text(b, "entry_compelled") != n || text(b, "entry_zone") != b.zone)
+  // RB 9.3.1 and 9.4: patrol planes may not let surface ships pass while the
+  // Attacker has aircraft with an attack value present. Aircraft on a carrier
+  // only act as if on patrol, by choice, and keep theirs.
+  const auto r = readRequest(b.data.require("request"));
+  const bool surface = std::any_of(r.units.begin(), r.units.end(), [&](const Id &id) {
+    return s.units.contains(id) && has(s, s.units.at(id), "surface_ship");
+  });
+  const bool held =
+      context == "movement_map" && surface &&
+      std::all_of(own.begin(), own.end(), [&](const Id &id) {
+        return onMaritimeAirPatrol(s, s.units.at(id));
+      }) &&
+      attackAircraftPresent(s, b.attacker, b.zone);
+  if ((text(b, "entry_compelled") != n || text(b, "entry_zone") != b.zone) && !held)
     options.push_back(
         action(s, n, "naval_reaction_decline", {{"plan", V(b.id)}}));
   decision(s, b, n, "naval_movement_reaction", std::move(options));
@@ -564,7 +589,8 @@ void encounter(State &s, const Id &id) {
       screenChoice(s, b);
       return;
     }
-    beginBattleFromPlan(s, id, r.units, opposing, "standard");
+    beginBattleFromPlan(s, id, r.units, fightingBlockers(s, n, b.zone, r.units),
+                        "standard");
     return;
   }
   continueRoute(s, id);
@@ -1624,7 +1650,8 @@ bool applyNavalMovementAction(State &s, const Action &a) {
       auto continuing = r.units;
       for (const auto &unit : selected)
         std::erase(continuing, unit);
-      beginBattleFromPlan(s, plan, selected, blockers(s, b.attacker, b.zone),
+      beginBattleFromPlan(s, plan, selected,
+                          fightingBlockers(s, b.attacker, b.zone, selected),
                           "screening", continuing);
     } else {
       const auto unit = p.require("unit").asString();
@@ -1745,7 +1772,17 @@ void continueNavalMovement(State &s, const Id &id) {
                         ? readIds(data.at("continuing"))
                         : r.units;
   continuing = live(s, continuing);
-  const auto remaining = blockers(s, b.attacker, b.zone);
+  // RB 9.4.2: screening wins when every Enemy surface warship and aircraft is
+  // gone, except aircraft on MAP that declined combat: those that stayed out
+  // of this battle, and those outside it that let these ships pass.
+  auto remaining = blockers(s, b.attacker, b.zone);
+  const auto *stayedOut = b.data.find("naval_patrol_declined");
+  std::erase_if(remaining, [&](const Id &unit) {
+    if (stayedOut && stayedOut->find(unit))
+      return true;
+    return std::find(b.defenders.begin(), b.defenders.end(), unit) == b.defenders.end() &&
+           patrolLetPass(s, s.units.at(unit), continuing);
+  });
   erasePlan(s, id);
   if (continuing.empty())
     return;

@@ -305,6 +305,105 @@ void patrolRefusalSettlesCombat() {
   check(offered("naval_reaction_engage", [](const Action &) { return true; }),
         "The patrol had no choice against ships entering later");
 }
+// RB 9.3.1 and 9.4: a patrol plane may let ships pass only while the Attacker
+// has no aircraft with an attack value present; a strategic bomber has none.
+void patrolPlaneCannotLetShipsPassUnderAttackingAircraft() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  s.territories.at("land_korea").possessor = "kmt";
+  add(s, "patrol", "fighter", p15, "kmt");
+  s.units.at("patrol").gameFlags["on_map"] = 1;
+  s.units.at("patrol").gameFlags["map_range"] = 1;
+  s.units.at("patrol").commitments.insert("maritime_air_patrol");
+  add(s, "dd", "destroyer", p16);
+  const auto reaction = [](State state, const Id &aircraft) {
+    if (!aircraft.empty()) {
+      add(state, "above", aircraft, p15);
+      state.units.at("above").turnFlags["air_in_flight"] = 1;
+      state.units.at("above").movementRemaining = 2;
+    }
+    state.captureTurnStart();
+    Engine e(state, rules());
+    move(e, "dd", {p16, p15});
+    std::set<Id> out;
+    for (const auto &a : e.legalActions())
+      out.insert(a.kind);
+    return out;
+  };
+  const std::set<Id> both{"naval_reaction_engage", "naval_reaction_decline"};
+  check(reaction(s, "") == both && reaction(s, "strategic_bomber") == both,
+        "A patrol plane could not let ships without attacking aircraft pass");
+  check(reaction(s, "tactical_bomber") == std::set<Id>{"naval_reaction_engage"},
+        "A patrol plane let ships pass beside aircraft that can attack it");
+}
+// RCL-017 and RCL-020 in a screening battle: a patrol plane that let the
+// fleet pass is not in it; one that fought its single round is, chooses
+// again, and once it stays out the screen can win and the rest sail on.
+void patrolPlaneInAScreeningBattle() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  s.territories.at(shantung).possessor = "kmt";
+  add(s, "patrol", "fighter", p14, "kmt");
+  s.units.at("patrol").gameFlags["on_map"] = 1;
+  s.units.at("patrol").gameFlags["map_range"] = 1;
+  s.units.at("patrol").commitments.insert("maritime_air_patrol");
+  add(s, "kd", "destroyer", p14, "kmt");
+  add(s, "s1", "destroyer", p15);
+  add(s, "s2", "destroyer", p15);
+  s.captureTurnStart();
+  const auto screen = [&](const Id &reaction, const std::vector<int> &dice) {
+    auto e = std::make_unique<Engine>(s, rules());
+    e->setDiceTapeForTesting(dice);
+    choose(*e, "naval_start_move", [](const Action &a) { return a.parameters.require("unit").asString() == "s1"; });
+    choose(*e, "naval_force_add", [](const Action &a) { return a.parameters.require("unit").asString() == "s2"; });
+    choose(*e, "naval_route", [](const Action &a) {
+      return canonicalJson(a.parameters.require("request").require("path")) ==
+             canonicalJson(V(V::Array{V(p15), V(p14), V(p32)}));
+    });
+    choose(*e, reaction);
+    for (int i = 0; i < 20 && e->state().decisions.empty(); ++i) {
+      if (e->state().chance)
+        e->resolveChance();
+      else
+        e->step(e->legalActions().front());
+    }
+    choose(*e, "naval_screen_add", [](const Action &a) { return a.parameters.require("unit").asString() == "s1"; });
+    choose(*e, "naval_screen_confirm");
+    return e;
+  };
+  const auto defenders = [](const Engine &e) {
+    for (const auto &[id, b] : e.state().battles)
+      if (b.flags.contains("naval_battle"))
+        return std::set<Id>(b.defenders.begin(), b.defenders.end());
+    return std::set<Id>{};
+  };
+  check(defenders(*screen("naval_reaction_decline", {})) == std::set<Id>{"kd"},
+        "A patrol plane that let the fleet pass was put into its screening battle");
+  // The single round misses; in Combat the screen sinks the destroyer while
+  // the patrol plane stays out.
+  auto e = screen("naval_reaction_engage", {12, 12, 12, 1, 12});
+  check(defenders(*e) == std::set<Id>{"kd", "patrol"},
+        "A patrol plane that fought its single round was left out of the screening battle");
+  choose(*e, "end_phase");
+  choose(*e, "naval_begin_battle");
+  choose(*e, "naval_patrol_decline");
+  const auto fighting = [&] {
+    return std::any_of(e->state().battles.begin(), e->state().battles.end(),
+                       [](const auto &entry) { return entry.second.flags.contains("naval_battle"); });
+  };
+  for (int i = 0; i < 30 && fighting(); ++i) {
+    if (e->state().chance)
+      e->resolveChance();
+    else
+      e->step(e->legalActions().front());
+  }
+  check(!e->state().units.contains("kd") && e->state().units.contains("patrol") &&
+            e->state().units.at("s2").zone == p14 && !e->state().decisions.empty() &&
+            e->state().decisions.back().kind == "naval_screening_continuation",
+        "The screen lost, or the patrol plane was lost, though the plane stayed out");
+}
 void unevolvedChinaKeepsToChineseWaters() {
   // RB 14.3.1: until it evolves, KMT sails only in sea zones next to Chinese
   // Home Country, here P14, P32 and P41; P33 touches only Okinawa and P15
@@ -916,6 +1015,9 @@ int main() {
              {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
              {"unevolved China keeps to Chinese waters", unevolvedChinaKeepsToChineseWaters},
              {"patrol refusal settles combat", patrolRefusalSettlesCombat},
+             {"patrol held by attacking aircraft",
+              patrolPlaneCannotLetShipsPassUnderAttackingAircraft},
+             {"patrol plane in a screening battle", patrolPlaneInAScreeningBattle},
              {"naval blockers", strategicAndNoncombatBlockers},
              {"carrier independent flight", carrierMovementGivesNoAircraftRide},
              {"zero-cost port exit", portExitCostsZero},

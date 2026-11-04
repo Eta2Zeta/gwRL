@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <stdexcept>
 
 namespace {
@@ -171,6 +172,58 @@ void scrambledCarrierTakesItsAircraft(){
     registerNavalBattle(s,sea,"japan",{"a"},{{"a",from}});Engine e(s,rules());choose(e,"naval_begin_battle");choose(e,"naval_scramble","carrier");
     check(e.state().units.at("carrier").zone==sea&&e.state().units.at("plane").zone==sea,"Scrambled Carrier left its aircraft in port");
 }
+// RB 9.3.1 and 9.4 (RCL-020): a patrol plane is not a carrier's aircraft. It
+// chooses first, before any scramble; staying out costs it nothing and leaves
+// no battle to scramble into; and it may not stay out when aircraft that can
+// attack it are present.
+void patrolPlaneChoosesBeforeScrambles(){
+    const auto setup=[](bool armed,bool escort){
+        auto s=fixture();s.territories.at(tokyo).possessor="kmt";
+        FacilityState port;port.id="scramble_port";port.type="major_port";port.zone=tokyo;port.flags["border:"+sea]=1;s.facilities[port.id]=port;
+        add(s,"a","destroyer","japan");add(s,"patrol","fighter","kmt");add(s,"scramble","destroyer","kmt",tokyo);
+        auto& p=s.units.at("patrol");p.gameFlags["on_map"]=1;p.gameFlags["map_range"]=1;p.commitments.insert("maritime_air_patrol");
+        s.units.at("scramble").gameFlags["in_port:scramble_port"]=1;
+        std::vector<Id> attackers{"a"};
+        if(armed){add(s,"f","fighter","japan");attackers.push_back("f");}
+        if(escort)add(s,"d","destroyer","kmt");
+        s.captureTurnStart();std::map<Id,Id> origins;for(const auto& id:attackers)origins[id]=from;
+        const auto id=registerNavalBattle(s,sea,"japan",attackers,origins);return std::make_pair(s,id);
+    };
+    const auto kinds=[](Engine& e){std::set<Id> out;for(const auto& a:e.legalActions())out.insert(a.kind);return out;};
+    {
+        auto [s,id]=setup(false,false);Engine e(s,rules());const auto checkpoint=e.serialize();choose(e,"naval_begin_battle");
+        check(kinds(e)==std::set<Id>{"naval_patrol_engage","naval_patrol_decline"},"The patrol plane was not asked first, before any scramble");
+        choose(e,"naval_patrol_decline");
+        check(e.state().battles.at(id).flags.contains("finished")&&!e.state().chance&&e.state().units.at("scramble").zone==tokyo,
+              "A battle went on, or a ship scrambled, after its only defender stayed out");
+        finish(e);
+        check(e.state().units.contains("patrol")&&e.state().units.at("patrol").gameFlags.contains("on_map"),
+              "A patrol plane that stayed out was lost or ended its patrol");
+        check(e.state().units.at("a").turnFlags.contains("map_declined_combat")&&!e.state().units.at("a").turnFlags.contains("naval_combat_turn"),
+              "Staying out did not let the ship pass, or counted it as fighting");
+        auto replayed=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
+        check(replayed.exactReplayIdentity()==e.exactReplayIdentity(),"Patrol plane choice replay diverged");
+    }
+    {
+        auto [s,id]=setup(false,false);Engine e(s,rules());choose(e,"naval_begin_battle");choose(e,"naval_patrol_engage");
+        check(e.state().decisions.back().kind=="naval_scramble"&&e.state().units.at("patrol").commitments.contains("air_battle:"+id),
+              "The port's ships were not asked to scramble once the patrol plane fought");
+    }
+    {
+        auto [s,id]=setup(true,false);Engine e(s,rules());choose(e,"naval_begin_battle");
+        check(!kinds(e).contains("naval_patrol_decline")&&e.state().decisions.back().kind=="naval_scramble"&&
+              e.state().units.at("patrol").commitments.contains("air_battle:"+id),
+              "A patrol plane stayed out of a fight with aircraft that can attack it");
+    }
+    {
+        auto [s,id]=setup(false,true);Engine e(s,rules());e.setDiceTapeForTesting({1,12});choose(e,"naval_begin_battle");
+        choose(e,"naval_patrol_decline");
+        check(e.state().decisions.back().kind=="naval_scramble","A defending destroyer beside the patrol plane got no scramble support");
+        choose(e,"naval_decline_scramble","scramble");finish(e);
+        check(!e.state().units.contains("d")&&e.state().units.contains("patrol"),
+              "A patrol plane that stayed out was lost with the battle, or its destroyer survived");
+    }
+}
 void seaplaneAswBonusTargetsSubmarines(){
     auto s=fixture();add(s,"a","seaplane","japan");add(s,"d","submarine","kmt");s.nations.at("japan").technologyStages["anti_submarine_warfare"]=4;
     s.units.at("a").gameFlags["on_map"]=1;s.units.at("a").gameFlags["map_range"]=2;const auto base=s.definition->catalog->stats("seaplane",0,catalogContext(s,"japan",sea)).attack.value();battle(s,{"a"});
@@ -186,8 +239,8 @@ int main(){try{
         {"port AA", portAttackStillGetsFacilityAaAfterShipLoss}, {"movement reaction", oneRoundMovementEncounterExcludesParkedFleet},
         {"raider",raiderDiscoveryTiesAndSlipStayInSea}, {"joint defense",jointDefenseDisputeUsesEntitledPlayers},
         {"ship scramble",shipScrambleAndSkeletonCrewExclusion}, {"carrier scramble cargo",scrambledCarrierTakesItsAircraft},
-        {"seaplane ASW",seaplaneAswBonusTargetsSubmarines}
+        {"seaplane ASW",seaplaneAswBonusTargetsSubmarines}, {"patrol plane choice",patrolPlaneChoosesBeforeScrambles}
     };
     for (const auto& [name, test] : checks) { std::cerr << "checking " << name << '\n'; test(); }
-    std::cout<<"18 naval combat fixture groups passed\n";return 0;
+    std::cout<<"19 naval combat fixture groups passed\n";return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

@@ -272,6 +272,23 @@
       "reference_url": "../clarifications.md#rcl-019-one-railroad-per-border-damaged-and-repaired-by-side",
       "reference_label": "Rule register",
       "authority_detail": "The user confirmed the per-side damage and repair on 3 November 2026; on 4 November 2026 the user confirmed 2 damage per side in difficult terrain and adopted one railroad per border as an equivalence ruling: bombing damages every railroad on a border together (RB 10.6.2), and repairing both sides at their maximum costs the building price."
+    },
+    {
+      "id": "RCL-020",
+      "category": "project",
+      "title": "A patrol plane attacked in its own sea zone",
+      "body": "Project ruling: when ships already in its sea zone attack a patrol plane, it chooses by the patrol rule, not the carrier rule. It may stay out unless the Attacker has aircraft with an attack value present, and staying out costs it nothing. It chooses before any scramble: if it stays out and nothing else of its side defends, there is no battle and nothing to scramble into. A plane that stays out lets those ships pass for the rest of the turn. Nothing scrambles into the single round it fights against entering units during Combat Movement.",
+      "section_ids": [
+        "rb-9-3-1",
+        "rb-10-4",
+        "rb-10-7"
+      ],
+      "date": "2026-11-04",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-020-a-patrol-plane-attacked-in-its-own-sea-zone",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted this on 4 November 2026. The rulebook gives a patrol plane's choice only for ships entering its zone, and the naval combat sequence puts scrambles before the choice of aircraft on carriers; the engine had given patrol planes that carrier choice."
     }
   ]
 }

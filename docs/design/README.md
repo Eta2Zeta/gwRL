@@ -233,11 +233,11 @@ For every position the search asks about, the engine's encoder
 (`src/zone_encoding.cpp`) turns the position into one bundle of numbers with three
 parts:
 
-1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 42,520
+1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 42,737
    zone questions, such as "how many CCP cavalry are here?".
-2. **The position as a whole:** 6,634 questions, such as the round, the phase,
+2. **The position as a whole:** 6,637 questions, such as the round, the phase,
    whose turn it is, treasuries and wars.
-3. **Each legal move:** 12,667 questions, such as which kind of move it is, which
+3. **Each legal move:** 12,673 questions, such as which kind of move it is, which
    unit it moves and which zones it names.
 
 Answers are whole numbers, and only the non-zero ones are stored. Each move is
@@ -271,11 +271,11 @@ width. For that decision:
 ```text
 the input                    learned table          vectors of 64 numbers
 board: 326 answers,     ->   zone table,       ->   37 zone vectors
-  filed by zone                42,520 rows
+  filed by zone                42,737 rows
 position: 119 answers   ->   position table,   ->   1 position vector
-                               6,634 rows
+                               6,637 rows
 moves: 244 answers,     ->   move table,       ->   13 move vectors
-  filed by move                12,667 rows
+  filed by move                12,673 rows
 
 then:
   2 message layers   every zone vector is updated from its neighbours' vectors,
@@ -289,9 +289,9 @@ then:
 ```
 
 **Learned rows.** A network is a large set of numbers that training adjusts
-(section 6), its *parameters*: 4,089,928 of them at 64×2. Almost all, 97%, sit in
-three tables that hold one row of 64 numbers for every question: 42,520 rows for
-the zone questions, 6,634 for the position's and 12,667 for the moves'. A
+(section 6), its *parameters*: 4,104,392 of them at 64×2. Almost all, 97%, sit in
+three tables that hold one row of 64 numbers for every question: 42,737 rows for
+the zone questions, 6,637 for the position's and 12,673 for the moves'. A
 question's row is what an answer to that question adds to a vector: the
 network's own description, in 64 numbers, of "a CCP cavalry is here" or "the CCP
 possesses this zone". No number in a row has a meaning chosen by hand. Training
@@ -302,9 +302,9 @@ by a learned table of numbers and adds a learned vector; most then bend the
 result with a fixed curve (GELU). Without the curves, any stack of layers would
 amount to a single multiplication and could only add effects up.
 
-**A zone's vector is a sum of rows.** Shensi answers 12 of the 42,520 zone
+**A zone's vector is a sum of rows.** Shensi answers 12 of the 42,737 zone
 questions in that decision ([listed here](network_input.md#3-questions-and-answers));
-its other 42,508 answers are zero. Each answered question picks out its own row
+its other 42,725 answers are zero. Each answered question picks out its own row
 from the zone table, multiplied by a weight that grows with the answer a,
 sign(a) × log(1 + |a|): an answer of 1 counts 0.69, 2 counts 1.10 and 10 counts
 2.40, so larger counts matter more but not in proportion. Shensi's vector starts
@@ -341,13 +341,13 @@ line per zone and one column per question, almost all zeros:
                     ccp         cavalry     beiping_hopeh       china_shensi
 land_china_shensi   1           1           0                   0
 land_china_hopeh    0           0           1                   1
-... 35 more zones, 42,520 columns in all
+... 35 more zones, 42,737 columns in all
 ```
 
 That is why questions are also called columns. Multiplying each zone's whole line
-of 42,520 weighted answers by the zone table, as a textbook network layer would,
+of 42,737 weighted answers by the zone table, as a textbook network layer would,
 gives the same 37 sums (checked on Shensi, up to float rounding), but for
-Shensi alone it would multiply 42,508 zeros. So the network fetches only the rows
+Shensi alone it would multiply 42,725 zeros. So the network fetches only the rows
 of the answered columns, a *column lookup*, and adds them up: 689 rows for this
 decision, 326 + 119 + 244.
 
@@ -417,9 +417,9 @@ reached adds nothing, instead of a random row added at full strength. On fixed
 data this gave a slightly lower held-out value error (0.0076 against 0.0081) and
 the same policy loss: no harm shown, not a strength gain.
 
-**Most of a network is rows:** 3.96 M of the 4.09 M parameters at 64×2 (97%), and
-15.83 M of 20.24 M at 256×8 (78%), whose wider layers weigh more. A decision reads
-only the rows of its answers: 689 of 61,821 in that example.
+**Most of a network is rows:** 3.97 M of the 4.10 M parameters at 64×2 (97%), and
+15.88 M of 20.30 M at 256×8 (78%), whose wider layers weigh more. A decision reads
+only the rows of its answers: 689 of 62,047 in that example.
 
 Measurements of this network are in the
 [zone network record](../stage_a/zone_network_2026_11_02.md).

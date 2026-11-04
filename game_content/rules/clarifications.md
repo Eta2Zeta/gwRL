@@ -60,6 +60,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Adopted: no; its refusal settles combat with those ships for the turn |
 | RCL-018 | Amphibious assault whose sea zone is not cleared, or whose transports retreat | Adopted: the assault is called off; the cargo stays aboard |
 | RCL-019 | Several railroads on one border; the damage limit and repair of each side | Adopted: one railroad per border; each side holds its own damage and is repaired by its possessor |
+| RCL-020 | A patrol plane attacked in its own sea zone: the carrier choice or the patrol choice, before or after scrambles | Adopted: the patrol choice, made before any scramble; staying out costs nothing |
 
 ## Pilot discussion review
 
@@ -399,6 +400,64 @@ such a border takes up to 2 damage on each side.
 `rail_land_manchuria_northern__land_manchuria_western`. In random-play seed 7004
 it has 1 damage on the Manchuria Northern side, and Japan, possessing Manchuria
 Northern, repairs that side for 1 IPP.
+
+## RCL-020: A patrol plane attacked in its own sea zone
+
+**Status: adopted by the user, 4 November 2026.**
+
+**Sources:** RB §0.3 p9 (zone sharing); §9.3.1 pp55-56; §9.4 p57; §9.4.2 p58;
+§10.1 pp61-62; §10.4 pp63-64 (scrambling); §10.7 p70 (naval combat sequence).
+
+**Question:** ships already in a patrol plane's sea zone, such as ships that
+started the turn there or survived its single round as they entered, may
+attack it: the attack is declared in Combat Movement (§0.3) and fought in the
+Combat Phase. The rulebook describes the plane's choice to fight only for ships
+entering its zone. In this battle, does the plane choose as a patrol plane or
+as an aircraft on a carrier (§10.7, step 2), and before or after its side
+scrambles units into the battle (§10.4)?
+
+**The engine before this ruling** gave the plane the carrier choice, after the
+scrambles. Ships in port could scramble in, the plane could then stay out, and
+a plane that stayed out was destroyed when its side lost, as a lone plane
+always did. It offered that choice even against aircraft that could attack it.
+
+**Adopted ruling:**
+
+- The plane chooses by the patrol rule (§§9.3.1 and 9.4), not the carrier rule.
+  It may stay out unless the Attacker has aircraft with an attack value
+  present, and staying out costs it nothing: it stays in its sea zone, on
+  patrol. Aircraft on carriers keep the choice of §10.7, step 2.
+- It chooses before any scramble. If it stays out and no other unit of its side
+  defends, there is no battle and nothing to scramble into, since §10.4 sends
+  units into combat where their side has a defending unit. If other units
+  defend, the battle goes on without the plane, and units may scramble to join
+  them.
+- A plane that stays out lets those ships pass for the rest of the turn, as in
+  RCL-017. It does not count against their screening (§9.4.2) or their
+  amphibious assault (§10.8.1).
+- Nothing scrambles into the single round a patrol plane fights against
+  entering units during Combat Movement, where other units may not take part
+  except paired destroyers (§9.3.1). The engine already worked this way.
+- A plane that fought that single round may fight the same ships again in the
+  Combat Phase, since §10.1 exempts single rounds at sea from its one-battle
+  limit, and it chooses again by the same rule.
+
+**Authority:** the user in chat on 4 November 2026: "of course we need to fix
+the MAP and the aircraft on a carrier difference, they are not the same", and
+for the order, "the MAP plane can choose to fight again, or not. Only then the
+ships can scramble into this [sea zone] because this is combat phase."
+
+**Related fix, from the rulebook alone:** when ships enter a patrol plane's sea
+zone, the plane may let them pass only if the Attacker has no aircraft with an
+attack value present (§9.4). The engine had offered the choice regardless.
+
+**Example:** a KMT fighter patrols P14, where a Japanese destroyer has been since
+before Japan's turn, and a KMT destroyer is in port at Shantung. Japan's
+destroyer attacks the fighter. Before this ruling, KMT was first asked whether
+to scramble the Shantung destroyer, and the fighter, if it stayed out, was
+destroyed when Japan won. Now the fighter is asked first. If it stays out, there
+is no battle and nothing is lost; if it fights, the Shantung destroyer may
+scramble to join it.
 
 ## Maintenance
 

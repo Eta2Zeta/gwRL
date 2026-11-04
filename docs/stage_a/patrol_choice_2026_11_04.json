@@ -1,0 +1,91 @@
+{
+ "date": "2026-11-04",
+ "ruling": "RCL-020",
+ "layout": {
+  "before": "campaign-zone-v1-a44069d0dfe2c7c0",
+  "after": "campaign-zone-v1-1d3c25d19abf2937"
+ },
+ "columns": {
+  "before": {
+   "zone": 42520,
+   "position": 6634,
+   "move": 12667
+  },
+  "after": {
+   "zone": 42737,
+   "position": 6637,
+   "move": 12673
+  },
+  "added_zone": {
+   "battle notes naval_patrol_choices and naval_patrol_declined: 2 x 91": 182,
+   "battle stage naval_patrol_choices: battle_stage 1, battle_data_word 34": 35
+  },
+  "added_position": {
+   "decision naval_patrol_participation: decision, decision_below, scheduled_decision": 3
+  },
+  "added_move": {
+   "kinds naval_patrol_engage and naval_patrol_decline": 2,
+   "battle stage naval_patrol_choices: 4 roles": 4
+  }
+ },
+ "parameters": {
+  "64x2": {
+   "before": 4089928,
+   "after": 4104392
+  },
+  "256x8": {
+   "before": 20239624,
+   "after": 20297480
+  }
+ },
+ "new_names": {
+  "moves": [
+   "naval_patrol_engage",
+   "naval_patrol_decline"
+  ],
+  "decisions": [
+   "naval_patrol_participation"
+  ],
+  "battle_stages": [
+   "naval_patrol_choices"
+  ],
+  "battle_notes": [
+   "naval_patrol_choices",
+   "naval_patrol_declined"
+  ]
+ },
+ "checks": {
+  "cpp_suites": {
+   "passed": 26,
+   "failed": 0
+  },
+  "python_suite": {
+   "tests": 455,
+   "skipped": 3,
+   "result": "OK"
+  },
+  "mutations_caught": 7,
+  "random_play_fuzz": {
+   "first_seed": 9000,
+   "games": 800,
+   "completed": 800,
+   "problems": 0
+  },
+  "zone_names": {
+   "first_seed": 7000,
+   "games": 240,
+   "finished": 240,
+   "decisions": 372917,
+   "unknown": {}
+  },
+  "same_240_games": {
+   "patrol_choice_menus": 13,
+   "games_with_patrol_choice": 11,
+   "naval_patrol_decline": 6,
+   "naval_patrol_engage": 7,
+   "entry_reaction_menus": 78,
+   "entry_reaction_menus_without_decline": 0,
+   "deck_or_ground_choice_menus": 442
+  }
+ }
+}

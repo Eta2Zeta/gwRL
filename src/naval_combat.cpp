@@ -437,6 +437,78 @@ void prepareSubmarines(State& s, BattleState& b) {
             s.units.at(id).commitments.insert("naval_combat");
     b.stage = "naval_first_strike"; advance(s, b);
 }
+// The units still in the battle once the patrol planes have chosen take part
+// in naval combat this turn; a lone defending raider fights one round.
+void openBattle(State& s, BattleState& b) {
+    const auto out = object(b, "naval_patrol_declined");
+    const int serial = static_cast<int>(s.clock.playerTurnSerial + 1);
+    for (const auto& unit : b.attackers)
+        if (s.units.contains(unit)) s.units.at(unit).turnFlags["naval_combat_turn"] = serial;
+    std::vector<Id> defending;
+    for (const auto& unit : b.defenders)
+        if (s.units.contains(unit) && !out.contains(unit)) {
+            s.units.at(unit).turnFlags["naval_combat_turn"] = serial;
+            defending.push_back(unit);
+        }
+    if (defending.size() == 1 && s.units.at(defending.front()).type == "battlecruiser" &&
+        marked(s.units.at(defending.front()).gameFlags, "raider")) put(b, "one_round", V(true));
+    b.stage = "naval_raider_discovery"; advance(s, b);
+}
+void joinPatrol(State& s, BattleState& b, const Id& id) {
+    auto done = object(b, "naval_patrol_choices"); done[id] = V(true); put(b, "naval_patrol_choices", V(done));
+    auto& u = s.units.at(id);
+    u.turnFlags["air_battle_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
+    u.commitments.insert("air_battle:" + b.id);
+}
+// The plane stays in its sea zone, unharmed and still on patrol, and lets the
+// ships pass for the rest of the turn, as when it declines them on entry
+// (RCL-017): a screening force's whole fleet, or the attacking ships.
+void stayOut(State& s, BattleState& b, const Id& id) {
+    auto done = object(b, "naval_patrol_choices"); done[id] = V(true); put(b, "naval_patrol_choices", V(done));
+    auto out = object(b, "naval_patrol_declined"); out[id] = V(true); put(b, "naval_patrol_declined", V(out));
+    auto excluded = object(b, "naval_excluded"); excluded[id] = V(true); put(b, "naval_excluded", V(excluded));
+    auto ships = b.attackers;
+    if (const auto* movement = b.data.find("naval_movement"))
+        ships = readIds(movement->require("request").require("units"));
+    for (const auto& ship : ships)
+        if (s.units.contains(ship) && has(s, s.units.at(ship), "naval") && s.units.at(ship).zone == b.zone)
+            s.units.at(ship).turnFlags["map_declined_combat"] = 1;
+}
+// RB 9.3.1 and 9.4: an aircraft on Maritime Air Patrol, unlike one aboard a
+// carrier (RB 10.7, step 2), may stay out of combat with ships unless the
+// Attacker has aircraft with an attack value present, and staying out costs it
+// nothing. Each decides first, before any scramble (user ruling RCL-020), so a
+// battle that every defender stays out of ends at once with nothing to
+// scramble into (RB 10.4). A plane fighting its single round against entering
+// units (movement_map) chose when they entered.
+void preparePatrols(State& s, BattleState& b) {
+    const auto context = string(b, "context", "standard");
+    if (context != "movement_map" && context != "port_attack") {
+        const bool armed = attackAircraftPresent(s, b.attacker, b.zone);
+        const auto done = object(b, "naval_patrol_choices");
+        const int serial = static_cast<int>(s.clock.playerTurnSerial + 1);
+        for (const auto& id : b.defenders) {
+            if (!s.units.contains(id) || done.contains(id) || !onMaritimeAirPatrol(s, s.units.at(id))) continue;
+            const auto& u = s.units.at(id);
+            // RB 10.1: one battle a turn, apart from single rounds at sea.
+            const auto fought = u.turnFlags.find("air_battle_turn");
+            if (fought != u.turnFlags.end() && fought->second == serial && !u.commitments.contains("air_battle:" + b.id))
+                stayOut(s, b, id);
+            else if (armed)
+                joinPatrol(s, b, id);
+            else {
+                decision(s, b, u.owner, "naval_patrol_participation", {
+                    action(s, u.owner, "naval_patrol_engage", {{"battle", V(b.id)}, {"unit", V(id)}}),
+                    action(s, u.owner, "naval_patrol_decline", {{"battle", V(b.id)}, {"unit", V(id)}})});
+                return;
+            }
+        }
+    }
+    if (!object(b, "naval_patrol_declined").empty() && living(s, b, false).empty()) {
+        finishBattle(s, b, "attacker_wins"); return;
+    }
+    openBattle(s, b);
+}
 void prepareRaiders(State& s, BattleState& b) {
     if (string(b, "context") != "port_attack" && string(b, "context") != "movement_submarines" && string(b, "context") != "movement_map")
         for (const auto& id : b.defenders)
@@ -485,6 +557,7 @@ void prepareShipScrambles(State& s, BattleState& b) {
 void advance(State& s, BattleState& b) {
     if (s.chance || !s.decisions.empty() || marked(b.flags, "finished")) return;
     if (!array(b, "naval_carrier_landing_queue").empty()) { queueCarrierLandings(s, b); return; }
+    if (b.stage == "naval_patrol_choices") { preparePatrols(s, b); return; }
     if (b.stage == "naval_raider_discovery") { prepareRaiders(s, b); return; }
     if (b.stage == "naval_scrambling") { prepareShipScrambles(s, b); return; }
     if (b.stage == "naval_air_defence") {
@@ -633,13 +706,7 @@ void beginNavalBattle(State& s, const Id& id) {
         s.nations.at("japan").turnFlags["surprise_attack_used"] = 1;
         if (string(b, "context") != "port_attack") s.nations.at("japan").turnFlags["surprise_attack_naval_sea:" + b.zone] = 1;
     }
-    for (const auto& unit : b.attackers)
-        if (s.units.contains(unit)) s.units.at(unit).turnFlags["naval_combat_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
-    for (const auto& unit : b.defenders)
-        if (s.units.contains(unit)) s.units.at(unit).turnFlags["naval_combat_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
-    if (b.defenders.size() == 1 && s.units.at(b.defenders.front()).type == "battlecruiser" &&
-        marked(s.units.at(b.defenders.front()).gameFlags, "raider")) put(b, "one_round", V(true));
-    b.stage = "naval_raider_discovery"; advance(s, b);
+    b.stage = "naval_patrol_choices"; advance(s, b);
 }
 std::vector<Action> navalCombatActions(const State& s) {
     if (s.chance || !s.decisions.empty()) return {};
@@ -705,6 +772,11 @@ bool applyNavalCombatAction(State& s, const Action& a) {
         for (const auto& id : eligibleHit(s, b, hit)) nations[politicalPlayer(s, s.units.at(id).owner)] = s.units.at(id).owner;
         A list; for (const auto& [player, nation] : nations) list.emplace_back(nation);
         put(b, "naval_disputing_nations", V(list)); roll(s, b, "naval_casualty_dispute", static_cast<int>(list.size())); return true;
+    }
+    if (a.kind == "naval_patrol_engage" || a.kind == "naval_patrol_decline") {
+        release(s, a); const auto unit = a.parameters.require("unit").asString();
+        if (a.kind == "naval_patrol_engage") joinPatrol(s, b, unit); else stayOut(s, b, unit);
+        advance(s, b); return true;
     }
     if (a.kind == "naval_sub_decline" || a.kind == "naval_sub_protected" || a.kind == "naval_sub_unprotected") {
         release(s, a); const auto unit = a.parameters.require("unit").asString();

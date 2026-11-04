@@ -124,7 +124,7 @@
       "test_suites": [
         "naval_movement"
       ],
-      "clarification": "RCL-017 adopted: a patrol plane that lets ships pass stays out of combat with them for the rest of the turn and does not stop their amphibious assaults"
+      "clarification": "RCL-017 adopted: a patrol plane that lets ships pass stays out of combat with them for the rest of the turn and does not stop their amphibious assaults. RCL-020 adopted: attacked by ships already in its zone, it chooses by the patrol rule before any scramble, and staying out costs it nothing"
     },
     {
       "id": "raider_slip_and_discovery",
@@ -208,7 +208,8 @@
       "test_suites": [
         "naval_combat",
         "naval_operations"
-      ]
+      ],
+      "clarification": "RCL-020 adopted: a patrol plane attacked in its sea zone chooses before ships scramble; if it stays out and nothing else of its side defends, there is no battle to scramble into"
     },
     {
       "id": "port_attacks",
@@ -352,6 +353,14 @@
       "ruling": "An amphibious assault whose sea zone still holds Enemy surface ships or aircraft after its naval combat, for example ships scrambled into it, is called off, and its land units stay aboard their transports for the rest of the turn. A transport that retreats takes its cargo out of the assault, which goes ahead with any cargo still in the cleared sea zone.",
       "authority": "User ruling in chat, 2026-11-03: \"Yes, adopt it\", to the proposal that an assault from an uncleared sea is called off with the infantry staying aboard.",
       "authority_detail": "RB 10.8.1 requires those units to be eliminated first and lets defenders scramble, but does not say what happens when they survive. Found as a self-play dead end on the night of 2 November 2026 (seed 4238465544019468396), where the engine could neither start nor drop the assault."
+    },
+    {
+      "id": "RCL-020",
+      "status": "adopted",
+      "date": "2026-11-04",
+      "ruling": "A patrol plane attacked by ships already in its sea zone chooses whether to fight by the patrol rule, not the carrier rule: it may stay out unless the Attacker has aircraft with an attack value present, and staying out costs it nothing. It chooses before any scramble, so if it stays out and no other unit of its side defends there is no battle and nothing to scramble into. Staying out lets those ships pass for the rest of the turn, as in RCL-017.",
+      "authority": "User ruling in chat, 2026-11-04: \"of course we need to fix the MAP and the aircraft on a carrier difference, they are not the same\", with the order \"the MAP plane can choose to fight again, or not. Only then the ships can scramble into this [sea zone] because this is combat phase.\"",
+      "authority_detail": "RB 9.3.1 and 9.4 give the patrol plane's choice only for ships entering its zone; RB 10.7 step 2 gives aircraft on carriers a choice after scrambles, and a carrier aircraft kept on deck is lost with the battle. The engine had applied the carrier rule to patrol planes since its first version. Found while checking RCL-017 on 4 November 2026."
     }
   ]
 }

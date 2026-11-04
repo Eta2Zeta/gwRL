@@ -7,6 +7,14 @@ struct FlightResult {
     int cost{0};
 };
 bool isAircraft(const State &, const UnitState &);
+// An aircraft flying a Maritime Air Patrol (RB 9.3.1). An aircraft aboard a
+// carrier is not one: in a sea battle it keeps the deck choice of RB 10.7,
+// step 2, and is lost with the battle if it stays on deck.
+bool onMaritimeAirPatrol(const State &, const UnitState &);
+// Whether this nation has an aircraft with an attack value in the zone,
+// carried or not. A patrol plane may decline combat with its ships only when
+// it has none (RB 9.3.1 and 9.4).
+bool attackAircraftPresent(const State &, const Id &nation, const Id &zone);
 FlightResult validateFlight(const State &, const Id &unit, const std::vector<Id> &path, bool combat,
                             bool attackDestination = false);
 std::vector<Id> airLandingSpots(const State &, const Id &unit);

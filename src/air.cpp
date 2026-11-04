@@ -371,7 +371,9 @@ void continueDefence(State &s, BattleState &b) {
     for (const auto &id : b.defenders)
         if (s.units.contains(id) && isAircraft(s, s.units.at(id)) && !done.contains("ground:" + id)) {
             const auto &u = s.units.at(id);
-            if (marked(u.turnFlags, "scrambled"))
+            // A patrol plane is neither on a deck nor on the ground: it chose
+            // whether to fight before any scramble (preparePatrols, RCL-020).
+            if (marked(u.turnFlags, "scrambled") || onMaritimeAirPatrol(s, u))
                 continue;
             if (used(s, u) && !u.commitments.contains("air_battle:" + b.id)) {
                 if (u.zone == b.zone) {
@@ -649,6 +651,18 @@ std::vector<Id> targets(const State &s, const Id &zone, const Id &kind) {
 
 bool isAircraft(const State &s, const UnitState &u) {
     return has(s, u, "aircraft");
+}
+bool onMaritimeAirPatrol(const State &s, const UnitState &u) {
+    return isAircraft(s, u) && !u.carriedBy &&
+           (marked(u.gameFlags, "on_map") || marked(u.turnFlags, "on_map") ||
+            u.commitments.contains("maritime_air_patrol"));
+}
+bool attackAircraftPresent(const State &s, const Id &nation, const Id &zone) {
+    return std::any_of(s.units.begin(), s.units.end(), [&](const auto &entry) {
+        const auto &u = entry.second;
+        return u.owner == nation && u.zone == zone && isAircraft(s, u) &&
+               catalogStats(s, u.type, u.damage, u.owner, u.zone).attack.has_value();
+    });
 }
 FlightResult validateFlight(const State &s, const Id &id, const std::vector<Id> &path, bool combat,
                             bool attackDestination) {
