@@ -1,0 +1,138 @@
+{
+ "date": "2026-11-04",
+ "rule": "RCL-019 in game_content/rules/clarifications.md",
+ "layout": {
+  "before": "campaign-zone-v1-edcfe0583896a5da",
+  "after": "campaign-zone-v1-40973ed0dcbeb890"
+ },
+ "columns": {
+  "before": {
+   "zone": 35407,
+   "position": 6621,
+   "move": 12114
+  },
+  "after": {
+   "zone": 35439,
+   "position": 6621,
+   "move": 12381
+  },
+  "added": {
+   "rail_repair_toward (zone, land zones and ~impossible)": 32,
+   "rail_zone (move, 4 roles x 31 land zones and ~impossible)": 125,
+   "rail_damage (move, 4 roles x 31 land zones and ~impossible)": 125,
+   "label damage (parameter, value x 11, number, true, false, null, list_length)": 17
+  }
+ },
+ "network_parameters_millions": {
+  "64x2": {
+   "before": 3.6,
+   "after": 3.62
+  },
+  "256x8": {
+   "before": 18.27,
+   "after": 18.35
+  }
+ },
+ "random_check": {
+  "script": "encode every decision of random eleven-round games; count names that fall into an other column",
+  "seeds": [
+   7000,
+   7239
+  ],
+  "calendar_rounds": 11,
+  "policy": "uniform random, ending a phase early with probability 0.02, 0.05 or 0.10 by seed",
+  "before": {
+   "date": "2026-11-03",
+   "games": 240,
+   "terminal": 240,
+   "decisions": 372935,
+   "unknown": {
+    "parameter:damage": 691,
+    "battle_data:reaction_context": 91,
+    "battle_data:reaction_units": 91,
+    "repair_target:land_china_beiping": 80,
+    "battle_data:map_attack": 61,
+    "enum_value:economy_rail_8": 55,
+    "battle_data:naval_submarine_choices": 39,
+    "enum_value:economy_rail_69": 36,
+    "enum_value:rail_land_china_hopeh__land_china_shensi": 26,
+    "battle_data:naval_excluded": 24,
+    "enum_value:rail_land_china_beiping__land_manchuria_rehe": 24,
+    "battle_data:naval_discovering_raider": 21,
+    "enum_value:rail_land_china_hunan__land_china_nanking": 20,
+    "battle_data:naval_carrier_landing_queue": 19,
+    "enum_value:rail_land_china_beiping__land_china_hopeh": 18,
+    "battle_data:naval_raider_choices": 17,
+    "enum_value:rail_land_china_hunan__land_china_shantung": 16,
+    "enum_value:rail_land_china_nanking__land_china_shantung": 15,
+    "enum_value:rail_land_china_hunan__land_kwangtung": 15,
+    "enum_value:rail_land_manchuria_northern__land_manchuria_western": 14,
+    "battle_data:kind": 11,
+    "battle_data:naval_pairing_done": 10,
+    "enum_value:rail_land_china_beiping__land_china_suiyuan": 10,
+    "battle_data:air_hit_queue": 8,
+    "battle_data:naval_protected_submarines": 8,
+    "battle_data:air_pending_dead": 6,
+    "battle_data:airborne_drop_ready": 4,
+    "battle_data:naval_destroyer_pairs": 3,
+    "enum_value:rail_land_manchuria_eastern__land_manchuria_western": 3,
+    "battle_data:air_interception_choices": 3,
+    "enum_value:local": 1
+   }
+  },
+  "after": {
+   "date": "2026-11-04",
+   "games": 240,
+   "terminal": 240,
+   "decisions": 373049,
+   "unknown": {
+    "enum_value:improved_construction_discount": 1195,
+    "enum_value:improved_construction_combine": 452,
+    "battle_data:reaction_context": 93,
+    "battle_data:reaction_units": 93,
+    "repair_target:land_china_beiping": 80,
+    "battle_data:map_attack": 61,
+    "battle_data:naval_submarine_choices": 43,
+    "battle_data:naval_excluded": 24,
+    "battle_data:naval_discovering_raider": 21,
+    "battle_data:naval_carrier_landing_queue": 19,
+    "battle_data:naval_raider_choices": 17,
+    "battle_data:kind": 11,
+    "battle_data:naval_pairing_done": 10,
+    "battle_data:naval_protected_submarines": 8,
+    "battle_data:air_hit_queue": 7,
+    "battle_data:air_pending_dead": 5,
+    "battle_data:airborne_drop_ready": 4,
+    "battle_data:naval_destroyer_pairs": 3,
+    "battle_data:air_interception_choices": 3,
+    "enum_value:local": 1
+   },
+   "improved_construction_prices": {
+    "games": 1,
+    "seed": 7078,
+    "occurrences": 1647,
+    "note": "the only game of the 240 in which a nation (Japan) completed Improved Construction"
+   }
+  }
+ },
+ "encoding_time_ms": {
+  "games": "random eleven-round seeds 31, 32 and 33",
+  "decisions": 4786,
+  "before": {
+   "date": "2026-11-03",
+   "mean": 0.166
+  },
+  "after": {
+   "date": "2026-11-04",
+   "median": 0.149,
+   "mean": 0.164,
+   "p95": 0.283
+  }
+ },
+ "tests": [
+  "economy_tests: oneRailroadPerBorder",
+  "zone_encoding_tests: a railroad repair names its border",
+  "campaign_state_tests: railroad named otherwise, railroad repair without a side",
+  "ctest: 26 of 26 suites pass"
+ ]
+}

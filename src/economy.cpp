@@ -853,10 +853,13 @@ bool applyEconomyAction(State &s, const Action &a) {
         } else if (facilityType(s, p.type)) {
             const auto zone = *p.site;
             if (p.type == "railroad") {
+                // One railroad per border (RCL-019); siteLegal refuses a second.
+                const auto border = *marker(p.flags, "border:");
                 RailState rail;
-                rail.id = unique(s, "rail");
-                rail.endpointA = zone;
-                rail.endpointB = *marker(p.flags, "border:");
+                rail.id = railroadId(zone, border);
+                rail.endpointA = std::min(zone, border);
+                rail.endpointB = std::max(zone, border);
+                require(!s.rails.contains(rail.id), "Border already has a railroad");
                 rail.damageByEndpoint[rail.endpointA] = rail.damageByEndpoint[rail.endpointB] = 0;
                 s.flags["logistics_rail_created_turn:" + rail.id] = serial(s);
                 s.rails.emplace(rail.id, std::move(rail));

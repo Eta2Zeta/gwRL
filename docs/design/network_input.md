@@ -46,10 +46,10 @@ in the 2 November profile: about 4%, a rough estimate.
 The input for one decision is one bundle with three parts:
 
 1. **The board:** each of the 37 zones (31 land and 6 sea) answers the same list
-   of 35,407 zone questions.
+   of 35,439 zone questions.
 2. **The position as a whole:** 6,621 questions about the round, the phase,
    whose turn it is, treasuries, wars and so on.
-3. **Each legal move:** every move on the menu answers the same list of 12,114
+3. **Each legal move:** every move on the menu answers the same list of 12,381
    move questions about itself.
 
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
@@ -120,16 +120,19 @@ The largest zone families:
 | `units` | 586 | how many units of each nation and type are here |
 | `carried` | 277 | carried units, by carrier type and cargo type |
 | `possessor`, `capital_of` | 27 | who holds the zone, whose capital it is |
-| `rail_to`, `rail_damage_toward` | 74 | railroads to each neighbour, and their damage |
+| `rail_to`, `rail_damage_toward`, `rail_repair_toward` | 106 | railroads to each neighbour, the damage on this side, and repairs under way |
 
 **Units are counted, not named.** The engine gives every unit a unique name.
 Units on the board from the start are named like `setup_japan_sea_p15_destroyer_2`:
 on the board from the start, owned by Japan, started in sea zone P15, a
 destroyer, the second of its kind there. Things created during play get counter
-names: `economy_unit_112` is a unit bought during the game, and `economy_rail_8`
-a railroad built during the game. The network never reads these names. It sees
-counts and conditions, such as "one Japanese destroyer here, undamaged, already
-moved".
+names, such as `economy_unit_112` for a unit bought during the game. Railroads
+are the exception: a border holds at most one, so each is named by the two zones
+it joins, such as `rail_land_china_hopeh__land_china_shensi`, whether it was on
+the map from the start or built during play
+([RCL-019](../../game_content/rules/clarifications.md#rcl-019-one-railroad-per-border-damaged-and-repaired-by-side)).
+The network never reads these names. It sees counts and conditions, such as "one
+Japanese destroyer here, undamaged, already moved".
 
 **Battle notes.** While a battle is being fought, the engine keeps notes on it:
 the round, the defenders, where the attackers came from and so on. They become
@@ -158,7 +161,7 @@ nation_present:<nation> = 1     one answer per nation in the game
 
 ### Every move has the same format
 
-Every legal move answers the same fixed list of 12,114 move questions. So every
+Every legal move answers the same fixed list of 12,381 move questions. So every
 move is a row of the same length, almost all zeros, and only its non-zero answers
 are stored. A move fills in only the questions that apply to it: the fighter
 attacking Hunan fills in 17, the airbase purchase 10.
@@ -213,8 +216,9 @@ Every move first says who chooses and what kind of move it is, for example
 detail with this label exists, such as `parameter:range = 1`, and then the
 detail's value. How it records the value depends on what the value is.
 
-All the examples below are details of real legal moves from a random game (seed
-7001; the railroad repair is from seed 7004).
+All the examples below are details of real legal moves from random games: seed
+7001, except the railroad repair (seed 7004) and the interception (seen once in
+240 random games).
 
 **Plain values:**
 
@@ -237,11 +241,12 @@ never reaches the network.
 | A facility's name | The transport entering port: `facility = facility_land_formosa_major_port` | `facility:0_source:major_port = 1` |
 | A battle's name | The CCP starts its battle in Hopeh: `battle = land_battle_2` | `battle_stage:0_source:awaiting_combat_rules = 1`, `battle_attacker:0_source:ccp = 1`, `battle_defender:0_source:warlord_beiping_hopeh = 1`, `battle_units:0_source:cavalry = 1`, `battle_units:0_source:militia = 1`, `battle_place:0_source:land_china_shensi = 2` (the battle's notes name Shensi twice) |
 | A construction project's name | Japan pays the next instalment on a fleet carrier it is building: `project = japan_queue_fleet_carrier` | `project:0_source:fleet_carrier = 1`, `project_owner:0_source:japan = 1`, `project_stat:0_source:paid_ipp = 5` (5 IPP paid), `project_stat:0_source:payments_left = 2`, `project_stat:0_source:remaining_payments = 10` (two payments, 10 IPP, to go), `project_stat:0_source:queue_position = 3`, `project_stat:0_source:count = 1` |
+| A railroad's name | Japan repairs the railroad between Manchuria Northern and Manchuria Western ([example 2](#example-2-a-railroad-repair)): `target = rail_land_manchuria_northern__land_manchuria_western` | `rail_zone:2_target:land_manchuria_northern = 1` and `rail_zone:2_target:land_manchuria_western = 1` (the two zones it joins), `rail_damage:2_target:land_manchuria_northern = 1` (1 damage on the Manchuria Northern side) |
 | A build-chart row | The airbase purchase: `row = japan_major_airbase` | `row:japan_major_airbase = 1` |
 | A nation's name | The KMT declares war on Japan: `target = japan` | `nation_named:2_target:japan = 1` |
 | A technology | Japan starts research at its Tokyo factory: `technology = advanced_artillery` | `technology:advanced_artillery = 1` |
 | Any other name, on the list of known values | The airbase purchase, at the printed price: `price = printed` | `value:price:printed = 1` |
-| Any other name, not on the list | The railroad repair ([example 2](#example-2-a-railroad-repair)): `target = rail_land_manchuria_northern__land_manchuria_western` | `value:target:other = 1` |
+| Any other name, not on the list | A fighter already in a bombed zone intercepts, rather than flying in from an airbase: `source = local` | `value:source:other = 1` |
 
 The `0_source`, `1_path` and `2_target` parts of these names are roles, explained
 below.
@@ -361,7 +366,7 @@ the words on the left of a move's details, not families:
 | --- | --- |
 | artillery, battle, facility, factory, origin_facility, plan, project, row, source, transport, unit, units | `0_source` |
 | path | `1_path` |
-| beneficiary, border, border2, declaring_nation, destination, destination_facility, neighbor, recipient, sea, target, technology, zone, zones | `2_target` |
+| beneficiary, border, border2, declaring_nation, destination, destination_facility, endpoint, neighbor, recipient, sea, target, technology, zone, zones | `2_target` |
 | any label not in the table | `3_other` |
 
 Some labels that name units are missing from the table. When a Japanese air
@@ -369,8 +374,7 @@ transport loads a mountain infantry (`air_load`, game seed 7006), the infantry i
 named by `cargo = setup_japan_land_manchuria_northern_mountain_infantry_1`.
 `cargo` is not in the table, so the infantry's answers read
 `unit:3_other:japan:mountain_infantry = 1`, `unit_stat:3_other:count = 1` and so
-on. `towed` (a unit towed along a move) and `endpoint` (the railroad repair below)
-are other such labels.
+on. `towed` (a unit towed along a move) is another such label.
 
 **A route's last zone is a path zone.** The fighter attacking Hunan has no
 detail labelled `target`. The engine writes its whole route as one detail,
@@ -408,10 +412,10 @@ The role changes three things:
    "how it travels" from the `1_path` details and path zones, and "what it acts on"
    from the `2_target` details. `3_other` details belong to no stage.
 
-The encoder keeps two separate lists of labels. The list of known labels (92 of
-them) decides questions like `parameter:endpoint`. The role table (26 labels)
+The encoder keeps two separate lists of labels. The list of known labels (93 of
+them) decides questions like `parameter:cargo`. The role table (27 labels)
 decides roles. A label can be on the first and missing from the second, as
-`endpoint` is.
+`cargo` is.
 
 ### Example 1: a cavalry attack
 
@@ -457,8 +461,8 @@ damage on the railroad between Manchuria Northern and Manchuria Western, on the
 Manchuria Northern side of the border.
 
 - Railroads sit on the borders between land zones, at most one per border. The
-  starting map has one on each border with a railway, and the engine refuses to
-  build one where one exists.
+  starting map has one on each border with a railway. Building one is not
+  offered where one stands, damaged or not, or is being built.
 - Bombing a zone's railroads damages the railroad on one chosen border of that
   zone, on the bombed zone's side (rulebook 10.6.2). Each side holds its own
   damage, up to the border terrain's limit: 1 in normal terrain, 2 in desert,
@@ -467,13 +471,18 @@ Manchuria Northern side of the border.
 - The nation that holds the zone on a damaged side may repair that side, at 1 IPP
   per point. It pays in the Production Phase, and the repair is done in the Place
   Units Phase if it still holds the zone.
-- The rulebook does not say who repairs a railroad or whether the limit applies
-  to each side. On 3 November 2026 the user confirmed the engine's reading: one
-  railroad per border, damage on each side, and each nation repairs the side it
-  holds for 1 IPP per point. That confirmation spoke of 1 damage per side, the
-  normal-terrain case; on difficult borders the engine allows 2 per side.
+- The rulebook leaves some of this open. The user settled it on 3 and 4 November
+  2026, as rule
+  [RCL-019](../../game_content/rules/clarifications.md#rcl-019-one-railroad-per-border-damaged-and-repaired-by-side):
+  one railroad per border, because a second would give nothing that a repair
+  does not, and damage and repair by side. The user's statement gave the
+  normal-terrain numbers; on difficult borders the engine allows 2 per side by
+  the same rule.
 
-The engine calls each side of the border an `endpoint`. The move's details mean:
+Because a border holds one railroad, a railroad is named by the two zones it
+joins, in alphabetical order:
+`rail_land_manchuria_northern__land_manchuria_western`. The engine calls each
+side of the border an `endpoint`. The move's details mean:
 
 - `target`: the railroad;
 - `endpoint`: the side being repaired;
@@ -485,47 +494,42 @@ The engine calls each side of the border an `endpoint`. The move's details mean:
 | --- | ---: | --- |
 | `schedule:play`, `player:axis`, `nation:japan` | 1 each | an ordinary move, the Axis player choosing for Japan |
 | `kind:economy_repair` | 1 | a repair |
-| `parameter:target` | 1 | it has a detail labelled `target` |
-| `parameter:endpoint` | 1 | and one labelled `endpoint` |
-| `parameter:other` | 1 | and one whose label, `damage`, is not on the list of known labels |
-| `zone:3_other:land_manchuria_northern` | 1 | it mentions Manchuria Northern, in a way the encoder cannot classify |
-| `value:target:other` | 1 | its target is a name the encoder does not recognise |
-| `number:other` | 1 | a number, 1, under an unrecognised label |
+| `parameter:damage`, `parameter:endpoint`, `parameter:target` | 1 each | it has these three details |
+| `zone:2_target:land_manchuria_northern` | 1 | it acts on Manchuria Northern, the side being repaired |
+| `rail_zone:2_target:land_manchuria_northern` | 1 | the railroad it acts on joins Manchuria Northern ... |
+| `rail_zone:2_target:land_manchuria_western` | 1 | ... and Manchuria Western |
+| `rail_damage:2_target:land_manchuria_northern` | 1 | that railroad has 1 damage on the Manchuria Northern side; the other side has none, so it has no answer |
+| `number:damage` | 1 | it repairs 1 point |
 
-**Line by line:**
+**Detail by detail:**
 
-- `zone:3_other:land_manchuria_northern = 1` reads "does this move mention
-  Manchuria Northern, in a way the encoder can't classify? Yes." The value
-  `land_manchuria_northern` is a zone, so the encoder records the zone and a role.
-  The role comes from the label, `endpoint`, which is not in the role table, so
-  it gets the leftover role `3_other`.
-- `value:target:other = 1`: the railroad's name is not a unit, zone, facility or
-  any other known thing, and no railroad name is on the list of known values. So
-  it is filed as an unknown value, and which railroad the move repairs is lost.
-- `number:other = 1`: every number in a move is filed under its label, so the
-  amount should arrive as `number:damage = 1`. Because `damage` is not a known
-  label, it is filed under `other`. The amount still arrives, under a heading that
-  does not say what it is. Today only repair moves have an unknown numeric label,
-  so in practice it means damage; any other would mix in.
+- `endpoint = land_manchuria_northern` is a zone, and `endpoint` is a `2_target`
+  label, so it becomes `zone:2_target:land_manchuria_northern`.
+- `target = rail_land_...` names a railroad. The encoder looks the railroad up
+  in the game state and writes the two zones it joins (`rail_zone`) and the
+  damage on each side (`rail_damage`), with the role of `target`, `2_target`.
+  The name itself never reaches the network, so a railroad built during play is
+  described the same way as one on the starting map.
+- `damage = 1` is a number under a known label: `number:damage = 1`.
 
-**What this costs the network:**
+**Links and stages.** The encoder reads a move's details in alphabetical order of
+their labels, so `endpoint` comes before `target`, and the first `2_target` zone
+is the side being repaired. The move is linked to Manchuria Northern as the zone
+it acts on, and the network reads that zone's board answers with it, including
+`rail_damage_toward:land_manchuria_western = 1`. All its zones are `2_target`,
+so repairs of different railroads, or of different sides, fall into different
+"what it acts on" groups. Repairs of the same side that differ only in how many
+points they mend are told apart at the last stage.
 
-- **Which railroad is lost.** Two damaged railroads that meet at Manchuria
-  Northern would give two repair moves with exactly the same answers, and the
-  network could not prefer one.
-- **A different question for the same situation.** A city repair names its city
-  under the label `target`, which is in the role table, so its zone gets
-  `2_target`. Both moves mean "repair damage in this zone", but the network sees
-  different questions, so what it learns about one carries over less to the
-  other.
-- **The zone link survives.** A move with no `0_source` zone starts from its first
-  `3_other` zone, so this repair is still linked to Manchuria Northern's board
-  answers. But the zone joins no probability stage: all rail repairs fall into
-  the same groups, whatever their zone, until the last stage tells them apart.
+**On the board.** Once bought, the repair is under way until the Place Units
+Phase. Manchuria Northern's board row then also says
+`repair:japan:rail:count = 1`, `repair:japan:rail:remaining_damage = 1` and
+`rail_repair_toward:land_manchuria_western = 1`: Japan is repairing 1 point on
+its side of the railroad toward Manchuria Western.
 
-If the encoder handled railroads properly, this move would describe the railroad
-by its two end zones as targets, give `endpoint` the role `2_target` and say
-`number:damage = 1`.
+Until 4 November 2026 this move reached the network as `value:target:other`, with
+the zone's role unknown and the amount as an unknown number, so which railroad
+it repaired was lost ([record](../stage_a/rail_repair_encoding_2026_11_04.md)).
 
 ## 7. Names the encoder doesn't know
 
@@ -567,34 +571,37 @@ MISSING  naval_pairing_done = {setup_japan_sea_p15_destroyer_2: true}
   note mentions a destroyer". All 16 missing battle notes share those same "other"
   questions.
 
-### The 31 missing names
+### The 20 missing names
 
-Found on 3 November 2026 by encoding every decision of 240 random eleven-round
-games (372,935 decisions). The counts are times seen in those games.
+Found by encoding every decision of 240 random eleven-round games (seeds 7000 to
+7239, 373,049 decisions, 4 November 2026; [record](../stage_a/rail_repair_encoding_2026_11_04.md)).
+The counts are times seen in those games.
 
 | Group | Names (times seen) | What the network loses |
 | --- | --- | --- |
-| 16 battle notes, in the board part | `reaction_units` and `reaction_context` (91 each): ships that may react to an enemy fleet passing through, and the situation; `map_attack` (61): the battle is a patrol plane's attack; `naval_submarine_choices` (39): submarines' choices to stay submerged; `naval_excluded` (24): units left out of the battle; `naval_discovering_raider` (21) and `naval_raider_choices` (17): raider discovery and raiders' choices; `naval_carrier_landing_queue` (19): aircraft waiting to land on a carrier; `kind` (11): the kind of raid or movement battle; `naval_pairing_done` (10) and `naval_destroyer_pairs` (3): destroyers teaming with patrol planes; `naval_protected_submarines` (8); `air_hit_queue` (8): air hits not yet assigned; `air_pending_dead` (6): aircraft hit but not yet removed; `airborne_drop_ready` (4); `air_interception_choices` (3) | These details all look like one "other note" during naval and air battles |
-| 12 railroad names, in moves | `economy_rail_8` (55), `economy_rail_69` (36), `rail_land_china_hopeh__land_china_shensi` (26), `rail_land_china_beiping__land_manchuria_rehe` (24), `rail_land_china_hunan__land_china_nanking` (20), `rail_land_china_beiping__land_china_hopeh` (18), `rail_land_china_hunan__land_china_shantung` (16), `rail_land_china_nanking__land_china_shantung` (15), `rail_land_china_hunan__land_kwangtung` (15), `rail_land_manchuria_northern__land_manchuria_western` (14), `rail_land_china_beiping__land_china_suiyuan` (10), `rail_land_manchuria_eastern__land_manchuria_western` (3) | Which railroad a repair move repairs (example 2 above) |
-| The label `damage`, in moves | 691 | The repair amount arrives as an unknown number |
+| 16 battle notes, in the board part | `reaction_units` and `reaction_context` (93 each): ships that may react to an enemy fleet passing through, and the situation; `map_attack` (61): the battle is a patrol plane's attack; `naval_submarine_choices` (43): submarines' choices to stay submerged; `naval_excluded` (24): units left out of the battle; `naval_discovering_raider` (21) and `naval_raider_choices` (17): raider discovery and raiders' choices; `naval_carrier_landing_queue` (19): aircraft waiting to land on a carrier; `kind` (11): the kind of raid or movement battle; `naval_pairing_done` (10) and `naval_destroyer_pairs` (3): destroyers teaming with patrol planes; `naval_protected_submarines` (8); `air_hit_queue` (7): air hits not yet assigned; `air_pending_dead` (5): aircraft hit but not yet removed; `airborne_drop_ready` (4); `air_interception_choices` (3) | These details all look like one "other note" during naval and air battles |
+| Two price methods, in moves | `improved_construction_discount` (1,195) and `improved_construction_combine` (452): buying a ship or facility for 1 IPP less per payment, or in one payment fewer, once a nation has Improved Construction. Seen in one game, seed 7078, the only one where a nation completed it | Both arrive as `value:price:other`, so buying the same ship at the discount or in fewer payments gives two moves with identical answers |
 | A city as a repair target, in the board part | `land_china_beiping` (80): the CCP repairing bomb damage to Beiping | The encoder expects a repair's target to be a unit, facility or railroad, so it skips a city repair entirely: the network cannot see that one is under way |
 | The value `local`, in moves | 1: intercepting with the fighters already in the zone rather than from a named airbase | Little: those moves still differ in other details |
 
-These are rare, a few hundred occurrences against 372,935 decisions, but in the
-decisions they touch the network misses things it should see.
+These are rare, a few thousand occurrences against 373,049 decisions, but in the
+decisions they touch the network misses things it should see. The first run, on
+3 November, found 31: the same names except the two price methods, which its
+games never reached, plus 12 railroad names and the label `damage`. Since
+4 November a railroad is described by its border
+([example 2](#example-2-a-railroad-repair)).
 
 ### Why they were missed, and what a fix involves
 
-The battle notes have been in the engine since 23 October; the encoder was written
-on 2 November, with its lists collected from the engine code and a few short
-games. Railroad names and city repairs are handled badly by design. The
-automatic completeness test plays one short game, which never reaches these
-situations, so only the large random check found them.
+The battle notes have been in the engine since 23 October and the price methods
+since its first commit; the encoder was written on 2 November, with its lists
+collected from the engine code and a few short games. City repairs are handled
+badly by design. The automatic completeness test plays one short game, which
+never reaches these situations, so only the large random check found them.
 
-A fix would add the 16 battle notes, `damage` and `local` to their lists, describe
-a railroad by its two end zones instead of its name (railroads built in play get
-new names, so they cannot be listed in advance), show a city repair at its zone,
-and make the test play several full games so that a future missing name fails it.
+A fix would add the 16 battle notes, the two price methods and `local` to their
+lists, show a city repair at its zone, and make the test play several full games
+so that a future missing name fails it.
 
 ## 8. Questions removed as impossible
 
@@ -602,7 +609,7 @@ On 3 November 2026 the layout dropped 24,974 questions, following the user's rul
 remove a question only when the rules of the whole game rule it out, judged per
 nation; a rare situation keeps its question.
 
-| Part | Before | After |
+| Part | Before | After (3 November) |
 | --- | ---: | ---: |
 | Board, per zone | 59,322 | 35,407 |
 | Position | 6,763 | 6,621 |
@@ -619,6 +626,9 @@ nation; a rare situation keeps its question.
   transports and strategic bombers the cargo their rules accept.
 - **Units in facilities.** Only ships and aircraft are ever inside a facility,
   and only naval facilities, which face the sea, have borders a unit can see.
+- **Railroads at sea.** Railroads join land zones only, so the railroad questions
+  added on 4 November (`rail_repair_toward`, `rail_zone`, `rail_damage`) have no
+  sea-zone versions.
 - **Kept on purpose:** the coastal defense ship, reserved for nobody and
   capturable; and "warlords never own ships or planes", which lend-lease and
   recruitment might break, so it could not be proved.
@@ -636,7 +646,7 @@ Facts that never change come with the layout, not with each position:
 - the 160 directed borders, with 22 facts each, such as rivers, narrow crossings,
   railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-edcfe0583896a5da`, is a hash of every
+The layout version, now `campaign-zone-v1-40973ed0dcbeb890`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change.
 
@@ -666,8 +676,8 @@ its own encoder code, kept in step with its rule by hand.
   and the name lookups are only part of encoding.
 - **Correctness: the real cost.** The engine and the encoder agree only through
   names. A rule can write a name the encoder's lists lack, and nothing fails: the
-  name falls into an "other" question and is only counted. That is how the 31
-  missing names arose.
+  name falls into an "other" question and is only counted. That is how the
+  missing names of [section 7](#7-names-the-encoder-doesnt-know) arose.
 
 **The alternatives:**
 

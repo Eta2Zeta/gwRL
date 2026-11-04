@@ -255,6 +255,22 @@
       "reference_url": "../clarifications.md#rcl-018-an-amphibious-assault-whose-sea-zone-is-not-cleared",
       "reference_label": "Rule register",
       "authority_detail": "The user adopted this on 3 November 2026. RB 10.8.1 requires those units to be eliminated first and lets defenders scramble, but does not say what happens when they survive; found as a self-play dead end on 2 November 2026."
+    },
+    {
+      "id": "RCL-019",
+      "category": "project",
+      "title": "One railroad per border, damaged and repaired by side",
+      "body": "Project ruling: a border has at most one railroad, so building one is not offered where a railroad, damaged or not, already exists or is under construction. Each side of the border holds its own damage up to the border terrain's maximum, a railroad damaged on either side cannot be used, and the nation possessing a damaged side's zone repairs that side at 1 IPP per point.",
+      "section_ids": [
+        "rb-13-2-8",
+        "rb-10-6-2"
+      ],
+      "date": "2026-11-04",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-019-one-railroad-per-border-damaged-and-repaired-by-side",
+      "reference_label": "Rule register",
+      "authority_detail": "The user confirmed the per-side damage and repair on 3 November 2026 and adopted one railroad per border on 4 November 2026 as an equivalence ruling: bombing damages every railroad on a border together (RB 10.6.2), and repairing both sides at their maximum costs the building price."
     }
   ]
 }

@@ -198,6 +198,74 @@ void identicalUnitsDifferOnlyByRank() {
             "The zone counts each movement state");
 }
 
+Action railRepairOf(const Id& rail, const Id& side) {
+    Action a;
+    a.id = "test_repair_" + rail + "_" + side;
+    a.kind = "economy_repair";
+    a.player = "axis";
+    a.nation = "japan";
+    a.parameters = V(O{{"target", V(rail)}, {"endpoint", V(side)}, {"damage", V(1.0)}});
+    return a;
+}
+
+int zoneNumber(const ZoneEncodingSpec& spec, const Id& zone) {
+    return static_cast<int>(std::find(spec.zones.begin(), spec.zones.end(), zone) - spec.zones.begin());
+}
+
+// A railroad repair names the railroad by its border: both zones as what the
+// repair acts on, the damage on each side, the side being repaired and the
+// amount. Two railroads that meet at one zone therefore stay apart.
+void railroadRepairNamesItsBorder() {
+    CampaignEnv env(scenario, 1, true);
+    auto s = env.engine().state().clone();
+    const Id northern = "land_manchuria_northern", western = "land_manchuria_western";
+    const auto id = railroadId(northern, western);
+    require(s.rails.contains(id), "Manchuria Northern and Western share a railroad");
+    const auto other = std::find_if(s.rails.begin(), s.rails.end(), [&](const auto& item) {
+        return item.first != id && (item.second.endpointA == western || item.second.endpointB == western);
+    });
+    require(other != s.rails.end(), "Manchuria Western has a second railroad");
+    s.rails.at(id).damageByEndpoint[northern] = 1;
+    s.rails.at(id).damageByEndpoint[western] = 1;
+    s.rails.at(other->first).damageByEndpoint[western] = 1;
+    const auto spec = zoneEncodingSpec(s);
+    const std::vector<Action> repairs{railRepairOf(id, western), railRepairOf(other->first, western)};
+    zoneEncodingUnknowns(true);
+    const auto z = encodeZoneInput(s, scheduleOf(env), optionsOf(repairs));
+    require(zoneEncodingUnknowns(true).empty(), "Every railroad repair detail has a column");
+    const auto answers = optionAnswers(*spec, z, 0);
+    for (const std::string expected :
+         {"kind:economy_repair=1", "parameter:target=1", "parameter:endpoint=1", "parameter:damage=1",
+          "zone:2_target:land_manchuria_western=1", "rail_zone:2_target:land_manchuria_northern=1",
+          "rail_zone:2_target:land_manchuria_western=1", "rail_damage:2_target:land_manchuria_northern=1",
+          "rail_damage:2_target:land_manchuria_western=1", "number:damage=1"})
+        require(answers.contains(expected), "Railroad repair answers " + expected);
+    require(std::none_of(answers.begin(), answers.end(),
+                         [](const std::string& x) {
+                             return x.rfind("value:", 0) == 0 || x.find(":3_other:") != std::string::npos ||
+                                    x.rfind("number:other", 0) == 0 || x.rfind("parameter:other", 0) == 0;
+                         }),
+            "Nothing in a railroad repair is filed as unknown");
+    require(z.actionTarget[0] == zoneNumber(*spec, western) && z.actionTarget[1] == zoneNumber(*spec, western),
+            "A railroad repair acts on the side being repaired");
+    require(z.factorGroups[4 * 0 + 3] != z.factorGroups[4 * 1 + 3],
+            "Repairs of two railroads at one zone differ in what they act on");
+
+    // A repair under way shows on the repaired side's row, toward the zone across.
+    RepairJob job;
+    job.id = "repair_" + id + "_" + western;
+    job.owner = "japan";
+    job.target = id;
+    job.remainingDamage = 1;
+    job.restrictsAction = false;
+    job.endpoint = western;
+    s.repairs.emplace(job.id, job);
+    const auto row = zoneAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}), western);
+    require(row.at("repair:japan:rail:count") == 1 && row.at("rail_repair_toward:land_manchuria_northern") == 1 &&
+                row.at("rail_damage_toward:land_manchuria_northern") == 1,
+            "The board shows which railroad is being repaired");
+}
+
 void unknownNamesAreCountedNotDropped() {
     CampaignEnv env(scenario, 1, true);
     auto s = env.engine().state().clone();
@@ -231,6 +299,7 @@ int main() {
                  {"opening reads as the board", openingReadsAsTheBoard},
                  {"random play stays well formed and deterministic", randomPlayStaysWellFormedAndDeterministic},
                  {"identical units differ only by rank", identicalUnitsDifferOnlyByRank},
+                 {"a railroad repair names its border", railroadRepairNamesItsBorder},
                  {"unknown names are counted, not dropped", unknownNamesAreCountedNotDropped},
                  {"scheduling state is part of the position", schedulingStateIsPartOfThePosition}}) {
             test();

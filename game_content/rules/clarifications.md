@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 3 November 2026.
+Updated: 4 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -59,6 +59,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-016 | KMT Low Morale 10+ with no legal retreat, such as after an amphibious assault | Adopted: the unit is eliminated |
 | RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Open: the engine currently allows a second chance |
 | RCL-018 | Amphibious assault whose sea zone is not cleared, or whose transports retreat | Adopted: the assault is called off; the cargo stays aboard |
+| RCL-019 | Several railroads on one border; the damage limit and repair of each side | Adopted: one railroad per border; each side holds its own damage and is repaired by its possessor |
 
 ## Pilot discussion review
 
@@ -349,6 +350,49 @@ P32, where only Japanese submarines were, and declared an assault on Formosa.
 In the naval battle in P32 Japan scrambled a light carrier and a destroyer from
 Formosa's port, and the transport retreated to P41. Before this ruling the
 engine could neither start nor drop the assault, and KMT had no legal move.
+
+## RCL-019: One railroad per border, damaged and repaired by side
+
+**Status: adopted by the user, 3 and 4 November 2026.**
+
+**Sources:** RB §13.2.8 pp98-99 (railroads: placement, price, maximum damage,
+repair cost); §10.6.2 p67 (strategic bombing of railroads); §1.6 p10.
+
+**Problem:** a railroad is placed on a land-zone border and takes at most 1
+damage in normal terrain or 2 in desert, jungle, marsh, mountain or tundra,
+repaired at 1 IPP per point. The rules do not say whether a second railroad may
+be built on a border that already has one; §10.6.2's "all railroads on that
+border" suggests several are possible. Nor do they say whether the maximum
+damage applies to each side of the border, or who repairs a damaged side.
+
+**Adopted ruling:**
+
+- A border has at most one railroad. Building a railroad is not offered on a
+  border that already has one, damaged or not, or that has one under
+  construction. A railroad is therefore named by the two land zones it connects.
+- Each side of the border holds its own damage, up to the border terrain's
+  maximum. A railroad with damage on either side cannot be used.
+- The nation possessing the zone on a damaged side may repair that side, at
+  1 IPP per point.
+
+**Why one railroad per border changes no outcome:** a second railroad on a
+border would give nothing that the first, repaired, does not. Bombing damages
+every railroad on the border together (§10.6.2), so a second one gives no
+protection, and repairing both sides at their maximum damage costs exactly the
+building price: 2 IPP in normal terrain, 4 in difficult terrain. The one
+difference is who pays: when the damaged side belongs to a friendly nation,
+repairing it is that nation's decision and cost, while a new railroad would be
+paid for by its builder. Building toward another nation needs that nation's
+permission anyway.
+
+The user's statement of 3 November gave the normal-terrain numbers: two damage,
+one on each side. The engine applies the difficult-terrain maximum to each side
+in the same way, so such a border takes up to 2 damage on each side.
+
+**Example:** the railroad between Manchuria Northern and Manchuria Western is
+`rail_land_manchuria_northern__land_manchuria_western`. In random-play seed 7004
+it has 1 damage on the Manchuria Northern side, and Japan, possessing Manchuria
+Northern, repairs that side for 1 IPP.
 
 ## Maintenance
 

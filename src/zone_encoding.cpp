@@ -169,7 +169,7 @@ const std::vector<std::string> kEnumValues{"blitz", "city", "construction", "fac
 const std::vector<std::string> kParameterKeys{
     "actor", "air_only", "air_priority", "aircraft", "armor", "artillery", "attacker", "attacking", "authority",
     "battle", "beneficiary", "bombarding", "border", "border2", "cargo", "carriers", "ccp_neighbor", "combat",
-    "companion", "context", "dadao_neighbor", "declaring_nation", "declined", "declined_rail_requests", "defenders",
+    "companion", "context", "dadao_neighbor", "damage", "declaring_nation", "declined", "declined_rail_requests", "defenders",
     "destination", "destination_facility", "eligible", "endpoint", "evacuated", "evacuation_selection_complete",
     "facility", "factory", "id", "in_port", "kind", "land_entry_origins", "land_only", "low_morale", "map_attack",
     "mode", "moved", "nation", "neighbor", "origin", "origin_facility", "origins", "owner", "path", "plan",
@@ -352,7 +352,7 @@ struct Context {
     int zPossessor, zStartPossessor, zChanged, zAligned, zTerritoryFlag, zCapitalOf, zDeclinedRail, zUnitNationType,
         zUnitStat, zUnitClassFlag, zUnitRef, zUnitAtFacility, zUnitFacilityBorder, zCarried, zNationHere, zFacility, zFacilityFlag, zFacilityBorder,
         zFacilityOriginalOwner, zFacilityOriginalType, zProject, zProjectStat, zProjectFlag, zProjectRow, zProjectBorder,
-        zRepair, zRail, zRailDamage, zBattle, zBattleStage, zBattleRound, zBattleAttacker, zBattleDefender, zBattleFlag,
+        zRepair, zRail, zRailDamage, zRailRepair, zBattle, zBattleStage, zBattleRound, zBattleAttacker, zBattleDefender, zBattleFlag,
         zBattleData, zBattleDataUnit, zBattleDataRank, zBattleDataZone, zBattleHits, zBattleOrder;
     // Global families.
     int gRound, gCompletedRounds, gRoundsLeft, gPhase, gTurnNation, gIncomeCollected, gTerminal, gPresent, gAlliance,
@@ -369,7 +369,7 @@ struct Context {
         aUnitLaterPeers, aUnitCarrier,
         aProjectStat, aProjectBorder, aProjectFlag, aFacilityBorder, aFacilityFlag, aFacilityDamage, aBattleAttacker, aBattleDefender, aBattleZone,
         aBattleUnits, aZone, aFacility,
-        aBattleStage, aProject, aProjectOwner, aRow, aNationRef, aTech, aEnum, aNumber, aTrue, aFalse, aNull,
+        aBattleStage, aProject, aProjectOwner, aRailZone, aRailDamage, aRow, aNationRef, aTech, aEnum, aNumber, aTrue, aFalse, aNull,
         aListLength;
 };
 
@@ -536,8 +536,8 @@ std::shared_ptr<const Context> buildContext(const State& s) {
         c->roleOfKey[key] = 0;
     c->roleOfKey["path"] = 1;
     for (const std::string key : {"beneficiary", "border", "border2", "declaring_nation", "destination",
-                                  "destination_facility", "neighbor", "recipient", "sea", "target", "technology",
-                                  "zone", "zones"})
+                                  "destination_facility", "endpoint", "neighbor", "recipient", "sea", "target",
+                                  "technology", "zone", "zones"})
         c->roleOfKey[key] = 2;
 
     // Cells the rules of the whole game rule out, whatever the scenario; a rare
@@ -660,6 +660,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->zRepair = z.add("repair", {&c->nations, &c->repairTargets, &c->repairStats});
     c->zRail = z.add("rail_to", {&c->zones});
     c->zRailDamage = z.add("rail_damage_toward", {&c->zones});
+    c->zRailRepair = z.add("rail_repair_toward", {&c->zones}, [&](const Cell& x) { return !sea[x[0]]; });
     c->zBattle = z.add("battle", {});
     c->zBattleStage = z.add("battle_stage", {&c->battleStages});
     c->zBattleRound = z.add("battle_round", {});
@@ -777,6 +778,8 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->aProject = a.add("project", {&c->roleGroups, &c->projectTypes},
                         [&](const Cell& x) { return projectOf(-1, x[1]); });
     c->aProjectOwner = a.add("project_owner", {&c->roleGroups, &c->nations});
+    c->aRailZone = a.add("rail_zone", {&c->roleGroups, &c->zones}, [&](const Cell& x) { return !sea[x[1]]; });
+    c->aRailDamage = a.add("rail_damage", {&c->roleGroups, &c->zones}, [&](const Cell& x) { return !sea[x[1]]; });
     c->aRow = a.add("row", {&c->rows});
     c->aNationRef = a.add("nation_named", {&c->roleGroups, &c->nations});
     c->aTech = a.add("technology", {&c->technologies});
@@ -1220,7 +1223,7 @@ void encodeProjects(const Context& c, const State& s, Builder& b) {
 
 void encodeRepairs(const Context& c, const State& s, Builder& b) {
     for (const auto& [id, r] : s.repairs) {
-        int zone = -1;
+        int zone = -1, toward = -1;
         std::string kind = "other";
         if (const auto u = s.units.find(r.target); u != s.units.end()) {
             zone = c.zones.find(u->second.zone);
@@ -1229,7 +1232,11 @@ void encodeRepairs(const Context& c, const State& s, Builder& b) {
             zone = c.zones.find(f->second.zone);
             kind = "facility";
         } else if (const auto rail = s.rails.find(r.target); rail != s.rails.end()) {
-            zone = c.zones.find(r.endpoint ? *r.endpoint : rail->second.endpointA);
+            // A railroad repair mends one side: it is filed at that side's zone,
+            // with the zone across the border.
+            const Id& side = r.endpoint ? *r.endpoint : rail->second.endpointA;
+            zone = c.zones.find(side);
+            toward = c.zones.find(side == rail->second.endpointA ? rail->second.endpointB : rail->second.endpointA);
             kind = "rail";
         }
         if (zone < 0) {
@@ -1242,6 +1249,7 @@ void encodeRepairs(const Context& c, const State& s, Builder& b) {
         b.zone(zone, c.zone.at(c.zRepair, {nation, target, c.repairStats.find("remaining_damage")}), r.remainingDamage);
         b.zone(zone, c.zone.at(c.zRepair, {nation, target, c.repairStats.find("remaining_cost")}), r.remainingCost);
         b.zone(zone, c.zone.at(c.zRepair, {nation, target, c.repairStats.find("restricts_action")}), r.restrictsAction);
+        if (toward >= 0) b.zone(zone, c.zone.at(c.zRailRepair, {toward}), r.remainingDamage);
     }
 }
 
@@ -1592,6 +1600,20 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
                 [&](int flag, long v) { b.option(c.action.at(c.aProjectFlag, {role, flag}), v, role); },
                 [&](int zone) { b.option(c.action.at(c.aProjectBorder, {role, zone}), 1, role); });
             if (project->second.site) b.zoneRef(role == 1 ? 3 : role, c.zones.find(*project->second.site));
+        } else if (const auto rail = s.rails.find(text); rail != s.rails.end()) {
+            // A railroad is described by the two zones it joins and the damage on
+            // each side; one border holds at most one railroad (RCL-019).
+            for (const auto& side : {rail->second.endpointA, rail->second.endpointB}) {
+                const int where = c.zones.find(side);
+                if (where < 0) {
+                    noteUnknown("rail_zone", side);
+                    continue;
+                }
+                b.option(c.action.at(c.aRailZone, {role, where}), 1, role);
+                if (const auto damage = rail->second.damageByEndpoint.find(side); damage != rail->second.damageByEndpoint.end())
+                    b.option(c.action.at(c.aRailDamage, {role, where}), damage->second, role);
+                b.zoneRef(role == 1 ? 3 : role, where);
+            }
         } else if (const int row = c.rows.find(text); row >= 0) {
             b.option(c.action.at(c.aRow, {row}), 1, role);
         } else if (const int nation = c.nations.find(text); nation >= 0) {

@@ -37,6 +37,24 @@
       "kind": "user_ruling",
       "date": "2026-10-22",
       "quote": "Yeah allow any dadao possessed chinese home country land and make a note on rules clarification on this issue, same for all future rules conflicts and I will report to devs"
+    },
+    {
+      "id": "user_rail_sides_2026_11_03",
+      "kind": "user_ruling",
+      "date": "2026-11-03",
+      "question": "Is the engine's railroad model right: one railroad per border, damage held on each side, and each side repaired by the nation holding it?",
+      "quote": "each border is limited to only 1 railroad, and you were right, each boarder's railroad can take 2 damage, one on each side. And a player can only repair one side of it that it owns for 1 ipp. So I guess the engine is correct.",
+      "ruling": "Each side of a railroad's border holds its own damage, up to the border terrain's maximum, and the nation possessing that side's zone repairs it at 1 IPP per point.",
+      "scope": "The quote gives the normal-terrain case; the engine applies the difficult-terrain maximum of 2 to each side the same way. Recorded as RCL-019."
+    },
+    {
+      "id": "user_one_railroad_per_border_2026_11_04",
+      "kind": "user_ruling",
+      "date": "2026-11-04",
+      "question": "May a second railroad be built on a border that already has one, damaged or not?",
+      "quote": "there should not exist extra rail between two lands, so each border or link between two tiles should only have one rail, we should add this to our own rule as a equivalence ruling because building extra does nothing and repairing achieve the same thing as building a new one",
+      "ruling": "A border has at most one railroad. Building a railroad is not offered on a border that already has one, damaged or not, or one under construction; a railroad is named by the two land zones it connects.",
+      "scope": "Equivalence ruling recorded as RCL-019: bombing damages every railroad on a border together (RB 10.6.2), and repairing both sides at their maximum costs the building price."
     }
   ],
   "rules": [
@@ -210,7 +228,9 @@
           "construction",
           "selected_rail_endpoint"
         ],
-        "destroyed_city_cannot_repair": true
+        "destroyed_city_cannot_repair": true,
+        "rail_damage_by_side": true,
+        "rail_side_repaired_by_its_possessor": true
       },
       "source_refs": [
         {
@@ -227,8 +247,12 @@
           "source_id": "rulebook",
           "pdf_page": 98,
           "section": "8.6;12.2;13.2.8"
+        },
+        {
+          "source_id": "user_rail_sides_2026_11_03"
         }
-      ]
+      ],
+      "clarification": "RCL-019"
     },
     {
       "id": "capital_ship_repairs",
@@ -412,7 +436,9 @@
         ],
         "foreign_endpoint_requires_permission": true,
         "noncontrolled_neutral_refuses": true,
-        "at_war_endpoint_forbidden": true
+        "at_war_endpoint_forbidden": true,
+        "one_railroad_per_border": true,
+        "existing_or_pending_railroad_blocks_construction": true
       },
       "source_refs": [
         {
@@ -424,8 +450,12 @@
           "source_id": "rulebook",
           "pdf_page": 99,
           "section": "13.2.8"
+        },
+        {
+          "source_id": "user_one_railroad_per_border_2026_11_04"
         }
-      ]
+      ],
+      "clarification": "RCL-019"
     },
     {
       "id": "city_income_damage",

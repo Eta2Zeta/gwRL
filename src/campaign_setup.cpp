@@ -242,7 +242,7 @@ State loadScenario(const std::filesystem::path& directory) {
             if (zone >= other || !present.isBool() || !present.asBool()
                     || nodes.at(other).require("type").asString() != "land") continue;
             RailState rail;
-            rail.id = "rail_" + zone + "__" + other;
+            rail.id = railroadId(zone, other);
             rail.endpointA = zone;
             rail.endpointB = other;
             rail.damageByEndpoint = {{zone, 0}, {other, 0}};

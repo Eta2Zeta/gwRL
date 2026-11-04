@@ -156,7 +156,8 @@
         67,
         98
       ],
-      "status": "implemented"
+      "status": "implemented",
+      "clarification": "RCL-019: one railroad per border; each side holds its own damage up to the border terrain's maximum"
     },
     {
       "id": "city_permanent_ipp_and_destruction",

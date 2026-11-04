@@ -37,10 +37,10 @@ State fixture() {
     UnitState defender;defender.id="defender";defender.type="militia";defender.owner="mongolia";defender.zone="b";defender.turnOrigin="b";
     s.units={{carrier.id,carrier},{cargo.id,cargo},{defender.id,defender}};
     s.facilities.emplace("port",FacilityState{"port","major_port","a",1,{{"blocked",1}}});
-    s.rails.emplace("rail",RailState{"rail","a","b",{{"a",1},{"b",0}}});
+    s.rails.emplace("rail_a__b",RailState{"rail_a__b","a","b",{{"a",1},{"b",0}}});
     s.construction.emplace("ship",BuildProject{"ship","japan","fleet_carrier",std::optional<Id>("port"),3,5,{5,5},{{"national_queue",1}}});
     s.repairs.emplace("repair",RepairJob{"repair","japan","carrier",1,3,true});
-    s.repairs.emplace("rail_repair",RepairJob{"rail_repair","japan","rail",1,1,true,std::optional<Id>("a")});
+    s.repairs.emplace("rail_repair",RepairJob{"rail_repair","japan","rail_a__b",1,1,true,std::optional<Id>("a")});
     s.completedTurns={{"ccp",0},{"mongolia",0},{"japan",0},{"kmt",0}};s.captureTurnStart();s.turnStart.units.emplace("historical_destroyed",std::pair{Id("kmt"),Id("a")});
     s.clock.playerTurnSerial=std::numeric_limits<std::uint64_t>::max();s.flags={{"rule_gate",1}};
     Decision d;d.id="reaction";d.kind="scramble";d.nation="mongolia";d.reaction=true;d.continuation="resume_battle";d.options.push_back(Action{"decline","decline","comintern","mongolia",std::optional<Id>("reaction"),V(O{{"choice",V(std::string("no\n\"scramble\""))}})});s.decisions.push_back(d);
@@ -96,7 +96,7 @@ void cloneIsolationAndKeys() {
     const std::vector<std::function<void(State&)>> changes={
         [](State&s){s.nations.at("japan").treasury=14;},[](State&s){s.nations.at("mongolia").player="allies";},[](State&s){s.nations.at("japan").incomeComponents["land"]=8;},[](State&s){s.nations.at("japan").incomeKnown=false;},[](State&s){s.nations.at("japan").technologyStages["radar"]=3;},[](State&s){s.nations.at("japan").gameFlags["event"]=0;},
         [](State&s){s.territories.at("a").possessor="kmt";},[](State&s){s.units.at("carrier").movementRemaining=0;},[](State&s){s.units.at("carrier").route.push_back("a");},[](State&s){s.units.at("carrier").commitments.insert("another");},[](State&s){s.units.at("cargo").owner="japan";},[](State&s){s.units.at("carrier").damage=0;},
-        [](State&s){s.facilities.at("port").flags["blocked"]=0;},[](State&s){s.rails.at("rail").damageByEndpoint["b"]=1;},[](State&s){s.construction.at("ship").remainingPayments[0]=4;},[](State&s){s.repairs.at("repair").restrictsAction=false;},[](State&s){s.repairs.at("rail_repair").endpoint="b";},
+        [](State&s){s.facilities.at("port").flags["blocked"]=0;},[](State&s){s.rails.at("rail_a__b").damageByEndpoint["b"]=1;},[](State&s){s.construction.at("ship").remainingPayments[0]=4;},[](State&s){s.repairs.at("repair").restrictsAction=false;},[](State&s){s.repairs.at("rail_repair").endpoint="b";},
         [](State&s){s.clock.incomeCollected=true;},[](State&s){s.completedTurns.at("ccp")=1;},[](State&s){s.turnStart.possessions.at("a")="kmt";},[](State&s){s.turnStart.units.at("cargo").first="japan";},
         [](State&s){s.decisions.back().continuation="different";},[](State&s){s.decisions.back().options[0].parameters=V(O{{"choice",V(true)}});},[](State&s){s.battles.at("battle").pendingHits["defender"]=2;},[](State&s){s.battles.at("battle").data=V(O{{"origin",V(std::string("b"))}});},[](State&s){s.chance->dice[0].modifier=2;},[](State&s){s.flags["rule_gate"]=2;}
     };
@@ -109,7 +109,7 @@ void invalidReferencesAndCargo() {
     const auto original=fixture();const std::vector<std::function<void(State&)>> bad={
         [](State&s){s.nations.erase("warlord");},[](State&s){s.nations.at("mongolia").controllerNation="comintern";},[](State&s){s.nations.at("japan").player="missing";},[](State&s){s.nations.at("japan").treasury=-1;},[](State&s){s.territories.erase("a");},[](State&s){s.territories.at("a").possessor="missing";},
         [](State&s){s.units.at("cargo").owner="missing";},[](State&s){s.units.at("cargo").zone="b";},[](State&s){s.units.at("carrier").cargo.clear();},[](State&s){s.units.at("carrier").cargo.push_back("cargo");},[](State&s){s.units.at("carrier").carriedBy="cargo";s.units.at("cargo").cargo={"carrier"};},[](State&s){s.units.at("carrier").movementRemaining=3;},
-        [](State&s){s.facilities.at("port").zone="sea";},[](State&s){s.rails.at("rail").damageByEndpoint["sea"]=1;},[](State&s){s.construction.at("ship").site="missing";},[](State&s){s.repairs.at("repair").target="missing";},[](State&s){s.repairs.at("rail_repair").endpoint="sea";},
+        [](State&s){s.facilities.at("port").zone="sea";},[](State&s){s.rails.at("rail_a__b").damageByEndpoint["sea"]=1;},[](State&s){auto r=s.rails.at("rail_a__b");s.rails.erase("rail_a__b");r.id="rail";s.rails.emplace(r.id,r);s.repairs.erase("rail_repair");},[](State&s){s.repairs.at("rail_repair").endpoint.reset();},[](State&s){s.construction.at("ship").site="missing";},[](State&s){s.repairs.at("repair").target="missing";},[](State&s){s.repairs.at("rail_repair").endpoint="sea";},
         [](State&s){s.clock.nationIndex=4;},[](State&s){s.clock.roundIndex=11;},
         [](State&s){s.clock.completedRounds=1;},
         [](State&s){s.completedTurns.erase("ccp");},

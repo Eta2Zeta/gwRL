@@ -147,11 +147,11 @@ For every position the search asks about, the engine's encoder
 (`src/zone_encoding.cpp`) turns the position into one bundle of numbers with three
 parts:
 
-1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 35,407
+1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 35,439
    zone questions, such as "how many CCP cavalry are here?".
 2. **The position as a whole:** 6,621 questions, such as the round, the phase,
    whose turn it is, treasuries and wars.
-3. **Each legal move:** 12,114 questions, such as which kind of move it is, which
+3. **Each legal move:** 12,381 questions, such as which kind of move it is, which
    unit it moves and which zones it names.
 
 Answers are whole numbers, and only the non-zero ones are stored. Each move is
@@ -204,8 +204,8 @@ reached adds nothing, instead of a random row added at full strength. On fixed
 data this gave a slightly lower held-out value error (0.0076 against 0.0081) and
 the same policy loss: no harm shown, not a strength gain.
 
-**Most of a network is rows:** one per question. A network has 3.60 M parameters
-at 64×2 and 18.27 M at 256×8.
+**Most of a network is rows:** one per question. A network has 3.62 M parameters
+at 64×2 and 18.35 M at 256×8.
 
 Measurements of this network are in the
 [zone network record](../stage_a/zone_network_2026_11_02.md).
@@ -296,7 +296,7 @@ controls, not expert play.
 
 ## 9. Known gaps and open questions
 
-- **31 names missing from the encoder's lists.** They fall into shared "other"
+- **20 names missing from the encoder's lists.** They fall into shared "other"
   questions, so the network cannot tell them apart. See
   [names the encoder doesn't know](network_input.md#7-names-the-encoder-doesnt-know).
   The recommended fix keeps the engine's names and checks them against the

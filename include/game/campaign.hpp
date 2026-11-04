@@ -144,12 +144,18 @@ struct FacilityState {
 };
 
 struct RailState {
-    Id id;
-    Id endpointA;
+    Id id;  // railroadId(endpointA, endpointB)
+    Id endpointA;  // The two land zones it connects, endpointA < endpointB.
     Id endpointB;
     // Bombing can target one side; do not erase that distinction in state.
     std::map<Id, int> damageByEndpoint;
 };
+
+// A border has at most one railroad (RCL-019), so a railroad is named by the
+// two land zones it connects, in sorted order: rail_<first>__<second>.
+inline Id railroadId(const Id& a, const Id& b) {
+    return a < b ? "rail_" + a + "__" + b : "rail_" + b + "__" + a;
+}
 
 struct BuildProject {
     Id id;

@@ -474,6 +474,75 @@ void foreignRailConsent() {
     check(s.rails.size() == count + 1, "Dynamic railroad created once");
     s.validate();
 }
+// RCL-019: a border has at most one railroad, so none is offered where one
+// stands, damaged or not, or is being built; a railroad is named by its border.
+bool railroadOffered(const State &s, const Id &a, const Id &b) {
+    return offers(s, "economy_purchase", [&](const Action &x) {
+        const auto *zone = x.parameters.find("zone");
+        const auto *border = x.parameters.find("border");
+        return zone && border &&
+               s.definition->catalog->row(x.parameters.require("row").asString()).type == "railroad" &&
+               ((zone->asString() == a && border->asString() == b) ||
+                (zone->asString() == b && border->asString() == a));
+    });
+}
+void oneRailroadPerBorder() {
+    auto s = fixture();
+    s.construction.clear();
+    s.nations.at("japan").treasury = 100;
+    finishResearch(s);
+    // Japan holds both sides of this railroad; without it, Japan could build one there.
+    const auto rail = std::find_if(s.rails.begin(), s.rails.end(), [&](const auto &item) {
+        auto without = s.clone();
+        without.rails.erase(item.first);
+        return s.territories.at(item.second.endpointA).possessor == "japan" &&
+               s.territories.at(item.second.endpointB).possessor == "japan" &&
+               railroadOffered(without, item.second.endpointA, item.second.endpointB);
+    });
+    check(rail != s.rails.end(), "A Japanese border railroad that could otherwise be built");
+    const auto id = rail->first, a = rail->second.endpointA, b = rail->second.endpointB;
+    check(id == railroadId(b, a) && a < b, "Setup railroads are named by their border");
+    check(!railroadOffered(s, a, b), "No second railroad beside an undamaged one");
+    s.rails.at(id).damageByEndpoint[a] = 1;
+    check(!railroadOffered(s, a, b), "No second railroad beside a damaged one: repair it instead");
+    check(offers(s, "economy_repair", [&](const Action &x) {
+              return x.parameters.require("target").asString() == id &&
+                     x.parameters.require("endpoint").asString() == a;
+          }),
+          "The damaged side can be repaired");
+
+    // A railroad bought on an empty border: no second one while it is built or after.
+    const auto first = pick(s, "economy_purchase", [&](const Action &x) {
+        return s.definition->catalog->row(x.parameters.require("row").asString()).type == "railroad";
+    });
+    const auto zone = first.parameters.require("zone").asString();
+    const auto border = first.parameters.require("border").asString();
+    applyEconomyAction(s, first);
+    check(!railroadOffered(s, zone, border), "No second railroad on a border under construction");
+    s.clock.phase = Phase::PlaceUnits;
+    applyEconomyAction(s, pick(s, "economy_place"));
+    const auto built = railroadId(zone, border);
+    check(s.rails.contains(built) && s.rails.at(built).endpointA == std::min(zone, border) &&
+              s.rails.at(built).endpointB == std::max(zone, border),
+          "A railroad built in play is named by its border");
+    s.validate();
+    turn(s, "japan", Phase::Production, 1);
+    finishResearch(s);
+    check(!railroadOffered(s, zone, border), "No second railroad beside one built in play");
+
+    // State checks refuse a second railroad on a border, or one named otherwise.
+    auto renamed = s.clone();
+    auto copy = renamed.rails.at(built);
+    renamed.rails.erase(built);
+    copy.id = "economy_rail_1";
+    renamed.rails.emplace(copy.id, copy);
+    rejects([&] { renamed.validate(); }, "A railroad must be named by its border");
+    auto doubled = s.clone();
+    copy = doubled.rails.at(built);
+    copy.id = "rail_second";
+    doubled.rails.emplace(copy.id, copy);
+    rejects([&] { doubled.validate(); }, "A border holds one railroad");
+}
 void leaseCredits() {
     auto s = fixture();
     s.construction.clear();
@@ -610,7 +679,8 @@ int main() {
         int count = 0;
         for (const auto &test : {income, stagedQueues, productionRepair, decentralizedAndMilitia, research,
                                  constructionAndCapture, cityAndRailRepair, ladaoLease, sharedShipyardRepair,
-                                 upgradesDiscountsAndCaps, foreignRailConsent, leaseCredits, accountingReplay,
+                                 upgradesDiscountsAndCaps, foreignRailConsent, oneRailroadPerBorder, leaseCredits,
+                                 accountingReplay,
                                  replacementUpgradeAndEliteLease}) {
             test();
             ++count;
