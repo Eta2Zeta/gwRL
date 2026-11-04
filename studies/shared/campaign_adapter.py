@@ -340,22 +340,19 @@ class CampaignAdapter:
 
     def clone(self) -> CampaignAdapter:
         self._sync()
-        result = CampaignAdapter(self.raw.clone(), interrupt_order=self.interrupt_order)
-        result._passed = self._passed.copy()
-        result._frozen_context = self._frozen_context
-        result._context_order = self._context_order
-        # Copy lazy cache containers while sharing their immutable source data.
-        # Neither real-play nor search RNG is stored in these snapshots.
-        if result._anchor == self._anchor:
-            result._raw_interrupts = self._raw_interrupts
-            result._raw_actions = self._raw_actions
-            result._raw_observation = self._raw_observation
-            result._decision = replace(self._decision) if self._decision is not None else None
-        return result
+        return self._copy_onto(self.raw.clone())
 
     def clone_for_search(self, seed: int) -> CampaignAdapter:
         self._sync()
-        result = CampaignAdapter(self.raw.clone_for_search(seed), interrupt_order=self.interrupt_order)
+        return self._copy_onto(self.raw.clone_for_search(seed))
+
+    def clone_for_search_continuing(self, source: CampaignAdapter) -> CampaignAdapter:
+        """A search copy of this position whose dice continue source's search stream."""
+        self._sync()
+        return self._copy_onto(self.raw.clone_for_search_continuing(source.raw))
+
+    def _copy_onto(self, raw: Any) -> CampaignAdapter:
+        result = CampaignAdapter(raw, interrupt_order=self.interrupt_order)
         result._passed = self._passed.copy()
         result._frozen_context = self._frozen_context
         result._context_order = self._context_order

@@ -172,14 +172,23 @@ position it passes. It does not look for the deepest branch: it goes deep only
 where the scores keep sending it. Each simulation adds one new position to the
 tree, so the lines the scores keep choosing are explored deeper and deeper.
 
-**What the search remembers, and why it plays moves again.** The tree holds, for
-every position the search has met, identified by its planning key, the moves
-tried there with their visit counts, value totals and priors (`Node` and `Edge`).
-It does not hold the positions themselves. So simulation 4 cannot jump straight
-to RA: on its own fresh copy of R, the engine plays A again, then x. A later
-simulation that goes A, x and further plays A and x again too. Every move on the
-way to a simulation's new position was already played by an earlier simulation,
-on that simulation's copy.
+**What the search remembers.** The tree holds, for every position the search has
+met, identified by its planning key, the moves tried there with their visit
+counts, value totals and priors (`Node` and `Edge`), and a saved copy of the game
+at that position (`Node.game`). A simulation walks the tree on these saved
+positions. Following a move already played from a position needs only the tree:
+the engine rolls no dice inside a move, so a move from a position always reaches
+the same position. The simulation copies a saved position only to play a move no
+simulation has played from there yet, or to roll dice. In the toy example,
+simulation 4 follows A to RA in the tree alone, copies the saved RA and plays only
+x.
+
+**The dice.** Each simulation rolls its own dice, from a stream seeded per
+simulation, so one move can lead to different outcomes in different simulations,
+and the tree keeps a branch per outcome; the real game's dice are untouched.
+Each copy a simulation makes continues that simulation's stream where its last
+copy left it (`clone_for_search_continuing`), so the dice come out exactly as if
+the simulation had played its whole path on one copy.
 
 **A real example** ([measurements](../stage_a/search_replays_2026_11_04.md)). At a
 round-5 Japanese Combat Movement decision with 24 legal moves, the network was
@@ -188,31 +197,23 @@ simulations, all among the first 31, each tried a different one of the 24 moves
 and stopped after one step. The other 40 went deeper, 37 of them through two
 moves, which ended with 27 and 12 of the 64 visits: 21 stopped after two steps
 and the rest after three to nine. The deepest, nine steps, chose to end Combat
-Movement and followed
-positions earlier simulations had evaluated: the start of a battle, a retreat, a
-retreating unit and the next battle, with four dice rolls on the way. The 64
-simulations together played 123 moves and 38 dice rolls on their copies. At a
-decision with 104 legal moves, 55 of the 64 simulations stopped after one step.
+Movement and followed positions earlier simulations had evaluated: the start of a
+battle, a retreat, a retreating unit and the next battle, with four dice rolls on
+the way. The 64
+simulations together played 57 moves and 38 dice rolls, and the tree kept 77
+positions. At a decision with 104 legal moves, 55 of the 64 simulations stopped
+after one step.
 
-**Why it works this way, and what it costs.** Replaying keeps the engine the only
-source of positions: every position the search evaluates comes from the real
-rules. Each copy also rolls its own dice from a stream seeded per simulation, so
-one move can lead to different outcomes in different simulations, and the tree
-keeps a branch per outcome; the real game's dice are untouched. Copying is cheap,
-under a tenth of a millisecond, but playing the moves is not. In six measured
-searches it took 8% to 53% of the search's time, and in whole self-play games it
-was about half of the time the game threads spent not waiting for the network:
-their largest single cost.
-
-**Saving copies instead, an untested idea.** If the tree kept a copy of the game
-at every position it holds, a simulation would choose its path by exactly the same
-scores but would not play the moves on the way. It would take the copy saved at
-the last position of its own path that the tree already knows, the tip of the
-branch the scores chose, which need not be the tree's deepest branch, and play
-only the new move from there. In the toy example, simulation 4 would start from
-the copy saved at RA and play only x. Dice on the path would still be rolled, on
-a copy of the position before the roll, because each simulation draws its own.
-That would save most of the replaying, for the memory of the copies.
+**What the copies cost and save.** Every position the search evaluates still comes
+from the real rules, played by the engine. A saved copy takes about 144 KB, so
+that tree held about 11 MB; each tree is dropped after its decision. Until
+4 November the tree kept no positions, and every simulation copied the current
+position and played its whole path again: 123 moves instead of 57 in the example,
+and about half of the time game threads spent not waiting for the network
+([measurements](../stage_a/search_replays_2026_11_04.md)). Saving copies gave
+identical search results on 151 real positions and played 59% fewer moves. In a
+matched training batch it raised games per hour while playing from 152 to 184,
+for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
 
 **After all simulations**, the number of times each first move was tried shows the
 search's preference. The move actually played is drawn at random in proportion to
@@ -349,6 +350,12 @@ On 2 November the Mac profile played 124 eleven-round games per hour with learni
 parameters at no cost in throughput, but it did not make the agents stronger: the
 learning, not the speed, is the current limit.
 
+On 4 November the search began keeping a copy of the game at each tree position
+(section 3). In a matched batch of the Mac profile, with little training, that
+raised decisions per hour while playing by 15%, from about 162,000 to 188,000;
+the coordinator, busy 90% of the time, now limits that layout
+([record](../stage_a/search_copies_2026_11_04.md)).
+
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
 `failed-positions/` folder. Two random-play checks run before long runs: the
@@ -401,10 +408,6 @@ controls, not expert play.
   menus.
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
-- **Search plays its moves again.** Every simulation replays its path from a
-  copy of the current position, about half of the game threads' own work.
-  Keeping copies in the tree is untested; see
-  [what the search remembers](#3-choosing-a-move-search).
 
 ## 10. Glossary
 
@@ -420,8 +423,8 @@ controls, not expert play.
 - **Depth:** how many steps, moves and dice rolls, a simulation walked from the
   current position before it stopped.
 - **Search tree:** what a search remembers between simulations: for each position
-  it has met, its planning key and the statistics of the moves tried there, but
-  not the position itself.
+  it has met, its planning key, the statistics of the moves tried there and a
+  saved copy of the game at that position.
 - **Prior:** the network's probability for a move, before searching.
 - **Visit count:** how often the search tried a move.
 - **Value:** the network's estimate of the final scores, one per alliance.

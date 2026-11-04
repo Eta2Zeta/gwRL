@@ -100,6 +100,11 @@ class LearningToyEnv:
         result.random = random.Random(seed)
         return result
 
+    def clone_for_search_continuing(self, source):
+        result = self.clone()
+        result.random = copy.deepcopy(source.random)
+        return result
+
     def serialize(self):
         return json.dumps({"node": self.node, "score": self.score, "draws": self.actual_draws,
                            "random": self.random.getstate(), "context": self.context_version}, sort_keys=True)

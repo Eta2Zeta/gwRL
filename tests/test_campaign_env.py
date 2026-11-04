@@ -125,6 +125,42 @@ class CampaignEnvironmentTests(unittest.TestCase):
             with self.subTest(seed=seed):
                 self.assertGreater(play_search_copy_beside_ordinary_copy(self, seed, 2), 100)
 
+    def test_a_continuing_copy_rolls_what_its_source_would_roll_next(self):
+        """A saved position copied with a simulation's stream keeps that simulation's dice."""
+        game = gwrl_cpp.CampaignEnv.curriculum(str(SCENARIO), 2, 77, training_actions=True)
+        choice = random.Random("continuing-dice")
+
+        def to_chance(env, moves=None):
+            played = []
+            while env.decision_kind() != "chance":
+                self.assertFalse(env.is_terminal())
+                actions = env.legal_actions()
+                index = moves[len(played)] if moves is not None else choice.randrange(len(actions))
+                env.apply_action(actions[index])
+                played.append(index)
+            return played
+
+        to_chance(game)
+        noticed = False
+        for seed in range(5, 13):
+            whole = game.clone_for_search(seed)  # One copy playing the whole path, as searches used to.
+            while whole.decision_kind() == "chance":  # So that moves separate the rolls compared.
+                whole.resolve_chance()
+            carrier = whole.clone()
+            moves = to_chance(whole)
+            self.assertTrue(moves)
+            saved = carrier.clone_for_search(999)  # The next chance position, saved with another stream.
+            to_chance(saved, moves)
+            self.assertEqual(saved.planning_key(), whole.planning_key())
+            continuing, unrelated = saved.clone_for_search_continuing(carrier), saved.clone_for_search(seed + 1000)
+            for copy in (whole, continuing, unrelated):
+                copy.resolve_chance()
+            self.assertEqual(continuing.planning_key(), whole.planning_key())
+            noticed |= unrelated.planning_key() != whole.planning_key()
+        self.assertTrue(noticed)  # These rolls would show a copy that kept another stream.
+        with self.assertRaisesRegex(RuntimeError, "continue only another search copy"):
+            game.clone_for_search(1).clone_for_search_continuing(game)
+
     def test_search_copy_that_fails_mid_move_refuses_every_later_call(self):
         env = env_with_unhandled_decision(71)
         checkpoint, key, observation = env.serialize(), env.planning_key(), env.observation()

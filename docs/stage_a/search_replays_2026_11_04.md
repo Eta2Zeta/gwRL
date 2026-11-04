@@ -101,5 +101,6 @@ simulation that followed the same branch played them all again.
   scores, start from the copy saved at the last known position of that path
   instead of the current position. That would save most of this work for the
   cost of the copies' memory; dice on the path would still be rolled.
-- **Open:** that change is untested, and how much memory its copies need is
-  unmeasured.
+- **Followed up the same day:** the search now keeps those copies, with
+  identical results; see [the search keeps a copy of the game at every tree
+  position](search_copies_2026_11_04.md).

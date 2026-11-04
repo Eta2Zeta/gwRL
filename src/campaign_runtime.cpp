@@ -621,6 +621,14 @@ Engine Engine::cloneForSearch(std::uint64_t seed) const {
     return result;
 }
 
+Engine Engine::cloneForSearchContinuing(const Engine& source) const {
+    require(source.random_.active == "search" && source.random_.testTape.empty(),
+            "Search dice continue only another search copy's stream");
+    Engine result = cloneForSearch(0);
+    result.random_.search = source.random_.search;
+    return result;
+}
+
 void Engine::setDiceTapeForTesting(std::vector<int> tape) {
     requireIntact();
     for (int face : tape) require(face > 0, "Invalid test dice tape face");

@@ -35,6 +35,7 @@ class CampaignEnv {
     std::shared_ptr<const json::Value> observationWithoutMenu() const;
     CampaignEnv clone() const;
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
+    CampaignEnv cloneForSearchContinuing(const CampaignEnv& source) const;
     std::string planningKey() const;
     std::string serialize() const { return engine_.serialize(); }
     // Inspection of already recorded events only. No execution RNG or future

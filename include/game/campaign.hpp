@@ -432,6 +432,10 @@ class Engine {
     // ordinary engine has. Should a transition fail after its legality check,
     // the copy refuses every later call; a rejected action leaves it usable.
     Engine cloneForSearch(std::uint64_t seed) const;
+    // The same, with dice that continue `source`'s search stream where it has
+    // got to: a search can save copies of positions and still roll each
+    // simulation's dice from one stream.
+    Engine cloneForSearchContinuing(const Engine& source) const;
     void setDiceTapeForTesting(std::vector<int> tape);
     std::string serialize() const;
     static Engine restore(std::shared_ptr<const Definition>, std::shared_ptr<const Rules>, const std::string&);

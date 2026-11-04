@@ -43,6 +43,17 @@ class NativeCampaignEnv {
         return std::forward<Function>(function)(std::as_const(env_));
     }
 
+    // Both boards' operations held at once, without lock-order deadlock.
+    template <class Function> auto callWith(const NativeCampaignEnv& other, Function&& function) const {
+        py::gil_scoped_release release;
+        if (this == &other) {
+            std::lock_guard lock(mutex_);
+            return std::forward<Function>(function)(std::as_const(env_), std::as_const(env_));
+        }
+        std::scoped_lock lock(mutex_, other.mutex_);
+        return std::forward<Function>(function)(std::as_const(env_), std::as_const(other.env_));
+    }
+
   private:
     game::campaign::CampaignEnv env_;
     mutable std::mutex mutex_;
@@ -382,6 +393,12 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                 return std::make_unique<NativeCampaignEnv>(env.cloneForSearch(seed));
             });
         })
+        .def("clone_for_search_continuing", [](const NativeCampaignEnv& self, const NativeCampaignEnv& source) {
+            return self.callWith(source, [](const CampaignEnv& env, const CampaignEnv& stream) {
+                return std::make_unique<NativeCampaignEnv>(env.cloneForSearchContinuing(stream));
+            });
+        }, py::arg("source"),
+           "A search copy of this position whose dice continue source's search stream.")
         .def("planning_key", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.planningKey(); });
         })

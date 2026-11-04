@@ -34,6 +34,8 @@ class SearchEnv(Protocol):
     def returns(self) -> Sequence[float]: ...
     def observation(self) -> Any: ...
     def clone_for_search(self, seed: int) -> SearchEnv: ...
+    # A copy of this position whose dice continue source's search stream.
+    def clone_for_search_continuing(self, source: SearchEnv) -> SearchEnv: ...
     def planning_key(self) -> str: ...
 
 
@@ -201,6 +203,9 @@ class Node:
     visits: int = 0
     value_sum: list[float] = field(default_factory=lambda: [0.0] * 3)
     evaluation: Vector = ZERO
+    # A copy of the game at this position. Simulations only copy it again, to
+    # play one move or roll dice there; nothing plays on it.
+    game: Any = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -357,6 +362,18 @@ class VectorMCTS:
         node.expanded = True
         return node.evaluation
 
+    @staticmethod
+    def _copy(node: Node, seed: int, stream: SearchEnv | None) -> SearchEnv:
+        """A copy of node's position to play on, continuing the simulation's dice."""
+        return node.game.clone_for_search(seed) if stream is None else node.game.clone_for_search_continuing(stream)
+
+    def _reach(self, game: SearchEnv) -> Node:
+        """The node of the position a copy has reached; a new node keeps the copy."""
+        node, _ = self._node(game)
+        if node.game is None:
+            node.game = game
+        return node
+
     def _bootstrap_value(self, node: Node, env: SearchEnv) -> Vector:
         """Approximate a nonterminal cutoff with the frozen evaluator value.
 
@@ -395,10 +412,17 @@ class VectorMCTS:
                 edge.selection_prior = (1 - epsilon) * edge.prior + epsilon * (value / total if total else 1 / len(order))
 
         traces = []
+        if root.game is None:
+            # Never the game itself: it moves on after the search.
+            root.game = env.clone_for_search(0)
         for _ in range(self.config.simulations):
             seed = self._random.getrandbits(64)
-            simulation = env.clone_for_search(seed)
             policy_random = random.Random(seed ^ 0xD1B54A32D192ED03)
+            # Walk the tree on its saved positions. Only playing a new move or
+            # rolling dice copies one; each copy continues the last, so the
+            # simulation's dice come from one stream started from its seed,
+            # exactly as if it had played its whole path on one copy.
+            stream: SearchEnv | None = None
             node = root
             nodes_path = [root]
             path_keys = {root.state_key}
@@ -407,29 +431,29 @@ class VectorMCTS:
             outcomes = []
             source = "depth_limit"
             for _depth in range(self.config.max_depth):
-                if simulation.is_terminal():
-                    values, source = vector(simulation.returns()), "terminal"
+                if node.kind == "terminal":
+                    values, source = vector(node.game.returns()), "terminal"
                     break
-                if simulation.decision_kind() == "chance":
-                    before = simulation.planning_key()
-                    simulation.resolve_chance()
-                    successor, _ = self._node(simulation)
+                if node.kind == "chance":
+                    stream = self._copy(node, seed, stream)
+                    stream.resolve_chance()
+                    successor = self._reach(stream)
                     node.chance_successors[successor.state_key] = successor
-                    outcomes.append((before, successor.state_key))
+                    outcomes.append((node.state_key, successor.state_key))
                     if successor.state_key in path_keys:
-                        values, source = self._bootstrap_value(successor, simulation), "cycle_cutoff"
+                        values, source = self._bootstrap_value(successor, successor.game), "cycle_cutoff"
                         break
                     node = successor
                     nodes_path.append(node)
                     path_keys.add(node.state_key)
                     continue
                 if not node.expanded:
-                    values, source = self._expand(node, simulation), "evaluator"
+                    values, source = self._expand(node, node.game), "evaluator"
                     break
                 fixed = self.config.mode == "fixed_opponents" and node.player != self.config.target_player
                 if fixed:
                     assert self.opponent_policy is not None
-                    selected = self.opponent_policy.sample(simulation, [edge.action for edge in node.edges], policy_random)
+                    selected = self.opponent_policy.sample(node.game, [edge.action for edge in node.edges], policy_random)
                 else:
                     scores = selection_scores(node, self.config, bounds, use_selection_priors=_depth == 0)
                     maximum = max(scores)
@@ -441,27 +465,33 @@ class VectorMCTS:
                     records = [] if fixed else score_actions(node, self.config, bounds, use_selection_priors=_depth == 0)
                     selections.append(Selection(node.state_key, str(node.player), edge.key,
                                                 "opponent_policy" if fixed else "puct", tuple(records)))
-                simulation.apply_action(edge.action)
                 edges_path.append(edge)
-                successor, _ = self._node(simulation)
-                edge.successors[successor.state_key] = successor
+                if edge.successors:
+                    # The engine rolls no dice inside a move, so a move played
+                    # once from a position leads to the same position every time.
+                    (successor,) = edge.successors.values()
+                else:
+                    stream = self._copy(node, seed, stream)
+                    stream.apply_action(edge.action)
+                    successor = self._reach(stream)
+                    edge.successors[successor.state_key] = successor
                 # A reversible planning sequence can return to an exact state.
                 # Stop at its first repetition and bootstrap; revisiting it
                 # inside this rollout would count one simulation repeatedly in
                 # the same node/action and inflate the cycle's policy target.
                 if successor.state_key in path_keys:
-                    values, source = self._bootstrap_value(successor, simulation), "cycle_cutoff"
+                    values, source = self._bootstrap_value(successor, successor.game), "cycle_cutoff"
                     break
                 node = successor
                 nodes_path.append(node)
                 path_keys.add(node.state_key)
             else:
-                if simulation.is_terminal():
-                    values, source = vector(simulation.returns()), "terminal"
+                if node.kind == "terminal":
+                    values, source = vector(node.game.returns()), "terminal"
                 else:
                     # A cutoff is an explicit approximation, never a fake
                     # terminal return or a policy-selected die outcome.
-                    values = self._bootstrap_value(node, simulation)
+                    values = self._bootstrap_value(node, node.game)
 
             for visited in nodes_path:
                 visited.visits += 1

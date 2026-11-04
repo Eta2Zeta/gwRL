@@ -52,6 +52,9 @@ class ContextRaw:
     def clone_for_search(self, seed):
         return self.clone()
 
+    def clone_for_search_continuing(self, source):
+        return self.clone()
+
     def serialize(self):
         return json.dumps({"state": self.state, "definition": self.definition})
 
@@ -150,6 +153,9 @@ class CountingRaw:
 
     def clone_for_search(self, seed):
         return type(self)(self.raw.clone_for_search(seed), self.calls)
+
+    def clone_for_search_continuing(self, source):
+        return type(self)(self.raw.clone_for_search_continuing(source.raw), self.calls)
 
     def legal_actions(self):
         self.calls["legal_actions"] += 1
@@ -575,16 +581,17 @@ class NativePlayActionTests(unittest.TestCase):
     def searched(self, env):
         evaluator = PositionEvaluator()
         result = VectorMCTS(evaluator, MctsConfig(simulations=24, max_depth=8, seed=31)).search(env, add_root_noise=True)
-        nodes, reached, stack = [], set(), [result.root]
+        nodes, reached, stack, played = [], set(), [result.root], 0
         while stack:
             node = stack.pop()
             if node.state_key not in reached:
                 reached.add(node.state_key)
                 nodes.append((node.state_key, node.visits, tuple(node.value_sum)))
+                played += sum(1 for edge in node.edges if edge.successors)
                 stack.extend(successor for edge in node.edges for successor in edge.successors.values())
                 stack.extend(node.chance_successors.values())
         return ([action_key(action) for action in result.actions], result.visit_counts, result.values,
-                result.action_values, sorted(nodes)), evaluator.requests
+                result.action_values, sorted(nodes)), evaluator.requests, played
 
     def test_searches_stay_bit_identical_and_list_only_evaluated_positions(self):
         listed = CampaignAdapter.apply_action
@@ -595,21 +602,21 @@ class NativePlayActionTests(unittest.TestCase):
         later.apply_action(self.end_phase(later))
         self.pass_offers(later)
         self.assertGreater(len(later.clone().legal_actions()), 10)
-        spared = 0
         for position in (self.offers, self.opening, later):
             with self.subTest(kind=position.decision_kind()):
                 direct_env, full_env = self.counted(position), self.counted(position)
                 state = position.serialize()
-                direct, evaluations = self.searched(direct_env)
+                direct, evaluations, played = self.searched(direct_env)
                 with patch.object(CampaignAdapter, "apply_action", full_check):
-                    full, _ = self.searched(full_env)
+                    full, _, _ = self.searched(full_env)
                 self.assertEqual(direct, full)
                 self.assertEqual(sum(direct[1]), 24)
                 self.assertEqual(direct_env.serialize(), state)
                 self.assertLessEqual(direct_env.raw.calls["legal_actions"], evaluations)
                 self.assertEqual(direct_env.raw.calls["apply_action"], full_env.raw.calls["apply_action"])
-                spared += full_env.raw.calls["legal_actions"] - direct_env.raw.calls["legal_actions"]
-        self.assertGreater(spared, 0)
+                # The tree saves its positions: a move is played once, when it
+                # first leads somewhere, never again on the way to a later leaf.
+                self.assertLessEqual(direct_env.raw.calls["apply_action"], played)
 
 
 if __name__ == "__main__":

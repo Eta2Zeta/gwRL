@@ -61,6 +61,11 @@ class TinyEnv:
         result.search_random = random.Random(seed)
         return result
 
+    def clone_for_search_continuing(self, source):
+        result = self.clone_for_search(0)
+        result.search_random = copy.deepcopy(source.search_random)
+        return result
+
     def serialize(self):
         return json.dumps([self.actor, self.tag, self.node, repr(self.actual_random.getstate()),
                            repr(self.search_random.getstate()) if self.search_random is not None else None])

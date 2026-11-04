@@ -117,6 +117,9 @@ std::shared_ptr<const V> CampaignEnv::observationWithoutMenu() const {
 
 CampaignEnv CampaignEnv::clone() const { return CampaignEnv(engine_.clone(), *this); }
 CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const { return CampaignEnv(engine_.cloneForSearch(seed), *this); }
+CampaignEnv CampaignEnv::cloneForSearchContinuing(const CampaignEnv& source) const {
+    return CampaignEnv(engine_.cloneForSearchContinuing(source.engine_), *this);
+}
 std::string CampaignEnv::planningKey() const {
     engine_.requireIntact();
     std::lock_guard lock(decisionCache_->mutex);

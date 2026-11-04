@@ -107,6 +107,11 @@ class EvaluationEnv:
         clone.search_copy = True
         return clone
 
+    def clone_for_search_continuing(self, source):
+        clone = self.clone_for_search(0)
+        clone.random = copy.deepcopy(source.random)
+        return clone
+
 
 class CountingEvaluator:
     version = "evaluation-test-vector-v1"

@@ -78,6 +78,11 @@ class TreeEnv:
         result.search_random = random.Random(seed)
         return result
 
+    def clone_for_search_continuing(self, source):
+        result = self.clone()
+        result.search_random = copy.deepcopy(source.search_random)
+        return result
+
     def serialize(self):
         return json.dumps({"node": self.node, "flags": self.flags, "actual_draws": self.actual_draws,
                            "actual_random": repr(self.actual_random.getstate()),
@@ -736,6 +741,9 @@ class InterruptRawEnv:
         return copy.deepcopy(self)
 
     def clone_for_search(self, seed):
+        return self.clone()
+
+    def clone_for_search_continuing(self, source):
         return self.clone()
 
     def planning_key(self):
