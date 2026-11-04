@@ -55,7 +55,8 @@ The input for one decision is one bundle with three parts:
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
 round 1, chosen by the Comintern player. It has 13 legal moves, and its input
 holds 326 board answers, 119 position answers and 244 answers across the 13
-moves.
+moves. Each earlier decision took the move that ends the phase, or else the first
+listed move.
 
 **Each part is filed differently:**
 
@@ -102,7 +103,8 @@ These are all the non-zero board answers of the zone Shensi in that decision:
 | `unit_stat:comintern:mountain_infantry:move_1` | 2 | ... with 1 move left |
 | `rail_to:land_china_hopeh` | 1 | a railroad runs from here to Hopeh |
 
-The network adds each answer in as sign(a) × log(1 + |a|): see
+The network keeps a learned row of numbers for every question and adds each
+answered question's row, weighted by sign(a) × log(1 + |a|): see
 [what a network computes](README.md#5-what-a-network-computes).
 
 ## 4. The board part

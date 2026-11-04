@@ -256,42 +256,170 @@ The details, with worked examples, are in [The network's input](network_input.md
 ## 5. What a network computes
 
 Each alliance has its own network: `CampaignPolicyValueNet` in
-`studies/campaign/neural.py`. Its size is written width × message layers, such as
-64×2 or 256×8. For one position it works in six steps:
+`studies/campaign/neural.py`. For a decision it returns three **values**, its
+estimates of the three alliances' final scores, and a **probability** for every
+legal move, its first guess at which moves the search should try. Its size is
+written width × message layers: 64×2 in the Mac profile's measurements, 256×8 in
+the night run of 2 November. The examples below use 64×2 and the decision of
+[the input page](network_input.md#2-three-parts): game seed 5, the CCP's first
+Combat Movement decision, with 13 legal moves.
 
-1. **One vector per zone.** Every question has its own learned row of numbers, as
-   long as the width. For each zone, the network adds up the rows of the questions
-   answered there, each weighted by sign(a) × log(1 + |a|) for answer a: an answer
-   of 1 counts 0.69, 2 counts 1.10 and 10 counts 2.40, so larger counts matter
-   more but not in proportion. It adds a learned row for the zone itself and the
-   zone's 39 fixed map facts, such as terrain and production value.
-2. **One vector for the position,** built the same way from the position's own
-   answers.
-3. **Messages along the borders.** In each message layer, every zone sends a
-   message along each of the 160 directed borders. The message depends on the
-   sender's vector and the border's 22 fixed facts, such as a river or a railway.
-   Each zone averages what it receives and updates its vector, and the position
-   vector updates from the average zone. After k layers a zone's vector reflects
-   zones up to k borders away.
-4. **The value:** from the position vector and the mean and maximum over zones,
-   three numbers, one per alliance.
-5. **A score for each move:** the move's own answers are added up the same way,
-   with the network's move rows. The vectors of the zone it starts from and the
-   zone it acts on, and the average of its path zones, are joined to that. A small
-   layer turns the result, together with the position, into one score.
-6. **Probabilities in stages.** The menu's probabilities are built step by step:
-   first the move's kind, then what acts, then how it travels, then what it acts
-   on, then the exact move. Every listed move gets a probability; none is padded,
-   merged or dropped. Which details count as "what acts" and so on comes from the
-   roles explained in [The network's input](network_input.md#roles).
+**The structure.** Inside the network, every zone, the position as a whole and
+every legal move is described by a *vector*: a list of numbers, as many as the
+width. For that decision:
+
+```text
+the input                    learned table          vectors of 64 numbers
+board: 326 answers,     ->   zone table,       ->   37 zone vectors
+  filed by zone                42,520 rows
+position: 119 answers   ->   position table,   ->   1 position vector
+                               6,634 rows
+moves: 244 answers,     ->   move table,       ->   13 move vectors
+  filed by move                12,667 rows
+
+then:
+  2 message layers   every zone vector is updated from its neighbours' vectors,
+                     along the 160 directed borders, and from the position
+                     vector; the position vector from the average zone
+  value              position vector + the zones' mean and maximum
+                     -> a summary vector -> 3 numbers, one per alliance
+  policy             each move vector + the vectors of the zones it starts
+                     from, acts on and passes through, + the summary
+                     -> 13 scores -> 13 probabilities, in stages
+```
+
+**Learned rows.** A network is a large set of numbers that training adjusts
+(section 6), its *parameters*: 4,089,928 of them at 64×2. Almost all, 97%, sit in
+three tables that hold one row of 64 numbers for every question: 42,520 rows for
+the zone questions, 6,634 for the position's and 12,667 for the moves'. A
+question's row is what an answer to that question adds to a vector: the
+network's own description, in 64 numbers, of "a CCP cavalry is here" or "the CCP
+possesses this zone". No number in a row has a meaning chosen by hand. Training
+moves them until the answers that matter push the vectors in useful directions.
+
+**Learned layers** hold most of the other 3%. A learned layer multiplies a vector
+by a learned table of numbers and adds a learned vector; most then bend the
+result with a fixed curve (GELU). Without the curves, any stack of layers would
+amount to a single multiplication and could only add effects up.
+
+**A zone's vector is a sum of rows.** Shensi answers 12 of the 42,520 zone
+questions in that decision ([listed here](network_input.md#3-questions-and-answers));
+its other 42,508 answers are zero. Each answered question picks out its own row
+from the zone table, multiplied by a weight that grows with the answer a,
+sign(a) × log(1 + |a|): an answer of 1 counts 0.69, 2 counts 1.10 and 10 counts
+2.40, so larger counts matter more but not in proportion. Shensi's vector starts
+as the sum of those 12 weighted rows. Here are three of the twelve, with the width
+cut to 3 and invented row numbers (a fresh network's rows are all zero, and a
+trained network's numbers mean nothing one by one):
+
+```text
+question             answer  weight  its row (3 numbers)    weight × row
+possessor:ccp           1     0.69   [ 0.50  0.10 -0.20]    [ 0.35  0.07 -0.14]
+units:ccp:cavalry       1     0.69   [ 0.20 -0.40  0.30]    [ 0.14 -0.28  0.21]
+units:ccp:militia       2     1.10   [ 0.10  0.30  0.00]    [ 0.11  0.33  0.00]
+                                                     sum:   [ 0.60  0.12  0.07]
+```
+
+The other nine answers add their rows the same way, and the real rows have 64
+numbers. Hopeh, next door, answers 8 questions, among them a warlord militia and
+three railroads, so its vector starts as a sum of 8 rows.
+
+**One table serves every zone.** `units:ccp:cavalry` has one row, added wherever
+CCP cavalry stand, so what the network learns about cavalry in Shensi applies in
+Hopeh too. To tell the zones apart, each zone vector also gets a learned row for
+the zone itself, and its 39 fixed map facts, such as production value, terrain
+and original owner, through a learned layer. Then its 64 numbers are rescaled to
+a standard spread (layer normalization), so a zone with 43 answers, like sea zone
+P15 with Japan's fleet, does not get a vector many times larger than a zone with
+one.
+
+**Why this is called a lookup.** Picture the board input as a table with one
+line per zone and one column per question, almost all zeros:
+
+```text
+                    possessor:  units:ccp:  possessor:warlord_  rail_to:land_   ...
+                    ccp         cavalry     beiping_hopeh       china_shensi
+land_china_shensi   1           1           0                   0
+land_china_hopeh    0           0           1                   1
+... 35 more zones, 42,520 columns in all
+```
+
+That is why questions are also called columns. Multiplying each zone's whole line
+of 42,520 weighted answers by the zone table, as a textbook network layer would,
+gives the same 37 sums (checked on Shensi, up to float rounding), but for
+Shensi alone it would multiply 42,508 zeros. So the network fetches only the rows
+of the answered columns, a *column lookup*, and adds them up: 689 rows for this
+decision, 326 + 119 + 244.
+
+**Three kinds of sums.** The position vector is the same kind of sum over the
+position's 119 answers, with the position table, and each move vector over the
+move's own answers, with the move table: 21 rows for the cavalry attack on Hopeh
+([its answers](network_input.md#example-1-a-cavalry-attack)), 4 for `end_phase`. A
+coordinator call (section 7) does this for every zone of every position, every
+position and every move at once: about 6,000 rows for a call of four positions
+([record](../stage_a/coordinator_lookups_2026_11_04.md)).
+
+**Messages along the borders.** A zone vector so far describes only its own zone.
+The map has 80 borders, each counted in both directions: 160 directed borders. In
+each message layer:
+
+1. every zone sends a message along each border leaving it: its own vector through
+   a learned layer, plus the border's 22 fixed facts, such as a river, a railway or
+   a narrow crossing, through another, the sum bent by the curve;
+2. every zone averages the messages it receives;
+3. every zone adds a correction to its vector, computed by a learned layer from its
+   old vector, that average and the position vector; then the position vector adds
+   a correction computed from itself and the average zone vector.
+
+Shensi borders Hopeh, Suiyuan, Szechwan and Tsinghai. After the first layer its
+vector reflects what they hold, such as Hopeh's warlord militia; after the second,
+also what borders them, such as Beiping next to Hopeh. Through the borders, after
+k layers a zone's vector reflects zones up to k borders away; through the position
+vector, from the second layer on, it also reads the average of all zones.
+
+**The value.** A learned layer combines the position vector with the mean and the
+maximum of the 37 zone vectors into one summary vector of the position. Two more
+learned layers turn the summary into three numbers: the predicted final scores of
+the Axis, the Allies and the Comintern, divided by 100.
+
+**A score for each move.** Each move vector is rescaled like the zone vectors and
+joined with three zone vectors, taken after the message layers: the zone it starts
+from, the zone it acts on and the average of its path zones. A move that names no
+zone, such as `end_phase`, gets a learned "no zone" vector for the first two and
+zeros for the path. A learned layer turns these 4 × 64 numbers into one combined
+vector of the move, and two more turn that, with the summary, into one score. So
+the cavalry attack on Hopeh reads its own 21 answers ("a CCP cavalry with 2 moves
+left, in Shensi, attacking along Shensi–Hopeh") together with Shensi's vector as
+its start, Hopeh's as the zone it acts on, and the average of both as its path.
+
+**Probabilities in stages.** The moves are grouped by kind, then by what acts, then
+by how it travels, then by what it acts on. At each stage the network scores every
+group from the summary and the average combined vector of the group's moves, and
+gives the groups under one parent probabilities that add up to 1; the exact move
+comes last. In that decision:
+
+| Stage | Groups | In this decision |
+| --- | ---: | --- |
+| Kind | 2 | a movement (12 moves), ending the phase (1) |
+| What acts | 4 | the cavalry, the first and the second mountain infantry (4 moves each), and ending the phase |
+| How it travels | 13 | each unit to Hopeh, Suiyuan, Szechwan or Tsinghai, and ending the phase |
+| What it acts on | 13 | no further split: these moves name no target apart from their path |
+| The exact move | 13 | one move in each group |
+
+So the probability of the cavalry attack on Hopeh is P(a movement) × P(the cavalry,
+among the three units) × P(to Hopeh, among its four destinations). Every listed
+move gets a probability; none is padded, merged or dropped. Which details count as
+"what acts" and so on comes from the roles explained in
+[The network's input](network_input.md#roles).
 
 **Rows start at zero** (since 3 November 2026). A question that training has never
 reached adds nothing, instead of a random row added at full strength. On fixed
 data this gave a slightly lower held-out value error (0.0076 against 0.0081) and
 the same policy loss: no harm shown, not a strength gain.
 
-**Most of a network is rows:** one per question. A network has 4.09 M parameters
-at 64×2 and 20.24 M at 256×8.
+**Most of a network is rows:** 3.96 M of the 4.09 M parameters at 64×2 (97%), and
+15.83 M of 20.24 M at 256×8 (78%), whose wider layers weigh more. A decision reads
+only the rows of its answers: 689 of 61,821 in that example.
 
 Measurements of this network are in the
 [zone network record](../stage_a/zone_network_2026_11_02.md).
@@ -344,7 +472,7 @@ sends back each position's priors and values (`studies/campaign/shared_evaluator
 A larger batch costs less per position: 0.70 ms for one position, 1.38 ms for
 four ([record](../stage_a/coordinator_lookups_2026_11_04.md)). On 2 November the
 network's forward pass was three quarters of the coordinator's time, and the
-column lookups were its largest single part, 26%
+column lookups (section 5) were its largest single part, 26%
 ([profile](../stage_a/search_replays_2026_11_04.md#2-november-one-profiled-training-batch)).
 Since the search keeps copies of its positions, the coordinator is busy 90% of the
 time and limits this layout.
@@ -450,7 +578,14 @@ controls, not expert play.
 - **Question (column):** one numbered input slot with a fixed meaning.
 - **Answer:** the whole number a position gives to a question.
 - **Family:** a group of questions with one name pattern, such as `units`.
-- **Row:** the learned numbers a network keeps for one question.
+- **Vector:** a list of numbers, as many as the width, that describes a zone, the
+  position or a move inside a network.
+- **Width:** how many numbers each vector and row has: 64 in a 64×2 network.
+- **Row:** the learned numbers, as many as the width, that a network keeps for one
+  question. An answer adds its question's row, weighted, to a vector.
+- **Column lookup:** fetching the rows of the questions a position answers and
+  adding them up.
+- **Parameters:** all the numbers training adjusts: the rows and the learned layers.
 - **Layout version:** an identifier of the full set of questions and fixed map
   facts; a network refuses inputs of another layout.
 - **Sample:** a kept decision with its targets.
