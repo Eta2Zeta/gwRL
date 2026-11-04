@@ -64,7 +64,7 @@
     {
       "id": "clarifications",
       "path": "game_content/rules/clarifications.md",
-      "sha256": "97d8a368f9f0a4751cee06919ada36fa7a013c65431977033fa01fdb9edf5654",
+      "sha256": "e43200d13d260eab16559aa4789426d54a6e700df9be144d4be5ca0e412cb72f",
       "kind": "project_rule_register"
     },
     {

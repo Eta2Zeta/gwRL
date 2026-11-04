@@ -260,7 +260,7 @@
       "id": "RCL-019",
       "category": "project",
       "title": "One railroad per border, damaged and repaired by side",
-      "body": "Project ruling: a border has at most one railroad, so building one is not offered where a railroad, damaged or not, already exists or is under construction. Each side of the border holds its own damage up to the border terrain's maximum, a railroad damaged on either side cannot be used, and the nation possessing a damaged side's zone repairs that side at 1 IPP per point.",
+      "body": "Project ruling: a border has at most one railroad, so building one is not offered where a railroad, damaged or not, already exists or is under construction. Each side of the border holds its own damage, up to 1 in normal terrain and 2 in difficult terrain; a railroad damaged on either side cannot be used, and the nation possessing a damaged side's zone repairs that side at 1 IPP per point.",
       "section_ids": [
         "rb-13-2-8",
         "rb-10-6-2"
@@ -270,7 +270,7 @@
       "scope": "prior_register_outside_pilot",
       "reference_url": "../clarifications.md#rcl-019-one-railroad-per-border-damaged-and-repaired-by-side",
       "reference_label": "Rule register",
-      "authority_detail": "The user confirmed the per-side damage and repair on 3 November 2026 and adopted one railroad per border on 4 November 2026 as an equivalence ruling: bombing damages every railroad on a border together (RB 10.6.2), and repairing both sides at their maximum costs the building price."
+      "authority_detail": "The user confirmed the per-side damage and repair on 3 November 2026; on 4 November 2026 the user confirmed 2 damage per side in difficult terrain and adopted one railroad per border as an equivalence ruling: bombing damages every railroad on a border together (RB 10.6.2), and repairing both sides at their maximum costs the building price."
     }
   ]
 }

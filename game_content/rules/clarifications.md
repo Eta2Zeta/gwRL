@@ -386,8 +386,8 @@ paid for by its builder. Building toward another nation needs that nation's
 permission anyway.
 
 The user's statement of 3 November gave the normal-terrain numbers: two damage,
-one on each side. The engine applies the difficult-terrain maximum to each side
-in the same way, so such a border takes up to 2 damage on each side.
+one on each side. On 4 November the user confirmed the difficult-terrain case:
+such a border takes up to 2 damage on each side.
 
 **Example:** the railroad between Manchuria Northern and Manchuria Western is
 `rail_land_manchuria_northern__land_manchuria_western`. In random-play seed 7004
