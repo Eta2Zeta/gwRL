@@ -236,8 +236,8 @@ void railroadRepairNamesItsBorder() {
     const auto answers = optionAnswers(*spec, z, 0);
     for (const std::string expected :
          {"kind:economy_repair=1", "parameter:target=1", "parameter:endpoint=1", "parameter:damage=1",
-          "zone:2_target:land_manchuria_western=1", "rail_zone:2_target:land_manchuria_northern=1",
-          "rail_zone:2_target:land_manchuria_western=1", "rail_damage:2_target:land_manchuria_northern=1",
+          "zone:2_target:land_manchuria_western=1", "rail_endpoint:2_target:land_manchuria_northern=1",
+          "rail_endpoint:2_target:land_manchuria_western=1", "rail_damage:2_target:land_manchuria_northern=1",
           "rail_damage:2_target:land_manchuria_western=1", "number:damage=1"})
         require(answers.contains(expected), "Railroad repair answers " + expected);
     require(std::none_of(answers.begin(), answers.end(),
@@ -279,6 +279,107 @@ void unknownNamesAreCountedNotDropped() {
             "Unknown flags still count in an other column");
 }
 
+// A battle's notes keep their words: its steps, situation, result, the classes
+// a hit may take and the nations and players named. A unit lost earlier this
+// turn is skipped; a new word is counted in an "other" column and reported.
+void battleNotesKeepTheirWords() {
+    CampaignEnv env(scenario, 1, true);
+    auto s = env.engine().state().clone();
+    const Id zone = "land_china_beiping", victim = "setup_warlord_beiping_hopeh_land_china_beiping_infantry_1";
+    require(s.units.contains(victim), "Beiping holds a warlord infantry");
+    const Id lost = "setup_zone_test_lost_unit";
+    s.turnStart.units.emplace(lost, std::pair{Id("kmt"), zone});
+    BattleState battle;
+    battle.id = "land_battle_test";
+    battle.zone = zone;
+    battle.attacker = "japan";
+    battle.defender = "warlord_beiping_hopeh";
+    battle.stage = "choose_hits";
+    battle.data = V(O{
+        {"rolling_phase", V(std::string("defender_fire"))},
+        {"after_hits", V(std::string("round_end"))},
+        {"result", V(std::string("attacker_wins"))},
+        {"context", V(std::string("port_attack"))},
+        {"hits", V(V::Array{V(O{{"eligible", V(V::Array{V(victim)})},
+                                {"firing_nation", V(std::string("kmt"))},
+                                {"target_classes", V(V::Array{V(std::string("vehicle_class"))})},
+                                {"victim_attacker", V(false)}})})},
+        {"casualty_consents", V(O{{"axis", V(true)}})},
+        {"truce_breaker", V(std::string("kmt"))},
+        {"map_attack", V(true)},
+        {"defenders", V(V::Array{V(lost)})}});
+    s.battles.emplace(battle.id, battle);
+    s.nations.at("japan").turnFlags["surprise_attack_linked_land:" + zone] = 1;
+    const auto spec = zoneEncodingSpec(s);
+    zoneEncodingUnknowns(true);
+    auto row = zoneAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}), zone);
+    require(zoneEncodingUnknowns(true).empty(), "Every battle note and word has a column");
+    for (const std::string expected :
+         {"battle_data_word:rolling_phase:defender_fire", "battle_data_word:after_hits:round_end",
+          "battle_data_word:result:attacker_wins", "battle_data_word:context:port_attack", "battle_data_word:hits:kmt",
+          "battle_data_word:hits:vehicle_class", "battle_data_word:casualty_consents:axis",
+          "battle_data_word:truce_breaker:kmt", "battle_data_unit:hits:infantry",
+          "nation_flag_here:japan:surprise_attack_linked_land"})
+        require(row.contains(expected) && row.at(expected) == 1, "Battle note answers " + expected);
+    require(row.at("battle_data:map_attack") == 2, "A note that is true counts once for being there and once for true");
+
+    // An unlisted word, and a word in a note that holds no words, still count and are reported.
+    auto& data = s.battles.at(battle.id).data;
+    auto notes = data.asObject();
+    notes["context"] = V(std::string("zone_test_word"));
+    notes["cursor"] = V(std::string("standard"));
+    data = V(std::move(notes));
+    row = zoneAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}), zone);
+    const auto unknown = zoneEncodingUnknowns(true);
+    require(unknown.contains("battle_word:zone_test_word") && unknown.contains("battle_word_note:cursor"),
+            "New words and word-holding notes are reported");
+    require(row.at("battle_data_word:context:other") == 1 && row.at("battle_data_word:other:standard") == 1,
+            "New words still count in other columns");
+}
+
+// Repairs of cities and construction projects show at their zones, and rare
+// values of a move's details have their own questions.
+void repairsAndRareValuesHaveColumns() {
+    CampaignEnv env(scenario, 1, true);
+    auto s = env.engine().state().clone();
+    s.repairs.emplace("repair_land_china_beiping",
+                      RepairJob{"repair_land_china_beiping", "ccp", "land_china_beiping", 3, 0, false, std::nullopt});
+    s.construction.emplace("economy_airbase_1", BuildProject{"economy_airbase_1", "japan", "airbase",
+                                                             std::optional<Id>("land_formosa"), 1, 2, {2}, {{"damage", 1}}});
+    s.repairs.emplace("repair_economy_airbase_1",
+                      RepairJob{"repair_economy_airbase_1", "japan", "economy_airbase_1", 1, 0, false, std::nullopt});
+    const auto spec = zoneEncodingSpec(s);
+    Action intercept;
+    intercept.id = "test_intercept";
+    intercept.kind = "air_intercept";
+    intercept.player = "axis";
+    intercept.nation = "japan";
+    intercept.parameters = V(O{{"source", V(std::string("local"))}});
+    Action purchase = intercept;
+    purchase.id = "test_purchase";
+    purchase.kind = "economy_purchase";
+    purchase.parameters = V(O{{"row", V(std::string("japan_major_airbase"))},
+                              {"price", V(std::string("improved_construction_discount"))}});
+    Action combined = purchase;
+    combined.id = "test_purchase_combined";
+    combined.parameters = V(O{{"row", V(std::string("japan_major_airbase"))},
+                              {"price", V(std::string("improved_construction_combine"))}});
+    const std::vector<Action> moves{intercept, purchase, combined};
+    zoneEncodingUnknowns(true);
+    const auto z = encodeZoneInput(s, scheduleOf(env), optionsOf(moves));
+    require(zoneEncodingUnknowns(true).empty(), "Repairs and rare values have columns");
+    const auto beiping = zoneAnswers(*spec, z, "land_china_beiping");
+    require(beiping.at("repair:ccp:city:count") == 1 && beiping.at("repair:ccp:city:remaining_damage") == 3,
+            "A city repair under way shows at the city");
+    require(zoneAnswers(*spec, z, "land_formosa").at("repair:japan:construction:count") == 1,
+            "A construction repair under way shows at its site");
+    require(optionAnswers(*spec, z, 0).contains("value:source:local=1"), "An interception from the zone itself");
+    require(optionAnswers(*spec, z, 1).contains("value:price:improved_construction_discount=1") &&
+                optionAnswers(*spec, z, 2).contains("value:price:improved_construction_combine=1") &&
+                optionAnswers(*spec, z, 1) != optionAnswers(*spec, z, 2),
+            "The two Improved Construction prices are told apart");
+}
+
 void schedulingStateIsPartOfThePosition() {
     CampaignEnv env(scenario, 1, true);
     const auto& s = env.engine().state();
@@ -301,6 +402,8 @@ int main() {
                  {"identical units differ only by rank", identicalUnitsDifferOnlyByRank},
                  {"a railroad repair names its border", railroadRepairNamesItsBorder},
                  {"unknown names are counted, not dropped", unknownNamesAreCountedNotDropped},
+                 {"battle notes keep their words", battleNotesKeepTheirWords},
+                 {"repairs and rare values have columns", repairsAndRareValuesHaveColumns},
                  {"scheduling state is part of the position", schedulingStateIsPartOfThePosition}}) {
             test();
             std::cout << "PASS " << name << '\n';

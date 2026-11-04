@@ -22,30 +22,29 @@ using V = json::Value;
 // "other" column and reported by zoneEncodingUnknowns, never dropped.
 const std::vector<std::string> kActorFlags{
     "access_to_resources_completed", "air_allied_loaded_turn", "air_battle", "air_battle_turn", "air_combat",
-    "air_defending_carrier", "air_in_flight", "air_landed_after_combat", "air_scramble_origin",
-    "air_scramble_source", "air_screening_continued", "air_screening_ready", "air_screening_wait",
-    "air_transport_unloaded", "airborne_assault", "amphibious_assault", "amphibious_transport", "assault_declared",
-    "assault_zone", "attrition", "benchmark_destroyed_enemy_value", "benchmark_initial_budget",
-    "benchmark_lost_value", "benchmark_purchased", "benchmark_unspent_budget", "blitz_eligible", "blitz_from",
-    "blitz_to", "blitz_with", "captured_port_pending", "civil_war_eliminated", "combat", "combat_move",
-    "controller_unresolved", "crossed_enemy_fortification", "direct_axis_control_after_japan_surrender",
-    "economy_militia_placed", "economy_militia_upgrades", "economy_production_cap", "economy_repair_cap",
-    "economy_repairs_finished", "economy_research_capacity", "economy_research_finished", "economy_research_used",
-    "economy_researched_round", "economy_start_damage", "economy_start_type", "economy_used", "escort",
-    "evolved_during_own_turn", "evolved_turn_serial", "first_allies_major_war_declared",
-    "from_attack_naval_transport", "in_port", "incorporated", "influence_attempted", "land_retreating",
-    "launched_from_carrier", "lease_declared", "lease_delivered", "lease_repair_wait", "logistics_last_turn_start",
-    "map_declined_combat", "map_range", "maritime_air_patrol", "must_withdraw_from_chinese_gift", "naval_combat",
-    "naval_combat_turn", "naval_combat_unloaded", "naval_escort", "naval_last_origin",
-    "naval_loaded_completed_turns", "naval_movement_spent", "naval_raider", "naval_retreated",
+    "air_defending_carrier", "air_in_flight", "air_landed_after_combat", "air_scramble_origin", "air_scramble_source",
+    "air_screening_continued", "air_screening_ready", "air_screening_wait", "air_transport_unloaded",
+    "airborne_assault", "amphibious_assault", "amphibious_transport", "assault_declared", "assault_zone", "attrition",
+    "benchmark_destroyed_enemy_value", "benchmark_initial_budget", "benchmark_lost_value", "benchmark_purchased",
+    "benchmark_unspent_budget", "blitz_eligible", "blitz_from", "blitz_to", "blitz_with", "captured_port_pending",
+    "civil_war_eliminated", "combat", "combat_move", "controller_unresolved", "crossed_enemy_fortification",
+    "direct_axis_control_after_japan_surrender", "economy_militia_placed", "economy_militia_upgrades",
+    "economy_production_cap", "economy_repair_cap", "economy_repairs_finished", "economy_research_capacity",
+    "economy_research_finished", "economy_research_used", "economy_researched_round", "economy_start_damage",
+    "economy_start_type", "economy_used", "escort", "evolved_during_own_turn", "evolved_turn_serial",
+    "first_allies_major_war_declared", "from_attack_naval_transport", "in_port", "incorporated",
+    "influence_attempted", "land_retreating", "launched_from_carrier", "lease_declared", "lease_delivered",
+    "lease_repair_wait", "logistics_last_turn_start", "map_declined_combat", "map_range", "maritime_air_patrol",
+    "must_withdraw_from_chinese_gift", "naval_combat", "naval_combat_turn", "naval_combat_unloaded", "naval_escort",
+    "naval_last_origin", "naval_loaded_completed_turns", "naval_movement_spent", "naval_raider", "naval_retreated",
     "naval_scramble_origin", "naval_scrambled", "naval_screening_continuing", "naval_start_sea",
     "naval_strategic_destination", "naval_strategic_moved", "naval_unloaded", "newly_placed", "objective_evolution",
     "objective_one_china", "on_map", "one_china_bonus_awarded", "one_china_bonus_eligible_at_surrender",
     "placed_this_turn", "politics_combat_finished", "port_unloaded_round", "possessed_land_ipp", "purchased",
     "raider", "rail_build_permission", "rail_declined", "rail_permission", "rail_used", "recruitment_attempted",
-    "repair", "repair_at", "repairing", "retreated", "rocket_launched", "scrambled", "ship_crew",
-    "shore_bombardment", "skeleton_crew", "skeleton_crew_until_own_turn", "strategic_moved", "strategic_naval_used",
-    "submerged", "surprise_attack_available", "surprise_attack_naval_sea", "surprise_attack_target",
+    "repair", "repair_at", "repairing", "retreated", "rocket_launched", "scrambled", "ship_crew", "shore_bombardment",
+    "skeleton_crew", "skeleton_crew_until_own_turn", "strategic_moved", "strategic_naval_used", "submerged",
+    "surprise_attack_available", "surprise_attack_linked_land", "surprise_attack_naval_sea", "surprise_attack_target",
     "surprise_attack_used", "surprise_attack_zone", "surrendered", "towed_by", "towing", "transport_unloaded",
     "unloaded_combat", "unloaded_noncombat"
 };
@@ -148,15 +147,40 @@ const std::vector<std::string> kPendingNames{
 };
 const std::vector<std::string> kBattleDataKeys{
     "after_hits", "after_pairing", "after_roll", "air_after_landing", "air_defence_choices", "air_defence_ready",
-    "air_landing_done", "air_landing_queue", "air_screening_continuing", "air_shots", "air_stage",
-    "airborne_return_fire", "amphibious_sea", "amphibious_waiting", "attack_pairs", "bombarding", "cargo",
-    "context", "cursor", "declined", "defenders", "defense_pairs", "entry_processed", "exited_aircraft", "facility",
-    "forced_retreat", "grounded", "hit_index", "hits", "land_entry_origins", "naval_after_roll",
-    "naval_attacker_shots", "naval_entry_origins", "naval_hit_index", "naval_hits", "naval_immediate_hits",
-    "naval_movement", "naval_pending_dead", "naval_round_shots", "naval_scramble_choices", "naval_shots",
-    "no_scramble", "origins", "pair_after", "pending_dead", "request", "result", "retreated_units", "rolling_phase",
-    "round", "scramble_origins", "scramble_sources", "screening", "sea", "selected", "shore_hit_index",
-    "shore_hits", "shore_shots", "shots", "submarines_initiated", "target", "target_kind", "waiting_ports"
+    "air_hit_queue", "air_interception_choices", "air_landing_done", "air_landing_queue", "air_pending_dead",
+    "air_screening_continuing", "air_shots", "air_stage", "airborne_drop_ready", "airborne_return_fire",
+    "amphibious_sea", "amphibious_waiting", "attack_pairs", "blitz_pairs", "bombarding", "cargo",
+    "carpet_return_done", "casualty_consents", "casualty_proposal", "context", "continuing", "cursor", "declined",
+    "defenders", "defense_pairs", "disputing_nations", "entry_compelled", "entry_nation", "entry_processed",
+    "entry_zone", "evacuated", "evacuation_selection_complete", "exited_aircraft", "facility", "forced_retreat",
+    "grounded", "hit_index", "hits", "kind", "land_entry_origins", "map_attack", "naval_after_roll",
+    "naval_attacker_shots", "naval_carrier_landing_queue", "naval_casualty_consents", "naval_casualty_proposal",
+    "naval_destroyer_pairs", "naval_discovering_raider", "naval_disputing_nations", "naval_entry_origins",
+    "naval_excluded", "naval_hit_index", "naval_hits", "naval_immediate_hits", "naval_movement", "naval_pairing_done",
+    "naval_pending_dead", "naval_protected_submarines", "naval_raider_choices", "naval_round_shots",
+    "naval_scramble_choices", "naval_shots", "naval_submarine_choices", "no_scramble", "one_round", "origins",
+    "pair_after", "pending_dead", "port_evacuation", "reaction_context", "reaction_units", "request", "result",
+    "retreated_units", "rolling_phase", "round", "scramble_origins", "scramble_sources", "screening", "sea",
+    "selected", "shore_consents", "shore_disputing_nations", "shore_hit_index", "shore_hits", "shore_proposal",
+    "shore_shots", "shots", "submarines_initiated", "target", "target_kind", "truce_breaker", "waiting_ports"
+};
+
+// Battle notes whose values can be words rather than units, zones or numbers:
+// a battle's next step, its situation, its result, a bombing target, the side
+// or unit classes a hit may take, nations and players.
+const std::vector<std::string> kBattleWordKeys{
+    "after_hits", "after_pairing", "after_roll", "air_after_landing", "air_hit_queue", "air_shots", "air_stage",
+    "casualty_consents", "context", "disputing_nations", "entry_compelled", "entry_nation", "hits", "kind",
+    "naval_after_roll", "naval_attacker_shots", "naval_casualty_consents", "naval_disputing_nations", "naval_hits",
+    "naval_immediate_hits", "naval_movement", "naval_shots", "pair_after", "reaction_context", "result",
+    "rolling_phase", "shore_consents", "shore_disputing_nations", "shore_hits", "shore_shots", "shots", "target_kind",
+    "truce_breaker"
+};
+// Words such notes use besides battle stages, unit classes, nations and players.
+const std::vector<std::string> kBattleWords{
+    "attacker", "attacker_wins", "attrition_complete", "carpet_round_end", "city", "construction", "defender",
+    "defender_wins", "drop", "facility", "finish", "forced_retreat", "movement_map", "movement_submarines",
+    "mutual_destruction", "one_round", "port_attack", "rail", "retreated", "screening", "stalemate", "standard"
 };
 
 const std::vector<std::string> kPhases{"combat", "combat_movement", "non_combat_movement", "place_units", "production"};
@@ -164,8 +188,10 @@ const std::vector<std::string> kScheduleKinds{"interrupt", "pass_interrupt", "pl
 const std::vector<std::string> kUnitClasses{"aircraft", "land", "naval"};
 const std::vector<std::string> kPowerStatuses{"major", "minor", "warlord"};
 const std::vector<std::string> kIncomeComponents{"china_control_bonus", "territorial"};
-const std::vector<std::string> kEnumValues{"blitz", "city", "construction", "facility", "narrow_crossing", "ordinary",
-                                           "printed", "rail", "strategic_rail", "strategic_river"};
+const std::vector<std::string> kEnumValues{
+    "blitz", "city", "construction", "facility", "improved_construction_combine", "improved_construction_discount",
+    "local", "narrow_crossing", "ordinary", "printed", "rail", "strategic_rail", "strategic_river"
+};
 const std::vector<std::string> kParameterKeys{
     "actor", "air_only", "air_priority", "aircraft", "armor", "artillery", "attacker", "attacking", "authority",
     "battle", "beneficiary", "bombarding", "border", "border2", "cargo", "carriers", "ccp_neighbor", "combat",
@@ -179,7 +205,7 @@ const std::vector<std::string> kParameterKeys{
     "threshold", "towed", "transport", "truce_breaker", "truce_eligible", "type", "unit", "unit_destruction",
     "units", "unload", "victim_attacker", "visited_configurations", "warlord", "zone", "zones"};
 const std::vector<std::string> kRoleGroups{"source", "path", "target", "other"};
-const std::vector<std::string> kRepairTargets{"facility", "rail", "unit"};
+const std::vector<std::string> kRepairTargets{"city", "construction", "facility", "rail", "unit"};
 const std::vector<std::string> kRepairStats{"count", "remaining_cost", "remaining_damage", "restricts_action"};
 const std::vector<std::string> kFacilityStats{"count", "damage", "damaged"};
 const std::vector<std::string> kProjectClasses{"facility", "unit"};
@@ -344,8 +370,9 @@ struct Context {
         rows, terrains, unitClasses, actorFlags, topUnitFlags, unitStats, refKinds, recordFlags, actionKinds,
         decisionKinds, adapterKinds, battleStages, chancePurposes, pendingNames, dataKeys, phases, scheduleKinds,
         powerStatuses, incomeComponents, enumValues, parameterKeys, roleGroups, repairTargets, repairStats,
-        facilityStats, projectClasses, projectStats, chanceStats, positions, ranks;
+        facilityStats, projectClasses, projectStats, chanceStats, positions, ranks, battleWordKeys, battleWords;
     std::vector<int> unitClassOfType;
+    std::vector<int> wordKeyOfDataKey;  // Each battle-note key's row in battleWordKeys, or its other.
     std::unordered_map<std::string, int> roleOfKey;
     Layout zone, global, action;
     // Zone families.
@@ -353,7 +380,7 @@ struct Context {
         zUnitStat, zUnitClassFlag, zUnitRef, zUnitAtFacility, zUnitFacilityBorder, zCarried, zNationHere, zFacility, zFacilityFlag, zFacilityBorder,
         zFacilityOriginalOwner, zFacilityOriginalType, zProject, zProjectStat, zProjectFlag, zProjectRow, zProjectBorder,
         zRepair, zRail, zRailDamage, zRailRepair, zBattle, zBattleStage, zBattleRound, zBattleAttacker, zBattleDefender, zBattleFlag,
-        zBattleData, zBattleDataUnit, zBattleDataRank, zBattleDataZone, zBattleHits, zBattleOrder;
+        zBattleData, zBattleDataUnit, zBattleDataRank, zBattleDataZone, zBattleDataWord, zBattleHits, zBattleOrder;
     // Global families.
     int gRound, gCompletedRounds, gRoundsLeft, gPhase, gTurnNation, gIncomeCollected, gTerminal, gPresent, gAlliance,
         gPlayer, gPower, gController, gTreasury, gHasTreasury, gIncome, gIncomeKnown, gTech, gWar, gAlly, gNationFlag,
@@ -369,7 +396,7 @@ struct Context {
         aUnitLaterPeers, aUnitCarrier,
         aProjectStat, aProjectBorder, aProjectFlag, aFacilityBorder, aFacilityFlag, aFacilityDamage, aBattleAttacker, aBattleDefender, aBattleZone,
         aBattleUnits, aZone, aFacility,
-        aBattleStage, aProject, aProjectOwner, aRailZone, aRailDamage, aRow, aNationRef, aTech, aEnum, aNumber, aTrue, aFalse, aNull,
+        aBattleStage, aProject, aProjectOwner, aRailEndpoint, aRailDamage, aRow, aNationRef, aTech, aEnum, aNumber, aTrue, aFalse, aNull,
         aListLength;
 };
 
@@ -508,6 +535,17 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->chancePurposes = Vocabulary("chance_purpose", kChancePurposes, true);
     c->pendingNames = Vocabulary("pending", kPendingNames, true);
     c->dataKeys = Vocabulary("battle_data", kBattleDataKeys, true);
+    std::vector<std::string> battleWords = kBattleWords;
+    battleWords.insert(battleWords.end(), kBattleStages.begin(), kBattleStages.end());
+    for (const auto& [id, unit] : catalog.units()) battleWords.insert(battleWords.end(), unit.classes.begin(), unit.classes.end());
+    battleWords.insert(battleWords.end(), nations.begin(), nations.end());
+    for (const std::string player : {"allies", "axis", "comintern"}) battleWords.push_back(player);
+    c->battleWords = Vocabulary("battle_word", battleWords, true);
+    c->battleWordKeys = Vocabulary("battle_word_note", kBattleWordKeys, true);
+    for (const auto& key : c->dataKeys.names()) {
+        const int row = c->battleWordKeys.find(key);
+        c->wordKeyOfDataKey.push_back(row >= 0 ? row : c->battleWordKeys.other());
+    }
     c->phases = Vocabulary("phase", kPhases, false);
     c->scheduleKinds = Vocabulary("schedule_kind", kScheduleKinds, true);
     c->powerStatuses = Vocabulary("power_status", kPowerStatuses, true);
@@ -672,6 +710,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
                                [&](const Cell& x) { return owned[x[1]] != 0; });
     c->zBattleDataRank = z.add("battle_data_unit_rank", {&c->dataKeys, &c->ranks});
     c->zBattleDataZone = z.add("battle_data_zone", {&c->dataKeys, &c->zones});
+    c->zBattleDataWord = z.add("battle_data_word", {&c->battleWordKeys, &c->battleWords});
     c->zBattleHits = z.add("battle_pending_hits", {});
     c->zBattleOrder = z.add("battle_order", {});
 
@@ -778,7 +817,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->aProject = a.add("project", {&c->roleGroups, &c->projectTypes},
                         [&](const Cell& x) { return projectOf(-1, x[1]); });
     c->aProjectOwner = a.add("project_owner", {&c->roleGroups, &c->nations});
-    c->aRailZone = a.add("rail_zone", {&c->roleGroups, &c->zones}, [&](const Cell& x) { return !sea[x[1]]; });
+    c->aRailEndpoint = a.add("rail_endpoint", {&c->roleGroups, &c->zones}, [&](const Cell& x) { return !sea[x[1]]; });
     c->aRailDamage = a.add("rail_damage", {&c->roleGroups, &c->zones}, [&](const Cell& x) { return !sea[x[1]]; });
     c->aRow = a.add("row", {&c->rows});
     c->aNationRef = a.add("nation_named", {&c->roleGroups, &c->nations});
@@ -1231,6 +1270,15 @@ void encodeRepairs(const Context& c, const State& s, Builder& b) {
         } else if (const auto f = s.facilities.find(r.target); f != s.facilities.end()) {
             zone = c.zones.find(f->second.zone);
             kind = "facility";
+        } else if (s.territories.contains(r.target)) {
+            zone = c.zones.find(r.target);
+            kind = "city";
+        } else if (const auto p = s.construction.find(r.target); p != s.construction.end()) {
+            if (p->second.site) {
+                const auto site = s.facilities.find(*p->second.site);
+                zone = c.zones.find(site != s.facilities.end() ? site->second.zone : *p->second.site);
+            }
+            kind = "construction";
         } else if (const auto rail = s.rails.find(r.target); rail != s.rails.end()) {
             // A railroad repair mends one side: it is filed at that side's zone,
             // with the zone across the border.
@@ -1272,25 +1320,52 @@ void dataUnit(const Context& c, Builder& b, const UnitRoles& roles, int zone, in
         b.zone(zone, c.zone.at(c.zBattleDataRank, {key, std::min(rank->second, 7)}), 1);
 }
 
+// A word in a battle note, filed under the note when it is one that holds words.
+// Unlisted words and words in other notes still count, in "other" columns, and
+// are reported.
+void dataWord(const Context& c, Builder& b, int zone, int key, const std::string& word) {
+    const int note = c.wordKeyOfDataKey[static_cast<std::size_t>(key)];
+    if (note == c.battleWordKeys.other()) noteUnknown("battle_word_note", c.dataKeys.names()[static_cast<std::size_t>(key)]);
+    b.zone(zone, c.zone.at(c.zBattleDataWord, {note, c.battleWords(word)}), 1);
+}
+
 void dataFacts(const Context& c, const State& s, Builder& b, const UnitRoles& roles, int zone, int key,
                const V& value, int depth) {
     if (depth > 6) return;
     if (value.isString()) {
         const auto& text = value.asString();
-        if (const auto u = s.units.find(text); u != s.units.end())
+        if (text.empty()) return;
+        if (const auto u = s.units.find(text); u != s.units.end()) {
             dataUnit(c, b, roles, zone, key, u->second);
-        else if (const int z = c.zones.find(text); z >= 0)
+        } else if (const int z = c.zones.find(text); z >= 0) {
             b.zone(zone, c.zone.at(c.zBattleDataZone, {key, z}), 1);
-        else if (const auto f = s.facilities.find(text); f != s.facilities.end())
+        } else if (const auto f = s.facilities.find(text); f != s.facilities.end()) {
             b.zone(zone, c.zone.at(c.zBattleDataZone, {key, c.zones(f->second.zone)}), 1);
+        } else if (const auto p = s.construction.find(text); p != s.construction.end()) {
+            if (p->second.site) {
+                const auto site = s.facilities.find(*p->second.site);
+                const int where = c.zones.find(site != s.facilities.end() ? site->second.zone : *p->second.site);
+                if (where >= 0) b.zone(zone, c.zone.at(c.zBattleDataZone, {key, where}), 1);
+            }
+        } else if (const auto r = s.rails.find(text); r != s.rails.end()) {
+            for (const auto& side : {r->second.endpointA, r->second.endpointB})
+                if (const int where = c.zones.find(side); where >= 0) b.zone(zone, c.zone.at(c.zBattleDataZone, {key, where}), 1);
+        } else if (!s.turnStart.units.contains(text) &&
+                   std::none_of(text.begin(), text.end(), [](unsigned char x) { return std::isdigit(x); })) {
+            // Names of units lost this turn, and of anything else no longer in the
+            // game, end in a number; words never contain digits.
+            dataWord(c, b, zone, key, text);
+        }
     } else if (value.isNumber() || value.isBool()) {
         b.zone(zone, c.zone.at(c.zBattleData, {key}), static_cast<long>(std::lround(numberOr(&value))));
     } else if (value.isArray()) {
         for (const auto& item : value.asArray()) dataFacts(c, s, b, roles, zone, key, item, depth + 1);
     } else if (value.isObject()) {
         for (const auto& [name, item] : value.asObject()) {
-            // Keys naming units count as those units, as values do.
+            // Keys naming units, nations or players count as those, as values do;
+            // other keys only name the note's fields.
             if (const auto u = s.units.find(name); u != s.units.end()) dataUnit(c, b, roles, zone, key, u->second);
+            else if (c.nations.find(name) >= 0 || c.players.find(name) >= 0) dataWord(c, b, zone, key, name);
             dataFacts(c, s, b, roles, zone, key, item, depth + 1);
         }
     }
@@ -1606,10 +1681,10 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
             for (const auto& side : {rail->second.endpointA, rail->second.endpointB}) {
                 const int where = c.zones.find(side);
                 if (where < 0) {
-                    noteUnknown("rail_zone", side);
+                    noteUnknown("rail_endpoint", side);
                     continue;
                 }
-                b.option(c.action.at(c.aRailZone, {role, where}), 1, role);
+                b.option(c.action.at(c.aRailEndpoint, {role, where}), 1, role);
                 if (const auto damage = rail->second.damageByEndpoint.find(side); damage != rail->second.damageByEndpoint.end())
                     b.option(c.action.at(c.aRailDamage, {role, where}), damage->second, role);
                 b.zoneRef(role == 1 ? 3 : role, where);

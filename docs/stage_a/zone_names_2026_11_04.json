@@ -1,0 +1,229 @@
+{
+ "date": "2026-11-04",
+ "layout": {
+  "before": "campaign-zone-v1-40973ed0dcbeb890",
+  "after": "campaign-zone-v1-a44069d0dfe2c7c0"
+ },
+ "columns": {
+  "before": {
+   "zone": 35439,
+   "position": 6621,
+   "move": 12381
+  },
+  "after": {
+   "zone": 42520,
+   "position": 6634,
+   "move": 12667
+  },
+  "added_zone": {
+   "36 battle notes x 91 (battle_data, battle_data_unit by owned unit type, battle_data_unit_rank, battle_data_zone)": 3276,
+   "repair targets city and construction: 2 x 13 nations x 4 facts": 104,
+   "mark surprise_attack_linked_land: unit_flag 16, nation_flag_here 13": 29,
+   "battle_data_word: 33 notes and an other row x 107 words and an other column": 3672
+  },
+  "added_position": {
+   "mark surprise_attack_linked_land: nation_flag x 13 nations": 13
+  },
+  "added_move": {
+   "values local, improved_construction_discount, improved_construction_combine: 3 x 94 labels": 282,
+   "mark surprise_attack_linked_land: unit_cargo_flag x 4 roles": 4
+  }
+ },
+ "network_parameters_millions": {
+  "64x2": {
+   "before": 3.62,
+   "after": 4.09
+  },
+  "256x8": {
+   "before": 18.35,
+   "after": 20.24
+  }
+ },
+ "added_names": {
+  "battle_notes_seen_in_random_games": [
+   "air_hit_queue",
+   "air_interception_choices",
+   "air_pending_dead",
+   "airborne_drop_ready",
+   "kind",
+   "map_attack",
+   "naval_carrier_landing_queue",
+   "naval_destroyer_pairs",
+   "naval_discovering_raider",
+   "naval_excluded",
+   "naval_pairing_done",
+   "naval_protected_submarines",
+   "naval_raider_choices",
+   "naval_submarine_choices",
+   "reaction_context",
+   "reaction_units"
+  ],
+  "battle_notes_found_in_engine_source": [
+   "blitz_pairs",
+   "carpet_return_done",
+   "casualty_consents",
+   "casualty_proposal",
+   "continuing",
+   "disputing_nations",
+   "entry_compelled",
+   "entry_nation",
+   "entry_zone",
+   "evacuated",
+   "evacuation_selection_complete",
+   "naval_casualty_consents",
+   "naval_casualty_proposal",
+   "naval_disputing_nations",
+   "one_round",
+   "port_evacuation",
+   "shore_consents",
+   "shore_disputing_nations",
+   "shore_proposal",
+   "truce_breaker"
+  ],
+  "notes_that_hold_words": 33,
+  "battle_words": {
+   "steps": "the 52 battle stage names",
+   "situations": [
+    "movement_map",
+    "movement_submarines",
+    "port_attack",
+    "screening",
+    "standard"
+   ],
+   "results": [
+    "attacker_wins",
+    "attrition_complete",
+    "defender_wins",
+    "forced_retreat",
+    "mutual_destruction",
+    "one_round",
+    "retreated",
+    "stalemate"
+   ],
+   "bombing_targets": [
+    "city",
+    "construction",
+    "facility",
+    "rail"
+   ],
+   "landing_steps": [
+    "carpet_round_end",
+    "drop",
+    "finish"
+   ],
+   "sides": [
+    "attacker",
+    "defender"
+   ],
+   "unit_classes": 17,
+   "nations": 13,
+   "players": [
+    "allies",
+    "axis",
+    "comintern"
+   ]
+  },
+  "move_values": [
+   "local",
+   "improved_construction_discount",
+   "improved_construction_combine"
+  ],
+  "repair_targets": [
+   "city",
+   "construction"
+  ],
+  "marks": [
+   "surprise_attack_linked_land"
+  ],
+  "renamed": {
+   "rail_zone": "rail_endpoint"
+  }
+ },
+ "battle_words_dropped_before": {
+  "source": "48 random games, seeds 7000 to 7047, sampling every third decision on 4 November",
+  "examples": {
+   "rolling_phase": [
+    "defender_fire",
+    "attacker_fire",
+    "air_fire",
+    "first_strike"
+   ],
+   "after_hits": [
+    "round_end",
+    "defender_fire"
+   ],
+   "context": [
+    "port_attack",
+    "standard",
+    "screening",
+    "movement_map"
+   ],
+   "result": [
+    "attacker_wins",
+    "one_round",
+    "retreated"
+   ],
+   "target_kind": [
+    "facility",
+    "rail"
+   ],
+   "hits and shots": [
+    "nation names",
+    "vehicle_class",
+    "land",
+    "naval"
+   ]
+  }
+ },
+ "random_check": {
+  "tool": "tools/check_zone_names.py",
+  "rounds": 11,
+  "workers": 8,
+  "runs": [
+   {
+    "seeds": [
+     7000,
+     7239
+    ],
+    "games": 240,
+    "finished": 240,
+    "decisions": 373049,
+    "unknown": {}
+   },
+   {
+    "seeds": [
+     9000,
+     9239
+    ],
+    "games": 240,
+    "finished": 240,
+    "decisions": 372113,
+    "unknown": {}
+   }
+  ],
+  "wall_seconds_per_run": 112
+ },
+ "encoding_time_ms": {
+  "games": "random eleven-round seeds 31, 32 and 33",
+  "decisions": 4786,
+  "before": {
+   "mean": 0.164
+  },
+  "after": {
+   "means": [
+    0.173,
+    0.169
+   ],
+   "medians": [
+    0.158,
+    0.154
+   ]
+  },
+  "note": "legal moves, play and clone took 2 to 5 percent longer in the same runs as well"
+ },
+ "tests": [
+  "zone_encoding_tests: battle notes keep their words; repairs and rare values have columns",
+  "test_campaign_zone_encoding: five checks of names in the engine's source; two whole random games",
+  "ctest: 26 of 26 suites pass"
+ ]
+}

@@ -147,11 +147,11 @@ For every position the search asks about, the engine's encoder
 (`src/zone_encoding.cpp`) turns the position into one bundle of numbers with three
 parts:
 
-1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 35,439
+1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 42,520
    zone questions, such as "how many CCP cavalry are here?".
-2. **The position as a whole:** 6,621 questions, such as the round, the phase,
+2. **The position as a whole:** 6,634 questions, such as the round, the phase,
    whose turn it is, treasuries and wars.
-3. **Each legal move:** 12,381 questions, such as which kind of move it is, which
+3. **Each legal move:** 12,667 questions, such as which kind of move it is, which
    unit it moves and which zones it names.
 
 Answers are whole numbers, and only the non-zero ones are stored. Each move is
@@ -204,8 +204,8 @@ reached adds nothing, instead of a random row added at full strength. On fixed
 data this gave a slightly lower held-out value error (0.0076 against 0.0081) and
 the same policy loss: no harm shown, not a strength gain.
 
-**Most of a network is rows:** one per question. A network has 3.62 M parameters
-at 64×2 and 18.35 M at 256×8.
+**Most of a network is rows:** one per question. A network has 4.09 M parameters
+at 64×2 and 20.24 M at 256×8.
 
 Measurements of this network are in the
 [zone network record](../stage_a/zone_network_2026_11_02.md).
@@ -266,9 +266,10 @@ learning, not the speed, is the current limit.
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
-`failed-positions/` folder. The random-play fuzzer
-(`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for moves that leave
-the game unchanged before long runs.
+`failed-positions/` folder. Two random-play checks run before long runs: the
+fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for moves
+that leave the game unchanged, and `tools/check_zone_names.py` for names the
+network's input does not list.
 
 ## 8. Measuring strength
 
@@ -296,11 +297,12 @@ controls, not expert play.
 
 ## 9. Known gaps and open questions
 
-- **20 names missing from the encoder's lists.** They fall into shared "other"
-  questions, so the network cannot tell them apart. See
-  [names the encoder doesn't know](network_input.md#7-names-the-encoder-doesnt-know).
-  The recommended fix keeps the engine's names and checks them against the
-  encoder's lists ([why](network_input.md#10-why-the-encoder-translates-names)).
+- **Some details are summarized, not named.** Since 4 November no name in 480
+  random games falls into an "other" question, and tests check the names the
+  engine's source writes. But a mark's argument other than a place or a nation,
+  such as which railroad was damaged this turn, is counted for the whole
+  position, and a battle note's numbers are added into one answer. See
+  [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
   replays in builds with memory checks did not reproduce it. Two crashes close

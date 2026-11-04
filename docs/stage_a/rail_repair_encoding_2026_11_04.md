@@ -12,8 +12,9 @@ holds the exact values.
 ## The rule
 
 The user confirmed on 3 November that each side of a railroad's border holds its
-own damage and that the nation possessing a side repairs it at 1 IPP per point.
-On 4 November the user adopted one railroad per border as an equivalence ruling:
+own damage and that the nation possessing a side repairs it at 1 IPP per point,
+and on 4 November that a difficult border takes up to 2 damage on each side.
+On 4 November the user also adopted one railroad per border as an equivalence ruling:
 a second railroad would give nothing that repairing the first does not. Bombing
 damages every railroad on a border together (RB 10.6.2), and repairing both
 sides at their maximum costs the building price (2 IPP in normal terrain, 4 in
@@ -51,7 +52,7 @@ economy_repair   target   = rail_land_manchuria_northern__land_manchuria_western
 
 | Before | After |
 | --- | --- |
-| `value:target:other`: some unknown name | `rail_zone:2_target:land_manchuria_northern`, `rail_zone:2_target:land_manchuria_western`: the railroad's two zones; `rail_damage:2_target:land_manchuria_northern = 1`: the damage on each side |
+| `value:target:other`: some unknown name | `rail_endpoint:2_target:land_manchuria_northern`, `rail_endpoint:2_target:land_manchuria_western`: the railroad's two zones, its endpoints; `rail_damage:2_target:land_manchuria_northern = 1`: the damage on each side |
 | `zone:3_other:land_manchuria_northern`: the side, with no role | `zone:2_target:land_manchuria_northern`: the side, as what the move acts on |
 | `parameter:other`, `number:other = 1` | `parameter:damage`, `number:damage = 1` |
 
@@ -100,8 +101,9 @@ new run starts fresh.
 
 ## Not changed
 
-- The other 20 missing names. They are listed in the
-  [design page](../design/network_input.md#the-20-missing-names).
+- The other 20 missing names, fixed later the same day
+  ([record](zone_names_2026_11_04.md)). That change also renamed the move
+  questions `rail_zone`, as this change first named them, to `rail_endpoint`.
 - Marks that say when a railroad or facility was damaged, repaired or built this
   turn (`logistics_damaged_turn:<name>`, `logistics_start_damaged:<name>`,
   `logistics_rail_created_turn:<name>`) are still counted for the whole position,
