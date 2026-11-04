@@ -73,6 +73,18 @@ Copying the game cost 3 to 4 ms for all 64 copies of a search. Playing a move
 cost 0.2 to 1.4 ms on average, depending on the move. The trees stayed shallow:
 1.2 to 2.5 steps per simulation on average, at most 9.
 
+How deep the simulations went, counting moves and dice rolls:
+
+| Search | Simulations by depth | First moves tried | Visits of the most-visited first moves |
+| --- | --- | ---: | --- |
+| Round 5, Japan, Combat Movement, 24 legal moves | 1 step: 24; 2: 21; 3: 1; 4: 6; 5: 7; 6: 4; 9: 1 | 24 of 24 | 27, 12, 2, 2, 2, then 1 each |
+| Round 2, KMT, Noncombat Movement, 104 legal moves | 1 step: 55; 2: 5; 3: 2; 4: 2 | 55 of 104 | 10, then 1 each |
+
+In the first of these, the 24 one-step simulations were all among the first 31,
+and 37 of the 40 deeper simulations started with one of the two most-visited
+moves. A move no simulation has tried scores as well as the best result so far,
+so untried moves usually come first.
+
 The deepest simulation of the last search copied the game and played five moves,
 Japan's `end_phase`, a `land_begin_battle`, a `land_retreat_begin`, a
 `land_retreat_unit` and another `land_begin_battle`, with four dice rolls along
