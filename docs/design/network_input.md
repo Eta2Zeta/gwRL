@@ -155,21 +155,44 @@ damage:   1
 
 ### How each detail becomes answers
 
-For each detail, the encoder records that a detail with this label exists
-(`parameter:<label>`), then its value:
+Every move first says who chooses and what kind of move it is, for example
+`schedule:play = 1`, `player:axis = 1`, `nation:japan = 1` and
+`kind:air_start_patrol = 1`. Then, for each detail, the encoder records that a
+detail with this label exists, such as `parameter:range = 1`, and then the
+detail's value. How it records the value depends on what the value is.
 
-| Value | Answers |
-| --- | --- |
-| a number | `number:<label>` = the number |
-| true, false, nothing | `true:<label>`, `false:<label>`, `null:<label>` = 1 |
-| a list | `list_length:<label>` = its length, then each item as a value |
-| a unit's name | what the unit is: `unit:<role>:<nation>:<type>`, its condition (`unit_stat:<role>:...`), its zone, its rank among identical units, the units after it, its cargo, ... |
-| a zone's name | `zone:<role>:<zone>` = 1 |
-| the name of a facility, battle, construction project, build-chart row, nation or technology | that thing's own families: `facility:<role>:<type>`, `battle_stage:<role>:<stage>`, ... |
-| any other name | `value:<label>:<name>` if the name is on the list of known values, otherwise `value:<label>:other` |
+All the examples below are details of real legal moves from a random game (seed
+7001; the railroad repair is from seed 7004).
 
-Like units, every named thing is replaced by what it is; its name never reaches
-the network.
+**Plain values:**
+
+| Value | Real example | Answers |
+| --- | --- | --- |
+| A number | A Japanese seaplane in Okinawa starts a patrol over sea zone P33: `range = 2` | `number:range = 2` |
+| True | A Japanese infantry moves from Rehe into Beiping to attack: `combat = true` | `true:combat = 1` |
+| False | A Japanese transport enters Formosa's port without unloading: `unload = false` | `false:unload = 1` |
+| Nothing | A Japanese heavy cruiser moves from sea zone P16 to P15, starting and ending at sea, not in a port: `origin_facility = null`, `destination_facility = null` | `null:origin_facility = 1`, `null:destination_facility = 1` |
+| A list | A Japanese fighter flies from Formosa over P32 to attack Hunan: `path = [land_formosa, sea_p32, land_china_hunan]` | `list_length:path = 3`, then each item as its own value: `zone:1_path:land_formosa = 1`, `zone:1_path:sea_p32 = 1`, `zone:1_path:land_china_hunan = 1` |
+| A group of details | The cruiser's move keeps its details in one group: `request = {combat = true, strategic = false, path = [sea_p16, sea_p15], units = [setup_japan_sea_p16_heavy_cruiser_1], ...}` | `parameter:request = 1`, then each inner detail as if it stood alone: `true:combat = 1`, `false:strategic = 1`, `list_length:path = 2`, `zone:1_path:sea_p16 = 1`, ..., `unit:0_source:japan:heavy_cruiser = 1`, ... |
+
+**Names of things.** A name is replaced by what the thing is; the name itself
+never reaches the network.
+
+| Value | Real example | Answers |
+| --- | --- | --- |
+| A unit's name | The fighter attacking Hunan: `unit = setup_japan_land_formosa_fighter_1` | `unit:0_source:japan:fighter = 1` (a Japanese fighter), `unit_stat:0_source:count = 1`, `unit_stat:0_source:move_4 = 1` (4 moves left), `unit_zone:0_source:land_formosa = 1` (it is in Formosa), `unit_turn_origin:0_source:land_formosa = 1` (it started the turn there), `unit_rank:0_source:0 = 1` (the first Japanese fighter there), `unit_later_peers:0_source:militia = 1` (one militia comes after it in unit order) |
+| A zone's name | Japan buys an airbase to build in Formosa: `zone = land_formosa` | `zone:2_target:land_formosa = 1` |
+| A facility's name | The transport entering port: `facility = facility_land_formosa_major_port` | `facility:0_source:major_port = 1` |
+| A battle's name | The CCP starts its battle in Hopeh: `battle = land_battle_2` | `battle_stage:0_source:awaiting_combat_rules = 1`, `battle_attacker:0_source:ccp = 1`, `battle_defender:0_source:warlord_beiping_hopeh = 1`, `battle_units:0_source:cavalry = 1`, `battle_units:0_source:militia = 1`, `battle_place:0_source:land_china_shensi = 2` (the battle's notes name Shensi twice) |
+| A construction project's name | Japan pays the next instalment on a fleet carrier it is building: `project = japan_queue_fleet_carrier` | `project:0_source:fleet_carrier = 1`, `project_owner:0_source:japan = 1`, `project_stat:0_source:paid_ipp = 5` (5 IPP paid), `project_stat:0_source:payments_left = 2`, `project_stat:0_source:remaining_payments = 10` (two payments, 10 IPP, to go), `project_stat:0_source:queue_position = 3`, `project_stat:0_source:count = 1` |
+| A build-chart row | The airbase purchase: `row = japan_major_airbase` | `row:japan_major_airbase = 1` |
+| A nation's name | The KMT declares war on Japan: `target = japan` | `nation_named:2_target:japan = 1` |
+| A technology | Japan starts research at its Tokyo factory: `technology = advanced_artillery` | `technology:advanced_artillery = 1` |
+| Any other name, on the list of known values | The airbase purchase, at the printed price: `price = printed` | `value:price:printed = 1` |
+| Any other name, not on the list | The railroad repair ([example 2](#example-2-a-railroad-repair)): `target = rail_land_manchuria_northern__land_manchuria_western` | `value:target:other = 1` |
+
+The `0_source`, `1_path` and `2_target` parts of these names are roles, explained
+next.
 
 ### Roles
 
