@@ -156,6 +156,43 @@ nation_present:<nation> = 1     one answer per nation in the game
 
 ## 6. The move part
 
+### Every move has the same format
+
+Every legal move answers the same fixed list of 12,114 move questions. So every
+move is a row of the same length, almost all zeros, and only its non-zero answers
+are stored. A move fills in only the questions that apply to it: the fighter
+attacking Hunan fills in 17, the airbase purchase 10.
+
+**A toy version.** Suppose the game had two unit types, infantry and tank, and
+three zones, a, b and c. Part of a move's row would be these eight questions:
+
+```text
+                  unit:0_source:   unit_zone:0_source:   zone:1_path:
+                  infantry  tank   a    b    c           a    b    c
+infantry a→b→c       1       0     1    0    0           1    1    1
+tank b→c             0       1     0    1    0           0    1    1
+```
+
+The infantry move also answers `list_length:path = 3`, and is linked to a as the
+zone it starts from and c as the zone it acts on; the tank move answers
+`list_length:path = 2`, with links to b and c.
+
+The real format works the same way, with three differences from a plain
+"which unit, which zones" row:
+
+- **Zones come with roles.** There is one question per zone and role, not one
+  per zone. A row with just "infantry, a, c" could not tell "a to c" from "c to
+  a". Here `unit_zone` says where the unit stands, so where the move starts,
+  and the link says which zone it acts on. Between the start and the end, the
+  path's zones are marked as a set, not in order.
+- **Units are described, not numbered.** A question says "an infantry", with
+  its condition (moves left, damage, ...) and its rank among identical units
+  there, never "unit 1".
+- **A row says more than units and zones:** the kind of move (a movement, an air
+  attack, a purchase, ...), who chooses, which labels the move has, and its plain
+  values, such as `true:combat = 1` or `number:range = 2`. Answers can be counts,
+  not only 0 or 1.
+
 ### How the engine writes a move
 
 A legal move is a kind plus labelled details. Each detail has a label on the
