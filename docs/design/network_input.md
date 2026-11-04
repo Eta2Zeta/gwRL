@@ -57,6 +57,21 @@ round 1, chosen by the Comintern player. It has 13 legal moves, and its input
 holds 326 board answers, 119 position answers and 244 answers across the 13
 moves.
 
+**Each part is filed differently:**
+
+- **The board is filed by zone.** Every answer is kept with its zone, as (zone,
+  question, answer), such as (Formosa, `units:japan:fighter`, 1). The zone is not
+  in the question's name: it is the row the answer belongs to, and all 37 zones
+  share the same questions.
+- **The position** has one set of answers, as (question, answer).
+- **Moves are filed by move.** Every answer is kept with its move, as (move,
+  question, answer). A move is not in one zone: it can start in one, pass through
+  others and end in another. So when a move's answer is about a zone, the zone is
+  written into the question's name, such as `unit_zone:0_source:land_formosa`, and
+  the move is linked to the zones it starts from, passes through and acts on.
+  [Section 6](#the-same-fighter-on-the-board-and-in-a-move) shows one unit in both
+  parts.
+
 ## 3. Questions and answers
 
 **A question** is a numbered slot with one fixed meaning, also called a column.
@@ -192,7 +207,64 @@ never reaches the network.
 | Any other name, not on the list | The railroad repair ([example 2](#example-2-a-railroad-repair)): `target = rail_land_manchuria_northern__land_manchuria_western` | `value:target:other = 1` |
 
 The `0_source`, `1_path` and `2_target` parts of these names are roles, explained
-next.
+below.
+
+### The same fighter on the board and in a move
+
+The board is filed by zone, but a move is filed by move. The fighter attacking
+Hunan shows the difference. This is decision 41 of game seed 7001: Japan's
+Combat Movement in round 1, with 106 legal moves.
+
+**On the board**, Formosa's row lists everything in Formosa, counted by nation,
+alliance and type. These are all 9 of its answers:
+
+```text
+possessor:japan = 1                    Japan holds Formosa
+turn_start_possessor:japan = 1
+units:japan:fighter = 1                one Japanese fighter
+units:japan:militia = 1                one Japanese militia
+unit_stat:axis:fighter:count = 1
+unit_stat:axis:fighter:move_4 = 1      the fighter has 4 moves left
+unit_stat:axis:militia:count = 1
+unit_stat:axis:militia:move_0 = 1      the militia has none
+facility:major_port:count = 1          a major port
+```
+
+Hunan's row says that the KMT holds it with two infantry, and P32's row lists a
+Japanese destroyer, light cruiser and transport.
+
+**In the move**, the answers describe the one unit the move uses and its route.
+The zones appear inside the names, because one move involves several zones:
+
+```text
+unit:0_source:japan:fighter = 1              the unit that acts is a Japanese fighter
+unit_stat:0_source:count = 1                 one unit
+unit_stat:0_source:move_4 = 1                with 4 moves left
+unit_zone:0_source:land_formosa = 1          standing in Formosa
+unit_turn_origin:0_source:land_formosa = 1   where it started the turn
+unit_rank:0_source:0 = 1                     the first Japanese fighter there
+unit_later_peers:0_source:militia = 1        a militia comes after it in unit order
+zone:1_path:land_formosa = 1                 the route: Formosa,
+zone:1_path:sea_p32 = 1                      sea zone P32,
+zone:1_path:land_china_hunan = 1             Hunan
+list_length:path = 3
+```
+
+Plus the answers every move has: `schedule:play`, `player:axis`, `nation:japan`,
+`kind:air_ground_attack`, `parameter:unit` and `parameter:path`.
+
+**The links join the two.** The move starts in Formosa, acts on Hunan and travels
+through Formosa, P32 and Hunan, so the network reads those zones' board vectors
+with the move's own answers. Together they say: this fighter, with 4 moves left,
+flies from Japanese Formosa, which also holds a militia and a major port, over
+P32 to attack Hunan, held by two KMT infantry.
+
+Moves are not filed under zones for three reasons:
+
+- one move involves several zones;
+- many moves share a zone: of these 106 moves, 58 start in sea zone P15, 18 in
+  Tokyo and 7 in Formosa, and filed under their zones they would blur together;
+- the network must score each move separately, so each move needs its own answers.
 
 ### Roles
 
