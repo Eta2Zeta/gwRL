@@ -336,6 +336,19 @@ limit. `tools/supervise_campaign_training.py` handles the time budget, restarts 
 memory stops. How to start, stop and resume a run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
+**The coordinator.** Game threads do not run the network themselves. A game
+thread that needs an evaluation writes the position's input into shared memory
+and waits. In each round the coordinator reads every waiting request, groups them
+by alliance network, merges each group into one batch, runs that network once and
+sends back each position's priors and values (`studies/campaign/shared_evaluator.py`).
+A larger batch costs less per position: 0.70 ms for one position, 1.38 ms for
+four ([record](../stage_a/coordinator_lookups_2026_11_04.md)). On 2 November the
+network's forward pass was three quarters of the coordinator's time, and the
+column lookups were its largest single part, 26%
+([profile](../stage_a/search_replays_2026_11_04.md#2-november-one-profiled-training-batch)).
+Since the search keeps copies of its positions, the coordinator is busy 90% of the
+time and limits this layout.
+
 **Throughput** is counted as decisions searched per hour, compared at the same
 training reuse (each kept sample drawn about 13 times):
 
@@ -408,6 +421,12 @@ controls, not expert play.
   menus.
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
+- **The coordinator limits the Mac layout.** It was busy 90% of the time in the
+  latest matched batch. A fused column lookup (PyTorch's `embedding_bag`) made the
+  network's forward pass 23% to 49% faster with identical outputs
+  ([record](../stage_a/coordinator_lookups_2026_11_04.md)); it is not yet in the
+  code. More games per process, for larger batches, and a second coordinator are
+  the other options, untested.
 
 ## 10. Glossary
 

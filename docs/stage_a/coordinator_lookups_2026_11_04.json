@@ -1,0 +1,39 @@
+{
+ "date": "2026-11-04",
+ "commit": "c58942a",
+ "torch": "2.11.0",
+ "threads": 1,
+ "network": "fresh 64x2",
+ "positions": 574,
+ "positions_from": "random games seeds 5000, 5001, 5002; every 7th decision with more than one legal move",
+ "batches_per_size": 300,
+ "warmup_batches": 20,
+ "results": [
+  {
+   "positions_per_call": 1,
+   "answers": 1484,
+   "forward_ms": 0.695,
+   "lookups_ms": 0.156,
+   "forward_fused_ms": 0.537,
+   "largest_output_difference": 0.0
+  },
+  {
+   "positions_per_call": 4,
+   "answers": 6056,
+   "forward_ms": 1.384,
+   "lookups_ms": 0.519,
+   "forward_fused_ms": 0.973,
+   "largest_output_difference": 0.0
+  },
+  {
+   "positions_per_call": 16,
+   "answers": 24180,
+   "forward_ms": 4.631,
+   "lookups_ms": 2.275,
+   "forward_fused_ms": 2.38,
+   "largest_output_difference": 0.0
+  }
+ ],
+ "rows_already_consecutive": true,
+ "coordinator_positions_per_call_2026_11_02": 3.9
+}
