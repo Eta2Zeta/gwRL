@@ -107,10 +107,10 @@ position's planning key, which identifies a position exactly.
 
 When an alliance must decide, the program does not just ask the network which
 move to play. It runs a search (`studies/shared/multiplayer_mcts.py`, class
-`VectorMCTS`), made of many simulations: 64 per decision in the Mac profile.
+`VectorMCTS`), made of many simulations: 64 per decision in current runs.
 
-**One simulation** starts from the current position on a copy of the game and
-walks forward:
+**One simulation** starts from the current position on a fresh copy of the game
+and walks forward:
 
 - At a decision, it picks a move by a score that adds two terms:
   - how well the move has done so far in earlier simulations, for the alliance
@@ -122,12 +122,41 @@ walks forward:
   network for two things: the position's value for all three alliances, and a
   prior for each legal move.
 - It also stops at the end of the game (using the true scores), at a depth limit
-  (16 moves in the Mac profile, using the network's value), or when it returns to
-  a position already on its path.
+  (16 steps, counting moves and dice rolls, in current runs; using the network's
+  value), or when it returns to a position already on its path.
 
 The three values found are then added to every position and move on the path.
 Each alliance judges moves by its own value: this is Max-N search, not a search
 for an equilibrium. Values are rescaled per alliance before they enter the score.
+
+**What the search remembers, and why it plays moves again.** Between simulations
+the search keeps a tree: for every position it has met, identified by its
+planning key, the moves tried there with their visit counts, value totals and
+priors (`Node` and `Edge`). It does not keep the positions themselves. So each
+simulation copies the game at the current position (`clone_for_search`), then
+has the engine play again every move and dice roll on the path the tree
+chooses, until it reaches the new position it will evaluate. A move that one
+simulation played is played again by every later simulation that goes the same
+way.
+
+For example, in a round-5 Japanese Combat Movement decision with 24 legal moves,
+the 64 simulations made 64 copies and played 123 moves and 38 dice rolls between
+them. The deepest one copied the game, then played Japan's end of Combat
+Movement, the start of a battle, a retreat, a retreating unit and the next
+battle, with four dice rolls along the way, before it reached a position the tree
+had not seen.
+
+This keeps the engine the only source of positions: every position the search
+evaluates comes from the real rules. Each copy also rolls its own dice from a
+stream seeded per simulation, so one move can lead to different outcomes in
+different simulations, and the tree keeps a branch per outcome; the real game's
+dice are untouched. Copying is cheap, under a tenth of a millisecond, but
+playing the moves is not. In six measured searches it took 8% to 53% of the
+search's time, and in whole self-play games it was about half of the time the
+game threads spent not waiting for the network: their largest single cost
+([measurements](../stage_a/search_replays_2026_11_04.md)). Keeping a copy of the
+game at each tree position would save most of this work, for the memory of the
+copies; that is untested.
 
 **After all simulations**, the number of times each first move was tried shows the
 search's preference. The move actually played is drawn at random in proportion to
@@ -316,6 +345,10 @@ controls, not expert play.
   menus.
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
+- **Search plays its moves again.** Every simulation replays its path from a
+  copy of the current position, about half of the game threads' own work.
+  Keeping copies in the tree is untested; see
+  [what the search remembers](#3-choosing-a-move-search).
 
 ## 10. Glossary
 
@@ -326,7 +359,11 @@ controls, not expert play.
 - **Chance event:** a position where the engine rolls dice.
 - **Planning key:** a text that identifies a position exactly.
 - **Search (MCTS):** the simulations that pick a move at a decision.
-- **Simulation:** one imagined walk forward from the current position.
+- **Simulation:** one imagined walk forward from the current position, on a copy
+  of the game.
+- **Search tree:** what a search remembers between simulations: for each position
+  it has met, its planning key and the statistics of the moves tried there, but
+  not the position itself.
 - **Prior:** the network's probability for a move, before searching.
 - **Visit count:** how often the search tried a move.
 - **Value:** the network's estimate of the final scores, one per alliance.

@@ -1,0 +1,212 @@
+{
+ "profile_2026_11_02": {
+  "date": "2026-11-02",
+  "commit": "f41dba6",
+  "setup": "--profile mac: 8 game processes x 4 games, coordinator on the CPU, 64 simulations, depth 16, hidden 64, 2 message layers, fresh networks, 32 eleven-round games",
+  "method": "stack sampler in every process every 10 ms (sys._current_frames); ps CPU time every 5 s",
+  "games_per_hour_while_playing": 129.0,
+  "unprofiled_games_per_hour_while_playing": 130.8,
+  "cpu_cores": {
+   "coordinator": 0.84,
+   "game_processes_total": 9.31,
+   "game_process_mean": 1.16,
+   "all_training": 10.15
+  },
+  "evaluator": {
+   "evaluations": 1915314,
+   "forward_seconds": 791.2,
+   "idle_seconds": 63.8,
+   "model_forwards": 491455,
+   "serving_rounds": 230880
+  },
+  "game_thread_shares": {
+   "waiting for the coordinator": 0.627,
+   "engine: applying moves": 0.191,
+   "engine: legal moves": 0.094,
+   "building the network input": 0.032,
+   "engine: cloning": 0.026,
+   "engine: dice": 0.01,
+   "engine: decision kind and keys": 0.006,
+   "search logic": 0.0005,
+   "game thread samples": 2008785
+  },
+  "coordinator_main_thread_shares": {
+   "idle": 0.075,
+   "network: column lookups (_bag)": 0.258,
+   "network: Linear layers": 0.113,
+   "network: grouped policy": 0.085,
+   "network: per-border message line": 0.084,
+   "merging positions into a batch": 0.065,
+   "network: GELU": 0.055,
+   "network: LayerNorm": 0.034,
+   "receiving and replying": 0.032,
+   "samples": 69565
+  }
+ },
+ "searches_2026_11_04": {
+  "commit": "1396518",
+  "torch": "2.11.0",
+  "searches": [
+   {
+    "round": 2,
+    "nation_index": 2,
+    "kind": "naval_force_selection",
+    "legal_moves": 14,
+    "search_ms": 356.6,
+    "calls": {
+     "list legal moves": 66,
+     "network evaluation": 65,
+     "copy the game": 64,
+     "play a move again": 133
+    },
+    "ms": {
+     "list legal moves": 64.1,
+     "network evaluation": 87.3,
+     "copy the game": 3.9,
+     "play a move again": 189.3
+    },
+    "steps_replayed_per_simulation": {
+     "mean": 2.1,
+     "max": 3
+    }
+   },
+   {
+    "round": 2,
+    "nation_index": 3,
+    "kind": "non_combat_movement",
+    "legal_moves": 104,
+    "search_ms": 195.2,
+    "calls": {
+     "list legal moves": 66,
+     "network evaluation": 65,
+     "copy the game": 64,
+     "play a move again": 75,
+     "roll dice again": 4
+    },
+    "ms": {
+     "list legal moves": 48.6,
+     "network evaluation": 107.4,
+     "copy the game": 4.0,
+     "play a move again": 15.8,
+     "roll dice again": 0.6
+    },
+    "steps_replayed_per_simulation": {
+     "mean": 1.2,
+     "max": 4
+    }
+   },
+   {
+    "round": 3,
+    "nation_index": 2,
+    "kind": "non_combat_movement",
+    "legal_moves": 51,
+    "search_ms": 233.9,
+    "calls": {
+     "list legal moves": 66,
+     "network evaluation": 65,
+     "copy the game": 64,
+     "play a move again": 78,
+     "roll dice again": 0
+    },
+    "ms": {
+     "list legal moves": 79.9,
+     "network evaluation": 74.2,
+     "copy the game": 3.2,
+     "play a move again": 63.6,
+     "roll dice again": 0.0
+    },
+    "steps_replayed_per_simulation": {
+     "mean": 1.2,
+     "max": 3
+    }
+   },
+   {
+    "round": 4,
+    "nation_index": 2,
+    "kind": "combat_movement",
+    "legal_moves": 32,
+    "search_ms": 190.9,
+    "calls": {
+     "list legal moves": 66,
+     "network evaluation": 65,
+     "copy the game": 64,
+     "play a move again": 105,
+     "roll dice again": 13
+    },
+    "ms": {
+     "list legal moves": 49.1,
+     "network evaluation": 76.1,
+     "copy the game": 3.7,
+     "play a move again": 47.5,
+     "roll dice again": 2.3
+    },
+    "steps_replayed_per_simulation": {
+     "mean": 1.8,
+     "max": 6
+    }
+   },
+   {
+    "round": 4,
+    "nation_index": 3,
+    "kind": "non_combat_movement",
+    "legal_moves": 74,
+    "search_ms": 140.7,
+    "calls": {
+     "list legal moves": 66,
+     "network evaluation": 65,
+     "copy the game": 64,
+     "play a move again": 102,
+     "roll dice again": 0
+    },
+    "ms": {
+     "list legal moves": 27.6,
+     "network evaluation": 78.2,
+     "copy the game": 3.4,
+     "play a move again": 18.1,
+     "roll dice again": 0.0
+    },
+    "steps_replayed_per_simulation": {
+     "mean": 1.6,
+     "max": 7
+    }
+   },
+   {
+    "round": 5,
+    "nation_index": 2,
+    "kind": "combat_movement",
+    "legal_moves": 24,
+    "search_ms": 184.7,
+    "calls": {
+     "list legal moves": 66,
+     "network evaluation": 65,
+     "copy the game": 64,
+     "play a move again": 123,
+     "roll dice again": 38
+    },
+    "ms": {
+     "list legal moves": 6.4,
+     "network evaluation": 79.9,
+     "copy the game": 4.0,
+     "play a move again": 74.5,
+     "roll dice again": 7.1
+    },
+    "steps_replayed_per_simulation": {
+     "mean": 2.5,
+     "max": 9
+    }
+   }
+  ],
+  "example": {
+   "moves": [
+    "end_phase",
+    "land_begin_battle_69e6df424c94a01fbe08",
+    "land_retreat_begin_69e6df424c94a01fbe08",
+    "land_retreat_unit_05d823ba4922b729b5d0",
+    "land_begin_battle_00c56011d9ad43b176be"
+   ],
+   "dice_rolls": 4
+  },
+  "date": "2026-11-04",
+  "setup": "fresh 64x2 network on the CPU, one thread, evaluated in the searching thread; 64 simulations, depth 16, search seed 11; positions: every 40th decision from round 2 on with more than three legal moves in random game seed 1951, moves from random.Random(7)"
+ }
+}

@@ -10,6 +10,7 @@ for it:
 - [A fixed zone encoding of campaign decisions](zone_encoding_2026_11_02.md): 37 zones answer fixed questions; no look-alike positions or options in 30,259 positions; 49 to 64 times smaller and 5 to 6 times faster to build than the graph input.
 - [The network reads the zone encoding](zone_network_2026_11_02.md): the graph input is removed; on the same positions a single forward pass is 7.4 times faster, batched passes 59 times, a training step 43 times, and a stored decision 66 times smaller; the network has 4.6 times more parameters.
 - [Bounded AI orders](action_interface_2026_10_24.md): forward-only naval orders and bounded configuration and permission choices, with separate replay compatibility.
+- [Where self-play time goes, and the moves each search plays again](search_replays_2026_11_04.md): the coordinator is busy 92% and game threads wait for it 63% of the time; a search's 64 simulations play 75 to 133 moves again on copies of the game, about half of the game threads' own work.
 
 The earlier records (the first pilots, the three-round experiment and the
 performance work on the replaced graph input) are summarized in the
