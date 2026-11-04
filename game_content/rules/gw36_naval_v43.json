@@ -118,12 +118,13 @@
       ],
       "status": "implemented",
       "handlers": [
-        "src/naval_movement.cpp"
+        "src/naval_movement.cpp",
+        "src/naval_operations.cpp"
       ],
       "test_suites": [
         "naval_movement"
       ],
-      "clarification": "RCL-017 open: ships may still engage a patrol plane that let them pass earlier that turn"
+      "clarification": "RCL-017 adopted: a patrol plane that lets ships pass stays out of combat with them for the rest of the turn and does not stop their amphibious assaults"
     },
     {
       "id": "raider_slip_and_discovery",

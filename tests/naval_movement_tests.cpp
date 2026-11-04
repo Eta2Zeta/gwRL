@@ -259,6 +259,52 @@ void strategicPickupKeepsMilitiaHome() {
   move(back, "t", {p14, p15, p16}, true, "facility_tokyo_major_shipyard");
   check(offers(back) == std::set<Id>{"i", "m"}, "Militia missed a voyage bound home");
 }
+void patrolRefusalSettlesCombat() {
+  // RCL-017: a patrol plane that lets ships pass stays out of combat with
+  // them for the rest of the turn and does not stop their landing (RB 10.8.1).
+  // Ships it has not let pass may still engage it, and ships entering later
+  // get a fresh choice (seed 9487 of the 2 November random games had a KMT
+  // transport engage a bomber that had let it pass).
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  s.territories.at("land_korea").possessor = "kmt";
+  add(s, "patrol", "fighter", p15, "kmt");
+  s.units.at("patrol").gameFlags["on_map"] = 1;
+  s.units.at("patrol").gameFlags["map_range"] = 1;
+  s.units.at("patrol").commitments.insert("maritime_air_patrol");
+  add(s, "t", "naval_transport", p16);
+  add(s, "i", "infantry", p16);
+  attachCargo(s, "t", "i");
+  add(s, "d", "destroyer", p15);
+  add(s, "late", "destroyer", p16);
+  s.captureTurnStart();
+  Engine e(s, rules());
+  const auto offered = [&](const Id &kind, const std::function<bool(const Action &)> &match) {
+    const auto actions = e.legalActions();
+    return std::any_of(actions.begin(), actions.end(),
+                       [&](const Action &a) { return a.kind == kind && match(a); });
+  };
+  const auto engages = [&](const Id &unit) {
+    choose(e, "naval_start_move", [&](const Action &a) { return a.parameters.require("unit").asString() == unit; });
+    const bool engage = offered("naval_engage_force", [](const Action &) { return true; });
+    choose(e, "naval_cancel_move");
+    return engage;
+  };
+  move(e, "t", {p16, p15});
+  choose(e, "naval_reaction_decline");
+  check(e.state().units.at("t").zone == p15 && e.state().battles.empty(), "The transport did not pass the patrol");
+  check(!engages("t"), "Ships could still engage a patrol plane that let them pass");
+  check(offered("naval_declare_assault", [](const Action &a) {
+          return a.parameters.require("transport").asString() == "t" &&
+                 a.parameters.require("zone").asString() == "land_korea";
+        }),
+        "A patrol plane that let the transport pass still stopped its landing");
+  check(engages("d"), "A ship the patrol never let pass could not engage it");
+  move(e, "late", {p16, p15});
+  check(offered("naval_reaction_engage", [](const Action &) { return true; }),
+        "The patrol had no choice against ships entering later");
+}
 void unevolvedChinaKeepsToChineseWaters() {
   // RB 14.3.1: until it evolves, KMT sails only in sea zones next to Chinese
   // Home Country, here P14, P32 and P41; P33 touches only Okinawa and P15
@@ -869,6 +915,7 @@ int main() {
              {"strategic pickup keeps militia home", strategicPickupKeepsMilitiaHome},
              {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
              {"unevolved China keeps to Chinese waters", unevolvedChinaKeepsToChineseWaters},
+             {"patrol refusal settles combat", patrolRefusalSettlesCombat},
              {"naval blockers", strategicAndNoncombatBlockers},
              {"carrier independent flight", carrierMovementGivesNoAircraftRide},
              {"zero-cost port exit", portExitCostsZero},

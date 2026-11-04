@@ -286,6 +286,16 @@ bool anyEnemy(const State &s, const Id &n, const Id &z) {
       return true;
   return false;
 }
+// Whether these ships have an enemy at sea in their zone to fight: any but a
+// patrol plane that let them pass this turn (RCL-017).
+bool engageable(const State &s, const Id &n, const Id &z,
+                const std::vector<Id> &ships) {
+  for (const auto &[id, u] : s.units)
+    if (u.zone == z && !u.carriedBy && hostile(s, n, u.owner) &&
+        port(u).empty() && !patrolLetPass(s, u, ships))
+      return true;
+  return false;
+}
 bool passage(const State &s, const UnitState &u, const Id &from, const Id &to,
              bool strategic) {
   const auto *e = mapEdge(s, from, to);
@@ -319,6 +329,8 @@ void moveTo(State &s, const std::vector<Id> &fleet, const Id &zone, int cost,
       if (sea(s, u.zone) && u.zone != zone)
         u.turnFlags["naval_last_origin:" + u.zone] =
             static_cast<int>(s.clock.playerTurnSerial + 1);
+      if (u.zone != zone)
+        u.turnFlags.erase("map_declined_combat");
       for (auto i = u.gameFlags.begin(); i != u.gameFlags.end();)
         if (i->first.rfind("in_port:", 0) == 0)
           i = u.gameFlags.erase(i);
@@ -922,7 +934,7 @@ public:
       return known->second;
     const auto &first = state_.units.at(selected.front());
     if (state_.clock.phase != Phase::NonCombatMovement &&
-        sea(state_, first.zone) && anyEnemy(state_, first.owner, first.zone) &&
+        sea(state_, first.zone) && engageable(state_, first.owner, first.zone, selected) &&
         !raiderWouldCombine(state_, first.zone, first.owner, selected, "standard") &&
         engagementKeepsLanding(state_, selected, first.zone))
       return complete_[selected] = true;
@@ -978,7 +990,7 @@ void routeChoices(State &s, BattleState &b) {
   options.push_back(
       action(s, b.attacker, "naval_cancel_move", {{"plan", V(b.id)}}));
   if (!selected.empty() && s.clock.phase != Phase::NonCombatMovement &&
-      sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone) &&
+      sea(s, b.zone) && engageable(s, b.attacker, b.zone, selected) &&
       !raiderWouldCombine(s, b.zone, b.attacker, selected, "standard") &&
       engagementKeepsLanding(s, selected, b.zone))
     options.push_back(
@@ -1013,6 +1025,16 @@ bool militiaCanLandFrom(const State &s, const std::vector<Id> &ships,
         return false;
     }
   return true;
+}
+// The ships carry the mark while they stay in the zone where the patrol let
+// them pass; entering another zone clears it.
+bool patrolLetPass(const State &s, const UnitState &plane, const std::vector<Id> &ships) {
+  return isAircraft(s, plane) && patrol(plane) && !ships.empty() &&
+         std::all_of(ships.begin(), ships.end(), [&](const Id &id) {
+           const auto ship = s.units.find(id);
+           return ship != s.units.end() && ship->second.zone == plane.zone &&
+                  marked(ship->second.turnFlags, "map_declined_combat");
+         });
 }
 
 std::vector<Action> forwardNavalOrderActions(const State &s,
@@ -1354,7 +1376,7 @@ std::set<Id> navalEndZones(const State &s, const Id &ship) {
     if ((s.clock.phase != Phase::CombatMovement &&
          s.clock.phase != Phase::NonCombatMovement) ||
         !available(s, u, combat) ||
-        (u.commitments.contains("combat_move") && anyEnemy(s, u.owner, u.zone)))
+        (u.commitments.contains("combat_move") && engageable(s, u.owner, u.zone, {ship})))
       return out;
     // A route ends early wherever an encounter can stop it. Enemy units may
     // wait only in a Combat Movement route's last zone, where its battle is
@@ -1540,6 +1562,8 @@ bool applyNavalMovementAction(State &s, const Action &a) {
     const auto selected = readIds(b.data.require("selected"));
     require(engagementKeepsLanding(s, selected, b.zone),
             "Engaging leaves aircraft without a joint landing plan");
+    require(engageable(s, b.attacker, b.zone, selected),
+            "No enemy here will fight these ships");
     detachAircraft(s, selected, b.zone);
     std::map<Id, Id> origins;
     std::vector<Id> enemies;
@@ -1551,7 +1575,7 @@ bool applyNavalMovementAction(State &s, const Action &a) {
     }
     for (const auto &[id, u] : s.units)
       if (u.zone == b.zone && !u.carriedBy && hostile(s, b.attacker, u.owner) &&
-          (has(s, u, "naval") || isAircraft(s, u)))
+          (has(s, u, "naval") || isAircraft(s, u)) && !patrolLetPass(s, u, selected))
         enemies.push_back(id);
     erasePlan(s, plan);
     registerNavalBattle(s, b.zone, b.attacker, selected, origins,
@@ -1639,8 +1663,17 @@ bool applyNavalMovementAction(State &s, const Action &a) {
     release(s, a);
     auto &b = s.battles.at(plan);
     const auto defenders = readIds(b.data.require("reaction_units"));
+    const auto r = readRequest(b.data.require("request"));
+    // A patrol plane that lets ships pass settles combat with them for the
+    // rest of the turn (user ruling RCL-017); one that fights does not.
+    if (text(b, "reaction_context") == "movement_map")
+      for (const auto &ship : live(s, r.units)) {
+        if (a.kind == "naval_reaction_engage")
+          s.units.at(ship).turnFlags.erase("map_declined_combat");
+        else
+          s.units.at(ship).turnFlags["map_declined_combat"] = 1;
+      }
     if (a.kind == "naval_reaction_engage") {
-      const auto r = readRequest(b.data.require("request"));
       beginBattleFromPlan(s, plan, r.units, defenders,
                           text(b, "reaction_context"));
     } else {

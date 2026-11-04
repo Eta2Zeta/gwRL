@@ -89,11 +89,15 @@ Id berth(const UnitState &u) {
 bool ship(const State &s, const UnitState &u) {
   return unitClass(s, u, "naval");
 }
-bool occupiedForAssault(const State &s, const Id &owner, const Id &zone) {
+// Enemy Surface Ships and aircraft in the sea zone must be eliminated before an
+// amphibious assault from it, except an aircraft on MAP that declined combat
+// (RB 10.8.1): a patrol plane that let these transports pass (RCL-017).
+bool occupiedForAssault(const State &s, const Id &owner, const Id &zone,
+                        const std::vector<Id> &transports) {
   for (const auto &[id, u] : s.units)
     if (u.zone == zone && !u.carriedBy && hostile(s, owner, u.owner) &&
         (unitClass(s, u, "surface_ship") || isAircraft(s, u)) &&
-        !flag(u.turnFlags, "map_declined_combat"))
+        !patrolLetPass(s, u, transports))
       return true;
   return false;
 }
@@ -190,6 +194,12 @@ std::vector<Id> assaultCargo(const State &s, const BattleState &b) {
       out.push_back(c);
   }
   return out;
+}
+std::vector<Id> assaultTransports(const State &s, const BattleState &b) {
+  std::set<Id> out;
+  for (const auto &c : assaultCargo(s, b))
+    out.insert(*s.units.at(c).carriedBy);
+  return {out.begin(), out.end()};
 }
 std::vector<Id> shoreCandidates(const State &s, const BattleState &b) {
   const auto water = b.data.require("sea").asString();
@@ -710,7 +720,7 @@ std::vector<Action> navalOperationActions(const State &s) {
       }
       if ((!unitClass(s, u, "naval_transport") &&
            !(u.owner == "japan" && u.type == "destroyer")) ||
-          !sea(s, u.zone) || occupiedForAssault(s, u.owner, u.zone))
+          !sea(s, u.zone) || occupiedForAssault(s, u.owner, u.zone, {id}))
         continue;
       for (const auto &c : u.cargo) {
         // Militia may not be used by the Attacker (RB), from the sea either.
@@ -828,7 +838,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
                c = a.parameters.require("cargo").asString();
     const auto zone = a.parameters.require("zone").asString();
     auto &transport = s.units.at(t);
-    require(!occupiedForAssault(s, transport.owner, transport.zone),
+    require(!occupiedForAssault(s, transport.owner, transport.zone, {t}),
             "Clear the launching sea before declaring the amphibious assault");
     require(s.units.at(c).carriedBy == t,
             "Assault cargo is not aboard transport");
@@ -875,7 +885,8 @@ bool applyNavalOperationAction(State &s, const Action &a) {
   if (a.kind == "naval_begin_assault") {
     auto &b = s.battles.at(a.parameters.require("battle").asString());
     require(
-        !occupiedForAssault(s, b.attacker, b.data.require("sea").asString()),
+        !occupiedForAssault(s, b.attacker, b.data.require("sea").asString(),
+                            assaultTransports(s, b)),
         "Sea must be cleared before assault");
     b.stage = "amphibious_shore_selection";
     shoreChoice(s, b);
@@ -1065,7 +1076,8 @@ bool applyNavalOperationChance(State &s, const ChanceRequest &r,
 bool assaultCalledOff(const State &s, const BattleState &b) {
   return s.clock.phase == Phase::Combat && b.stage == "amphibious_declared" &&
          flag(b.flags, "amphibious_preparation") &&
-         (occupiedForAssault(s, b.attacker, b.data.require("sea").asString()) ||
+         (occupiedForAssault(s, b.attacker, b.data.require("sea").asString(),
+                             assaultTransports(s, b)) ||
           assaultCargo(s, b).empty());
 }
 // Runs as a land battle begins, and first as the phase ends, before scrambled

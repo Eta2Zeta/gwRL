@@ -57,7 +57,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-014 | Combat roles when ships evacuate into a third party's fleet | Closed: evacuating fleet defends; fleet already at sea attacks; developer clarification |
 | RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
 | RCL-016 | KMT Low Morale 10+ with no legal retreat, such as after an amphibious assault | Adopted: the unit is eliminated |
-| RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Open: the engine currently allows a second chance |
+| RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Adopted: no; its refusal settles combat with those ships for the turn |
 | RCL-018 | Amphibious assault whose sea zone is not cleared, or whose transports retreat | Adopted: the assault is called off; the cargo stays aboard |
 | RCL-019 | Several railroads on one border; the damage limit and repair of each side | Adopted: one railroad per border; each side holds its own damage and is repaired by its possessor |
 
@@ -298,7 +298,8 @@ a casualty, and Major-Power KMT remains exempt.
 
 ## RCL-017: A patrol plane's second chance against ships it let pass
 
-**Status: open, 2 November 2026; found in random-play seed 9487.**
+**Status: adopted by the user, 4 November 2026; found in random-play seed 9487
+on 2 November.**
 
 **Sources:** RB §9.3.1 pp55-56; §9.4 p57; §9.4.2 p58; §10.4 p63; §10.8.1 p70.
 
@@ -313,18 +314,23 @@ still offer the plane a battle, which it may then accept with scrambled support?
   the turn. Ships without aircraft that can attack cannot force combat on a
   patrol plane (§§9.3.1 and 9.4), and §§9.4.2 and 10.8.1 treat an aircraft on
   MAP "which declined combat" as out of the fight for the rest of the turn.
-- **Two chances (current engine):** §9.3.1's single round during movement and
-  §9.4's Combat-phase battle are separate. The engine offers the single round
-  when the ships enter; if the plane declines, the ships may still engage it,
-  the plane chooses again in the Combat phase, and its side may scramble units
-  under §10.4.
+- **Two chances (the engine before this ruling):** §9.3.1's single round
+  during movement and §9.4's Combat-phase battle are separate. The engine
+  offered the single round when the ships entered; if the plane declined, the
+  ships could still engage it, the plane chose again in the Combat phase, and
+  its side could scramble units under §10.4.
 
 **Example:** in seed 9487 a captured KMT transport entered P16, where a Japanese
 tactical bomber on patrol let it pass. Random play then engaged the bomber;
 Japan accepted and scrambled a destroyer from Honshu's port, both missed, and
 the transport retreated to P15.
 
-**Until ruled:** the engine keeps the two-chance reading.
+**Adopted ruling:** one decision per turn. A patrol plane that lets ships pass
+settles combat with those ships for the rest of the turn: they cannot engage
+it, and it does not stop their amphibious assaults. Ships it has not let pass
+are unaffected: the plane may still fight ships that enter its zone later that
+turn, and ships that started the turn beside it may still engage it. In seed
+9487 the second battle at P16 therefore cannot happen.
 
 ## RCL-018: An amphibious assault whose sea zone is not cleared
 
