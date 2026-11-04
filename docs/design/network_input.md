@@ -335,6 +335,29 @@ named by `cargo = setup_japan_land_manchuria_northern_mountain_infantry_1`.
 on. `towed` (a unit towed along a move) and `endpoint` (the railroad repair below)
 are other such labels.
 
+**A route's last zone is a path zone.** The fighter attacking Hunan has no
+detail labelled `target`. The engine writes its whole route as one detail,
+`path = [land_formosa, sea_p32, land_china_hunan]`, and the attacked zone is
+simply the route's last zone. Roles come from labels, one per detail, so all
+three zones get the role of `path`: `zone:1_path:land_china_hunan = 1`, the
+same kind of answer as for Formosa and P32. Movement moves that attack, such as
+the cavalry in [example 1](#example-1-a-cavalry-attack), are written the same way.
+
+The network still learns where such a move ends in two ways:
+
+- **The link.** For a move with a path, the zone it acts on is the path's last
+  zone. So the network reads Hunan's board row in the "acts on" slot, just as it
+  reads a `2_target` zone for a move without a path.
+- **The kind.** `kind:air_ground_attack = 1`, or `true:combat = 1` for a
+  movement move, says that the move is an attack.
+
+What is lost is narrower: among the move's own answers, "passes through Hunan"
+and "ends in Hunan" look the same, and the "what it acts on" probability stage
+has nothing for such moves; their destinations separate them only in the "how
+it travels" stage, which lists the path zones in order. Also writing the last
+path zone as a `2_target` zone would make the destination explicit there. That
+is an untested idea, not a known fault.
+
 The role changes three things:
 
 1. **The question.** `zone:2_target:land_china_beiping` and
