@@ -260,7 +260,8 @@ Each alliance has its own network: `CampaignPolicyValueNet` in
 estimates of the three alliances' final scores, and a **probability** for every
 legal move, its first guess at which moves the search should try. Its size is
 written width × message layers: 64×2 in the Mac profile's measurements, 256×8 in
-the night run of 2 November. The examples below use 64×2 and the decision of
+the night run of 2 November; which plays better is
+[open](#how-wide-and-how-deep). The examples below use 64×2 and the decision of
 [the input page](network_input.md#2-three-parts): game seed 5, the CCP's first
 Combat Movement decision, with 13 legal moves.
 
@@ -307,7 +308,8 @@ questions in that decision ([listed here](network_input.md#3-questions-and-answe
 its other 42,725 answers are zero. Each answered question picks out its own row
 from the zone table, multiplied by a weight that grows with the answer a,
 sign(a) × log(1 + |a|): an answer of 1 counts 0.69, 2 counts 1.10 and 10 counts
-2.40, so larger counts matter more but not in proportion. Shensi's vector starts
+2.40, so larger counts matter more but not in proportion (a chosen curve, see
+[open questions](#how-should-a-count-count)). Shensi's vector starts
 as the sum of those 12 weighted rows. Here are three of the twelve, with the width
 cut to 3 and invented row numbers (a fresh network's rows are all zero, and a
 trained network's numbers mean nothing one by one):
@@ -326,9 +328,11 @@ three railroads, so its vector starts as a sum of 8 rows.
 
 **One table serves every zone.** `units:ccp:cavalry` has one row, added wherever
 CCP cavalry stand, so what the network learns about cavalry in Shensi applies in
-Hopeh too. To tell the zones apart, each zone vector also gets a learned row for
-the zone itself, and its 39 fixed map facts, such as production value, terrain
-and original owner, through a learned layer. Then its 64 numbers are rescaled to
+Hopeh too. It does not carry across combinations: KMT cavalry has a separate row
+([open question](#one-row-per-combination-or-rows-built-from-parts)). To tell
+the zones apart, each zone vector also gets a learned row for the zone itself,
+and its 39 fixed map facts, such as production value, terrain and original
+owner, through a learned layer. Then its 64 numbers are rescaled to
 a standard spread (layer normalization), so a zone with 43 answers, like sea zone
 P15 with Japan's fleet, does not get a vector many times larger than a zone with
 one.
@@ -530,6 +534,13 @@ controls, not expert play.
 
 ## 9. Known gaps and open questions
 
+Known gaps are parts of the system that are missing, broken or unmeasured. Open
+design questions are choices the design made without testing the alternative;
+each says what the design does now, what the alternative would be, what is
+measured and what would settle it.
+
+### Known gaps
+
 - **Some details are summarized, not named.** Since 4 November no name in 480
   random games falls into an "other" question, and tests check the names the
   engine's source writes. But a mark's argument other than a place or a nation,
@@ -543,10 +554,9 @@ controls, not expert play.
   one process, but that is unproven. A ThreadSanitizer run is the suggested next
   step.
 - **Learning strength is unmeasured.** Neither the larger network nor the zone
-  input has yet made the agents stronger. The
-  [decision review](../stage_a/decision_review_2026_10_31.md) found that the
-  objective rewards a passive Japan and that search targets are flat on large
-  menus.
+  input has yet made the agents stronger. Two design questions below may be part
+  of the reason: the [objective](#is-the-final-wealth-gap-the-right-goal) and
+  [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
 - **The coordinator limits the Mac layout.** It was busy 90% of the time in the
@@ -555,6 +565,119 @@ controls, not expert play.
   ([record](../stage_a/coordinator_lookups_2026_11_04.md)); it is not yet in the
   code. More games per process, for larger batches, and a second coordinator are
   the other options, untested.
+
+### Open design questions
+
+#### One row per combination, or rows built from parts?
+
+**Now.** Every question names a full combination and has its own row (section 5).
+`unit_stat:axis:infantry:move_1`, an Axis infantry with one move left, and
+`unit_stat:allies:infantry:move_1`, the same for the Allies, share nothing. What
+training learns about one does not carry over to the other, and a combination
+that training rarely meets keeps a row near zero.
+
+**Alternative.** Build each row from its parts: one row for the alliance, one for
+the unit type, one for the property. Every part is trained wherever it appears,
+and the tables shrink about tenfold: unit statistics would need 5 + 45 + 74 = 124
+part rows instead of their 13,321 combination rows, and the three tables about
+6,400 instead of 62,047.
+
+**The catch.** Added parts lose which part went with which. With Axis infantry
+with one move left and Axis tanks with two in one zone, a sum of parts cannot
+tell whether the infantry or the tanks have the one move, and the layers after
+the lookup would have to learn what the current rows give directly. Combining
+each answer's parts through a small learned layer, or keeping a combination row
+alongside the parts, keeps that distinction at some cost per answer.
+
+**Measured:** nothing yet. **Would settle it:** both versions trained with equal
+compute, compared on held-out value error and in evaluation games.
+
+#### How wide and how deep?
+
+**Now.** 64×2 in the Mac profile's measurements and 256×8 in the night run of
+2 November (section 5). After k message layers a zone's vector reflects zones up
+to k borders away, so a 64×2 network sees two borders, plus the average of all
+zones through the position vector. Inferred, not measured: in China many threats
+are three or more borders away.
+
+**Measured:** the cost of each size ([section 7](#7-running-training),
+[zone network record](../stage_a/zone_network_2026_11_02.md)). **Unmeasured:**
+whether a larger network plays better at equal compute, and whether depth or
+width matters more. **Would settle it:** equal-compute runs at a few sizes,
+including deep but narrow ones such as 64×6.
+
+#### How should a count count?
+
+**Now.** An answer a adds its row times sign(a) × log(1 + |a|) (section 5): 1
+counts 0.69, 2 counts 1.10 and 10 counts 2.40. The curve was chosen, not compared.
+
+**Alternatives:** counts in proportion, or separate questions for count ranges
+(1, 2 to 3, 4 to 7, more), so each range learns its own effect. **Would settle
+it:** held-out value error on fixed data first, which is cheap, then games.
+
+#### One network per alliance, or one shared network?
+
+**Now.** Each alliance has its own network. All three value heads learn from every
+kept decision, but each policy only from its own alliance's decisions
+(`CampaignLearner.update` in `studies/campaign/learning.py`).
+
+**Alternative.** One network told which alliance is choosing. Its policy would
+learn from all three alliances' decisions, and the coordinator would make one
+larger call where it now makes up to three smaller ones; its calls carried 3.9
+positions on average on 2 November
+([record](../stage_a/coordinator_lookups_2026_11_04.md)). **The catch:** one
+network must hold three different strategies.
+
+**Measured:** nothing. **Would settle it:** an equal-compute comparison. The
+[plan](../plans/japan_china_full_rules_plan.md#2-training-approach) lists
+sharing as optional future work.
+
+#### Is the final wealth gap the right goal?
+
+**Now.** Each alliance maximizes its wealth minus the other two alliances'
+combined wealth after the July 1941 round, the approved objective
+([plan](../plans/japan_china_full_rules_plan.md#wealth-definition-and-approved-accounting-decisions)).
+
+**Measured.** In the
+[decision review](../stage_a/decision_review_2026_10_31.md#the-objective-rewards-a-passive-japan),
+a Japan that never attacks beat the scripted attacking Japan in 4 of 4
+three-round seeds and 3 of 4 eleven-round seeds. Japan's first attack makes every
+warlord join China at once, ends the KMT–CCP civil war and costs about 100 IPP of
+units. So the goal itself may teach a passive Japan, however well the networks
+learn.
+
+**Would settle it:** the owner's decision on the objective. A changed objective
+can be checked first with the same scripted comparison.
+
+#### Are 64 simulations enough on large menus?
+
+**Now.** A search runs 64 simulations, and the share of visits each first move
+received becomes the policy target (section 3).
+
+**Measured** on 31 October: at Japan's opening, with 308 options, the search tried
+63 of them, almost all once, and in an eleven-round game 60% of Japan's Combat
+Movement decisions had at least 64 options
+([decision review](../stage_a/decision_review_2026_10_31.md#training-findings)).
+Such targets say little more than which moves were tried. Since then Combat
+Movement menus have shrunk to about a third
+([record](../stage_a/combat_movement_combats_only_2026_11_01.md)); the spread of
+targets has not been measured again.
+
+**Alternatives:** more simulations where menus are large, fewer options per
+decision, or Gumbel root search, which the review suggests because it was
+designed for fewer simulations than options. **Would settle it:** measuring the
+targets on current menus, then comparing learning at equal compute.
+
+#### Search-guided self-play or direct policy learning, and which opponents?
+
+**Now.** AlphaZero-style: every decision is searched, and all three alliances play
+their latest networks.
+
+**Open.** The [plan](../plans/japan_china_full_rules_plan.md#2-training-approach)
+keeps masked PPO, a policy trained without a search at every decision, as a
+competing method, and older networks as extra opponents for when evaluation shows
+overfitting to the current ones. Neither has been tried. **Would settle it:** the
+equal-compute comparison the plan describes.
 
 ## 10. Glossary
 
