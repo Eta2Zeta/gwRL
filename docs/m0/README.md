@@ -126,7 +126,10 @@ The approved theatre-adjusted starting treasury uses this documented local
 derivation, not an official alternate setup rule:
 
 $$
-\text{starting cash} = \min\bigl(\text{official starting IPP},\ \text{printed IPP of the retained, directly possessed original land}\bigr)
+\begin{aligned}
+\text{starting cash} = \min\bigl(&\text{official starting IPP}, \\
+&\text{printed IPP of the retained, directly possessed original land}\bigr)
+\end{aligned}
 $$
 
 Japan starts with **15 IPP**, KMT **6**, and CCP **2**: **23 IPP total**.

@@ -64,7 +64,8 @@ For alliance `i`, the approved income/asset weighting gives:
 $$
 \begin{aligned}
 W_i ={}& \text{current income rate}_i \\
-&+ 0.1 \times \bigl(\text{completed unit value}_i + \text{completed infrastructure value}_i + \text{treasury}_i + \text{paid unfinished construction}_i\bigr)
+&+ 0.1 \times \bigl(\text{completed unit value}_i + \text{completed infrastructure value}_i \\
+&\qquad + \text{treasury}_i + \text{paid unfinished construction}_i\bigr)
 \end{aligned}
 $$
 
