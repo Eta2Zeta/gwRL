@@ -474,6 +474,152 @@ void patrolPlaneInAScreeningBattle() {
             e->state().decisions.back().kind == "naval_screening_continuation",
         "The screen lost, or the patrol plane was lost, though the plane stayed out");
 }
+// RB 9.3.1: after its single round against entering ships, a Fighter on
+// patrol bars their way on, and they need a screening force to sail on (RB
+// 9.4.2); they may instead end their move in its zone, and then, as when their
+// route ends there, may not sail on later that phase. The screen wins if the
+// fighter stays out of the Combat Phase battle, and the ships sailing on must
+// turn back if it fights and survives. A fighter that lets them pass and a
+// patrol bomber are unchanged.
+void patrolFighterBarsTheWayOn() {
+  auto s = fixture(Phase::CombatMovement);
+  s.nations.at("japan").atWarWith.insert("kmt");
+  s.nations.at("kmt").atWarWith.insert("japan");
+  // Evolved, so that the plane may land in Korea (RB 14.3.1).
+  s.nations.at("kmt").powerStatus = "major";
+  s.territories.at("land_korea").possessor = "kmt";
+  add(s, "s1", "destroyer", p16);
+  add(s, "s2", "destroyer", p16);
+  add(s, "s3", "destroyer", p16);
+  const auto unit = [](const Id &id) {
+    return [id](const Action &a) { return a.parameters.require("unit").asString() == id; };
+  };
+  const auto kinds = [](Engine &e) {
+    std::set<Id> out;
+    for (const auto &a : e.legalActions())
+      out.insert(a.kind);
+    return out;
+  };
+  // Drive the engine through moves and battles until a decision is owed or
+  // nothing naval is left in progress.
+  const auto settle = [](Engine &e) {
+    for (int i = 0; i < 40 && e.state().decisions.empty() && !e.state().battles.empty(); ++i) {
+      if (e.state().chance)
+        e.resolveChance();
+      else
+        e.step(e.legalActions().front());
+    }
+  };
+  const auto enter = [&](const Id &type, const std::vector<Id> &path, const Id &reaction,
+                         const std::vector<int> &dice) {
+    auto start = s.clone();
+    add(start, "patrol", type, p15, "kmt");
+    start.units.at("patrol").gameFlags["on_map"] = 1;
+    start.units.at("patrol").gameFlags["map_range"] = 1;
+    start.units.at("patrol").commitments.insert("maritime_air_patrol");
+    start.captureTurnStart();
+    auto e = std::make_unique<Engine>(start, rules());
+    e->setDiceTapeForTesting(dice);
+    choose(*e, "naval_start_move", unit("s1"));
+    choose(*e, "naval_force_add", unit("s2"));
+    V::Array route;
+    for (const auto &zone : path)
+      route.emplace_back(zone);
+    choose(*e, "naval_route", [&](const Action &a) {
+      return canonicalJson(a.parameters.require("request").require("path")) == canonicalJson(V(route));
+    });
+    choose(*e, reaction);
+    settle(*e);
+    return e;
+  };
+  const auto at = [](const Engine &e, const Id &zone) {
+    return e.state().units.at("s1").zone == zone && e.state().units.at("s2").zone == zone;
+  };
+  // Whether this ship may still start a voyage; attacking where it is does not count.
+  const auto sails = [&](Engine &e, const Id &ship) {
+    choose(e, "naval_start_move", unit(ship));
+    const bool route = kinds(e).contains("naval_route");
+    choose(e, "naval_cancel_move");
+    return route;
+  };
+  const std::vector<Id> onward{p16, p15, p14};
+  // The single round misses on both sides.
+  const std::vector<int> misses{12, 12, 12};
+  {
+    auto e = enter("fighter", onward, "naval_reaction_engage", misses);
+    check(!e->state().decisions.empty() && e->state().decisions.back().kind == "naval_screening_force" &&
+              kinds(*e).contains("naval_screen_stop_route"),
+          "Ships sailed on past a patrol fighter without a screen, or could not stop");
+    choose(*e, "naval_screen_stop_route");
+    check(at(*e, p15) && e->state().battles.empty(), "Ships that stopped beside the fighter did not end their move there");
+    check(!sails(*e, "s1"), "A ship that stopped beside the fighter could still sail on without a screen");
+  }
+  const auto screened = [&](const Id &choice, const std::vector<int> &dice) {
+    auto e = enter("fighter", onward, "naval_reaction_engage", dice);
+    choose(*e, "naval_screen_add", unit("s1"));
+    choose(*e, "naval_screen_confirm");
+    std::set<Id> defenders;
+    for (const auto &[id, b] : e->state().battles)
+      if (b.flags.contains("naval_battle"))
+        defenders.insert(b.defenders.begin(), b.defenders.end());
+    check(defenders == std::set<Id>{"patrol"}, "The screening battle did not face the patrol fighter");
+    choose(*e, "end_phase");
+    choose(*e, "naval_begin_battle");
+    choose(*e, choice);
+    const auto fighting = [&] {
+      return std::any_of(e->state().battles.begin(), e->state().battles.end(),
+                         [](const auto &entry) { return entry.second.flags.contains("naval_battle"); });
+    };
+    for (int i = 0; i < 30 && fighting(); ++i) {
+      if (e->state().chance)
+        e->resolveChance();
+      else
+        e->step(e->legalActions().front());
+    }
+    return e;
+  };
+  {
+    auto e = screened("naval_patrol_decline", misses);
+    check(!e->state().decisions.empty() && e->state().decisions.back().kind == "naval_screening_continuation",
+          "The screen did not win when the fighter stayed out");
+    choose(*e, "naval_screen_continue_route");
+    settle(*e);
+    check(e->state().units.at("s2").zone == p14 && e->state().units.contains("patrol"),
+          "The ship sailing on did not reach its destination past the fighter");
+  }
+  {
+    // In Combat the fighter sinks the screening destroyer, which misses.
+    auto e = screened("naval_patrol_engage", {12, 12, 12, 1, 12});
+    check(!e->state().units.contains("s1") && e->state().units.contains("patrol") &&
+              e->state().units.at("s2").zone == p16,
+          "The ship sailing on did not turn back when the fighter won the screen");
+  }
+  {
+    auto e = enter("fighter", onward, "naval_reaction_decline", {});
+    check(at(*e, p14) && e->state().decisions.empty(), "A fighter that let the ships pass still barred their way");
+  }
+  {
+    auto e = enter("tactical_bomber", onward, "naval_reaction_engage", misses);
+    check(at(*e, p14) && e->state().decisions.empty(), "A patrol bomber barred the ships' way after its single round");
+  }
+  {
+    auto e = enter("tactical_bomber", {p16, p15}, "naval_reaction_engage", misses);
+    check(at(*e, p15) && sails(*e, "s1"), "Ships that met a patrol bomber could not sail on later");
+  }
+  {
+    auto e = enter("fighter", {p16, p15}, "naval_reaction_engage", misses);
+    check(at(*e, p15) && e->state().decisions.empty() && e->state().battles.empty(),
+          "A route ending beside the fighter was asked for a screen or a battle");
+    check(!sails(*e, "s1"), "Ships that ended their route beside the fighter could sail on later without a screen");
+    // Having fought those ships, the fighter lets a later ship pass, which
+    // sails on without a screen.
+    move(*e, "s3", onward);
+    choose(*e, "naval_reaction_decline");
+    settle(*e);
+    check(e->state().units.at("s3").zone == p14 && e->state().decisions.empty(),
+          "A fighter that let a later ship pass still barred its way");
+  }
+}
 void unevolvedChinaKeepsToChineseWaters() {
   // RB 14.3.1: until it evolves, KMT sails only in sea zones next to Chinese
   // Home Country, here P14, P32 and P41; P33 touches only Okinawa and P15
@@ -1085,6 +1231,7 @@ int main() {
              {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
              {"unevolved China keeps to Chinese waters", unevolvedChinaKeepsToChineseWaters},
              {"patrol plane may fight ships it let pass", patrolPlaneMayFightShipsItLetPass},
+             {"patrol fighter bars the way on", patrolFighterBarsTheWayOn},
              {"patrol held by attacking aircraft",
               patrolPlaneCannotLetShipsPassUnderAttackingAircraft},
              {"patrol plane in a screening battle", patrolPlaneInAScreeningBattle},

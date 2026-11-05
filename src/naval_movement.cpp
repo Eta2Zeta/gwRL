@@ -267,6 +267,17 @@ int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
 int spent(const State &s, const UnitState &u) {
   return value(u.turnFlags, "naval_movement_spent");
 }
+// The ships may not sail again this phase: their movement counts as spent, one
+// point above their allowance, since a Japanese surprise attack adds one for
+// its own target zone.
+void endVoyage(State &s, const std::vector<Id> &ships) {
+  for (const auto &ship : ships) {
+    auto &u = s.units.at(ship);
+    const int most = allowance(s, u, true, Id{}, u.zone) + 1;
+    u.turnFlags["naval_movement_spent"] = std::max(spent(s, u), most);
+    u.movementRemaining = 0;
+  }
+}
 std::vector<Id> blockers(const State &s, const Id &n, const Id &z,
                          bool includeOptional = false) {
   std::vector<Id> out;
@@ -307,6 +318,41 @@ std::vector<Id> fightingBlockers(const State &s, const Id &n, const Id &z,
   auto out = blockers(s, n, z);
   std::erase_if(out, [&](const Id &unit) {
     return patrolLetPass(s, s.units.at(unit), ships);
+  });
+  return out;
+}
+// RB 9.3.1: a Fighter on patrol that fought these entering ships for its single
+// round still bars their way on: to sail on they need a screening force (RB
+// 9.4.2). Its battle stamps the fighter, and engaging the ships takes away
+// their mark of having been let pass.
+bool fighterBarsWayOn(const State &s, const UnitState &u,
+                      const std::vector<Id> &ships) {
+  const auto fought = u.turnFlags.find("naval_combat_turn");
+  return has(s, u, "fighter") && patrol(u) && fought != u.turnFlags.end() &&
+         fought->second == static_cast<int>(s.clock.playerTurnSerial + 1) &&
+         !std::all_of(ships.begin(), ships.end(), [&](const Id &id) {
+           return s.units.contains(id) &&
+                  marked(s.units.at(id).turnFlags, "map_declined_combat");
+         });
+}
+// The units that stop these ships in this zone: the blockers, without the
+// patrol planes that have already reacted to them here by letting them pass or
+// fighting a single round. On a route that goes on, a Fighter that fought them
+// still stops them (fighterBarsWayOn). Submarines alone pass them all.
+std::vector<Id> barring(const State &s, const Id &n, const Id &z,
+                        const std::vector<Id> &ships,
+                        const std::vector<Id> &reacted, bool onward) {
+  const bool surface = std::any_of(ships.begin(), ships.end(), [&](const Id &id) {
+    return s.units.contains(id) && has(s, s.units.at(id), "surface_ship");
+  });
+  if (!surface)
+    return {};
+  auto out = blockers(s, n, z);
+  std::erase_if(out, [&](const Id &unit) {
+    const auto &u = s.units.at(unit);
+    return patrol(u) &&
+           std::find(reacted.begin(), reacted.end(), unit) != reacted.end() &&
+           !(onward && fighterBarsWayOn(s, u, ships));
   });
   return out;
 }
@@ -505,6 +551,14 @@ void screenChoice(State &s, BattleState &b) {
   if (!selected.empty())
     options.push_back(
         action(s, b.attacker, "naval_screen_confirm", {{"plan", V(b.id)}}));
+  // When only a Fighter on patrol bars the way on, the ships may instead end
+  // their move here: they owe no further combat, but may not sail on later
+  // this phase (RB 9.3.1).
+  const auto reacted = b.data.find("declined") ? readIds(b.data.require("declined"))
+                                               : std::vector<Id>{};
+  if (barring(s, b.attacker, b.zone, live(s, r.units), reacted, false).empty())
+    options.push_back(
+        action(s, b.attacker, "naval_screen_stop_route", {{"plan", V(b.id)}}));
   decision(s, b, b.attacker, "naval_screening_force", std::move(options));
 }
 void encounter(State &s, const Id &id) {
@@ -562,13 +616,14 @@ void encounter(State &s, const Id &id) {
     reaction(s, b, subs, "movement_submarines");
     return;
   }
-  auto opposing = blockers(s, n, b.zone);
-  std::erase_if(opposing, [&](const Id &unit) {
-    return patrol(s.units.at(unit)) &&
-           std::find(declined.begin(), declined.end(), unit) != declined.end();
-  });
-  if (!surface)
-    opposing.clear();
+  const auto cursor = b.data.require("cursor").asInt();
+  const bool onward = cursor + 1 < static_cast<int>(r.path.size());
+  const auto opposing = barring(s, n, b.zone, r.units, declined, onward);
+  // Ships whose route ends beside a Fighter on patrol that fought them may not
+  // sail on later this phase, since they did not screen: their move ends here
+  // (RB 9.3.1).
+  if (!onward && barring(s, n, b.zone, r.units, declined, true).size() > opposing.size())
+    endVoyage(s, r.units);
   if (!opposing.empty()) {
     const bool loneRaider =
         r.units.size() == 1 &&
@@ -584,8 +639,7 @@ void encounter(State &s, const Id &id) {
       s.chance = c;
       return;
     }
-    const auto cursor = b.data.require("cursor").asInt();
-    if (cursor + 1 < static_cast<int>(r.path.size())) {
+    if (onward) {
       b.stage = "naval_screen_selection";
       put(b, "screening", V(A{}));
       screenChoice(s, b);
@@ -1512,9 +1566,14 @@ bool applyNavalMovementAction(State &s, const Action &a) {
       a.kind == "naval_screen_stop_route") {
     const auto plan = p.require("plan").asString();
     release(s, a);
-    if (a.kind == "naval_screen_stop_route")
+    if (a.kind == "naval_screen_stop_route") {
+      // Ships that stop beside a Fighter on patrol instead of screening end
+      // their move there (RB 9.3.1).
+      const auto &b = s.battles.at(plan);
+      if (b.stage == "naval_screen_selection")
+        endVoyage(s, live(s, readRequest(b.data.require("request")).units));
       erasePlan(s, plan);
-    else
+    } else
       encounter(s, plan);
     return true;
   }

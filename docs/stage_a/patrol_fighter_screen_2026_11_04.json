@@ -1,0 +1,59 @@
+{
+ "date": "2026-11-04",
+ "rule": "RB 9.3.1: a patrol Fighter requires a screening force for entering ships to continue",
+ "layout": {
+  "before": "campaign-zone-v1-1d3c25d19abf2937",
+  "after": "campaign-zone-v1-1d3c25d19abf2937"
+ },
+ "checks": {
+  "cpp_suites": {
+   "passed": 26,
+   "failed": 0
+  },
+  "python_suite": {
+   "tests": 455,
+   "skipped": 3,
+   "result": "OK"
+  },
+  "mutations_caught": {
+   "no fighter barrier": "Ships sailed on past a patrol fighter without a screen, or could not stop",
+   "no stop option": "Ships sailed on past a patrol fighter without a screen, or could not stop",
+   "let-pass mark ignored": "The ship sailing on did not reach its destination past the fighter",
+   "barrier at the route end": "A route ending beside the fighter was asked for a screen or a battle",
+   "any patrol plane bars": "A patrol bomber barred the ships' way after its single round",
+   "stopping keeps movement": "A ship that stopped beside the fighter could still sail on without a screen",
+   "route end keeps movement": "Ships that ended their route beside the fighter could sail on later without a screen",
+   "any patrol plane ends the voyage": "Ships that met a patrol bomber could not sail on later"
+  },
+  "random_play_fuzz": {
+   "first_seed": 9000,
+   "games": 800,
+   "completed": 800,
+   "problems": 0
+  },
+  "zone_names": {
+   "first_seed": 7000,
+   "games": 240,
+   "finished": 240,
+   "decisions": 372857,
+   "unknown": {}
+  },
+  "fighter_screen_counts": {
+   "policy": "tools/check_zone_names.py random policy, eleven rounds",
+   "first_seed": 7000,
+   "games": 480,
+   "finished": 480,
+   "decisions": 745285,
+   "entry_engagements": 74,
+   "fighter_screen_menus": 2,
+   "choices": {
+    "naval_screen_add": 1,
+    "naval_screen_stop_route": 1
+   },
+   "seeds_with_fighter_screen": [
+    7193
+   ]
+  }
+ },
+ "seed_7193": "Decision 724: a captured KMT naval transport leaving port into P14, bound for P32, met the Japanese fighter on patrol there, which fought its single round. Random play added the transport to a screen, then stopped instead (naval_screen_stop_route). Before endVoyage it then began a second voyage to P32 and P41; now it can only attack in place, which it did with a torpedo boat destroyer. In the Combat Phase the fighter accepted (naval_patrol_engage) and Japan scrambled a battleship and a torpedo boat destroyer from the Rehe major port."
+}

@@ -96,6 +96,8 @@
       "id": "screening_and_continuation",
       "source_id": "rulebook",
       "pdf_pages": [
+        55,
+        56,
         58,
         69
       ],
@@ -105,7 +107,8 @@
       ],
       "test_suites": [
         "naval_movement"
-      ]
+      ],
+      "note": "RB 9.3.1: after its single round against entering ships, a Fighter on patrol bars their way on. To sail on they need a screening force (RB 9.4.2), or they may end their move in its zone; ships that stop there, or whose route ends there, may not sail on later that phase. Submarines alone may sail on, as RB 9.4 says of them."
     },
     {
       "id": "submarine_and_map_reactions",
