@@ -61,17 +61,20 @@ this timing does not create a Soviet participant, account, possession or unlock.
 
 For alliance `i`, the approved income/asset weighting gives:
 
-```text
-W_i = current_income_rate_i
-      + 0.1 * (completed_unit_value_i
-               + completed_infrastructure_value_i
-               + treasury_i
-               + paid_unfinished_construction_i)
+$$
+\begin{aligned}
+W_i ={}& \text{current income rate}_i \\
+&+ 0.1 \times \bigl(\text{completed unit value}_i + \text{completed infrastructure value}_i + \text{treasury}_i + \text{paid unfinished construction}_i\bigr)
+\end{aligned}
+$$
 
-R_i = W_i - sum(W_j for the other two alliances j)
+$$
+R_i = W_i - \sum_{j \ne i} W_j \qquad \text{(the sum runs over the other two alliances)}
+$$
 
-completed_asset_value = purchase_price - remaining_repair_price
-```
+$$
+\text{completed asset value} = \text{purchase price} - \text{remaining repair price}
+$$
 
 The user confirmed income means the **current income-per-turn rate**, not
 cumulative collections; one point of that rate has the weight of ten IPP of

@@ -155,13 +155,13 @@ The position answers questions such as `round`, `rounds_left`, `phase:<phase>`,
 (`decision:<kind>`) and the purpose of a pending dice roll. In the seed-5 decision
 these include:
 
-```text
-round = 1
-rounds_left = 11
-phase:combat_movement = 1
-turn_nation:ccp = 1
-nation_present:<nation> = 1     one answer per nation in the game
-```
+| Question | Answer | Meaning |
+| --- | ---: | --- |
+| `round` | 1 | the round |
+| `rounds_left` | 11 | rounds still to play |
+| `phase:combat_movement` | 1 | the Combat Movement phase |
+| `turn_nation:ccp` | 1 | the CCP's turn |
+| `nation_present:<nation>` | 1 | one answer for each nation in the game |
 
 ## 6. The move part
 
@@ -175,16 +175,7 @@ attacking Hunan fills in 17, the airbase purchase 10.
 **A toy version.** Suppose the game had two unit types, infantry and tank, and
 three zones, a, b and c. Part of a move's row would be these eight questions:
 
-```text
-                  unit:0_source:   unit_zone:0_source:   zone:1_path:
-                  infantry  tank   a    b    c           a    b    c
-infantry a→b→c       1       0     1    0    0           1    1    1
-tank b→c             0       1     0    1    0           0    1    1
-```
-
-The infantry move also answers `list_length:path = 3`, and is linked to a as the
-zone it starts from and c as the zone it acts on; the tank move answers
-`list_length:path = 2`, with links to b and c.
+![Two toy moves as rows of the same questions: the infantry moving a to b to c answers unit:0_source:infantry, unit_zone:0_source:a, zone:1_path a, b and c, and list_length:path 3, and is linked to a as where it starts and c as what it acts on; the tank moving b to c answers unit:0_source:tank, unit_zone:0_source:b, zone:1_path b and c, and list_length:path 2, with links to b and c.](figures/move_row.svg)
 
 The real format works the same way, with three differences from a plain
 "which unit, which zones" row:
@@ -207,12 +198,12 @@ The real format works the same way, with three differences from a plain
 A legal move is a kind plus labelled details. Each detail has a label on the
 left and a value on the right. The engine's rule code chose the labels:
 
-```text
-kind:     economy_repair
-target:   rail_land_manchuria_northern__land_manchuria_western
-endpoint: land_manchuria_northern
-damage:   1
-```
+| Label | Value |
+| --- | --- |
+| `kind` | `economy_repair` |
+| `target` | `rail_land_manchuria_northern__land_manchuria_western` |
+| `endpoint` | `land_manchuria_northern` |
+| `damage` | `1` |
 
 ### How each detail becomes answers
 
@@ -265,17 +256,17 @@ Combat Movement in round 1, with 106 legal moves.
 **On the board**, Formosa's row lists everything in Formosa, counted by nation,
 alliance and type. These are all 9 of its answers:
 
-```text
-possessor:japan = 1                    Japan holds Formosa
-turn_start_possessor:japan = 1
-units:japan:fighter = 1                one Japanese fighter
-units:japan:militia = 1                one Japanese militia
-unit_stat:axis:fighter:count = 1
-unit_stat:axis:fighter:move_4 = 1      the fighter has 4 moves left
-unit_stat:axis:militia:count = 1
-unit_stat:axis:militia:move_0 = 1      the militia has none
-facility:major_port:count = 1          a major port
-```
+| Question | Answer | Meaning |
+| --- | ---: | --- |
+| `possessor:japan` | 1 | Japan holds Formosa |
+| `turn_start_possessor:japan` | 1 | and held it when the turn began |
+| `units:japan:fighter` | 1 | one Japanese fighter |
+| `units:japan:militia` | 1 | one Japanese militia |
+| `unit_stat:axis:fighter:count` | 1 | one Axis fighter |
+| `unit_stat:axis:fighter:move_4` | 1 | the fighter has 4 moves left |
+| `unit_stat:axis:militia:count` | 1 | one Axis militia |
+| `unit_stat:axis:militia:move_0` | 1 | the militia has none |
+| `facility:major_port:count` | 1 | a major port |
 
 Hunan's row says that the KMT holds it with two infantry, and P32's row lists a
 Japanese destroyer, light cruiser and transport.
@@ -283,19 +274,19 @@ Japanese destroyer, light cruiser and transport.
 **In the move**, the answers describe the one unit the move uses and its route.
 The zones appear inside the names, because one move involves several zones:
 
-```text
-unit:0_source:japan:fighter = 1              the unit that acts is a Japanese fighter
-unit_stat:0_source:count = 1                 one unit
-unit_stat:0_source:move_4 = 1                with 4 moves left
-unit_zone:0_source:land_formosa = 1          standing in Formosa
-unit_turn_origin:0_source:land_formosa = 1   where it started the turn
-unit_rank:0_source:0 = 1                     the first Japanese fighter there
-unit_later_peers:0_source:militia = 1        a militia comes after it in unit order
-zone:1_path:land_formosa = 1                 the route: Formosa,
-zone:1_path:sea_p32 = 1                      sea zone P32,
-zone:1_path:land_china_hunan = 1             Hunan
-list_length:path = 3
-```
+| Question | Answer | Meaning |
+| --- | ---: | --- |
+| `unit:0_source:japan:fighter` | 1 | the unit that acts is a Japanese fighter |
+| `unit_stat:0_source:count` | 1 | one unit |
+| `unit_stat:0_source:move_4` | 1 | with 4 moves left |
+| `unit_zone:0_source:land_formosa` | 1 | standing in Formosa |
+| `unit_turn_origin:0_source:land_formosa` | 1 | where it started the turn |
+| `unit_rank:0_source:0` | 1 | the first Japanese fighter there |
+| `unit_later_peers:0_source:militia` | 1 | a militia comes after it in unit order |
+| `zone:1_path:land_formosa` | 1 | the route: Formosa, |
+| `zone:1_path:sea_p32` | 1 | sea zone P32, |
+| `zone:1_path:land_china_hunan` | 1 | Hunan |
+| `list_length:path` | 3 | the route has 3 zones |
 
 Plus the answers every move has: `schedule:play`, `player:axis`, `nation:japan`,
 `kind:air_ground_attack`, `parameter:unit` and `parameter:path`.
@@ -317,10 +308,7 @@ Moves are not filed under zones for three reasons:
 
 **Reading a move question's name.** Most move questions have three parts:
 
-```text
-unit_stat : 0_source : move_4
-family      role       which fact
-```
+![The three parts of unit_stat:0_source:move_4: unit_stat is the family, what kind of fact (a named unit's condition); 0_source is the role, through which detail the move names the unit (a source detail); move_4 is which fact (4 moves left).](figures/question_name.svg)
 
 - **The family** says what kind of fact it is: `unit` is a named unit's nation
   and type, `unit_stat` its condition, `unit_zone` where it stands, `zone` a
@@ -345,10 +333,10 @@ label `unit` is a source label. `unit_stat` is not a label; it is the family.
 **One move, two units, two roles.** A Japanese tactical bomber lands on a light
 carrier (game seed 7004):
 
-```text
-air_land_noncombat   unit        = japan_tactical_bomber_p15_fleet_carrier_1
-                     destination = japan_light_carrier_p15_setup_1
-```
+| Kind | Label | Value |
+| --- | --- | --- |
+| `air_land_noncombat` | `unit` | `japan_tactical_bomber_p15_fleet_carrier_1` |
+| | `destination` | `japan_light_carrier_p15_setup_1` |
 
 Both details name a unit, so both produce the same families, each with its own
 detail's role:
@@ -426,11 +414,12 @@ decides roles. A label can be on the first and missing from the second, as
 
 The CCP cavalry in Shensi attacks Hopeh. In the engine's form:
 
-```text
-movement_route   unit = setup_ccp_land_china_shensi_cavalry_1
-                 path = [land_china_shensi, land_china_hopeh]
-                 combat = true, mode = ordinary
-```
+| Kind | Label | Value |
+| --- | --- | --- |
+| `movement_route` | `unit` | `setup_ccp_land_china_shensi_cavalry_1` |
+| | `path` | `[land_china_shensi, land_china_hopeh]` |
+| | `combat` | `true` |
+| | `mode` | `ordinary` |
 
 It becomes 21 answers:
 
@@ -562,16 +551,14 @@ from P32, and a Japanese fighter on patrol, from a light carrier, attacked it. A
 Japanese destroyer was also in P33. Some of the battle's notes, mid-way, and the
 answers they give on P33's row:
 
-```text
-round = 1                                     battle_data:round = 2
-defenders = [the Japanese fighter]            battle_data_unit:defenders:fighter = 1
-origins = {the submarine: sea_p32}            battle_data_unit:origins:submarine = 1
-                                              battle_data_zone:origins:sea_p32 = 1
-context = "movement_map"                      battle_data_word:context:movement_map = 1
-submarines_initiated = false                  battle_data:submarines_initiated = 1
-naval_pairing_done = {the destroyer: true}    battle_data:naval_pairing_done = 2
-                                              battle_data_unit:naval_pairing_done:destroyer = 1
-```
+| Note | Its answers on P33's row |
+| --- | --- |
+| `round = 1` | `battle_data:round = 2` |
+| `defenders = [the Japanese fighter]` | `battle_data_unit:defenders:fighter = 1` |
+| `origins = {the submarine: sea_p32}` | `battle_data_unit:origins:submarine = 1`, `battle_data_zone:origins:sea_p32 = 1` |
+| `context = "movement_map"` | `battle_data_word:context:movement_map = 1` |
+| `submarines_initiated = false` | `battle_data:submarines_initiated = 1` |
+| `naval_pairing_done = {the destroyer: true}` | `battle_data:naval_pairing_done = 2`, `battle_data_unit:naval_pairing_done:destroyer = 1` |
 
 - Every note answers `battle_data:<note> = 1` for being there, and its numbers
   and true values are added in: `round = 1` gives 2, `false` adds nothing.

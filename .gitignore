@@ -17,6 +17,8 @@ __pycache__/
 *.[sS][vV][gG]
 *.[hH][eE][iI][cC]
 *.[aA][vV][iI][fF]
+# Documentation figures are drawn as SVG and tracked.
+!/docs/design/figures/*.svg
 
 # Local extraction scripts, rendered pages, and other temporary audit work.
 /tmp/

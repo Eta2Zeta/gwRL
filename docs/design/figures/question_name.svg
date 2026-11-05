@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="230" viewBox="0 0 760 230" role="img" aria-labelledby="title desc">
+  <title id="title">The three parts of a move question's name</title>
+  <desc id="desc">The question unit_stat:0_source:move_4 has three parts. unit_stat is the family: what kind of fact, here a named unit's condition. 0_source is the role: through which detail the move names that unit, here a source detail. move_4 is which fact: 4 moves left. So unit_stat:0_source:move_4 = 1 reads: the unit named by a source detail has 4 moves left.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .part { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 20px; font-weight: 600; }
+    .colon { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 20px; fill: #8c959f; }
+    .kind { font-size: 14px; font-weight: 700; }
+    .body { font-size: 13px; }
+    .read { font-size: 13px; fill: #57606a; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; fill: #1f2328; }
+  </style>
+  <rect x="0.5" y="0.5" width="759" height="229" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+
+  <!-- The name -->
+  <rect x="170" y="24" width="136" height="40" rx="8" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+  <text class="part" x="238" y="51" text-anchor="middle">unit_stat</text>
+  <text class="colon" x="319" y="51" text-anchor="middle">:</text>
+  <rect x="332" y="24" width="124" height="40" rx="8" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.5"/>
+  <text class="part" x="394" y="51" text-anchor="middle">0_source</text>
+  <text class="colon" x="469" y="51" text-anchor="middle">:</text>
+  <rect x="482" y="24" width="100" height="40" rx="8" fill="#fff1e5" stroke="#bc4c00" stroke-width="1.5"/>
+  <text class="part" x="532" y="51" text-anchor="middle">move_4</text>
+
+  <!-- Connectors -->
+  <path d="M 238 66 L 238 82 L 132 82 L 132 98" fill="none" stroke="#0969da" stroke-width="1.5"/>
+  <path d="M 394 66 L 394 98" fill="none" stroke="#1a7f37" stroke-width="1.5"/>
+  <path d="M 532 66 L 532 82 L 636 82 L 636 98" fill="none" stroke="#bc4c00" stroke-width="1.5"/>
+
+  <!-- Explanations -->
+  <rect x="24" y="98" width="216" height="76" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="kind" x="38" y="121" fill="#0969da" style="fill:#0969da">family</text>
+  <text class="body" x="38" y="142">what kind of fact: here a</text>
+  <text class="body" x="38" y="160">named unit's condition</text>
+  <rect x="272" y="98" width="216" height="76" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="kind" x="286" y="121" style="fill:#1a7f37">role</text>
+  <text class="body" x="286" y="142">through which detail the move</text>
+  <text class="body" x="286" y="160">names it: a source detail</text>
+  <rect x="520" y="98" width="216" height="76" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="kind" x="534" y="121" style="fill:#bc4c00">which fact</text>
+  <text class="body" x="534" y="142">the fact itself: here</text>
+  <text class="body" x="534" y="160">4 moves left</text>
+
+  <!-- Reading -->
+  <text class="read" x="380" y="204" text-anchor="middle"><tspan class="mono">unit_stat:0_source:move_4 = 1</tspan> reads: the unit named by a source detail has 4 moves left.</text>
+</svg>

@@ -44,17 +44,7 @@ loop:
    they predict the search's preferences and the final result better.
 4. **Save the networks** and play the next batch with them.
 
-```text
-  batch of self-play games (networks frozen)
-    each decision: search, asking the network many times -> move
-    a random share of decisions is kept as samples (5% in the Mac profile)
-                    |
-                    v  game over: the final scores are attached
-  replay buffer of recent samples
-                    |
-                    v  training steps
-  updated networks -> next batch
-```
+![The training loop. 1: play a batch of games with the networks frozen; at every decision the alliance to move searches, asking its network many times, and a random 5% of decisions are kept as samples. When a game ends, its scores are added to its samples. 2: the samples join a replay buffer of recent samples. 3: training steps update the three networks, one per alliance. 4: the saved networks play the next batch.](figures/training_loop.svg)
 
 The idea comes from AlphaZero. The search chooses better than the bare network,
 the network learns to imitate the search and to predict outcomes, and a better
@@ -81,13 +71,15 @@ Reactions are decisions too: the defender picks casualties, an attacker chooses
 whether to retreat, and so on. A full eleven-round game holds well over a
 thousand decisions.
 
-**A legal move is a small record:** a kind plus labelled details. For example:
+**A legal move is a small record:** a kind plus labelled details. For example,
+the CCP cavalry in Shensi attacking Hopeh is a move of kind `movement_route`:
 
-```text
-movement_route   unit = setup_ccp_land_china_shensi_cavalry_1
-                 path = [land_china_shensi, land_china_hopeh]
-                 combat = true, mode = ordinary
-```
+| Detail | Value |
+| --- | --- |
+| `unit` | `setup_ccp_land_china_shensi_cavalry_1` |
+| `path` | `[land_china_shensi, land_china_hopeh]` |
+| `combat` | `true` |
+| `mode` | `ordinary` |
 
 Long orders, such as a fleet's, are built one step at a time with bounded
 choices: see the [AI order interface](../stage_a/action_interface_2026_10_24.md).
@@ -152,12 +144,7 @@ it stopped, counting moves and dice rolls. The limit is 16 in current runs.
 moves, A, B and C. Before the first simulation the network evaluates R, which
 gives priors for A, B and C.
 
-```text
-simulation 1   R --A--> RA                  RA is new: ask the network, stop    depth 1
-simulation 2   R --B--> RB                  RB is new: ask the network, stop    depth 1
-simulation 3   R --C--> RC                  RC is new: ask the network, stop    depth 1
-simulation 4   R --A--> RA --x--> RAx       RAx is new: ask the network, stop   depth 2
-```
+![The tree after four simulations. Simulations 1, 2 and 3 each try one untried move from R and add RA, RB and RC at depth 1, asking the network about each. Simulation 4 plays A again, then x, the move with the highest prior at RA, and adds RAx at depth 2.](figures/search_tree.svg)
 
 Simulations 1 to 3 each try a move nobody has tried. Simulation 4 scores the three
 moves again. Say the network's priors are A 0.5, B 0.3 and C 0.2, and the results
@@ -269,25 +256,7 @@ Combat Movement decision, with 13 legal moves.
 every legal move is described by a *vector*: a list of numbers, as many as the
 width. For that decision:
 
-```text
-the input                    learned table          vectors of 64 numbers
-board: 326 answers,     ->   zone table,       ->   37 zone vectors
-  filed by zone                42,737 rows
-position: 119 answers   ->   position table,   ->   1 position vector
-                               6,637 rows
-moves: 244 answers,     ->   move table,       ->   13 move vectors
-  filed by move                12,673 rows
-
-then:
-  2 message layers   every zone vector is updated from its neighbours' vectors,
-                     along the 160 directed borders, and from the position
-                     vector; the position vector from the average zone
-  value              position vector + the zones' mean and maximum
-                     -> a summary vector -> 3 numbers, one per alliance
-  policy             each move vector + the vectors of the zones it starts
-                     from, acts on and passes through, + the summary
-                     -> 13 scores -> 13 probabilities, in stages
-```
+![For the seed-5 decision: the board's 326 answers go through the zone table (42,737 rows) to 37 zone vectors, the position's 119 answers through the position table (6,637 rows) to one position vector, and the moves' 244 answers through the move table (12,673 rows) to 13 move vectors. Two message layers update the zone vectors from their neighbours and the position vector. The value head gives 3 values, one per alliance; the policy head gives 13 scores and probabilities, built in stages.](figures/network_structure.svg)
 
 **Learned rows.** A network is a large set of numbers that training adjusts
 (section 6), its *parameters*: 4,104,392 of them at 64×2. Almost all, 97%, sit in
@@ -314,13 +283,12 @@ as the sum of those 12 weighted rows. Here are three of the twelve, with the wid
 cut to 3 and invented row numbers (a fresh network's rows are all zero, and a
 trained network's numbers mean nothing one by one):
 
-```text
-question             answer  weight  its row (3 numbers)    weight × row
-possessor:ccp           1     0.69   [ 0.50  0.10 -0.20]    [ 0.35  0.07 -0.14]
-units:ccp:cavalry       1     0.69   [ 0.20 -0.40  0.30]    [ 0.14 -0.28  0.21]
-units:ccp:militia       2     1.10   [ 0.10  0.30  0.00]    [ 0.11  0.33  0.00]
-                                                     sum:   [ 0.60  0.12  0.07]
-```
+| Question | Answer | Weight | Its row (3 numbers) | Weight × row |
+| --- | ---: | ---: | --- | --- |
+| `possessor:ccp` | 1 | 0.69 | [0.50, 0.10, −0.20] | [0.35, 0.07, −0.14] |
+| `units:ccp:cavalry` | 1 | 0.69 | [0.20, −0.40, 0.30] | [0.14, −0.28, 0.21] |
+| `units:ccp:militia` | 2 | 1.10 | [0.10, 0.30, 0.00] | [0.11, 0.33, 0.00] |
+| **Sum** | | | | **[0.60, 0.12, 0.07]** |
 
 The other nine answers add their rows the same way, and the real rows have 64
 numbers. Hopeh, next door, answers 8 questions, among them a warlord militia and
@@ -340,13 +308,11 @@ one.
 **Why this is called a lookup.** Picture the board input as a table with one
 line per zone and one column per question, almost all zeros:
 
-```text
-                    possessor:  units:ccp:  possessor:warlord_  rail_to:land_   ...
-                    ccp         cavalry     beiping_hopeh       china_shensi
-land_china_shensi   1           1           0                   0
-land_china_hopeh    0           0           1                   1
-... 35 more zones, 42,737 columns in all
-```
+| Zone | `possessor:ccp` | `units:ccp:cavalry` | `possessor:warlord_beiping_hopeh` | `rail_to:land_china_shensi` | … 42,733 more columns |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `land_china_shensi` | 1 | 1 | 0 | 0 | … |
+| `land_china_hopeh` | 0 | 0 | 1 | 1 | … |
+| … 35 more zones | | | | | |
 
 That is why questions are also called columns. Multiplying each zone's whole line
 of 42,737 weighted answers by the zone table, as a textbook network layer would,

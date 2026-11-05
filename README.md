@@ -42,22 +42,20 @@ has yet shown robust playing strength.
 
 ## Repository layout
 
-```text
-game_content/
-  catalog/       Shared unit, facility, technology and national build definitions
-  maps/          Global map data and its authoring files
-  rules/         Official PDFs, rules profiles and the clarification register
-  scenarios/     The Japan–China 1936 campaign scenario
-include/game/    C++ public headers and game rules
-src/             C++ implementation and Python bindings
-studies/
-  campaign/      Zone network, search, self-play, training and evaluation
-  shared/        Campaign adapter, multi-player search and frozen JSON
-tests/           C++ engine suites and Python checks
-docs/            Rules ledger, engine module pages, Stage A records and history
-tools/           Training supervisor, recording, checks, benchmarks and map builders
-web/             Campaign Observatory
-```
+| Folder | Contents |
+| --- | --- |
+| `game_content/catalog/` | Shared unit, facility, technology and national build definitions |
+| `game_content/maps/` | Global map data and its authoring files |
+| `game_content/rules/` | Official PDFs, rules profiles and the clarification register |
+| `game_content/scenarios/` | The Japan–China 1936 campaign scenario |
+| `include/game/` | C++ public headers and game rules |
+| `src/` | C++ implementation and Python bindings |
+| `studies/campaign/` | Zone network, search, self-play, training and evaluation |
+| `studies/shared/` | Campaign adapter, multi-player search and frozen JSON |
+| `tests/` | C++ engine suites and Python checks |
+| `docs/` | Design document, rules ledger, engine module pages, Stage A records and history |
+| `tools/` | Training supervisor, recording, checks, benchmarks and map builders |
+| `web/` | Campaign Observatory |
 
 New runs write into ignored `runs/` folders.
 

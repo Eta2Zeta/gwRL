@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="250" viewBox="0 0 920 250" role="img" aria-labelledby="title desc">
+  <title id="title">Two toy moves as rows of the same questions</title>
+  <desc id="desc">A toy game with two unit types and three zones. The infantry moving a to b to c answers unit:0_source:infantry 1, unit_zone:0_source:a 1, zone:1_path a, b and c 1 each and list_length:path 3; it starts from a and acts on c. The tank moving b to c answers unit:0_source:tank 1, unit_zone:0_source:b 1, zone:1_path b and c 1 each and list_length:path 2; it starts from b and acts on c. All other answers are zero.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .q { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2328; }
+    .sub { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; fill: #57606a; }
+    .row { font-size: 14px; font-weight: 600; }
+    .one { font-size: 15px; font-weight: 700; fill: #ffffff; }
+    .zero { font-size: 14px; fill: #8c959f; }
+    .link { font-size: 13px; font-weight: 600; }
+    .head { font-size: 12px; fill: #57606a; font-weight: 600; }
+    .note { font-size: 12px; fill: #57606a; }
+  </style>
+  <rect x="0.5" y="0.5" width="919" height="249" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+
+  <!-- Group headers -->
+  <text class="q" x="247" y="36" text-anchor="middle">unit:0_source:</text>
+  <line x1="200" y1="44" x2="294" y2="44" stroke="#0969da" stroke-width="2"/>
+  <text class="q" x="390" y="36" text-anchor="middle">unit_zone:0_source:</text>
+  <line x1="318" y1="44" x2="462" y2="44" stroke="#1a7f37" stroke-width="2"/>
+  <text class="q" x="558" y="36" text-anchor="middle">zone:1_path:</text>
+  <line x1="486" y1="44" x2="630" y2="44" stroke="#bc4c00" stroke-width="2"/>
+  <text class="q" x="676" y="36" text-anchor="middle">list_length:path</text>
+  <line x1="654" y1="44" x2="698" y2="44" stroke="#8250df" stroke-width="2"/>
+  <text class="head" x="824" y="36" text-anchor="middle">LINKS</text>
+  <line x1="748" y1="44" x2="898" y2="44" stroke="#8c959f" stroke-width="2"/>
+
+  <!-- Sub headers -->
+  <text class="sub" x="222" y="66" text-anchor="middle">infantry</text>
+  <text class="sub" x="272" y="66" text-anchor="middle">tank</text>
+  <text class="sub" x="340" y="66" text-anchor="middle">a</text>
+  <text class="sub" x="390" y="66" text-anchor="middle">b</text>
+  <text class="sub" x="440" y="66" text-anchor="middle">c</text>
+  <text class="sub" x="508" y="66" text-anchor="middle">a</text>
+  <text class="sub" x="558" y="66" text-anchor="middle">b</text>
+  <text class="sub" x="608" y="66" text-anchor="middle">c</text>
+  <text class="head" x="784" y="66" text-anchor="middle">starts from</text>
+  <text class="head" x="864" y="66" text-anchor="middle">acts on</text>
+
+  <!-- Row 1: infantry a→b→c -->
+  <text class="row" x="24" y="104">infantry a→b→c</text>
+  <rect x="200" y="80" width="44" height="36" rx="6" fill="#0969da"/><text class="one" x="222" y="104" text-anchor="middle">1</text>
+  <rect x="250" y="80" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="272" y="104" text-anchor="middle">0</text>
+  <rect x="318" y="80" width="44" height="36" rx="6" fill="#1a7f37"/><text class="one" x="340" y="104" text-anchor="middle">1</text>
+  <rect x="368" y="80" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="390" y="104" text-anchor="middle">0</text>
+  <rect x="418" y="80" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="440" y="104" text-anchor="middle">0</text>
+  <rect x="486" y="80" width="44" height="36" rx="6" fill="#bc4c00"/><text class="one" x="508" y="104" text-anchor="middle">1</text>
+  <rect x="536" y="80" width="44" height="36" rx="6" fill="#bc4c00"/><text class="one" x="558" y="104" text-anchor="middle">1</text>
+  <rect x="586" y="80" width="44" height="36" rx="6" fill="#bc4c00"/><text class="one" x="608" y="104" text-anchor="middle">1</text>
+  <rect x="654" y="80" width="44" height="36" rx="6" fill="#8250df"/><text class="one" x="676" y="104" text-anchor="middle">3</text>
+  <rect x="754" y="82" width="60" height="32" rx="16" fill="#f6f8fa" stroke="#8c959f"/><text class="link" x="784" y="103" text-anchor="middle">a</text>
+  <rect x="834" y="82" width="60" height="32" rx="16" fill="#f6f8fa" stroke="#8c959f"/><text class="link" x="864" y="103" text-anchor="middle">c</text>
+
+  <!-- Row 2: tank b→c -->
+  <text class="row" x="24" y="152">tank b→c</text>
+  <rect x="200" y="128" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="222" y="152" text-anchor="middle">0</text>
+  <rect x="250" y="128" width="44" height="36" rx="6" fill="#0969da"/><text class="one" x="272" y="152" text-anchor="middle">1</text>
+  <rect x="318" y="128" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="340" y="152" text-anchor="middle">0</text>
+  <rect x="368" y="128" width="44" height="36" rx="6" fill="#1a7f37"/><text class="one" x="390" y="152" text-anchor="middle">1</text>
+  <rect x="418" y="128" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="440" y="152" text-anchor="middle">0</text>
+  <rect x="486" y="128" width="44" height="36" rx="6" fill="#f6f8fa" stroke="#d0d7de"/><text class="zero" x="508" y="152" text-anchor="middle">0</text>
+  <rect x="536" y="128" width="44" height="36" rx="6" fill="#bc4c00"/><text class="one" x="558" y="152" text-anchor="middle">1</text>
+  <rect x="586" y="128" width="44" height="36" rx="6" fill="#bc4c00"/><text class="one" x="608" y="152" text-anchor="middle">1</text>
+  <rect x="654" y="128" width="44" height="36" rx="6" fill="#8250df"/><text class="one" x="676" y="152" text-anchor="middle">2</text>
+  <rect x="754" y="130" width="60" height="32" rx="16" fill="#f6f8fa" stroke="#8c959f"/><text class="link" x="784" y="151" text-anchor="middle">b</text>
+  <rect x="834" y="130" width="60" height="32" rx="16" fill="#f6f8fa" stroke="#8c959f"/><text class="link" x="864" y="151" text-anchor="middle">c</text>
+
+  <!-- Notes -->
+  <text class="note" x="24" y="196">Each colour is one family of questions; grey cells are zero and are not stored. The path's zones are a set: the row alone</text>
+  <text class="note" x="24" y="214">cannot say a came before b. Where the move starts comes from unit_zone, and where it ends from the link to the zone it acts on.</text>
+</svg>

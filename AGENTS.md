@@ -76,6 +76,11 @@
 - Keep measurements and the reasons for past changes in dated records such as
   `docs/stage_a/`, and link to them from the design document rather than
   copying them.
+- Never draw a diagram, table or formula in plain text, in any document. Draw
+  diagrams as SVG figures in `docs/design/figures/` (tracked despite the image
+  ignore rule), with a title, a description and alt text, and look at them
+  rendered before committing. Write tables as Markdown tables and formulas as
+  math. Code blocks are for commands and code only.
 
 ## References
 

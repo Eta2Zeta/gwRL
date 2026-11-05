@@ -44,11 +44,11 @@ in the economy and air rules profiles and in the rules reader.
 
 A railroad repair move, such as Japan's in random-play seed 7004:
 
-```text
-economy_repair   target   = rail_land_manchuria_northern__land_manchuria_western
-                 endpoint = land_manchuria_northern
-                 damage   = 1
-```
+| Kind | Label | Value |
+| --- | --- | --- |
+| `economy_repair` | `target` | `rail_land_manchuria_northern__land_manchuria_western` |
+| | `endpoint` | `land_manchuria_northern` |
+| | `damage` | `1` |
 
 | Before | After |
 | --- | --- |

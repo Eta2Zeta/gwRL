@@ -125,20 +125,27 @@ ships discussed below are not those parenthesized reinforcements.
 The approved theatre-adjusted starting treasury uses this documented local
 derivation, not an official alternate setup rule:
 
-```text
-starting_cash = min(official_starting_IPP,
-                    retained_directly_possessed_original_land_printed_IPP)
-```
+$$
+\text{starting cash} = \min\bigl(\text{official starting IPP},\ \text{printed IPP of the retained, directly possessed original land}\bigr)
+$$
 
 Japan starts with **15 IPP**, KMT **6**, and CCP **2**: **23 IPP total**.
 Unaligned warlords have no starting treasury. There is no FEC or USSR account.
 
-```text
-W(side) = current legally collectable income-per-turn rate
-        + 0.1 × (units + infrastructure + treasury + paid construction)
-R(side) = W(side) - W(other side 1) - W(other side 2)
-surviving asset value = purchase price - remaining repair price
-```
+$$
+\begin{aligned}
+W(\text{side}) ={}& \text{current legally collectable income per turn} \\
+&+ 0.1 \times (\text{units} + \text{infrastructure} + \text{treasury} + \text{paid construction})
+\end{aligned}
+$$
+
+$$
+R(\text{side}) = W(\text{side}) - W(\text{other side 1}) - W(\text{other side 2})
+$$
+
+$$
+\text{surviving asset value} = \text{purchase price} - \text{remaining repair price}
+$$
 
 Income means the current rate, not cumulative collections. Setup assets count.
 Controlled/aligned minor assets count toward their controlling alliance;
