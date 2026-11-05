@@ -272,11 +272,15 @@ width. For that decision:
 **Learned rows.** A network is a large set of numbers that training adjusts
 (section 6), its *parameters*: 4,104,392 of them at 64×2. Almost all, 97%, sit in
 three tables that hold one row of 64 numbers for every question: 42,737 rows for
-the zone questions, 6,637 for the position's and 12,673 for the moves'. A
-question's row is what an answer to that question adds to a vector: the
-network's own description, in 64 numbers, of "a CCP cavalry is here" or "the CCP
-possesses this zone". No number in a row has a meaning chosen by hand. Training
-moves them until the answers that matter push the vectors in useful directions.
+the zone questions, 6,637 for the position's and 12,673 for the moves'. Each of a
+row's 64 numbers is one parameter, so the zone table alone holds
+42,737 × 64 = 2,735,168 of them. A row belongs to a question, not to a zone:
+`units:ccp:cavalry` has one row, the network's own description, in 64 numbers,
+of "a CCP cavalry is here", added in whichever zone that is true. No number in a
+row has a meaning chosen by hand. Training moves them until the answers that
+matter push the vectors in useful directions, and it moves a row only when it
+trains on decisions that answer the row's question
+([section 6](#6-how-the-networks-learn)).
 
 **Learned layers** hold most of the other 3%. A learned layer multiplies a vector
 by a learned table of numbers and adds a learned vector; most then bend the
@@ -286,13 +290,39 @@ amount to a single multiplication and could only add effects up.
 **A zone's vector is a sum of rows.** Shensi answers 12 of the 42,737 zone
 questions in that decision ([listed here](network_input.md#3-questions-and-answers));
 its other 42,725 answers are zero. Each answered question picks out its own row
-from the zone table, multiplied by a weight that grows with the answer a,
-sign(a) × log(1 + |a|): an answer of 1 counts 0.69, 2 counts 1.10 and 10 counts
-2.40, so larger counts matter more but not in proportion (a chosen curve, see
-[open questions](#how-should-a-count-count)). Shensi's vector starts
-as the sum of those 12 weighted rows. Here are three of the twelve, with the width
-cut to 3 and invented row numbers (a fresh network's rows are all zero, and a
-trained network's numbers mean nothing one by one):
+from the zone table and multiplies it by a weight that depends on the answer, and
+Shensi's vector starts as the sum of those 12 weighted rows.
+
+**The weight** is a fixed formula of the answer $a$, written by hand, not learned
+(`_signed_log` in `studies/campaign/features.py`):
+
+$$
+w(a) = \operatorname{sign}(a)\,\ln(1 + |a|)
+$$
+
+where $\ln$ is the natural logarithm. Answers are counts and yes-or-no flags, so
+in practice $a \ge 0$ and the weight is $\ln(1 + a)$; no answer was negative in
+60 decisions sampled from a game, and the sign only keeps the formula defined for
+negative numbers:
+
+| Answer $a$ | Weight $w(a)$ | Compared with an answer of 1 |
+| ---: | ---: | ---: |
+| 1 | $\ln 2 \approx 0.69$ | 1 |
+| 2 | $\ln 3 \approx 1.10$ | 1.58 |
+| 3 | $\ln 4 \approx 1.39$ | 2 |
+| 10 | $\ln 11 \approx 2.40$ | 3.46 |
+| 100 | $\ln 101 \approx 4.62$ | 6.66 |
+
+Larger counts matter more but not in proportion: ten militia add their row 3.46
+times as strongly as one, not ten times, so a big stack does not drown out
+everything else in its zone. That an answer of 1 counts 0.69 rather than 1 makes
+no difference, because the row it multiplies is learned and training can make it
+as large as it needs; the formula fixes only how counts compare with one another.
+The curve was chosen, not compared with others ([open question](#how-should-a-count-count)).
+
+Here are three of Shensi's twelve answers, with the width cut to 3 and invented
+row numbers (a fresh network's rows are all zero, and a trained network's numbers
+mean nothing one by one):
 
 | Question | Answer | Weight | Its row (3 numbers) | Weight × row |
 | --- | ---: | ---: | --- | --- |
@@ -522,6 +552,24 @@ Each network takes one Adam step on the sum of the two, and all three step
 together (`CampaignLearner.update` in `studies/campaign/learning.py`). The updated
 networks are saved as a model export, and the next batch starts.
 
+**What a step changes.** For every parameter, training works out its *gradient*:
+which way, and how strongly, a small change to that number would lower the loss
+on the step's 32 samples. Adam then moves every parameter a small way against its
+gradient, about the learning rate, 0.001, in size, scaled per parameter by how
+large its recent gradients have been. Every sample passes through the learned
+layers, so nearly all of their numbers change in every step. A row's gradient is
+zero unless its question is answered in one of the 32 samples, because an
+unanswered question's row was never added in. So a step changes the rows of the
+questions those samples answer, and Adam's momentum (a running average of past
+gradients that shrinks by a tenth each step) keeps moving a recently answered row
+for a few dozen steps more. A row whose question has never appeared in a trained
+sample stays at zero. Checked with a test loss on two real decisions: the first
+step gave a gradient to exactly the 150 rows its decision answers and changed
+only those; the second step also moved the 59 rows that only the first decision
+answered. Over one update's 700 steps, a question answered in many samples has
+its row moved hundreds of times, and a question absent from the replay buffer
+not at all, apart from that momentum.
+
 With the Mac profile's settings, each kept sample is drawn about 13 times before
 it leaves the buffer.
 
@@ -681,8 +729,9 @@ including deep but narrow ones such as 64×6.
 
 #### How should a count count?
 
-**Now.** An answer a adds its row times sign(a) × log(1 + |a|) (section 5): 1
-counts 0.69, 2 counts 1.10 and 10 counts 2.40. The curve was chosen, not compared.
+**Now.** An answer $a$ adds its row times $\operatorname{sign}(a)\ln(1 + |a|)$
+([section 5](#5-what-a-network-computes)): 1 counts 0.69, 2 counts 1.10 and 10
+counts 2.40. The curve was chosen, not compared.
 
 **Alternatives:** counts in proportion, or separate questions for count ranges
 (1, 2 to 3, 4 to 7, more), so each range learns its own effect. **Would settle
