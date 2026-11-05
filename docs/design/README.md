@@ -116,17 +116,8 @@ in a tree, which the next simulation reads.
 
 1. Copy the game at the current position (`clone_for_search`).
 2. At a decision the search has already evaluated, give every legal move a
-   score and play the move with the highest score on the copy; a tie is broken
-   at random. The score adds two terms:
-   - **what earlier simulations found:** the move's average result so far for
-     the alliance that is choosing, rescaled so that the worst and best move
-     averages seen in this search become 0 and 1. A simulation's result is the
-     network's value of the position where it stopped, or the true final scores
-     at the end of the game. A move no simulation has tried yet gets 1, as good
-     as the best, so untried moves usually come first;
-   - **what the network expected:** `c_puct` (1.5) × the move's prior × √(visits
-     of all moves here + 1) ÷ (this move's visits + 1). It is large for a move the
-     network likes that has been tried little.
+   score (below) and play the move with the highest score on the copy; a tie is
+   broken at random.
 3. At a chance event, roll the dice on the copy.
 4. At a decision no simulation has evaluated yet, ask the deciding alliance's
    network for the position's value for all three alliances and a prior for each
@@ -136,6 +127,26 @@ in a tree, which the next simulation reads.
    simulation's path.
 6. Add the three values found to every position and move on the path, with one
    more visit each.
+
+**The score** of a move adds two terms:
+
+$$
+\text{score} = \underbrace{\frac{\bar v - v_{\min}}{v_{\max} - v_{\min}}}_{\text{first term}} + \underbrace{c_{\text{puct}} \times P \times \frac{\sqrt{N + 1}}{n + 1}}_{\text{second term}}
+$$
+
+- **The first term, what earlier simulations found.** $\bar v$ is the move's
+  average result so far for the alliance that is choosing. A simulation's result
+  is the network's value of the position where it stopped, or the true final
+  scores at the end of the game. $v_{\min}$ and $v_{\max}$ are the lowest and
+  highest averages, for that alliance, that any move anywhere in this search's
+  tree has had so far; the range only widens. So the first term places the
+  move's average on a scale from 0, the worst seen, to 1, the best. A move no
+  simulation has tried yet gets 1, as good as the best, so untried moves usually
+  come first.
+- **The second term, what the network expected.** $P$ is the move's prior, $n$
+  how many simulations have played this move here, $N$ how many have played any
+  move here, and $c_{\text{puct}}$ is 1.5. It is large for a move the network
+  likes that has been tried little, and it shrinks each time the move is tried.
 
 Each alliance judges moves by its own value: this is Max-N search, not a search
 for an equilibrium. Values are rescaled per alliance before they enter the score.
@@ -152,8 +163,9 @@ gives priors for A, B and C.
 Simulations 1 to 3 each try a move nobody has tried. Simulation 4 scores the three
 moves again. Say the network's priors are A 0.5, B 0.3 and C 0.2, and the results
 so far rescale to A 1, C 0.5 and B 0. Each move has one visit of three, so its
-second term is 1.5 × prior × √4 ÷ 2: A scores 1 + 0.75 = 1.75, B 0 + 0.45 = 0.45
-and C 0.5 + 0.3 = 0.8, and the simulation plays A. At RA no move has been tried, so
+second term is $1.5 \times P \times \sqrt{3 + 1} \div (1 + 1)$: A scores
+1 + 0.75 = 1.75, B 0 + 0.45 = 0.45 and C 0.5 + 0.3 = 0.8, and the simulation
+plays A. At RA no move has been tried, so
 every first term is 1 and the move with the highest prior, x, wins. RAx is new, so
 the simulation stops there.
 
@@ -472,23 +484,77 @@ moves, the attack on Hopeh and ending Combat Movement. Both differences have
 one cause: the search found one move better than the rest
 ([trace](../stage_a/training_sample_2026_11_05.md#how-the-64-simulations-were-spent)).
 
-- **The attack on Hopeh gained.** In one look the network gave it 0.10. Its
-  first two simulations stopped before the battle, with Hopeh still the KMT's,
-  and scored like every other move: about −102.2 for the Comintern. From
-  simulation 15 on, its simulations played on through the end of Combat
-  Movement and the battle, which the CCP won, and the network rated most of the
-  positions they reached, with the CCP holding Hopeh, between −101.2 and
-  −101.4. No simulation of another move did better than −102.2. Rescaled to the
-  range of results this search had seen, that lead was large: before simulation
-  33, the attack's first term was 0.77 and the other moves' 0 to 0.25. So the
-  search chose the attack in 32 of simulations 15 to 51, and the attack ended
-  with 36 of the 64, although the exploration noise had lowered its prior to
-  0.08.
-- **The other moves shared what was left, by prior.** Their simulations scored
-  about the same, −102.3 to −102.5 on average, so only the second term of the
-  score told them apart. That term grows with the prior, so the remaining 28
-  simulations went to them roughly in proportion to their priors after the
-  noise, which left each with about half that prior:
+**How the 64 simulations were split.** The simulations ran one after another,
+numbered 1 to 64 in the order they ran. Each began by giving the five moves the
+score of [section 3](#3-choosing-a-move-search) and playing the move with the
+highest score. The figure shows the move each began with.
+
+![The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the move it began with. Simulations 1 to 14 tried every move; the two that began with the attack on Hopeh, 6 and 11, stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a position rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37; simulation 33's scores are in the table below. Simulation 53 stopped at the depth limit at a position rated −106.02, and simulations 54 to 64 all began with the other moves.](figures/sample_simulations.svg)
+
+**Simulations 1 to 14** tried every move. The attack's two, simulations 6 and 11,
+stopped before its battle, with Hopeh still the KMT's, and scored like every
+other move: about −102.2 for the Comintern.
+
+**Simulation 15** was the first to play on through the end of Combat Movement and
+the battle, which the CCP won. The network rated the position it reached, with
+the CCP holding Hopeh, −101.42: better than any result before it.
+
+**Simulations 15 to 51** began with the attack 32 times out of 37. From 15 on,
+all 34 of its simulations stopped at positions where the CCP held Hopeh, and the
+network rated 24 of them between −101.43 and −101.16; no simulation of another
+move did better than −102.16. The table gives the five scores just before
+simulation 33, after 32 simulations:
+
+| Move | Simulations so far ($n$) | Average result for the Comintern ($\bar v$) | First term | Prior after noise ($P$) | Second term | Score |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Shensi → Hopeh | 18 | −101.50 | 0.77 | 0.085 | 0.04 | **0.81** |
+| Shensi → Suiyuan | 1 | −102.40 | 0.16 | 0.072 | 0.31 | 0.47 |
+| Shensi → Szechwan | 1 | −102.63 | 0.00 | 0.177 | 0.76 | 0.76 |
+| Shensi → Tsinghai | 7 | −102.26 | 0.25 | 0.268 | 0.29 | 0.54 |
+| End Combat Movement | 5 | −102.39 | 0.17 | 0.399 | 0.57 | 0.74 |
+
+**The first term** places a move's average on a scale that runs from the worst
+average the search had met so far, which counts as 0, to the best, which counts
+as 1. Before simulation 33 these were −102.63, the result of the Szechwan
+attack's one simulation, and −101.16, the result of simulation 20, deep in the
+attack's line. (A move that only one simulation has tried has that simulation's
+result as its average.) The attack's average sat 77% of the way up:
+
+$$
+\frac{-101.50 - (-102.63)}{-101.16 - (-102.63)} = \frac{1.13}{1.47} \approx 0.77
+$$
+
+The other moves' averages lay 0 to 0.37 points above the worst, 0 to 25% of the
+way up. The attack's lead over the next best move, Tsinghai, was 0.76 points:
+small next to final scores in the tens or hundreds, but the results this search
+had seen spanned only 1.47 points, so on its scale the lead was large.
+
+**The second term** was small for the attack, because it had already been tried
+18 times:
+
+$$
+1.5 \times 0.085 \times \frac{\sqrt{32 + 1}}{18 + 1} \approx 0.04
+$$
+
+Szechwan's was 0.76: it had been tried once, and the noise had raised its prior
+to 0.177. The attack's score, 0.81, still beat Szechwan's 0.76, so simulation 33
+began with the attack. Five of simulations 15 to 51, numbers 16, 32, 38, 42 and
+51, began with another move, whose second term outweighed the attack's lead at
+that moment.
+
+**Simulation 53**, one of the attack's, stopped at the depth limit at a position
+rated −106.02, far below anything before. The bottom of the scale moved from
+−102.64 to −106.02, so all five first terms crowded between 0.70 and 0.90, and
+the second terms decided: 0.025 for the attack after 36 simulations, 0.37 to
+0.65 for the others. Simulations 54 to 64 all began with the other moves. So the
+attack ended with 36 of the 64, although the exploration noise had lowered its
+prior from 0.10 to 0.085.
+
+**The other moves shared what was left, by prior.** Their simulations scored
+about the same, −102.3 to −102.5 on average, so only the second term of the
+score told them apart. That term grows with the prior, so the remaining 28
+simulations went to them roughly in proportion to their priors after the
+noise, which left each with about half that prior:
 
 | Move | Network's probability | Prior after noise | Visits if the 28 went exactly by that prior | Visits | Share |
 | --- | ---: | ---: | ---: | ---: | ---: |

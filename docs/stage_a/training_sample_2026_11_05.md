@@ -83,7 +83,7 @@ simulations that began with each move:
   still the KMT's: −102.22 and −102.23.
 - **Simulation 15** was the first to play on through the end of Combat Movement
   and the battle for Hopeh, with its dice roll. The CCP held Hopeh at its end,
-  rated −101.42. All 34 later simulations of the attack passed through the
+  rated −101.42. The 33 later simulations of the attack all passed through the
   CCP's capture, and 23 of them scored between −101.43 and −101.16.
 - **Simulations 15 to 51** chose the attack 32 times out of 37. Before
   simulation 33, the attack's rescaled first term was 0.77 and the other
@@ -102,6 +102,50 @@ simulations that began with each move:
 of the last simulations. One extreme result anywhere in the tree changes how a
 search spends its remaining simulations, because the range is set by the worst
 and best averages seen.
+
+**Which move each simulation began with**, as the design document's
+[figure](../design/figures/sample_simulations.svg) draws it from this trace:
+
+| Move | Simulations | Count |
+| --- | --- | ---: |
+| Shensi → Hopeh | 6, 11, 15, 17–31, 33–37, 39–41, 43–50, 52, 53 | 36 |
+| Shensi → Suiyuan | 7, 60 | 2 |
+| Shensi → Szechwan | 3, 38, 54, 57, 63 | 5 |
+| Shensi → Tsinghai | 2, 4, 5, 9, 10, 12, 14, 61, 64 | 9 |
+| End Combat Movement | 1, 8, 13, 16, 32, 42, 51, 55, 56, 58, 59, 62 | 12 |
+
+**The scores, rebuilt from the trace** on 5 November. The trace records, for
+each simulation, its first move, its result and every move's rescaled first
+term before it. Adding the second term, computed from the priors after noise,
+gives the highest score to the move the simulation chose in all 64 simulations.
+The range the first terms were rescaled to follows from them:
+
+| Before simulations | Lowest average | Highest average | Set by |
+| --- | ---: | ---: | --- |
+| 4–15 | −102.63 | −102.16 | simulation 3 (Szechwan) and simulation 2 (Tsinghai) |
+| 16–18 | −102.63 | −101.42 | simulation 15, the first through the battle |
+| 19–20 | −102.63 | −101.38 | simulation 18 |
+| 21–38 | −102.63 | −101.16 | simulation 20 |
+| 39–53 | −102.64 | −101.16 | simulation 38 (Szechwan) |
+| 54–64 | −106.02 | −101.16 | simulation 53, stopped at the depth limit |
+
+A move that only one simulation has tried has that simulation's result as its
+average, so the deepest moves of a path set the extremes. The scores before
+simulation 33 (it began with the attack) and before simulation 54 (it began
+with the attack on Szechwan):
+
+| Before | Move | Simulations so far | Average | First term | Second term | Score |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 33 | Shensi → Hopeh | 18 | −101.50 | 0.768 | 0.038 | 0.806 |
+| 33 | Shensi → Suiyuan | 1 | −102.40 | 0.161 | 0.309 | 0.470 |
+| 33 | Shensi → Szechwan | 1 | −102.63 | 0.000 | 0.761 | 0.761 |
+| 33 | Shensi → Tsinghai | 7 | −102.26 | 0.253 | 0.289 | 0.541 |
+| 33 | End Combat Movement | 5 | −102.39 | 0.166 | 0.573 | 0.739 |
+| 54 | Shensi → Hopeh | 36 | −101.63 | 0.902 | 0.025 | 0.927 |
+| 54 | Shensi → Suiyuan | 1 | −102.40 | 0.745 | 0.396 | 1.141 |
+| 54 | Shensi → Szechwan | 2 | −102.64 | 0.695 | 0.649 | 1.344 |
+| 54 | Shensi → Tsinghai | 7 | −102.26 | 0.773 | 0.369 | 1.142 |
+| 54 | End Combat Movement | 7 | −102.36 | 0.753 | 0.550 | 1.303 |
 
 **What the network read** (part 1 of the sample): 840 answers about the board,
 from all 37 zones; 191 about the position as a whole; 80 about the five moves;

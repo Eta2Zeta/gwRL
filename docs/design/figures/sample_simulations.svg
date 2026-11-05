@@ -1,0 +1,237 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="364" viewBox="0 0 960 364" role="img" aria-labelledby="title desc">
+  <title id="title">The move each of the 64 simulations began with</title>
+  <desc id="desc">The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the move it began with. Simulations 1 to 14 tried every move; both attacks on Hopeh among them stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a position rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37. Simulation 53 stopped at the depth limit at a position rated −106.02, and simulations 54 to 64 all began with the other moves. Simulations beginning with the attack on Hopeh: 6, 11, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 39, 40, 41, 43, 44, 45, 46, 47, 48, 49, 50, 52, 53.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .cell { font-size: 11px; font-weight: 600; }
+      .num { font-size: 10px; fill: #57606a; }
+      .label { font-size: 12px; fill: #57606a; }
+      .note { font-size: 12px; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="363" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="40" y="36">The move each simulation began with, in the order the 64 ran</text>
+  <rect x="40" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="52.5" y="107.5" text-anchor="middle">E</text>
+  <text class="num" x="52.5" y="132" text-anchor="middle">1</text>
+  <rect x="67" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="79.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="79.5" y="132" text-anchor="middle">2</text>
+  <rect x="94" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="106.5" y="107.5" text-anchor="middle">Sz</text>
+  <text class="num" x="106.5" y="132" text-anchor="middle">3</text>
+  <rect x="121" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="133.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="133.5" y="132" text-anchor="middle">4</text>
+  <rect x="148" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="160.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="160.5" y="132" text-anchor="middle">5</text>
+  <rect x="175" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="187.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="187.5" y="132" text-anchor="middle">6</text>
+  <rect x="202" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="214.5" y="107.5" text-anchor="middle">Su</text>
+  <text class="num" x="214.5" y="132" text-anchor="middle">7</text>
+  <rect x="229" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="241.5" y="107.5" text-anchor="middle">E</text>
+  <text class="num" x="241.5" y="132" text-anchor="middle">8</text>
+  <rect x="256" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="268.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="268.5" y="132" text-anchor="middle">9</text>
+  <rect x="283" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="295.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="295.5" y="132" text-anchor="middle">10</text>
+  <rect x="310" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="322.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="322.5" y="132" text-anchor="middle">11</text>
+  <rect x="337" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="349.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="349.5" y="132" text-anchor="middle">12</text>
+  <rect x="364" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="376.5" y="107.5" text-anchor="middle">E</text>
+  <text class="num" x="376.5" y="132" text-anchor="middle">13</text>
+  <rect x="391" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="403.5" y="107.5" text-anchor="middle">T</text>
+  <text class="num" x="403.5" y="132" text-anchor="middle">14</text>
+  <rect x="418" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="430.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="430.5" y="132" text-anchor="middle">15</text>
+  <rect x="445" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="457.5" y="107.5" text-anchor="middle">E</text>
+  <text class="num" x="457.5" y="132" text-anchor="middle">16</text>
+  <rect x="472" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="484.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="484.5" y="132" text-anchor="middle">17</text>
+  <rect x="499" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="511.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="511.5" y="132" text-anchor="middle">18</text>
+  <rect x="526" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="538.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="538.5" y="132" text-anchor="middle">19</text>
+  <rect x="553" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="565.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="565.5" y="132" text-anchor="middle">20</text>
+  <rect x="580" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="592.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="592.5" y="132" text-anchor="middle">21</text>
+  <rect x="607" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="619.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="619.5" y="132" text-anchor="middle">22</text>
+  <rect x="634" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="646.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="646.5" y="132" text-anchor="middle">23</text>
+  <rect x="661" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="673.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="673.5" y="132" text-anchor="middle">24</text>
+  <rect x="688" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="700.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="700.5" y="132" text-anchor="middle">25</text>
+  <rect x="715" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="727.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="727.5" y="132" text-anchor="middle">26</text>
+  <rect x="742" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="754.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="754.5" y="132" text-anchor="middle">27</text>
+  <rect x="769" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="781.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="781.5" y="132" text-anchor="middle">28</text>
+  <rect x="796" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="808.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="808.5" y="132" text-anchor="middle">29</text>
+  <rect x="823" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="835.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="835.5" y="132" text-anchor="middle">30</text>
+  <rect x="850" y="88" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="862.5" y="107.5" text-anchor="middle">H</text>
+  <text class="num" x="862.5" y="132" text-anchor="middle">31</text>
+  <rect x="877" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="889.5" y="107.5" text-anchor="middle">E</text>
+  <text class="num" x="889.5" y="132" text-anchor="middle">32</text>
+  <rect x="40" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="52.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="52.5" y="272" text-anchor="middle">33</text>
+  <rect x="67" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="79.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="79.5" y="272" text-anchor="middle">34</text>
+  <rect x="94" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="106.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="106.5" y="272" text-anchor="middle">35</text>
+  <rect x="121" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="133.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="133.5" y="272" text-anchor="middle">36</text>
+  <rect x="148" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="160.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="160.5" y="272" text-anchor="middle">37</text>
+  <rect x="175" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="187.5" y="247.5" text-anchor="middle">Sz</text>
+  <text class="num" x="187.5" y="272" text-anchor="middle">38</text>
+  <rect x="202" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="214.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="214.5" y="272" text-anchor="middle">39</text>
+  <rect x="229" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="241.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="241.5" y="272" text-anchor="middle">40</text>
+  <rect x="256" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="268.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="268.5" y="272" text-anchor="middle">41</text>
+  <rect x="283" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="295.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="295.5" y="272" text-anchor="middle">42</text>
+  <rect x="310" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="322.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="322.5" y="272" text-anchor="middle">43</text>
+  <rect x="337" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="349.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="349.5" y="272" text-anchor="middle">44</text>
+  <rect x="364" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="376.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="376.5" y="272" text-anchor="middle">45</text>
+  <rect x="391" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="403.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="403.5" y="272" text-anchor="middle">46</text>
+  <rect x="418" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="430.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="430.5" y="272" text-anchor="middle">47</text>
+  <rect x="445" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="457.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="457.5" y="272" text-anchor="middle">48</text>
+  <rect x="472" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="484.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="484.5" y="272" text-anchor="middle">49</text>
+  <rect x="499" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="511.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="511.5" y="272" text-anchor="middle">50</text>
+  <rect x="526" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="538.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="538.5" y="272" text-anchor="middle">51</text>
+  <rect x="553" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="565.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="565.5" y="272" text-anchor="middle">52</text>
+  <rect x="580" y="228" width="25" height="30" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="592.5" y="247.5" text-anchor="middle">H</text>
+  <text class="num" x="592.5" y="272" text-anchor="middle">53</text>
+  <rect x="607" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="619.5" y="247.5" text-anchor="middle">Sz</text>
+  <text class="num" x="619.5" y="272" text-anchor="middle">54</text>
+  <rect x="634" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="646.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="646.5" y="272" text-anchor="middle">55</text>
+  <rect x="661" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="673.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="673.5" y="272" text-anchor="middle">56</text>
+  <rect x="688" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="700.5" y="247.5" text-anchor="middle">Sz</text>
+  <text class="num" x="700.5" y="272" text-anchor="middle">57</text>
+  <rect x="715" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="727.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="727.5" y="272" text-anchor="middle">58</text>
+  <rect x="742" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="754.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="754.5" y="272" text-anchor="middle">59</text>
+  <rect x="769" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="781.5" y="247.5" text-anchor="middle">Su</text>
+  <text class="num" x="781.5" y="272" text-anchor="middle">60</text>
+  <rect x="796" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="808.5" y="247.5" text-anchor="middle">T</text>
+  <text class="num" x="808.5" y="272" text-anchor="middle">61</text>
+  <rect x="823" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="835.5" y="247.5" text-anchor="middle">E</text>
+  <text class="num" x="835.5" y="272" text-anchor="middle">62</text>
+  <rect x="850" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="862.5" y="247.5" text-anchor="middle">Sz</text>
+  <text class="num" x="862.5" y="272" text-anchor="middle">63</text>
+  <rect x="877" y="228" width="25" height="30" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="889.5" y="247.5" text-anchor="middle">T</text>
+  <text class="num" x="889.5" y="272" text-anchor="middle">64</text>
+  <path d="M 40 84 L 40 78 L 416 78 L 416 84" fill="none" stroke="#57606a" stroke-width="1.5"/>
+  <text class="label" x="40" y="71">1–14: every move tried</text>
+  <path d="M 418 84 L 418 78 L 902 78" fill="none" stroke="#57606a" stroke-width="1.5"/>
+  <text class="label" x="418" y="71">15–51: the attack on Hopeh 32 times out of 37 →</text>
+  <path d="M 40 218 L 551 218 L 551 224" fill="none" stroke="#57606a" stroke-width="1.5"/>
+  <text class="label" x="40" y="211">… 15–51 continued</text>
+  <path d="M 607 224 L 607 218 L 902 218 L 902 224" fill="none" stroke="#57606a" stroke-width="1.5"/>
+  <text class="label" x="607" y="211">54–64: only the other moves</text>
+  <line x1="187.5" y1="138" x2="187.5" y2="152" stroke="#57606a" stroke-width="1.5"/>
+  <text class="note" x="183.5" y="166">6 and 11: stop before the battle</text>
+  <line x1="430.5" y1="138" x2="430.5" y2="152" stroke="#57606a" stroke-width="1.5"/>
+  <text class="note" x="426.5" y="166">15: the first to play through the battle; the CCP takes Hopeh, rated −101.42</text>
+  <line x1="52.5" y1="278" x2="52.5" y2="292" stroke="#57606a" stroke-width="1.5"/>
+  <text class="note" x="48.5" y="306">33: the scores in the table below</text>
+  <line x1="592.5" y1="278" x2="592.5" y2="292" stroke="#57606a" stroke-width="1.5"/>
+  <text class="note" x="588.5" y="306">53: stops at the depth limit, rated −106.02</text>
+  <rect x="40" y="325" width="25" height="20" rx="4" fill="#2a78d6"/>
+  <text class="cell" x="52.5" y="339.5" text-anchor="middle">H</text>
+  <text class="label" x="74" y="340">the attack on Hopeh</text>
+  <rect x="226" y="325" width="25" height="20" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="238.5" y="339.5" text-anchor="middle">E</text>
+  <text class="label" x="260" y="340">ending Combat Movement</text>
+  <rect x="430" y="325" width="25" height="20" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="442.5" y="339.5" text-anchor="middle">Su</text>
+  <rect x="458" y="325" width="25" height="20" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="470.5" y="339.5" text-anchor="middle">Sz</text>
+  <rect x="486" y="325" width="25" height="20" rx="4" fill="#e8ebef"/>
+  <text class="cell" x="498.5" y="339.5" text-anchor="middle">T</text>
+  <text class="label" x="520" y="340">the attacks on Suiyuan, Szechwan and Tsinghai</text>
+</svg>
