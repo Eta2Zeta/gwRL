@@ -38,13 +38,16 @@ loop:
 1. **Play a batch of games.** At every decision, the alliance to move runs a
    search: it imagines possible continuations, guided by its own network, and
    picks a move. The networks do not change during the batch.
-2. **Keep some decisions as training samples.** A sample holds the position,
-   the moves the search preferred and, once the game is over, how it ended.
+2. **Keep some decisions as training samples.** A sample is a saved record of
+   one decision: what the network read there, how many of the search's
+   simulations began with each legal move and, added when the game ends, the
+   final scores. [Section 6](#6-how-the-networks-learn) shows a real one.
 3. **Train the three networks** on those samples and recent older ones, so that
-   they predict the search's preferences and the final result better.
+   their move probabilities come closer to the search's shares and their
+   predicted scores closer to the final ones.
 4. **Save the networks** and play the next batch with them.
 
-![The training loop. 1: play a batch of games with the networks frozen; at every decision the alliance to move searches, asking its network many times, and a random 5% of decisions are kept as samples. When a game ends, its scores are added to its samples. 2: the samples join a replay buffer of recent samples. 3: training steps update the three networks, one per alliance. 4: the saved networks play the next batch.](figures/training_loop.svg)
+![The training loop. 1: play a batch of games with the networks frozen; at every decision the alliance to move searches, asking its network many times, and a random 5% of decisions are kept as samples. When a game ends, its scores are added to its samples. 2: the samples join a replay buffer of recent samples; a sample records what the network read, how many simulations began with each move and, once the game ends, the final scores. 3: training steps update the three networks, one per alliance: each network's move probabilities shift toward the search's shares and its predicted scores toward the final ones. 4: the saved networks play the next batch.](figures/training_loop.svg)
 
 The idea comes from AlphaZero. The search chooses better than the bare network,
 the network learns to imitate the search and to predict outcomes, and a better
@@ -205,7 +208,8 @@ for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
 **After all simulations**, the number of times each first move was tried shows the
 search's preference. The move actually played is drawn at random in proportion to
 these visit counts (temperature 1), and the visit shares become the sample's
-policy target (`studies/campaign/learning.py`, `_decide`).
+policy target (`studies/campaign/learning.py`, `_decide`);
+[section 6](#6-how-the-networks-learn) shows a real sample.
 
 **Exploration.** During training, random noise (Dirichlet, alpha 0.3, mixed in at
 25%) is added to the network's priors at the starting position, so the search
@@ -385,7 +389,10 @@ move gets a probability; none is padded, merged or dropped. Which details count 
 **Rows start at zero** (since 3 November 2026). A question that training has never
 reached adds nothing, instead of a random row added at full strength. On fixed
 data this gave a slightly lower held-out value error (0.0076 against 0.0081) and
-the same policy loss: no harm shown, not a strength gain.
+the same policy loss: no harm shown, not a strength gain. A fresh network
+therefore gives every position the same values
+([section 6](#6-how-the-networks-learn) says what that means for a run's first
+batch).
 
 **Most of a network is rows:** 3.97 M of the 4.10 M parameters at 64×2 (97%), and
 15.88 M of 20.30 M at 256×8 (78%), whose wider layers weigh more. A decision reads
@@ -396,14 +403,68 @@ Measurements of this network are in the
 
 ## 6. How the networks learn
 
-**Samples.** A batch of games is played with all three networks frozen. Of each
-game's decisions, a random share is kept: 5% in the Mac profile, because a game's
-thousand-odd positions are close to one another. A sample holds the decision's
-encoding, the alliance that chose and the search's visit shares.
+A batch of games is played with all three networks frozen. Some of their
+decisions are saved as samples, and after the batch the networks are trained on
+them.
 
-**Targets.** When the game ends, every sample from it gets the final scores as its
-value target, divided by 100 for training. Games cut off before their end are not
-used for training in `--complete-episodes` runs.
+**What a sample is.** A sample is one decision of a self-play game, saved so that
+training can show it to the networks again and compare their answers with
+better ones. It stores four things (`_decide` and `play_episode` in
+`studies/campaign/learning.py`):
+
+| Part | What it stores | What training does with it |
+| --- | --- | --- |
+| 1. What the network read | The decision's input ([section 4](#4-what-a-network-reads)): the non-zero answers about the board, about the position as a whole and about each legal move, and the zones each move names. It is not a copy of the game. | Shows the decision to the networks again. |
+| 2. Who chose | The alliance to move. | Only that alliance's network learns move probabilities from the sample; all three learn values from it. |
+| 3. How the search split its simulations | Each legal move's share: how many of the search's simulations began with that move, divided by their number. | The policy target: the move probabilities the network should give. |
+| 4. How the game ended | The three alliances' final scores, written into every sample of the game when it ends. | The value target: the values the network should predict, the scores divided by 100. |
+
+**A real sample**, from a game the networks played after one training batch
+([record](../stage_a/training_sample_2026_11_05.md)):
+
+![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 191 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
+
+In round 5 the CCP's mountain infantry in Shensi could attack one of four
+neighbouring KMT zones, or the CCP could end Combat Movement. Part 1 is the
+position as the Comintern's network read it. Among its answers, Hopeh's say the
+KMT holds it and is building a shipyard and a fortification there, and none
+says a unit is there. In one look, the network gave ending Combat Movement 0.53
+and the attack on Hopeh 0.10. But where the simulations that began with that
+attack stopped, the network rated the positions best for the Comintern: −101.6
+on average, against −102.3 to −102.5 after the other moves. The search
+compares results rescaled to the range it has seen
+([section 3](#3-choosing-a-move-search)), so this small lead drew 36 of the 64
+simulations; the exploration noise had even lowered that move's prior, to 0.08.
+The sample stores 36/64 = 0.56 for the attack on Hopeh, and the other moves'
+shares likewise. The move played was drawn from these shares, and it was the
+attack on Hopeh. The game ended with Axis +49.0, Allies −63.8 and Comintern
+−106.2, and every sample of the game stores these three scores.
+
+**Why the search's shares are the target.** The network answers in one look. The
+search also asks it about every position its 64 simulations reach, and returns
+most often to the moves whose continuations score best for the alliance
+choosing ([section 3](#3-choosing-a-move-search)). Its split is
+therefore a better judgment than the network's first guess. Training moves the
+network's probabilities toward the split, so the network's next first guesses
+come closer to what a search would conclude, and the next batch's searches start
+from them. The final scores are what really happened after the decision, so they
+teach the network to predict how a position will end.
+
+**In a run's first batch** the shares carry little. Fresh networks give every
+position the same values, because their rows start at zero
+([section 5](#5-what-a-network-computes)): on 5 November a fresh 64×2 network
+gave the same three values at four different positions of a game
+([record](../stage_a/training_sample_2026_11_05.md#a-fresh-network-gives-every-position-the-same-values)).
+A first-batch search therefore splits its simulations by the network's
+arbitrary first guesses, the exploration noise and the rare game ends it
+reaches; only the final scores carry information. From the second batch on, the
+values differ between positions.
+
+**Which decisions are kept.** A random share of each game's decisions: 5% in the
+Mac profile, because a game's thousand-odd positions are close to one another.
+A decision with only one legal move, played without a search, can be kept too:
+its share is 1, so it teaches only the values. Games cut off before their end
+give no samples in `--complete-episodes` runs.
 
 **Replay.** Samples go into a replay buffer, 8,000 in the Mac profile; the oldest
 leave first.
@@ -683,7 +744,13 @@ equal-compute comparison the plan describes.
 - **Parameters:** all the numbers training adjusts: the rows and the learned layers.
 - **Layout version:** an identifier of the full set of questions and fixed map
   facts; a network refuses inputs of another layout.
-- **Sample:** a kept decision with its targets.
+- **Sample:** one saved decision: what the network read, who chose, how the
+  search split its simulations among the moves and the final scores.
+- **Share:** a move's visit count divided by the number of simulations.
+- **Policy target:** a sample's shares, the move probabilities a network is
+  trained toward.
+- **Value target:** a sample's final scores, divided by 100, the values a network
+  is trained toward.
 - **Replay buffer:** the recent samples that training draws from.
 - **Batch:** the games played between two updates.
 - **Update:** the training steps after a batch.

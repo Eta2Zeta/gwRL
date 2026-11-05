@@ -13,6 +13,7 @@ for it:
 - [Where self-play time goes, and the moves each search plays again](search_replays_2026_11_04.md): the coordinator is busy 92% and game threads wait for it 63% of the time; a search's 64 simulations play 75 to 133 moves again on copies of the game, about half of the game threads' own work.
 - [The search keeps a copy of the game at every tree position](search_copies_2026_11_04.md): identical search results on 151 positions with 59% fewer moves played; a matched Mac-profile batch played 184 games per hour while playing instead of 152, for 0.5 GB more peak memory.
 - [The coordinator's column lookups, and a fused replacement](coordinator_lookups_2026_11_04.md): the lookups are 22% to 49% of the network's forward pass; PyTorch's embedding_bag makes the pass 23% to 49% faster with identical outputs; not yet in the code.
+- [One real training sample](training_sample_2026_11_05.md): what a sample stores, shown with a decision from a game played after one training batch; a fresh network gives every position the same values, so a run's first batch learns little from the search's shares.
 
 The earlier records (the first pilots, the three-round experiment and the
 performance work on the replaced graph input) are summarized in the
