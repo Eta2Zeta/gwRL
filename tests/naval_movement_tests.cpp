@@ -259,15 +259,20 @@ void strategicPickupKeepsMilitiaHome() {
   move(back, "t", {p14, p15, p16}, true, "facility_tokyo_major_shipyard");
   check(offers(back) == std::set<Id>{"i", "m"}, "Militia missed a voyage bound home");
 }
-void patrolRefusalSettlesCombat() {
-  // RCL-017: a patrol plane that lets ships pass stays out of combat with
-  // them for the rest of the turn and does not stop their landing (RB 10.8.1).
-  // Ships it has not let pass may still engage it, and ships entering later
-  // get a fresh choice (seed 9487 of the 2 November random games had a KMT
-  // transport engage a bomber that had let it pass).
+void patrolPlaneMayFightShipsItLetPass() {
+  // A patrol plane that lets ships pass shares its sea zone with them until a
+  // new combat move is made against it (RB 0.3; user ruling RCL-017, revised
+  // on 4 November). The ships may attack it, and in the Combat Phase it chooses
+  // again whether to fight, before any scramble (RCL-020). Until it accepts a
+  // battle it does not stop their landing (RB 10.8.1); once it has fought and
+  // survived, it does. Ships it never let pass may engage it, and ships
+  // entering later get a fresh choice (seed 9487 of the 2 November random
+  // games had a KMT transport engage a bomber that had let it pass).
   auto s = fixture(Phase::CombatMovement);
   s.nations.at("japan").atWarWith.insert("kmt");
   s.nations.at("kmt").atWarWith.insert("japan");
+  // Evolved, so that the plane may land in Korea (RB 14.3.1).
+  s.nations.at("kmt").powerStatus = "major";
   s.territories.at("land_korea").possessor = "kmt";
   add(s, "patrol", "fighter", p15, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
@@ -276,34 +281,99 @@ void patrolRefusalSettlesCombat() {
   add(s, "t", "naval_transport", p16);
   add(s, "i", "infantry", p16);
   attachCargo(s, "t", "i");
+  add(s, "e", "destroyer", p16);
   add(s, "d", "destroyer", p15);
   add(s, "late", "destroyer", p16);
   s.captureTurnStart();
-  Engine e(s, rules());
-  const auto offered = [&](const Id &kind, const std::function<bool(const Action &)> &match) {
+  const auto unit = [](const Id &id) {
+    return [id](const Action &a) { return a.parameters.require("unit").asString() == id; };
+  };
+  const auto offered = [](Engine &e, const Id &kind,
+                          const std::function<bool(const Action &)> &match) {
     const auto actions = e.legalActions();
     return std::any_of(actions.begin(), actions.end(),
                        [&](const Action &a) { return a.kind == kind && match(a); });
   };
-  const auto engages = [&](const Id &unit) {
-    choose(e, "naval_start_move", [&](const Action &a) { return a.parameters.require("unit").asString() == unit; });
-    const bool engage = offered("naval_engage_force", [](const Action &) { return true; });
+  const auto anything = [](const Action &) { return true; };
+  const auto landing = [](const Action &a) {
+    return a.parameters.require("transport").asString() == "t" &&
+           a.parameters.require("zone").asString() == "land_korea";
+  };
+  const auto engages = [&](Engine &e, const Id &ship) {
+    choose(e, "naval_start_move", unit(ship));
+    const bool engage = offered(e, "naval_engage_force", anything);
     choose(e, "naval_cancel_move");
     return engage;
   };
-  move(e, "t", {p16, p15});
-  choose(e, "naval_reaction_decline");
-  check(e.state().units.at("t").zone == p15 && e.state().battles.empty(), "The transport did not pass the patrol");
-  check(!engages("t"), "Ships could still engage a patrol plane that let them pass");
-  check(offered("naval_declare_assault", [](const Action &a) {
-          return a.parameters.require("transport").asString() == "t" &&
-                 a.parameters.require("zone").asString() == "land_korea";
-        }),
-        "A patrol plane that let the transport pass still stopped its landing");
-  check(engages("d"), "A ship the patrol never let pass could not engage it");
-  move(e, "late", {p16, p15});
-  check(offered("naval_reaction_engage", [](const Action &) { return true; }),
+  // The transport and its escort enter the plane's zone, and it lets them pass.
+  const auto pass = [&](const std::vector<int> &dice) {
+    auto e = std::make_unique<Engine>(s, rules());
+    e->setDiceTapeForTesting(dice);
+    choose(*e, "naval_start_move", unit("t"));
+    choose(*e, "naval_force_add", unit("e"));
+    choose(*e, "naval_route", [](const Action &a) {
+      return canonicalJson(a.parameters.require("request").require("path")) ==
+             canonicalJson(V(V::Array{V(p16), V(p15)}));
+    });
+    choose(*e, "naval_reaction_decline");
+    return e;
+  };
+  auto e = pass({});
+  check(e->state().units.at("t").zone == p15 && e->state().units.at("e").zone == p15 &&
+            e->state().battles.empty(),
+        "The transport and its escort did not pass the patrol");
+  check(engages(*e, "t") && engages(*e, "e"),
+        "Ships could not attack anew a patrol plane that let them pass");
+  check(offered(*e, "naval_declare_assault", landing),
+        "A patrol plane that let the transport pass stopped its landing");
+  check(engages(*e, "d"), "A ship the patrol never let pass could not engage it");
+  move(*e, "late", {p16, p15});
+  check(offered(*e, "naval_reaction_engage", anything),
         "The patrol had no choice against ships entering later");
+  // The transport declares its landing, the escort attacks the plane, and in
+  // the Combat Phase the plane is asked first whether to fight.
+  const auto attacked = [&](const Id &choice, const std::vector<int> &dice) {
+    auto e = pass(dice);
+    choose(*e, "naval_declare_assault", landing);
+    choose(*e, "naval_start_move", unit("e"));
+    choose(*e, "naval_engage_force");
+    std::set<Id> defenders;
+    for (const auto &[id, b] : e->state().battles)
+      if (b.flags.contains("naval_battle"))
+        defenders.insert(b.defenders.begin(), b.defenders.end());
+    check(defenders == std::set<Id>{"patrol"},
+          "The escort's attack did not take in the patrol plane that let it pass");
+    choose(*e, "end_phase");
+    choose(*e, "naval_begin_battle");
+    check(!e->state().decisions.empty() &&
+              e->state().decisions.back().kind == "naval_patrol_participation",
+          "The patrol plane was not asked first whether to fight");
+    choose(*e, choice);
+    const auto fighting = [&] {
+      return std::any_of(e->state().battles.begin(), e->state().battles.end(), [](const auto &entry) {
+        return entry.second.flags.contains("naval_battle");
+      });
+    };
+    for (int i = 0; i < 30 && fighting(); ++i) {
+      if (e->state().chance)
+        e->resolveChance();
+      else
+        e->step(e->legalActions().front());
+    }
+    return e;
+  };
+  const auto lands = [&](Engine &e) {
+    return offered(e, "naval_begin_assault", anything);
+  };
+  auto out = attacked("naval_patrol_decline", {});
+  check(out->state().units.contains("patrol") && out->state().units.contains("e") && lands(*out),
+        "A patrol plane that stayed out was lost, or still stopped the landing");
+  // The escort misses and the plane sinks it.
+  auto in = attacked("naval_patrol_engage", {1, 12, 12, 12, 12, 12});
+  check(in->state().units.contains("patrol") && !in->state().units.contains("e"),
+        "The patrol plane did not fight the escort that attacked it");
+  check(!lands(*in) && in->state().units.at("i").carriedBy == Id{"t"},
+        "A patrol plane that fought and survived did not stop the landing");
 }
 // RB 9.3.1 and 9.4: a patrol plane may let ships pass only while the Attacker
 // has no aircraft with an attack value present; a strategic bomber has none.
@@ -337,8 +407,8 @@ void patrolPlaneCannotLetShipsPassUnderAttackingAircraft() {
   check(reaction(s, "tactical_bomber") == std::set<Id>{"naval_reaction_engage"},
         "A patrol plane let ships pass beside aircraft that can attack it");
 }
-// RCL-017 and RCL-020 in a screening battle: a patrol plane that let the
-// fleet pass is not in it; one that fought its single round is, chooses
+// RB 0.3 and 9.4.2 with RCL-020 in a screening battle: a patrol plane that let
+// the fleet pass is not in it; one that fought its single round is, chooses
 // again, and once it stays out the screen can win and the rest sail on.
 void patrolPlaneInAScreeningBattle() {
   auto s = fixture(Phase::CombatMovement);
@@ -1014,7 +1084,7 @@ int main() {
              {"strategic pickup keeps militia home", strategicPickupKeepsMilitiaHome},
              {"allied ships leave carrier reach", alliedShipsLeaveCarrierReach},
              {"unevolved China keeps to Chinese waters", unevolvedChinaKeepsToChineseWaters},
-             {"patrol refusal settles combat", patrolRefusalSettlesCombat},
+             {"patrol plane may fight ships it let pass", patrolPlaneMayFightShipsItLetPass},
              {"patrol held by attacking aircraft",
               patrolPlaneCannotLetShipsPassUnderAttackingAircraft},
              {"patrol plane in a screening battle", patrolPlaneInAScreeningBattle},

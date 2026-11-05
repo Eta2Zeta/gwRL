@@ -124,7 +124,7 @@
       "test_suites": [
         "naval_movement"
       ],
-      "clarification": "RCL-017 adopted: a patrol plane that lets ships pass stays out of combat with them for the rest of the turn and does not stop their amphibious assaults. RCL-020 adopted: attacked by ships already in its zone, it chooses by the patrol rule before any scramble, and staying out costs it nothing"
+      "clarification": "RCL-017 adopted, revised: a patrol plane that lets ships pass takes no part in their battles in its zone and does not stop their amphibious assaults, but they may attack it anew and it then chooses again (RB 0.3); once it has fought and survived, it stops their amphibious assault. RCL-020 adopted: attacked by ships already in its zone, it chooses by the patrol rule before any scramble, and staying out costs it nothing"
     },
     {
       "id": "raider_slip_and_discovery",
@@ -347,6 +347,14 @@
       "authority_detail": "The developer example is Commonwealth evacuation into Italian ships during German bombing. Applying these roles to KMT evacuation into CCP ships during Japan's turn extends the same principle to three alliances; that exact example was not in the message."
     },
     {
+      "id": "RCL-017",
+      "status": "adopted",
+      "date": "2026-11-04",
+      "ruling": "A patrol plane that lets ships pass shares its sea zone with them (RB 0.3): it takes no part in their screening battle or the battle where their route ends, and it does not count against their screening or amphibious assault. The ships may still attack it in Combat Movement, a new combat move; it then chooses again by the patrol rule (RCL-020), before any scramble. If it fights, it no longer counts as having declined combat, and if it survives it stops their amphibious assault.",
+      "authority": "User ruling in chat, 2026-11-04: \"RCL 017 is wrong, it can accept later after it passed\", reversing the same day's ruling that a refusal settles combat with those ships for the turn.",
+      "authority_detail": "RB 0.3 lists a declined Maritime Air Patrol among the cases where units at war share a sea zone, which lasts until one power makes a new combat move against the other units there. RB 9.4.2 and 10.8.1 exempt an aircraft on MAP which declined combat from screening and from the amphibious assault's clearing."
+    },
+    {
       "id": "RCL-018",
       "status": "adopted",
       "date": "2026-11-03",
@@ -358,7 +366,7 @@
       "id": "RCL-020",
       "status": "adopted",
       "date": "2026-11-04",
-      "ruling": "A patrol plane attacked by ships already in its sea zone chooses whether to fight by the patrol rule, not the carrier rule: it may stay out unless the Attacker has aircraft with an attack value present, and staying out costs it nothing. It chooses before any scramble, so if it stays out and no other unit of its side defends there is no battle and nothing to scramble into. Staying out lets those ships pass for the rest of the turn, as in RCL-017.",
+      "ruling": "A patrol plane attacked by ships already in its sea zone chooses whether to fight by the patrol rule, not the carrier rule: it may stay out unless the Attacker has aircraft with an attack value present, and staying out costs it nothing. It chooses before any scramble, so if it stays out and no other unit of its side defends there is no battle and nothing to scramble into. A plane that stays out has declined combat again and does not count against those ships' screening or amphibious assault.",
       "authority": "User ruling in chat, 2026-11-04: \"of course we need to fix the MAP and the aircraft on a carrier difference, they are not the same\", with the order \"the MAP plane can choose to fight again, or not. Only then the ships can scramble into this [sea zone] because this is combat phase.\"",
       "authority_detail": "RB 9.3.1 and 9.4 give the patrol plane's choice only for ships entering its zone; RB 10.7 step 2 gives aircraft on carriers a choice after scrambles, and a carrier aircraft kept on deck is lost with the battle. The engine had applied the carrier rule to patrol planes since its first version. Found while checking RCL-017 on 4 November 2026."
     }

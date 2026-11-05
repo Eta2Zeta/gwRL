@@ -226,9 +226,10 @@
     {
       "id": "RCL-017",
       "category": "project",
-      "title": "A patrol plane's refusal settles combat with those ships",
-      "body": "Project ruling: a patrol plane that lets ships without attacking aircraft pass stays out of combat with those ships for the rest of the turn. They cannot engage it later, and it does not stop their amphibious assaults. It may still fight other ships that enter its zone later that turn, and ships that started the turn beside it may still engage it.",
+      "title": "A patrol plane's second chance against ships it let pass",
+      "body": "Project ruling, revised: a patrol plane that lets ships without attacking aircraft pass shares its sea zone with them. It takes no part in their screening battle or the battle where their route ends, and it does not stop their amphibious assaults. They may still attack it anew in Combat Movement; it then chooses again by the patrol rule, before any scramble, and once it has fought it stops their amphibious assault if it survives.",
       "section_ids": [
+        "rb-0-3",
         "rb-9-3-1",
         "rb-9-4",
         "rb-10-8-1"
@@ -238,7 +239,7 @@
       "scope": "prior_register_outside_pilot",
       "reference_url": "../clarifications.md#rcl-017-a-patrol-planes-second-chance-against-ships-it-let-pass",
       "reference_label": "Rule register",
-      "authority_detail": "The user adopted the one-decision reading on 4 November 2026, after the question was found in random-play seed 9487. RB 9.4.2 and 10.8.1 treat an aircraft on MAP that declined combat as out of the fight; the rulebook does not say outright that ships may not engage it again later that turn."
+      "authority_detail": "The user first adopted the one-decision reading on 4 November 2026, after the question was found in random-play seed 9487, and reversed it the same day. RB 0.3 lists a declined patrol among the ways units at war share a sea zone, which lasts until one power makes a new combat move against the other units there; RB 9.4.2 and 10.8.1 exempt an aircraft on MAP which declined combat."
     },
     {
       "id": "RCL-018",
@@ -277,7 +278,7 @@
       "id": "RCL-020",
       "category": "project",
       "title": "A patrol plane attacked in its own sea zone",
-      "body": "Project ruling: when ships already in its sea zone attack a patrol plane, it chooses by the patrol rule, not the carrier rule. It may stay out unless the Attacker has aircraft with an attack value present, and staying out costs it nothing. It chooses before any scramble: if it stays out and nothing else of its side defends, there is no battle and nothing to scramble into. A plane that stays out lets those ships pass for the rest of the turn. Nothing scrambles into the single round it fights against entering units during Combat Movement.",
+      "body": "Project ruling: when ships already in its sea zone attack a patrol plane, it chooses by the patrol rule, not the carrier rule. It may stay out unless the Attacker has aircraft with an attack value present, and staying out costs it nothing. It chooses before any scramble: if it stays out and nothing else of its side defends, there is no battle and nothing to scramble into. A plane that stays out has declined combat again and does not count against their screening or amphibious assault. Nothing scrambles into the single round it fights against entering units during Combat Movement.",
       "section_ids": [
         "rb-9-3-1",
         "rb-10-4",

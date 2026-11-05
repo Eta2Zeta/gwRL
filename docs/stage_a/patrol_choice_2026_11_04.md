@@ -20,6 +20,8 @@ in the naval rules profile and in the rules reader:
 - It chooses before any scramble. If it stays out and nothing else of its side
   defends, there is no battle and nothing to scramble into (RB 10.4).
 - Staying out lets those ships pass for the rest of the turn, as in RCL-017.
+  The user revised RCL-017 later that day: the ships may attack the plane anew
+  ([record](patrol_second_chance_2026_11_04.md)).
 
 The scramble ban for the single round a patrol plane fights against entering
 ships, during Combat Movement, was already in place (RB 9.3.1: other units may

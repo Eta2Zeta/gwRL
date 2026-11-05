@@ -21,10 +21,12 @@ bool militiaAllowedIn(const State &, const UnitState &unit, const Id &zone);
 // Whether these ships can still put every militia aboard ashore in its Home
 // Country, from these land zones, in this Noncombat Movement.
 bool militiaCanLandFrom(const State &, const std::vector<Id> &ships, const std::vector<Id> &zones);
-// Whether this patrol plane let all these ships pass this turn, when they
-// entered its sea zone or by staying out of a battle with them (user rulings
-// RCL-017 and RCL-020). It then stays out of combat with them for the rest of
-// the turn, and it does not stop their amphibious assaults.
+// Whether this patrol plane declined combat with all these ships this turn,
+// when they entered its sea zone or by staying out of a battle with them, and
+// has fought no battle this turn. It then takes no part in their battles in its
+// zone unless they attack it anew, and it does not count against their
+// screening or amphibious assault (RB 0.3, 9.4.2 and 10.8.1; user rulings
+// RCL-017 and RCL-020). Once it accepts a battle it no longer lets them pass.
 bool patrolLetPass(const State &, const UnitState &plane, const std::vector<Id> &ships);
 // Sea zones where a ship can still end this phase's movement, its own zone
 // included, by a route that meets no unfriendly unit before its last zone, so

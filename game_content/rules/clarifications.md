@@ -57,7 +57,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-014 | Combat roles when ships evacuate into a third party's fleet | Closed: evacuating fleet defends; fleet already at sea attacks; developer clarification |
 | RCL-015 | Neutral units required to relocate with no Friendly land remaining | Provisionally adopted: eliminate units with no Friendly relocation destination |
 | RCL-016 | KMT Low Morale 10+ with no legal retreat, such as after an amphibious assault | Adopted: the unit is eliminated |
-| RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Adopted: no; its refusal settles combat with those ships for the turn |
+| RCL-017 | May a patrol plane that let ships pass still fight them later that turn? | Adopted, revised the same day: yes, if they attack it anew; it then chooses again whether to fight |
 | RCL-018 | Amphibious assault whose sea zone is not cleared, or whose transports retreat | Adopted: the assault is called off; the cargo stays aboard |
 | RCL-019 | Several railroads on one border; the damage limit and repair of each side | Adopted: one railroad per border; each side holds its own damage and is repaired by its possessor |
 | RCL-020 | A patrol plane attacked in its own sea zone: the carrier choice or the patrol choice, before or after scrambles | Adopted: the patrol choice, made before any scramble; staying out costs nothing |
@@ -300,9 +300,11 @@ a casualty, and Major-Power KMT remains exempt.
 ## RCL-017: A patrol plane's second chance against ships it let pass
 
 **Status: adopted by the user, 4 November 2026; found in random-play seed 9487
-on 2 November.**
+on 2 November. The user first adopted one decision per turn and reversed it
+later that day, after weighing §0.3.**
 
-**Sources:** RB §9.3.1 pp55-56; §9.4 p57; §9.4.2 p58; §10.4 p63; §10.8.1 p70.
+**Sources:** RB §0.3 p9 (zone sharing); §9.3.1 pp55-56; §9.4 p57; §9.4.2 p58;
+§10.4 p63; §10.8.1 p70.
 
 **Question:** surface ships with no attacking aircraft enter a sea zone where an
 enemy aircraft is on Maritime Air Patrol. The plane may fight them or let them
@@ -311,27 +313,45 @@ still offer the plane a battle, which it may then accept with scrambled support?
 
 **Readings:**
 
-- **One decision per turn:** the refusal settles combat with those ships for
-  the turn. Ships without aircraft that can attack cannot force combat on a
-  patrol plane (§§9.3.1 and 9.4), and §§9.4.2 and 10.8.1 treat an aircraft on
-  MAP "which declined combat" as out of the fight for the rest of the turn.
-- **Two chances (the engine before this ruling):** §9.3.1's single round
-  during movement and §9.4's Combat-phase battle are separate. The engine
-  offered the single round when the ships entered; if the plane declined, the
-  ships could still engage it, the plane chose again in the Combat phase, and
-  its side could scramble units under §10.4.
+- **One decision per turn (adopted first, then reversed):** the refusal
+  settles combat with those ships for the turn. Ships without aircraft that can
+  attack cannot force combat on a patrol plane (§§9.3.1 and 9.4), and §§9.4.2
+  and 10.8.1 treat an aircraft on MAP "which declined combat" as out of the
+  fight.
+- **Two chances (adopted):** §0.3 lists a patrol plane's refusal among the ways
+  units at war come to share a sea zone, and such units take no part in combat
+  until one power makes a new combat move against the others there. The ships
+  may make one; the plane, attacked again, may again decline or accept, and if
+  it accepts its side may scramble units under §10.4. The engine allowed this
+  second battle before the first ruling.
 
 **Example:** in seed 9487 a captured KMT transport entered P16, where a Japanese
 tactical bomber on patrol let it pass. Random play then engaged the bomber;
 Japan accepted and scrambled a destroyer from Honshu's port, both missed, and
 the transport retreated to P15.
 
-**Adopted ruling:** one decision per turn. A patrol plane that lets ships pass
-settles combat with those ships for the rest of the turn: they cannot engage
-it, and it does not stop their amphibious assaults. Ships it has not let pass
-are unaffected: the plane may still fight ships that enter its zone later that
-turn, and ships that started the turn beside it may still engage it. In seed
-9487 the second battle at P16 therefore cannot happen.
+**Adopted ruling (revised):** two chances.
+
+- A patrol plane that lets ships pass shares its sea zone with them (§0.3). It
+  takes no part in their screening battle there or the battle where their route
+  ends, and it does not count against their screening (§9.4.2) or their
+  amphibious assault (§10.8.1).
+- The ships may still attack it in Combat Movement, a new combat move (§0.3).
+  The battle is fought in the Combat Phase, where the plane chooses again by
+  the patrol rule (RCL-020): it may stay out unless the Attacker has aircraft
+  with an attack value present, and it chooses before any scramble.
+- If it stays out, it has declined combat again. If it fights, it is no longer
+  an aircraft on MAP which declined combat: if it survives, it stops an
+  amphibious assault from its sea zone, which is then called off (RCL-018).
+- Ships it has not let pass, such as ships that started the turn beside it,
+  may engage it as before, and ships entering its zone later get a fresh choice.
+
+In seed 9487 the second battle at P16 can therefore happen, with the bomber now
+choosing before the Honshu destroyer may scramble.
+
+**Authority:** the user in chat on 4 November 2026, first for one decision per
+turn ("Refusal settles it"), then, after the conflict with §0.3 was raised:
+"RCL 017 is wrong, it can accept later after it passed".
 
 ## RCL-018: An amphibious assault whose sea zone is not cleared
 
@@ -432,9 +452,8 @@ always did. It offered that choice even against aircraft that could attack it.
   units into combat where their side has a defending unit. If other units
   defend, the battle goes on without the plane, and units may scramble to join
   them.
-- A plane that stays out lets those ships pass for the rest of the turn, as in
-  RCL-017. It does not count against their screening (§9.4.2) or their
-  amphibious assault (§10.8.1).
+- A plane that stays out has declined combat again: it does not count against
+  those ships' screening (§9.4.2) or their amphibious assault (§10.8.1).
 - Nothing scrambles into the single round a patrol plane fights against
   entering units during Combat Movement, where other units may not take part
   except paired destroyers (§9.3.1). The engine already worked this way.

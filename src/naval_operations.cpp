@@ -91,7 +91,8 @@ bool ship(const State &s, const UnitState &u) {
 }
 // Enemy Surface Ships and aircraft in the sea zone must be eliminated before an
 // amphibious assault from it, except an aircraft on MAP that declined combat
-// (RB 10.8.1): a patrol plane that let these transports pass (RCL-017).
+// (RB 10.8.1): a patrol plane that let these transports pass and has not
+// accepted a battle since (patrolLetPass).
 bool occupiedForAssault(const State &s, const Id &owner, const Id &zone,
                         const std::vector<Id> &transports) {
   for (const auto &[id, u] : s.units)

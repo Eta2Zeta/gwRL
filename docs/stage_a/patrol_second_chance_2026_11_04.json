@@ -1,0 +1,58 @@
+{
+ "date": "2026-11-04",
+ "ruling": "RCL-017, revised",
+ "layout": {
+  "before": "campaign-zone-v1-1d3c25d19abf2937",
+  "after": "campaign-zone-v1-1d3c25d19abf2937"
+ },
+ "checks": {
+  "cpp_suites": {
+   "passed": 26,
+   "failed": 0
+  },
+  "python_suite": {
+   "tests": 455,
+   "skipped": 3,
+   "result": "OK"
+  },
+  "mutations_caught": {
+   "plane left out of the attack": "the engine refused the battle with no defender",
+   "attack not offered": "Ships could not attack anew a patrol plane that let them pass",
+   "fighting keeps the exemption": "A patrol plane that fought and survived did not stop the landing"
+  },
+  "random_play_fuzz": {
+   "first_seed": 9000,
+   "games": 800,
+   "completed": 800,
+   "problems": 0
+  },
+  "zone_names": {
+   "first_seed": 7000,
+   "games": 240,
+   "finished": 240,
+   "decisions": 372910,
+   "unknown": {}
+  },
+  "second_chance_counts": {
+   "policy": "tools/check_zone_names.py random policy, eleven rounds",
+   "first_seed": 7000,
+   "games": 480,
+   "finished": 480,
+   "decisions": 745338,
+   "entry_menus_with_decline": 144,
+   "entry_declines": 71,
+   "patrol_choice_menus": 37,
+   "naval_patrol_engage": 15,
+   "naval_patrol_decline": 22,
+   "attacks_on_a_plane_that_let_them_pass": 1,
+   "patrol_choices_after_such_an_attack": {
+    "naval_patrol_decline": 2,
+    "naval_patrol_engage": 0
+   },
+   "seeds_with_such_an_attack": [
+    7021
+   ]
+  }
+ },
+ "seed_7021": "Decision 1121, KMT Combat Movement (player turn serial 31): a captured KMT naval transport in P15 attacked the Japanese fighter and tactical bomber on patrol there, which had let it pass. In the Combat Phase both were asked first (naval_patrol_participation) and both stayed out; the battle ended with no scramble."
+}

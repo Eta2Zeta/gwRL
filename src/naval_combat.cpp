@@ -460,9 +460,10 @@ void joinPatrol(State& s, BattleState& b, const Id& id) {
     u.turnFlags["air_battle_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
     u.commitments.insert("air_battle:" + b.id);
 }
-// The plane stays in its sea zone, unharmed and still on patrol, and lets the
-// ships pass for the rest of the turn, as when it declines them on entry
-// (RCL-017): a screening force's whole fleet, or the attacking ships.
+// The plane stays in its sea zone, unharmed and still on patrol. It has
+// declined combat with the ships, as when it lets them pass on entry, and does
+// not count against their screening or amphibious assault (RB 9.4.2 and
+// 10.8.1): the mark goes on a screening force's whole fleet, or the attackers.
 void stayOut(State& s, BattleState& b, const Id& id) {
     auto done = object(b, "naval_patrol_choices"); done[id] = V(true); put(b, "naval_patrol_choices", V(done));
     auto out = object(b, "naval_patrol_declined"); out[id] = V(true); put(b, "naval_patrol_declined", V(out));
