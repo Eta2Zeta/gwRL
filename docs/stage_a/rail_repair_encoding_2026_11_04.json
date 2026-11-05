@@ -41,6 +41,7 @@
   ],
   "calendar_rounds": 11,
   "policy": "uniform random, ending a phase early with probability 0.02, 0.05 or 0.10 by seed",
+  "policy_correction": "the early phase ends never happened, so every move was uniformly random; see zone_name_check_early_end_2026_11_05.md",
   "before": {
    "date": "2026-11-03",
    "games": 240,

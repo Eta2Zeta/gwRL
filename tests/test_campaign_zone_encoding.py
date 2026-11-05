@@ -116,10 +116,11 @@ class ZoneEncodingTests(unittest.TestCase):
         self.fail("No chance position was reached")
 
     def test_every_name_in_random_play_has_a_column(self):
-        # Two whole eleven-round games, about four seconds each. A random move is
-        # sometimes replaced by ending the phase, so games reach later rounds with
-        # fewer, larger battles. tools/check_zone_names.py plays hundreds.
+        # Two whole eleven-round games, about 3.5 seconds each. A random move is
+        # sometimes replaced by ending the phase, so some phases do little and
+        # others much. tools/check_zone_names.py plays hundreds.
         gwrl_cpp.zone_encoding_unknowns(True)
+        early = 0
         for seed in (1952, 1953):
             env = make_env(seed, calendar_rounds=11)
             rng = random.Random(seed)
@@ -130,8 +131,15 @@ class ZoneEncodingTests(unittest.TestCase):
                     continue
                 actions = tuple(env.legal_actions())
                 env.zone_input(actions)
-                ends = [action for action in actions if action.kind == "end_phase"]
-                env.apply_action(ends[0] if ends and rng.random() < 0.05 else actions[rng.randrange(len(actions))])
+                # A wrapper action's kind is the scheduler's label; the engine's
+                # move name ends its id.
+                ends = [action for action in actions if action.id.endswith(":play:end_phase")]
+                if ends and rng.random() < 0.05:
+                    env.apply_action(ends[0])
+                    early += 1
+                else:
+                    env.apply_action(actions[rng.randrange(len(actions))])
+        self.assertGreater(early, 0, "no phase was ended early")
         self.assertEqual(gwrl_cpp.zone_encoding_unknowns(True), {})
 
 

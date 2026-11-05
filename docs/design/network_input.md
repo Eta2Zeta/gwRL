@@ -580,10 +580,14 @@ without being counted.
 ### Keeping the lists complete
 
 Encoding every decision of 240 random eleven-round games (seeds 7000 to 7239,
-373,049 decisions) meets no unlisted name, and neither do 240 more (seeds 9000
-to 9239, 372,113 decisions), measured on 4 November 2026.
+313,496 decisions) meets no unlisted name, and neither do 240 more (seeds 9000
+to 9239, 314,594 decisions), measured on 5 November 2026. One of the latter,
+seed 9239, reaches a question removed as impossible (section 8): an air
+transport carrying motorized infantry. The rules forbid that cargo, and the
+engine made it by upgrading an infantry already aboard
+([record](../stage_a/zone_name_check_early_end_2026_11_05.md)).
 
-Before that day the lists lacked names in four groups. On 3 November the random
+Before 4 November the lists lacked names in four groups. On 3 November the random
 check found 31: 16 battle notes, 12 railroad names, the label `damage`, a city as
 a repair target and the value `local`. Two prices that come with Improved
 Construction turned up on 4 November. The engine's source named 20 more battle
@@ -602,7 +606,10 @@ Three checks keep the lists complete:
 - **Whole games.** The encoding test plays two whole random games and fails on
   any unlisted name.
 - **Many games.** `tools/check_zone_names.py` plays hundreds of random games,
-  240 in about two minutes on 8 workers. Run it before a long self-play run.
+  240 in about 105 seconds on 8 workers. Run it before a long self-play run.
+
+The random games make uniformly random moves, but now and then end the phase
+instead, so some phases do little and others much.
 
 A name written another way, and met in no random game, can still slip into an
 "other" question, but it is counted and reported, never dropped.
@@ -646,7 +653,9 @@ nation; a rare situation keeps its question.
 
 Each family that lost questions keeps one `~impossible` question. A removed
 combination that occurs anyway is counted there and reported as unknown, never
-dropped; 240 random games met none.
+dropped. Of 480 random games on 5 November, one met such a combination: an air
+transport carrying motorized infantry, which the rules forbid too
+([keeping the lists complete](#keeping-the-lists-complete)).
 
 ## 9. Fixed facts and the layout version
 

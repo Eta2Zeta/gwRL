@@ -507,12 +507,18 @@ measured and what would settle it.
 
 ### Known gaps
 
-- **Some details are summarized, not named.** Since 4 November no name in 480
-  random games falls into an "other" question, and tests check the names the
-  engine's source writes. But a mark's argument other than a place or a nation,
-  such as which railroad was damaged this turn, is counted for the whole
-  position, and a battle note's numbers are added into one answer. See
+- **Some details are summarized, not named.** Tests check the names the
+  engine's source writes, and in 480 random games no name falls into an "other"
+  question. But a mark's argument other than a place or a nation, such as which
+  railroad was damaged this turn, is counted for the whole position, and a
+  battle note's numbers are added into one answer. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
+- **An upgrade can break an air transport's cargo rule.** The engine lets an
+  upgrade turn an infantry into motorized infantry while it is aboard an air
+  transport, which may carry only infantry-class units. One of 480 random games
+  did so, and the input then files the cargo under a question removed as
+  impossible. How the rules should treat such an upgrade awaits a ruling
+  ([record](../stage_a/zone_name_check_early_end_2026_11_05.md)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
   replays in builds with memory checks did not reproduce it. Two crashes close

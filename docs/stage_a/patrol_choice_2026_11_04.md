@@ -106,4 +106,5 @@ Networks and checkpoints of the old layout cannot be used with the new one.
 
 Found in passing: `tools/check_zone_names.py` compares a scheduled move's label
 (`play`, `interrupt`) with `end_phase`, so its early phase ends never happen.
-Its games still all finish. Not changed here.
+Its games still all finish. Not changed here; fixed on 5 November
+([record](zone_name_check_early_end_2026_11_05.md)).
