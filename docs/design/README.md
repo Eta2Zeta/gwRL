@@ -530,27 +530,57 @@ arbitrary first guesses, the exploration noise and the rare game ends it
 reaches; only the final scores carry information. From the second batch on, the
 values differ between positions.
 
-**Which decisions are kept.** A random share of each game's decisions: 5% in the
-Mac profile, because a game's thousand-odd positions are close to one another.
-A decision with only one legal move, played without a search, can be kept too:
-its share is 1, so it teaches only the values. Games cut off before their end
-give no samples in `--complete-episodes` runs.
+The numbers in the rest of this section are those of the Mac training command in
+the [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
+which calls them the speed test's settings, not tuned values.
 
-**Replay.** Samples go into a replay buffer, 8,000 in the Mac profile; the oldest
-leave first.
+**Which decisions are kept.** A random 5% of each game's decisions, because a
+game's thousand-odd positions are close to one another. A decision with only one
+legal move, played without a search, can be kept too: its share is 1, so it
+teaches only the values. Games cut off before their end give no samples in
+`--complete-episodes` runs.
 
-**An update** follows each batch: a fixed number of training steps, 700 in the Mac
-profile. Each step draws 32 samples at random and, for each of the three networks:
+**Where samples wait: the replay buffer.** A sample is made in a game process at
+the moment of its decision, and its final scores are added when its game ends. A
+batch is 32 games played at once, by 8 game processes of 4 games each. The
+processes hand their samples to the main training process, which adds them to its
+*replay buffer* once all 32 games have ended. The buffer is a list of the latest
+samples, at most 8,000, from which the oldest leave first. On 5 November one batch
+kept 1,611 samples from 33,062 decisions, so a full buffer holds about the last
+five batches
+([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
 
-- **value loss:** the squared error between the network's three values and the
-  final scores, on every sample;
-- **policy loss:** the cross-entropy between the network's move probabilities and
-  the search's visit shares, only on samples where this network's alliance was
-  choosing.
+**An update** follows each batch. It runs in the main training process, on the
+CPU, while the game processes wait, and it is 700 training steps in a row. Each
+step does four things (`CampaignLearner.update` in `studies/campaign/learning.py`):
 
-Each network takes one Adam step on the sum of the two, and all three step
-together (`CampaignLearner.update` in `studies/campaign/learning.py`). The updated
-networks are saved as a model export, and the next batch starts.
+1. **Draw.** It picks 32 different samples at random from the whole buffer, so
+   one step mixes decisions of many games and of all three alliances. Nothing is
+   played: a step only reads stored decisions.
+2. **Read.** Each of the three networks reads the 32 decisions in one call. It
+   gives its three values for every decision, and its move probabilities for
+   those where its alliance was choosing.
+3. **Compare.** Two losses measure, for each network, how far its answers are
+   from the samples' targets:
+   - **value loss:** the squared error between the network's three values and
+     the final scores, averaged over all 32 samples;
+   - **policy loss:** the cross-entropy between the network's move probabilities
+     and the search's shares, averaged over the samples where this network's
+     alliance was choosing. On 5 November a step held 16 of the Axis's decisions
+     on average, and 8 each of the Allies' and the Comintern's.
+4. **Step.** Each network takes one Adam step on the sum of its two losses, and
+   all three step together.
+
+The next step draws a new 32. After the 700th, the networks are saved as a model
+export, and the next batch of games plays with them. The 32 games take about 15
+minutes to play, and the 700 steps under a minute: 851 and 49 seconds on
+5 November, 881 and 46 seconds on 2 November.
+
+![Where a training step's 32 samples come from. 1: a batch of 32 games plays at once, 8 game processes of 4 games each, with the networks frozen; at each decision a random draw keeps it as a sample with chance 5%, and when a game ends its final scores are added to its samples; on 5 November one batch kept 1,611 samples from 33,062 decisions. 2: when all of the batch's games have ended, their samples join the replay buffer in the main training process, the latest 8,000 samples, about five batches, drawn as five bars from the oldest batch, whose samples leave first, to the newest; purple dots spread over all five bars mark one step's 32 samples, drawn at random. 3: one training step, 700 per update, each with a new draw: draw 32 different samples at random from the whole buffer; each of the three networks reads all 32 in one call; it compares its values with the final scores on all 32, and its move probabilities with the shares on its own alliance's samples; each network takes one Adam step. 4: after the 700th step the networks are saved for the next batch. With 64×2 networks on the CPU, a batch's 32 games take about 15 minutes to play and its 700 steps under a minute; no game plays during the steps.](figures/training_update.svg)
+
+In the training command the 32 is `--batch-size` and the 700 is `--epochs`. Both
+names mislead here: a step's 32 samples are not the batch of games, and the 700
+steps are not passes through the buffer.
 
 **What a step changes.** For every parameter, training works out its *gradient*:
 which way, and how strongly, a small change to that number would lower the loss
@@ -570,8 +600,43 @@ answered. Over one update's 700 steps, a question answered in many samples has
 its row moved hundreds of times, and a question absent from the replay buffer
 not at all, apart from that momentum.
 
-With the Mac profile's settings, each kept sample is drawn about 13 times before
-it leaves the buffer.
+**Why a few random samples per step.** One sample's gradient points the way that
+one decision would move the parameters. The average over 32 different decisions
+comes nearer to the way the game's decisions in general would: the random error of
+an average of $n$ independent samples shrinks like $1/\sqrt{n}$. And one step on
+32 decisions costs far less than 32 steps on one: it took 78 ms, and a step on a
+single sample 21 ms, timed on 5 November
+([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
+Averaging all 8,000 in every step would read 250 times as many decisions per step
+but shrink that error only about 16 times, $\sqrt{250}$. So for the same time,
+many cheap steps with a little noise make more progress than a few exact ones;
+that is the usual reasoning behind small batches, not something measured here.
+Drawing at random keeps a step from being 32 neighbouring positions of one game,
+which would push the networks 32 times in nearly the same direction; keeping only
+5% of decisions serves the same purpose. Both choices are standard. DQN, which
+learned Atari games, took mini-batches of 32 experiences drawn at random from a
+replay memory; AlphaGo trained its value network on one position from each
+self-play game; AlphaGo Zero took batches of 2,048 positions drawn at random from
+its latest 500,000 games (Sutton and Barto, *Reinforcement Learning: An
+Introduction*, 2nd edition, sections 16.5, 16.6.1 and 16.6.2). Whether 32 and 700
+suit this game has not been tested.
+
+**How often a sample is drawn.** Each update draws 700 × 32 = 22,400 times. Once
+the buffer is full, a sample is drawn 2.8 times per update and stays about five
+updates, until newer samples push it out:
+
+$$
+\text{draws per sample} \approx \underbrace{\frac{700 \times 32}{8{,}000}}_{\text{per update}} \times \underbrace{\frac{8{,}000}{1{,}611}}_{\text{updates in the buffer}} = \frac{22{,}400}{1{,}611} \approx 14
+$$
+
+The buffer's size cancels: it sets how old a sample may be, about five batches,
+not how often a sample is drawn. Longer games keep more samples per batch, and
+each is then drawn less often: 8 times on 31 October, when a batch of longer games
+kept about 2,750 samples
+([record](../stage_a/training_sample_2026_11_05.md#draws-per-kept-sample-in-recorded-runs)).
+A run's first samples are drawn more often, because the buffer is not yet full: in
+the first update of the 5 November run, its 1,611 samples shared all 22,400 draws,
+14 each in that one update.
 
 ## 7. Running training
 
@@ -596,8 +661,9 @@ column lookups (section 5) were its largest single part, 26%
 Since the search keeps copies of its positions, the coordinator is busy 90% of the
 time and limits this layout.
 
-**Throughput** is counted as decisions searched per hour, compared at the same
-training reuse (each kept sample drawn about 13 times):
+**Throughput** is counted as decisions searched per hour, with learning settings
+under which each kept sample was drawn 8 to 12 times
+([section 6](#6-how-the-networks-learn)):
 
 | Setup | Network | Decisions per hour |
 | --- | --- | ---: |
@@ -843,5 +909,8 @@ equal-compute comparison the plan describes.
 - **Replay buffer:** the recent samples that training draws from.
 - **Batch:** the games played between two updates.
 - **Update:** the training steps after a batch.
+- **Training step:** one draw of 32 samples from the replay buffer, read by the
+  three networks, and one Adam step for each. The training command calls the 32
+  `--batch-size` and the steps per update `--epochs`.
 - **Model export:** the saved networks after an update.
 - **Checkpoint:** a full save of a run, for resuming it.

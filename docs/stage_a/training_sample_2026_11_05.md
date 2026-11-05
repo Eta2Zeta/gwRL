@@ -5,7 +5,9 @@ a training sample stores by showing one real sample. This record says how that
 sample was made and gives its exact values; the
 [evidence file](training_sample_2026_11_05.json) holds them in full, with every
 answer the network read. It also records why the example does not come from a
-run's first batch: a fresh network gives every position the same values.
+run's first batch: a fresh network gives every position the same values. Two
+later sections record what the update after the batch did with its samples, and
+how often recorded runs drew each kept sample.
 
 ## How it was made
 
@@ -144,6 +146,67 @@ with moves drawn by `random.Random(5)`.
 **Inferred:** in a run's first batch, a search sees different values only at
 game ends. Its split therefore follows the network's arbitrary priors, the noise
 and the rare game ends it reaches.
+
+## The update after the batch
+
+Read on 5 November from the run's manifest
+(`studies/campaign/runs/sample-example-2026-11-05/manifest.json`, not tracked)
+and checked against `CampaignLearner.update` in `studies/campaign/learning.py`.
+
+- **The buffer.** The update began with the batch's 1,611 samples as the whole
+  replay buffer: a run's first update has no older samples.
+- **The draws.** Each of the 700 steps drew 32 different samples from the whole
+  buffer (`random.Random.sample`), 22,400 draws in all, about 14 per sample.
+- **Time.** The games played for 851 seconds, and the update took 48.7 seconds
+  (the run's `learning_updates` timing, which also counts adding the samples to
+  the buffer), 70 ms per step. Another session's test suite ran beside both. On
+  2 November, with no other load, the speed test's batch with the same settings
+  (`zone-speed-2026-11-02/cpuserver`) played for 881 seconds and updated for 45.5.
+
+**Each network's own samples.** The alliance to move in a step's 32 samples, over
+the 700 steps:
+
+| Alliance | Decisions in the batch | Share | Per step, on average | Fewest | Most |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Axis | 17,560 | 53% | 16.1 | 7 | 25 |
+| Allies | 8,068 | 24% | 8.1 | 2 | 17 |
+| Comintern | 7,434 | 22% | 7.8 | 1 | 17 |
+
+Every step held decisions of all three alliances, so each network's policy loss
+had samples to average in every step.
+
+**One step on 1 sample or on 32.** Later on 5 November, steps that repeat
+`CampaignLearner.update`'s step for all three networks, with this run's networks
+and samples, one thread and fresh Adam optimizers, were timed in six interleaved
+rounds of 40 steps on 1 sample and 8 steps on 32. The medians were 21.3 ms per
+step on 1 sample and 78.2 ms on 32: 3.7 times the time for 32 times the samples.
+Other programs kept the machine's load average at 12 to 15 on its 14 cores.
+
+## Draws per kept sample in recorded runs
+
+Once the buffer is full, every sample in it has the same chance at each draw, and
+a sample stays until as many newer ones have joined as the buffer holds. On
+average a kept sample is therefore drawn
+
+$$
+\text{draws per sample} \approx \frac{\text{steps per update} \times \text{samples per step}}{\text{samples kept per batch}}
+$$
+
+times before it leaves. From the runs' manifests:
+
+| Run | Network | Samples per step | Steps per update | Games per batch | Samples kept per batch | Draws per sample |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 31 October, GPU training (`gpu-training-2026-10-31`, 2 batches) | graph input, 64×2 | 32 | 700 | 32 | 2,754 | 8.1 |
+| 2 November, CPU speed test (`zone-speed-2026-11-02/cpuserver`) | zone input, 64×2 | 32 | 700 | 32 | 1,887 | 11.9 |
+| Night of 2 November, batches 1–2 (`night-2026-11-02/training`) | zone input, 256×8 | 128 | 700 | 117 | 8,415 | 10.6 |
+| 5 November, this record (`sample-example-2026-11-05`) | zone input, 64×2 | 32 | 700 | 32 | 1,611 | 13.9 |
+
+The first three are the runs whose throughput the design document compares. The
+games of 31 October were the longest, about 1,730 decisions each, against about
+1,160 in the 2 November speed test and 1,030 here, so its batches kept the most
+samples per game, and each was drawn least often. The night run's games averaged
+about 1,450 decisions; it drew 128 samples per step for its 117 games per batch.
+Every run kept 4.9 to 5.1% of its decisions.
 
 ## What this does and does not show
 
