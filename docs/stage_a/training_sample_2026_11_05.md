@@ -61,6 +61,46 @@ A move's average value is the mean, over the simulations that began with it, of
 the network's predicted final score where each stopped. The best average drew
 most simulations, although the noise had lowered that move's prior.
 
+## How the 64 simulations were spent
+
+Replaying the game to decision 612 with the search's trace on (`record_trace`,
+which only records) gave the same visits. The Comintern's results of the
+simulations that began with each move:
+
+| Move | Simulations | Worst | Best | Average |
+| --- | ---: | ---: | ---: | ---: |
+| Shensi → Hopeh | 36 | −106.02 | −101.16 | −101.63 |
+| Shensi → Suiyuan | 2 | −102.41 | −102.40 | −102.40 |
+| Shensi → Szechwan | 5 | −102.64 | −102.37 | −102.50 |
+| Shensi → Tsinghai | 9 | −102.36 | −102.16 | −102.27 |
+| End Combat Movement | 12 | −102.46 | −102.20 | −102.36 |
+
+- **Simulations 1 to 14** tried every move: Tsinghai 7 times, ending the phase
+  3, Hopeh 2, Szechwan and Suiyuan once each. Hopeh's two, simulations 6 and 11,
+  stopped one and two steps after the attack, before its battle, with Hopeh
+  still the KMT's: −102.22 and −102.23.
+- **Simulation 15** was the first to play on through the end of Combat Movement
+  and the battle for Hopeh, with its dice roll. The CCP held Hopeh at its end,
+  rated −101.42. All 34 later simulations of the attack passed through the
+  CCP's capture, and 23 of them scored between −101.43 and −101.16.
+- **Simulations 15 to 51** chose the attack 32 times out of 37. Before
+  simulation 33, the attack's rescaled first term was 0.77 and the other
+  moves' 0 to 0.25.
+- **Simulations 54 to 64** all went to the other moves. Simulation 53, one of
+  the attack's, stopped at the depth limit at a position rated −106.02. That
+  widened the range the results are rescaled to, from about −102.6 to −101.2
+  before, to −106.0 to −101.2. The first terms then lay close together: at
+  the end, 0.90 for the attack and 0.72 to 0.77 for the others. So the second
+  term, larger for the moves tried less, drew the last simulations to them.
+- **The other 28 simulations** went roughly in proportion to the priors after
+  noise: 2, 5, 9 and 12, where an exact split by those priors gives 2.2, 5.4,
+  8.2 and 12.2.
+
+**Inferred:** without simulation 53's outlier, the attack would have drawn more
+of the last simulations. One extreme result anywhere in the tree changes how a
+search spends its remaining simulations, because the range is set by the worst
+and best averages seen.
+
 **What the network read** (part 1 of the sample): 840 answers about the board,
 from all 37 zones; 191 about the position as a whole; 80 about the five moves;
 and 8 zones named by the moves' paths. The arrays take 12,448 bytes. Some of the

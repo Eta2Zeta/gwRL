@@ -206,9 +206,16 @@ matched training batch it raised games per hour while playing from 152 to 184,
 for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
 
 **After all simulations**, the number of times each first move was tried shows the
-search's preference. The move actually played is drawn at random in proportion to
-these visit counts (temperature 1), and the visit shares become the sample's
-policy target (`studies/campaign/learning.py`, `_decide`);
+search's preference, and the two terms of the score explain it. A move whose
+simulations keep scoring better than the others' is chosen again and again,
+until its second term has shrunk enough for the others to catch up. Moves whose
+results are about the same share the remaining simulations roughly in
+proportion to their priors, since only the second term tells them apart. So the
+visit shares end up far from the network's priors mainly where the search found
+a move better than the rest: that move gains, and every other move gives up
+simulations in proportion to its prior. The move actually played is drawn at
+random in proportion to these visit counts (temperature 1), and the visit shares
+become the sample's policy target (`studies/campaign/learning.py`, `_decide`);
 [section 6](#6-how-the-networks-learn) shows a real sample.
 
 **Exploration.** During training, random noise (Dirichlet, alpha 0.3, mixed in at
@@ -428,22 +435,55 @@ In round 5 the CCP's mountain infantry in Shensi could attack one of four
 neighbouring KMT zones, or the CCP could end Combat Movement. Part 1 is the
 position as the Comintern's network read it. Among its answers, Hopeh's say the
 KMT holds it and is building a shipyard and a fortification there, and none
-says a unit is there. In one look, the network gave ending Combat Movement 0.53
-and the attack on Hopeh 0.10. But where the simulations that began with that
-attack stopped, the network rated the positions best for the Comintern: −101.6
-on average, against −102.3 to −102.5 after the other moves. The search
-compares results rescaled to the range it has seen
-([section 3](#3-choosing-a-move-search)), so this small lead drew 36 of the 64
-simulations; the exploration noise had even lowered that move's prior, to 0.08.
-The sample stores 36/64 = 0.56 for the attack on Hopeh, and the other moves'
-shares likewise. The move played was drawn from these shares, and it was the
-attack on Hopeh. The game ended with Axis +49.0, Allies −63.8 and Comintern
+says a unit is there.
+
+The shares in part 3 differ most from the network's probabilities for two
+moves, the attack on Hopeh and ending Combat Movement. Both differences have
+one cause: the search found one move better than the rest
+([trace](../stage_a/training_sample_2026_11_05.md#how-the-64-simulations-were-spent)).
+
+- **The attack on Hopeh gained.** In one look the network gave it 0.10. Its
+  first two simulations stopped before the battle, with Hopeh still the KMT's,
+  and scored like every other move: about −102.2 for the Comintern. From
+  simulation 15 on, its simulations played on through the end of Combat
+  Movement and the battle, which the CCP won, and the network rated most of the
+  positions they reached, with the CCP holding Hopeh, between −101.2 and
+  −101.4. No simulation of another move did better than −102.2. Rescaled to the
+  range of results this search had seen, that lead was large: before simulation
+  33, the attack's first term was 0.77 and the other moves' 0 to 0.25. So the
+  search chose the attack in 32 of simulations 15 to 51, and the attack ended
+  with 36 of the 64, although the exploration noise had lowered its prior to
+  0.08.
+- **The other moves shared what was left, by prior.** Their simulations scored
+  about the same, −102.3 to −102.5 on average, so only the second term of the
+  score told them apart. That term grows with the prior, so the remaining 28
+  simulations went to them roughly in proportion to their priors after the
+  noise, which left each with about half that prior:
+
+| Move | Network's probability | Prior after noise | Visits if the 28 went exactly by that prior | Visits | Share |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Shensi → Suiyuan | 0.10 | 0.07 | 2.2 | 2 | 0.03 |
+| Shensi → Szechwan | 0.09 | 0.18 | 5.4 | 5 | 0.08 |
+| Shensi → Tsinghai | 0.18 | 0.27 | 8.2 | 9 | 0.14 |
+| End Combat Movement | 0.53 | 0.40 | 12.2 | 12 | 0.19 |
+
+Ending Combat Movement had by far the largest prior, so it lost the most: the
+noise cut 0.53 to 0.40, and halving left 0.19. The other three started small.
+The noise had raised Szechwan's and Tsinghai's priors, and halving brought them
+back near the network's numbers; Suiyuan's fell to a third, but only from 0.10
+to 0.03. Their agreement is a coincidence of small numbers, not the search
+confirming the network: it found no difference among them.
+
+The sample stores the shares. The move played was drawn from them, and it was
+the attack on Hopeh. The game ended with Axis +49.0, Allies −63.8 and Comintern
 −106.2, and every sample of the game stores these three scores.
 
 **Why the search's shares are the target.** The network answers in one look. The
 search also asks it about every position its 64 simulations reach, and returns
 most often to the moves whose continuations score best for the alliance
-choosing ([section 3](#3-choosing-a-move-search)). Its split is
+choosing ([section 3](#3-choosing-a-move-search)). In the example, the one look
+did not see that the attack would take Hopeh; the simulations that played
+through the battle did. Where the search finds a difference, its split is
 therefore a better judgment than the network's first guess. Training moves the
 network's probabilities toward the split, so the network's next first guesses
 come closer to what a search would conclude, and the next batch's searches start

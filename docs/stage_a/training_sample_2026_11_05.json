@@ -1296,5 +1296,1015 @@
   "legal_moves": [2, 18, 2, 1],
   "values_at_every_decision": [-0.4212, 0.2407, -0.2264],
   "prior_range_at_the_18_move_decision": [0.0166, 0.2695]
+ },
+ "search_trace": {
+  "how": "the same game replayed to decision 612 with MctsConfig.record_trace on; identical visits",
+  "c_puct": 1.5,
+  "visits": [36, 2, 5, 9, 12],
+  "comintern_rescaling_range_at_end": [-106.01853942871094, -101.15782928466797],
+  "final_scores": [
+   {
+    "move": "shensi_to_hopeh",
+    "visits": 36,
+    "average": -101.63341070104529,
+    "rescaled": 0.9021580381705806,
+    "second_term": 0.027715804903076142,
+    "score": 0.9298738430736567
+   },
+   {
+    "move": "shensi_to_suiyuan",
+    "visits": 2,
+    "average": -102.40095138549805,
+    "rescaled": 0.7442509295985108,
+    "second_term": 0.2893190996817559,
+    "score": 1.0335700292802668
+   },
+   {
+    "move": "shensi_to_szechwan",
+    "visits": 5,
+    "average": -102.4954116821289,
+    "rescaled": 0.7248174941885384,
+    "second_term": 0.3558381008690859,
+    "score": 1.0806555950576242
+   },
+   {
+    "move": "shensi_to_tsinghai",
+    "visits": 9,
+    "average": -102.27118004692926,
+    "rescaled": 0.7709489499953509,
+    "second_term": 0.32393660051336093,
+    "score": 1.0948855505087118
+   },
+   {
+    "move": "end_phase",
+    "visits": 12,
+    "average": -102.35699462890625,
+    "rescaled": 0.7532942083148251,
+    "second_term": 0.3711961485877395,
+    "score": 1.1244903569025646
+   }
+  ],
+  "simulations": [
+   {
+    "number": 1,
+    "first_move": "end_phase",
+    "steps": 1,
+    "stopped": "evaluator",
+    "comintern_value": -102.45480346679688,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 1.0,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 1.0,
+     "shensi_to_tsinghai": 1.0,
+     "end_phase": 1.0
+    }
+   },
+   {
+    "number": 2,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 1,
+    "stopped": "evaluator",
+    "comintern_value": -102.15553283691406,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 1.0,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 1.0,
+     "shensi_to_tsinghai": 1.0,
+     "end_phase": 0.5
+    }
+   },
+   {
+    "number": 3,
+    "first_move": "shensi_to_szechwan",
+    "steps": 1,
+    "stopped": "evaluator",
+    "comintern_value": -102.63430786132812,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 1.0,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 1.0,
+     "shensi_to_tsinghai": 1.0,
+     "end_phase": 0.0
+    }
+   },
+   {
+    "number": 4,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 2,
+    "stopped": "evaluator",
+    "comintern_value": -102.16452026367188,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 1.0,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 1.0,
+     "end_phase": 0.3749243076138573
+    }
+   },
+   {
+    "number": 5,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 3,
+    "stopped": "evaluator",
+    "comintern_value": -102.24142456054688,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 1.0,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.9906141441183032,
+     "end_phase": 0.3749243076138573
+    }
+   },
+   {
+    "number": 6,
+    "first_move": "shensi_to_hopeh",
+    "steps": 1,
+    "stopped": "evaluator",
+    "comintern_value": -102.22083282470703,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 1.0,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.933943121819582,
+     "end_phase": 0.3749243076138573
+    }
+   },
+   {
+    "number": 7,
+    "first_move": "shensi_to_suiyuan",
+    "steps": 1,
+    "stopped": "evaluator",
+    "comintern_value": -102.39622497558594,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8636102877904197,
+     "shensi_to_suiyuan": 1.0,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.933943121819582,
+     "end_phase": 0.3749243076138573
+    }
+   },
+   {
+    "number": 8,
+    "first_move": "end_phase",
+    "steps": 2,
+    "stopped": "evaluator",
+    "comintern_value": -102.45801544189453,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8636102877904197,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.933943121819582,
+     "end_phase": 0.3749243076138573
+    }
+   },
+   {
+    "number": 9,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 3,
+    "stopped": "evaluator",
+    "comintern_value": -102.23479461669922,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8636102877904197,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.933943121819582,
+     "end_phase": 0.37156993976479585
+    }
+   },
+   {
+    "number": 10,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 4,
+    "stopped": "evaluator",
+    "comintern_value": -102.35543060302734,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8636102877904197,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.9090695413838161,
+     "end_phase": 0.37156993976479585
+    }
+   },
+   {
+    "number": 11,
+    "first_move": "shensi_to_hopeh",
+    "steps": 2,
+    "stopped": "evaluator",
+    "comintern_value": -102.22989654541016,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8636102877904197,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.8437517927144205,
+     "end_phase": 0.37156993976479585
+    }
+   },
+   {
+    "number": 12,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 5,
+    "stopped": "evaluator",
+    "comintern_value": -102.35858917236328,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8541447557127833,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.8437517927144205,
+     "end_phase": 0.37156993976479585
+    }
+   },
+   {
+    "number": 13,
+    "first_move": "end_phase",
+    "steps": 3,
+    "stopped": "evaluator",
+    "comintern_value": -102.41517639160156,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8541447557127833,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.7991070954308258,
+     "end_phase": 0.37156993976479585
+    }
+   },
+   {
+    "number": 14,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 6,
+    "stopped": "evaluator",
+    "comintern_value": -102.31594848632812,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8541447557127833,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.7991070954308258,
+     "end_phase": 0.4002772731618702
+    }
+   },
+   {
+    "number": 15,
+    "first_move": "shensi_to_hopeh",
+    "steps": 3,
+    "stopped": "evaluator",
+    "comintern_value": -101.42381286621094,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.8541447557127833,
+     "shensi_to_suiyuan": 0.49727507409886224,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.7799411762027776,
+     "end_phase": 0.4002772731618702
+    }
+   },
+   {
+    "number": 16,
+    "first_move": "end_phase",
+    "steps": 4,
+    "stopped": "evaluator",
+    "comintern_value": -102.41777801513672,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.5585542431920306,
+     "shensi_to_suiyuan": 0.19668225536045178,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.3084823623263863,
+     "end_phase": 0.1583176816124844
+    }
+   },
+   {
+    "number": 17,
+    "first_move": "shensi_to_hopeh",
+    "steps": 4,
+    "stopped": "evaluator",
+    "comintern_value": -101.4301528930664,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.5585542431920306,
+     "shensi_to_suiyuan": 0.19668225536045178,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.3084823623263863,
+     "end_phase": 0.16345753866710366
+    }
+   },
+   {
+    "number": 18,
+    "first_move": "shensi_to_hopeh",
+    "steps": 5,
+    "stopped": "evaluator",
+    "comintern_value": -101.37970733642578,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.6676062951431344,
+     "shensi_to_suiyuan": 0.19668225536045178,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.3084823623263863,
+     "end_phase": 0.16345753866710366
+    }
+   },
+   {
+    "number": 19,
+    "first_move": "shensi_to_hopeh",
+    "steps": 6,
+    "stopped": "evaluator",
+    "comintern_value": -101.38070678710938,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7153092560948148,
+     "shensi_to_suiyuan": 0.18976788309627043,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2976376529948317,
+     "end_phase": 0.15771118259822553
+    }
+   },
+   {
+    "number": 20,
+    "first_move": "shensi_to_hopeh",
+    "steps": 6,
+    "stopped": "evaluator",
+    "comintern_value": -101.15782928466797,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7626249419758454,
+     "shensi_to_suiyuan": 0.18976788309627043,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2976376529948317,
+     "end_phase": 0.15771118259822553
+    }
+   },
+   {
+    "number": 21,
+    "first_move": "shensi_to_hopeh",
+    "steps": 7,
+    "stopped": "evaluator",
+    "comintern_value": -101.15852355957031,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.6983040212597104,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 22,
+    "first_move": "shensi_to_hopeh",
+    "steps": 6,
+    "stopped": "evaluator",
+    "comintern_value": -102.13343811035156,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7359572406665805,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 23,
+    "first_move": "shensi_to_hopeh",
+    "steps": 7,
+    "stopped": "evaluator",
+    "comintern_value": -101.30842590332031,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.6918767314013385,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 24,
+    "first_move": "shensi_to_hopeh",
+    "steps": 8,
+    "stopped": "evaluator",
+    "comintern_value": -101.308837890625,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7124893424622142,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 25,
+    "first_move": "shensi_to_hopeh",
+    "steps": 7,
+    "stopped": "evaluator",
+    "comintern_value": -101.93218231201172,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7293288393559659,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 26,
+    "first_move": "shensi_to_hopeh",
+    "steps": 9,
+    "stopped": "evaluator",
+    "comintern_value": -101.30231475830078,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7081798217284588,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 27,
+    "first_move": "shensi_to_hopeh",
+    "steps": 10,
+    "stopped": "evaluator",
+    "comintern_value": -101.31201934814453,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7230999771446787,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 28,
+    "first_move": "shensi_to_hopeh",
+    "steps": 8,
+    "stopped": "evaluator",
+    "comintern_value": -101.30186462402344,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7354191964862421,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 29,
+    "first_move": "shensi_to_hopeh",
+    "steps": 11,
+    "stopped": "evaluator",
+    "comintern_value": -101.31709289550781,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7465543642078987,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 30,
+    "first_move": "shensi_to_hopeh",
+    "steps": 9,
+    "stopped": "evaluator",
+    "comintern_value": -101.31161499023438,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7556530164061491,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 31,
+    "first_move": "shensi_to_hopeh",
+    "steps": 7,
+    "stopped": "evaluator",
+    "comintern_value": -101.40584564208984,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7638994809912109,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 32,
+    "first_move": "end_phase",
+    "steps": 4,
+    "stopped": "evaluator",
+    "comintern_value": -102.1981201171875,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7676840488596097,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.1340111096757525
+    }
+   },
+   {
+    "number": 33,
+    "first_move": "shensi_to_hopeh",
+    "steps": 12,
+    "stopped": "evaluator",
+    "comintern_value": -101.2661361694336,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7676840488596097,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.16629376049605993
+    }
+   },
+   {
+    "number": 34,
+    "first_move": "shensi_to_hopeh",
+    "steps": 12,
+    "stopped": "evaluator",
+    "comintern_value": -101.35128784179688,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7760504218821143,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.16629376049605993
+    }
+   },
+   {
+    "number": 35,
+    "first_move": "shensi_to_hopeh",
+    "steps": 10,
+    "stopped": "evaluator",
+    "comintern_value": -101.31668853759766,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7806965508332295,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.16629376049605993
+    }
+   },
+   {
+    "number": 36,
+    "first_move": "shensi_to_hopeh",
+    "steps": 12,
+    "stopped": "evaluator",
+    "comintern_value": -101.8691177368164,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7860160801176137,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.16629376049605993
+    }
+   },
+   {
+    "number": 37,
+    "first_move": "shensi_to_hopeh",
+    "steps": 12,
+    "stopped": "evaluator",
+    "comintern_value": -101.21572875976562,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.773845051731628,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.16629376049605993
+    }
+   },
+   {
+    "number": 38,
+    "first_move": "shensi_to_szechwan",
+    "steps": 2,
+    "stopped": "evaluator",
+    "comintern_value": -102.64334869384766,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7819728941884829,
+     "shensi_to_suiyuan": 0.1612504844335357,
+     "shensi_to_szechwan": 0.0,
+     "shensi_to_tsinghai": 0.2529101075903842,
+     "end_phase": 0.16629376049605993
+    }
+   },
+   {
+    "number": 39,
+    "first_move": "shensi_to_hopeh",
+    "steps": 12,
+    "stopped": "evaluator",
+    "comintern_value": -101.16407775878906,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7832998014885018,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1713676750038519
+    }
+   },
+   {
+    "number": 40,
+    "first_move": "shensi_to_hopeh",
+    "steps": 11,
+    "stopped": "evaluator",
+    "comintern_value": -101.26554870605469,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7921537157824456,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1713676750038519
+    }
+   },
+   {
+    "number": 41,
+    "first_move": "shensi_to_hopeh",
+    "steps": 12,
+    "stopped": "evaluator",
+    "comintern_value": -101.86383819580078,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7975670484309965,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1713676750038519
+    }
+   },
+   {
+    "number": 42,
+    "first_move": "end_phase",
+    "steps": 5,
+    "stopped": "evaluator",
+    "comintern_value": -102.20048522949219,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7870736756438599,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1713676750038519
+    }
+   },
+   {
+    "number": 43,
+    "first_move": "shensi_to_hopeh",
+    "steps": 13,
+    "stopped": "evaluator",
+    "comintern_value": -101.37263488769531,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7870736756438599,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 44,
+    "first_move": "shensi_to_hopeh",
+    "steps": 13,
+    "stopped": "depth_limit",
+    "comintern_value": -101.9326171875,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.789604292803927,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 45,
+    "first_move": "shensi_to_hopeh",
+    "steps": 11,
+    "stopped": "evaluator",
+    "comintern_value": -101.35082244873047,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7784912727352753,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 46,
+    "first_move": "shensi_to_hopeh",
+    "steps": 13,
+    "stopped": "evaluator",
+    "comintern_value": -101.1649398803711,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.781649632787222,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 47,
+    "first_move": "shensi_to_hopeh",
+    "steps": 11,
+    "stopped": "evaluator",
+    "comintern_value": -101.86767578125,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7887684248369351,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 48,
+    "first_move": "shensi_to_hopeh",
+    "steps": 13,
+    "stopped": "evaluator",
+    "comintern_value": -101.300537109375,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7801680249038662,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 49,
+    "first_move": "shensi_to_hopeh",
+    "steps": 14,
+    "stopped": "depth_limit",
+    "comintern_value": -101.7864507039388,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7840357133685995,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 50,
+    "first_move": "shensi_to_hopeh",
+    "steps": 14,
+    "stopped": "depth_limit",
+    "comintern_value": -101.86663055419922,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7777568712651655,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 51,
+    "first_move": "end_phase",
+    "steps": 6,
+    "stopped": "evaluator",
+    "comintern_value": -102.36070251464844,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.770259893798815,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.1924931094105796
+    }
+   },
+   {
+    "number": 52,
+    "first_move": "shensi_to_hopeh",
+    "steps": 14,
+    "stopped": "depth_limit",
+    "comintern_value": -101.81441497802734,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.770259893798815,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.19217517626947309
+    }
+   },
+   {
+    "number": 53,
+    "first_move": "shensi_to_hopeh",
+    "steps": 14,
+    "stopped": "depth_limit",
+    "comintern_value": -106.01853942871094,
+    "hopeh_held_by_at_stop": "ccp",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.7641955924684012,
+     "shensi_to_suiyuan": 0.16635509218838274,
+     "shensi_to_szechwan": 0.003042987006317087,
+     "shensi_to_tsinghai": 0.2574568772606908,
+     "end_phase": 0.19217517626947309
+    }
+   },
+   {
+    "number": 54,
+    "first_move": "shensi_to_szechwan",
+    "steps": 3,
+    "stopped": "evaluator",
+    "comintern_value": -102.41210174560547,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.6953122179616169,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7531143764374506
+    }
+   },
+   {
+    "number": 55,
+    "first_move": "end_phase",
+    "steps": 5,
+    "stopped": "evaluator",
+    "comintern_value": -102.35858154296875,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.7108604626462817,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7531143764374506
+    }
+   },
+   {
+    "number": 56,
+    "first_move": "end_phase",
+    "steps": 7,
+    "stopped": "evaluator",
+    "comintern_value": -102.35052490234375,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.7108604626462817,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7530960456943383
+    }
+   },
+   {
+    "number": 57,
+    "first_move": "shensi_to_szechwan",
+    "steps": 4,
+    "stopped": "evaluator",
+    "comintern_value": -102.41483306884766,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.7108604626462817,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7532659554263597
+    }
+   },
+   {
+    "number": 58,
+    "first_move": "end_phase",
+    "steps": 8,
+    "stopped": "evaluator",
+    "comintern_value": -102.35964965820312,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.7184941053487427,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7532659554263597
+    }
+   },
+   {
+    "number": 59,
+    "first_move": "end_phase",
+    "steps": 9,
+    "stopped": "evaluator",
+    "comintern_value": -102.36172485351562,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.7184941053487427,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.753214158464173
+    }
+   },
+   {
+    "number": 60,
+    "first_move": "shensi_to_suiyuan",
+    "steps": 2,
+    "stopped": "evaluator",
+    "comintern_value": -102.40567779541016,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7452232998431965,
+     "shensi_to_szechwan": 0.7184941053487427,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7531329670826749
+    }
+   },
+   {
+    "number": 61,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 7,
+    "stopped": "evaluator",
+    "comintern_value": -102.31861114501953,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7442509295985108,
+     "shensi_to_szechwan": 0.7184941053487427,
+     "shensi_to_tsinghai": 0.7730656245087986,
+     "end_phase": 0.7531329670826749
+    }
+   },
+   {
+    "number": 62,
+    "first_move": "end_phase",
+    "steps": 6,
+    "stopped": "evaluator",
+    "comintern_value": -102.34837341308594,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7442509295985108,
+     "shensi_to_szechwan": 0.7184941053487427,
+     "shensi_to_tsinghai": 0.7715812827753126,
+     "end_phase": 0.7531329670826749
+    }
+   },
+   {
+    "number": 63,
+    "first_move": "shensi_to_szechwan",
+    "steps": 5,
+    "stopped": "evaluator",
+    "comintern_value": -102.37246704101562,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7442509295985108,
+     "shensi_to_szechwan": 0.7184941053487427,
+     "shensi_to_tsinghai": 0.7715812827753126,
+     "end_phase": 0.7532942083148251
+    }
+   },
+   {
+    "number": 64,
+    "first_move": "shensi_to_tsinghai",
+    "steps": 3,
+    "stopped": "evaluator",
+    "comintern_value": -102.29576873779297,
+    "hopeh_held_by_at_stop": "kmt",
+    "rescaled_first_terms_before": {
+     "shensi_to_hopeh": 0.9021580381705806,
+     "shensi_to_suiyuan": 0.7442509295985108,
+     "shensi_to_szechwan": 0.7248174941885384,
+     "shensi_to_tsinghai": 0.7715812827753126,
+     "end_phase": 0.7532942083148251
+    }
+   }
+  ]
  }
 }
