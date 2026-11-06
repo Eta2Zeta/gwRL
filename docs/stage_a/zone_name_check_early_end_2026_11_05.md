@@ -120,7 +120,12 @@ Units Phase with the infantry aboard. Whether a nation's own unit may stay
 aboard its air transport after the noncombat move is a second open question.
 Requiring a nation's own cargo to leave its air transports by the end of
 Noncombat Movement would remove those two cases, but not an ally's unit aboard.
-The engine is unchanged until the user decides.
+
+The user ruled the same day that cargo may stay aboard, and that an upgrade may
+not leave a transport carrying a unit it may not carry
+([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport);
+[record](never_better_choices_2026_11_05.md#the-users-decision)). Upgrades of
+units aboard ships at sea are still offered.
 
 ## Earlier records
 

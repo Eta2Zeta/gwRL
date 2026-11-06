@@ -290,6 +290,23 @@
       "reference_url": "../clarifications.md#rcl-020-a-patrol-plane-attacked-in-its-own-sea-zone",
       "reference_label": "Rule register",
       "authority_detail": "The user adopted this on 4 November 2026. The rulebook gives a patrol plane's choice only for ships entering its zone, and the naval combat sequence puts scrambles before the choice of aircraft on carriers; the engine had given patrol planes that carrier choice."
+    },
+    {
+      "id": "RCL-021",
+      "category": "project",
+      "title": "Upgrading a unit aboard a transport",
+      "body": "Project ruling: an upgrade may not be placed on a unit aboard a transport if the transport could not carry its cargo afterwards. It stays on the build queue until it can reach a suitable unit. An infantry aboard an air transport may not become motorized infantry, and of two infantry aboard one naval transport only one may. A militia aboard an air transport may still become infantry, and cargo may still stay aboard. Whether a unit aboard a ship at sea may be upgraded at all is not settled.",
+      "section_ids": [
+        "rb-8-4",
+        "rb-11-3-1",
+        "rb-12-3"
+      ],
+      "date": "2026-11-05",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted this on 5 November 2026. The rulebook limits what each transport carries but does not say whether a carried unit may be upgraded; the engine had placed such upgrades, and in random play an air transport came to carry motorized infantry."
     }
   ]
 }

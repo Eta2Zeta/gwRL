@@ -11,6 +11,10 @@ struct IncomeBreakdown {
 };
 
 int effectiveTerritorialIpp(const State &, const Id &zone);
+// Whether upgrading this unit to `type` leaves its transport, if it is aboard
+// one, with cargo it may carry. An upgrade that would not waits on the build
+// queue (user ruling RCL-021; RB 12.3).
+bool upgradeKeepsCargo(const State &, const UnitState &unit, const Id &type);
 IncomeBreakdown evaluateIncome(const State &, const Id &nation);
 void refreshIncome(State &);
 void reconcileCapturedFacilities(State &, const Id &zone, const std::optional<Id> &oldOwner,

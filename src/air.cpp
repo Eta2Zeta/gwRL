@@ -652,6 +652,15 @@ std::vector<Id> targets(const State &s, const Id &zone, const Id &kind) {
 bool isAircraft(const State &s, const UnitState &u) {
     return has(s, u, "aircraft");
 }
+bool airCargoTypeFits(const State &s, const UnitState &aircraft, const Id &type) {
+    if (has(s, aircraft, "strategic_bomber"))
+        return type == "airborne_infantry" || type == "elite_airborne_infantry";
+    const auto &classes = s.definition->catalog->unit(type).classes;
+    return transport(aircraft) && classes.contains("land") &&
+           (classes.contains("infantry_class") ||
+            (aircraft.type == "heavy_air_transport" &&
+             (classes.contains("artillery_class") || type == "anti_aircraft_artillery")));
+}
 bool onMaritimeAirPatrol(const State &s, const UnitState &u) {
     return isAircraft(s, u) && !u.carriedBy &&
            (marked(u.gameFlags, "on_map") || marked(u.turnFlags, "on_map") ||
@@ -1375,10 +1384,7 @@ bool loadsAt(const State &s, const UnitState &u, const Id &zone, bool combat, co
     if (static_cast<int>(u.cargo.size()) >= cap)
         return false;
     return combat ? (c.type == "airborne_infantry" || c.type == "elite_airborne_infantry")
-                  : (transport(u) &&
-                     (has(s, c, "infantry_class") ||
-                      (u.type == "heavy_air_transport" &&
-                       (has(s, c, "artillery_class") || c.type == "anti_aircraft_artillery"))));
+                  : transport(u) && airCargoTypeFits(s, u, c.type);
 }
 // Militia start and end every move in their Home Country (RB): militia aboard
 // may be carried only to a land zone there where they could step off.
@@ -1482,10 +1488,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                             !c.commitments.contains("attrition") && !c.commitments.contains("combat") &&
                             !c.commitments.contains("combat_move") && t.cargo.empty() &&
                             // Militia must land again this turn, which an allied load forbids.
-                            c.type != "militia" &&
-                            (has(s, c, "infantry_class") ||
-                             (t.type == "heavy_air_transport" &&
-                              (has(s, c, "artillery_class") || c.type == "anti_aircraft_artillery"))))
+                            c.type != "militia" && airCargoTypeFits(s, t, c.type))
                             out.push_back(action(s, s.currentNation(), "air_allied_load",
                                                  {{"unit", V(tid)}, {"cargo", V(cid)}}));
                     }

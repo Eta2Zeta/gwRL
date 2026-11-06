@@ -632,6 +632,58 @@ void accountingReplay() {
     check(paid(all.state()) == 10, "Unadvanced opening queue paid value unchanged throughout");
 }
 
+void board(State &s, const Id &carrier, const Id &cargo) {
+    s.units.at(cargo).carriedBy = carrier;
+    s.units.at(cargo).zone = s.units.at(carrier).zone;
+    s.units.at(carrier).cargo.push_back(cargo);
+}
+// RCL-021: an upgrade may not leave a transport carrying a unit it may not
+// carry. It waits on the build queue for a suitable unit (RB 12.3).
+void upgradesKeepCargo() {
+    auto s = fixture();
+    s.construction.clear();
+    s.nations.at("japan").treasury = 100;
+    addUnit(s, "airlift", "air_transport", "japan", tokyo);
+    addUnit(s, "flown", "infantry", "japan", tokyo);
+    board(s, "airlift", "flown");
+    addUnit(s, "airlift_militia", "air_transport", "japan", tokyo);
+    addUnit(s, "flown_militia", "militia", "japan", tokyo);
+    board(s, "airlift_militia", "flown_militia");
+    addUnit(s, "ship", "naval_transport", "japan", tokyo);
+    s.units.at("ship").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+    addUnit(s, "first", "infantry", "japan", tokyo);
+    addUnit(s, "second", "infantry", "japan", tokyo);
+    board(s, "ship", "first");
+    board(s, "ship", "second");
+    addUnit(s, "ashore", "infantry", "japan", tokyo);
+    finishResearch(s);
+    buy(s, "japan_major_infantry_to_motorized_infantry");
+    buy(s, "japan_major_infantry_to_motorized_infantry");
+    buy(s, "japan_major_militia_to_infantry");
+    s.clock.phase = Phase::PlaceUnits;
+    const auto offered = [&](const Id &target, const Id &type) {
+        return offers(s, "economy_place", [&](const auto &a) {
+            const auto *t = a.parameters.find("target");
+            return t && t->asString() == target &&
+                   s.construction.at(a.parameters.require("project").asString()).type == type;
+        });
+    };
+    check(!offered("flown", "motorized_infantry"),
+          "Upgrade offered that would leave an air transport carrying motorized infantry");
+    check(offered("flown_militia", "infantry"), "Militia aboard an air transport may become infantry");
+    check(offered("first", "motorized_infantry") && offered("second", "motorized_infantry") &&
+              offered("ashore", "motorized_infantry"),
+          "Upgrade withheld from a unit whose transport could carry the result");
+    applyEconomyAction(s, pick(s, "economy_place", [](const auto &a) {
+                           return a.parameters.require("target").asString() == "first";
+                       }));
+    check(s.units.at("first").type == "motorized_infantry", "Upgrade aboard a naval transport not applied");
+    check(!offered("second", "motorized_infantry"),
+          "Upgrade offered that would leave a naval transport two units that are not infantry-class");
+    check(offered("ashore", "motorized_infantry") && !offered("flown", "motorized_infantry"),
+          "Remaining upgrade lost its suitable unit or reached the air cargo");
+    s.validate();
+}
 void replacementUpgradeAndEliteLease() {
     auto s = fixture();
     s.construction.clear();
@@ -681,7 +733,7 @@ int main() {
                                  constructionAndCapture, cityAndRailRepair, ladaoLease, sharedShipyardRepair,
                                  upgradesDiscountsAndCaps, foreignRailConsent, oneRailroadPerBorder, leaseCredits,
                                  accountingReplay,
-                                 replacementUpgradeAndEliteLease}) {
+                                 replacementUpgradeAndEliteLease, upgradesKeepCargo}) {
             test();
             ++count;
         }

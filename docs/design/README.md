@@ -794,18 +794,16 @@ measured and what would settle it.
   railroad was damaged this turn, is counted for the whole position, and a
   battle note's numbers are added into one answer. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
-- **Upgrades reach units aboard transports.** The engine offers an upgrade on a
-  carried unit wherever it can trace a Supply Path, at sea too. RB 12.3 asks for
-  a Supply Path to the land zone the unit is in, so a unit aboard a ship at sea
-  may not be upgraded; 89 of 241 random games offered that. Aboard a landed air
-  transport the unit is in a land zone, but the motorized infantry an upgrade
-  makes is cargo an air transport may not carry. One random game took that
-  upgrade, and the input then filed the cargo under a question removed as
-  impossible. The rules keep an ally's unit aboard an air transport through its
-  own Place Units Phase. The engine also lets a nation's own unit stay aboard its
-  air transport after the noncombat move, which the rules never describe. No
-  rule speaks of upgrading carried units directly; the engine is unchanged until
-  the user decides
+- **Upgrades of units aboard ships at sea.** RB 12.3 asks for a Supply Path to
+  the land zone the unit is in, so a unit aboard a ship at sea may not be
+  upgraded, but the engine offers such upgrades: 89 of 241 random games did.
+  Since 5 November an upgrade may not leave a transport carrying a unit it may
+  not carry
+  ([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)),
+  which ended the case where an air transport came to carry motorized infantry.
+  The engine still lets a nation's own unit stay aboard its air transport after
+  the noncombat move, which the rules never describe. Whether to bar upgrades at
+  sea awaits the user
   ([record](../stage_a/zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
@@ -942,35 +940,36 @@ equal-compute comparison the plan describes.
 
 #### Should the engine leave out choices that are never better?
 
-**Now.** The engine offers every legal move, including moves that can never do
-better than another on the same menu, and copies of one move that differ only in
-which of several identical units they name. The search spends simulations on
-each, and the network must learn to tell them apart.
+**Now.** Since 5 November the engine leaves out two moves that do what another
+move on the same menu does, at greater cost, on the user's decision: a
+strategic rail move to a zone the unit also reaches by an ordinary move, which
+spends rail capacity and ends the unit's movement, and the printed price once
+Improved Construction offers the discount (RB 8.2.1 offers the discount or the
+condensed stages). In random games they were 3.0% of options and, in 1 game of
+240, 1,930 options. The engine still offers copies of one move for each of
+several identical units, and lets a player skip the free recruitment roll.
 
-**Alternative.** Leave such moves out, or play them automatically. Four were
-found:
+**Alternative.** Leave those out too:
 
 | Choice | Why it is never better | In random games |
 | --- | --- | ---: |
 | The same move for another of several identical units | the positions differ only in the units' names | 10.2% of options |
-| A strategic rail or river move to a zone the unit also reaches by an ordinary move | both end in the same zone, but the rail move spends rail capacity and ends the unit's movement | 3.0% of options |
 | Ending the Place Units Phase without the recruitment roll | the roll is free and every result helps (RB 12.7) | skipped 472 times in 48 games |
-| The printed price for naval units and facilities once Improved Construction is developed | the discount buys the same on the same schedule for less (RB 8.2.1) | in 1 game of 240 |
 
 **The catch.** A move may go only if it is never better in any position, and
 some that look so are not. Cargo kept aboard a landed air transport cannot be
 carpet-bombed, since carpet bombing attacks only land units, so taking every
-unit off its transport before the Place Units Phase is not free. For a nation's
-own unit on its own air transport the rules support it anyway: RB 11.3.1
-describes such cargo being unloaded during the noncombat move. Ships at sea
-cannot unload, and an ally's units stay aboard until their next turn.
+unit off its transport before the Place Units Phase would change the game. The
+user kept that choice and instead barred upgrades that would leave a transport
+with cargo it may not carry
+([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)).
+Merging identical units touches the menu, the network input and the search, so
+it needs its own check.
 
 **Measured:** the shares above
-([record](../stage_a/never_better_choices_2026_11_05.md)). The first two together
-are 12.2% of options, which would also help the 64 simulations of the question
-above. **Would settle it:** the user's decision on each, a check on test
-positions that every removed move is matched by a kept one with the same or a
-better result, then learning compared at equal compute.
+([record](../stage_a/never_better_choices_2026_11_05.md)). Fewer options would
+also help the 64 simulations of the question above. **Would settle it:** the
+user's decision on the two left, then learning compared at equal compute.
 
 ## 10. Glossary
 

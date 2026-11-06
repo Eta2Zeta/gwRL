@@ -585,7 +585,9 @@ to 9239, 314,594 decisions), measured on 5 November 2026. One of the latter,
 seed 9239, reaches a question removed as impossible (section 8): an air
 transport carrying motorized infantry. The rules forbid that cargo, and the
 engine made it by upgrading an infantry already aboard
-([record](../stage_a/zone_name_check_early_end_2026_11_05.md)).
+([record](../stage_a/zone_name_check_early_end_2026_11_05.md)). Since
+[RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)
+the engine no longer offers that upgrade.
 
 Before 4 November the lists lacked names in four groups. On 3 November the random
 check found 31: 16 battle notes, 12 railroad names, the label `damage`, a city as
@@ -654,8 +656,8 @@ nation; a rare situation keeps its question.
 Each family that lost questions keeps one `~impossible` question. A removed
 combination that occurs anyway is counted there and reported as unknown, never
 dropped. Of 480 random games on 5 November, one met such a combination: an air
-transport carrying motorized infantry, which the rules forbid too
-([keeping the lists complete](#keeping-the-lists-complete)).
+transport carrying motorized infantry, which the rules forbid too and the engine
+no longer makes ([keeping the lists complete](#keeping-the-lists-complete)).
 
 ## 9. Fixed facts and the layout version
 

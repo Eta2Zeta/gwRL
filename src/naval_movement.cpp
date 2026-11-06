@@ -1193,34 +1193,39 @@ int strategicNavalCapacity(const State &s, const Id &n) {
     ++base;
   return base;
 }
+bool navalCargoTypesFit(const State &s, const UnitState &t,
+                        const std::vector<Id> &types) {
+  const auto is = [&](const Id &type, const Id &cls) {
+    return s.definition->catalog->unit(type).classes.contains(cls);
+  };
+  if (t.type == "destroyer" && t.owner == "japan")
+    return types.size() <= 1 &&
+           std::all_of(types.begin(), types.end(),
+                       [](const Id &type) { return type == "marine"; });
+  if (!has(s, t, "naval_transport") || types.size() > 2)
+    return false;
+  int other = 0;
+  for (const auto &type : types) {
+    if (!is(type, "land") && !is(type, "rocket"))
+      return false;
+    if (!is(type, "infantry_class"))
+      ++other;
+  }
+  return other <= 1;
+}
 bool navalCargoFits(const State &s, const Id &ship,
                     const std::vector<Id> &cargo) {
   if (!s.units.contains(ship))
     return false;
-  const auto &t = s.units.at(ship);
   if (std::set<Id>(cargo.begin(), cargo.end()).size() != cargo.size())
     return false;
-  if (t.type == "destroyer" && t.owner == "japan") {
-    return cargo.size() <= 1 &&
-           std::all_of(cargo.begin(), cargo.end(), [&](const Id &id) {
-             return s.units.contains(id) && s.units.at(id).type == "marine";
-           });
-  }
-  if (!has(s, t, "naval_transport"))
-    return false;
-  if (cargo.size() > 2)
-    return false;
-  int other = 0;
+  std::vector<Id> types;
   for (const auto &id : cargo) {
     if (!s.units.contains(id))
       return false;
-    const auto &c = s.units.at(id);
-    if (!has(s, c, "land") && !has(s, c, "rocket"))
-      return false;
-    if (!has(s, c, "infantry_class"))
-      ++other;
+    types.push_back(s.units.at(id).type);
   }
-  return other <= 1;
+  return navalCargoTypesFit(s, s.units.at(ship), types);
 }
 RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
   auto fail = [](const std::string &why) {

@@ -35,6 +35,10 @@ std::set<Id> navalEndZones(const State &, const Id &ship);
 int strategicNavalCapacity(const State &, const Id &nation);
 int navalCompletedTurns(const State &, const Id &nation);
 bool navalCargoFits(const State &, const Id &transport, const std::vector<Id> &cargo);
+// Whether a ship may carry land units of these types together: a naval
+// transport two land units or rockets, at most one of them not infantry-class;
+// a Japanese destroyer one Marine.
+bool navalCargoTypesFit(const State &, const UnitState &ship, const std::vector<Id> &types);
 bool navalLoadAllowed(const State &, const Id &transport, const Id &cargo);
 std::vector<Action> navalMovementActions(const State &);
 // Training order construction is forward-only. The ordinary rules retain the

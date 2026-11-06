@@ -1186,6 +1186,8 @@ std::vector<Action> MovementRules::actions(const State &s) const {
   for (const auto &[id, u] : s.units)
     if (movementController(s, u.owner) && !u.carriedBy &&
         s.territories.contains(u.zone)) {
+      // Zones this unit reaches by an ordinary noncombat move.
+      std::set<Id> ordinaryEnds;
       if (unitClass(s, u, "land")) {
         std::function<void(std::vector<Id>)> visit = [&](std::vector<Id> path) {
           if (path.size() > 1) {
@@ -1198,6 +1200,8 @@ std::vector<Action> MovementRules::actions(const State &s) const {
               // but the search still passes through it to farther targets.
               if (!combat || landRouteAttacks(s, u.owner, r)) {
                 out.push_back(movementAction(s, r));
+                if (!combat && !blitz)
+                  ordinaryEnds.insert(path.back());
                 if (u.type == "motorized_infantry" && !blitz)
                   for (const auto &[partner, towed] : s.units)
                     if (partner != id && towed.zone == u.zone &&
@@ -1258,7 +1262,12 @@ std::vector<Action> MovementRules::actions(const State &s) const {
               RouteRequest r{id, p, MovementMode::StrategicRail, false};
               if (validateRoute(s, r).allowed) {
                 seen.insert(next);
-                out.push_back(movementAction(s, r));
+                // Where an ordinary move reaches the same zone, the rail move
+                // would only spend rail capacity and end the unit's movement,
+                // so it is not offered (user decision, 5 November 2026). The
+                // search still passes through the zone to farther ones.
+                if (!ordinaryEnds.contains(next))
+                  out.push_back(movementAction(s, r));
                 todo.push_back(std::move(p));
               }
             }

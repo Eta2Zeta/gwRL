@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 4 November 2026.
+Updated: 5 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -61,6 +61,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-018 | Amphibious assault whose sea zone is not cleared, or whose transports retreat | Adopted: the assault is called off; the cargo stays aboard |
 | RCL-019 | Several railroads on one border; the damage limit and repair of each side | Adopted: one railroad per border; each side holds its own damage and is repaired by its possessor |
 | RCL-020 | A patrol plane attacked in its own sea zone: the carrier choice or the patrol choice, before or after scrambles | Adopted: the patrol choice, made before any scramble; staying out costs nothing |
+| RCL-021 | Upgrading a unit aboard a transport into one the transport may not carry | Adopted: not allowed; the upgrade waits on the build queue |
 
 ## Pilot discussion review
 
@@ -477,6 +478,56 @@ to scramble the Shantung destroyer, and the fighter, if it stayed out, was
 destroyed when Japan won. Now the fighter is asked first. If it stays out, there
 is no battle and nothing is lost; if it fights, the Shantung destroyer may
 scramble to join it.
+
+## RCL-021: Upgrading a unit aboard a transport
+
+**Status: adopted by the user, 5 November 2026.**
+
+**Sources:** RB §8.4 p51 (upgrades); §10.6.5 pp68-69 (carpet bombing); §11.3.1
+pp75-76 and §11.4.1 pp76-77 (air and naval cargo); §12.3 p80 (placing
+upgrades); §13.1.5 pp89-92 and §13.1.6 p92 (what each transport carries).
+
+**Question:** a unit can still be aboard a transport when its owner places
+upgrades in the Place Units Phase: on a ship at sea or in port, or, as an
+ally's unit, on an air transport, which it boards on its own turn and leaves on
+its next (§§11.3.1 and 11.4.1). An upgrade can turn it into a unit the
+transport may not carry. An air transport carries one infantry-class unit, a
+Heavy Air Transport also artillery, so an infantry aboard may not become
+motorized infantry, which is vehicle-class. A naval transport carries two
+infantry-class units or one and another land unit, so of two infantry aboard
+only one may. The rulebook does not say whether such an upgrade may be placed.
+
+**The engine before this ruling** offered an upgrade on any unit of the right
+type that a Supply Path reaches, carried or not. In random play it made an air
+transport carry motorized infantry.
+
+**Adopted ruling:**
+
+- An upgrade may not be placed on a unit aboard a transport if the transport
+  could not carry its cargo afterwards. The upgrade stays on the build queue
+  until it can reach a suitable unit, as §12.3 provides when it cannot reach
+  one.
+- Other upgrades of carried units are unchanged: an infantry aboard a naval
+  transport may become motorized infantry when nothing else aboard is outside
+  the infantry class, and a militia aboard an air transport may become infantry.
+- Cargo may still stay aboard. Making every unit leave its transport before the
+  Place Units Phase was considered and not adopted, because staying aboard can
+  be better: carpet bombing attacks only land units (§10.6.5).
+
+**Not settled here:** whether a unit aboard a ship at sea may be upgraded at
+all. §12.3 requires a Supply Path to the land zone the unit is in, and a unit
+at sea is in none. The engine still offers such upgrades.
+
+**Authority:** the user in chat on 5 November 2026: "if there are cases where
+not unloading is better we then should keep the option of having them loaded,
+lets just make it not allowed to upgrade a loaded unit to something not
+carry-able then".
+
+**Example:** a KMT air transport landed in Sikang still carries an infantry in
+the KMT's Place Units Phase, and the KMT has bought an upgrade to motorized
+infantry. Before this ruling the upgrade could be placed on that infantry. Now
+it is offered only on an infantry not aboard a transport, or aboard one that
+could carry the result.
 
 ## Maintenance
 

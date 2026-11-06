@@ -115,7 +115,7 @@ std::vector<Action> recipientPlacements(const State &s, const BuildProject &p) {
                 for (const auto &[id, u] : s.units)
                     if (supplied && value(s.nations.at(p.owner).turnFlags, "economy_militia_upgrades") < 2 &&
                         u.owner == p.owner && u.zone == zone && u.type == "militia" &&
-                        !value(u.turnFlags, "placed_this_turn"))
+                        !value(u.turnFlags, "placed_this_turn") && upgradeKeepsCargo(s, u, "infantry"))
                         out.push_back(
                             action(s, "economy_lease_place", {{"project", V(p.id)}, {"target", V(id)}}));
             } else if (baseType(p.type)) {

@@ -55,5 +55,82 @@
   "recruitment": "src/politics_influence.cpp: recruitment_roll is offered beside the other Place Units moves; a failed roll only marks recruitment_attempted",
   "aircraft given up": "src/air.cpp mayBeGivenUp: only when some aircraft must be lost or this one has no landing spot",
   "artillery pairing": "src/land_combat.cpp requestPairing: no decline option"
+ },
+ "decision": {
+  "date": "2026-11-05",
+  "quote": "I mean if there are cases where not unloading is better we then should keep the option of having them loaded, lets just make it not allowed to upgrade a loaded unit to something not carry-able then . And for the ones you found that was never worse off and equivalent, just disallow the options that do things in a more expensive way",
+  "kept": [
+   "cargo staying aboard a transport",
+   "moves for another of several identical units",
+   "skipping the recruitment roll"
+  ],
+  "ruled": "RCL-021: an upgrade may not leave a transport carrying a unit it may not carry",
+  "left_out": [
+   "strategic rail move to a zone the same unit reaches by an ordinary move",
+   "printed price where Improved Construction offers the discount"
+  ],
+  "open": "whether to bar upgrades of units aboard ships at sea (RB 12.3)"
+ },
+ "after_change": {
+  "cpp_suites": {
+   "passed": 26,
+   "failed": 0
+  },
+  "mutations_caught": {
+   "upgrade check ignored": "Upgrade offered that would leave an air transport carrying motorized infantry",
+   "air cargo accepts any land unit": "Upgrade offered that would leave an air transport carrying motorized infantry",
+   "naval cargo ignores the one-unit limit": "Upgrade offered that would leave a naval transport two units that are not infantry-class",
+   "rail offered within ordinary reach": "Rail move offered where an ordinary move reaches the same zone",
+   "rail search stops at a skipped zone": "Expected route was not offered",
+   "printed price kept beside the discount": "Cruiser discount and acceleration combined or mispriced, or printed price kept"
+  },
+  "random_play_fuzz": {
+   "first_seed": 9000,
+   "games": 800,
+   "completed": 800,
+   "problems": 0
+  },
+  "zone_names": [
+   {
+    "first_seed": 7000,
+    "games": 240,
+    "finished": 240,
+    "decisions": 315001,
+    "early_ends": 8787,
+    "unknown": {}
+   },
+   {
+    "first_seed": 9000,
+    "games": 240,
+    "finished": 240,
+    "decisions": 311709,
+    "early_ends": 8829,
+    "unknown": {}
+   }
+  ],
+  "carried_upgrades": {
+   "seeds": "7000 to 7239 and 9239",
+   "games": 241,
+   "offered": {
+    "naval_transport in a land zone": 101,
+    "naval_transport at sea": 139
+   },
+   "taken": {
+    "naval_transport in a land zone": 30,
+    "naval_transport at sea": 43
+   },
+   "games_by_place": {
+    "naval_transport in a land zone": 59,
+    "naval_transport at sea": 85
+   },
+   "air_transport_offers": 0
+  },
+  "probe_48_games": {
+   "decisions": 63500,
+   "options": 2023998,
+   "identical_unit_duplicates": 192740,
+   "rail_moves_within_ordinary_reach": 0
+  },
+  "improved_construction_games_in_240": 0
  }
 }

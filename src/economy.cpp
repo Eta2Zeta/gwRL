@@ -1,6 +1,8 @@
 #include "game/economy.hpp"
+#include "game/air.hpp"
 #include "game/catalog.hpp"
 #include "game/movement.hpp"
+#include "game/naval.hpp"
 #include "game/politics.hpp"
 
 #include <algorithm>
@@ -9,6 +11,17 @@
 #include <stdexcept>
 
 namespace game::campaign {
+bool upgradeKeepsCargo(const State &s, const UnitState &unit, const Id &type) {
+    if (!unit.carriedBy)
+        return true;
+    const auto &carrier = s.units.at(*unit.carriedBy);
+    if (isAircraft(s, carrier))
+        return airCargoTypeFits(s, carrier, type);
+    std::vector<Id> types;
+    for (const auto &id : carrier.cargo)
+        types.push_back(id == unit.id ? type : s.units.at(id).type);
+    return navalCargoTypesFit(s, carrier, types);
+}
 namespace {
 using V = json::Value;
 using O = V::Object;
@@ -315,7 +328,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
     if (flag(p.flags, "unit_upgrade") && row) {
         for (const auto &[id, u] : s.units)
             if (u.owner == n && row->upgradesFrom == u.type && !flag(u.turnFlags, "placed_this_turn") &&
-                inSupply(s, n, u.zone) &&
+                inSupply(s, n, u.zone) && upgradeKeepsCargo(s, u, p.type) &&
                 (u.type != "militia" || value(s.nations.at(n).turnFlags, "economy_militia_upgrades") < 2))
                 out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"target", V(id)}}));
         return out;
@@ -332,7 +345,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
         const auto fac = s.facilities.find(*target);
         if (unit != s.units.end() && unit->second.owner == n &&
             !flag(unit->second.turnFlags, "placed_this_turn") && inSupply(s, n, unit->second.zone) && row &&
-            row->upgradesFrom == unit->second.type &&
+            row->upgradesFrom == unit->second.type && upgradeKeepsCargo(s, unit->second, p.type) &&
             (unit->second.type != "militia" ||
              value(s.nations.at(n).turnFlags, "economy_militia_upgrades") < 2))
             out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"target", V(*target)}}));

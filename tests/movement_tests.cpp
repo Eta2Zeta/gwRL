@@ -272,8 +272,16 @@ void railGaugeDamageCapacity() {
       validateRoute(s, {"two", {"a", "b"}, MovementMode::StrategicRail, false})
           .allowed,
       "Improved Logistics did not add one regional move");
-  rules.apply(
-      s, offered(rules, s, "two", {"a", "b"}, MovementMode::StrategicRail));
+  // Unit two reaches b by an ordinary move, so its rail move there is not
+  // offered (user decision, 5 November 2026). Applied directly, it still uses
+  // up the regional move Improved Logistics added.
+  rejects([&] { offered(rules, s, "two", {"a", "b"}, MovementMode::StrategicRail); },
+          "Rail move offered where an ordinary move reaches the same zone");
+  auto rail = offered(rules, s, "two", {"a", "b"}, MovementMode::Ordinary);
+  auto railParameters = rail.parameters.asObject();
+  railParameters["mode"] = str("strategic_rail");
+  rail.parameters = V(std::move(railParameters));
+  rules.apply(s, rail);
   unit(s, "three", "a");
   check(!validateRoute(
              s, {"three", {"a", "b"}, MovementMode::StrategicRail, false})
@@ -893,6 +901,39 @@ void lendLeaseDestinationException() {
         "Naval lend-lease could not leave Home Country port");
 }
 } // namespace
+// A rail move to a zone the same unit reaches by an ordinary move would only
+// spend rail capacity and end the unit's movement, so it is not offered (user
+// decision, 5 November 2026). Rail moves beyond ordinary reach stay.
+void railOnlyBeyondOrdinaryReach() {
+  Puzzle p;
+  p.link("a", "b", {{"railway_connection", V(true)}});
+  p.link("b", "c", {{"railway_connection", V(true)}});
+  p.link("c", "d", {{"railway_connection", V(true)}});
+  auto s = p.state();
+  for (const auto &[id, from, to] :
+       std::vector<std::tuple<Id, Id, Id>>{{"ab", "a", "b"}, {"bc", "b", "c"}, {"cd", "c", "d"}})
+    s.rails[id] = {id, from, to, {}};
+  unit(s, "slow", "a", "infantry", "japan", 1);
+  unit(s, "fast", "a", "infantry", "japan", 2);
+  MovementRules rules;
+  const auto railTo = [&](const Id &unitId) {
+    std::set<Id> ends;
+    for (const auto &a : rules.actions(s))
+      if (a.kind == "movement_route" &&
+          a.parameters.require("unit").asString() == unitId &&
+          a.parameters.require("mode").asString() == "strategic_rail")
+        ends.insert(a.parameters.require("path").asArray().back().asString());
+    return ends;
+  };
+  offered(rules, s, "slow", {"a", "b"}, MovementMode::Ordinary);
+  check(railTo("slow") == std::set<Id>{"c", "d"},
+        "Rail offered within ordinary reach, or not past it");
+  offered(rules, s, "fast", {"a", "b", "c"}, MovementMode::Ordinary);
+  check(railTo("fast") == std::set<Id>{"d"},
+        "Rail offered within a two-move unit's ordinary reach");
+  rules.apply(s, offered(rules, s, "slow", {"a", "b", "c"}, MovementMode::StrategicRail));
+  check(s.units.at("slow").zone == "c", "Offered rail move did not apply");
+}
 int main() {
   try {
     for (const auto &[name, fn] :
@@ -923,7 +964,8 @@ int main() {
              {"lend-lease destination exception",
               lendLeaseDestinationException},
              {"combat movement only starts combats", combatMovementOnlyStartsCombats},
-             {"aligned land opens at once", alignedLandOpensAtOnce}}) {
+             {"aligned land opens at once", alignedLandOpensAtOnce},
+             {"rail only beyond ordinary reach", railOnlyBeyondOrdinaryReach}}) {
       fn();
       std::cout << "PASS " << name << '\n';
     }

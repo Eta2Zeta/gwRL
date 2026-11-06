@@ -270,13 +270,15 @@ void technologyAndConstruction(const Catalog& catalog) {
     c = japan();
     check(prices(catalog, "japan_major_heavy_cruiser", c) == std::set<std::vector<int>> {{5, 5}}, "Printed cruiser payments changed");
     c.technologies.insert("improved_construction");
-    check(prices(catalog, "japan_major_heavy_cruiser", c) == std::set<std::vector<int>> {{5, 5}, {4, 4}, {10}},
-          "Cruiser discount and acceleration combined or mispriced");
-    check(prices(catalog, "japan_major_fleet_carrier", c) == std::set<std::vector<int>> {{5, 5, 5}, {4, 4, 4}, {10, 5}},
+    // The discount replaces the printed price, which would buy the same on the
+    // same schedule for more (user decision, 5 November 2026).
+    check(prices(catalog, "japan_major_heavy_cruiser", c) == std::set<std::vector<int>> {{4, 4}, {10}},
+          "Cruiser discount and acceleration combined or mispriced, or printed price kept");
+    check(prices(catalog, "japan_major_fleet_carrier", c) == std::set<std::vector<int>> {{4, 4, 4}, {10, 5}},
           "Three-stage carrier acceleration/discount wrong");
-    check(prices(catalog, "japan_major_major_factory", c) == std::set<std::vector<int>> {{6, 6, 6}, {5, 5, 5}, {12, 6}},
+    check(prices(catalog, "japan_major_major_factory", c) == std::set<std::vector<int>> {{5, 5, 5}, {12, 6}},
           "Facility construction choices wrong");
-    check(prices(catalog, "japan_major_minor_factory_to_medium_factory", c) == std::set<std::vector<int>> {{7}, {6}},
+    check(prices(catalog, "japan_major_minor_factory_to_medium_factory", c) == std::set<std::vector<int>> {{6}},
           "Improved Construction does not cover facility upgrades");
     check(prices(catalog, "japan_major_infantry", c) == std::set<std::vector<int>> {{3}}
               && prices(catalog, "japan_major_fighter", c) == std::set<std::vector<int>> {{10}},

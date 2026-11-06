@@ -64,6 +64,15 @@
       "quote": "And yes, difficult terrain takes 2 damage for railroads.",
       "ruling": "A railroad on a desert, jungle, marsh, mountain or tundra border takes up to 2 damage on each side; on a normal border, up to 1 on each side.",
       "scope": "Recorded as RCL-019."
+    },
+    {
+      "id": "user_upgrade_aboard_transport_2026_11_05",
+      "kind": "user_ruling",
+      "date": "2026-11-05",
+      "question": "May a unit aboard a transport be upgraded into a unit the transport may not carry, such as an infantry aboard an air transport into motorized infantry?",
+      "quote": "if there are cases where not unloading is better we then should keep the option of having them loaded, lets just make it not allowed to upgrade a loaded unit to something not carry-able then",
+      "ruling": "An upgrade is not placed on a unit aboard a transport when the transport could not carry its cargo afterwards; the upgrade stays on the build queue until it can reach a suitable unit (RB 12.3). Cargo may still stay aboard.",
+      "scope": "Recorded as RCL-021. Whether a unit aboard a ship at sea may be upgraded at all is not settled by this ruling."
     }
   ],
   "rules": [
@@ -210,7 +219,8 @@
         "new_unit_same_turn_forbidden": true,
         "supply_required": true,
         "militia_upgrades_per_turn": 2,
-        "motorization_upgrades_per_turn": 2
+        "motorization_upgrades_per_turn": 2,
+        "carried_unit_stays_carriable": true
       },
       "source_refs": [
         {
@@ -222,8 +232,12 @@
           "source_id": "rulebook",
           "pdf_page": 80,
           "section": "8.4;12.3"
+        },
+        {
+          "source_id": "user_upgrade_aboard_transport_2026_11_05"
         }
-      ]
+      ],
+      "clarification": "RCL-021"
     },
     {
       "id": "paid_repairs",

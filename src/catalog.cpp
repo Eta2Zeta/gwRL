@@ -156,8 +156,10 @@ Eligibility Catalog::purchaseEligibility(const Id& id,const CatalogContext& c,in
 Eligibility Catalog::placementEligibility(const Id& id,const CatalogContext& c) const {Eligibility e;for(const auto& p:row(id).placement)if(!flag(c,p))e.reasons.push_back("placement:"+p);e.allowed=e.reasons.empty();return e;}
 std::vector<BuildChartRow> Catalog::purchaseOptions(const CatalogContext& c) const {std::vector<BuildChartRow> out;for(const auto& [id,r]:rows_)if(purchaseEligibility(id,c).allowed)out.push_back(r);return out;}
 std::vector<PriceOption> Catalog::priceOptions(const Id& id,const CatalogContext& c) const {
-    const auto& r=row(id);if(!purchaseEligibility(id,c).allowed)return {};std::vector<PriceOption> out{{"printed",r.purchaseCosts}};
-    const bool naval=units_.contains(r.type)&&unit(r.type).classes.contains("naval");if(!c.technologies.contains("improved_construction")||(!naval&&!facilities_.contains(r.type)))return out;
+    const auto& r=row(id);if(!purchaseEligibility(id,c).allowed)return {};std::vector<PriceOption> out;
+    const bool naval=units_.contains(r.type)&&unit(r.type).classes.contains("naval");if(!c.technologies.contains("improved_construction")||(!naval&&!facilities_.contains(r.type))){out.push_back({"printed",r.purchaseCosts});return out;}
+    // The discount replaces the printed price: that would buy the same thing on
+    // the same schedule for more (user decision, 5 November 2026).
     auto reduced=r.purchaseCosts;for(int& n:reduced)n=std::max(0,n-1);out.push_back({"improved_construction_discount",reduced});
     if(r.purchaseCosts.size()>=2) {auto combined=r.purchaseCosts;combined[0]+=combined[1];combined.erase(combined.begin()+1);out.push_back({"improved_construction_combine",combined});}return out;
 }

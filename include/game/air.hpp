@@ -7,6 +7,11 @@ struct FlightResult {
     int cost{0};
 };
 bool isAircraft(const State &, const UnitState &);
+// Whether an aircraft may carry a land unit of this type outside an airborne
+// assault: an air transport one infantry-class unit, a Heavy Air Transport also
+// one artillery or anti-aircraft artillery unit (RB 11.3.1 and 13.1.5). A
+// strategic bomber carries only airborne infantry.
+bool airCargoTypeFits(const State &, const UnitState &aircraft, const Id &type);
 // An aircraft flying a Maritime Air Patrol (RB 9.3.1). An aircraft aboard a
 // carrier is not one: in a sea battle it keeps the deck choice of RB 10.7,
 // step 2, and is lost with the battle if it stays on deck.
