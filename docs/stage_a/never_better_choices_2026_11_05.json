@@ -1,0 +1,59 @@
+{
+ "date": "2026-11-05",
+ "question": "may every unit be taken off its transport before the Place Units Phase, and which other choices are never better than another on the same menu",
+ "policy": "tools/check_zone_names.py random policy (uniform moves; where the phase can end, end it with probability 0.02, 0.05 or 0.10 by seed % 3), eleven rounds",
+ "engine_commit": "38a7a5c",
+ "probe": {
+  "seeds": [
+   7000,
+   7047
+  ],
+  "games": 48,
+  "decisions": 63110,
+  "options": 2007702,
+  "identical_unit_duplicates": 204340,
+  "rail_moves_with_ordinary_move_to_same_zone": 61129,
+  "options_left_without_both": 1762061,
+  "share_removed": 0.1223,
+  "menus_left_with_one_option": 244,
+  "recruitment_roll_menus": 1418,
+  "recruitment_roll_menus_beside_end_phase": 885,
+  "recruitment_roll_skipped": 472,
+  "noncombat_ends_with_own_air_cargo_aboard": 0,
+  "counting": {
+   "identical_units": "unit ids in an option's parameters replaced by the unit's full state (all fields but id; cargo by type); options that then coincide counted once, as in tools/decision_census.py symmetry",
+   "rail": "movement_route in mode strategic_rail or strategic_river whose unit has a noncombat ordinary movement_route to the same last zone in the same menu",
+   "recruitment": "menus offering recruitment_roll; skipped when the policy chose end_phase in such a menu"
+  }
+ },
+ "printed_price": {
+  "seeds": [
+   7000,
+   7239
+  ],
+  "games": 240,
+  "purchase_options": 3370586,
+  "printed_options_beside_the_discount": 1930,
+  "menus_with_the_discount": 12,
+  "games_with_the_discount": [
+   7097
+  ]
+ },
+ "rules": {
+  "RB 11.4.1": "naval cargo is unloaded into adjacent land zones; an ally's unit loads on its own turn, rides on yours, unloads on its next",
+  "RB 11.5": "a naval transport may go in port with or without cargo; unloading is decided as it berths; unloaded cargo cannot move for the rest of the Calendar Turn",
+  "RB 11.3.1": "an air transport picks its cargo up before or during its noncombat move and unloads it in a Friendly-possessed land zone; an ally's unit loads on its own turn and unloads on its next",
+  "RB 10.6.5": "carpet bombing attacks only land units",
+  "RB 12.7": "controlled minor powers make recruitment rolls; success gives 1 infantry or 2 militia, a ship advance or a facility repair",
+  "RB 8.2.1": "Improved Construction: -1 IPP per stage for facilities, facility upgrades and naval units, or the first two stages condensed into one"
+ },
+ "engine": {
+  "land battle defenders": "src/land_combat.cpp registerLandBattle skips carried units",
+  "air cargo on landing": "src/air.cpp air_land_noncombat steps off only militia",
+  "rail move": "src/movement.cpp: strategic rail adds to the region's rail counter, marks strategic_moved and ends movement; ordinary moves subtract their cost",
+  "price options": "src/catalog.cpp priceOptions: printed, plus improved_construction_discount and improved_construction_combine for naval units and facilities with Improved Construction",
+  "recruitment": "src/politics_influence.cpp: recruitment_roll is offered beside the other Place Units moves; a failed roll only marks recruitment_attempted",
+  "aircraft given up": "src/air.cpp mayBeGivenUp: only when some aircraft must be lost or this one has no landing spot",
+  "artillery pairing": "src/land_combat.cpp requestPairing: no decline option"
+ }
+}

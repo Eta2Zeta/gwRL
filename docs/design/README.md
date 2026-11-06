@@ -940,6 +940,38 @@ competing method, and older networks as extra opponents for when evaluation show
 overfitting to the current ones. Neither has been tried. **Would settle it:** the
 equal-compute comparison the plan describes.
 
+#### Should the engine leave out choices that are never better?
+
+**Now.** The engine offers every legal move, including moves that can never do
+better than another on the same menu, and copies of one move that differ only in
+which of several identical units they name. The search spends simulations on
+each, and the network must learn to tell them apart.
+
+**Alternative.** Leave such moves out, or play them automatically. Four were
+found:
+
+| Choice | Why it is never better | In random games |
+| --- | --- | ---: |
+| The same move for another of several identical units | the positions differ only in the units' names | 10.2% of options |
+| A strategic rail or river move to a zone the unit also reaches by an ordinary move | both end in the same zone, but the rail move spends rail capacity and ends the unit's movement | 3.0% of options |
+| Ending the Place Units Phase without the recruitment roll | the roll is free and every result helps (RB 12.7) | skipped 472 times in 48 games |
+| The printed price for naval units and facilities once Improved Construction is developed | the discount buys the same on the same schedule for less (RB 8.2.1) | in 1 game of 240 |
+
+**The catch.** A move may go only if it is never better in any position, and
+some that look so are not. Cargo kept aboard a landed air transport cannot be
+carpet-bombed, since carpet bombing attacks only land units, so taking every
+unit off its transport before the Place Units Phase is not free. For a nation's
+own unit on its own air transport the rules support it anyway: RB 11.3.1
+describes such cargo being unloaded during the noncombat move. Ships at sea
+cannot unload, and an ally's units stay aboard until their next turn.
+
+**Measured:** the shares above
+([record](../stage_a/never_better_choices_2026_11_05.md)). The first two together
+are 12.2% of options, which would also help the 64 simulations of the question
+above. **Would settle it:** the user's decision on each, a check on test
+positions that every removed move is matched by a kept one with the same or a
+better result, then learning compared at equal compute.
+
 ## 10. Glossary
 
 - **Alliance (player):** Axis, Allies or Comintern; each chooses for its nations.
