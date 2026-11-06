@@ -801,8 +801,11 @@ measured and what would settle it.
   transport the unit is in a land zone, but the motorized infantry an upgrade
   makes is cargo an air transport may not carry. One random game took that
   upgrade, and the input then filed the cargo under a question removed as
-  impossible. No rule speaks of upgrading carried units directly; the engine is
-  unchanged until the user decides
+  impossible. The rules keep an ally's unit aboard an air transport through its
+  own Place Units Phase. The engine also lets a nation's own unit stay aboard its
+  air transport after the noncombat move, which the rules never describe. No
+  rule speaks of upgrading carried units directly; the engine is unchanged until
+  the user decides
   ([record](../stage_a/zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
