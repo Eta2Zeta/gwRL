@@ -78,12 +78,12 @@
    "economy_place project economy_motorized_infantry_113 on target setup_warlord_yunnan_land_china_yunnan_infantry_2, still carried by economy_unit_82"
   ],
   "rules": [
-   "RB 11.3.1 and the 13.1.5 unit chart: an air transport carries one infantry-class unit in Noncombat Movement; a Heavy Air Transport also one artillery or anti-aircraft artillery",
+   "RB 11.3.1 and the 13.1.5 unit chart: an air transport carries one infantry-class unit in Noncombat Movement; a Heavy Air Transport one infantry-class, artillery or anti-aircraft artillery unit",
    "RB 8.4: infantry may be upgraded to motorized infantry, which is vehicle-class",
-   "RB 12.3: an upgrade needs a Supply Path to the unit's land zone and not a unit placed this turn; nothing on carried units"
+   "RB 12.3: an upgrade needs a Supply Path to the land zone that the unit receiving it is in, and not a unit placed this turn"
   ],
   "engine_offers_upgrade_on": "units of the nation and type, not placed this turn, in supply, whether carried or not (src/economy.cpp placements)",
-  "status": "awaiting the user's ruling; engine unchanged"
+  "status": "awaiting the user's decision; engine unchanged"
  },
  "encoding_test": {
   "seeds": [
@@ -94,5 +94,55 @@
   "seconds_with_old_lookup": 8.7,
   "old_lookup_result": "AssertionError: 0 not greater than 0 : no phase was ended early"
  },
- "machine": "M4 Max, MallocNanoZone unset"
+ "machine": "M4 Max, MallocNanoZone unset",
+ "upgrades_on_carried_units": {
+  "rules_search": {
+   "searched": [
+    "rulebook 8.4, 12.1, 12.3, 9.4.3, 11.3.1, 11.4.1, 11.5 and the unit charts",
+    "the thirteen national reference sheets",
+    "game_content/rules/clarifications.md",
+    "game_content/rules/source_answered_questions.md",
+    "game_content/rules/gw36_economy_v43.json rule upgrades",
+    "game_content/rules/html/annotations.json",
+    "game_content/rules/discord_audits/2025-08-26_2025-09-26"
+   ],
+   "direct_rule_on_carried_units": "none found",
+   "bearing_sentence": "RB 12.3: a Supply Path to the land zone that the unit receiving the upgrade is in; a unit aboard a ship at sea is in no land zone",
+   "earlier_wording": "the first version of this record said only that the rules are silent"
+  },
+  "engine": "placements() in src/economy.cpp offers a unit upgrade on any unit of the nation and type, not placed this turn, with inSupply(unit zone), carried or not; traceSupply accepts a sea-zone destination; berthShip puts a ship and its cargo in the port's land zone",
+  "probe": {
+   "policy": "tools/check_zone_names.py policy without encoding",
+   "seeds": "7000 to 7239 and 9239",
+   "games": 241,
+   "decisions": 314581,
+   "counted": "once per carried target unit and round",
+   "games_with_an_offer": 132,
+   "places": {
+    "naval transport at sea": {
+     "offered": 151,
+     "taken": 58,
+     "games": 89,
+     "rb_12_3": "no upgrade"
+    },
+    "naval transport in port": {
+     "offered": 123,
+     "taken": 50,
+     "games": 78,
+     "rb_12_3": "upgrade allowed"
+    },
+    "air transport in a land zone": {
+     "offered": 2,
+     "taken": 1,
+     "games": 2,
+     "seeds": [
+      7120,
+      9239
+     ],
+     "rb_12_3": "upgrade allowed; the result is cargo an air transport may not carry"
+    }
+   },
+   "upgrade": "every offer: infantry to motorized infantry; 274 by Japan, 2 by the KMT"
+  }
+ }
 }

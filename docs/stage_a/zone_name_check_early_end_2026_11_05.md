@@ -7,7 +7,9 @@ instead of making a random move, so that some phases do little and others much.
 Where the phase can end, the tool ends it at 2, 5 or 10% of decisions depending
 on the seed, the test at 5%. Since they were written on 4 November (commit
 `1396518`), that never happened. The user asked to fix both. The more varied
-games then found a cargo the rules forbid. The
+games then found a cargo the rules forbid, made by upgrading a unit aboard an
+air transport. Following that up showed the engine also upgrades units aboard
+ships at sea, which RB 12.3 rules out. The
 [evidence file](zone_name_check_early_end_2026_11_05.json) holds the exact
 values.
 
@@ -56,7 +58,8 @@ infantry (`carried:allies:air_transport:motorized_infantry`). The input had
 removed that question as impossible, rightly: in Noncombat Movement an air
 transport carries one infantry-class unit and a Heavy Air Transport one
 infantry-class, artillery or anti-aircraft artillery unit (RB 11.3.1 and the
-unit chart in 13.1.5), and motorized infantry is vehicle-class. The engine made the cargo itself, in round 9:
+unit chart in 13.1.5), and motorized infantry is vehicle-class. The engine made
+the cargo itself, in round 9:
 
 1. In the Production Phase the KMT bought an upgrade of infantry to motorized
    infantry (RB 8.4).
@@ -65,14 +68,37 @@ unit chart in 13.1.5), and motorized infantry is vehicle-class. The engine made 
 3. In the Place Units Phase the KMT placed the upgrade on that infantry, which
    became motorized infantry aboard the air transport.
 
+## Upgrades on units aboard a transport
+
+No rule speaks of upgrading a unit aboard a transport. The search covered the
+rulebook's upgrade and placement rules (8.4, 12.1 and 12.3), its transport rules
+(9.4.3, 11.3.1, 11.4.1 and 11.5), the unit charts, the thirteen national sheets,
+the project's clarifications and answered questions, the economy rules profile,
+the rules reader's notes and the audited Discord answers. One sentence bears on
+it: RB 12.3 requires a Supply Path to the land zone that the unit receiving the
+upgrade is in. An earlier version of this record said only that the rules are
+silent, which missed this.
+
 The engine offers an upgrade on any of the nation's units of the right type
-that a Supply Path reaches and that was not placed this turn (RB 12.3), carried
-or not. The rules do not say whether a unit aboard a transport may be upgraded.
-Making a nation's own cargo leave its air transports when Noncombat Movement
-ends would not settle it: RB 11.3.1 lets an ally's unit ride an air transport
-through its own Place Units Phase, loading on its own turn and unloading on
-its next. How to treat such an upgrade awaits the user's ruling. The engine is
-unchanged.
+that is in supply and was not placed this turn, carried or not, and its Supply
+Path may end in a sea zone, as naval supply does. A ship in port, and its cargo,
+stand in the port's land zone. In 241 random games with the policy above (seeds
+7000 to 7239 and 9239), 132 games offered an upgrade on a carried unit, counted
+once per unit and round:
+
+| Where the carried unit is | Its zone | What RB 12.3 allows | Offered | Taken | Games |
+| --- | --- | --- | ---: | ---: | ---: |
+| Aboard a ship at sea | a sea zone | no upgrade: the unit is in no land zone | 151 | 58 | 89 |
+| Aboard a ship in port | the port's land zone | an upgrade | 123 | 50 | 78 |
+| Aboard a landed air transport | its land zone | an upgrade, but the motorized infantry it makes is cargo an air transport may not carry | 2 | 1 | 2 |
+
+Every offer was an upgrade of infantry to motorized infantry, all by Japan
+except the two KMT ones aboard air transports. So the engine breaks RB 12.3 at
+sea, and the air transport case is open. Making a nation's own cargo leave its
+air transports when Noncombat Movement ends would not settle that case:
+RB 11.3.1 lets an ally's unit ride an air transport through its own Place Units
+Phase, loading on its own turn and unloading on its next. The engine is
+unchanged until the user decides.
 
 ## Earlier records
 

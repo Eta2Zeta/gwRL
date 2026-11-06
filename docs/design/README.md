@@ -794,12 +794,16 @@ measured and what would settle it.
   railroad was damaged this turn, is counted for the whole position, and a
   battle note's numbers are added into one answer. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
-- **An upgrade can break an air transport's cargo rule.** The engine lets an
-  upgrade turn an infantry into motorized infantry while it is aboard an air
-  transport, which may carry only infantry-class units. One of 480 random games
-  did so, and the input then files the cargo under a question removed as
-  impossible. How the rules should treat such an upgrade awaits a ruling
-  ([record](../stage_a/zone_name_check_early_end_2026_11_05.md)).
+- **Upgrades reach units aboard transports.** The engine offers an upgrade on a
+  carried unit wherever it can trace a Supply Path, at sea too. RB 12.3 asks for
+  a Supply Path to the land zone the unit is in, so a unit aboard a ship at sea
+  may not be upgraded; 89 of 241 random games offered that. Aboard a landed air
+  transport the unit is in a land zone, but the motorized infantry an upgrade
+  makes is cargo an air transport may not carry. One random game took that
+  upgrade, and the input then filed the cargo under a question removed as
+  impossible. No rule speaks of upgrading carried units directly; the engine is
+  unchanged until the user decides
+  ([record](../stage_a/zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
   replays in builds with memory checks did not reproduce it. Two crashes close
