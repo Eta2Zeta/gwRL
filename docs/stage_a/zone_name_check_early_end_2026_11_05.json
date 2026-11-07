@@ -148,7 +148,7 @@
    "rules": {
     "ship at sea or in port": "allowed: RB 11.5 lets a naval transport go in port with or without cargo, unloading decided as it berths; the RB 11.4.2 example lets units remain on board; RB 11.4.1 lets an ally's unit ride from its own turn to its next",
     "ally's unit on an air transport": "allowed: RB 11.3.1, loads on its own Player Turn and unloads on its next, so it is aboard through its own Place Units Phase",
-    "own unit on own air transport": "not described: RB 11.3.1 has it picked up before or during the noncombat move and unloaded in a Friendly-possessed land zone, and never says it may stay aboard afterwards"
+    "own unit on own air transport": "allowed: RB 11.3.1 lets the transport pick its cargo up before or during its noncombat move and keep moving after unloading it in a Friendly-possessed land zone, and does not require it to unload (corrected 6 November 2026; the first version read the rule as requiring the unload)"
    },
    "scenario": "CCP and Mongolia are both Comintern and may both own air transports and infantry",
    "engine": "air_land_noncombat steps off only militia (user's militia ruling); nothing unloads other air cargo at the end of the phase (src/air.cpp)",
@@ -156,7 +156,7 @@
     "9239": "round 9 Noncombat Movement: KMT air transport economy_unit_82 loads an infantry in land_china_sikang and never takes off",
     "7120": "round 8 Noncombat Movement: KMT air transport economy_unit_63 loads infantry setup_kmt_land_china_nanking_infantry_2; round 9 Noncombat Movement: flies to land_china_sikang and lands without unloading; aboard at round 9 Place Units"
    },
-   "status": "second open question: may a nation's own unit stay aboard its air transport after the noncombat move"
+   "status": "not an open question: no rule requires a nation's own cargo to leave its air transport; the first version called it one on a misreading the user corrected on 6 November 2026"
   }
  }
 }

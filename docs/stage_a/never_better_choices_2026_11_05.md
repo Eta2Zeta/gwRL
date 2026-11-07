@@ -15,8 +15,7 @@ is removed.
 
 ## Units off their transports
 
-Unloading is not never worse, but for a nation's own unit on its own air
-transport the rules point the same way:
+Unloading is not never worse, and no rule requires it:
 
 - **On a ship at sea** nothing can be unloaded: cargo leaves only into an
   adjacent land zone (RB 11.4.1).
@@ -29,13 +28,14 @@ transport the rules point the same way:
   11.4.1), so it must stay aboard.
 - **A nation's own unit on its own air transport.** Staying aboard can be
   better: carpet bombing attacks only land units (RB 10.6.5), and the engine
-  leaves cargo out of land battles. But RB 11.3.1 describes the transport
-  picking the cargo up before or during its noncombat move and unloading it in
-  a Friendly-possessed land zone, and never says it may stay aboard. Unloading
-  it when Noncombat Movement ends follows that description. It reached a Place
-  Units Phase in 2 of 241 random games
+  leaves cargo out of land battles. RB 11.3.1 lets the transport pick its
+  cargo up before or during its noncombat move and keep moving after it unloads
+  in a Friendly-possessed land zone, but does not require it to unload. Such
+  cargo reached a Place Units Phase in 2 of 241 random games
   ([record](zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport))
-  and in none of the 48 below.
+  and in none of the 48 below. An earlier version of this record read RB 11.3.1
+  as having the transport unload its cargo; the user pointed out on 6 November
+  that the rule says no such thing.
 
 So unloading cannot replace the upgrade rule: units at sea, and an ally's units,
 are still aboard when upgrades are placed.

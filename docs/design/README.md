@@ -794,17 +794,6 @@ measured and what would settle it.
   railroad was damaged this turn, is counted for the whole position, and a
   battle note's numbers are added into one answer. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
-- **A nation's own unit may stay aboard its air transport** after the
-  Noncombat Movement Phase, which RB 11.3.1 never describes. The engine allows
-  it, and
-  [RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)
-  keeps cargo aboard because staying can be better, but no ruling says whether
-  the rules allow this case
-  ([record](../stage_a/zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)).
-  Upgrades of carried units follow RCL-021 either way: none may leave a
-  transport carrying a unit it may not carry, and since 6 November none reaches
-  a unit aboard a ship at sea, which RB 12.3 rules out
-  ([record](../stage_a/upgrades_at_sea_2026_11_06.md)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
   replays in builds with memory checks did not reproduce it. Two crashes close

@@ -72,7 +72,11 @@ Upgrades offered on carried units, in the 241 random games of the earlier count
 - The random policy is that of `tools/check_zone_names.py`: uniform random
   moves, with the phase ended early at 2, 5 or 10% of decisions depending on the
   seed. Shares under trained play will differ.
-- One rule question about carried units stays open: the engine lets a nation's
-  own unit stay aboard its air transport after the Noncombat Movement Phase,
-  which RB 11.3.1 never describes
-  ([record](zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)).
+- A nation's own unit may stay aboard its own air transport after the
+  Noncombat Movement Phase, and the engine allows it. RB 11.3.1 lets the
+  transport pick its cargo up before or during its noncombat move and keep
+  moving after it unloads in a Friendly-possessed land zone, but does not
+  require it to unload. This record first called it an open question, as the
+  design document and the
+  [record of 5 November](zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)
+  did; the user pointed out the same day that the rule says no such thing.

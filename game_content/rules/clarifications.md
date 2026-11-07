@@ -490,9 +490,10 @@ port); §12.3 p80 (placing upgrades); §13.1.5 pp89-92 and §13.1.6 p92 (what ea
 transport carries).
 
 **Question:** a unit can still be aboard a transport when its owner places
-upgrades in the Place Units Phase: on a ship at sea or in port, or, as an
-ally's unit, on an air transport, which it boards on its own turn and leaves on
-its next (§§11.3.1 and 11.4.1). Two questions follow.
+upgrades in the Place Units Phase: on a ship at sea or in port, or on an air
+transport. §11.3.1 does not require an air transport to unload its cargo, and
+an ally's unit boards on its own turn and leaves on its next (§§11.3.1 and
+11.4.1). Two questions follow.
 
 - An upgrade can turn it into a unit the transport may not carry. An air
   transport carries one infantry-class unit, a Heavy Air Transport also

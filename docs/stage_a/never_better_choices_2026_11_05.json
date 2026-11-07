@@ -42,7 +42,8 @@
  "rules": {
   "RB 11.4.1": "naval cargo is unloaded into adjacent land zones; an ally's unit loads on its own turn, rides on yours, unloads on its next",
   "RB 11.5": "a naval transport may go in port with or without cargo; unloading is decided as it berths; unloaded cargo cannot move for the rest of the Calendar Turn",
-  "RB 11.3.1": "an air transport picks its cargo up before or during its noncombat move and unloads it in a Friendly-possessed land zone; an ally's unit loads on its own turn and unloads on its next",
+  "RB 11.3.1": "an air transport may pick its cargo up before or during its noncombat move and keep moving after unloading it in a Friendly-possessed land zone; nothing requires it to unload; an ally's unit loads on its own turn and unloads on its next",
+  "RB 11.3.1 correction": "6 November 2026: the first version said the transport unloads its cargo; the rule does not require that (pointed out by the user)",
   "RB 10.6.5": "carpet bombing attacks only land units",
   "RB 12.7": "controlled minor powers make recruitment rolls; success gives 1 infantry or 2 militia, a ship advance or a facility repair",
   "RB 8.2.1": "Improved Construction: -1 IPP per stage for facilities, facility upgrades and naval units, or the first two stages condensed into one"

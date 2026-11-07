@@ -107,19 +107,20 @@ The rules let a unit still be aboard then in these cases:
   and unload on its next, so it is aboard through its own Place Units Phase. In
   this scenario the CCP and Mongolia are both in the Comintern, and both may
   own air transports and infantry.
+- **A nation's own unit on its own air transport.** RB 11.3.1 lets the
+  transport pick its cargo up before or during its noncombat move and keep
+  moving after it unloads in a Friendly-possessed land zone. It does not
+  require the transport to unload.
 
-A nation's own unit on its own air transport is another matter. RB 11.3.1 has
-the transport pick it up before or during the noncombat move and unload it in a
-Friendly-possessed land zone, and never says it may stay aboard afterwards. The
-engine lets it stay: when an air transport lands only militia step off, under
-the user's militia ruling, and nothing unloads the rest when the phase ends. In
-seed 9239 a KMT air transport loaded an infantry and never took off. In seed
-7120 one loaded an infantry in round 8, kept it aboard for a whole round, flew
-it to Sikang in round 9 and landed without unloading it. Both reached a Place
-Units Phase with the infantry aboard. Whether a nation's own unit may stay
-aboard its air transport after the noncombat move is a second open question.
-Requiring a nation's own cargo to leave its air transports by the end of
-Noncombat Movement would remove those two cases, but not an ally's unit aboard.
+The engine lets a nation's own unit stay aboard: when an air transport lands
+only militia step off, under the user's militia ruling, and nothing unloads the
+rest when the phase ends. In seed 9239 a KMT air transport loaded an infantry
+and never took off. In seed 7120 one loaded an infantry in round 8, kept it
+aboard for a whole round, flew it to Sikang in round 9 and landed without
+unloading it. Both reached a Place Units Phase with the infantry aboard. An
+earlier version of this record read RB 11.3.1 as having the transport unload a
+nation's own cargo, and called staying aboard a second open question. The user
+pointed out on 6 November that the rule says no such thing.
 
 The user ruled the same day that cargo may stay aboard, and that an upgrade may
 not leave a transport carrying a unit it may not carry
