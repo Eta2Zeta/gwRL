@@ -69,7 +69,8 @@
    "strategic rail move to a zone the same unit reaches by an ordinary move",
    "printed price where Improved Construction offers the discount"
   ],
-  "open": "whether to bar upgrades of units aboard ships at sea (RB 12.3)"
+  "open": "whether to bar upgrades of units aboard ships at sea (RB 12.3)",
+  "open_answered": "6 November 2026: barred; see upgrades_at_sea_2026_11_06.md"
  },
  "after_change": {
   "cpp_suites": {

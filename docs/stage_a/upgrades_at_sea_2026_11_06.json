@@ -1,0 +1,116 @@
+{
+ "date": "2026-11-06",
+ "question": "RB 12.3 requires a Supply Path to the land zone the unit is in. Should upgrades of units aboard ships at sea, which are in no land zone, be barred?",
+ "user_answer": "Yes, bar them",
+ "register": "RCL-021",
+ "rule_sources": {
+  "RB 12.3": "rulebook PDF page 80: an upgrade needs a Supply Path to the land zone of the unit receiving it",
+  "RB 11.5": "rulebook PDF pages 77-78: a ship in port is located in the land zone of its Naval Facility"
+ },
+ "unit_upgrades_in_build_charts": [
+  "infantry to motorized_infantry",
+  "militia to infantry"
+ ],
+ "engine_change": {
+  "file": "src/economy.cpp",
+  "function": "upgradeUnitLegal",
+  "added_condition": "the unit's zone is a land zone (s.territories), checked before the Supply Path",
+  "callers": [
+   "placements: unit_upgrade project, any suitable unit",
+   "placements: project with a target: flag"
+  ],
+  "lend_lease_militia_upgrade": "unchanged: already placed only on a militia in a land zone of the recipient's Home Country (RB 12.4)"
+ },
+ "records": {
+  "clarifications_sha256": "6573a4a188955387647f563e70c55f04a262bd5a36f20982dd950ccef5e0ec7c",
+  "economy_profile": "upgrades rule: unit_in_land_zone_required; source user_upgrade_at_sea_2026_11_06",
+  "rules_reader": "RCL-021 note also at rb-11-5"
+ },
+ "test": {
+  "file": "tests/economy_tests.cpp",
+  "group": "upgradesWaitAtSea",
+  "economy_groups_passed": 17
+ },
+ "mutations_caught": {
+  "land-zone condition dropped": "Upgrade offered to a unit aboard a ship at sea, which is in no land zone (RB 12.3)",
+  "every carried unit barred instead": "Militia aboard an air transport may become infantry"
+ },
+ "cpp_suites": {
+  "passed": 26,
+  "failed": 0
+ },
+ "python_suite": {
+  "tests": 455,
+  "skipped": 3,
+  "result": "OK"
+ },
+ "random_play_fuzz": {
+  "first_seed": 9000,
+  "games": 800,
+  "completed": 800,
+  "problems": 0
+ },
+ "zone_names": [
+  {
+   "first_seed": 7000,
+   "games": 240,
+   "finished": 240,
+   "decisions": 314977,
+   "early_ends": 8848,
+   "unknown": {}
+  },
+  {
+   "first_seed": 9000,
+   "games": 240,
+   "finished": 240,
+   "decisions": 312365,
+   "early_ends": 8790,
+   "unknown": {}
+  }
+ ],
+ "carried_upgrades": {
+  "seeds": "7000 to 7239 and 9239",
+  "games": 241,
+  "counted": "once per carried unit and round",
+  "before": {
+   "source": "never_better_choices_2026_11_05.json, after_change.carried_upgrades",
+   "offered": {
+    "naval_transport in a land zone": 101,
+    "naval_transport at sea": 139
+   },
+   "taken": {
+    "naval_transport in a land zone": 30,
+    "naval_transport at sea": 43
+   },
+   "games_by_place": {
+    "naval_transport in a land zone": 59,
+    "naval_transport at sea": 85
+   },
+   "air_transport_offers": 0
+  },
+  "after": {
+   "decisions": 316135,
+   "games_with_an_upgrade_offered_on_carried_unit": 59,
+   "offered": {
+    "naval_transport in a land zone": 92
+   },
+   "taken": {
+    "naval_transport in a land zone": 33
+   },
+   "games_by_place": {
+    "naval_transport in a land zone": 59
+   },
+   "air_transport_offers": 0,
+   "offers_by_port": {
+    "land_jap_honshu": 29,
+    "land_jap_kyushu": 26,
+    "land_jap_tokyo": 18,
+    "land_manchuria_rehe": 11,
+    "land_china_nanking": 3,
+    "land_formosa": 3,
+    "land_china_shantung": 2
+   }
+  }
+ },
+ "not_measured": "speed"
+}

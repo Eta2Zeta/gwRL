@@ -15,6 +15,7 @@ for it:
 - [The coordinator's column lookups, and a fused replacement](coordinator_lookups_2026_11_04.md): the lookups are 22% to 49% of the network's forward pass; PyTorch's embedding_bag makes the pass 23% to 49% faster with identical outputs; not yet in the code.
 - [One real training sample](training_sample_2026_11_05.md): what a sample stores, shown with a decision from a game played after one training batch; a fresh network gives every position the same values, so a run's first batch learns little from the search's shares.
 - [Choices that are never better](never_better_choices_2026_11_05.md): unloading every unit before the Place Units Phase is not free, since cargo aboard cannot be carpet-bombed, so cargo may stay aboard and an upgrade may not leave a transport with cargo it cannot carry (RCL-021); rail moves where an ordinary move reaches the same zone (3.0% of options) and the printed price under Improved Construction are left out; moves for another of several identical units (10.2%) and skipping the free recruitment roll remain.
+- [Upgrades wait while their unit is at sea](upgrades_at_sea_2026_11_06.md): RB 12.3 needs a Supply Path to the unit's land zone, so a unit aboard a ship at sea is no longer offered an upgrade, while one aboard a ship in port still is (RCL-021); in 241 random games such offers at sea fell from 139 to none.
 
 The earlier records (the first pilots, the three-round experiment and the
 performance work on the replaced graph input) are summarized in the

@@ -295,18 +295,19 @@
       "id": "RCL-021",
       "category": "project",
       "title": "Upgrading a unit aboard a transport",
-      "body": "Project ruling: an upgrade may not be placed on a unit aboard a transport if the transport could not carry its cargo afterwards. It stays on the build queue until it can reach a suitable unit. An infantry aboard an air transport may not become motorized infantry, and of two infantry aboard one naval transport only one may. A militia aboard an air transport may still become infantry, and cargo may still stay aboard. Whether a unit aboard a ship at sea may be upgraded at all is not settled.",
+      "body": "Project ruling: an upgrade may not be placed on a unit aboard a transport if the transport could not carry its cargo afterwards, nor on a unit aboard a ship at sea, which is in no land zone. Aboard a ship in port, which is located in the land zone, it may. Either way the upgrade stays on the build queue until it can reach a suitable unit. An infantry aboard an air transport may not become motorized infantry, and of two infantry aboard one naval transport only one may. A militia aboard an air transport may still become infantry, and cargo may still stay aboard.",
       "section_ids": [
         "rb-8-4",
         "rb-11-3-1",
+        "rb-11-5",
         "rb-12-3"
       ],
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "authority": "User-adopted interpretation",
       "scope": "prior_register_outside_pilot",
       "reference_url": "../clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport",
       "reference_label": "Rule register",
-      "authority_detail": "The user adopted this on 5 November 2026. The rulebook limits what each transport carries but does not say whether a carried unit may be upgraded; the engine had placed such upgrades, and in random play an air transport came to carry motorized infantry."
+      "authority_detail": "The user adopted this on 5 November 2026 and the part on ships at sea on 6 November 2026. The rulebook limits what each transport carries and requires a Supply Path to the unit's land zone, but does not say how either applies to carried units; the engine had placed such upgrades, and in random play an air transport came to carry motorized infantry and infantry were upgraded aboard ships at sea."
     }
   ]
 }

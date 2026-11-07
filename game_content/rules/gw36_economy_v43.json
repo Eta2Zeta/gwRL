@@ -72,7 +72,16 @@
       "question": "May a unit aboard a transport be upgraded into a unit the transport may not carry, such as an infantry aboard an air transport into motorized infantry?",
       "quote": "if there are cases where not unloading is better we then should keep the option of having them loaded, lets just make it not allowed to upgrade a loaded unit to something not carry-able then",
       "ruling": "An upgrade is not placed on a unit aboard a transport when the transport could not carry its cargo afterwards; the upgrade stays on the build queue until it can reach a suitable unit (RB 12.3). Cargo may still stay aboard.",
-      "scope": "Recorded as RCL-021. Whether a unit aboard a ship at sea may be upgraded at all is not settled by this ruling."
+      "scope": "Recorded as RCL-021. Whether a unit aboard a ship at sea may be upgraded at all was settled separately on 6 November 2026 (user_upgrade_at_sea_2026_11_06)."
+    },
+    {
+      "id": "user_upgrade_at_sea_2026_11_06",
+      "kind": "user_ruling",
+      "date": "2026-11-06",
+      "question": "RB 12.3 requires a Supply Path to the land zone the unit is in. Should upgrades of units aboard ships at sea, which are in no land zone, be barred?",
+      "quote": "Yes, bar them",
+      "ruling": "An upgrade is not placed on a unit aboard a ship at sea; it stays on the build queue until it can reach a suitable unit (RB 12.3). A ship in port is located in the land zone of its Naval Facility (RB 11.5), so its cargo may be upgraded there.",
+      "scope": "Recorded in RCL-021."
     }
   ],
   "rules": [
@@ -220,7 +229,8 @@
         "supply_required": true,
         "militia_upgrades_per_turn": 2,
         "motorization_upgrades_per_turn": 2,
-        "carried_unit_stays_carriable": true
+        "carried_unit_stays_carriable": true,
+        "unit_in_land_zone_required": true
       },
       "source_refs": [
         {
@@ -234,7 +244,15 @@
           "section": "8.4;12.3"
         },
         {
+          "source_id": "rulebook",
+          "pdf_page": 78,
+          "section": "11.5"
+        },
+        {
           "source_id": "user_upgrade_aboard_transport_2026_11_05"
+        },
+        {
+          "source_id": "user_upgrade_at_sea_2026_11_06"
         }
       ],
       "clarification": "RCL-021"

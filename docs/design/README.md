@@ -794,17 +794,17 @@ measured and what would settle it.
   railroad was damaged this turn, is counted for the whole position, and a
   battle note's numbers are added into one answer. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
-- **Upgrades of units aboard ships at sea.** RB 12.3 asks for a Supply Path to
-  the land zone the unit is in, so a unit aboard a ship at sea may not be
-  upgraded, but the engine offers such upgrades: 89 of 241 random games did.
-  Since 5 November an upgrade may not leave a transport carrying a unit it may
-  not carry
-  ([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)),
-  which ended the case where an air transport came to carry motorized infantry.
-  The engine still lets a nation's own unit stay aboard its air transport after
-  the noncombat move, which the rules never describe. Whether to bar upgrades at
-  sea awaits the user
+- **A nation's own unit may stay aboard its air transport** after the
+  Noncombat Movement Phase, which RB 11.3.1 never describes. The engine allows
+  it, and
+  [RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)
+  keeps cargo aboard because staying can be better, but no ruling says whether
+  the rules allow this case
   ([record](../stage_a/zone_name_check_early_end_2026_11_05.md#upgrades-on-units-aboard-a-transport)).
+  Upgrades of carried units follow RCL-021 either way: none may leave a
+  transport carrying a unit it may not carry, and since 6 November none reaches
+  a unit aboard a ship at sea, which RB 12.3 rules out
+  ([record](../stage_a/upgrades_at_sea_2026_11_06.md)).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
   replays in builds with memory checks did not reproduce it. Two crashes close

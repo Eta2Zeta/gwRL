@@ -125,7 +125,8 @@ The user ruled the same day that cargo may stay aboard, and that an upgrade may
 not leave a transport carrying a unit it may not carry
 ([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport);
 [record](never_better_choices_2026_11_05.md#the-users-decision)). Upgrades of
-units aboard ships at sea are still offered.
+units aboard ships at sea were still offered until the user barred them on
+6 November ([record](upgrades_at_sea_2026_11_06.md)).
 
 ## Earlier records
 

@@ -309,6 +309,15 @@ bool upgradeFacilityLegal(const State &s, const BuildChartRow &row, const Facili
     return s.territories.at(f.zone).possessor == row.nation && row.upgradesFrom == f.type &&
            !flag(f.flags, "moved_this_turn") && siteLegal(s, row, f.zone, border, f.id);
 }
+// RB 12.3 needs a Supply Path to the land zone the unit is in, so a unit aboard
+// a ship at sea, in no land zone, cannot be upgraded until it is ashore or in
+// port (RCL-021).
+bool upgradeUnitLegal(const State &s, const Id &nation, const BuildChartRow &row, const UnitState &u,
+                      const Id &type) {
+    return u.owner == nation && row.upgradesFrom == u.type && !flag(u.turnFlags, "placed_this_turn") &&
+           s.territories.contains(u.zone) && inSupply(s, nation, u.zone) && upgradeKeepsCargo(s, u, type) &&
+           (u.type != "militia" || value(s.nations.at(nation).turnFlags, "economy_militia_upgrades") < 2);
+}
 void copyMetadata(BuildProject &p, const BuildChartRow &row, const PriceOption &price) {
     p.flags["row:" + row.id] = 1;
     p.flags["price:" + price.method] = 1;
@@ -327,9 +336,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
     const auto *row = projectRow(s, p);
     if (flag(p.flags, "unit_upgrade") && row) {
         for (const auto &[id, u] : s.units)
-            if (u.owner == n && row->upgradesFrom == u.type && !flag(u.turnFlags, "placed_this_turn") &&
-                inSupply(s, n, u.zone) && upgradeKeepsCargo(s, u, p.type) &&
-                (u.type != "militia" || value(s.nations.at(n).turnFlags, "economy_militia_upgrades") < 2))
+            if (upgradeUnitLegal(s, n, *row, u, p.type))
                 out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"target", V(id)}}));
         return out;
     }
@@ -343,11 +350,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
     if (target) {
         const auto unit = s.units.find(*target);
         const auto fac = s.facilities.find(*target);
-        if (unit != s.units.end() && unit->second.owner == n &&
-            !flag(unit->second.turnFlags, "placed_this_turn") && inSupply(s, n, unit->second.zone) && row &&
-            row->upgradesFrom == unit->second.type && upgradeKeepsCargo(s, unit->second, p.type) &&
-            (unit->second.type != "militia" ||
-             value(s.nations.at(n).turnFlags, "economy_militia_upgrades") < 2))
+        if (unit != s.units.end() && row && upgradeUnitLegal(s, n, *row, unit->second, p.type))
             out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"target", V(*target)}}));
         if (fac != s.facilities.end() && s.territories.at(fac->second.zone).possessor == n &&
             inSupply(s, n, fac->second.zone) && row && row->upgradesFrom == fac->second.type)

@@ -684,6 +684,41 @@ void upgradesKeepCargo() {
           "Remaining upgrade lost its suitable unit or reached the air cargo");
     s.validate();
 }
+void upgradesWaitAtSea() {
+    auto s = fixture();
+    s.construction.clear();
+    s.nations.at("japan").treasury = 100;
+    addUnit(s, "ship", "naval_transport", "japan", tokyo);
+    addUnit(s, "sailor", "infantry", "japan", tokyo);
+    addUnit(s, "sailor_militia", "militia", "japan", tokyo);
+    board(s, "ship", "sailor");
+    board(s, "ship", "sailor_militia");
+    const auto sea = navalFacilitySeaZones(s, "facility_tokyo_major_shipyard").front();
+    for (const Id id : {"ship", "sailor", "sailor_militia"})
+        s.units.at(id).zone = sea;
+    finishResearch(s);
+    buy(s, "japan_major_infantry_to_motorized_infantry");
+    buy(s, "japan_major_militia_to_infantry");
+    s.clock.phase = Phase::PlaceUnits;
+    const auto offered = [&](const Id &target, const Id &type) {
+        return offers(s, "economy_place", [&](const auto &a) {
+            const auto *t = a.parameters.find("target");
+            return t && t->asString() == target &&
+                   s.construction.at(a.parameters.require("project").asString()).type == type;
+        });
+    };
+    // A Supply Path reaches the sea zone, so only the land-zone rule withholds these.
+    check(inSupply(s, "japan", sea), "Fixture sea zone is out of supply");
+    check(!offered("sailor", "motorized_infantry") && !offered("sailor_militia", "infantry"),
+          "Upgrade offered to a unit aboard a ship at sea, which is in no land zone (RB 12.3)");
+    s.validate();
+    for (const Id id : {"ship", "sailor", "sailor_militia"})
+        s.units.at(id).zone = tokyo;
+    s.units.at("ship").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+    check(offered("sailor", "motorized_infantry") && offered("sailor_militia", "infantry"),
+          "Upgrade withheld from cargo aboard a ship in port, which stands in the port's land zone");
+    s.validate();
+}
 void replacementUpgradeAndEliteLease() {
     auto s = fixture();
     s.construction.clear();
@@ -733,7 +768,7 @@ int main() {
                                  constructionAndCapture, cityAndRailRepair, ladaoLease, sharedShipyardRepair,
                                  upgradesDiscountsAndCaps, foreignRailConsent, oneRailroadPerBorder, leaseCredits,
                                  accountingReplay,
-                                 replacementUpgradeAndEliteLease, upgradesKeepCargo}) {
+                                 replacementUpgradeAndEliteLease, upgradesKeepCargo, upgradesWaitAtSea}) {
             test();
             ++count;
         }
