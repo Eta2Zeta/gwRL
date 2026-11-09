@@ -1,4 +1,5 @@
 """Local viewer boundaries and portable packaging; no browser or training needed."""
+import base64
 from http.client import HTTPConnection
 import json
 from pathlib import Path
@@ -23,6 +24,13 @@ class CampaignViewerTests(unittest.TestCase):
         self.addCleanup(self.scratch.cleanup)
         self.path = Path(self.scratch.name) / "recording.json"
         self.path.write_text(json.dumps(fixture()))
+        self.board_art = Path(self.scratch.name) / "board.png"
+        self.board_art.write_bytes(base64.b64decode(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNg"
+            "YGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC"))
+        map_patch = patch.object(viewer, "BOARD_ART", self.board_art)
+        map_patch.start()
+        self.addCleanup(map_patch.stop)
 
     def server(self):
         server = viewer.make_server([self.path], port=0)
@@ -48,7 +56,12 @@ class CampaignViewerTests(unittest.TestCase):
         status, headers, body = self.request(server, "/")
         self.assertEqual(status, 200)
         self.assertIn(b"Campaign Observatory", body)
+        self.assertIn(b'href="./campaign-map.png"', body)
         self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
+        status, headers, body = self.request(server, "/campaign-map.png")
+        self.assertEqual((status, headers["Content-Type"], body), (200, "image/png", self.board_art.read_bytes()))
+        self.assertEqual(self.request(server, "/campaign-map.png", headers={"If-None-Match": headers["ETag"]})[0], 304)
+        self.assertEqual(self.request(server, "/map-layout.js")[0], 200)
         status, _, body = self.request(server, "/api/replays")
         self.assertEqual(status, 200)
         identity = json.loads(body)["replays"][0]["id"]
@@ -61,7 +74,8 @@ class CampaignViewerTests(unittest.TestCase):
         status, headers, body = self.request(server, "/app.js", method="HEAD")
         self.assertEqual((status, body), (200, b""))
         self.assertGreater(int(headers["Content-Length"]), 0)
-        for path in ("/AGENTS.md", "/%2e%2e/AGENTS.md", "/api/replays/../../AGENTS.md", "/api/replays/missing"):
+        for path in ("/AGENTS.md", "/%2e%2e/AGENTS.md", "/api/replays/../../AGENTS.md", "/api/replays/missing",
+                     "/game_content/maps/gw36map_full.png"):
             self.assertEqual(self.request(server, path)[0], 404, path)
         self.assertEqual(self.request(server, "/", method="POST")[0], 501)
         self.assertEqual(self.request(server, "/", headers={"Host": "unrelated.example"})[0], 403)
@@ -87,13 +101,27 @@ class CampaignViewerTests(unittest.TestCase):
         self.assertIn(r"\u003c/script\u003e", page)
         self.assertNotIn('src="./app.js"', page)
         self.assertNotIn('href="./style.css"', page)
-        self.assertNotRegex(page, r"from\s+['\"]\./model.js")
+        self.assertNotRegex(page, r"from\s+['\"]\./(?:model|map-layout)\.js")
+        self.assertNotIn('href="./campaign-map.png"', page)
+        image = re.search(r'href="data:image/png;base64,([^"]+)"', page)
+        self.assertIsNotNone(image)
+        self.assertEqual(base64.b64decode(image.group(1)), self.board_art.read_bytes())
         scripts = re.findall(r'<script type="module">([\s\S]*?)</script>', page)
         self.assertEqual(len(scripts), 1)
         script = Path(self.scratch.name) / "viewer.mjs"
         script.write_text(scripts[0])
         checked = subprocess.run(["node", "--check", str(script)], capture_output=True, text=True)
         self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    def test_missing_local_artwork_preserves_served_and_portable_viewers(self):
+        self.board_art.unlink()
+        server = self.server()
+        self.assertEqual(self.request(server, "/campaign-map.png")[0], 404)
+        status, _, body = self.request(server, "/")
+        self.assertEqual(status, 200)
+        for page in (body.decode(), viewer.standalone_html(fixture())):
+            self.assertIn('data-missing="true"', page)
+            self.assertNotIn('href="./campaign-map.png"', page)
 
     def test_portable_export_never_overwrites_existing_file(self):
         output = Path(self.scratch.name) / "viewer.html"

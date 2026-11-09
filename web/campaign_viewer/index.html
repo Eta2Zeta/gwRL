@@ -31,8 +31,17 @@
     </section>
     <div class="workspace">
       <section class="map-panel panel" aria-label="Campaign map">
-        <div class="panel-heading"><div><h2>Theatre map</h2><span class="caption">Geographic schematic · zoom in and drag to inspect</span></div><div class="map-controls"><label><input type="checkbox" id="show-connections"> Connections</label><div class="zoom-controls"><button id="zoom-out" class="icon-button" title="Zoom out" aria-label="Zoom map out" disabled>−</button><span id="zoom-level" aria-live="polite">100%</span><button id="zoom-in" class="icon-button" title="Zoom in" aria-label="Zoom map in">+</button><button id="reset-view" class="icon-button" title="Show full map" aria-label="Reset map to full view">↺</button></div></div></div>
-        <div class="map-container" id="map-container"><svg id="map" viewBox="0 0 1400 1000" role="group" aria-label="Schematic campaign map. Choose a location to inspect it."></svg><div id="map-empty" class="map-empty"><span aria-hidden="true">◈</span><strong>Your campaign, decision by decision.</strong><p>Load a recording above. This viewer reads saved events; it does not run the engine or train a network.</p></div></div>
+        <div class="panel-heading"><div><h2>Theatre map</h2><span class="caption">Counters show units · scroll or pinch to zoom · drag to pan</span></div><div class="map-controls"><label><input type="checkbox" id="show-connections"> Connections</label><div class="zoom-controls"><button id="zoom-out" class="icon-button" title="Zoom out" aria-label="Zoom map out" disabled>−</button><span id="zoom-level" aria-live="polite">100%</span><button id="zoom-in" class="icon-button" title="Zoom in" aria-label="Zoom map in">+</button><button id="reset-view" class="icon-button" title="Show full map" aria-label="Reset map to full view">↺</button></div></div></div>
+        <div class="map-container" id="map-container"><svg id="map" viewBox="0 0 2197 1774" tabindex="0" role="group" aria-label="China campaign board. Choose a location to inspect it. Use the arrow keys to pan and plus or minus to zoom.">
+            <defs>
+              <marker id="move-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 1 1 L 11 6 L 1 11 Z" fill="#ffd15a" stroke="#513710" stroke-width="1"/>
+              </marker>
+            </defs>
+            <image id="board-art" href="./campaign-map.png" x="0" y="0" width="2197" height="1774" aria-hidden="true"/>
+            <g id="map-overlays"></g>
+          </svg><div id="map-empty" class="map-empty"><span aria-hidden="true">◈</span><strong>Your campaign, decision by decision.</strong><p>Load a recording above. This viewer reads saved events; it does not run the engine or train a network.</p></div></div>
+        <p id="map-art-status" class="map-art-status" role="status" hidden>To include the printed board, place gw36map_china_campaign.png in game_content/maps, then reload the local viewer or export a new standalone page.</p>
         <div class="map-legend"><span><i style="--faction:#b54d43"></i>Japan</span><span><i style="--faction:#34658a"></i>KMT</span><span><i style="--faction:#ad812b"></i>CCP</span><span><i style="--faction:#4f7c63"></i>Mongolia</span><span><i style="--faction:#858073"></i>Other nations</span><span class="legend-highlight"><i></i>Changed this event</span></div><div class="politics-status" id="politics-status"></div>
       </section>
       <aside class="inspector panel" aria-label="Location inspector"><div class="panel-heading"><h2>Location inspector</h2><span class="small-tag" id="location-type">MAP</span></div><div id="location-details" class="inspector-body"><div class="empty-detail"><span aria-hidden="true">⌖</span><h3>Select a location</h3><p>Inspect its possessor, units, facilities and work in progress.</p></div></div></aside>

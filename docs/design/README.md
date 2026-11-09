@@ -774,22 +774,26 @@ action and search details or its dice record.
 [Recorder](../../studies/campaign/learning.py) · [Replay builder](../../studies/campaign/replay.py)
 
 **From replay to screen.** A local Python server serves the selected recording
-and the four frontend files directly from `web/campaign_viewer/`. The browser
+and the frontend files directly from `web/campaign_viewer/`. The browser
 loads the JavaScript as native modules. The server can also follow a growing
 trace. With *Follow latest* enabled, the browser checks every two seconds and
 the server applies newly completed records. For offline viewing, the same
-Python module can package the recording, styles and scripts into one HTML file.
+Python module can package the recording, board image, styles and scripts into
+one HTML file.
 [Server and HTML export](../../studies/campaign/viewer.py) · [Launch commands](../../web/campaign_viewer/README.md)
 
 **How the browser draws a position.** The HTML defines the map, inspector,
 timeline and analysis panels. The stylesheet arranges them. When you move the
 timeline, `model.js` applies recorded changes from the current position or a
 cached earlier one. In `app.js`, `seek()` compares the selected position with
-its predecessor and redraws the panels. The map renderer places 31 land zones
-and six sea zones at hand-set SVG coordinates. The scenario supplies their
-names and connections. The selected position supplies possession, units and
-battles, and the last move supplies the route for a movement arrow.
-[Layout](../../web/campaign_viewer/index.html) · [Styles](../../web/campaign_viewer/style.css) · [Replay model](../../web/campaign_viewer/model.js) · [Rendering and controls](../../web/campaign_viewer/app.js)
+its predecessor and redraws the panels. The SVG uses the pixel coordinates of
+the China campaign board image. Each of the 31 land pins marks its printed
+territory roundel, and each of the six sea pins sits inside its zone. Scenario
+connections and recorded movement routes use the same pins. Zooming enlarges
+the board under them. The labels keep a minimum screen size, adding location
+names and stacks by nation as space allows. Selecting a label opens its full
+location record at any zoom.
+[Layout](../../web/campaign_viewer/index.html) · [Board coordinates](../../web/campaign_viewer/map-layout.js) · [Styles](../../web/campaign_viewer/style.css) · [Replay model](../../web/campaign_viewer/model.js) · [Rendering and controls](../../web/campaign_viewer/app.js)
 
 For example, at event 12 of the seed-1951 benchmark, the journal records Ma
 Clique joining KMT after the CCP attack, and Tsinghai's map card now shows KMT

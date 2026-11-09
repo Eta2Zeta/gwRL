@@ -6,6 +6,7 @@ are served. This process does not run search, update models, or expose a shell.
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -17,13 +18,26 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "web/campaign_viewer"
+BOARD_ART = ROOT / "game_content/maps/gw36map_china_campaign.png"
 DEFAULT_DIRECTORY = ROOT / "output/campaign_viewer/replays"
 SCHEMA = "campaign-replay-v1"
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/index.html": ("index.html", "text/html; charset=utf-8"),
           "/style.css": ("style.css", "text/css; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
-          "/model.js": ("model.js", "text/javascript; charset=utf-8")}
+          "/model.js": ("model.js", "text/javascript; charset=utf-8"),
+          "/map-layout.js": ("map-layout.js", "text/javascript; charset=utf-8")}
+
+
+def viewer_page(*, embed_map: bool = False) -> str:
+    page = (ASSETS / "index.html").read_text(encoding="utf-8")
+    reference = 'href="./campaign-map.png"'
+    if not BOARD_ART.is_file():
+        return page.replace(reference, 'data-missing="true"')
+    if embed_map:
+        encoded = base64.b64encode(BOARD_ART.read_bytes()).decode("ascii")
+        return page.replace(reference, f'href="data:image/png;base64,{encoded}"')
+    return page
 
 
 def read_replay(path: Path) -> dict:
@@ -126,9 +140,20 @@ def make_server(paths: list[Path], *, port: int = 8765, live_traces: list[Path] 
                 return
             path = unquote(urlsplit(self.path).path)
             try:
-                if path in STATIC:
+                if path == "/campaign-map.png":
+                    if not BOARD_ART.is_file():
+                        self._reply(404, b"Campaign map artwork is missing", "text/plain; charset=utf-8")
+                        return
+                    info = BOARD_ART.stat()
+                    etag = f'W/"{info.st_mtime_ns:x}-{info.st_size:x}"'
+                    if self.headers.get("If-None-Match") == etag:
+                        self._reply(304, b"", "image/png", etag)
+                    else:
+                        self._reply(200, BOARD_ART.read_bytes(), "image/png", etag)
+                elif path in STATIC:
                     name, kind = STATIC[path]
-                    self._reply(200, (ASSETS / name).read_bytes(), kind)
+                    body = viewer_page().encode() if name == "index.html" else (ASSETS / name).read_bytes()
+                    self._reply(200, body, kind)
                 elif path == "/api/replays":
                     body = json.dumps(registry.catalog(), ensure_ascii=False, allow_nan=False).encode()
                     self._reply(200, body, "application/json; charset=utf-8")
@@ -155,17 +180,20 @@ def standalone_html(replay: dict) -> str:
     """Package the same viewer with its recording; no server or CDN is needed."""
     if replay.get("schema") != SCHEMA:
         raise ValueError("Expected campaign-replay-v1 data")
-    page = (ASSETS / "index.html").read_text()
+    page = viewer_page(embed_map=True)
     css = (ASSETS / "style.css").read_text()
-    model = (ASSETS / "model.js").read_text()
     app = (ASSETS / "app.js").read_text()
-    app, count = re.subn(r"\Aimport\s+\{[\s\S]*?\}\s+from\s+['\"]\./model\.js['\"];\s*", "", app, count=1)
-    if count != 1:
-        raise ValueError("Viewer model import no longer matches the standalone packager")
+    dependencies = []
+    for filename in ("model.js", "map-layout.js"):
+        pattern = rf"^import\s+\{{[^}}]*\}}\s+from\s+['\"]\./{re.escape(filename)}['\"];\s*"
+        app, count = re.subn(pattern, "", app, count=1, flags=re.MULTILINE)
+        if count != 1:
+            raise ValueError(f"Viewer import for {filename} no longer matches the standalone packager")
+        dependencies.append((ASSETS / filename).read_text())
     data = json.dumps(replay, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
     data = data.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     data = data.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
-    script = f"globalThis.CAMPAIGN_REPLAY={data};\n{model}\n{app}"
+    script = "\n".join([f"globalThis.CAMPAIGN_REPLAY={data};", *dependencies, app])
     script = script.replace("</script", "<\\/script")
     page = page.replace('<link rel="stylesheet" href="./style.css">', f"<style>{css}</style>")
     page = page.replace('<script type="module" src="./app.js"></script>',

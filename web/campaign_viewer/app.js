@@ -2,37 +2,23 @@ import { createReplayModel, displayName, eventSummary, factionColor, locationOf,
   ownerOf, recordEntries, changedLocations, territoryIdentity, possessionChanges,
   possessionChangeText, diceReport, activeBattles, stageLabel, politicalStatus, movementPath,
   movementStops } from './model.js';
+import { BOARD_WIDTH, BOARD_HEIGHT, BOARD_POSITIONS } from './map-layout.js';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
+const MAX_MAP_ZOOM = 8;
 const UI = { replay: null, model: null, position: 0, state: null, selected: null,
   playing: false, timer: null, showConnections: false, catalog: [], loadToken: 0,
   sourceId: null, replaySourceId: null, etag: null, followTimer: null, refreshInFlight: false,
-  zoom: 1, view: { x:0, y:0, width:1400, height:1000 }, drag: null, suppressClickUntil: 0 };
+  zoom: 1, view: { x: 0, y: 0, width: BOARD_WIDTH, height: BOARD_HEIGHT },
+  pointers: new Map(), mapDragging: false, suppressClickUntil: 0 };
 const present = (value) => value !== null && value !== undefined && value !== '';
 const number = (value, digits = 0) => present(value) && Number.isFinite(Number(value))
   ? Number(value).toLocaleString(undefined, { maximumFractionDigits: digits }) : '—';
 const percent = (value) => present(value) && Number.isFinite(Number(value)) ? `${(Number(value) * 100).toFixed(1)}%` : '—';
 const human = (value) => displayName(value, UI.replay);
-const POSITIONS = {
-  land_mongolia_kobdo:[140,110], land_mongolia_ulyassutai:[310,100],
-  land_mongolia_central_mongolia:[485,115], land_mongolia_kerulen:[655,110],
-  land_manchuria_northern:[875,85], land_manchuria_eastern:[945,195],
-  land_manchuria_western:[775,185], land_manchuria_rehe:[750,285],
-  land_china_sinkiang:[140,300], land_china_tsinghai:[310,385],
-  land_china_suiyuan:[485,285], land_china_beiping:[625,365],
-  land_china_hopeh:[590,465], land_china_shantung:[780,500],
-  land_china_shensi:[430,510], land_tibet:[125,550],
-  land_china_sikang:[270,580], land_china_szechwan:[445,640],
-  land_china_nanking:[780,615], land_china_hunan:[625,705],
-  land_china_kweichow:[465,770], land_china_yunnan:[300,830],
-  land_kwangtung:[750,825], land_hainan:[735,940], land_formosa:[1010,725],
-  land_korea:[1000,365], land_jap_hokkaido:[1240,105],
-  land_jap_honshu:[1245,285], land_jap_tokyo:[1270,390],
-  land_jap_kyushu:[1150,515], land_jap_okinawa:[1190,700],
-  sea_p14:[840,390], sea_p15:[1000,485], sea_p16:[1120,235],
-  sea_p32:[975,605], sea_p33:[1000,850], sea_p41:[890,940],
-};
+let mapLabels = [];
+let lastMapScale = 0;
 function element(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -50,9 +36,10 @@ function notice(message = '') {
   $('notice').hidden = !message;
 }
 function positionFor(id, index = 0) {
+  if (Object.hasOwn(BOARD_POSITIONS, id)) return BOARD_POSITIONS[id];
   const custom = UI.replay?.map?.nodes?.[id]?.display_position;
   if (Array.isArray(custom) && custom.length === 2 && custom.every(Number.isFinite)) return custom;
-  return POSITIONS[id] || [120 + (index % 7) * 180, 110 + Math.floor(index / 7) * 150];
+  return [120 + (index % 7) * 180, 110 + Math.floor(index / 7) * 150];
 }
 function clockText(clock) {
   if (!clock) return '—';
@@ -118,34 +105,58 @@ function renderClock() {
 function unitsAt(id) {
   return recordEntries(UI.state.units).map(([, record]) => record).filter((record) => locationOf(record) === id);
 }
-function updateMapView(){
-  const view=UI.view;
-  $('map').setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);
-  $('map').style.cursor=UI.zoom>1?(UI.drag?'grabbing':'grab'):'';
-  $('zoom-level').textContent=`${Math.round(UI.zoom*100)}%`;
-  $('zoom-out').disabled=UI.zoom<=1;
-  $('zoom-in').disabled=UI.zoom>=4;
+// The SVG fits its viewBox with xMidYMid meet. Account for the margins when
+// converting pointer coordinates in CSS pixels to positions on the board.
+function mapViewport() {
+  const rect = $('map').getBoundingClientRect();
+  const scale = Math.min(rect.width / UI.view.width, rect.height / UI.view.height) || 1;
+  return { scale, left: rect.left + (rect.width - UI.view.width * scale) / 2,
+    top: rect.top + (rect.height - UI.view.height * scale) / 2 };
 }
-function zoomMap(factor){
-  const zoom=Math.max(1,Math.min(4,UI.zoom*factor));
-  const centerX=UI.view.x+UI.view.width/2;
-  const centerY=UI.view.y+UI.view.height/2;
-  const width=1400/zoom;const height=1000/zoom;
-  UI.zoom=zoom;UI.view={x:Math.max(0,Math.min(1400-width,centerX-width/2)),y:Math.max(0,Math.min(1000-height,centerY-height/2)),width,height};
+
+function updateMapView() {
+  const view = UI.view;
+  $('map').setAttribute('viewBox', `${view.x} ${view.y} ${view.width} ${view.height}`);
+  $('map').style.cursor = UI.mapDragging ? 'grabbing' : UI.zoom > 1 ? 'grab' : '';
+  $('zoom-level').textContent = `${Math.round(UI.zoom * 100)}%`;
+  $('zoom-out').disabled = UI.zoom <= 1;
+  $('zoom-in').disabled = UI.zoom >= MAX_MAP_ZOOM;
+  layoutMapNodes();
+}
+
+function setMapView(zoom, x, y) {
+  const width = BOARD_WIDTH / zoom;
+  const height = BOARD_HEIGHT / zoom;
+  UI.view = { x: Math.max(0, Math.min(BOARD_WIDTH - width, x)),
+    y: Math.max(0, Math.min(BOARD_HEIGHT - height, y)), width, height };
+  UI.zoom = zoom;
   updateMapView();
 }
-function resetMapView(){UI.zoom=1;UI.view={x:0,y:0,width:1400,height:1000};UI.drag=null;updateMapView();}
-function renderMap(changed = new Set(), before = null) {
-  const map = $('map');
-  map.replaceChildren();
-  const defs = svgElement('defs');
-  const marker = svgElement('marker', { id:'move-arrow', viewBox:'0 0 10 10', refX:9, refY:5, markerWidth:5, markerHeight:5, orient:'auto-start-reverse' });
-  marker.append(svgElement('path', { d:'M 0 0 L 10 5 L 0 10 z', fill:'#b78331' }));
-  defs.append(marker); map.append(defs);
-  map.append(svgElement('path', { d:'M 42 220 Q 95 115 260 155 L 620 178 Q 730 130 850 145 L 960 250 L 1010 370 L 843 440 L 850 600 L 730 850 L 545 888 L 235 860 L 160 680 L 65 600 Z', class:'map-land-wash' }));
-  for (const [text, x, y] of [['M O N G O L I A',245,43],['C H I N A',270,703],['M A N C H U R I A',685,40],['J A P A N',1160,603],['W E S T E R N  P A C I F I C',1015,790]]) {
-    map.append(svgElement('text', { x,y,class:'map-region', 'font-size':text.length > 17 ? 15 : 22 }, text));
+
+// A wheel or button keeps one point fixed. A drag or pinch can move that
+// point between frames, so its old board coordinate must land under 'to'.
+function zoomMap(factor, from, to = from) {
+  const zoom = Math.max(1, Math.min(MAX_MAP_ZOOM, UI.zoom * factor));
+  const { left, top, scale } = mapViewport();
+  if (!from) {
+    from = to = { x: left + UI.view.width * scale / 2, y: top + UI.view.height * scale / 2 };
   }
+  const nextScale = scale * zoom / UI.zoom;
+  const x = UI.view.x + (from.x - left) / scale - (to.x - left) / nextScale;
+  const y = UI.view.y + (from.y - top) / scale - (to.y - top) / nextScale;
+  setMapView(zoom, x, y);
+}
+
+function resetMapView() {
+  UI.pointers.clear();
+  UI.mapDragging = false;
+  setMapView(1, 0, 0);
+}
+function renderMap(changed = new Set(), before = null) {
+  const map = $('map-overlays');
+  map.replaceChildren();
+  mapLabels = [];
+  lastMapScale = 0;
   const nodes = recordEntries(UI.replay.map.nodes);
   const indexes = new Map(nodes.map(([id], index) => [id,index]));
   const fighting = new Set(activeBattles(UI.state).map((battle) => battle.zone));
@@ -180,46 +191,167 @@ function renderMap(changed = new Set(), before = null) {
           const [x1,y1] = points[index];
           return `Q ${(x1+x2)/2+15} ${(y1+y2)/2-28} ${x2} ${y2}`;
         });
-        map.append(svgElement('path', { d:`M ${points[0][0]} ${points[0][1]} ${legs.join(' ')}`, class:'movement-line' }));
+        const d = `M ${points[0][0]} ${points[0][1]} ${legs.join(' ')}`;
+        map.append(svgElement('path', { d, class:'movement-casing' }),
+          svgElement('path', { d, class:'movement-line' }));
       }
     }
   }
   for (const [index, [id,node]] of nodes.entries()) {
-    const [x,y] = positionFor(id,index);
+    const [x, y] = positionFor(id, index);
+    const name = node.name || id;
     const identity = territoryIdentity(id, UI.state, UI.replay);
-    const owner = identity.owner;
     const sea = node.type === 'sea' || id.startsWith('sea_');
-    const group = svgElement('g', { transform:`translate(${x},${y})`, class:`map-node${sea ? ' sea-node' : ''}${id === UI.selected ? ' selected' : ''}${changed.has(id) ? ' changed' : ''}${fighting.has(id) ? ' battle' : ''}`, tabindex:0, role:'button', 'aria-label':`${node.name || id}, ${sea ? 'sea zone' : identity.subtitle}, ${unitsAt(id).length} units`, 'data-location':id, 'aria-pressed':id === UI.selected });
-    const width = Math.max(130,Math.min(170,(node.name || id).length*7.5+26));
-    if (changed.has(id)) group.append(svgElement('rect',{x:-width/2-5,y:-32,width:width+10,height:69,rx:9,class:'change-ring'}));
-    group.append(svgElement('rect',{x:-width/2,y:-27,width,height:59,rx:6,class:'node-card'}));
-    group.append(svgElement('rect',{x:-width/2,y:-27,width:5,height:59,rx:2,fill:sea ? '#8eafb7' : factionColor(owner)}));
-    group.append(svgElement('text',{x:0,y:-9,'text-anchor':'middle',class:'node-label'},node.name || id));
-    const secondary = sea ? 'Sea zone' : identity.subtitle;
-    group.append(svgElement('text',{x:0,y:5,'text-anchor':'middle',class:'node-subtitle'},secondary.length > 26 ? secondary.slice(0,25)+'…' : secondary));
-    if (node.is_city) group.append(svgElement('rect',{x:width/2-12,y:-20,width:5,height:5,class:'city-dot'}));
-    if (fighting.has(id)) group.append(svgElement('text',{x:-width/2+10,y:-11,class:'battle-mark'},'⚔'));
+    const subtitle = sea ? 'Sea zone' : identity.subtitle;
     const units = unitsAt(id);
-    const byNation = new Map();
-    for (const unit of units) { const nation = ownerOf(unit); byNation.set(nation,(byNation.get(nation)||0)+1); }
-    const stacks = [...byNation.entries()].sort((a,b)=>b[1]-a[1]);
-    if (stacks.length) {
-      const shown = stacks.slice(0,4); const pillWidth = 26;
-      shown.forEach(([nation,count],index) => {
-        const left = -shown.length*pillWidth/2+index*pillWidth;
-        group.append(svgElement('rect',{x:left,y:12,width:22,height:14,rx:3,fill:factionColor(nation),class:'unit-pill'}));
-        group.append(svgElement('text',{x:left+11,y:22,'text-anchor':'middle',class:'unit-count'},count));
-      });
-      if (stacks.length > 4) group.append(svgElement('text',{x:width/2-7,y:23,'text-anchor':'end',class:'node-subtitle'},'+'));
-    } else group.append(svgElement('text',{x:0,y:23,'text-anchor':'middle',class:'node-subtitle'},'No units'));
-    group.append(svgElement('title',{},`${node.name || id} · ${secondary} · ${units.length} units`));
-    const select = () => { if(Date.now()<UI.suppressClickUntil)return;UI.selected=id; renderMap(changed,before); renderInspector(); };
-    group.addEventListener('click',select);
-    group.addEventListener('keydown',(event)=>{ if (event.key==='Enter' || event.key===' ') { event.preventDefault();select(); } });
+    const counts = new Map();
+    for (const unit of units) {
+      const nation = ownerOf(unit);
+      counts.set(nation, (counts.get(nation) || 0) + 1);
+    }
+    const stacks = [...counts].sort((a, b) => b[1] - a[1]);
+    const description = `${name} · ${subtitle} · ${units.length} units`;
+    const inBattle = fighting.has(id);
+    const isChanged = changed.has(id);
+    const group = svgElement('g', { transform:`translate(${x},${y})`, class:
+      `map-node${sea ? ' sea-node' : ''}${inBattle ? ' battle' : ''}${isChanged ? ' changed' : ''}`,
+      tabindex:0, role:'button', 'aria-label':description, 'data-location':id, 'aria-pressed':id === UI.selected });
+    const color = sea ? '#426975' : factionColor(identity.owner);
+    const symbol = svgElement('g');
+    const leader = svgElement('line', { class:'map-leader' });
+    const pin = svgElement('circle', { r:3, class:'board-pin', fill:color });
+    const card = svgElement('g');
+    symbol.append(leader, pin, card);
+    group.append(svgElement('title', {}, description), symbol);
+    const label = { id, x, y, name, subtitle, color, total:units.length, stacks, inBattle,
+      isCity:node.is_city, isChanged, group, symbol, card, leader };
+    const select = () => {
+      if (Date.now() < UI.suppressClickUntil) return;
+      UI.selected = id;
+      for (const item of mapLabels) item.group.setAttribute('aria-pressed', item.id === id);
+      renderInspector();
+    };
+    group.addEventListener('click', select);
+    group.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(); }
+    });
+    mapLabels.push(label);
     map.append(group);
   }
   updateMapView();
 }
+// Measure labels in screen pixels. Their pins and every replay route stay in board pixels.
+function layoutMapNodes() {
+  const scale = mapViewport().scale;
+  if (!mapLabels.length || scale === lastMapScale) return;
+  lastMapScale = scale;
+  const occupied = mapLabels.map(({ x, y }) => ({
+    x: x * scale - 4, y: y * scale - 4, width: 8, height: 8,
+  }));
+  // Give every zone a counter before spending the remaining space on names and
+  // stack details. A large label can never displace another zone's counter.
+  const sizes = scale >= 0.4 ? ['counter', 'compact', 'detail'] : ['counter', 'compact'];
+  for (const size of sizes) {
+    for (const [index, label] of mapLabels.entries()) {
+      const slot = mapLabels.length + index;
+      const previous = occupied[slot];
+      occupied[slot] = null;
+      const nameWidth = Math.ceil(label.name.length * 7.1);
+      let width = nameWidth + 38;
+      let height = 24;
+      if (size === 'counter') width = Math.max(25, String(label.total).length * 8 + 14);
+      if (size === 'detail') {
+        width = Math.max(116, nameWidth + 23, Math.min(200, label.subtitle.length * 6.1 + 16));
+        height = 53;
+      }
+      const box = placeMapLabel(label.x * scale, label.y * scale, width, height, scale, occupied,
+        size === 'counter' ? occupied[index] : null);
+      occupied[slot] = !previous || !box.overlap ? { ...box, size } : previous;
+    }
+  }
+  for (const [index, label] of mapLabels.entries()) {
+    const box = occupied[mapLabels.length + index];
+    const { width, height, size } = box;
+    const x = label.x * scale;
+    const y = label.y * scale;
+    label.symbol.setAttribute('transform', `scale(${1 / scale})`);
+    label.card.setAttribute('transform', `translate(${box.x - x},${box.y - y})`);
+    label.leader.setAttribute('x2', Math.max(box.x, Math.min(x, box.x + width)) - x);
+    label.leader.setAttribute('y2', Math.max(box.y, Math.min(y, box.y + height)) - y);
+    if (label.size !== size) {
+      drawMapLabel(label, size, width, height);
+      label.size = size;
+    }
+  }
+}
+
+function placeMapLabel(x, y, width, height, scale, occupied, ownPin) {
+  const gap = 6;
+  const above = -height - gap;
+  const left = -width - gap;
+  const candidates = [
+    [-width / 2, above], [-width / 2, gap], [gap, -height / 2], [left, -height / 2],
+    [gap, above], [left, above], [gap, gap], [left, gap],
+  ];
+  if (ownPin) {
+    candidates.unshift([-width/2, -height/2]);
+    for (const distance of [14, 28, 42]) {
+      candidates.push([left-distance, -height/2], [gap+distance, -height/2],
+        [-width/2, above-distance], [-width/2, gap+distance],
+        [left-distance, above-distance], [gap+distance, above-distance],
+        [left-distance, gap+distance], [gap+distance, gap+distance]);
+    }
+  }
+  let best;
+  for (const [dx, dy] of candidates) {
+    const bx = Math.max(2, Math.min(x + dx, BOARD_WIDTH * scale - width - 2));
+    const by = Math.max(2, Math.min(y + dy, BOARD_HEIGHT * scale - height - 2));
+    let overlap = 0;
+    for (const other of occupied) {
+      if (!other || other === ownPin) continue;
+      const w = Math.min(bx + width + 2, other.x + other.width) - Math.max(bx - 2, other.x);
+      const h = Math.min(by + height + 2, other.y + other.height) - Math.max(by - 2, other.y);
+      overlap += Math.max(0, w) * Math.max(0, h);
+    }
+    if (!best || overlap < best.overlap) best = { x: bx, y: by, width, height, overlap };
+    if (!overlap) break;
+  }
+  return best;
+}
+
+function drawMapLabel(label, size, width, height) {
+  const { card, name, color, total, stacks } = label;
+  card.replaceChildren();
+  card.setAttribute('data-size', size);
+  if (label.isChanged) card.append(svgElement('rect', { x:-3, y:-3, width:width+6, height:height+6, rx:7, class:'change-ring' }));
+  card.append(svgElement('rect', { width, height, rx:4, class:'node-card' }),
+    svgElement('rect', { x:2, y:3, width:3, height:height-6, rx:1.5, fill:color }));
+  if (size === 'counter') {
+    card.append(svgElement('text', { x:width/2+2, y:15, 'text-anchor':'middle', class:'counter-total' }, total));
+  } else if (size === 'compact') {
+    card.append(svgElement('text', { x:9, y:15.5, class:'node-label' }, name),
+      svgElement('rect', { x:width-23, y:4, width:19, height:15, rx:4, class:'total-pill' }),
+      svgElement('text', { x:width-13.5, y:15.5, 'text-anchor':'middle', class:'counter-total' }, total));
+  } else {
+    card.append(svgElement('text', { x:width/2, y:15, 'text-anchor':'middle', class:'node-label' }, name),
+      svgElement('text', { x:width/2, y:30, 'text-anchor':'middle', class:'node-subtitle' },
+        label.subtitle.length > 30 ? label.subtitle.slice(0, 29) + '…' : label.subtitle));
+    if (label.isCity) card.append(svgElement('circle', { cx:width-8, cy:7, r:2, class:'city-dot' }));
+    const shown = stacks.slice(0, 4);
+    shown.forEach(([nation, count], index) => {
+      const x = (width - shown.length * 25) / 2 + index * 25;
+      card.append(svgElement('rect', { x, y:34, width:22, height:15, rx:3, fill:factionColor(nation) }),
+        svgElement('text', { x:x+11, y:45.5, 'text-anchor':'middle', class:'unit-count' }, count));
+    });
+    if (!shown.length) card.append(svgElement('text', { x:width/2, y:45, 'text-anchor':'middle', class:'node-subtitle' }, 'No units'));
+    if (stacks.length > shown.length) card.append(svgElement('text', { x:width-9, y:45, class:'node-subtitle' }, '+'));
+  }
+  if (label.inBattle) {
+    card.append(svgElement('circle', { cx:width-1, cy:0, r:8, class:'battle-disc' }),
+      svgElement('text', { x:width-1, y:4, 'text-anchor':'middle', class:'battle-mark' }, '⚔'));
+  }
+}
+
 function factsRow(container,label,value) {
   const cell = element('div'); cell.append(element('dt','',label),element('dd','',value)); container.append(cell);
 }
@@ -654,29 +786,80 @@ $('show-connections').addEventListener('change',(event)=>{UI.showConnections=eve
 $('zoom-in').addEventListener('click',()=>zoomMap(1.4));
 $('zoom-out').addEventListener('click',()=>zoomMap(1/1.4));
 $('reset-view').addEventListener('click',()=>{resetMapView();UI.selected=null;if(UI.replay){seek(UI.position);$('location-type').textContent='MAP';$('location-details').replaceChildren(element('p','empty-copy','Choose a location on the map to inspect its units and facilities.'));}});
-$('map').addEventListener('pointerdown',(event)=>{
-  if(UI.zoom<=1||(event.button!==undefined&&event.button!==0))return;
-  const rect=$('map').getBoundingClientRect();
-  UI.drag={pointer:event.pointerId,x:event.clientX,y:event.clientY,view:{...UI.view},scale:Math.min(rect.width/UI.view.width,rect.height/UI.view.height),moved:false};
-  updateMapView();
-});
-$('map').addEventListener('pointermove',(event)=>{
-  const drag=UI.drag;if(!drag||drag.pointer!==event.pointerId)return;
-  const dx=event.clientX-drag.x;const dy=event.clientY-drag.y;
-  if(!drag.moved&&Math.hypot(dx,dy)>4){drag.moved=true;$('map').setPointerCapture(event.pointerId);}
-  if(!drag.moved)return;
-  UI.view={...drag.view,x:Math.max(0,Math.min(1400-drag.view.width,drag.view.x-dx/drag.scale)),y:Math.max(0,Math.min(1000-drag.view.height,drag.view.y-dy/drag.scale))};
-  updateMapView();
-});
-function endMapDrag(event){
-  if(!UI.drag||UI.drag.pointer!==event.pointerId)return;
-  if(UI.drag.moved)UI.suppressClickUntil=Date.now()+300;
-  UI.drag=null;updateMapView();
+const mapSurface = $('map');
+if (window.ResizeObserver) new ResizeObserver(updateMapView).observe(mapSurface);
+
+mapSurface.addEventListener('wheel', (event) => {
+  if (!UI.replay || !event.deltaY) return;
+  const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? mapSurface.clientHeight : 1;
+  const factor = Math.exp(-event.deltaY * unit * 0.002);
+  if (!event.ctrlKey && ((UI.zoom === 1 && factor < 1) || (UI.zoom === MAX_MAP_ZOOM && factor > 1))) return;
+  event.preventDefault();
+  zoomMap(factor, { x: event.clientX, y: event.clientY });
+}, { passive: false });
+
+function gestureCenter() {
+  const [first, second] = UI.pointers.values();
+  if (!second) return first;
+  return { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2,
+    distance: Math.hypot(first.x - second.x, first.y - second.y) };
 }
-$('map').addEventListener('pointerup',endMapDrag);
-$('map').addEventListener('pointercancel',endMapDrag);
-$('map').addEventListener('lostpointercapture',endMapDrag);
-$('map').addEventListener('pointerleave',(event)=>{if(UI.drag&&!UI.drag.moved)endMapDrag(event);});
+function startMapDrag() {
+  UI.mapDragging = true;
+  for (const id of UI.pointers.keys()) mapSurface.setPointerCapture(id);
+}
+mapSurface.addEventListener('pointerdown', (event) => {
+  if (!UI.replay || event.button !== 0 || UI.pointers.size >= 2) return;
+  if (!UI.pointers.size) UI.suppressClickUntil = 0;
+  UI.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  if (UI.pointers.size === 2) startMapDrag();
+});
+mapSurface.addEventListener('pointermove', (event) => {
+  const previous = UI.pointers.get(event.pointerId);
+  if (!previous) return;
+  if (!UI.mapDragging) {
+    if (Math.hypot(event.clientX - previous.x, event.clientY - previous.y) <= 4) return;
+    startMapDrag();
+  }
+  const before = gestureCenter();
+  UI.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  const after = gestureCenter();
+  zoomMap(before.distance ? after.distance / before.distance : 1, before, after);
+});
+function endMapDrag(event) {
+  if (!UI.pointers.delete(event.pointerId) || !UI.mapDragging) return;
+  UI.suppressClickUntil = Date.now() + 300;
+  if (!UI.pointers.size) {
+    UI.mapDragging = false;
+    mapSurface.style.cursor = UI.zoom > 1 ? 'grab' : '';
+  }
+}
+mapSurface.addEventListener('pointerup', endMapDrag);
+mapSurface.addEventListener('pointercancel', endMapDrag);
+mapSurface.addEventListener('lostpointercapture', (event) => {
+  // Touch initially captures the node that received the press. Transferring
+  // capture to the map sends a bubbling lost event from that old target.
+  if (event.target === mapSurface) endMapDrag(event);
+});
+mapSurface.addEventListener('pointerleave', (event) => {
+  if (!UI.mapDragging) endMapDrag(event);
+});
+mapSurface.addEventListener('keydown', (event) => {
+  if (!UI.replay || event.ctrlKey || event.metaKey || event.altKey) return;
+  const { x, y, width, height } = UI.view;
+  switch (event.key) {
+    case '+': case '=': zoomMap(1.4); break;
+    case '-': zoomMap(1 / 1.4); break;
+    case '0': resetMapView(); break;
+    case 'ArrowLeft': setMapView(UI.zoom, x - width / 5, y); break;
+    case 'ArrowRight': setMapView(UI.zoom, x + width / 5, y); break;
+    case 'ArrowUp': setMapView(UI.zoom, x, y - height / 5); break;
+    case 'ArrowDown': setMapView(UI.zoom, x, y + height / 5); break;
+    default: return;
+  }
+  event.preventDefault();
+  event.stopPropagation();
+});
 document.addEventListener('keydown',(event)=>{
   if(!UI.replay||event.altKey||event.ctrlKey||event.metaKey||event.target.closest('input,select,textarea,button,[role=button],a'))return;
   if(event.key===' '){event.preventDefault();togglePlay();}
@@ -685,6 +868,9 @@ document.addEventListener('keydown',(event)=>{
   else if(event.key==='Home'){event.preventDefault();stop();seek(0);}
   else if(event.key==='End'){event.preventDefault();stop();seek(UI.replay.steps.length);}
 });
+const boardArt = $('board-art');
+$('map-art-status').hidden = boardArt.getAttribute('data-missing') !== 'true';
+boardArt.addEventListener('error', () => { $('map-art-status').hidden = false; });
 if (globalThis.CAMPAIGN_REPLAY) {
   $('recordings').replaceChildren(element('option','','Embedded campaign recording'));
   try { loadReplay(globalThis.CAMPAIGN_REPLAY); }

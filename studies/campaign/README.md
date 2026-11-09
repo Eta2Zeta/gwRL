@@ -171,7 +171,7 @@ training interface select the ordinary game interface for exact verification.
 ## Watch self-play
 
 The [Campaign Observatory](../../web/campaign_viewer/README.md)
-shows the actual game on a geographic schematic, with playback, location
+shows the actual game on the printed China campaign map, with playback, location
 inspection, dice, wealth and the search alternatives behind each choice.
 Add `--record-replay` to a fresh training command, then run
 `python -m studies.campaign.viewer --live-trace PATH_TO_RUN/replay.jsonl` and

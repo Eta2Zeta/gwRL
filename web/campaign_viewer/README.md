@@ -6,11 +6,19 @@ dice, cash and wealth. The decision panel separately shows the alternatives
 considered by stochastic MCTS. Network value estimates are score predictions,
 not measured win rates.
 
-The map is a geographic schematic of all 37 scenario locations, with optional
-connections taken from scenario data. It is not a tracing of the printed board.
-Click a location to inspect it; use +/− to zoom and drag the zoomed map to pan.
-The reset button restores the whole map. Use the timeline, arrows, play button
-and speed selector to browse events. Home/End jump to the first/last position.
+The viewer uses the China campaign board artwork at
+`game_content/maps/gw36map_china_campaign.png`. The 31 land pins sit on their
+printed territory roundels, and six sea pins sit inside their sea zones. Names
+and unit counts have a minimum screen size. On a small screen, crowded zones
+show a unit counter. Zoom in for names, possession and stacks by nation, or tap
+a pin or label to open the inspector. The Connections checkbox shows passable
+links from the scenario.
+
+Scroll, pinch or use the +/− buttons to zoom. Drag to pan. With the map focused,
+the arrow keys pan, +/− zoom and 0 fits the full board. The timeline, playback
+buttons and speed selector browse events. Home/End jump to the first/last
+position. Existing replay JSON files work with the board. The PNG is a local
+map source and a standalone HTML export embeds it when available.
 
 The **Combat & dice** panel under the timeline explains fighting at the selected
 position. At a dice event it names the battle type and location, the combat
