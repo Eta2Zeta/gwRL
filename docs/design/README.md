@@ -25,6 +25,7 @@ Deeper pages:
 5. [What a network computes](#5-what-a-network-computes)
 6. [How the networks learn](#6-how-the-networks-learn)
 7. [Running training](#7-running-training)
+   - [How the Campaign Observatory shows a game](#how-the-campaign-observatory-shows-a-game)
 8. [Measuring strength](#8-measuring-strength)
 9. [Known gaps and open questions](#9-known-gaps-and-open-questions)
 10. [Glossary](#10-glossary)
@@ -754,6 +755,50 @@ rules dead end (a decision with no legal move) saves its position in the run's
 fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for moves
 that leave the game unchanged, and `tools/check_zone_names.py` for names the
 network's input does not list.
+
+### How the Campaign Observatory shows a game
+
+The Observatory lets you stop a recorded game at any event and inspect both the
+board and the decision facing the player there. Python prepares the recording.
+The browser draws it with HTML, CSS, JavaScript and SVG.
+
+**From play to replay.** On a fresh run with the in-process game collector,
+`--record-replay` writes a `replay.jsonl` trace. It records the actual moves,
+resolved dice and search statistics for the choices at each recorded decision.
+To turn the trace into a viewable game, Python starts a separate copy of the C++
+engine from the recorded seed. It plays each move or dice event in order and
+checks the resulting position against the trace. The exported JSON contains
+the scenario map, factions, one initial position and a list of events. Each
+event carries just the changes needed to advance the board, alongside its
+action and search details or its dice record.
+[Recorder](../../studies/campaign/learning.py) · [Replay builder](../../studies/campaign/replay.py)
+
+**From replay to screen.** A local Python server serves the selected recording
+and the four frontend files directly from `web/campaign_viewer/`. The browser
+loads the JavaScript as native modules. The server can also follow a growing
+trace. With *Follow latest* enabled, the browser checks every two seconds and
+the server applies newly completed records. For offline viewing, the same
+Python module can package the recording, styles and scripts into one HTML file.
+[Server and HTML export](../../studies/campaign/viewer.py) · [Launch commands](../../web/campaign_viewer/README.md)
+
+**How the browser draws a position.** The HTML defines the map, inspector,
+timeline and analysis panels. The stylesheet arranges them. When you move the
+timeline, `model.js` applies recorded changes from the current position or a
+cached earlier one. In `app.js`, `seek()` compares the selected position with
+its predecessor and redraws the panels. The map renderer places 31 land zones
+and six sea zones at hand-set SVG coordinates. The scenario supplies their
+names and connections. The selected position supplies possession, units and
+battles, and the last move supplies the route for a movement arrow.
+[Layout](../../web/campaign_viewer/index.html) · [Styles](../../web/campaign_viewer/style.css) · [Replay model](../../web/campaign_viewer/model.js) · [Rendering and controls](../../web/campaign_viewer/app.js)
+
+For example, at event 12 of the seed-1951 benchmark, the journal records Ma
+Clique joining KMT after the CCP attack, and Tsinghai's map card now shows KMT
+possession. Stepping back one event restores Ma Clique. The search panel looks
+forward from whichever board you select. If the next event is a decision with
+saved search data, it shows the legal choices, the network's initial preferences,
+the simulation visits and the move actually played. If the next event is a dice
+roll, the combat and dice panel shows the outcome once you step forward.
+[Replay example and checks](../../tools/verify_campaign_replay_viewer.mjs)
 
 ## 8. Measuring strength
 
