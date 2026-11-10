@@ -103,6 +103,13 @@ of the last simulations. One extreme result anywhere in the tree changes how a
 search spends its remaining simulations, because the range is set by the worst
 and best averages seen.
 
+**Found on 9 November** ([depth limit record](depth_limit_2026_11_09.md#simulation-53-at-decision-612)):
+simulation 53 reached a new position where Japan decides, so the Axis network
+rated it, the only stop of this search that network rated. At the two chance
+events of this search, the Axis network gave the Comintern about 5 points less
+than the Comintern's own network did. The outlier therefore comes from which
+network rated the position; the depth limit did not cause it.
+
 **Which move each simulation began with**, as the design document's
 [figure](../design/figures/sample_simulations.svg) draws it from this trace:
 

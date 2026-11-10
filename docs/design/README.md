@@ -123,9 +123,10 @@ in a tree, which the next simulation reads.
 4. At a decision no simulation has evaluated yet, ask the deciding alliance's
    network for the position's value for all three alliances and a prior for each
    legal move, and stop.
-5. Stop also at the end of the game (using the true scores), at the depth limit
-   (using the network's value), or on returning to a position already on this
-   simulation's path.
+5. Stop also at the end of the game, using the true scores; on returning to a
+   position already on this simulation's path; or after 16 steps, the depth
+   limit. The last two use an estimate of the position reached, explained with
+   the limit below.
 6. Add the three values found to every position and move on the path, with one
    more visit each.
 
@@ -152,8 +153,9 @@ $$
 Each alliance judges moves by its own value: this is Max-N search, not a search
 for an equilibrium. Values are rescaled per alliance before they enter the score.
 
-**Depth** is how many steps a simulation walked from the current position before
-it stopped, counting moves and dice rolls. The limit is 16 in current runs.
+**Depth** is how many steps a simulation took from the current position before
+it stopped, counting moves and dice rolls. No simulation may take more than 16,
+the depth limit, explained below.
 
 **How the tree grows: a toy example.** The current position R has three legal
 moves, A, B and C. Before the first simulation the network evaluates R, which
@@ -217,6 +219,47 @@ and about half of the time game threads spent not waiting for the network
 identical search results on 151 real positions and played 59% fewer moves. In a
 matched training batch it raised games per hour while playing from 152 to 184,
 for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
+
+**The depth limit** is the most steps a simulation may take: 16 in current runs
+(`--max-depth 16` in the training command, `MctsConfig.max_depth` in the code;
+held-out evaluation takes its own, 4 unless set). After its 16th step a
+simulation stops wherever it is, even at a position the tree already holds, and
+uses an estimate of that position:
+
+| What the 16th step reached | What the simulation uses |
+| --- | --- |
+| A decision no simulation has evaluated | The deciding alliance's network's value, as at any new position, so the limit changes nothing |
+| A decision evaluated before | The value its network gave it then; nothing new joins the tree |
+| A chance event | The average of the three networks' values, since no alliance decides there |
+
+**Why there is a limit.** It is as old as the search (commit `6480d5b`,
+23 October). That first version had nothing else to end a simulation caught in
+a loop: some sequences of moves could bring the game back to exactly a position
+already on the simulation's path, and on such a loop every position is already
+in the tree, so the rule to stop at a new position never fires. Two hours later
+the search began to stop at such a repetition (step 5 above, commit `47eb3d6`).
+Since then a simulation ends without the limit too: it never repeats a position,
+it stops at the first decision no simulation has evaluated, and each simulation
+adds at most one such decision to the tree, so no walk can outrun what earlier
+simulations added. What the limit does now is cap how far ahead a search can
+look along one line. Like the other learning settings, 16 is the speed test's
+value, not a tuned one.
+
+**How much it matters** ([record](../stage_a/depth_limit_2026_11_09.md)). A
+replay of the game that gave [section 6](#6-how-the-networks-learn)'s sample,
+with the networks after one update, ran 68,800 simulations in 1,075 searches:
+41% stopped after one step, 90% within five and 18 at the limit, in 10
+searches, all at decisions with two to five legal moves, where the simulations
+crowd into few lines; none returned to a position already on its path. Nine of
+the 18 had reached a new position and would have stopped there anyway; eight
+stopped at a chance event and one at a known decision. Searched again without
+the limit, those ten positions' deepest simulations took 16 to 19 steps; at five
+of them 1 to 6 of the 64 visits moved to other moves, and the most-visited move
+stayed the same at all ten. So in this game the limit hardly mattered. At the eight chance events, though, the three
+networks' values for the same position differed by 2.5 to 17 points, more than a
+search's moves usually differ; [section 9](#one-network-per-alliance-or-one-shared-network)
+takes that up. Better-trained networks may crowd the simulations into fewer
+lines and meet the limit more often; that has not been measured.
 
 **After all simulations**, the number of times each first move was tried shows the
 search's preference, and the two terms of the score explain it. A move whose
@@ -543,13 +586,19 @@ began with the attack. Five of simulations 15 to 51, numbers 16, 32, 38, 42 and
 51, began with another move, whose second term outweighed the attack's lead at
 that moment.
 
-**Simulation 53**, one of the attack's, stopped at the depth limit at a position
-rated −106.02, far below anything before. The bottom of the scale moved from
-−102.64 to −106.02, so all five first terms crowded between 0.70 and 0.90, and
-the second terms decided: 0.025 for the attack after 36 simulations, 0.37 to
-0.65 for the others. Simulations 54 to 64 all began with the other moves. So the
-attack ended with 36 of the 64, although the exploration noise had lowered its
-prior from 0.10 to 0.085.
+**Simulation 53**, one of the attack's, went 16 steps deep, to the depth limit,
+and reached a new position where Japan decides. So the Axis network rated it,
+the only position of this search that network rated, and it put the Comintern
+at −106.02, far below anything before. The low value says more about the
+network than the position: at the two positions of this search that all three
+networks rated, the Axis network gave the Comintern about 5 points less than the
+Comintern's own network did
+([record](../stage_a/depth_limit_2026_11_09.md#simulation-53-at-decision-612)).
+The bottom of the scale moved from −102.64 to −106.02, so all five first terms
+crowded between 0.70 and 0.90, and the second terms decided: 0.025 for the
+attack after 36 simulations, 0.37 to 0.65 for the others. Simulations 54 to 64
+all began with the other moves. So the attack ended with 36 of the 64, although
+the exploration noise had lowered its prior from 0.10 to 0.085.
 
 **The other moves shared what was left, by prior.** Their simulations scored
 about the same, −102.3 to −102.5 on average, so only the second term of the
@@ -635,8 +684,8 @@ step does four things (`CampaignLearner.update` in `studies/campaign/learning.py
      and the search's shares, averaged over the samples where this network's
      alliance was choosing. On 5 November a step held 16 of the Axis's decisions
      on average, and 8 each of the Allies' and the Comintern's.
-4. **Step.** Each network takes one Adam step on the sum of its two losses, and
-   all three step together.
+4. **Step.** Each network changes its parameters by one Adam step, explained
+   below, to lower the sum of its two losses; all three step together.
 
 The next step draws a new 32. After the 700th, the networks are saved as a model
 export, and the next batch of games plays with them. The 32 games take about 15
@@ -649,23 +698,108 @@ In the training command the 32 is `--batch-size` and the 700 is `--epochs`. Both
 names mislead here: a step's 32 samples are not the batch of games, and the 700
 steps are not passes through the buffer.
 
-**What a step changes.** For every parameter, training works out its *gradient*:
-which way, and how strongly, a small change to that number would lower the loss
-on the step's 32 samples. Adam then moves every parameter a small way against its
-gradient, about the learning rate, 0.001, in size, scaled per parameter by how
-large its recent gradients have been. Every sample passes through the learned
-layers, so nearly all of their numbers change in every step. A row's gradient is
-zero unless its question is answered in one of the 32 samples, because an
-unanswered question's row was never added in. So a step changes the rows of the
-questions those samples answer, and Adam's momentum (a running average of past
-gradients that shrinks by a tenth each step) keeps moving a recently answered row
-for a few dozen steps more. A row whose question has never appeared in a trained
-sample stays at zero. Checked with a test loss on two real decisions: the first
-step gave a gradient to exactly the 150 rows its decision answers and changed
-only those; the second step also moved the 59 rows that only the first decision
-answered. Over one update's 700 steps, a question answered in many samples has
-its row moved hundreds of times, and a question absent from the replay buffer
-not at all, apart from that momentum.
+**What a step changes: the gradient.** A network's parameters are the numbers
+training adjusts: 4.10 million in a 64×2 network
+([section 5](#5-what-a-network-computes)). A step nudges each of them the way that
+lowers the step's loss, the sum of its value and policy losses. For that,
+training first works out every parameter's *gradient* (`loss.backward()`): how
+fast the loss on the step's 32 samples would change if that one number were
+raised a little. A positive gradient means that raising the number would raise
+the loss, so it should go down; a negative one, that it should go up. The larger
+the gradient, the more the loss responds to that number.
+
+**Adam.** The plainest rule, gradient descent, moves every parameter against its
+gradient by a fixed multiple of it, the *learning rate*. Its steps then follow
+the gradients' sizes, which differ enormously: in the first step of the
+5 November update, the Comintern network's nonzero gradients ranged from
+$4 \times 10^{-17}$ to 171. And a gradient from 32 random samples is noisy: it
+points a little differently in every step. Training uses Adam instead
+(`torch.optim.Adam` in `CampaignLearner._optimizer`), a standard rule built for
+both problems (Kingma and Ba, *Adam: A Method for Stochastic Optimization*,
+2015). For every parameter it keeps two running averages, both starting at
+zero:
+
+- $m$, the average of the parameter's recent gradients: each step keeps 90% of
+  it and adds 10% of the new gradient $g$, so it mostly reflects the last ten or
+  so steps;
+- $v$, the average of its recent squared gradients: each step keeps 99.9% of it
+  and adds 0.1% of the new gradient squared, so its square root is the
+  gradient's typical size over roughly the last thousand steps.
+
+At step number $t$, counted over the whole run, Adam moves the parameter by
+
+$$
+\Delta = -\eta \times \frac{\hat m}{\sqrt{\hat v} + \epsilon},
+\qquad
+\hat m = \frac{m}{1 - 0.9^{t}},
+\qquad
+\hat v = \frac{v}{1 - 0.999^{t}}
+$$
+
+where $\eta$ is the learning rate, 0.001. The divisions by $1 - 0.9^{t}$ and
+$1 - 0.999^{t}$ correct the averages for having started at zero, which would
+otherwise make them too small in the first steps, and $\epsilon = 10^{-8}$ only
+keeps the division safe. Apart from the learning rate, these are PyTorch's
+defaults.
+
+The fraction cancels the gradient's size and keeps how steadily it points one
+way. A parameter whose gradients keep their sign moves about 0.001 per step,
+whether they are large or small; one whose gradients keep changing sign has a
+small average beside its typical size and moves much less. In the very first
+step the corrected averages are the gradient and its size, so every parameter
+moves by exactly the learning rate, unless its gradient is so small that
+$\epsilon$ counts. **An Adam step** is this rule applied once to every parameter
+of one network, by `optimizer.step()`. Each of the three networks has its own
+Adam, whose averages carry over from one update to the next and are saved in
+checkpoints.
+
+**A real update, run again** ([record](../stage_a/adam_steps_2026_11_09.md)).
+Re-running the 5 November update from that run's fresh networks and its 1,611
+samples gave its generation-1 networks exactly. In the first step, 211,741 of the
+Comintern network's 221,675 numbers with a nonzero gradient moved by 0.001, to
+within 0.00001; the rest had gradients below about $10^{-6}$, where $\epsilon$
+shrinks the step. One number shows how the steps change after that: the value
+head's bias for the Comintern's own value, which is added to every Comintern
+score the network predicts. The fresh network predicted the Comintern's final
+scores on the first step's samples 109 points too high on average, so the bias's
+gradient was positive, and Adam lowered it:
+
+| Step | Gradient | Average gradient ($\hat m$) | Typical size ($\sqrt{\hat v}$) | Change |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 0.728 | 0.728 | 0.728 | −0.001000 |
+| 2 | 0.322 | 0.514 | 0.563 | −0.000914 |
+| 3 | 0.099 | 0.361 | 0.463 | −0.000780 |
+| 4 | −0.004 | 0.255 | 0.401 | −0.000635 |
+| 5 | −0.066 | 0.176 | 0.360 | −0.000490 |
+| 10 | 0.027 | 0.046 | 0.257 | −0.000178 |
+| 50 | −0.00006 | 0.003 | 0.115 | −0.000026 |
+| 700 | −0.016 | −0.0013 | 0.030 | +0.000044 |
+
+From step 4 on, the gradients pointed now one way, now the other (356 of the
+700 were negative), so their average shrank, while the typical size still
+remembered the large first gradients: at step 700 the first step's gradient
+still made up 60% of the average squared gradient. The steps shrank
+accordingly. The average still leaned the first way, so the bias kept falling
+until step 39; over all 700 steps it moved by 0.78 points of predicted score. The network's other numbers did most of the
+correcting: in the first step each of them with a gradient also moved by 0.001,
+the way that lowered the loss. The network's value loss was 0.62 on the first
+step's samples and 0.0065 on the fourth step's, after three steps: an error of
+about 79 points per value, then 8 (root mean square). These are samples it is
+trained on, so this measures fit, not foresight.
+
+**Which numbers a step moves.** Every sample passes through the learned layers,
+so nearly all of their numbers change in every step. A row's gradient is zero
+unless its question is answered in one of the 32 samples, because an unanswered
+question's row was never added in. So a step changes the rows of the questions
+those samples answer, and Adam's average $m$, which loses a tenth each step
+without a new gradient, keeps moving a recently answered row for a few dozen
+steps more. A row whose question has never appeared in a trained sample stays at
+zero. Checked with a test loss on two real decisions: the first step gave a
+gradient to exactly the 150 rows its decision answers and changed only those;
+the second step also moved the 59 rows that only the first decision answered.
+Over one update's 700 steps, a question answered in many samples has its row
+moved hundreds of times, and a question absent from the replay buffer not at
+all, apart from that momentum.
 
 **Why a few random samples per step.** One sample's gradient points the way that
 one decision would move the parameters. The average over 32 different decisions
@@ -916,7 +1050,9 @@ it:** held-out value error on fixed data first, which is cheap, then games.
 
 **Now.** Each alliance has its own network. All three value heads learn from every
 kept decision, but each policy only from its own alliance's decisions
-(`CampaignLearner.update` in `studies/campaign/learning.py`).
+(`CampaignLearner.update` in `studies/campaign/learning.py`). A search rates each
+new position with the network of the alliance that decides there, so one search
+compares values that different networks gave.
 
 **Alternative.** One network told which alliance is choosing. Its policy would
 learn from all three alliances' decisions, and the coordinator would make one
@@ -925,7 +1061,17 @@ positions on average on 2 November
 ([record](../stage_a/coordinator_lookups_2026_11_04.md)). **The catch:** one
 network must hold three different strategies.
 
-**Measured:** nothing. **Would settle it:** an equal-compute comparison. The
+**Measured** on 9 November, with networks after one update
+([record](../stage_a/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):
+at eight positions that all three networks rated, their values for one alliance
+differed by 2.5 to 17 points, while the best and worst moves' average results in
+a search lay a median 1.45 points apart. In one game 9.3% of the simulations
+stopped at positions rated by another alliance's network than the choosing one's,
+and such a rating set the bottom of the scale in
+[section 6](#6-how-the-networks-learn)'s example. Whether the networks agree
+better after more training, and how much the disagreement changes searches, is
+not measured. **Would settle it:** those two measurements first, then an
+equal-compute comparison. The
 [plan](../plans/japan_china_full_rules_plan.md#2-training-approach) lists
 sharing as optional future work.
 
@@ -1020,8 +1166,10 @@ user's decision on the two left, then learning compared at equal compute.
 - **Search (MCTS):** the simulations that pick a move at a decision.
 - **Simulation:** one imagined walk forward from the current position, on a copy
   of the game.
-- **Depth:** how many steps, moves and dice rolls, a simulation walked from the
+- **Depth:** how many steps, moves and dice rolls, a simulation took from the
   current position before it stopped.
+- **Depth limit:** the most steps a simulation may take, 16 in current runs; a
+  simulation that reaches it stops and uses an estimate of the position there.
 - **Search tree:** what a search remembers between simulations: for each position
   it has met, its planning key, the statistics of the moves tried there and a
   saved copy of the game at that position.
@@ -1051,6 +1199,15 @@ user's decision on the two left, then learning compared at equal compute.
 - **Replay buffer:** the recent samples that training draws from.
 - **Batch:** the games played between two updates.
 - **Update:** the training steps after a batch.
+- **Loss:** a number that measures how far a network's answers are from the
+  samples' targets: the value loss plus the policy loss. Training lowers it.
+- **Gradient:** for one parameter, how fast the loss would change if that number
+  were raised a little.
+- **Learning rate:** how far Adam moves a parameter in one step while its
+  gradients keep their sign: 0.001.
+- **Adam step:** one change of every parameter of a network: against the
+  average of its recent gradients, divided by their typical size, times the
+  learning rate.
 - **Training step:** one draw of 32 samples from the replay buffer, read by the
   three networks, and one Adam step for each. The training command calls the 32
   `--batch-size` and the steps per update `--epochs`.

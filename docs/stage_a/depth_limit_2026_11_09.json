@@ -1,0 +1,1110 @@
+{
+ "date": "2026-11-09",
+ "design_section": "docs/design/README.md#3-choosing-a-move-search",
+ "sources": "commit d64117d, extracted and built separately",
+ "networks": "generation 1 of studies/campaign/runs/sample-example-2026-11-05",
+ "game": {
+  "run_seed": 1936,
+  "environment_seed": 1105,
+  "simulations": 64,
+  "max_depth": 16,
+  "root_noise": true,
+  "temperature": 1.0,
+  "decisions": 1349,
+  "chance_events": 183,
+  "searched_decisions": 1075,
+  "final_scores": [
+   49.0,
+   -63.8,
+   -106.2
+  ],
+  "same_as_training_sample_record": true,
+  "seconds_with_instrumentation": 225.3
+ },
+ "simulations": 68800,
+ "stopped": {
+  "evaluator": 68765,
+  "depth_limit": 18,
+  "terminal": 17
+ },
+ "depth_limit_stops_by_position": {
+  "chance": 8,
+  "new_decision": 9,
+  "known_decision": 1
+ },
+ "searches_with_a_depth_limit_stop": 10,
+ "depth_histogram": {
+  "1": 28170,
+  "2": 18270,
+  "3": 7263,
+  "4": 4418,
+  "5": 3538,
+  "6": 2424,
+  "7": 1664,
+  "8": 1166,
+  "9": 710,
+  "10": 488,
+  "11": 308,
+  "12": 212,
+  "13": 95,
+  "14": 37,
+  "15": 19,
+  "16": 18
+ },
+ "mean_depth": 2.571,
+ "decisions_with_limit_stops": [
+  {
+   "decision": 12,
+   "chooser": "comintern",
+   "legal_moves": 2,
+   "limit_stops": [
+    {
+     "simulation": 46,
+     "kind": "chance",
+     "value_for_chooser": -101.3269,
+     "each_network_for_chooser": {
+      "axis": -105.9867,
+      "allies": -96.2518,
+      "comintern": -101.7421
+     }
+    }
+   ],
+   "visits_depth_16": [
+    52,
+    12
+   ],
+   "visits_no_limit": [
+    51,
+    13
+   ],
+   "deepest_no_limit": 18,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 1,
+   "seconds_depth_16": 0.141,
+   "seconds_no_limit": 0.127,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 563,
+   "chooser": "axis",
+   "legal_moves": 3,
+   "limit_stops": [
+    {
+     "simulation": 44,
+     "kind": "new_decision",
+     "value_for_chooser": 42.4232
+    },
+    {
+     "simulation": 59,
+     "kind": "new_decision",
+     "value_for_chooser": 42.1845
+    }
+   ],
+   "visits_depth_16": [
+    16,
+    34,
+    14
+   ],
+   "visits_no_limit": [
+    16,
+    34,
+    14
+   ],
+   "deepest_no_limit": 16,
+   "simulations_beyond_16_no_limit": 0,
+   "same_most_visited": true,
+   "visits_moved": 0,
+   "seconds_depth_16": 0.165,
+   "seconds_no_limit": 0.154,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 567,
+   "chooser": "axis",
+   "legal_moves": 2,
+   "limit_stops": [
+    {
+     "simulation": 50,
+     "kind": "chance",
+     "value_for_chooser": 34.5725,
+     "each_network_for_chooser": {
+      "axis": 42.6841,
+      "allies": 34.0647,
+      "comintern": 26.9688
+     }
+    }
+   ],
+   "visits_depth_16": [
+    47,
+    17
+   ],
+   "visits_no_limit": [
+    50,
+    14
+   ],
+   "deepest_no_limit": 19,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 3,
+   "seconds_depth_16": 0.21,
+   "seconds_no_limit": 0.216,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 568,
+   "chooser": "axis",
+   "legal_moves": 3,
+   "limit_stops": [
+    {
+     "simulation": 57,
+     "kind": "chance",
+     "value_for_chooser": 34.3624,
+     "each_network_for_chooser": {
+      "axis": 43.5391,
+      "allies": 33.0415,
+      "comintern": 26.5066
+     }
+    }
+   ],
+   "visits_depth_16": [
+    6,
+    12,
+    46
+   ],
+   "visits_no_limit": [
+    6,
+    12,
+    46
+   ],
+   "deepest_no_limit": 19,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 0,
+   "seconds_depth_16": 0.21,
+   "seconds_no_limit": 0.2,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 612,
+   "chooser": "comintern",
+   "legal_moves": 5,
+   "limit_stops": [
+    {
+     "simulation": 44,
+     "kind": "new_decision",
+     "value_for_chooser": -101.9326
+    },
+    {
+     "simulation": 49,
+     "kind": "chance",
+     "value_for_chooser": -101.7865,
+     "each_network_for_chooser": {
+      "axis": -106.1054,
+      "allies": -98.0645,
+      "comintern": -101.1895
+     }
+    },
+    {
+     "simulation": 50,
+     "kind": "chance",
+     "value_for_chooser": -101.8666,
+     "each_network_for_chooser": {
+      "axis": -106.5016,
+      "allies": -97.7732,
+      "comintern": -101.3252
+     }
+    },
+    {
+     "simulation": 52,
+     "kind": "new_decision",
+     "value_for_chooser": -101.8144
+    },
+    {
+     "simulation": 53,
+     "kind": "new_decision",
+     "value_for_chooser": -106.0185
+    }
+   ],
+   "visits_depth_16": [
+    36,
+    2,
+    5,
+    9,
+    12
+   ],
+   "visits_no_limit": [
+    36,
+    2,
+    5,
+    9,
+    12
+   ],
+   "deepest_no_limit": 18,
+   "simulations_beyond_16_no_limit": 3,
+   "same_most_visited": true,
+   "visits_moved": 0,
+   "seconds_depth_16": 0.115,
+   "seconds_no_limit": 0.106,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 679,
+   "chooser": "axis",
+   "legal_moves": 2,
+   "limit_stops": [
+    {
+     "simulation": 35,
+     "kind": "chance",
+     "value_for_chooser": 30.2345,
+     "each_network_for_chooser": {
+      "axis": 36.6842,
+      "allies": 27.423,
+      "comintern": 26.5963
+     }
+    }
+   ],
+   "visits_depth_16": [
+    30,
+    34
+   ],
+   "visits_no_limit": [
+    27,
+    37
+   ],
+   "deepest_no_limit": 17,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 3,
+   "seconds_depth_16": 0.146,
+   "seconds_no_limit": 0.139,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 840,
+   "chooser": "comintern",
+   "legal_moves": 5,
+   "limit_stops": [
+    {
+     "simulation": 44,
+     "kind": "chance",
+     "value_for_chooser": -102.6729,
+     "each_network_for_chooser": {
+      "axis": -105.6144,
+      "allies": -102.945,
+      "comintern": -99.4594
+     }
+    }
+   ],
+   "visits_depth_16": [
+    5,
+    10,
+    7,
+    15,
+    27
+   ],
+   "visits_no_limit": [
+    5,
+    9,
+    9,
+    10,
+    31
+   ],
+   "deepest_no_limit": 18,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 6,
+   "seconds_depth_16": 0.108,
+   "seconds_no_limit": 0.101,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 847,
+   "chooser": "comintern",
+   "legal_moves": 3,
+   "limit_stops": [
+    {
+     "simulation": 54,
+     "kind": "new_decision",
+     "value_for_chooser": -99.7412
+    }
+   ],
+   "visits_depth_16": [
+    6,
+    35,
+    23
+   ],
+   "visits_no_limit": [
+    6,
+    35,
+    23
+   ],
+   "deepest_no_limit": 16,
+   "simulations_beyond_16_no_limit": 0,
+   "same_most_visited": true,
+   "visits_moved": 0,
+   "seconds_depth_16": 0.114,
+   "seconds_no_limit": 0.11,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 940,
+   "chooser": "comintern",
+   "legal_moves": 2,
+   "limit_stops": [
+    {
+     "simulation": 49,
+     "kind": "chance",
+     "value_for_chooser": -104.5752,
+     "each_network_for_chooser": {
+      "axis": -106.011,
+      "allies": -104.212,
+      "comintern": -103.5026
+     }
+    }
+   ],
+   "visits_depth_16": [
+    22,
+    42
+   ],
+   "visits_no_limit": [
+    25,
+    39
+   ],
+   "deepest_no_limit": 17,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 3,
+   "seconds_depth_16": 0.16,
+   "seconds_no_limit": 0.164,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  },
+  {
+   "decision": 1063,
+   "chooser": "comintern",
+   "legal_moves": 2,
+   "limit_stops": [
+    {
+     "simulation": 50,
+     "kind": "new_decision",
+     "value_for_chooser": -101.4811
+    },
+    {
+     "simulation": 61,
+     "kind": "new_decision",
+     "value_for_chooser": -101.5358
+    },
+    {
+     "simulation": 63,
+     "kind": "known_decision",
+     "value_for_chooser": -101.4811
+    },
+    {
+     "simulation": 64,
+     "kind": "new_decision",
+     "value_for_chooser": -101.5383
+    }
+   ],
+   "visits_depth_16": [
+    11,
+    53
+   ],
+   "visits_no_limit": [
+    11,
+    53
+   ],
+   "deepest_no_limit": 17,
+   "simulations_beyond_16_no_limit": 1,
+   "same_most_visited": true,
+   "visits_moved": 0,
+   "seconds_depth_16": 0.107,
+   "seconds_no_limit": 0.104,
+   "no_limit_stops": {
+    "evaluator": 64
+   }
+  }
+ ],
+ "decision_612": {
+  "visits": [
+   36,
+   2,
+   5,
+   9,
+   12
+  ],
+  "simulations": [
+   {
+    "simulation": 1,
+    "steps": 1,
+    "moves": 1,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.4548
+   },
+   {
+    "simulation": 2,
+    "steps": 1,
+    "moves": 1,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.1555
+   },
+   {
+    "simulation": 3,
+    "steps": 1,
+    "moves": 1,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.6343
+   },
+   {
+    "simulation": 4,
+    "steps": 2,
+    "moves": 2,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.1645
+   },
+   {
+    "simulation": 5,
+    "steps": 5,
+    "moves": 3,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.2414
+   },
+   {
+    "simulation": 6,
+    "steps": 1,
+    "moves": 1,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.2208
+   },
+   {
+    "simulation": 7,
+    "steps": 1,
+    "moves": 1,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3962
+   },
+   {
+    "simulation": 8,
+    "steps": 2,
+    "moves": 2,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.458
+   },
+   {
+    "simulation": 9,
+    "steps": 5,
+    "moves": 3,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.2348
+   },
+   {
+    "simulation": 10,
+    "steps": 6,
+    "moves": 4,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3554
+   },
+   {
+    "simulation": 11,
+    "steps": 2,
+    "moves": 2,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.2299
+   },
+   {
+    "simulation": 12,
+    "steps": 7,
+    "moves": 5,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3586
+   },
+   {
+    "simulation": 13,
+    "steps": 3,
+    "moves": 3,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.4152
+   },
+   {
+    "simulation": 14,
+    "steps": 8,
+    "moves": 6,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3159
+   },
+   {
+    "simulation": 15,
+    "steps": 4,
+    "moves": 3,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.4238
+   },
+   {
+    "simulation": 16,
+    "steps": 5,
+    "moves": 4,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.4178
+   },
+   {
+    "simulation": 17,
+    "steps": 5,
+    "moves": 4,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.4302
+   },
+   {
+    "simulation": 18,
+    "steps": 6,
+    "moves": 5,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3797
+   },
+   {
+    "simulation": 19,
+    "steps": 8,
+    "moves": 6,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3807
+   },
+   {
+    "simulation": 20,
+    "steps": 7,
+    "moves": 6,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.1578
+   },
+   {
+    "simulation": 21,
+    "steps": 9,
+    "moves": 7,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.1585
+   },
+   {
+    "simulation": 22,
+    "steps": 8,
+    "moves": 6,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.1334
+   },
+   {
+    "simulation": 23,
+    "steps": 8,
+    "moves": 7,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3084
+   },
+   {
+    "simulation": 24,
+    "steps": 10,
+    "moves": 8,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3088
+   },
+   {
+    "simulation": 25,
+    "steps": 9,
+    "moves": 7,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.9322
+   },
+   {
+    "simulation": 26,
+    "steps": 11,
+    "moves": 9,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3023
+   },
+   {
+    "simulation": 27,
+    "steps": 12,
+    "moves": 10,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.312
+   },
+   {
+    "simulation": 28,
+    "steps": 9,
+    "moves": 8,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3019
+   },
+   {
+    "simulation": 29,
+    "steps": 13,
+    "moves": 11,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3171
+   },
+   {
+    "simulation": 30,
+    "steps": 10,
+    "moves": 9,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3116
+   },
+   {
+    "simulation": 31,
+    "steps": 9,
+    "moves": 7,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.4058
+   },
+   {
+    "simulation": 32,
+    "steps": 4,
+    "moves": 4,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.1981
+   },
+   {
+    "simulation": 33,
+    "steps": 14,
+    "moves": 12,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.2661
+   },
+   {
+    "simulation": 34,
+    "steps": 14,
+    "moves": 12,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3513
+   },
+   {
+    "simulation": 35,
+    "steps": 11,
+    "moves": 10,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3167
+   },
+   {
+    "simulation": 36,
+    "steps": 14,
+    "moves": 12,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.8691
+   },
+   {
+    "simulation": 37,
+    "steps": 14,
+    "moves": 12,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.2157
+   },
+   {
+    "simulation": 38,
+    "steps": 2,
+    "moves": 2,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.6433
+   },
+   {
+    "simulation": 39,
+    "steps": 14,
+    "moves": 12,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.1641
+   },
+   {
+    "simulation": 40,
+    "steps": 12,
+    "moves": 11,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.2655
+   },
+   {
+    "simulation": 41,
+    "steps": 14,
+    "moves": 12,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.8638
+   },
+   {
+    "simulation": 42,
+    "steps": 6,
+    "moves": 5,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.2005
+   },
+   {
+    "simulation": 43,
+    "steps": 15,
+    "moves": 13,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3726
+   },
+   {
+    "simulation": 44,
+    "steps": 16,
+    "moves": 13,
+    "dice": 3,
+    "stopped": "depth_limit",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.9326
+   },
+   {
+    "simulation": 45,
+    "steps": 12,
+    "moves": 11,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3508
+   },
+   {
+    "simulation": 46,
+    "steps": 15,
+    "moves": 13,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.1649
+   },
+   {
+    "simulation": 47,
+    "steps": 12,
+    "moves": 11,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.8677
+   },
+   {
+    "simulation": 48,
+    "steps": 15,
+    "moves": 13,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.3005
+   },
+   {
+    "simulation": 49,
+    "steps": 16,
+    "moves": 14,
+    "dice": 2,
+    "stopped": "depth_limit",
+    "position": "chance",
+    "rated_by": "all three, averaged",
+    "comintern_value": -101.7865
+   },
+   {
+    "simulation": 50,
+    "steps": 16,
+    "moves": 14,
+    "dice": 2,
+    "stopped": "depth_limit",
+    "position": "chance",
+    "rated_by": "all three, averaged",
+    "comintern_value": -101.8666
+   },
+   {
+    "simulation": 51,
+    "steps": 7,
+    "moves": 6,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3607
+   },
+   {
+    "simulation": 52,
+    "steps": 16,
+    "moves": 14,
+    "dice": 2,
+    "stopped": "depth_limit",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -101.8144
+   },
+   {
+    "simulation": 53,
+    "steps": 16,
+    "moves": 14,
+    "dice": 2,
+    "stopped": "depth_limit",
+    "position": "new_decision",
+    "rated_by": "axis",
+    "comintern_value": -106.0185
+   },
+   {
+    "simulation": 54,
+    "steps": 4,
+    "moves": 3,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.4121
+   },
+   {
+    "simulation": 55,
+    "steps": 5,
+    "moves": 5,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3586
+   },
+   {
+    "simulation": 56,
+    "steps": 8,
+    "moves": 7,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3505
+   },
+   {
+    "simulation": 57,
+    "steps": 5,
+    "moves": 4,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.4148
+   },
+   {
+    "simulation": 58,
+    "steps": 9,
+    "moves": 8,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3596
+   },
+   {
+    "simulation": 59,
+    "steps": 10,
+    "moves": 9,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3617
+   },
+   {
+    "simulation": 60,
+    "steps": 2,
+    "moves": 2,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.4057
+   },
+   {
+    "simulation": 61,
+    "steps": 10,
+    "moves": 7,
+    "dice": 3,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3186
+   },
+   {
+    "simulation": 62,
+    "steps": 6,
+    "moves": 6,
+    "dice": 0,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3484
+   },
+   {
+    "simulation": 63,
+    "steps": 6,
+    "moves": 5,
+    "dice": 1,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.3725
+   },
+   {
+    "simulation": 64,
+    "steps": 5,
+    "moves": 3,
+    "dice": 2,
+    "stopped": "evaluator",
+    "position": "new_decision",
+    "rated_by": "comintern",
+    "comintern_value": -102.2958
+   }
+  ]
+ },
+ "who_rated_each_stop": {
+  "another alliance's network": 6364,
+  "the choosing alliance's network": 62410,
+  "no single network (depth-limit stop at a chance event or a known decision)": 9,
+  "end of game": 17
+ },
+ "searches_with_a_stop_rated_by_another_alliance": 504,
+ "move_average_spread_per_search": {
+  "what": "points between the best and worst first move's average result for the choosing alliance, per search",
+  "searches": 1075,
+  "lower_quartile": 0.776,
+  "median": 1.448,
+  "upper_quartile": 2.695
+ }
+}
