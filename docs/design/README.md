@@ -1,73 +1,97 @@
 # How gwRL learns
 
-This is the central design document of the learning system. It explains, from
-the top down, how the program learns to play the 1936–1941 Japan–China
-campaign: what the game engine gives the learner, how a move is chosen, what the
-networks read and compute, how they are trained, how runs are organised and how
-strength is checked. Each layer starts in plain words, then names the code that
-does it.
+This is the central design document of the learning system: how the program
+learns to play the 1936–1941 Japan–China campaign. It builds the system up from
+its bricks. Each section defines its parts, with a picture or a real example,
+before any later section uses them, and the last sections put the whole training
+loop together. One real decision, called decision 612 and introduced in
+[section 2](#23-legal-moves-and-the-running-example), is the example throughout.
+A section's last part, headed "More detail", can be skipped on a first reading.
 
 The document is revised whenever a question digs into part of the design (see
 `AGENTS.md`). Measurements and the reasons for past changes stay in the dated
-[Stage A records](../stage_a/README.md), which this document links to.
-
-Deeper pages:
-
-- [The network's input](network_input.md): how a decision becomes numbers, with
-  worked examples.
+[Stage A records](../stage_a/README.md), which this document links to. The page
+[The network's input](network_input.md) goes deeper into how a decision becomes
+numbers.
 
 ## Contents
 
-1. [The big picture](#1-the-big-picture)
-2. [The game engine: positions, decisions and moves](#2-the-game-engine-positions-decisions-and-moves)
-3. [Choosing a move: search](#3-choosing-a-move-search)
-4. [What a network reads](#4-what-a-network-reads)
-5. [What a network computes](#5-what-a-network-computes)
-6. [How the networks learn](#6-how-the-networks-learn)
-7. [Running training](#7-running-training)
-   - [How the Campaign Observatory shows a game](#how-the-campaign-observatory-shows-a-game)
-8. [Measuring strength](#8-measuring-strength)
-9. [Known gaps and open questions](#9-known-gaps-and-open-questions)
-10. [Glossary](#10-glossary)
+1. [In brief](#1-in-brief)
+2. [The game, as the learner sees it](#2-the-game-as-the-learner-sees-it)
+3. [What a network gives at a decision](#3-what-a-network-gives-at-a-decision)
+4. [Choosing a move: search](#4-choosing-a-move-search)
+   - [4.1 Why search](#41-why-search) · [4.2 One simulation](#42-one-simulation) ·
+     [4.3 The score of a move](#43-the-score-of-a-move) ·
+     [4.4 A toy search](#44-a-toy-search) ·
+     [4.5 After the simulations](#45-after-the-simulations-visits-and-shares) ·
+     [4.6 A real search](#46-a-real-search-decision-612) ·
+     [4.7 More detail](#47-more-detail-on-the-search)
+5. [How a decision becomes numbers](#5-how-a-decision-becomes-numbers)
+   - [5.1 Questions and answers](#51-questions-and-answers) ·
+     [5.2 Three parts](#52-three-parts-the-board-the-position-and-the-moves) ·
+     [5.3 Grids of answers](#53-the-input-as-grids-of-answers) ·
+     [5.4 A move's answers](#54-a-moves-answers-and-the-zones-it-is-linked-to) ·
+     [5.5 Facts that never change](#55-facts-that-never-change) ·
+     [5.6 More detail](#56-more-detail-how-the-encoder-builds-the-input)
+6. [Inside a network, brick by brick](#6-inside-a-network-brick-by-brick)
+   - [6.1 Vectors](#61-vectors) · [6.2 Rows and tables](#62-rows-and-tables) ·
+     [6.3 A weighted sum of rows](#63-from-answers-to-a-vector-a-weighted-sum-of-rows) ·
+     [6.4 Learned layers](#64-learned-layers) ·
+     [6.5 A zone's vector](#65-a-zones-vector) ·
+     [6.6 Position and move vectors](#66-the-position-vector-and-the-move-vectors) ·
+     [6.7 Messages](#67-messages-along-the-borders) ·
+     [6.8 The values](#68-the-values) ·
+     [6.9 The move probabilities](#69-the-move-probabilities) ·
+     [6.10 The whole network](#610-the-whole-network)
+7. [Self-play and training samples](#7-self-play-and-training-samples)
+8. [Training the networks](#8-training-the-networks)
+   - [8.1 The loss](#81-the-loss) · [8.2 The gradient](#82-the-gradient) ·
+     [8.3 Adam](#83-adam) · [8.4 Steps and updates](#84-one-training-step-and-one-update) ·
+     [8.5 Which numbers a step moves](#85-which-numbers-a-step-moves) ·
+     [8.6 Why a few random samples](#86-why-a-few-random-samples-per-step) ·
+     [8.7 How often a sample is drawn](#87-how-often-a-sample-is-drawn)
+9. [The whole loop, and running it](#9-the-whole-loop-and-running-it)
+10. [Measuring strength](#10-measuring-strength)
+11. [Known gaps and open questions](#11-known-gaps-and-open-questions)
+12. [Glossary](#12-glossary)
 
-## 1. The big picture
+## 1. In brief
 
 Three agents, one per alliance (Axis, Allies and Comintern), learn the campaign
-by playing it against each other many thousands of times. Training repeats one
-loop:
+by playing it against each other many thousands of times, in the manner of
+AlphaZero:
 
-1. **Play a batch of games.** At every decision, the alliance to move runs a
-   search: it imagines possible continuations, guided by its own network, and
-   picks a move. The networks do not change during the batch.
-2. **Keep some decisions as training samples.** A sample is a saved record of
-   one decision: what the network read there, how many of the search's
-   simulations began with each legal move and, added when the game ends, the
-   final scores. [Section 6](#6-how-the-networks-learn) shows a real one.
-3. **Train the three networks** on those samples and recent older ones, so that
-   their move probabilities come closer to the search's shares and their
-   predicted scores closer to the final ones.
-4. **Save the networks** and play the next batch with them.
+- **They look ahead before they move.** At every decision the agent whose turn
+  it is plays possible continuations on copies of the game, a *search*
+  (section 4), guided by its own neural network (sections 3, 5 and 6).
+- **They keep some of their decisions** as training *samples*: each with what the
+  search preferred there and how the game ended (section 7).
+- **They learn from them.** Play comes in *batches* of games. After each batch,
+  an *update* adjusts each network to propose what the search preferred and to
+  predict how games end (section 8). Better networks make the next searches
+  better, and the loop repeats (section 9).
 
-![The training loop. 1: play a batch of games with the networks frozen; at every decision the alliance to move searches, asking its network many times, and a random 5% of decisions are kept as samples. When a game ends, its scores are added to its samples. 2: the samples join a replay buffer of recent samples; a sample records what the network read, how many simulations began with each move and, once the game ends, the final scores. 3: training steps update the three networks, one per alliance: each network's move probabilities shift toward the search's shares and its predicted scores toward the final ones. 4: the saved networks play the next batch.](figures/training_loop.svg)
+Whether that works for this game on this hardware is unproven: no run has yet
+shown robust playing strength ([section 10](#10-measuring-strength)).
 
-The idea comes from AlphaZero. The search chooses better than the bare network,
-the network learns to imitate the search and to predict outcomes, and a better
-network makes the next searches better. Whether that works for this game on this
-hardware is unproven: no run has yet shown robust playing strength.
-
-## 2. The game engine: positions, decisions and moves
+## 2. The game, as the learner sees it
 
 The rules are written in C++ (`src/`, `include/game/`) and reach Python as
 `gwrl_cpp.CampaignEnv`, wrapped by `studies/shared/campaign_adapter.py`.
 
-**Nations and alliances.** Each alliance plays for its nations: the Axis for
-Japan, the Allies for the KMT, and the Comintern for the CCP and Mongolia. The
-eight Chinese warlords start under nobody's control; some rules can later hand
-one to an alliance.
+### 2.1 Alliances and nations
 
-**A game is a sequence of positions.** Every position is one of three things:
+Each alliance plays for its nations: the Axis for Japan, the Allies for the KMT,
+and the Comintern for the CCP and Mongolia. The eight Chinese warlords start
+under nobody's control; some rules can later hand one to an alliance.
 
-- **a decision:** one alliance chooses one move from a list of legal moves;
+### 2.2 Positions: decisions, chance events and the end
+
+A *position* is everything about the game at one moment. A game is a chain of
+positions, and each position is one of three kinds:
+
+- **a decision:** one alliance chooses one move from a list of *legal moves*, the
+  moves the rules allow there;
 - **a chance event:** the engine rolls dice;
 - **the end** of the game, after the eleventh round (1941).
 
@@ -75,62 +99,127 @@ Reactions are decisions too: the defender picks casualties, an attacker chooses
 whether to retreat, and so on. A full eleven-round game holds well over a
 thousand decisions.
 
-**A legal move is a small record:** a kind plus labelled details. For example,
-the CCP cavalry in Shensi attacking Hopeh is a move of kind `movement_route`:
+![A row of five positions joined by arrows: a decision, where one alliance chooses one legal move; a move leads to the next decision, often by the same alliance; a move leads to a chance event, where the engine rolls dice, say for a battle; the dice lead to further decisions, over a thousand of them; the chain ends after round 11 with the final scores. Below: one real game, played on 5 November with the networks after one update (seed 1105), had 1,349 decisions and 183 chance events; its 612th decision is the running example, in round 5 the Comintern choosing the CCP's Combat Movement from 5 legal moves; it ended Axis +49.0, Allies −63.8, Comintern −106.2.](figures/game_positions.svg)
+
+### 2.3 Legal moves, and the running example
+
+**A legal move is a small record:** a kind plus labelled details. The running
+example of this document is decision 612 of a game the networks played on
+5 November, after one round of training
+([record](../stage_a/training_sample_2026_11_05.md)). In round 5, during the CCP's
+Combat Movement, the Comintern chooses for the CCP. The CCP's mountain infantry in
+Shensi has one move left and may attack one of four neighbouring zones the KMT
+holds, Hopeh, Suiyuan, Szechwan or Tsinghai, or the CCP may end its Combat
+Movement. So the decision has 5 legal moves. The attack on Hopeh, as the engine
+writes it:
 
 | Detail | Value |
 | --- | --- |
-| `unit` | `setup_ccp_land_china_shensi_cavalry_1` |
+| `kind` | `movement_route` |
+| `unit` | `setup_ccp_land_china_shensi_mountain_infantry_1` |
 | `path` | `[land_china_shensi, land_china_hopeh]` |
 | `combat` | `true` |
 | `mode` | `ordinary` |
 
-Long orders, such as a fleet's, are built one step at a time with bounded
-choices: see the [AI order interface](../stage_a/action_interface_2026_10_24.md).
+The other three attacks differ only in the path's second zone. The fifth move,
+ending the phase, has the kind `end_phase` and no details. Long orders, such as a
+fleet's, are built one step at a time with bounded choices: see the
+[AI order interface](../stage_a/action_interface_2026_10_24.md).
 
-**The final score.** Only the end of the game is scored; there is no reward
-along the way. Each alliance's wealth is its income plus a tenth of the value of
-its units, its infrastructure, its treasury and its paid construction. Its score
-is its own wealth minus the other two alliances' wealth combined
-(`src/campaign_objective.cpp`). The three scores form one vector,
-`[Axis, Allies, Comintern]`.
+### 2.4 The final score
 
-**What the learner asks of the engine:** the legal moves, play a move, roll the
-dice, is the game over, the final scores, a copy of the game for search, and the
-position's planning key, which identifies a position exactly.
+Only the end of the game is scored; there is no reward along the way. Each
+alliance's wealth is its income plus a tenth of the value of its units, its
+infrastructure, its treasury and its paid construction. Its score is its own
+wealth minus the other two alliances' wealth combined
+(`src/campaign_objective.cpp`). The three scores form one list,
+`[Axis, Allies, Comintern]`. The game of decision 612 ended Axis +49.0, Allies
+−63.8 and Comintern −106.2.
 
-## 3. Choosing a move: search
+### 2.5 What the learner asks of the engine
 
-When an alliance must decide, the program does not just ask the network which
-move to play. It runs a search (`studies/shared/multiplayer_mcts.py`, class
-`VectorMCTS`), made of many simulations: 64 per decision in current runs.
+The legal moves, play a move, roll the dice, is the game over, the final scores,
+a copy of the game for search, and the position's *planning key*, a text that
+identifies a position exactly.
+
+## 3. What a network gives at a decision
+
+In reinforcement-learning terms an agent needs a *policy*, how likely it is to
+choose each legal move, and a *value function*, how good a position is for it.
+Here one neural network per alliance gives both, for any decision its alliance
+faces (`CampaignPolicyValueNet` in `studies/campaign/neural.py`). Given a
+decision, it returns:
+
+- **three values:** its estimates of the three alliances' final scores. Inside,
+  the network works in hundreds of points: it outputs 0.251 for a score of +25.1.
+- **a probability for every legal move,** adding up to 1: its first guess at
+  which move to play. The search (section 4) calls these the moves' *priors*.
+
+This is what the Comintern's network gave at decision 612:
+
+![Left: decision 612, what the network is given: the position (the board, round 5, Combat Movement, the CCP's turn) and the 5 legal moves: 1 to 4, the mountain infantry in Shensi attacking Hopeh, Suiyuan, Szechwan or Tsinghai, and 5, ending Combat Movement. Middle: the Comintern's network, 4.1 million learned numbers. Right, what it gives: values, its estimate of each alliance's final score: Axis +25.1, Allies −42.4, Comintern −102.4; and move probabilities, its first guess, which the search calls priors: 0.10, 0.10, 0.09, 0.18 and 0.53 for moves 1 to 5.](figures/network_outputs.svg)
+
+The network gives values for all three alliances, not only its own, because a
+search (section 4) needs to know how each position it reaches looks to whichever
+alliance chooses there.
+
+Until section 6 the network is a closed box: what goes in and what comes out is
+all the next section needs. Inside are 4.1 million learned numbers, its
+*parameters*; training (section 8) adjusts them. Section 5 shows how a decision
+is turned into numbers the network can read, and section 6 how it turns them into
+values and probabilities.
+
+The first guess is not the last word. At decision 612 the network favoured
+ending the phase, 0.53, over the attack on Hopeh, 0.10. The search, looking
+ahead, preferred the attack ([section 4.6](#46-a-real-search-decision-612)), and
+the game ended with the Comintern at −106.2 where the network had predicted
+−102.4.
+
+## 4. Choosing a move: search
+
+### 4.1 Why search
+
+The network answers in one look. A search looks ahead: it plays moves on copies
+of the game, asks the network about the positions it reaches, and combines the
+answers. Where looking ahead finds something the one look missed, the search
+chooses better than the network alone. The search is Monte Carlo tree search in
+AlphaZero's style (`studies/shared/multiplayer_mcts.py`, class `VectorMCTS`),
+made of many *simulations*: 64 per decision in current runs.
+
+### 4.2 One simulation
 
 **Every simulation starts from the same place: the current position.** It plays
 on its own copy of the game, so the real game does not change. It does not play
 to the end of the game: it walks forward only until it reaches a position that no
 earlier simulation has asked the network about, asks about that one, and stops.
 So the first simulations look one move ahead, and later ones look further along
-the lines that earlier ones found promising. What the simulations find is kept
-in a tree, which the next simulation reads.
+the lines that earlier ones found promising.
+
+**What the simulations find is kept in a tree,** which the next simulation reads.
+For every position the search has met, the tree holds the moves tried there,
+each with its *visit count*, how many simulations played it, and the total of the
+values those simulations found.
 
 **One simulation, step by step:**
 
 1. Copy the game at the current position (`clone_for_search`).
 2. At a decision the search has already evaluated, give every legal move a
-   score (below) and play the move with the highest score on the copy; a tie is
-   broken at random.
+   score (section 4.3) and play the move with the highest score on the copy; a
+   tie is broken at random.
 3. At a chance event, roll the dice on the copy.
 4. At a decision no simulation has evaluated yet, ask the deciding alliance's
-   network for the position's value for all three alliances and a prior for each
-   legal move, and stop.
+   network for the position's values for all three alliances and a prior for
+   each legal move, and stop.
 5. Stop also at the end of the game, using the true scores; on returning to a
    position already on this simulation's path; or after 16 steps, the depth
-   limit. The last two use an estimate of the position reached, explained with
-   the limit below.
+   limit. The last two use an estimate of the position reached
+   ([section 4.7](#47-more-detail-on-the-search)).
 6. Add the three values found to every position and move on the path, with one
    more visit each.
 
-**The score** of a move adds two terms:
+### 4.3 The score of a move
+
+At step 2 the score of a move adds two terms:
 
 $$
 \text{score} = \underbrace{\frac{\bar v - v_{\min}}{v_{\max} - v_{\min}}}_{\text{first term}} + \underbrace{c_{\text{puct}} \times P \times \frac{\sqrt{N + 1}}{n + 1}}_{\text{second term}}
@@ -153,13 +242,10 @@ $$
 Each alliance judges moves by its own value: this is Max-N search, not a search
 for an equilibrium. Values are rescaled per alliance before they enter the score.
 
-**Depth** is how many steps a simulation took from the current position before
-it stopped, counting moves and dice rolls. No simulation may take more than 16,
-the depth limit, explained below.
+### 4.4 A toy search
 
-**How the tree grows: a toy example.** The current position R has three legal
-moves, A, B and C. Before the first simulation the network evaluates R, which
-gives priors for A, B and C.
+The current position R has three legal moves, A, B and C. Before the first
+simulation the network evaluates R, which gives priors for A, B and C.
 
 ![The tree after four simulations. Simulations 1, 2 and 3 each try one untried move from R and add RA, RB and RC at depth 1, asking the network about each. Simulation 4 plays A again, then x, the move with the highest prior at RA, and adds RAx at depth 2.](figures/search_tree.svg)
 
@@ -168,370 +254,46 @@ moves again. Say the network's priors are A 0.5, B 0.3 and C 0.2, and the result
 so far rescale to A 1, C 0.5 and B 0. Each move has one visit of three, so its
 second term is $1.5 \times P \times \sqrt{3 + 1} \div (1 + 1)$: A scores
 1 + 0.75 = 1.75, B 0 + 0.45 = 0.45 and C 0.5 + 0.3 = 0.8, and the simulation
-plays A. At RA no move has been tried, so
-every first term is 1 and the move with the highest prior, x, wins. RAx is new, so
-the simulation stops there.
+plays A. At RA no move has been tried, so every first term is 1 and the move with
+the highest prior, x, wins. RAx is new, so the simulation stops there.
 
 So a simulation chooses its path one step at a time, by these scores, at every
 position it passes. It does not look for the deepest branch: it goes deep only
 where the scores keep sending it. Each simulation adds one new position to the
 tree, so the lines the scores keep choosing are explored deeper and deeper.
 
-**What the search remembers.** The tree holds, for every position the search has
-met, identified by its planning key, the moves tried there with their visit
-counts, value totals and priors (`Node` and `Edge`), and a saved copy of the game
-at that position (`Node.game`). A simulation walks the tree on these saved
-positions. Following a move already played from a position needs only the tree:
-the engine rolls no dice inside a move, so a move from a position always reaches
-the same position. The simulation copies a saved position only to play a move no
-simulation has played from there yet, or to roll dice. In the toy example,
-simulation 4 follows A to RA in the tree alone, copies the saved RA and plays only
-x.
+### 4.5 After the simulations: visits and shares
 
-**The dice.** Each simulation rolls its own dice, from a stream seeded per
-simulation, so one move can lead to different outcomes in different simulations,
-and the tree keeps a branch per outcome; the real game's dice are untouched.
-Each copy a simulation makes continues that simulation's stream where its last
-copy left it (`clone_for_search_continuing`), so the dice come out exactly as if
-the simulation had played its whole path on one copy.
+**Visits and shares.** After all 64 simulations, the number of times each first
+move was tried, its visit count, shows the search's preference. A move's *share*
+is its visit count divided by the number of simulations. The move actually played
+is drawn at random in proportion to the visit counts (temperature 1), and the
+shares become part of a training sample (section 7).
 
-**A real example** ([measurements](../stage_a/search_replays_2026_11_04.md)). At a
-round-5 Japanese Combat Movement decision with 24 legal moves, the network was
-asked 65 times: once for the current position and once per simulation. 24
-simulations, all among the first 31, each tried a different one of the 24 moves
-and stopped after one step. The other 40 went deeper, 37 of them through two
-moves, which ended with 27 and 12 of the 64 visits: 21 stopped after two steps
-and the rest after three to nine. The deepest, nine steps, chose to end Combat
-Movement and followed positions earlier simulations had evaluated: the start of a
-battle, a retreat, a retreating unit and the next battle, with four dice rolls on
-the way. The 64
-simulations together played 57 moves and 38 dice rolls, and the tree kept 77
-positions. At a decision with 104 legal moves, 55 of the 64 simulations stopped
-after one step.
+**How the shares come to differ from the priors.** A move whose simulations keep
+scoring better than the others' is chosen again and again, until its second term
+has shrunk enough for the others to catch up. Moves whose results are about the
+same share the remaining simulations roughly in proportion to their priors, since
+only the second term tells them apart. So the shares end up far from the
+network's priors mainly where the search found a move better than the rest: that
+move gains, and every other move gives up simulations in proportion to its prior.
 
-**What the copies cost and save.** Every position the search evaluates still comes
-from the real rules, played by the engine. A saved copy takes about 144 KB, so
-that tree held about 11 MB; each tree is dropped after its decision. Until
-4 November the tree kept no positions, and every simulation copied the current
-position and played its whole path again: 123 moves instead of 57 in the example,
-and about half of the time game threads spent not waiting for the network
-([measurements](../stage_a/search_replays_2026_11_04.md)). Saving copies gave
-identical search results on 151 real positions and played 59% fewer moves. In a
-matched training batch it raised games per hour while playing from 152 to 184,
-for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
-
-**The depth limit** is the most steps a simulation may take: 16 in current runs
-(`--max-depth 16` in the training command, `MctsConfig.max_depth` in the code;
-held-out evaluation takes its own, 4 unless set). After its 16th step a
-simulation stops wherever it is, even at a position the tree already holds, and
-uses an estimate of that position:
-
-| What the 16th step reached | What the simulation uses |
-| --- | --- |
-| A decision no simulation has evaluated | The deciding alliance's network's value, as at any new position, so the limit changes nothing |
-| A decision evaluated before | The value its network gave it then; nothing new joins the tree |
-| A chance event | The average of the three networks' values, since no alliance decides there |
-
-**Why there is a limit.** It is as old as the search (commit `6480d5b`,
-23 October). That first version had nothing else to end a simulation caught in
-a loop: some sequences of moves could bring the game back to exactly a position
-already on the simulation's path, and on such a loop every position is already
-in the tree, so the rule to stop at a new position never fires. Two hours later
-the search began to stop at such a repetition (step 5 above, commit `47eb3d6`).
-Since then a simulation ends without the limit too: it never repeats a position,
-it stops at the first decision no simulation has evaluated, and each simulation
-adds at most one such decision to the tree, so no walk can outrun what earlier
-simulations added. What the limit does now is cap how far ahead a search can
-look along one line. Like the other learning settings, 16 is the speed test's
-value, not a tuned one.
-
-**How much it matters** ([record](../stage_a/depth_limit_2026_11_09.md)). A
-replay of the game that gave [section 6](#6-how-the-networks-learn)'s sample,
-with the networks after one update, ran 68,800 simulations in 1,075 searches:
-41% stopped after one step, 90% within five and 18 at the limit, in 10
-searches, all at decisions with two to five legal moves, where the simulations
-crowd into few lines; none returned to a position already on its path. Nine of
-the 18 had reached a new position and would have stopped there anyway; eight
-stopped at a chance event and one at a known decision. Searched again without
-the limit, those ten positions' deepest simulations took 16 to 19 steps; at five
-of them 1 to 6 of the 64 visits moved to other moves, and the most-visited move
-stayed the same at all ten. So in this game the limit hardly mattered. At the eight chance events, though, the three
-networks' values for the same position differed by 2.5 to 17 points, more than a
-search's moves usually differ; [section 9](#one-network-per-alliance-or-one-shared-network)
-takes that up. Better-trained networks may crowd the simulations into fewer
-lines and meet the limit more often; that has not been measured.
-
-**After all simulations**, the number of times each first move was tried shows the
-search's preference, and the two terms of the score explain it. A move whose
-simulations keep scoring better than the others' is chosen again and again,
-until its second term has shrunk enough for the others to catch up. Moves whose
-results are about the same share the remaining simulations roughly in
-proportion to their priors, since only the second term tells them apart. So the
-visit shares end up far from the network's priors mainly where the search found
-a move better than the rest: that move gains, and every other move gives up
-simulations in proportion to its prior. The move actually played is drawn at
-random in proportion to these visit counts (temperature 1), and the visit shares
-become the sample's policy target (`studies/campaign/learning.py`, `_decide`);
-[section 6](#6-how-the-networks-learn) shows a real sample.
-
-**Exploration.** During training, random noise (Dirichlet, alpha 0.3, mixed in at
-25%) is added to the network's priors at the starting position, so the search
-sometimes tries moves the network dislikes. Evaluation turns it off.
+**Exploration noise.** During training, random noise (Dirichlet, alpha 0.3,
+mixed in at 25%) is added to the network's priors at the starting position, so
+the search sometimes tries moves the network dislikes. Evaluation turns it off.
 
 **A decision with only one legal move** is played at once, with no search and no
-network call. It is still recorded as a sample.
+network call.
 
-## 4. What a network reads
+### 4.6 A real search: decision 612
 
-For every position the search asks about, the engine's encoder
-(`src/zone_encoding.cpp`) turns the position into one bundle of numbers with three
-parts:
-
-1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same 42,737
-   zone questions, such as "how many CCP cavalry are here?".
-2. **The position as a whole:** 6,637 questions, such as the round, the phase,
-   whose turn it is, treasuries and wars.
-3. **Each legal move:** 12,673 questions, such as which kind of move it is, which
-   unit it moves and which zones it names.
-
-Answers are whole numbers, and only the non-zero ones are stored. Each move is
-also linked to the zones it starts from, passes through and acts on, so the
-network can read those zones' board answers with the move. Facts that never
-change, such as terrain and borders, come with the layout once.
-
-The encoder reads the engine's memory directly; no text is written or parsed.
-But the engine identifies everything by name (unit types, marks on units, battle
-notes, a move's details), so the encoder translates names into question numbers
-through fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
-game process's work.
-
-The details, with worked examples, are in [The network's input](network_input.md).
-
-## 5. What a network computes
-
-Each alliance has its own network: `CampaignPolicyValueNet` in
-`studies/campaign/neural.py`. For a decision it returns three **values**, its
-estimates of the three alliances' final scores, and a **probability** for every
-legal move, its first guess at which moves the search should try. Its size is
-written width × message layers: 64×2 in the Mac profile's measurements, 256×8 in
-the night run of 2 November; which plays better is
-[open](#how-wide-and-how-deep). The examples below use 64×2 and the decision of
-[the input page](network_input.md#2-three-parts): game seed 5, the CCP's first
-Combat Movement decision, with 13 legal moves.
-
-**The structure.** Inside the network, every zone, the position as a whole and
-every legal move is described by a *vector*: a list of numbers, as many as the
-width. For that decision:
-
-![For the seed-5 decision: the board's 326 answers go through the zone table (42,737 rows) to 37 zone vectors, the position's 119 answers through the position table (6,637 rows) to one position vector, and the moves' 244 answers through the move table (12,673 rows) to 13 move vectors. Two message layers update the zone vectors from their neighbours and the position vector. The value head gives 3 values, one per alliance; the policy head gives 13 scores and probabilities, built in stages.](figures/network_structure.svg)
-
-**Learned rows.** A network is a large set of numbers that training adjusts
-(section 6), its *parameters*: 4,104,392 of them at 64×2. Almost all, 97%, sit in
-three tables that hold one row of 64 numbers for every question: 42,737 rows for
-the zone questions, 6,637 for the position's and 12,673 for the moves'. Each of a
-row's 64 numbers is one parameter, so the zone table alone holds
-42,737 × 64 = 2,735,168 of them. A row belongs to a question, not to a zone:
-`units:ccp:cavalry` has one row, the network's own description, in 64 numbers,
-of "a CCP cavalry is here", added in whichever zone that is true. No number in a
-row has a meaning chosen by hand. Training moves them until the answers that
-matter push the vectors in useful directions, and it moves a row only when it
-trains on decisions that answer the row's question
-([section 6](#6-how-the-networks-learn)).
-
-**Learned layers** hold most of the other 3%. A learned layer multiplies a vector
-by a learned table of numbers and adds a learned vector; most then bend the
-result with a fixed curve (GELU). Without the curves, any stack of layers would
-amount to a single multiplication and could only add effects up.
-
-**A zone's vector is a sum of rows.** Shensi answers 12 of the 42,737 zone
-questions in that decision ([listed here](network_input.md#3-questions-and-answers));
-its other 42,725 answers are zero. Each answered question picks out its own row
-from the zone table and multiplies it by a weight that depends on the answer, and
-Shensi's vector starts as the sum of those 12 weighted rows.
-
-**The weight** is a fixed formula of the answer $a$, written by hand, not learned
-(`_signed_log` in `studies/campaign/features.py`):
-
-$$
-w(a) = \operatorname{sign}(a)\,\ln(1 + |a|)
-$$
-
-where $\ln$ is the natural logarithm. Answers are counts and yes-or-no flags, so
-in practice $a \ge 0$ and the weight is $\ln(1 + a)$; no answer was negative in
-60 decisions sampled from a game, and the sign only keeps the formula defined for
-negative numbers:
-
-| Answer $a$ | Weight $w(a)$ | Compared with an answer of 1 |
-| ---: | ---: | ---: |
-| 1 | $\ln 2 \approx 0.69$ | 1 |
-| 2 | $\ln 3 \approx 1.10$ | 1.58 |
-| 3 | $\ln 4 \approx 1.39$ | 2 |
-| 10 | $\ln 11 \approx 2.40$ | 3.46 |
-| 100 | $\ln 101 \approx 4.62$ | 6.66 |
-
-Larger counts matter more but not in proportion: ten militia add their row 3.46
-times as strongly as one, not ten times, so a big stack does not drown out
-everything else in its zone. That an answer of 1 counts 0.69 rather than 1 makes
-no difference, because the row it multiplies is learned and training can make it
-as large as it needs; the formula fixes only how counts compare with one another.
-The curve was chosen, not compared with others ([open question](#how-should-a-count-count)).
-
-Here are three of Shensi's twelve answers, with the width cut to 3 and invented
-row numbers (a fresh network's rows are all zero, and a trained network's numbers
-mean nothing one by one):
-
-| Question | Answer | Weight | Its row (3 numbers) | Weight × row |
-| --- | ---: | ---: | --- | --- |
-| `possessor:ccp` | 1 | 0.69 | [0.50, 0.10, −0.20] | [0.35, 0.07, −0.14] |
-| `units:ccp:cavalry` | 1 | 0.69 | [0.20, −0.40, 0.30] | [0.14, −0.28, 0.21] |
-| `units:ccp:militia` | 2 | 1.10 | [0.10, 0.30, 0.00] | [0.11, 0.33, 0.00] |
-| **Sum** | | | | **[0.60, 0.12, 0.07]** |
-
-The other nine answers add their rows the same way, and the real rows have 64
-numbers. Hopeh, next door, answers 8 questions, among them a warlord militia and
-three railroads, so its vector starts as a sum of 8 rows.
-
-**One table serves every zone.** `units:ccp:cavalry` has one row, added wherever
-CCP cavalry stand, so what the network learns about cavalry in Shensi applies in
-Hopeh too. It does not carry across combinations: KMT cavalry has a separate row
-([open question](#one-row-per-combination-or-rows-built-from-parts)). To tell
-the zones apart, each zone vector also gets a learned row for the zone itself,
-and its 39 fixed map facts, such as production value, terrain and original
-owner, through a learned layer. Then its 64 numbers are rescaled to
-a standard spread (layer normalization), so a zone with 43 answers, like sea zone
-P15 with Japan's fleet, does not get a vector many times larger than a zone with
-one.
-
-**Why this is called a lookup.** Picture the board input as a table with one
-line per zone and one column per question, almost all zeros:
-
-| Zone | `possessor:ccp` | `units:ccp:cavalry` | `possessor:warlord_beiping_hopeh` | `rail_to:land_china_shensi` | … 42,733 more columns |
-| --- | ---: | ---: | ---: | ---: | --- |
-| `land_china_shensi` | 1 | 1 | 0 | 0 | … |
-| `land_china_hopeh` | 0 | 0 | 1 | 1 | … |
-| … 35 more zones | | | | | |
-
-That is why questions are also called columns. Multiplying each zone's whole line
-of 42,737 weighted answers by the zone table, as a textbook network layer would,
-gives the same 37 sums (checked on Shensi, up to float rounding), but for
-Shensi alone it would multiply 42,725 zeros. So the network fetches only the rows
-of the answered columns, a *column lookup*, and adds them up: 689 rows for this
-decision, 326 + 119 + 244.
-
-**Three kinds of sums.** The position vector is the same kind of sum over the
-position's 119 answers, with the position table, and each move vector over the
-move's own answers, with the move table: 21 rows for the cavalry attack on Hopeh
-([its answers](network_input.md#example-1-a-cavalry-attack)), 4 for `end_phase`. A
-coordinator call (section 7) does this for every zone of every position, every
-position and every move at once: about 6,000 rows for a call of four positions
-([record](../stage_a/coordinator_lookups_2026_11_04.md)).
-
-**Messages along the borders.** A zone vector so far describes only its own zone.
-The map has 80 borders, each counted in both directions: 160 directed borders. In
-each message layer:
-
-1. every zone sends a message along each border leaving it: its own vector through
-   a learned layer, plus the border's 22 fixed facts, such as a river, a railway or
-   a narrow crossing, through another, the sum bent by the curve;
-2. every zone averages the messages it receives;
-3. every zone adds a correction to its vector, computed by a learned layer from its
-   old vector, that average and the position vector; then the position vector adds
-   a correction computed from itself and the average zone vector.
-
-Shensi borders Hopeh, Suiyuan, Szechwan and Tsinghai. After the first layer its
-vector reflects what they hold, such as Hopeh's warlord militia; after the second,
-also what borders them, such as Beiping next to Hopeh. Through the borders, after
-k layers a zone's vector reflects zones up to k borders away; through the position
-vector, from the second layer on, it also reads the average of all zones.
-
-**The value.** A learned layer combines the position vector with the mean and the
-maximum of the 37 zone vectors into one summary vector of the position. Two more
-learned layers turn the summary into three numbers: the predicted final scores of
-the Axis, the Allies and the Comintern, divided by 100.
-
-**A score for each move.** Each move vector is rescaled like the zone vectors and
-joined with three zone vectors, taken after the message layers: the zone it starts
-from, the zone it acts on and the average of its path zones. A move that names no
-zone, such as `end_phase`, gets a learned "no zone" vector for the first two and
-zeros for the path. A learned layer turns these 4 × 64 numbers into one combined
-vector of the move, and two more turn that, with the summary, into one score. So
-the cavalry attack on Hopeh reads its own 21 answers ("a CCP cavalry with 2 moves
-left, in Shensi, attacking along Shensi–Hopeh") together with Shensi's vector as
-its start, Hopeh's as the zone it acts on, and the average of both as its path.
-
-**Probabilities in stages.** The moves are grouped by kind, then by what acts, then
-by how it travels, then by what it acts on. At each stage the network scores every
-group from the summary and the average combined vector of the group's moves, and
-gives the groups under one parent probabilities that add up to 1; the exact move
-comes last. In that decision:
-
-| Stage | Groups | In this decision |
-| --- | ---: | --- |
-| Kind | 2 | a movement (12 moves), ending the phase (1) |
-| What acts | 4 | the cavalry, the first and the second mountain infantry (4 moves each), and ending the phase |
-| How it travels | 13 | each unit to Hopeh, Suiyuan, Szechwan or Tsinghai, and ending the phase |
-| What it acts on | 13 | no further split: these moves name no target apart from their path |
-| The exact move | 13 | one move in each group |
-
-So the probability of the cavalry attack on Hopeh is P(a movement) × P(the cavalry,
-among the three units) × P(to Hopeh, among its four destinations). Every listed
-move gets a probability; none is padded, merged or dropped. Which details count as
-"what acts" and so on comes from the roles explained in
-[The network's input](network_input.md#roles).
-
-**Rows start at zero** (since 3 November 2026). A question that training has never
-reached adds nothing, instead of a random row added at full strength. On fixed
-data this gave a slightly lower held-out value error (0.0076 against 0.0081) and
-the same policy loss: no harm shown, not a strength gain. A fresh network
-therefore gives every position the same values
-([section 6](#6-how-the-networks-learn) says what that means for a run's first
-batch).
-
-**Most of a network is rows:** 3.97 M of the 4.10 M parameters at 64×2 (97%), and
-15.88 M of 20.30 M at 256×8 (78%), whose wider layers weigh more. A decision reads
-only the rows of its answers: 689 of 62,047 in that example.
-
-Measurements of this network are in the
-[zone network record](../stage_a/zone_network_2026_11_02.md).
-
-## 6. How the networks learn
-
-A batch of games is played with all three networks frozen. Some of their
-decisions are saved as samples, and after the batch the networks are trained on
-them.
-
-**What a sample is.** A sample is one decision of a self-play game, saved so that
-training can show it to the networks again and compare their answers with
-better ones. It stores four things (`_decide` and `play_episode` in
-`studies/campaign/learning.py`):
-
-| Part | What it stores | What training does with it |
-| --- | --- | --- |
-| 1. What the network read | The decision's input ([section 4](#4-what-a-network-reads)): the non-zero answers about the board, about the position as a whole and about each legal move, and the zones each move names. It is not a copy of the game. | Shows the decision to the networks again. |
-| 2. Who chose | The alliance to move. | Only that alliance's network learns move probabilities from the sample; all three learn values from it. |
-| 3. How the search split its simulations | Each legal move's share: how many of the search's simulations began with that move, divided by their number. | The policy target: the move probabilities the network should give. |
-| 4. How the game ended | The three alliances' final scores, written into every sample of the game when it ends. | The value target: the values the network should predict, the scores divided by 100. |
-
-**A real sample**, from a game the networks played after one training batch
-([record](../stage_a/training_sample_2026_11_05.md)):
-
-![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 191 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
-
-In round 5 the CCP's mountain infantry in Shensi could attack one of four
-neighbouring KMT zones, or the CCP could end Combat Movement. Part 1 is the
-position as the Comintern's network read it. Among its answers, Hopeh's say the
-KMT holds it and is building a shipyard and a fortification there, and none
-says a unit is there.
-
-The shares in part 3 differ most from the network's probabilities for two
-moves, the attack on Hopeh and ending Combat Movement. Both differences have
-one cause: the search found one move better than the rest
+At decision 612 the noise changed the five priors of [section
+3](#3-what-a-network-gives-at-a-decision): it lowered the attack on Hopeh from
+0.10 to 0.085 and ending the phase from 0.53 to 0.40, and raised the attacks on
+Szechwan and Tsinghai to 0.177 and 0.268. The simulations ran one after another,
+numbered 1 to 64 in the order they ran. Each began by scoring the five moves and
+playing the move with the highest score. The figure shows the move each began with
 ([trace](../stage_a/training_sample_2026_11_05.md#how-the-64-simulations-were-spent)).
-
-**How the 64 simulations were split.** The simulations ran one after another,
-numbered 1 to 64 in the order they ran. Each began by giving the five moves the
-score of [section 3](#3-choosing-a-move-search) and playing the move with the
-highest score. The figure shows the move each began with.
 
 ![The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the move it began with. Simulations 1 to 14 tried every move; the two that began with the attack on Hopeh, 6 and 11, stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a position rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37; simulation 33's scores are in the table below. Simulation 53 stopped at the depth limit at a position rated −106.02, and simulations 54 to 64 all began with the other moves.](figures/sample_simulations.svg)
 
@@ -620,34 +382,562 @@ back near the network's numbers; Suiyuan's fell to a third, but only from 0.10
 to 0.03. Their agreement is a coincidence of small numbers, not the search
 confirming the network: it found no difference among them.
 
-The sample stores the shares. The move played was drawn from them, and it was
-the attack on Hopeh. The game ended with Axis +49.0, Allies −63.8 and Comintern
-−106.2, and every sample of the game stores these three scores.
+The attack on Hopeh ended with a share of 0.56. The move played was drawn from
+the shares, and it was the attack.
 
-**Why the search's shares are the target.** The network answers in one look. The
-search also asks it about every position its 64 simulations reach, and returns
-most often to the moves whose continuations score best for the alliance
-choosing ([section 3](#3-choosing-a-move-search)). In the example, the one look
-did not see that the attack would take Hopeh; the simulations that played
-through the battle did. Where the search finds a difference, its split is
-therefore a better judgment than the network's first guess. Training moves the
-network's probabilities toward the split, so the network's next first guesses
-come closer to what a search would conclude, and the next batch's searches start
-from them. The final scores are what really happened after the decision, so they
-teach the network to predict how a position will end.
+### 4.7 More detail on the search
 
-**In a run's first batch** the shares carry little. Fresh networks give every
-position the same values, because their rows start at zero
-([section 5](#5-what-a-network-computes)): on 5 November a fresh 64×2 network
-gave the same three values at four different positions of a game
+**Depth** is how many steps a simulation took from the current position before
+it stopped, counting moves and dice rolls. The *depth limit* is the most steps a
+simulation may take: 16 in current runs (`--max-depth 16` in the training
+command, `MctsConfig.max_depth` in the code; held-out evaluation takes its own,
+4 unless set). After its 16th step a simulation stops wherever it is, even at a
+position the tree already holds, and uses an estimate of that position:
+
+| What the 16th step reached | What the simulation uses |
+| --- | --- |
+| A decision no simulation has evaluated | The deciding alliance's network's value, as at any new position, so the limit changes nothing |
+| A decision evaluated before | The value its network gave it then; nothing new joins the tree |
+| A chance event | The average of the three networks' values, since no alliance decides there |
+
+**Why there is a limit.** It is as old as the search (commit `6480d5b`,
+23 October). That first version had nothing else to end a simulation caught in
+a loop: some sequences of moves could bring the game back to exactly a position
+already on the simulation's path, and on such a loop every position is already
+in the tree, so the rule to stop at a new position never fires. Two hours later
+the search began to stop at such a repetition (step 5 of section 4.2, commit
+`47eb3d6`). Since then a simulation ends without the limit too: it never repeats
+a position, it stops at the first decision no simulation has evaluated, and each
+simulation adds at most one such decision to the tree, so no walk can outrun what
+earlier simulations added. What the limit does now is cap how far ahead a search
+can look along one line. Like the other learning settings, 16 is the speed test's
+value, not a tuned one.
+
+**How much it matters** ([record](../stage_a/depth_limit_2026_11_09.md)). A
+replay of the game of decision 612, with the networks after one update, ran
+68,800 simulations in 1,075 searches: 41% stopped after one step, 90% within five
+and 18 at the limit, in 10 searches, all at decisions with two to five legal
+moves, where the simulations crowd into few lines; none returned to a position
+already on its path. Nine of the 18 had reached a new position and would have
+stopped there anyway; eight stopped at a chance event and one at a known
+decision. Searched again without the limit, those ten positions' deepest
+simulations took 16 to 19 steps; at five of them 1 to 6 of the 64 visits moved to
+other moves, and the most-visited move stayed the same at all ten. So in this
+game the limit hardly mattered. At the eight chance events, though, the three
+networks' values for the same position differed by 2.5 to 17 points, more than a
+search's moves usually differ;
+[section 11](#one-network-per-alliance-or-one-shared-network) takes that up.
+Better-trained networks may crowd the simulations into fewer lines and meet the
+limit more often; that has not been measured.
+
+**What the search remembers.** The tree holds, for every position the search has
+met, identified by its planning key, the moves tried there with their visit
+counts, value totals and priors (`Node` and `Edge`), and a saved copy of the game
+at that position (`Node.game`). A simulation walks the tree on these saved
+positions. Following a move already played from a position needs only the tree:
+the engine rolls no dice inside a move, so a move from a position always reaches
+the same position. The simulation copies a saved position only to play a move no
+simulation has played from there yet, or to roll dice. In the toy example,
+simulation 4 follows A to RA in the tree alone, copies the saved RA and plays only
+x.
+
+**The dice.** Each simulation rolls its own dice, from a stream seeded per
+simulation, so one move can lead to different outcomes in different simulations,
+and the tree keeps a branch per outcome; the real game's dice are untouched.
+Each copy a simulation makes continues that simulation's stream where its last
+copy left it (`clone_for_search_continuing`), so the dice come out exactly as if
+the simulation had played its whole path on one copy.
+
+**A search at a larger decision**
+([measurements](../stage_a/search_replays_2026_11_04.md)). At a round-5 Japanese
+Combat Movement decision with 24 legal moves, the network was asked 65 times: once
+for the current position and once per simulation. 24 simulations, all among the
+first 31, each tried a different one of the 24 moves and stopped after one step.
+The other 40 went deeper, 37 of them through two moves, which ended with 27 and 12
+of the 64 visits: 21 stopped after two steps and the rest after three to nine. The
+deepest, nine steps, chose to end Combat Movement and followed positions earlier
+simulations had evaluated: the start of a battle, a retreat, a retreating unit and
+the next battle, with four dice rolls on the way. The 64 simulations together
+played 57 moves and 38 dice rolls, and the tree kept 77 positions. At a decision
+with 104 legal moves, 55 of the 64 simulations stopped after one step.
+
+**What the copies cost and save.** Every position the search evaluates still comes
+from the real rules, played by the engine. A saved copy takes about 144 KB, so
+that tree held about 11 MB; each tree is dropped after its decision. Until
+4 November the tree kept no positions, and every simulation copied the current
+position and played its whole path again: 123 moves instead of 57 in the example,
+and about half of the time game threads spent not waiting for the network
+([measurements](../stage_a/search_replays_2026_11_04.md)). Saving copies gave
+identical search results on 151 real positions and played 59% fewer moves. In a
+matched training batch it raised games per hour while playing from 152 to 184,
+for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
+
+## 5. How a decision becomes numbers
+
+A network computes with numbers, so every decision it is asked about is first
+turned into numbers: the network's *input*. The engine's encoder
+(`src/zone_encoding.cpp`) builds it once per decision. Search copies of the same
+position share it, and a training sample stores it (section 7).
+
+### 5.1 Questions and answers
+
+**A question** is a numbered slot with one fixed meaning, such as "how many CCP
+mountain infantry are in this zone?". Its name, here
+`units:ccp:mountain_infantry`, is a readable label for that meaning; the network
+only sees the number. A name is built as `family:part:part`. The *family* says
+what kind of fact it is, `units` being how many units of a nation and type are
+somewhere, and the parts say which nation, which unit type, which zone and so on.
+
+**An answer** is a whole number: a count ("how many?"), 1 for "yes", or a value
+such as the round. Almost every answer is 0, so only the non-zero answers are
+stored.
+
+These are all the non-zero answers of the zone Shensi at decision 612:
+
+| Question | Answer | Meaning |
+| --- | ---: | --- |
+| `possessor:ccp` | 1 | the CCP holds Shensi |
+| `turn_start_possessor:ccp` | 1 | and held it when the turn began |
+| `units:ccp:militia` | 1 | one CCP militia is here |
+| `units:ccp:mountain_infantry` | 1 | one CCP mountain infantry |
+| `unit_stat:comintern:militia:count` | 1 | one Comintern militia |
+| `unit_stat:comintern:militia:move_0` | 1 | ... with no moves left |
+| `unit_stat:comintern:mountain_infantry:count` | 1 | one Comintern mountain infantry |
+| `unit_stat:comintern:mountain_infantry:move_1` | 1 | ... with 1 move left |
+| `rail_to:land_china_hopeh` | 1 | a railroad runs from here to Hopeh |
+
+Shensi's other 42,728 zone questions have the answer 0. Hopeh, next door, has 28
+non-zero answers: the KMT holds it and is building a fortification and a major
+shipyard there, and none of its answers says a unit is there.
+
+### 5.2 Three parts: the board, the position and the moves
+
+The input for one decision has three parts:
+
+1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same list of
+   42,737 zone questions, such as `units:ccp:mountain_infantry`.
+2. **The position as a whole:** one list of 6,637 position questions, such as the
+   round, the phase, whose turn it is, treasuries and wars.
+3. **Each legal move:** every move on the menu answers the same list of 12,673
+   move questions about itself, such as which kind of move it is, which unit it
+   moves and which zones it names.
+
+At decision 612 the board has 840 non-zero answers, from 2 in Szechwan to 86 in
+sea zone P14, the position 191, and the moves 80: 19 for each attack and 4 for
+ending the phase.
+
+### 5.3 The input as grids of answers
+
+Picture each part as a grid of answers: the board as one line per zone and one
+column per zone question, the position as one line, and the moves as one line per
+legal move. That is why questions are also called *columns*. Almost every cell
+is 0, and only the non-zero cells are stored.
+
+![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,737 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 6,637 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 191 non-zero answers in all.](figures/answer_grid.svg)
+
+A line of a grid holds one zone's, the position's or one move's answers. It is
+not what section 6 calls a row.
+
+### 5.4 A move's answers, and the zones it is linked to
+
+![A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,673 move columns. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.](figures/move_answers.svg)
+
+These are all 19 answers of the attack on Hopeh:
+
+| Question | Answer | Meaning |
+| --- | ---: | --- |
+| `schedule:play`, `player:comintern`, `nation:ccp` | 1 each | an ordinary move in play, the Comintern choosing for the CCP |
+| `kind:movement_route` | 1 | a movement |
+| `parameter:combat`, `parameter:mode`, `parameter:path`, `parameter:unit` | 1 each | it has these four details |
+| `unit:0_source:ccp:mountain_infantry` | 1 | the unit that acts is a CCP mountain infantry |
+| `unit_stat:0_source:count` | 1 | one unit |
+| `unit_stat:0_source:move_1` | 1 | with 1 move left |
+| `unit_zone:0_source:land_china_shensi` | 1 | standing in Shensi |
+| `unit_turn_origin:0_source:land_china_shensi` | 1 | where it started the turn |
+| `unit_rank:0_source:0` | 1 | the first of the identical mountain infantry there |
+| `zone:1_path:land_china_shensi`, `zone:1_path:land_china_hopeh` | 1 each | its path goes through Shensi and Hopeh |
+| `list_length:path` | 2 | the path has 2 zones |
+| `value:mode:ordinary` | 1 | ordinary movement |
+| `true:combat` | 1 | it starts a combat |
+
+Ending the phase has only the four answers every move has: `schedule:play`,
+`player:comintern`, `nation:ccp` and `kind:end_phase`.
+
+**Zones in a move's questions.** A board answer belongs to its zone's line, so a
+zone question never names its zone. A move involves several zones, so a move's
+answer about a zone names it inside the question, as in
+`zone:1_path:land_china_hopeh`. The parts `0_source` and `1_path` are *roles*:
+they say whether a detail names what acts, the route, or what the move acts on
+([details](network_input.md#roles)).
+
+**Links.** Each move is also linked to three places on the board: the zone it
+starts from, the zone it acts on and its path's zones. The attack on Hopeh starts
+from Shensi, acts on Hopeh and travels through Shensi and Hopeh; ending the phase
+names no zone. Through the links the network reads those zones' descriptions
+together with the move's own answers
+([section 6.9](#69-the-move-probabilities)).
+
+### 5.5 Facts that never change
+
+Some facts never change during a game, so they come with the layout once, not
+with each decision:
+
+- **39 facts per zone,** such as terrain, production value, capitals, victory
+  cities, original owners and home countries. Shensi's: it is land, worth 2 IPP,
+  mountainous, originally the CCP's, and part of the CCP's and the KMT's home
+  countries; its other 33 facts are 0.
+- **22 facts per border.** The map has 80 borders, each counted in both
+  directions: 160 *directed borders*. The border from Shensi to Hopeh is land to
+  land, crosses a river, carries a railway connection and is passable.
+
+The *layout version*, now `campaign-zone-v1-1d3c25d19abf2937`, is a hash of every
+question name and every fixed fact. A network refuses inputs of another layout,
+and a run cannot resume across a layout change.
+
+### 5.6 More detail: how the encoder builds the input
+
+The encoder reads the engine's memory directly; no text is written or parsed.
+But the engine identifies everything by name (unit types, marks on units, battle
+notes, a move's details), so the encoder translates names into question numbers
+through fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
+game process's work.
+
+[The network's input](network_input.md) explains the families, the roles, how
+each kind of detail becomes answers, how the lists of names are kept complete,
+which questions were removed as impossible, and why the engine works with names.
+
+## 6. Inside a network, brick by brick
+
+This section opens the box of [section 3](#3-what-a-network-gives-at-a-decision).
+It builds a network from small parts and shows each on decision 612, with the
+Comintern's network after its first update, the network that faced that decision.
+A network's size is written width × message layers, both explained below: 64×2
+here and in the Mac profile's measurements, 256×8 in the night run of 2 November.
+Which plays better is [open](#how-wide-and-how-deep).
+
+### 6.1 Vectors
+
+Inside the network, every zone, the position as a whole and every legal move is
+described by a *vector*: a list of numbers, 64 of them here, the network's
+*width*. At decision 612, Shensi's vector begins −0.294, 1.957, −1.422, −0.203,
+and goes on to 64 numbers ([section 6.5](#65-a-zones-vector) derives them).
+
+A vector is the network's own description of its zone, position or move: no
+number in it has a meaning chosen by hand. The network computes every vector from
+the answers of section 5 and its learned numbers, and training (section 8) adjusts
+the learned numbers until the vectors are useful for predicting values and good
+moves.
+
+### 6.2 Rows and tables
+
+**A row** is the list of 64 learned numbers that a network keeps for one
+question: one number per place in a vector. **A table** holds the rows of one
+part's questions, one row per question, in question order:
+
+| Table | Rows | One row for each |
+| --- | ---: | --- |
+| Zone table | 42,737 | zone question |
+| Position table | 6,637 | position question |
+| Move table | 12,673 | move question |
+
+A question's number is its row's number: `units:ccp:mountain_infantry` is
+question 191 of the zone questions, and its row is row 191 of the zone table. In
+machine-learning terms a table is an *embedding table* and a row an *embedding*.
+
+![Top: one row, the 64 learned numbers the Comintern's network keeps for the zone question units:ccp:mountain_infantry, row 191 of its zone table after one update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone table, one row per zone question, 42,737 rows of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 189 and 191 (units:ccp:militia and units:ccp:mountain_infantry), 307 (units:kmt:fighter, still all zeros because no kept sample had a KMT fighter), 9,844, 9,845, 9,992 and 9,994 (Comintern militia and mountain infantry counts and moves left), 29,446 (rail_to:land_china_hopeh) and the last, 42,736 (battle_order). The 9 rows Shensi's answers pick are highlighted. A fresh network's rows are all zeros; after one update 1,840 have moved. Right: Shensi's 9 answers, each 1, weigh ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,446; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 rows: Shensi's other 42,728 answers are 0.](figures/rows_and_tables.svg)
+
+**A row belongs to a question, not to a zone.** `units:ccp:mountain_infantry` has
+one row, the network's own description, in 64 numbers, of "a CCP mountain
+infantry is here", added in whichever zone that is true. No number in a row has a
+meaning chosen by hand.
+
+**Each of a row's numbers is one parameter,** so the zone table alone holds
+42,737 × 64 = 2,735,168 parameters, and the three tables 3.97 million of the
+network's 4.10 million.
+
+**Rows start at zero** (since 3 November 2026), and training moves a row only when
+it trains on samples that answer the row's question
+([section 8.5](#85-which-numbers-a-step-moves)). After the first update of the
+5 November run, 1,840 of the zone table's 42,737 rows had moved; the row of
+`units:kmt:fighter` was still all zeros, because no kept sample had a KMT fighter.
+Starting at zero means a question training has never reached adds nothing,
+instead of a random row added at full strength. On fixed data it gave a slightly
+lower held-out value error (0.0076 against 0.0081) and the same policy loss
+([section 8.1](#81-the-loss)): no harm shown, not a strength gain.
+
+### 6.3 From answers to a vector: a weighted sum of rows
+
+A zone's vector starts as a weighted sum of rows. Each of the zone's non-zero
+answers picks its question's row from the zone table and multiplies it by a
+weight that depends on the answer, and the products are added up. Shensi has 9
+non-zero answers, so its vector starts as the sum of 9 weighted rows: the right
+of the figure above.
+
+**The weight** is a fixed formula of the answer $a$, written by hand, not learned
+(`_signed_log` in `studies/campaign/features.py`):
+
+$$
+w(a) = \operatorname{sign}(a) \ln(1 + |a|)
+$$
+
+where $\ln$ is the natural logarithm. Answers are counts and yes-or-no flags, so
+in practice $a \ge 0$ and the weight is $\ln(1 + a)$; no answer was negative in
+60 decisions sampled from a game, and the sign only keeps the formula defined for
+negative numbers:
+
+| Answer $a$ | Weight $w(a)$ | Compared with an answer of 1 |
+| ---: | ---: | ---: |
+| 1 | $\ln 2 \approx 0.69$ | 1 |
+| 2 | $\ln 3 \approx 1.10$ | 1.58 |
+| 3 | $\ln 4 \approx 1.39$ | 2 |
+| 10 | $\ln 11 \approx 2.40$ | 3.46 |
+| 100 | $\ln 101 \approx 4.62$ | 6.66 |
+
+Larger counts matter more but not in proportion: ten militia add their row 3.46
+times as strongly as one, not ten times, so a big stack does not drown out
+everything else in its zone. That an answer of 1 counts 0.69 rather than 1 makes
+no difference, because the row it multiplies is learned and training can make it
+as large as it needs; the formula fixes only how counts compare with one another.
+The curve was chosen, not compared with others ([open question](#how-should-a-count-count)).
+
+**Shensi's sum, in numbers.** Each of Shensi's answers is 1, so each weight is
+0.69. The first 4 of the 64 numbers of each row, from the Comintern's network
+after one update:
+
+| Question | Its row's first 4 numbers | × 0.69 |
+| --- | --- | --- |
+| `possessor:ccp` | −0.006, −0.002, −0.028, −0.010 | −0.004, −0.002, −0.020, −0.007 |
+| `turn_start_possessor:ccp` | −0.006, −0.003, −0.027, −0.009 | −0.004, −0.002, −0.019, −0.007 |
+| `units:ccp:militia` | −0.016, 0.058, −0.030, −0.042 | −0.011, 0.040, −0.021, −0.029 |
+| `units:ccp:mountain_infantry` | 0.019, 0.001, −0.030, 0.021 | 0.013, 0.001, −0.021, 0.014 |
+| `unit_stat:comintern:militia:count` | −0.016, 0.047, −0.028, −0.048 | −0.011, 0.033, −0.019, −0.034 |
+| `unit_stat:comintern:militia:move_0` | −0.016, 0.047, −0.028, −0.048 | −0.011, 0.033, −0.019, −0.034 |
+| `unit_stat:comintern:mountain_infantry:count` | 0.019, 0.001, −0.030, 0.021 | 0.013, 0.001, −0.021, 0.014 |
+| `unit_stat:comintern:mountain_infantry:move_1` | 0.012, 0.066, 0.004, −0.038 | 0.008, 0.046, 0.003, −0.027 |
+| `rail_to:land_china_hopeh` | 0.008, −0.017, 0.025, 0.005 | 0.006, −0.012, 0.018, 0.003 |
+| **Sum** | | **−0.001, 0.137, −0.118, −0.104** |
+
+Two pairs of rows are identical, the militia's count and moves left, and the
+mountain infantry's `units` and `count` questions: in every sample so far these
+questions were answered together, so training moved them alike
+([section 8.5](#85-which-numbers-a-step-moves)).
+
+**Why this is called a lookup.** Multiplying Shensi's whole line of 42,737
+weighted answers by the zone table, as a textbook network layer would, gives the
+same 64 numbers (checked: equal to within $3 \times 10^{-8}$, float rounding),
+but it would multiply 42,728 zeros. So the network fetches only the rows of the
+answered columns, a *column lookup*, and adds them up (`_bag` in
+`studies/campaign/neural.py`).
+
+### 6.4 Learned layers
+
+The rest of the network is built from *learned layers*. A learned layer turns a
+vector of $n$ numbers into a vector of $m$ numbers: it multiplies it by a learned
+grid of $m \times n$ numbers (a matrix), adds a learned vector of $m$ numbers (the
+*bias*), and most layers then bend each result with a fixed curve, GELU. A toy
+layer with 3 inputs, 1, 2 and 3, and 2 outputs, $y_1$ and $y_2$, whose learned
+numbers are 0.5, 0.2, 0.1 and bias 0.1 for the first output, and 0.1, 0.3, −0.4
+and bias 0 for the second:
+
+$$
+y_1 = \operatorname{GELU}(0.5 \times 1 + 0.2 \times 2 + 0.1 \times 3 + 0.1) = \operatorname{GELU}(1.3) \approx 1.17
+$$
+
+$$
+y_2 = \operatorname{GELU}(0.1 \times 1 + 0.3 \times 2 - 0.4 \times 3 + 0) = \operatorname{GELU}(-0.5) \approx -0.15
+$$
+
+GELU multiplies a number by the chance that a standard normal variable falls
+below it, $\operatorname{GELU}(x) = x \Phi(x)$: large positive numbers pass almost
+unchanged and negative ones are squashed toward 0. Without such curves any stack
+of layers would amount to a single multiplication and could only add effects up.
+The layer's $m \times n$ and $m$ numbers are parameters, adjusted by training like
+the rows.
+
+**Layer normalization** rescales a vector's numbers to an average of 0 and a
+spread (standard deviation) of 1, then multiplies each by a learned number and
+adds another. It keeps vectors on a common scale, whatever went into them.
+
+### 6.5 A zone's vector
+
+A zone's vector, before the borders come in, adds three things and normalizes
+the result:
+
+1. **the weighted sum of its answers' rows** (section 6.3);
+2. **the zone's own row:** a learned row of 64 numbers for each of the 37 zones,
+   so the network can tell zones apart. Unlike the question rows, these start
+   random;
+3. **its 39 fixed facts** (section 5.5), turned into 64 numbers by a learned
+   layer without a curve.
+
+Then layer normalization rescales the sum. For Shensi at decision 612, the first 4
+of the 64 numbers:
+
+| Part | First 4 numbers |
+| --- | --- |
+| 1. Weighted sum of the 9 answers' rows | −0.001, 0.137, −0.118, −0.104 |
+| 2. Shensi's own row | 0.204, 1.874, −1.609, 0.437 |
+| 3. Its fixed facts, through a learned layer | −0.449, −0.205, 0.425, −0.504 |
+| Total | −0.246, 1.807, −1.302, −0.171 |
+| After layer normalization: Shensi's vector | −0.294, 1.957, −1.422, −0.203 |
+
+After one update the answers are still a small part of it: measured over all 64
+numbers, the sum of the answers' rows is about a sixth the size of Shensi's own
+row (1.3 against 8.0, root of the sum of squares) and smaller than its facts'
+part (2.1). So this early network's description of Shensi still says mostly
+"this is Shensi", whatever stands there. Inferred: that is part of why young
+networks rate different positions much alike.
+
+**One table serves every zone.** `units:ccp:mountain_infantry` has one row, added
+wherever CCP mountain infantry stand, so what the network learns about mountain
+infantry in Shensi applies in Hopeh too. It does not carry across combinations:
+KMT infantry has a separate row
+([open question](#one-row-per-combination-or-rows-built-from-parts)).
+
+Layer normalization also keeps a busy zone from dominating: sea zone P14, with 86
+answers at decision 612, does not get a vector many times larger than Szechwan,
+with 2.
+
+### 6.6 The position vector and the move vectors
+
+**The position vector** is built the same way from the position's answers and the
+position table: the weighted sum of the rows of its 191 answers at decision 612,
+then layer normalization. There is no identity row or fixed fact for it.
+
+**A move vector** is built the same way from the move's own answers and the move
+table: 19 rows for each attack at decision 612 and 4 for ending the phase, then
+layer normalization.
+
+A coordinator call (section 9.2) does these lookups for every zone of every
+position, every position and every move at once: about 6,000 rows for a call of
+four positions ([record](../stage_a/coordinator_lookups_2026_11_04.md)).
+
+### 6.7 Messages along the borders
+
+A zone vector so far describes only its own zone. *Message layers* let each zone
+hear from its neighbours along the 160 directed borders. In each message layer:
+
+1. every zone sends a message along each border leaving it: its own vector
+   through a learned layer, plus the border's 22 fixed facts, such as a river, a
+   railway or a narrow crossing, through another, the sum bent by the curve;
+2. every zone averages the messages it receives;
+3. every zone adds a correction to its vector, computed by a learned layer (with
+   its curve and a layer normalization) from its old vector, that average and the
+   position vector; then the position vector adds a correction computed the same
+   way from itself and the average zone vector.
+
+With $h_z$ for zone $z$'s vector, $u$ for the position vector and $f_{s \to t}$ for
+the facts of the border from $s$ to $t$, the message along that border is
+
+$$
+\text{message}_{s \to t} = \operatorname{GELU}\big(\text{layer}_1(h_s) + \text{layer}_2(f_{s \to t})\big)
+$$
+
+and then every zone $t$, and after them the position vector, change by
+
+$$
+h_t \leftarrow h_t + \text{layer}_3\big(h_t,\ \text{average of the messages into } t,\ u\big)
+$$
+
+$$
+u \leftarrow u + \text{layer}_4\big(u,\ \text{average of all } h_z\big)
+$$
+
+Every zone sends at the same time, so information spreads one border per layer:
+
+![Two panels of a schematic map around Shensi. Message layer 1: every zone hears from its neighbours at the same time: arrows run into Shensi from its four neighbours, Hopeh, Suiyuan, Szechwan and Tsinghai, and into those four from the 12 zones beyond them. After it, Shensi's vector reflects its 4 neighbours. Message layer 2: Shensi hears its neighbours again, and their vectors now carry what they heard from the zones beyond, so after it Shensi's vector also reflects those 12 zones. Every zone sends along all its borders at once, so 2 layers reach zones up to 2 borders away.](figures/message_layers.svg)
+
+After the first layer Shensi's vector reflects what its four neighbours hold;
+after the second, also the 12 zones two borders away, such as Beiping beyond
+Hopeh. In general, after $k$ layers a zone's vector reflects zones up to $k$
+borders away, and through the position vector, from the second layer on, the
+average of all zones. Each layer has its own learned layers; a 64×2 network has 2
+message layers.
+
+### 6.8 The values
+
+A learned layer (with its curve and a layer normalization) combines the position
+vector with the average and the largest value, number by number, of the 37 zone
+vectors after the message layers into one *summary vector* of the position. Two
+more learned layers, the *value head*, turn the summary into three numbers: the
+predicted final scores of the Axis, the Allies and the Comintern, in hundreds of
+points. At decision 612 they were 0.251, −0.424 and −1.024: +25.1, −42.4 and
+−102.4 (section 3).
+
+### 6.9 The move probabilities
+
+**A score for each move.** Each move vector is joined with three zone vectors,
+taken after the message layers, through the move's links (section 5.4): the zone
+it starts from, the zone it acts on and the average of its path zones. A move that
+names no zone, such as ending the phase, gets a learned "no zone" vector for the
+first two and zeros for the path. A learned layer turns these 4 × 64 numbers into
+one combined vector of the move, and two more, the *policy head*, turn that,
+together with the summary, into one number, the move's score. So the attack on Hopeh reads its own
+19 answers ("a CCP mountain infantry with 1 move left, in Shensi, attacking along
+Shensi–Hopeh") together with Shensi's vector as its start, Hopeh's as the zone it
+acts on, and the average of both as its path.
+
+**From scores to probabilities: softmax.** A list of scores becomes probabilities
+that add up to 1 by a *softmax*: each score $s_i$ becomes
+
+$$
+p_i = \frac{e^{s_i}}{\sum_j e^{s_j}}
+$$
+
+so a higher score means a higher probability, and only differences between
+scores matter.
+
+**Probabilities in stages.** The softmax is not taken over all moves at once. The
+moves are grouped by kind, then by what acts, then by how it travels, then by
+what it acts on, and the exact move comes last. At each stage the network scores
+every group from the summary and the average combined vector of the group's
+moves, and a softmax over the groups under one parent gives them probabilities
+that add up to 1. A move's probability is the product along its path:
+
+![A tree from decision 612 through the stages kind, what acts, how it travels, what it acts on and the move. Kind: a movement with probability 0.469, or ending the phase with 0.531. Under a movement, what acts: the mountain infantry, probability 1, the only unit that can move. How it travels: to Hopeh 0.219, to Suiyuan 0.204, to Szechwan 0.184, to Tsinghai 0.394. What it acts on: no split, probability 1. The moves' probabilities, the products along their paths: 0.102, 0.096, 0.086 and 0.185 for the four attacks, and 0.531 for ending the phase, whose later stages have one branch each.](figures/policy_stages.svg)
+
+At a larger decision the stages split more: at the CCP's first Combat Movement
+decision of one game, with 13 legal moves, three units could each move to four
+zones, so "what acts" had three branches under "a movement"
+([the input page](network_input.md#2-three-parts) describes that decision). Every
+listed move gets a probability; none is padded, merged or dropped. Which details
+count as "what acts" and so on comes from the roles explained in
+[The network's input](network_input.md#roles).
+
+### 6.10 The whole network
+
+All the bricks together, for decision 612:
+
+![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,737 rows to 37 zone vectors; the position's 191 answers through the position table of 6,637 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,673 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. The value head turns the position vector and the zones' mean and maximum into a summary vector and three values, one per alliance. The policy head combines each move vector with the vectors of the zones it starts from, acts on and passes through and with the summary, giving 5 scores and 5 probabilities, built in stages.](figures/network_structure.svg)
+
+**Its size.** A 64×2 network has 4,104,392 parameters. Most, 3.97 million or 97%,
+are rows; the learned layers hold the rest. At 256×8 there are 20.30 million, 78%
+of them rows, since wider layers weigh more. A decision reads only the rows of its
+answers: at decision 612, 1,111 row lookups (840 + 191 + 80) of 596 different
+rows, out of 62,047.
+
+**A fresh network gives every position the same values.** Its question rows are
+all zero, so every answer adds nothing: each zone's vector is only its own row
+and its fixed facts, the same in every position, and so are the position vector,
+the summary and the values. On 5 November a fresh 64×2 network gave the same
+three values at four different positions of a game
 ([record](../stage_a/training_sample_2026_11_05.md#a-fresh-network-gives-every-position-the-same-values)).
-A first-batch search therefore splits its simulations by the network's
-arbitrary first guesses, the exploration noise and the rare game ends it
-reaches; only the final scores carry information. From the second batch on, the
-values differ between positions.
+Its move probabilities still differ between moves, because a move's combined
+vector also carries the vectors of the zones it is linked to.
 
-The numbers in the rest of this section are those of the Mac training command in
-the [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
+Measurements of this network are in the
+[zone network record](../stage_a/zone_network_2026_11_02.md).
+
+## 7. Self-play and training samples
+
+### 7.1 A batch of games
+
+Training alternates between playing and learning. A *batch* of games is played
+with all three networks frozen: 32 games at once, 8 game processes of 4 games
+each ([section 9.2](#92-running-training-on-the-mac)). At every decision the
+alliance to move searches (section 4) and plays the move drawn from the shares.
+The numbers in sections 7 and 8 are those of the Mac training command in the
+[campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
 which calls them the speed test's settings, not tuned values.
 
 **Which decisions are kept.** A random 5% of each game's decisions, because a
@@ -656,59 +946,127 @@ legal move, played without a search, can be kept too: its share is 1, so it
 teaches only the values. Games cut off before their end give no samples in
 `--complete-episodes` runs.
 
-**Where samples wait: the replay buffer.** A sample is made in a game process at
-the moment of its decision, and its final scores are added when its game ends. A
-batch is 32 games played at once, by 8 game processes of 4 games each. The
-processes hand their samples to the main training process, which adds them to its
-*replay buffer* once all 32 games have ended. The buffer is a list of the latest
-samples, at most 8,000, from which the oldest leave first. On 5 November one batch
-kept 1,611 samples from 33,062 decisions, so a full buffer holds about the last
-five batches
-([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
+### 7.2 What a sample stores
 
-**An update** follows each batch. It runs in the main training process, on the
-CPU, while the game processes wait, and it is 700 training steps in a row. Each
-step does four things (`CampaignLearner.update` in `studies/campaign/learning.py`):
+A *sample* is one decision of a self-play game, saved so that training can show
+it to the networks again and compare their answers with better ones. It stores
+four things (`_decide` and `play_episode` in `studies/campaign/learning.py`):
 
-1. **Draw.** It picks 32 different samples at random from the whole buffer, so
-   one step mixes decisions of many games and of all three alliances. Nothing is
-   played: a step only reads stored decisions.
-2. **Read.** Each of the three networks reads the 32 decisions in one call. It
-   gives its three values for every decision, and its move probabilities for
-   those where its alliance was choosing.
-3. **Compare.** Two losses measure, for each network, how far its answers are
-   from the samples' targets:
-   - **value loss:** the squared error between the network's three values and
-     the final scores, averaged over all 32 samples;
-   - **policy loss:** the cross-entropy between the network's move probabilities
-     and the search's shares, averaged over the samples where this network's
-     alliance was choosing. On 5 November a step held 16 of the Axis's decisions
-     on average, and 8 each of the Allies' and the Comintern's.
-4. **Step.** Each network changes its parameters by one Adam step, explained
-   below, to lower the sum of its two losses; all three step together.
+| Part | What it stores | What training does with it |
+| --- | --- | --- |
+| 1. What the network read | The decision's input (section 5): the non-zero answers about the board, about the position as a whole and about each legal move, and each move's links. It is not a copy of the game. | Shows the decision to the networks again. |
+| 2. Who chose | The alliance to move. | Only that alliance's network learns move probabilities from the sample; all three learn values from it. |
+| 3. How the search split its simulations | Each legal move's share (section 4.5). | The *policy target*: the move probabilities the network should give. |
+| 4. How the game ended | The three alliances' final scores, written into every sample of the game when it ends. | The *value target*: the values the network should predict, the scores divided by 100. |
 
-The next step draws a new 32. After the 700th, the networks are saved as a model
-export, and the next batch of games plays with them. The 32 games take about 15
-minutes to play, and the 700 steps under a minute: 851 and 49 seconds on
-5 November, 881 and 46 seconds on 2 November.
+**Decision 612, as a sample.** The game of decision 612 was played for this
+example and kept every decision
+([record](../stage_a/training_sample_2026_11_05.md)); this is its sample:
 
-![Where a training step's 32 samples come from. 1: a batch of 32 games plays at once, 8 game processes of 4 games each, with the networks frozen; at each decision a random draw keeps it as a sample with chance 5%, and when a game ends its final scores are added to its samples; on 5 November one batch kept 1,611 samples from 33,062 decisions. 2: when all of the batch's games have ended, their samples join the replay buffer in the main training process, the latest 8,000 samples, about five batches, drawn as five bars from the oldest batch, whose samples leave first, to the newest; purple dots spread over all five bars mark one step's 32 samples, drawn at random. 3: one training step, 700 per update, each with a new draw: draw 32 different samples at random from the whole buffer; each of the three networks reads all 32 in one call; it compares its values with the final scores on all 32, and its move probabilities with the shares on its own alliance's samples; each network takes one Adam step. 4: after the 700th step the networks are saved for the next batch. With 64×2 networks on the CPU, a batch's 32 games take about 15 minutes to play and its 700 steps under a minute; no game plays during the steps.](figures/training_update.svg)
+![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 191 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
 
-In the training command the 32 is `--batch-size` and the 700 is `--epochs`. Both
-names mislead here: a step's 32 samples are not the batch of games, and the 700
-steps are not passes through the buffer.
+Part 1 is the input of section 5, 12 KB in all. Part 3 is the search of
+[section 4.6](#46-a-real-search-decision-612): its shares differ most from the
+network's probabilities for the attack on Hopeh and for ending Combat Movement,
+both because the search found the attack better than the rest. Part 4 is the
+game's end: Axis +49.0, Allies −63.8 and Comintern −106.2, which every sample of
+the game stores.
 
-**What a step changes: the gradient.** A network's parameters are the numbers
-training adjusts: 4.10 million in a 64×2 network
-([section 5](#5-what-a-network-computes)). A step nudges each of them the way that
-lowers the step's loss, the sum of its value and policy losses. For that,
-training first works out every parameter's *gradient* (`loss.backward()`): how
-fast the loss on the step's 32 samples would change if that one number were
-raised a little. A positive gradient means that raising the number would raise
-the loss, so it should go down; a negative one, that it should go up. The larger
-the gradient, the more the loss responds to that number.
+### 7.3 Why these targets
 
-**Adam.** The plainest rule, gradient descent, moves every parameter against its
+**The shares.** The network answers in one look. The search also asks it about
+every position its 64 simulations reach, and returns most often to the moves
+whose continuations score best for the alliance choosing (section 4). At decision
+612, the one look did not see that the attack would take Hopeh; the simulations
+that played through the battle did. Where the search finds a difference, its
+split is therefore a better judgment than the network's first guess. Training
+moves the network's probabilities toward the split, so the network's next first
+guesses come closer to what a search would conclude, and the next batch's
+searches start from them.
+
+**The final scores** are what really happened after the decision, so they teach
+the network to predict how a position will end.
+
+**In a run's first batch** the shares carry little. A fresh network gives every
+position the same values ([section 6.10](#610-the-whole-network)), so a
+first-batch search splits its simulations by the network's arbitrary first
+guesses, the exploration noise and the rare game ends it reaches; only the final
+scores carry information. From the second batch on, the values differ between
+positions.
+
+## 8. Training the networks
+
+Training changes a network's parameters so that, on the saved samples, its move
+probabilities come closer to the shares and its values closer to the final
+scores. This section builds that from its parts: a number that measures how far
+off the network is, the *loss*; the direction that lowers it, the *gradient*; the
+rule that takes a step, *Adam*; and the schedule of steps, the *update*.
+
+### 8.1 The loss
+
+The loss has two parts. On one sample, with the network's values $v_k$, the final
+scores divided by 100 as $z_k$, the shares $\pi_m$ and the network's
+probabilities $p_m$:
+
+- **the value loss** is the average squared error of the three values:
+
+$$
+L_{\text{value}} = \frac{1}{3} \sum_{k=1}^{3} \left( v_k - z_k \right)^2
+$$
+
+- **the policy loss** is the *cross-entropy* between the shares and the
+  probabilities:
+
+$$
+L_{\text{policy}} = -\sum_{m} \pi_m \ln p_m
+$$
+
+On decision 612's sample, for the Comintern's network:
+
+| Alliance | Value $v_k$ | Target $z_k$ | Error | Squared |
+| --- | ---: | ---: | ---: | ---: |
+| Axis | 0.251 | 0.490 | −0.239 | 0.057 |
+| Allies | −0.424 | −0.638 | 0.214 | 0.046 |
+| Comintern | −1.024 | −1.062 | 0.038 | 0.001 |
+| **Value loss, the average** | | | | **0.035** |
+
+| Move | Share $\pi_m$ | Probability $p_m$ | Share × (−ln probability) |
+| --- | ---: | ---: | ---: |
+| Shensi → Hopeh | 0.5625 | 0.102 | 1.282 |
+| Shensi → Suiyuan | 0.0313 | 0.096 | 0.073 |
+| Shensi → Szechwan | 0.0781 | 0.086 | 0.192 |
+| Shensi → Tsinghai | 0.1406 | 0.185 | 0.238 |
+| End Combat Movement | 0.1875 | 0.531 | 0.119 |
+| **Policy loss, the sum** | | | **1.903** |
+
+The cross-entropy is lowest when the probabilities equal the shares, here 1.221,
+the shares' own entropy; the gap of 0.682 is what training can remove on this
+sample. Most of the loss comes from the attack on Hopeh, to which the search gave
+0.56 and the network 0.10.
+
+In a training step the two losses are averaged over the step's samples: the
+value loss over all of them, the policy loss over those where the network's own
+alliance chose (section 8.4). The step lowers their sum.
+
+### 8.2 The gradient
+
+A step nudges each of the network's 4.10 million parameters the way that lowers
+the loss. For that, training first works out every parameter's *gradient*
+(`loss.backward()`): how fast the loss on the step's samples would change if that
+one number were raised a little. A positive gradient means that raising the
+number would raise the loss, so it should go down; a negative one, that it should
+go up. The larger the gradient, the more the loss responds to that number.
+
+**An example.** The value head's last layer adds a learned bias to every
+Comintern value the network predicts. In the first step of the 5 November update,
+the fresh network predicted the Comintern's final scores 109 points too high on
+average on the step's samples, so raising that bias would have raised the loss
+further: its gradient was positive, 0.728, and the step lowered it
+([record](../stage_a/adam_steps_2026_11_09.md)).
+
+### 8.3 Adam
+
+The plainest rule, gradient descent, moves every parameter against its
 gradient by a fixed multiple of it, the *learning rate*. Its steps then follow
 the gradients' sizes, which differ enormously: in the first step of the
 5 November update, the Comintern network's nonzero gradients ranged from
@@ -758,11 +1116,7 @@ Re-running the 5 November update from that run's fresh networks and its 1,611
 samples gave its generation-1 networks exactly. In the first step, 211,741 of the
 Comintern network's 221,675 numbers with a nonzero gradient moved by 0.001, to
 within 0.00001; the rest had gradients below about $10^{-6}$, where $\epsilon$
-shrinks the step. One number shows how the steps change after that: the value
-head's bias for the Comintern's own value, which is added to every Comintern
-score the network predicts. The fresh network predicted the Comintern's final
-scores on the first step's samples 109 points too high on average, so the bias's
-gradient was positive, and Adam lowered it:
+shrinks the step. The bias of section 8.2 shows how the steps change after that:
 
 | Step | Gradient | Average gradient ($\hat m$) | Typical size ($\sqrt{\hat v}$) | Change |
 | ---: | ---: | ---: | ---: | ---: |
@@ -780,16 +1134,57 @@ From step 4 on, the gradients pointed now one way, now the other (356 of the
 remembered the large first gradients: at step 700 the first step's gradient
 still made up 60% of the average squared gradient. The steps shrank
 accordingly. The average still leaned the first way, so the bias kept falling
-until step 39; over all 700 steps it moved by 0.78 points of predicted score. The network's other numbers did most of the
-correcting: in the first step each of them with a gradient also moved by 0.001,
-the way that lowered the loss. The network's value loss was 0.62 on the first
-step's samples and 0.0065 on the fourth step's, after three steps: an error of
-about 79 points per value, then 8 (root mean square). These are samples it is
-trained on, so this measures fit, not foresight.
+until step 39; over all 700 steps it moved by 0.78 points of predicted score.
+The network's other numbers did most of the correcting: in the first step each
+of them with a gradient also moved by 0.001, the way that lowered the loss. The
+network's value loss was 0.62 on the first step's samples and 0.0065 on the
+fourth step's, after three steps: an error of about 79 points per value, then 8
+(root mean square). These are samples it is trained on, so this measures fit,
+not foresight.
 
-**Which numbers a step moves.** Every sample passes through the learned layers,
-so nearly all of their numbers change in every step. A row's gradient is zero
-unless its question is answered in one of the 32 samples, because an unanswered
+### 8.4 One training step, and one update
+
+**Where samples wait: the replay buffer.** A sample is made in a game process at
+the moment of its decision, and its final scores are added when its game ends.
+The game processes hand their samples to the main training process, which adds
+them to its *replay buffer* once all 32 games of the batch have ended. The buffer
+is a list of the latest samples, at most 8,000, from which the oldest leave
+first. On 5 November one batch kept 1,611 samples from 33,062 decisions, so a
+full buffer holds about the last five batches
+([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
+
+**An update** follows each batch. It runs in the main training process, on the
+CPU, while the game processes wait, and it is 700 *training steps* in a row. Each
+step does four things (`CampaignLearner.update` in `studies/campaign/learning.py`):
+
+1. **Draw.** It picks 32 different samples at random from the whole buffer, so
+   one step mixes decisions of many games and of all three alliances. Nothing is
+   played: a step only reads stored decisions.
+2. **Read.** Each of the three networks reads the 32 decisions in one call. It
+   gives its three values for every decision, and its move probabilities for
+   those where its alliance was choosing.
+3. **Compare.** It computes each network's losses (section 8.1), averaged over
+   the samples they use. On 5 November a step held 16 of the Axis's decisions on
+   average, and 8 each of the Allies' and the Comintern's.
+4. **Step.** Each network takes one Adam step (section 8.3) to lower the sum of
+   its two losses; all three step together.
+
+The next step draws a new 32. After the 700th, the networks are saved as a *model
+export*, and the next batch of games plays with them. The 32 games take about 15
+minutes to play, and the 700 steps under a minute: 851 and 49 seconds on
+5 November, 881 and 46 seconds on 2 November.
+
+![Where a training step's 32 samples come from. 1: a batch of 32 games plays at once, 8 game processes of 4 games each, with the networks frozen; at each decision a random draw keeps it as a sample with chance 5%, and when a game ends its final scores are added to its samples; on 5 November one batch kept 1,611 samples from 33,062 decisions. 2: when all of the batch's games have ended, their samples join the replay buffer in the main training process, the latest 8,000 samples, about five batches, drawn as five bars from the oldest batch, whose samples leave first, to the newest; purple dots spread over all five bars mark one step's 32 samples, drawn at random. 3: one training step, 700 per update, each with a new draw: draw 32 different samples at random from the whole buffer; each of the three networks reads all 32 in one call; it compares its values with the final scores on all 32, and its move probabilities with the shares on its own alliance's samples; each network takes one Adam step. 4: after the 700th step the networks are saved for the next batch. With 64×2 networks on the CPU, a batch's 32 games take about 15 minutes to play and its 700 steps under a minute; no game plays during the steps.](figures/training_update.svg)
+
+In the training command the 32 is `--batch-size` and the 700 is `--epochs`. Both
+names mislead here: a step's 32 samples are not the batch of games, and the 700
+steps are not passes through the buffer.
+
+### 8.5 Which numbers a step moves
+
+Every sample passes through the learned layers, so nearly all of their numbers
+change in every step. A row is different: its gradient is zero unless its
+question is answered in one of the step's samples, because an unanswered
 question's row was never added in. So a step changes the rows of the questions
 those samples answer, and Adam's average $m$, which loses a tenth each step
 without a new gradient, keeps moving a recently answered row for a few dozen
@@ -797,16 +1192,35 @@ steps more. A row whose question has never appeared in a trained sample stays at
 zero. Checked with a test loss on two real decisions: the first step gave a
 gradient to exactly the 150 rows its decision answers and changed only those;
 the second step also moved the 59 rows that only the first decision answered.
-Over one update's 700 steps, a question answered in many samples has its row
-moved hundreds of times, and a question absent from the replay buffer not at
-all, apart from that momentum.
 
-**Why a few random samples per step.** One sample's gradient points the way that
-one decision would move the parameters. The average over 32 different decisions
-comes nearer to the way the game's decisions in general would: the random error of
-an average of $n$ independent samples shrinks like $1/\sqrt{n}$. And one step on
-32 decisions costs far less than 32 steps on one: it took 78 ms, and a step on a
-single sample 21 ms, timed on 5 November
+**After the first update of the 5 November run:**
+
+| Table | Rows moved, Axis network | Allies | Comintern | Rows in the table |
+| --- | ---: | ---: | ---: | ---: |
+| Zone table | 1,840 | 1,840 | 1,840 | 42,737 |
+| Position table | 670 | 670 | 670 | 6,637 |
+| Move table | 948 | 430 | 242 | 12,673 |
+
+The three networks moved the same zone and position rows, because every network
+learns values from every sample. Move rows feed only the move probabilities,
+which each network learns from its own alliance's decisions alone, so each moved
+the rows of the move questions its own decisions answered.
+
+**Questions always answered together get identical rows.** Of the Comintern
+network's 1,840 moved zone rows, only 1,480 were different from one another. Two
+questions answered together, with the same answers, in every sample get the same
+gradient in every step and stay identical, such as `units:ccp:mountain_infantry`
+and `unit_stat:comintern:mountain_infantry:count` in section 6.3. The network
+cannot tell them apart until some sample answers one without the other.
+
+### 8.6 Why a few random samples per step
+
+One sample's gradient points the way that one decision would move the
+parameters. The average over 32 different decisions comes nearer to the way the
+game's decisions in general would: the random error of an average of $n$
+independent samples shrinks like $1/\sqrt{n}$. And one step on 32 decisions costs
+far less than 32 steps on one: it took 78 ms, and a step on a single sample
+21 ms, timed on 5 November
 ([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
 Averaging all 8,000 in every step would read 250 times as many decisions per step
 but shrink that error only about 16 times, $\sqrt{250}$. So for the same time,
@@ -822,9 +1236,11 @@ its latest 500,000 games (Sutton and Barto, *Reinforcement Learning: An
 Introduction*, 2nd edition, sections 16.5, 16.6.1 and 16.6.2). Whether 32 and 700
 suit this game has not been tested.
 
-**How often a sample is drawn.** Each update draws 700 × 32 = 22,400 times. Once
-the buffer is full, a sample is drawn 2.8 times per update and stays about five
-updates, until newer samples push it out:
+### 8.7 How often a sample is drawn
+
+Each update draws 700 × 32 = 22,400 times. Once the buffer is full, a sample is
+drawn 2.8 times per update and stays about five updates, until newer samples push
+it out:
 
 $$
 \text{draws per sample} \approx \underbrace{\frac{700 \times 32}{8{,}000}}_{\text{per update}} \times \underbrace{\frac{8{,}000}{1{,}611}}_{\text{updates in the buffer}} = \frac{22{,}400}{1{,}611} \approx 14
@@ -839,7 +1255,31 @@ A run's first samples are drawn more often, because the buffer is not yet full: 
 the first update of the 5 November run, its 1,611 samples shared all 22,400 draws,
 14 each in that one update.
 
-## 7. Running training
+## 9. The whole loop, and running it
+
+### 9.1 The training loop
+
+With all the bricks in place, training repeats one loop:
+
+1. **Play a batch of games** (section 7.1). At every decision, the alliance to move
+   runs a search (section 4), guided by its own network (sections 3, 5 and 6),
+   and picks a move. The networks do not change during the batch.
+2. **Keep some decisions as training samples** (section 7.2): what the network
+   read, how the search split its simulations and, added when the game ends, the
+   final scores.
+3. **Train the three networks** on those samples and recent older ones from the
+   replay buffer (section 8), so that their move probabilities come closer to the
+   search's shares and their values closer to the final scores.
+4. **Save the networks** and play the next batch with them.
+
+![The training loop. 1: play a batch of games with the networks frozen; at every decision the alliance to move searches, asking its network many times, and a random 5% of decisions are kept as samples. When a game ends, its scores are added to its samples. 2: the samples join a replay buffer of recent samples; a sample records what the network read, how many simulations began with each move and, once the game ends, the final scores. 3: training steps update the three networks, one per alliance: each network's move probabilities shift toward the search's shares and its predicted scores toward the final ones. 4: the saved networks play the next batch.](figures/training_loop.svg)
+
+The idea comes from AlphaZero. The search chooses better than the bare network,
+the network learns to imitate the search and to predict outcomes, and a better
+network makes the next searches better. Whether that works for this game on this
+hardware is unproven: no run has yet shown robust playing strength.
+
+### 9.2 Running training on the Mac
 
 **Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 8 game
 processes of 4 games each. One coordinating process evaluates all their positions
@@ -857,14 +1297,14 @@ sends back each position's priors and values (`studies/campaign/shared_evaluator
 A larger batch costs less per position: 0.70 ms for one position, 1.38 ms for
 four ([record](../stage_a/coordinator_lookups_2026_11_04.md)). On 2 November the
 network's forward pass was three quarters of the coordinator's time, and the
-column lookups (section 5) were its largest single part, 26%
+column lookups (section 6.3) were its largest single part, 26%
 ([profile](../stage_a/search_replays_2026_11_04.md#2-november-one-profiled-training-batch)).
 Since the search keeps copies of its positions, the coordinator is busy 90% of the
 time and limits this layout.
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
-([section 6](#6-how-the-networks-learn)):
+([section 8.7](#87-how-often-a-sample-is-drawn)):
 
 | Setup | Network | Decisions per hour |
 | --- | --- | ---: |
@@ -878,10 +1318,10 @@ parameters at no cost in throughput, but it did not make the agents stronger: th
 learning, not the speed, is the current limit.
 
 On 4 November the search began keeping a copy of the game at each tree position
-(section 3). In a matched batch of the Mac profile, with little training, that
-raised decisions per hour while playing by 15%, from about 162,000 to 188,000;
-the coordinator, busy 90% of the time, now limits that layout
-([record](../stage_a/search_copies_2026_11_04.md)).
+([section 4.7](#47-more-detail-on-the-search)). In a matched batch of the Mac
+profile, with little training, that raised decisions per hour while playing by
+15%, from about 162,000 to 188,000; the coordinator, busy 90% of the time, now
+limits that layout ([record](../stage_a/search_copies_2026_11_04.md)).
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
@@ -890,7 +1330,7 @@ fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for moves
 that leave the game unchanged, and `tools/check_zone_names.py` for names the
 network's input does not list.
 
-### How the Campaign Observatory shows a game
+### 9.3 How the Campaign Observatory shows a game
 
 The Observatory lets you stop a recorded game at any event and inspect both the
 board and the decision facing the player there. Python prepares the recording.
@@ -938,7 +1378,7 @@ the simulation visits and the move actually played. If the next event is a dice
 roll, the combat and dice panel shows the outcome once you step forward.
 [Replay example and checks](../../tools/verify_campaign_replay_viewer.mjs)
 
-## 8. Measuring strength
+## 10. Measuring strength
 
 **Held-out evaluation** (`studies/campaign/evaluation.py`) fixes the networks
 being tested, turns exploration noise off and plays them against simple scripted
@@ -962,7 +1402,7 @@ must not offer one.
 Small samples do not establish strength. The scripted opponents are simple
 controls, not expert play.
 
-## 9. Known gaps and open questions
+## 11. Known gaps and open questions
 
 Known gaps are parts of the system that are missing, broken or unmeasured. Open
 design questions are choices the design made without testing the alternative;
@@ -1000,7 +1440,7 @@ measured and what would settle it.
 
 #### One row per combination, or rows built from parts?
 
-**Now.** Every question names a full combination and has its own row (section 5).
+**Now.** Every question names a full combination and has its own row (section 6.2).
 `unit_stat:axis:infantry:move_1`, an Axis infantry with one move left, and
 `unit_stat:allies:infantry:move_1`, the same for the Allies, share nothing. What
 training learns about one does not carry over to the other, and a combination
@@ -1025,12 +1465,12 @@ compute, compared on held-out value error and in evaluation games.
 #### How wide and how deep?
 
 **Now.** 64×2 in the Mac profile's measurements and 256×8 in the night run of
-2 November (section 5). After k message layers a zone's vector reflects zones up
-to k borders away, so a 64×2 network sees two borders, plus the average of all
+2 November (section 6). After $k$ message layers a zone's vector reflects zones
+up to $k$ borders away, so a 64×2 network sees two borders, plus the average of all
 zones through the position vector. Inferred, not measured: in China many threats
 are three or more borders away.
 
-**Measured:** the cost of each size ([section 7](#7-running-training),
+**Measured:** the cost of each size ([section 9.2](#92-running-training-on-the-mac),
 [zone network record](../stage_a/zone_network_2026_11_02.md)). **Unmeasured:**
 whether a larger network plays better at equal compute, and whether depth or
 width matters more. **Would settle it:** equal-compute runs at a few sizes,
@@ -1039,7 +1479,7 @@ including deep but narrow ones such as 64×6.
 #### How should a count count?
 
 **Now.** An answer $a$ adds its row times $\operatorname{sign}(a)\ln(1 + |a|)$
-([section 5](#5-what-a-network-computes)): 1 counts 0.69, 2 counts 1.10 and 10
+([section 6.3](#63-from-answers-to-a-vector-a-weighted-sum-of-rows)): 1 counts 0.69, 2 counts 1.10 and 10
 counts 2.40. The curve was chosen, not compared.
 
 **Alternatives:** counts in proportion, or separate questions for count ranges
@@ -1068,7 +1508,7 @@ differed by 2.5 to 17 points, while the best and worst moves' average results in
 a search lay a median 1.45 points apart. In one game 9.3% of the simulations
 stopped at positions rated by another alliance's network than the choosing one's,
 and such a rating set the bottom of the scale in
-[section 6](#6-how-the-networks-learn)'s example. Whether the networks agree
+[section 4.6](#46-a-real-search-decision-612)'s example. Whether the networks agree
 better after more training, and how much the disagreement changes searches, is
 not measured. **Would settle it:** those two measurements first, then an
 equal-compute comparison. The
@@ -1095,7 +1535,7 @@ can be checked first with the same scripted comparison.
 #### Are 64 simulations enough on large menus?
 
 **Now.** A search runs 64 simulations, and the share of visits each first move
-received becomes the policy target (section 3).
+received becomes the policy target (section 4.5).
 
 **Measured** on 31 October: at Japan's opening, with 308 options, the search tried
 63 of them, almost all once, and in an eleven-round game 60% of Japan's Combat
@@ -1155,52 +1595,118 @@ it needs its own check.
 also help the 64 simulations of the question above. **Would settle it:** the
 user's decision on the two left, then learning compared at equal compute.
 
-## 10. Glossary
+## 12. Glossary
+
+Terms in the order the document introduces them.
+
+**The game (section 2)**
 
 - **Alliance (player):** Axis, Allies or Comintern; each chooses for its nations.
 - **Position (state):** everything about the game at one moment.
 - **Decision:** a position where one alliance must choose a move.
 - **Legal move (option, action):** one choice the rules allow at a decision.
 - **Chance event:** a position where the engine rolls dice.
+- **Final score:** an alliance's wealth minus the other two alliances' combined
+  wealth at the end of the game.
 - **Planning key:** a text that identifies a position exactly.
+- **Decision 612:** the running example: round 5 of a game played on 5 November,
+  the Comintern choosing the CCP's Combat Movement from 5 legal moves.
+
+**What a network gives (section 3)**
+
+- **Network:** one per alliance; it turns a decision into three values and a
+  probability for every legal move.
+- **Value:** a network's estimate of an alliance's final score, in hundreds of
+  points.
+- **Prior:** a network's probability for a move, as the search uses it.
+- **Parameters:** all the numbers training adjusts: the rows and the learned
+  layers.
+
+**Search (section 4)**
+
 - **Search (MCTS):** the simulations that pick a move at a decision.
 - **Simulation:** one imagined walk forward from the current position, on a copy
   of the game.
+- **Search tree:** what a search remembers between simulations: for each position
+  it has met, its planning key, the statistics of the moves tried there and a
+  saved copy of the game at that position.
+- **Visit count:** how many simulations played a move.
+- **Score of a move:** its first term, the move's average result rescaled between
+  the worst and best averages seen, plus its second term, a bonus from its prior
+  that shrinks each time the move is tried.
+- **Share:** a move's visit count divided by the number of simulations.
+- **Exploration noise:** random noise mixed into the priors at the starting
+  position during training.
 - **Depth:** how many steps, moves and dice rolls, a simulation took from the
   current position before it stopped.
 - **Depth limit:** the most steps a simulation may take, 16 in current runs; a
   simulation that reaches it stops and uses an estimate of the position there.
-- **Search tree:** what a search remembers between simulations: for each position
-  it has met, its planning key, the statistics of the moves tried there and a
-  saved copy of the game at that position.
-- **Prior:** the network's probability for a move, before searching.
-- **Visit count:** how often the search tried a move.
-- **Value:** the network's estimate of the final scores, one per alliance.
+
+**The input (section 5)**
+
+- **Input:** a decision turned into numbers: the non-zero answers about the board,
+  the position as a whole and each legal move, and each move's links.
 - **Question (column):** one numbered input slot with a fixed meaning.
-- **Answer:** the whole number a position gives to a question.
+- **Answer:** the whole number a decision gives to a question; only non-zero
+  answers are stored.
 - **Family:** a group of questions with one name pattern, such as `units`.
+- **Grid of answers:** a part of the input pictured with one line per zone, for
+  the position or per move, and one column per question.
+- **Role:** the part of a move question's name, such as `0_source`, that says how
+  the move relates to the unit or zone a detail names.
+- **Links:** the zones a move starts from, acts on and passes through.
+- **Fixed facts:** 39 per zone and 22 per directed border, the same in every
+  position.
+- **Layout version:** an identifier of the full set of questions and fixed facts;
+  a network refuses inputs of another layout.
+
+**The network (section 6)**
+
 - **Vector:** a list of numbers, as many as the width, that describes a zone, the
   position or a move inside a network.
 - **Width:** how many numbers each vector and row has: 64 in a 64×2 network.
 - **Row:** the learned numbers, as many as the width, that a network keeps for one
-  question. An answer adds its question's row, weighted, to a vector.
+  question; in machine-learning terms, an embedding.
+- **Table:** the rows of one part's questions, one per question: the zone table,
+  the position table and the move table; embedding tables.
+- **Weight of an answer:** the factor its row is multiplied by,
+  $\operatorname{sign}(a)\ln(1 + |a|)$ for an answer $a$.
 - **Column lookup:** fetching the rows of the questions a position answers and
-  adding them up.
-- **Parameters:** all the numbers training adjusts: the rows and the learned layers.
-- **Layout version:** an identifier of the full set of questions and fixed map
-  facts; a network refuses inputs of another layout.
+  adding them up, weighted.
+- **Learned layer:** a multiplication by a learned matrix plus a learned bias,
+  usually followed by the GELU curve.
+- **GELU:** the fixed curve $x \Phi(x)$ that bends a layer's results.
+- **Layer normalization:** rescaling a vector to an average of 0 and a spread of
+  1, then a learned scale and shift for each number.
+- **Zone vector, position vector, move vector:** the vectors that describe a zone,
+  the position as a whole and a legal move.
+- **Message layer:** one round in which every zone hears from its neighbours
+  along the borders; a 64×2 network has 2.
+- **Summary vector:** one vector of the position, from the position vector and
+  the zone vectors' average and maximum.
+- **Value head:** the learned layers that turn the summary into three values.
+- **Policy head:** the learned layers that turn a move's combined vector and the
+  summary into the move's score.
+- **Move score:** a number for each move, from its vector, its linked zones'
+  vectors and the summary.
+- **Softmax:** turning scores into probabilities that add up to 1.
+- **Stage:** one level of the grouping by which move probabilities are built:
+  kind, what acts, how it travels, what it acts on, and the move.
+
+**Samples and training (sections 7 and 8)**
+
+- **Batch:** the games played between two updates, 32 at once.
 - **Sample:** one saved decision: what the network read, who chose, how the
   search split its simulations among the moves and the final scores.
-- **Share:** a move's visit count divided by the number of simulations.
 - **Policy target:** a sample's shares, the move probabilities a network is
   trained toward.
 - **Value target:** a sample's final scores, divided by 100, the values a network
   is trained toward.
-- **Replay buffer:** the recent samples that training draws from.
-- **Batch:** the games played between two updates.
-- **Update:** the training steps after a batch.
 - **Loss:** a number that measures how far a network's answers are from the
-  samples' targets: the value loss plus the policy loss. Training lowers it.
+  samples' targets: the value loss, a squared error, plus the policy loss, a
+  cross-entropy. Training lowers it.
+- **Cross-entropy:** the policy loss, lowest when the move probabilities equal
+  the shares.
 - **Gradient:** for one parameter, how fast the loss would change if that number
   were raised a little.
 - **Learning rate:** how far Adam moves a parameter in one step while its
@@ -1208,8 +1714,10 @@ user's decision on the two left, then learning compared at equal compute.
 - **Adam step:** one change of every parameter of a network: against the
   average of its recent gradients, divided by their typical size, times the
   learning rate.
+- **Replay buffer:** the latest samples, at most 8,000, that training draws from.
 - **Training step:** one draw of 32 samples from the replay buffer, read by the
   three networks, and one Adam step for each. The training command calls the 32
   `--batch-size` and the steps per update `--epochs`.
+- **Update:** the 700 training steps after a batch.
 - **Model export:** the saved networks after an update.
 - **Checkpoint:** a full save of a run, for resuming it.

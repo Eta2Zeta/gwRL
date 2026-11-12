@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="662" viewBox="0 0 960 662" role="img" aria-labelledby="title desc">
+  <title id="title">The board and the position as grids of answers</title>
+  <desc id="desc">Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,737 columns: possessor:ccp, possessor:kmt, units:ccp:militia, units:ccp:mountain_infantry, units:kmt:militia, units:kmt:infantry, rail_to:land_china_hopeh and project:kmt:fortification. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 6,637 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 191 non-zero answers in all.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .bold { font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; fill: #57606a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .num { font-size: 12px; font-weight: 600; }
+      .zero { font-size: 12px; fill: #8c959f; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="661" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">Decision 612's input, drawn as grids of answers</text>
+  <text class="body bold" x="24" y="64">The board: 37 zones, one line each; every zone answers the same 42,737 zone questions, one column each</text>
+  <text class="mono" x="193.0" y="218" transform="rotate(-40 193.0 218)">possessor:ccp</text>
+  <text class="mono" x="239.0" y="218" transform="rotate(-40 239.0 218)">possessor:kmt</text>
+  <text class="mono" x="285.0" y="218" transform="rotate(-40 285.0 218)">units:ccp:militia</text>
+  <text class="mono" x="331.0" y="218" transform="rotate(-40 331.0 218)">units:ccp:mountain_infantry</text>
+  <text class="mono" x="377.0" y="218" transform="rotate(-40 377.0 218)">units:kmt:militia</text>
+  <text class="mono" x="423.0" y="218" transform="rotate(-40 423.0 218)">units:kmt:infantry</text>
+  <text class="mono" x="469.0" y="218" transform="rotate(-40 469.0 218)">rail_to:land_china_hopeh</text>
+  <text class="mono" x="515.0" y="218" transform="rotate(-40 515.0 218)">project:kmt:fortification</text>
+  <text class="label" x="550" y="214">… 42,729 more columns</text>
+  <text class="label" x="772" y="214" text-anchor="middle">non-zero answers</text>
+  <text class="body bold" x="30" y="246">Shensi</text>
+  <rect x="177" y="231" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="197.0" y="247" text-anchor="middle">1</text>
+  <rect x="223" y="231" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="243.0" y="247" text-anchor="middle">0</text>
+  <rect x="269" y="231" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="289.0" y="247" text-anchor="middle">1</text>
+  <rect x="315" y="231" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="335.0" y="247" text-anchor="middle">1</text>
+  <rect x="361" y="231" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="247" text-anchor="middle">0</text>
+  <rect x="407" y="231" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="247" text-anchor="middle">0</text>
+  <rect x="453" y="231" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="473.0" y="247" text-anchor="middle">1</text>
+  <rect x="499" y="231" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="247" text-anchor="middle">0</text>
+  <text class="zero" x="554" y="247">…</text>
+  <text class="body" x="772" y="247" text-anchor="middle">9</text>
+  <text class="body bold" x="30" y="274">Hopeh</text>
+  <rect x="177" y="259" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="275" text-anchor="middle">0</text>
+  <rect x="223" y="259" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="275" text-anchor="middle">1</text>
+  <rect x="269" y="259" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="275" text-anchor="middle">0</text>
+  <rect x="315" y="259" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="275" text-anchor="middle">0</text>
+  <rect x="361" y="259" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="275" text-anchor="middle">0</text>
+  <rect x="407" y="259" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="275" text-anchor="middle">0</text>
+  <rect x="453" y="259" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="275" text-anchor="middle">0</text>
+  <rect x="499" y="259" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="519.0" y="275" text-anchor="middle">1</text>
+  <text class="zero" x="554" y="275">…</text>
+  <text class="body" x="772" y="275" text-anchor="middle">28</text>
+  <text class="body bold" x="30" y="302">Suiyuan</text>
+  <rect x="177" y="287" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="303" text-anchor="middle">0</text>
+  <rect x="223" y="287" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="303" text-anchor="middle">1</text>
+  <rect x="269" y="287" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="303" text-anchor="middle">0</text>
+  <rect x="315" y="287" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="303" text-anchor="middle">0</text>
+  <rect x="361" y="287" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="381.0" y="303" text-anchor="middle">3</text>
+  <rect x="407" y="287" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="303" text-anchor="middle">0</text>
+  <rect x="453" y="287" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="303" text-anchor="middle">0</text>
+  <rect x="499" y="287" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="303" text-anchor="middle">0</text>
+  <text class="zero" x="554" y="303">…</text>
+  <text class="body" x="772" y="303" text-anchor="middle">12</text>
+  <text class="body bold" x="30" y="330">Szechwan</text>
+  <rect x="177" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="331" text-anchor="middle">0</text>
+  <rect x="223" y="315" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="331" text-anchor="middle">1</text>
+  <rect x="269" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="331" text-anchor="middle">0</text>
+  <rect x="315" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="331" text-anchor="middle">0</text>
+  <rect x="361" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="331" text-anchor="middle">0</text>
+  <rect x="407" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="331" text-anchor="middle">0</text>
+  <rect x="453" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="331" text-anchor="middle">0</text>
+  <rect x="499" y="315" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="331" text-anchor="middle">0</text>
+  <text class="zero" x="554" y="331">…</text>
+  <text class="body" x="772" y="331" text-anchor="middle">2</text>
+  <text class="body bold" x="30" y="358">Tsinghai</text>
+  <rect x="177" y="343" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="359" text-anchor="middle">0</text>
+  <rect x="223" y="343" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="359" text-anchor="middle">1</text>
+  <rect x="269" y="343" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="359" text-anchor="middle">0</text>
+  <rect x="315" y="343" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="359" text-anchor="middle">0</text>
+  <rect x="361" y="343" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="381.0" y="359" text-anchor="middle">1</text>
+  <rect x="407" y="343" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="427.0" y="359" text-anchor="middle">2</text>
+  <rect x="453" y="343" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="359" text-anchor="middle">0</text>
+  <rect x="499" y="343" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="359" text-anchor="middle">0</text>
+  <text class="zero" x="554" y="359">…</text>
+  <text class="body" x="772" y="359" text-anchor="middle">13</text>
+  <text class="label" x="30" y="386">… 32 more zones</text>
+  <text class="label" x="24" y="416">In all 37 zones: 840 non-zero answers. Every other cell of the 37 × 42,737 grid is 0 and is not stored.</text>
+  <text class="body bold" x="24" y="448">The position as a whole: one line of 6,637 position questions</text>
+  <text class="mono" x="193.0" y="598" transform="rotate(-40 193.0 598)">round</text>
+  <text class="mono" x="239.0" y="598" transform="rotate(-40 239.0 598)">completed_rounds</text>
+  <text class="mono" x="285.0" y="598" transform="rotate(-40 285.0 598)">rounds_left</text>
+  <text class="mono" x="331.0" y="598" transform="rotate(-40 331.0 598)">phase:combat_movement</text>
+  <text class="mono" x="377.0" y="598" transform="rotate(-40 377.0 598)">turn_nation:ccp</text>
+  <text class="mono" x="423.0" y="598" transform="rotate(-40 423.0 598)">turn_nation:japan</text>
+  <text class="mono" x="469.0" y="598" transform="rotate(-40 469.0 598)">phase:noncombat_movement</text>
+  <text class="label" x="504" y="594">… 6,630 more columns</text>
+  <text class="label" x="726" y="594" text-anchor="middle">non-zero answers</text>
+  <text class="body bold" x="30" y="626">the position</text>
+  <rect x="177" y="611" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="197.0" y="627" text-anchor="middle">5</text>
+  <rect x="223" y="611" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="627" text-anchor="middle">4</text>
+  <rect x="269" y="611" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="289.0" y="627" text-anchor="middle">7</text>
+  <rect x="315" y="611" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="335.0" y="627" text-anchor="middle">1</text>
+  <rect x="361" y="611" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="381.0" y="627" text-anchor="middle">1</text>
+  <rect x="407" y="611" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="627" text-anchor="middle">0</text>
+  <rect x="453" y="611" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="627" text-anchor="middle">0</text>
+  <text class="zero" x="508" y="627">…</text>
+  <text class="body" x="726" y="627" text-anchor="middle">191</text>
+</svg>

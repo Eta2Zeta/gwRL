@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" role="img" aria-labelledby="title desc">
   <title id="title">What a network computes for one decision</title>
-  <desc id="desc">For the seed-5 decision at width 64: the board's 326 answers, filed by zone, go through the zone table of 42,737 rows to 37 zone vectors; the position's 119 answers through the position table of 6,637 rows to one position vector; the moves' 244 answers, filed by move, through the move table of 12,673 rows to 13 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. The value head turns the position vector and the zones' mean and maximum into a summary vector and three values, one per alliance. The policy head combines each move vector with the vectors of the zones it starts from, acts on and passes through and with the summary, giving 13 scores and 13 probabilities, built in stages.</desc>
+  <desc id="desc">For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,737 rows to 37 zone vectors; the position's 191 answers through the position table of 6,637 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,673 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. The value head turns the position vector and the zones' mean and maximum into a summary vector and three values, one per alliance. The policy head combines each move vector with the vectors of the zones it starts from, acts on and passes through and with the summary, giving 5 scores and 5 probabilities, built in stages.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -25,7 +25,7 @@
   <!-- Row 1: board -->
   <rect x="24" y="52" width="190" height="60" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
   <text class="name" x="38" y="76">Board</text>
-  <text class="small" x="38" y="98">326 answers, filed by zone</text>
+  <text class="small" x="38" y="98">840 answers, filed by zone</text>
   <rect x="262" y="52" width="190" height="60" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
   <text class="name" x="276" y="76">Zone table</text>
   <text class="small" x="276" y="98">42,737 rows</text>
@@ -35,7 +35,7 @@
   <!-- Row 2: position -->
   <rect x="24" y="136" width="190" height="60" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
   <text class="name" x="38" y="160">Position</text>
-  <text class="small" x="38" y="182">119 answers</text>
+  <text class="small" x="38" y="182">191 answers</text>
   <rect x="262" y="136" width="190" height="60" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
   <text class="name" x="276" y="160">Position table</text>
   <text class="small" x="276" y="182">6,637 rows</text>
@@ -45,12 +45,12 @@
   <!-- Row 3: moves -->
   <rect x="24" y="220" width="190" height="60" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
   <text class="name" x="38" y="244">Moves</text>
-  <text class="small" x="38" y="266">244 answers, filed by move</text>
+  <text class="small" x="38" y="266">80 answers, filed by move</text>
   <rect x="262" y="220" width="190" height="60" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
   <text class="name" x="276" y="244">Move table</text>
   <text class="small" x="276" y="266">12,673 rows</text>
   <rect x="500" y="220" width="180" height="60" rx="8" fill="#ddf4ff" stroke="#54aeff"/>
-  <text class="name" x="514" y="255">13 move vectors</text>
+  <text class="name" x="514" y="255">5 move vectors</text>
 
   <!-- Row arrows -->
   <line x1="216" y1="82" x2="258" y2="82" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
@@ -87,7 +87,7 @@
   <text class="name" x="276" y="348">Policy</text>
   <text class="body" x="276" y="370">each move vector + the vectors of the zones it starts</text>
   <text class="body" x="276" y="387">from, acts on and passes through + the summary</text>
-  <text class="body" x="276" y="404">→ 13 scores → 13 probabilities, built in stages:</text>
+  <text class="body" x="276" y="404">→ 5 scores → 5 probabilities, built in stages:</text>
   <text class="body" x="276" y="421">kind, what acts, how it travels, what it acts on, move</text>
   <line x1="590" y1="282" x2="590" y2="320" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
   <line x1="746" y1="206" x2="654" y2="320" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>

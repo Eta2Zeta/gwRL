@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="436" viewBox="0 0 960 436" role="img" aria-labelledby="title desc">
+  <title id="title">Decision 612's legal moves as a grid of answers</title>
+  <desc id="desc">A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,673 move columns: kind:movement_route, kind:end_phase, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path for Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and true:combat. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .bold { font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; fill: #57606a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .num { font-size: 12px; font-weight: 600; }
+      .zero { font-size: 12px; fill: #8c959f; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="435" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">Decision 612's legal moves, drawn as a grid of answers, and the zones each move is linked to</text>
+  <text class="body bold" x="24" y="64">One line per legal move; every move answers the same 12,673 move questions, one column each</text>
+  <text class="mono" x="164.0" y="246" transform="rotate(-40 164.0 246)">kind:movement_route</text>
+  <text class="mono" x="204.0" y="246" transform="rotate(-40 204.0 246)">kind:end_phase</text>
+  <text class="mono" x="244.0" y="246" transform="rotate(-40 244.0 246)">unit:0_source:ccp:mountain_infantry</text>
+  <text class="mono" x="284.0" y="246" transform="rotate(-40 284.0 246)">unit_stat:0_source:move_1</text>
+  <text class="mono" x="324.0" y="246" transform="rotate(-40 324.0 246)">zone:1_path:land_china_shensi</text>
+  <text class="mono" x="364.0" y="246" transform="rotate(-40 364.0 246)">zone:1_path:land_china_hopeh</text>
+  <text class="mono" x="404.0" y="246" transform="rotate(-40 404.0 246)">zone:1_path:land_china_suiyuan</text>
+  <text class="mono" x="444.0" y="246" transform="rotate(-40 444.0 246)">zone:1_path:land_china_szechwan</text>
+  <text class="mono" x="484.0" y="246" transform="rotate(-40 484.0 246)">zone:1_path:land_china_tsinghai</text>
+  <text class="mono" x="524.0" y="246" transform="rotate(-40 524.0 246)">true:combat</text>
+  <text class="label" x="556" y="242">… 12,663 more</text>
+  <text class="label" x="698" y="242" text-anchor="middle">non-zero answers</text>
+  <text class="body bold" x="30" y="274">1 → Hopeh</text>
+  <rect x="151" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="168.0" y="275" text-anchor="middle">1</text>
+  <rect x="191" y="259" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="208.0" y="275" text-anchor="middle">0</text>
+  <rect x="231" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="248.0" y="275" text-anchor="middle">1</text>
+  <rect x="271" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="288.0" y="275" text-anchor="middle">1</text>
+  <rect x="311" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="328.0" y="275" text-anchor="middle">1</text>
+  <rect x="351" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="368.0" y="275" text-anchor="middle">1</text>
+  <rect x="391" y="259" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="408.0" y="275" text-anchor="middle">0</text>
+  <rect x="431" y="259" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="448.0" y="275" text-anchor="middle">0</text>
+  <rect x="471" y="259" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="488.0" y="275" text-anchor="middle">0</text>
+  <rect x="511" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="528.0" y="275" text-anchor="middle">1</text>
+  <text class="zero" x="560" y="275">…</text>
+  <text class="body" x="698" y="275" text-anchor="middle">19</text>
+  <text class="body bold" x="30" y="302">2 → Suiyuan</text>
+  <rect x="151" y="287" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="168.0" y="303" text-anchor="middle">1</text>
+  <rect x="191" y="287" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="208.0" y="303" text-anchor="middle">0</text>
+  <rect x="231" y="287" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="248.0" y="303" text-anchor="middle">1</text>
+  <rect x="271" y="287" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="288.0" y="303" text-anchor="middle">1</text>
+  <rect x="311" y="287" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="328.0" y="303" text-anchor="middle">1</text>
+  <rect x="351" y="287" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="368.0" y="303" text-anchor="middle">0</text>
+  <rect x="391" y="287" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="408.0" y="303" text-anchor="middle">1</text>
+  <rect x="431" y="287" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="448.0" y="303" text-anchor="middle">0</text>
+  <rect x="471" y="287" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="488.0" y="303" text-anchor="middle">0</text>
+  <rect x="511" y="287" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="528.0" y="303" text-anchor="middle">1</text>
+  <text class="zero" x="560" y="303">…</text>
+  <text class="body" x="698" y="303" text-anchor="middle">19</text>
+  <text class="body bold" x="30" y="330">3 → Szechwan</text>
+  <rect x="151" y="315" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="168.0" y="331" text-anchor="middle">1</text>
+  <rect x="191" y="315" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="208.0" y="331" text-anchor="middle">0</text>
+  <rect x="231" y="315" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="248.0" y="331" text-anchor="middle">1</text>
+  <rect x="271" y="315" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="288.0" y="331" text-anchor="middle">1</text>
+  <rect x="311" y="315" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="328.0" y="331" text-anchor="middle">1</text>
+  <rect x="351" y="315" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="368.0" y="331" text-anchor="middle">0</text>
+  <rect x="391" y="315" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="408.0" y="331" text-anchor="middle">0</text>
+  <rect x="431" y="315" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="448.0" y="331" text-anchor="middle">1</text>
+  <rect x="471" y="315" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="488.0" y="331" text-anchor="middle">0</text>
+  <rect x="511" y="315" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="528.0" y="331" text-anchor="middle">1</text>
+  <text class="zero" x="560" y="331">…</text>
+  <text class="body" x="698" y="331" text-anchor="middle">19</text>
+  <text class="body bold" x="30" y="358">4 → Tsinghai</text>
+  <rect x="151" y="343" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="168.0" y="359" text-anchor="middle">1</text>
+  <rect x="191" y="343" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="208.0" y="359" text-anchor="middle">0</text>
+  <rect x="231" y="343" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="248.0" y="359" text-anchor="middle">1</text>
+  <rect x="271" y="343" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="288.0" y="359" text-anchor="middle">1</text>
+  <rect x="311" y="343" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="328.0" y="359" text-anchor="middle">1</text>
+  <rect x="351" y="343" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="368.0" y="359" text-anchor="middle">0</text>
+  <rect x="391" y="343" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="408.0" y="359" text-anchor="middle">0</text>
+  <rect x="431" y="343" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="448.0" y="359" text-anchor="middle">0</text>
+  <rect x="471" y="343" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="488.0" y="359" text-anchor="middle">1</text>
+  <rect x="511" y="343" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="528.0" y="359" text-anchor="middle">1</text>
+  <text class="zero" x="560" y="359">…</text>
+  <text class="body" x="698" y="359" text-anchor="middle">19</text>
+  <text class="body bold" x="30" y="386">5 end the phase</text>
+  <rect x="151" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="168.0" y="387" text-anchor="middle">0</text>
+  <rect x="191" y="371" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="208.0" y="387" text-anchor="middle">1</text>
+  <rect x="231" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="248.0" y="387" text-anchor="middle">0</text>
+  <rect x="271" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="288.0" y="387" text-anchor="middle">0</text>
+  <rect x="311" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="328.0" y="387" text-anchor="middle">0</text>
+  <rect x="351" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="368.0" y="387" text-anchor="middle">0</text>
+  <rect x="391" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="408.0" y="387" text-anchor="middle">0</text>
+  <rect x="431" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="448.0" y="387" text-anchor="middle">0</text>
+  <rect x="471" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="488.0" y="387" text-anchor="middle">0</text>
+  <rect x="511" y="371" width="34" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="528.0" y="387" text-anchor="middle">0</text>
+  <text class="zero" x="560" y="387">…</text>
+  <text class="body" x="698" y="387" text-anchor="middle">4</text>
+  <text class="label" x="809" y="242" text-anchor="middle">starts from</text>
+  <text class="label" x="893" y="242" text-anchor="middle">acts on</text>
+  <text class="label bold" x="851" y="222" text-anchor="middle">LINKS</text>
+  <rect x="770" y="260" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="809" y="274" text-anchor="middle">Shensi</text>
+  <rect x="854" y="260" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="893" y="274" text-anchor="middle">Hopeh</text>
+  <rect x="770" y="288" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="809" y="302" text-anchor="middle">Shensi</text>
+  <rect x="854" y="288" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="893" y="302" text-anchor="middle">Suiyuan</text>
+  <rect x="770" y="316" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="809" y="330" text-anchor="middle">Shensi</text>
+  <rect x="854" y="316" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="893" y="330" text-anchor="middle">Szechwan</text>
+  <rect x="770" y="344" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="809" y="358" text-anchor="middle">Shensi</text>
+  <rect x="854" y="344" width="78" height="20" rx="10" fill="#ffffff" stroke="#8c959f"/>
+  <text class="body" x="893" y="358" text-anchor="middle">Tsinghai</text>
+  <rect x="770" y="372" width="78" height="20" rx="10" fill="#f6f8fa" stroke="#8c959f"/>
+  <text class="small" x="809" y="386" text-anchor="middle">no zone</text>
+  <rect x="854" y="372" width="78" height="20" rx="10" fill="#f6f8fa" stroke="#8c959f"/>
+  <text class="small" x="893" y="386" text-anchor="middle">no zone</text>
+  <text class="label" x="24" y="418">In all 5 moves: 80 non-zero answers. Each attack also links to its path's zones, Shensi and the zone it attacks; ending the phase links to no zone.</text>
+</svg>

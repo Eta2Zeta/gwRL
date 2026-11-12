@@ -2,7 +2,7 @@
 
 This page explains, layer by layer, how one decision of the game becomes the
 numbers a network reads. It belongs to the [design document](README.md), whose
-section 4 summarizes it. The encoder is C++ (`src/zone_encoding.cpp`);
+section 5 summarizes it. The encoder is C++ (`src/zone_encoding.cpp`);
 `studies/campaign/features.py` turns its output into arrays and
 `studies/campaign/neural.py` reads them. Measurements and the reasons for the
 design are in the [zone encoding record](../stage_a/zone_encoding_2026_11_02.md).
@@ -10,7 +10,7 @@ design are in the [zone encoding record](../stage_a/zone_encoding_2026_11_02.md)
 ## 1. When and how the input is built
 
 Whenever the search reaches a decision it has not seen, it asks the deciding
-alliance's network about it (see [search](README.md#3-choosing-a-move-search)).
+alliance's network about it (see [search](README.md#4-choosing-a-move-search)).
 Before that, the engine encodes the position once. Search copies of the same
 position share that encoding, and a kept training sample stores it. The input
 describes one decision: both the state of the game and the moves on offer.
@@ -62,8 +62,8 @@ listed move.
 
 - **The board is filed by zone.** Every answer is kept with its zone, as (zone,
   question, answer), such as (Formosa, `units:japan:fighter`, 1). The zone is not
-  in the question's name: it is the row the answer belongs to, and all 37 zones
-  share the same questions.
+  in the question's name: it is the line of the board's grid the answer belongs
+  to, and all 37 zones share the same questions.
 - **The position** has one set of answers, as (question, answer).
 - **Moves are filed by move.** Every answer is kept with its move, as (move,
   question, answer). A move is not in one zone: it can start in one, pass through
@@ -104,8 +104,9 @@ These are all the non-zero board answers of the zone Shensi in that decision:
 | `rail_to:land_china_hopeh` | 1 | a railroad runs from here to Hopeh |
 
 The network keeps a learned row of numbers for every question and adds each
-answered question's row, weighted by sign(a) × log(1 + |a|): see
-[what a network computes](README.md#5-what-a-network-computes).
+answered question's row, weighted by $\operatorname{sign}(a)\ln(1 + |a|)$ for an
+answer $a$: see
+[a weighted sum of rows](README.md#63-from-answers-to-a-vector-a-weighted-sum-of-rows).
 
 ## 4. The board part
 
@@ -168,30 +169,30 @@ these include:
 ### Every move has the same format
 
 Every legal move answers the same fixed list of 12,673 move questions. So every
-move is a row of the same length, almost all zeros, and only its non-zero answers
-are stored. A move fills in only the questions that apply to it: the fighter
-attacking Hunan fills in 17, the airbase purchase 10.
+move is a line of the same length in the moves' grid, almost all zeros, and only
+its non-zero answers are stored. A move fills in only the questions that apply to
+it: the fighter attacking Hunan fills in 17, the airbase purchase 10.
 
 **A toy version.** Suppose the game had two unit types, infantry and tank, and
-three zones, a, b and c. Part of a move's row would be these eight questions:
+three zones, a, b and c. Part of a move's line would be these eight questions:
 
-![Two toy moves as rows of the same questions: the infantry moving a to b to c answers unit:0_source:infantry, unit_zone:0_source:a, zone:1_path a, b and c, and list_length:path 3, and is linked to a as where it starts and c as what it acts on; the tank moving b to c answers unit:0_source:tank, unit_zone:0_source:b, zone:1_path b and c, and list_length:path 2, with links to b and c.](figures/move_row.svg)
+![Two toy moves as lines of the same questions: the infantry moving a to b to c answers unit:0_source:infantry, unit_zone:0_source:a, zone:1_path a, b and c, and list_length:path 3, and is linked to a as where it starts and c as what it acts on; the tank moving b to c answers unit:0_source:tank, unit_zone:0_source:b, zone:1_path b and c, and list_length:path 2, with links to b and c.](figures/move_row.svg)
 
 The real format works the same way, with three differences from a plain
-"which unit, which zones" row:
+"which unit, which zones" line:
 
 - **Zones come with roles.** There is one question per zone and role, not one
-  per zone. A row with just "infantry, a, c" could not tell "a to c" from "c to
+  per zone. A line with just "infantry, a, c" could not tell "a to c" from "c to
   a". Here `unit_zone` says where the unit stands, so where the move starts,
   and the link says which zone it acts on. Between the start and the end, the
   path's zones are marked as a set, not in order.
 - **Units are described, not numbered.** A question says "an infantry", with
   its condition (moves left, damage, ...) and its rank among identical units
   there, never "unit 1".
-- **A row says more than units and zones:** the kind of move (a movement, an air
-  attack, a purchase, ...), who chooses, which labels the move has, and its plain
-  values, such as `true:combat = 1` or `number:range = 2`. Answers can be counts,
-  not only 0 or 1.
+- **A move's line says more than units and zones:** the kind of move (a movement,
+  an air attack, a purchase, ...), who chooses, which labels the move has, and its
+  plain values, such as `true:combat = 1` or `number:range = 2`. Answers can be
+  counts, not only 0 or 1.
 
 ### How the engine writes a move
 
@@ -253,7 +254,7 @@ The board is filed by zone, but a move is filed by move. The fighter attacking
 Hunan shows the difference. This is decision 41 of game seed 7001: Japan's
 Combat Movement in round 1, with 106 legal moves.
 
-**On the board**, Formosa's row lists everything in Formosa, counted by nation,
+**On the board**, Formosa's line lists everything in Formosa, counted by nation,
 alliance and type. These are all 9 of its answers:
 
 | Question | Answer | Meaning |
@@ -268,7 +269,7 @@ alliance and type. These are all 9 of its answers:
 | `unit_stat:axis:militia:move_0` | 1 | the militia has none |
 | `facility:major_port:count` | 1 | a major port |
 
-Hunan's row says that the KMT holds it with two infantry, and P32's row lists a
+Hunan's line says that the KMT holds it with two infantry, and P32's line lists a
 Japanese destroyer, light cruiser and transport.
 
 **In the move**, the answers describe the one unit the move uses and its route.
@@ -380,7 +381,7 @@ the cavalry in [example 1](#example-1-a-cavalry-attack), are written the same wa
 The network still learns where such a move ends in two ways:
 
 - **The link.** For a move with a path, the zone it acts on is the path's last
-  zone. So the network reads Hunan's board row in the "acts on" slot, just as it
+  zone. So the network reads Hunan's zone vector in the "acts on" slot, just as it
   reads a `2_target` zone for a move without a path.
 - **The kind.** `kind:air_ground_attack = 1`, or `true:combat = 1` for a
   movement move, says that the move is an attack.
@@ -516,7 +517,7 @@ so repairs of different railroads, or of different sides, fall into different
 points they mend are told apart at the last stage.
 
 **On the board.** Once bought, the repair is under way until the Place Units
-Phase. Manchuria Northern's board row then also says
+Phase. Manchuria Northern's board answers then also include
 `repair:japan:rail:count = 1`, `repair:japan:rail:remaining_damage = 1` and
 `rail_repair_toward:land_manchuria_western = 1`: Japan is repairing 1 point on
 its side of the railroad toward Manchuria Western.
@@ -541,7 +542,7 @@ construction project or railroad. A name ending in a number that is none of
 these belongs to something no longer in the game, such as a unit lost earlier
 this turn, and is skipped; words never contain digits. Any other name is a word.
 Only some notes hold words, such as `context`, `result` or `rolling_phase`; a
-word in another note goes to an "other" row and is reported, like an unlisted
+word in another note goes to an "other" question and is reported, like an unlisted
 word.
 
 ### A battle note, word by word
@@ -549,9 +550,9 @@ word.
 A real naval battle in sea zone P33 (game seed 7019): an enemy submarine moved in
 from P32, and a Japanese fighter on patrol, from a light carrier, attacked it. A
 Japanese destroyer was also in P33. Some of the battle's notes, mid-way, and the
-answers they give on P33's row:
+answers they give on P33's line:
 
-| Note | Its answers on P33's row |
+| Note | Its answers on P33's line |
 | --- | --- |
 | `round = 1` | `battle_data:round = 2` |
 | `defenders = [the Japanese fighter]` | `battle_data_unit:defenders:fighter = 1` |

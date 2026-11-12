@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="250" viewBox="0 0 920 250" role="img" aria-labelledby="title desc">
-  <title id="title">Two toy moves as rows of the same questions</title>
+  <title id="title">Two toy moves as lines of the same questions</title>
   <desc id="desc">A toy game with two unit types and three zones. The infantry moving a to b to c answers unit:0_source:infantry 1, unit_zone:0_source:a 1, zone:1_path a, b and c 1 each and list_length:path 3; it starts from a and acts on c. The tank moving b to c answers unit:0_source:tank 1, unit_zone:0_source:b 1, zone:1_path b and c 1 each and list_length:path 2; it starts from b and acts on c. All other answers are zero.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -67,6 +67,6 @@
   <rect x="834" y="130" width="60" height="32" rx="16" fill="#f6f8fa" stroke="#8c959f"/><text class="link" x="864" y="151" text-anchor="middle">c</text>
 
   <!-- Notes -->
-  <text class="note" x="24" y="196">Each colour is one family of questions; grey cells are zero and are not stored. The path's zones are a set: the row alone</text>
+  <text class="note" x="24" y="196">Each colour is one family of questions; grey cells are zero and are not stored. The path's zones are a set: the line alone</text>
   <text class="note" x="24" y="214">cannot say a came before b. Where the move starts comes from unit_zone, and where it ends from the link to the zone it acts on.</text>
 </svg>

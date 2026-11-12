@@ -1,6 +1,6 @@
 # What Adam did in one real update — 9 November 2026
 
-The [design document](../design/README.md#6-how-the-networks-learn) explains a
+The [design document](../design/README.md#82-the-gradient) explains a
 training step's gradient and its Adam step with numbers from one real update:
 the 700 steps that followed the first batch of the
 [5 November sample run](training_sample_2026_11_05.md). This record says how

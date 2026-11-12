@@ -1,6 +1,6 @@
 # How often the depth limit stops a simulation — 9 November 2026
 
-The [design document](../design/README.md#3-choosing-a-move-search) explains the
+The [design document](../design/README.md#47-more-detail-on-the-search) explains the
 search's depth limit: a simulation stops after 16 steps, moves and dice rolls,
 wherever it is. This record measures how often that happened in one real
 training game, what the stopped simulations used instead, and what the searches

@@ -8,7 +8,7 @@ played by the tree alone. It copies a saved position only to play a new move or
 to roll dice there. The search's results are identical to before. In a matched
 training batch on the Mac profile, games per hour while playing rose from 152 to
 184 and the game processes' CPU per game fell from 217 to 149 seconds, for
-0.5 GB more peak memory. The [design document](../design/README.md#3-choosing-a-move-search)
+0.5 GB more peak memory. The [design document](../design/README.md#47-more-detail-on-the-search)
 explains how the search works now; the [evidence file](search_copies_2026_11_04.json)
 holds the exact values.
 

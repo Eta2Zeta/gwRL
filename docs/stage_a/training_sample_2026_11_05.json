@@ -1,7 +1,7 @@
 {
  "date": "2026-11-05",
  "commit": "d64117d",
- "design_section": "docs/design/README.md#6-how-the-networks-learn",
+ "design_section": "docs/design/README.md#72-what-a-sample-stores",
  "training_batch": {
   "command": "env -u MallocNanoZone ./.venv/bin/python -m studies.campaign.run train --run-dir studies/campaign/runs/sample-example-2026-11-05 --seed 1936 --calendar-rounds 11 --complete-episodes --batches 1 --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 --batch-size 32 --epochs 700 --replay-capacity 8000 --sample-fraction 0.05 --transitions-per-batch 20000 --episode-workers 8 --games-per-process 4 --parallel-envs 32 --neural-device cpu --threads 1 --cpu-budget 11",
   "games": 32,

@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="334" viewBox="0 0 960 334" role="img" aria-labelledby="title desc">
+  <title id="title">What a network gives at a decision</title>
+  <desc id="desc">Left: decision 612, what the network is given: the position (the board, round 5, Combat Movement, the CCP's turn) and the 5 legal moves: 1 to 4, the mountain infantry in Shensi attacking Hopeh, Suiyuan, Szechwan or Tsinghai, and 5, ending Combat Movement. Middle: the Comintern's network, 4.1 million learned numbers. Right, what it gives: values, its estimate of each alliance's final score: Axis +25.1, Allies −42.4, Comintern −102.4; and move probabilities, its first guess, which the search calls priors: 0.10, 0.10, 0.09, 0.18 and 0.53 for moves 1 to 5.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .bold { font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; fill: #57606a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .num { font-size: 12px; font-weight: 600; }
+      .zero { font-size: 12px; fill: #8c959f; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="333" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="24" y="24" width="318" height="286" rx="8" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="title" x="40" y="52">Decision 612</text>
+  <text class="sub" x="40" y="74">what the network is given</text>
+  <text class="body" x="40" y="100">the position: the board, round 5,</text>
+  <text class="body" x="40" y="118">Combat Movement, the CCP's turn, …</text>
+  <text class="body bold" x="40" y="146">and the 5 legal moves:</text>
+  <text class="num" x="40" y="172">1</text>
+  <text class="body" x="58" y="172">mountain infantry Shensi → Hopeh</text>
+  <text class="num" x="40" y="194">2</text>
+  <text class="body" x="58" y="194">mountain infantry Shensi → Suiyuan</text>
+  <text class="num" x="40" y="216">3</text>
+  <text class="body" x="58" y="216">mountain infantry Shensi → Szechwan</text>
+  <text class="num" x="40" y="238">4</text>
+  <text class="body" x="58" y="238">mountain infantry Shensi → Tsinghai</text>
+  <text class="num" x="40" y="260">5</text>
+  <text class="body" x="58" y="260">end Combat Movement</text>
+  <text class="label" x="40" y="290">moves 1 to 4 attack a KMT zone</text>
+  <line x1="346" y1="167" x2="388" y2="167" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="392" y="112" width="168" height="110" rx="8" fill="#fbefff" stroke="#c297ff"/>
+  <text class="head" x="476" y="146" text-anchor="middle">The Comintern's</text>
+  <text class="head" x="476" y="166" text-anchor="middle">network</text>
+  <text class="label" x="476" y="192" text-anchor="middle">4.1 million learned</text>
+  <text class="label" x="476" y="208" text-anchor="middle">numbers inside</text>
+  <line x1="564" y1="167" x2="606" y2="167" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="610" y="24" width="326" height="286" rx="8" fill="#dafbe1" stroke="#4ac26b"/>
+  <text class="title" x="626" y="52">What it gives</text>
+  <text class="body bold" x="626" y="78">Values: its estimate of each</text>
+  <text class="body bold" x="626" y="96">alliance's final score</text>
+  <text class="body" x="640" y="120">Axis</text>
+  <text class="body bold" x="800" y="120" text-anchor="end">+25.1</text>
+  <text class="body" x="640" y="139">Allies</text>
+  <text class="body bold" x="800" y="139" text-anchor="end">−42.4</text>
+  <text class="body" x="640" y="158">Comintern</text>
+  <text class="body bold" x="800" y="158" text-anchor="end">−102.4</text>
+  <text class="body bold" x="626" y="192">Move probabilities: its first guess,</text>
+  <text class="sub" x="626" y="210">which the search calls priors</text>
+  <text class="small" x="640" y="234" text-anchor="middle">1</text>
+  <rect x="652" y="225" width="34.2" height="11" rx="2" fill="#2a78d6"/>
+  <text class="small" x="692.1570686887874" y="234.5">0.10</text>
+  <text class="small" x="640" y="250" text-anchor="middle">2</text>
+  <rect x="652" y="241" width="31.9" height="11" rx="2" fill="#2a78d6"/>
+  <text class="small" x="689.897577624698" y="250.5">0.10</text>
+  <text class="small" x="640" y="266" text-anchor="middle">3</text>
+  <rect x="652" y="257" width="28.7" height="11" rx="2" fill="#2a78d6"/>
+  <text class="small" x="686.6870546071907" y="266.5">0.09</text>
+  <text class="small" x="640" y="282" text-anchor="middle">4</text>
+  <rect x="652" y="273" width="61.6" height="11" rx="2" fill="#2a78d6"/>
+  <text class="small" x="719.5655425484161" y="282.5">0.18</text>
+  <text class="small" x="640" y="298" text-anchor="middle">5</text>
+  <rect x="652" y="289" width="177.0" height="11" rx="2" fill="#2a78d6"/>
+  <text class="small" x="835.0260898642412" y="298.5">0.53</text>
+</svg>

@@ -1,6 +1,6 @@
 # One real training sample — 5 November 2026
 
-The [design document](../design/README.md#6-how-the-networks-learn) explains what
+The [design document](../design/README.md#72-what-a-sample-stores) explains what
 a training sample stores by showing one real sample. This record says how that
 sample was made and gives its exact values; the
 [evidence file](training_sample_2026_11_05.json) holds them in full, with every

@@ -61,9 +61,13 @@
 
 - `docs/design/README.md` is the central design document of the learning
   system: the game interface, search, the network's input, the network,
-  training, runs, evaluation and their data structures. It explains the design
-  from the top down, layer by layer, in plain words for a reader who is not a
-  reinforcement learning specialist, with real examples from the engine.
+  training, runs, evaluation and their data structures. It builds the design up
+  from its bricks, in plain words for a reader who knows basic reinforcement
+  learning but not this project: every part is defined, with a diagram or a real
+  example from the engine (decision 612 is the running one), before any later
+  part uses it, and the last sections assemble the whole training loop. A
+  mention of a later part must point ahead explicitly. Details a first reading
+  can skip go in a section's closing "More detail" part.
 - When the user asks how or why something in the learning design works, put the
   explanation in the design document, then answer in chat briefly with a link to
   the section. Do not leave a design explanation only in chat.
@@ -81,9 +85,13 @@
   ignore rule), with a title, a description and alt text, and look at them
   rendered before committing. Write tables as Markdown tables and formulas as
   math. Code blocks are for commands and code only.
+- GitHub reads Markdown before maths: `\,` and other backslash-punctuation lose
+  their backslash, `&` is mangled, and a formula line starting with `+`, `-` or
+  `=` becomes a list or heading. Avoid them, and check new formulas through
+  GitHub's Markdown API (`gh api markdown`, mode `gfm`) before committing.
 
 ## References
 
 For STEM questions, especially mathematics and physics, first look for references
-in `/Users/home/Documents/Education/Books/Textbooks`. If those are insufficient,
+in `/Users/home/Documents/Education/Library/Books/Textbooks`. If those are insufficient,
 then look online for papers and notes.

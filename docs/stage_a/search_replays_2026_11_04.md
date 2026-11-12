@@ -7,7 +7,7 @@ the one process that evaluates every game's positions (the coordinator) was busy
 work the game processes did while not waiting was about half applying moves.
 On 4 November six single searches were counted: each copies the game 64 times
 and plays 75 to 133 moves and up to 38 dice rolls on those copies. The
-[design document](../design/README.md#3-choosing-a-move-search) explains why a
+[design document](../design/README.md#47-more-detail-on-the-search) explains why a
 search plays moves again. The [evidence file](search_replays_2026_11_04.json)
 holds the exact values.
 

@@ -1,6 +1,6 @@
 {
  "date": "2026-11-09",
- "design_section": "docs/design/README.md#6-how-the-networks-learn",
+ "design_section": "docs/design/README.md#82-the-gradient",
  "sources": "commit d64117d, the commit of the 5 November sample run, extracted and built separately",
  "run": "studies/campaign/runs/sample-example-2026-11-05 (training_sample_2026_11_05.md)",
  "how": "Built a learner with run._learner from the export's run configuration, loaded generation 0, set its replay to the 1,611 samples stored in the run's checkpoint, in their stored order, and called CampaignLearner.update(): 700 steps of 32 samples, Adam with learning rate 0.001 and PyTorch's other defaults. Each optimizer's step() was wrapped to read gradients and Adam's state; nothing else changed.",
