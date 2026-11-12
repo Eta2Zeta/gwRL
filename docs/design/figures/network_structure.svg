@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" role="img" aria-labelledby="title desc">
   <title id="title">What a network computes for one decision</title>
-  <desc id="desc">For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,737 rows to 37 zone vectors; the position's 191 answers through the position table of 6,637 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,673 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. The value head turns the position vector and the zones' mean and maximum into a summary vector and three values, one per alliance. The policy head combines each move vector with the vectors of the zones it starts from, acts on and passes through and with the summary, giving 5 scores and 5 probabilities, built in stages.</desc>
+  <desc id="desc">For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,737 rows to 37 zone vectors; the position's 191 answers through the position table of 6,637 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,673 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -87,7 +87,7 @@
   <text class="name" x="276" y="348">Policy</text>
   <text class="body" x="276" y="370">each move vector + the vectors of the zones it starts</text>
   <text class="body" x="276" y="387">from, acts on and passes through + the summary</text>
-  <text class="body" x="276" y="404">→ 5 scores → 5 probabilities, built in stages:</text>
+  <text class="body" x="276" y="404">→ 5 logits → 5 probabilities, built in stages:</text>
   <text class="body" x="276" y="421">kind, what acts, how it travels, what it acts on, move</text>
   <line x1="590" y1="282" x2="590" y2="320" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
   <line x1="746" y1="206" x2="654" y2="320" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
