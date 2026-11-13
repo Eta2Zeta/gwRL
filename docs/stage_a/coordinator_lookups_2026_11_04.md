@@ -7,7 +7,8 @@ time in a matched batch. On 2 November the network's forward pass was about thre
 quarters of its time, and the column lookups were the largest single part, 26%
 ([profile](search_replays_2026_11_04.md#2-november-one-profiled-training-batch)).
 This measurement times those lookups inside the real forward pass and a fused
-replacement. The replacement is not in the code yet. The
+replacement. The replacement went into the code on 12 November
+([record](coordinator_lookups_2026_11_12.md)). The
 [evidence file](coordinator_lookups_2026_11_04.json) holds the exact values.
 
 ## What a lookup does
@@ -36,7 +37,11 @@ drawn from them, after 20 warm-up passes:
 
 In the 2 November batch the coordinator's calls carried 3.9 positions on average,
 so the forward pass would be about 30% faster, and the gain grows with larger
-calls. The fused outputs were identical to the last bit for every batch.
+calls. The fused outputs were identical to the last bit for every batch. But a
+fresh network's rows are all zero, so this compared sums of zeros and showed
+nothing about the sums. The
+[12 November check](coordinator_lookups_2026_11_12.md#the-same-outputs), with
+trained and random rows, did.
 
 ## What this does and does not show
 
@@ -48,3 +53,7 @@ calls. The fused outputs were identical to the last bit for every batch.
   the cores, not the coordinator, would set the next limit.
 - **Open:** training's backward pass through the fused lookup, and the gain in a
   whole training batch, are unmeasured.
+- **Followed up on 12 November:** the fused lookup is in the code, with identical
+  outputs. In matched training batches the coordinator's time per evaluation fell
+  by 18% and decisions per hour rose by 17.6%
+  ([record](coordinator_lookups_2026_11_12.md)).

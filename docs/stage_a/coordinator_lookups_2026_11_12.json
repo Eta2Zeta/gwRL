@@ -1,0 +1,404 @@
+{
+ "date": "2026-11-12",
+ "base_commit": "5bf6c44",
+ "change": "neural._bag: torch.nn.functional.embedding_bag (sum, per-answer weights, offsets) instead of index_select, multiply and index_add_; features.pack_zone_arrays gives each bag's start (zone_bags, global_bags, action_bags)",
+ "equivalence": {
+  "positions": "random-play eleven-round games, seeds 5000, 5001, 5002 (moves from random.Random(seed)): every 7th decision with more than one legal move (525) and every 50th chance position (15)",
+  "networks": "the 5 November run's generation-1 networks (studies/campaign/runs/sample-example-2026-11-05/models/generation-000001.pt; 1,840 of 42,737 zone rows not zero) and a fresh 64x2 network with its three tables filled from a normal distribution, standard deviation 0.1, seed 7",
+  "batches": "60 random batches each of 1, 4, 16 and 64 positions; gradients: 5 batches of 32 decisions, loss = mean squared value error to random targets minus the logits weighted by random shares",
+  "torch_2_14": {
+   "torch": "2.14.0",
+   "largest_output_difference": 0.0,
+   "outputs": {
+    "trained axis, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained axis, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained axis, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained axis, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    }
+   },
+   "shuffled_board_answers_largest_difference": 7.450580596923828e-08,
+   "gradients_largest_difference_relative_to_largest_gradient": {
+    "trained comintern": 1.2447587875302554e-06,
+    "random rows": 1.0459960734702063e-06
+   },
+   "forward_ms": {
+    "1": {
+     "answers": 1571,
+     "old": 0.492,
+     "fused": 0.443
+    },
+    "4": {
+     "answers": 6311,
+     "old": 1.009,
+     "fused": 0.73
+    },
+    "16": {
+     "answers": 24930,
+     "old": 3.304,
+     "fused": 1.965
+    }
+   }
+  },
+  "torch_2_11": {
+   "torch": "2.11.0",
+   "largest_output_difference": 0.0,
+   "outputs": {
+    "trained axis, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 1 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained axis, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 4 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained axis, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 16 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained axis, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained allies, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "trained comintern, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    },
+    "random rows, 64 per call": {
+     "largest score difference": 0.0,
+     "largest value difference": 0.0
+    }
+   },
+   "shuffled_board_answers_largest_difference": 7.450580596923828e-08,
+   "gradients_largest_difference_relative_to_largest_gradient": {
+    "trained comintern": 1.2447587875302554e-06,
+    "random rows": 1.0459960734702063e-06
+   },
+   "forward_ms": {
+    "1": {
+     "answers": 1571,
+     "old": 0.622,
+     "fused": 0.483
+    },
+    "4": {
+     "answers": 6311,
+     "old": 1.534,
+     "fused": 0.972
+    },
+    "16": {
+     "answers": 24930,
+     "old": 4.812,
+     "fused": 2.47
+    }
+   }
+  },
+  "mps_torch_2_14": {
+   "largest_logit_difference_to_cpu": 9.5367431640625e-07,
+   "largest_value_difference_to_cpu": 1.6391277313232422e-07,
+   "backward": "ran; 366 zone rows got a gradient",
+   "positions": 8,
+   "network": "fresh 64x2 with random rows"
+  },
+  "note_on_4_november": "the 4 November check used fresh networks, whose rows are all zero since 3 November, so its identical outputs compared sums of zeros"
+ },
+ "coordinator_call_profile": {
+  "torch": "2.14.0",
+  "positions_per_call": 4,
+  "calls": 400,
+  "network": "trained Comintern network, generation 1 of the 5 November run",
+  "ms": {
+   "pack_zone_arrays": 0.135,
+   "forward_packed": 0.86,
+   "collect": 0.028,
+   "total": 1.023
+  },
+  "operator_calls_per_forward": 898,
+  "operator_self_time_us_per_forward": 694,
+  "largest_operators": {
+   "aten::gelu": [
+    146.5,
+    14
+   ],
+   "aten::addmm": [
+    101.4,
+    23
+   ],
+   "aten::_embedding_bag": [
+    60.4,
+    3
+   ],
+   "aten::scatter_add_": [
+    37.1,
+    6.9
+   ],
+   "aten::add": [
+    35.5,
+    20
+   ],
+   "aten::copy_": [
+    33.4,
+    43
+   ],
+   "aten::native_layer_norm": [
+    32.5,
+    9
+   ],
+   "aten::cat": [
+    32.5,
+    17
+   ],
+   "aten::index_select": [
+    27.6,
+    24
+   ]
+  },
+  "largest_operators_columns": [
+   "self microseconds per forward",
+   "calls per forward"
+  ]
+ },
+ "activation_timing_us": {
+  "torch": "2.14.0",
+  "threads": 1,
+  "40960 numbers": {
+   "gelu exact": 35.73,
+   "gelu tanh": 107.86,
+   "silu": 31.15,
+   "relu": 2.66,
+   "add": 3.15
+  },
+  "9472 numbers": {
+   "gelu exact": 8.46,
+   "gelu tanh": 24.77,
+   "silu": 7.44,
+   "relu": 1.17,
+   "add": 1.63
+  },
+  "6400 numbers": {
+   "gelu exact": 5.75,
+   "gelu tanh": 18.29,
+   "silu": 5.91,
+   "relu": 0.8,
+   "add": 1.39
+  }
+ },
+ "matched_batches": {
+  "settings": "--profile mac (8 game processes of 4 games, coordinator on the CPU, PyTorch 2.14); 32 eleven-round games, fresh 64x2 networks, 64 simulations, depth 16, seed 20261104, epochs 50, batch size 32, replay 8000, sample fraction 0.05, transitions per batch 20000; order: old, new, old2, clean-new; nothing else running",
+  "runs": {
+   "old": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 648.8,
+    "learning_seconds": 2.4,
+    "games_per_hour_playing": 177.6,
+    "decisions_per_game": 1056,
+    "decisions_per_hour_playing": 187543,
+    "evaluations_per_game": 53675,
+    "coordinator_busy": 0.9,
+    "game_process_cpu_seconds_per_game": 150.4,
+    "coordinator_cpu_seconds_per_game": 18.4,
+    "peak_rss_bytes": 5195547752,
+    "label": "old lookup, run 1 (clean copy of 5bf6c44)",
+    "positions_per_network_call": 3.95,
+    "coordinator_ms_per_network_call": 1.343,
+    "coordinator_ms_per_evaluation": 0.34,
+    "requests_per_serving_round": 8.66,
+    "memory_first_minute_max_bytes": 5103190016,
+    "memory_after_first_minute_max_bytes": 4257071104,
+    "memory_after_first_minute_median_bytes": 3624452096,
+    "evaluator": {
+     "evaluations": 1717600,
+     "forward_seconds": 584.118590087397,
+     "idle_seconds": 36.57487419433892,
+     "model_forwards": 434985,
+     "serving_rounds": 198286
+    }
+   },
+   "old2": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 617.4,
+    "learning_seconds": 2.5,
+    "games_per_hour_playing": 186.6,
+    "decisions_per_game": 1061,
+    "decisions_per_hour_playing": 197889,
+    "evaluations_per_game": 54160,
+    "coordinator_busy": 0.918,
+    "game_process_cpu_seconds_per_game": 155.2,
+    "coordinator_cpu_seconds_per_game": 18.3,
+    "peak_rss_bytes": 7456964920,
+    "label": "old lookup, run 2 (clean copy of 5bf6c44)",
+    "positions_per_network_call": 4.06,
+    "coordinator_ms_per_network_call": 1.33,
+    "coordinator_ms_per_evaluation": 0.327,
+    "requests_per_serving_round": 9.47,
+    "memory_first_minute_max_bytes": 7286145024,
+    "memory_after_first_minute_max_bytes": 7432372224,
+    "memory_after_first_minute_median_bytes": 3610640384,
+    "evaluator": {
+     "evaluations": 1733122,
+     "forward_seconds": 567.0430328946095,
+     "idle_seconds": 24.178931737318635,
+     "model_forwards": 426412,
+     "serving_rounds": 183075
+    }
+   },
+   "new": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 555.0,
+    "learning_seconds": 2.9,
+    "games_per_hour_playing": 207.6,
+    "decisions_per_game": 1062,
+    "decisions_per_hour_playing": 220511,
+    "evaluations_per_game": 54086,
+    "coordinator_busy": 0.871,
+    "game_process_cpu_seconds_per_game": 150.0,
+    "coordinator_cpu_seconds_per_game": 15.5,
+    "peak_rss_bytes": 6100569448,
+    "label": "fused lookup, run 1 (working repository)",
+    "positions_per_network_call": 3.45,
+    "coordinator_ms_per_network_call": 0.964,
+    "coordinator_ms_per_evaluation": 0.279,
+    "requests_per_serving_round": 7.66,
+    "memory_first_minute_max_bytes": 5844369408,
+    "memory_after_first_minute_max_bytes": 5261279232,
+    "memory_after_first_minute_median_bytes": 3789185024,
+    "evaluator": {
+     "evaluations": 1730757,
+     "forward_seconds": 483.515969639644,
+     "idle_seconds": 44.348376946523786,
+     "model_forwards": 501540,
+     "serving_rounds": 225963
+    }
+   },
+   "clean-new": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 536.1,
+    "learning_seconds": 2.3,
+    "games_per_hour_playing": 214.9,
+    "decisions_per_game": 1082,
+    "decisions_per_hour_playing": 232618,
+    "evaluations_per_game": 55081,
+    "coordinator_busy": 0.879,
+    "game_process_cpu_seconds_per_game": 161.2,
+    "coordinator_cpu_seconds_per_game": 15.3,
+    "peak_rss_bytes": 6167219488,
+    "label": "fused lookup, run 2 (clean copy)",
+    "positions_per_network_call": 3.49,
+    "coordinator_ms_per_network_call": 0.933,
+    "coordinator_ms_per_evaluation": 0.267,
+    "requests_per_serving_round": 7.77,
+    "memory_first_minute_max_bytes": 5893865472,
+    "memory_after_first_minute_max_bytes": 5550817280,
+    "memory_after_first_minute_median_bytes": 4000415744,
+    "evaluator": {
+     "evaluations": 1762603,
+     "forward_seconds": 471.1729824512731,
+     "idle_seconds": 39.005300423828885,
+     "model_forwards": 504970,
+     "serving_rounds": 226958
+    }
+   }
+  }
+ }
+}

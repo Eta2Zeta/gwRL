@@ -761,8 +761,11 @@ questions were answered together, so training moved them alike
 weighted answers by the zone table, as a matrix multiplication, gives the
 same 64 numbers (checked: equal to within $3 \times 10^{-8}$, float rounding),
 but it would multiply 42,728 zeros. So the network fetches only the rows of the
-answered columns, a *column lookup*, and adds them up (`_bag` in
-`studies/campaign/neural.py`).
+answered columns, a *column lookup*, and adds them up. One PyTorch operation,
+`embedding_bag`, does this for every zone at once: it fetches each answered row,
+multiplies it by its weight and adds it to its zone's sum, without first copying
+the fetched rows into a temporary array (`_bag` in `studies/campaign/neural.py`,
+since 12 November; [record](../stage_a/coordinator_lookups_2026_11_12.md)).
 
 ### 6.4 Learned layers
 
@@ -1345,14 +1348,16 @@ Over and over, the coordinator reads every waiting request, groups them by
 alliance network, merges each group into one call of that network, runs it and
 sends back each position's priors and values
 (`studies/campaign/shared_evaluator.py`). A call with more positions costs less
-per position: 0.70 ms for one position, 1.38 ms for four
-([record](../stage_a/coordinator_lookups_2026_11_04.md)). On 2 November the
-network's forward pass, computing its outputs from an input, was three quarters of
-the coordinator's time, and the column lookups (section 6.3) were its largest
-single part, 26%
-([profile](../stage_a/search_replays_2026_11_04.md#2-november-one-profiled-training-batch)).
-The coordinator was busy 90% of the time both before and after the search began
-keeping copies of its positions; inferred: it now limits this layout.
+per position: the network's forward pass, computing its outputs from an input,
+takes 0.44 ms for one position and 0.73 ms for four
+([record](../stage_a/coordinator_lookups_2026_11_12.md#the-forward-pass)). Until
+12 November the column lookups (section 6.3) were the largest part of a call;
+since then one fused operation does them, and the largest part is the GELU curve,
+mostly in the border messages (section 6.7). The coordinator is still busy 87% to
+88% of the time, but the game processes and the coordinator together now use 9.5
+to 10.5 of the 11 cores. Inferred: the coordinator and the cores limit this layout
+about equally, so a faster coordinator alone would add at most 4% to 15% more
+([record](../stage_a/coordinator_lookups_2026_11_12.md#what-this-does-and-does-not-show)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1378,6 +1383,11 @@ profile, with little training, that raised decisions per hour while playing by
 15.5%, from about 162,000 to 188,000. Games per hour rose more, from 152 to 184,
 because that batch's games were shorter
 ([record](../stage_a/search_copies_2026_11_04.md)).
+
+On 12 November the fused column lookup cut the coordinator's time per evaluation
+by 18%. In two matched pairs of Mac-profile batches, decisions per hour while
+playing rose by 17.6%, from about 192,700 to 226,600, and games per hour from 182
+to 211 ([record](../stage_a/coordinator_lookups_2026_11_12.md)).
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
@@ -1490,12 +1500,13 @@ measured and what would settle it.
   [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
-- **The coordinator limits the Mac layout.** It was busy 90% of the time in the
-  latest matched batch. A fused column lookup (PyTorch's `embedding_bag`) made the
-  network's forward pass 23% to 49% faster with identical outputs
-  ([record](../stage_a/coordinator_lookups_2026_11_04.md)); it is not yet in the
-  code. More games per process, for larger batches, and a second coordinator are
-  the other options, untested.
+- **Self-play on the Mac is near two limits at once.** Since the fused column
+  lookup of 12 November, the coordinator is busy 87% to 88% of the time, and the
+  game processes and the coordinator use 9.5 to 10.5 of the 11 training cores. A
+  faster or a second coordinator could add at most 4% to 15% (inferred). The
+  larger lever is the game processes' own work, about 90% of the CPU, which has
+  not been profiled since the search began keeping copies of its positions
+  ([record](../stage_a/coordinator_lookups_2026_11_12.md)).
 
 ### Open design questions
 

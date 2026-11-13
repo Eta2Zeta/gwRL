@@ -98,15 +98,24 @@ def _check_range(values: np.ndarray, low: int, high: int, what: str) -> None:
         raise ValueError(f"Zone input {what} out of range")
 
 
+def _bag_offsets(counts: Any) -> np.ndarray:
+    """Where each bag's answers start, then the end of the last: bag i adds answers
+    offsets[i] to offsets[i + 1] - 1, the layout neural._bag reads."""
+    offsets = np.zeros(len(counts) + 1, dtype=np.int64)
+    np.cumsum(counts, out=offsets[1:])
+    return offsets
+
+
 @dataclass
 class ZoneBatch:
     """Several decisions as flat host arrays for one network pass.
 
-    Entry rows say which bag an answer adds into: a zone of a position, a
-    position, or an option. Option zones index the batch's zone vectors, with
-    one extra slot, positions * zones, meaning "no zone". Policy-group ids are
-    numbered across the batch; a level's parents are groups of the level above,
-    and level 0's parents are the positions.
+    Answers are grouped by the bag they add into, in bag order: each zone of
+    each position, each position, or each option. A bag array holds where each
+    bag's answers start, then the end of the last. Option zones index the
+    batch's zone vectors, with one extra slot, positions * zones, meaning "no
+    zone". Policy-group ids are numbered across the batch; a level's parents
+    are groups of the level above, and level 0's parents are the positions.
     """
     positions: int
     zones: int
@@ -136,14 +145,19 @@ def pack_zone_arrays(items: Sequence[Mapping[str, np.ndarray]], spec: ZoneSpec) 
     _check_range(global_column, 0, spec.global_columns, "position column")
     action_column = _join([item["action_column"] for item in items], np.int64)
     _check_range(action_column, 0, spec.action_columns, "option column")
+    zone_value = _join([item["zone_value"] for item in items], np.int32)
     zone_rows = zone_index + np.repeat(np.arange(count, dtype=np.int64) * zones,
                                        [len(item["zone_index"]) for item in items])
-    global_rows = np.repeat(np.arange(count, dtype=np.int64), [len(item["global_column"]) for item in items])
+    if zone_rows.size > 1 and (zone_rows[1:] < zone_rows[:-1]).any():
+        # The engine lists each position's answers zone by zone; another order is
+        # put into bag order here, since a bag's answers must be consecutive.
+        order = np.argsort(zone_rows, kind="stable")
+        zone_rows, zone_column, zone_value = zone_rows[order], zone_column[order], zone_value[order]
     entries = np.concatenate([np.diff(item["action_offsets"]) for item in items]) if items else np.zeros(0, np.int64)
-    action_rows = np.repeat(np.arange(len(entries), dtype=np.int64), entries)
-    integers = {"zone_rows": zone_rows, "zone_column": zone_column, "global_rows": global_rows,
-                "global_column": global_column, "action_rows": action_rows, "action_column": action_column}
-    floats = {"zone_weight": _signed_log(_join([item["zone_value"] for item in items], np.int32)),
+    integers = {"zone_bags": _bag_offsets(np.bincount(zone_rows, minlength=count * zones)), "zone_column": zone_column,
+                "global_bags": _bag_offsets([len(item["global_column"]) for item in items]),
+                "global_column": global_column, "action_bags": _bag_offsets(entries), "action_column": action_column}
+    floats = {"zone_weight": _signed_log(zone_value),
               "global_weight": _signed_log(_join([item["global_value"] for item in items], np.int32)),
               "action_weight": _signed_log(_join([item["action_value"] for item in items], np.int32))}
     group_counts = [0] * GROUP_LEVELS

@@ -162,10 +162,15 @@ def _conditional_log_softmax(scores: Tensor, owners: Tensor, count: int) -> Tens
     return shifted - totals.log().index_select(0, owners)
 
 
-def _bag(table: Tensor, columns: Tensor, weights: Tensor, rows: Tensor, count: int) -> Tensor:
-    """Sum of weighted column vectors per row: one vector per zone, position or option."""
-    vectors = table.index_select(0, columns) * weights.unsqueeze(1)
-    return vectors.new_zeros((count, table.shape[1])).index_add_(0, rows, vectors)
+def _bag(table: Tensor, columns: Tensor, weights: Tensor, bags: Tensor) -> Tensor:
+    """Sum of weighted column vectors per bag: one vector per zone, position or option.
+
+    Bag i adds the rows of columns[bags[i]:bags[i + 1]], each times its weight;
+    an empty bag is zero. One fused lookup, without first gathering every
+    answer's row into a temporary array (docs/stage_a/coordinator_lookups_2026_11_12.md).
+    """
+    return F.embedding_bag(columns, table, bags, mode="sum", per_sample_weights=weights.to(table.dtype),
+                           include_last_offset=True)
 
 
 def _block(inputs: int, dim: int) -> nn.Sequential:
@@ -250,11 +255,10 @@ class CampaignPolicyValueNet(nn.Module):
         t = batch_tensors(batch, device, non_blocking=non_blocking)
         positions, zones, dim = batch.positions, batch.zones, self.config.hidden_dim
         nodes = positions * zones
-        local = _bag(self.zone_columns.weight, t["zone_column"], t["zone_weight"], t["zone_rows"], nodes)
+        local = _bag(self.zone_columns.weight, t["zone_column"], t["zone_weight"], t["zone_bags"])
         local = local.view(positions, zones, dim) + self.zone_identity.weight + self.map_facts(self.zone_static)
         h = self.zone_norm(local).reshape(nodes, dim)
-        u = self.global_norm(_bag(self.global_columns.weight, t["global_column"], t["global_weight"],
-                                  t["global_rows"], positions))
+        u = self.global_norm(_bag(self.global_columns.weight, t["global_column"], t["global_weight"], t["global_bags"]))
         shift = torch.arange(positions, device=device).repeat_interleave(len(self.edge_source)) * zones
         sources, targets = self.edge_source.repeat(positions) + shift, self.edge_target.repeat(positions) + shift
         degree = self.in_degree.repeat(positions, 1)
@@ -270,7 +274,7 @@ class CampaignPolicyValueNet(nn.Module):
         if not batch.options:
             return values.new_empty((0,)), values
         options = self.option_norm(_bag(self.option_columns.weight, t["action_column"], t["action_weight"],
-                                        t["action_rows"], batch.options))
+                                        t["action_bags"]))
         bank = torch.cat((h, self.no_zone.unsqueeze(0)))
         path = h.new_zeros((batch.options, dim)).index_add_(
             0, t["path_option"], bank.index_select(0, t["path_zone"])) * t["path_scale"]
