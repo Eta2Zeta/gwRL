@@ -19,6 +19,7 @@ for it:
 - [How often the depth limit stops a simulation](depth_limit_2026_11_09.md): in a replayed training game, 18 of 68,800 simulations reached the limit of 16 steps and 9 were cut short; without the limit the deepest went 19 steps and no most-visited move changed; the networks' values for one position differ by 2.5 to 17 points, and 9.3% of simulations end at positions another alliance's network rates.
 - [What Adam did in one real update](adam_steps_2026_11_09.md): re-running the 5 November update gave generation 1 exactly; in the first step every number with a gradient above about $10^{-6}$ moved by 0.001; one value-head bias shows how the steps then shrink.
 - [The fused column lookup, in the code](coordinator_lookups_2026_11_12.md): identical outputs with trained and random rows; in two matched pairs of Mac-profile batches the coordinator's time per evaluation fell 18% and decisions per hour rose 17.6%; the coordinator is still busy 87% to 88%, but the training now uses 9.5 to 10.5 of its 11 cores.
+- [Where the game processes' time goes](game_processes_2026_11_13.md): in a profiled Mac-profile batch, playing a move and listing the legal moves cost about a millisecond each and are two thirds of the game threads' CPU; supply tracing, naval route enumeration, the economy's options and aircraft landing plans dominate the engine, and playing a move redoes the move list's work without its cache.
 
 The earlier records (the first pilots, the three-round experiment and the
 performance work on the replaced graph input) are summarized in the

@@ -1359,6 +1359,16 @@ to 10.5 of the 11 cores. Inferred: the coordinator and the cores limit this layo
 about equally, so a faster coordinator alone would add at most 4% to 15% more
 ([record](../stage_a/coordinator_lookups_2026_11_12.md#what-this-does-and-does-not-show)).
 
+**The game processes** do about 90% of the CPU work. In a profiled batch on 13
+November, a game thread used 151 ms of CPU per decision, two thirds of it in two
+engine calls of about a millisecond each: playing a move and listing a position's
+legal moves. Inside the engine a few rule checks take the most: searching the map
+for a nation's Supply Path to a zone, enumerating every route a naval force could
+sail, listing the economy's options, and finding landing plans for aircraft in
+flight. Playing a move also redoes much of what the position's list of legal moves
+already worked out, without the cache that listing uses
+([record](../stage_a/game_processes_2026_11_13.md)).
+
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
 ([section 8.7](#87-how-often-a-sample-is-drawn)):
@@ -1504,9 +1514,12 @@ measured and what would settle it.
   lookup of 12 November, the coordinator is busy 87% to 88% of the time, and the
   game processes and the coordinator use 9.5 to 10.5 of the 11 training cores. A
   faster or a second coordinator could add at most 4% to 15% (inferred). The
-  larger lever is the game processes' own work, about 90% of the CPU, which has
-  not been profiled since the search began keeping copies of its positions
-  ([record](../stage_a/coordinator_lookups_2026_11_12.md)).
+  larger lever is the game processes' own work, about 90% of the CPU: playing a
+  move and listing the legal moves cost about a millisecond each and are two
+  thirds of it. Caching supply answers while a move is played, and letting a move
+  reuse what its position's list of legal moves worked out, are the first
+  candidates; their savings are unmeasured
+  ([record](../stage_a/game_processes_2026_11_13.md)).
 
 ### Open design questions
 

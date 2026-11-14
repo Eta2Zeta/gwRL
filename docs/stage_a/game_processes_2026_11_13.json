@@ -1,0 +1,663 @@
+{
+ "date": "2026-11-13",
+ "commit": "bb350e5",
+ "tool": "tools/profile_game_process_cpu.py (rewritten 2026-11-13)",
+ "settings": "--profile mac (8 game processes of 4 games, coordinator on the CPU, PyTorch 2.14); 32 eleven-round games, fresh 64x2 networks, 64 simulations, depth 16, seed 20261104, epochs 50, batch size 32, replay 8000, sample fraction 0.05, transitions per batch 20000; native samples: /usr/bin/sample of one game process for 20 s at 150 s and another at 360 s",
+ "batch": {
+  "playing_seconds": 583.2838745408226,
+  "games": 32,
+  "games_per_hour": 197.50245982831032,
+  "decisions_per_hour": 211383.17958311873,
+  "coordinator_busy": 0.8888821328752194
+ },
+ "batch_evaluator": {
+  "evaluations": 1753984,
+  "forward_seconds": 518.4706144735683,
+  "idle_seconds": 34.986892379121855,
+  "model_forwards": 536798,
+  "serving_rounds": 246797
+ },
+ "peak_rss_bytes": 5521739208,
+ "unprofiled_games_per_hour_same_settings": {
+  "2026-11-12 fused run 1": 207.6,
+  "2026-11-12 fused run 2": 214.9
+ },
+ "accounts": {
+  "games": 32,
+  "complete_games": 32,
+  "decisions_per_game": 1070.28125,
+  "chance_events_per_game": 159.5625,
+  "evaluations_per_game": 54812.0,
+  "thread_cpu_seconds_per_game": 161.2715969935625,
+  "thread_cpu_ms_per_decision": 150.68151197973665,
+  "seconds_per_game": {
+   "search": 8.45621936134375,
+   "engine": 120.07245945121875,
+   "encode": 13.2861704550625,
+   "adapter": 7.77697757815625,
+   "input": 1.58244705796875,
+   "messaging": 4.19854936565625,
+   "game loop": 5.898773724156251
+  },
+  "share_of_thread_cpu": {
+   "search": 0.052434647631605574,
+   "engine": 0.74453568817832,
+   "encode": 0.08238382147101107,
+   "adapter": 0.048222859592980186,
+   "input": 0.009812310955362566,
+   "messaging": 0.026034028582378608,
+   "game loop": 0.03657664358834193
+  },
+  "seconds_per_game_by_call": {
+   "engine/apply_action": 52.6684259129375,
+   "engine/legal_actions": 51.30857418803125,
+   "encode/zone_input": 12.8430043930625,
+   "search": 8.45621936134375,
+   "engine/resolve_chance": 6.39832832909375,
+   "engine/clone_for_search": 5.3707402536875,
+   "game loop": 4.27473812234375,
+   "adapter/legal_actions": 2.78355393659375,
+   "messaging/recv": 1.765612560125,
+   "engine/clone_for_search_continuing": 1.5789432471875,
+   "game loop/make_env": 1.51681366421875,
+   "input/prepare_into": 1.41340855196875,
+   "messaging/send": 1.33424628190625,
+   "engine/planning_key": 1.27636197353125,
+   "adapter/planning_key": 1.19692245265625,
+   "messaging/evaluate": 1.098690523625,
+   "engine/legal_interrupts": 0.9654857911875,
+   "adapter/clone_for_search": 0.9260290736875,
+   "adapter/decision_kind": 0.7194939500312499,
+   "adapter/apply_action": 0.65186105415625,
+   "adapter/zone_input": 0.64941386875,
+   "encode/arrays": 0.44316606199999997,
+   "engine/is_terminal": 0.29380958687500003,
+   "adapter/current_decision_player": 0.26554562053125,
+   "adapter/is_terminal": 0.2393287025625,
+   "adapter/clone_for_search_continuing": 0.21465198125,
+   "input/make_zone_input": 0.169038506,
+   "adapter/resolve_chance": 0.12992869025,
+   "game loop/_decide": 0.10722193759375,
+   "engine/current_decision_player": 0.093748299625,
+   "engine/decision_kind": 0.08678982534375,
+   "engine/apply_interrupt": 0.02423301190625,
+   "engine/returns": 0.00625519196875,
+   "engine/observation": 0.00068394134375,
+   "adapter/returns": 0.0002482476875,
+   "engine/wealth": 7.989850000000001e-05
+  },
+  "calls_per_game": {
+   "adapter/apply_action": 53507.65625,
+   "adapter/clone_for_search": 54874.21875,
+   "adapter/clone_for_search_continuing": 20396.46875,
+   "adapter/current_decision_player": 131378.0625,
+   "adapter/decision_kind": 99957.3125,
+   "adapter/is_terminal": 187567.75,
+   "adapter/legal_actions": 56938.84375,
+   "adapter/planning_key": 79025.75,
+   "adapter/resolve_chance": 22147.6875,
+   "adapter/returns": 123.125,
+   "adapter/zone_input": 55882.28125,
+   "encode/arrays": 54812.0,
+   "encode/zone_input": 55031.71875,
+   "engine/apply_action": 53274.875,
+   "engine/apply_interrupt": 115.1875,
+   "engine/clone_for_search": 54874.21875,
+   "engine/clone_for_search_continuing": 20396.46875,
+   "engine/current_decision_player": 75269.96875,
+   "engine/decision_kind": 75656.34375,
+   "engine/is_terminal": 319106.375,
+   "engine/legal_actions": 54780.78125,
+   "engine/legal_interrupts": 45159.96875,
+   "engine/observation": 1.0,
+   "engine/planning_key": 702771.03125,
+   "engine/resolve_chance": 22147.6875,
+   "engine/returns": 123.125,
+   "engine/wealth": 1.0,
+   "game loop/_decide": 1070.28125,
+   "game loop/make_env": 1.0,
+   "input/make_zone_input": 55882.28125,
+   "input/prepare_into": 54812.0,
+   "messaging/evaluate": 54812.0,
+   "messaging/recv": 54812.0,
+   "messaging/send": 54812.0,
+   "search": 1070.28125
+  },
+  "microseconds_per_call": {
+   "adapter/apply_action": 12.182575351658203,
+   "adapter/clone_for_search": 16.875485333219434,
+   "adapter/clone_for_search_continuing": 10.523977649317361,
+   "adapter/current_decision_player": 2.021232582351791,
+   "adapter/decision_kind": 7.1980121517497775,
+   "adapter/is_terminal": 1.2759587005895203,
+   "adapter/legal_actions": 48.88673097780897,
+   "adapter/planning_key": 15.145980299538442,
+   "adapter/resolve_chance": 5.8664675601008005,
+   "adapter/returns": 2.016224873096447,
+   "adapter/zone_input": 11.621105191549423,
+   "encode/arrays": 8.085201452236737,
+   "encode/zone_input": 233.37458260037536,
+   "engine/apply_action": 988.6166023465564,
+   "engine/apply_interrupt": 210.3788336950624,
+   "engine/clone_for_search": 97.87365316590498,
+   "engine/clone_for_search_continuing": 77.41257893906267,
+   "engine/current_decision_player": 1.245494068642084,
+   "engine/decision_kind": 1.1471585995556386,
+   "engine/is_terminal": 0.920726158714316,
+   "engine/legal_actions": 936.616328158541,
+   "engine/legal_interrupts": 21.37923957680994,
+   "engine/observation": 683.94134375,
+   "engine/planning_key": 1.8161846700781321,
+   "engine/resolve_chance": 288.8937424773467,
+   "engine/returns": 50.803589593908626,
+   "engine/wealth": 79.89850000000001,
+   "game loop/_decide": 100.1810856667348,
+   "game loop/make_env": 1516813.66421875,
+   "input/make_zone_input": 3.024903461685362,
+   "input/prepare_into": 25.786480186250273,
+   "messaging/evaluate": 20.044707794369845,
+   "messaging/recv": 32.212153545300296,
+   "messaging/send": 24.34222947358699,
+   "search": 7900.931985255044
+  },
+  "estimated_instrumentation_seconds_per_game": 1.6258377643640098,
+  "wrapped_call_overhead_ns": 631.044868125,
+  "searches_per_game": {
+   "all": 1070.28125,
+   "one legal move": 225.09375
+  },
+  "search_seconds_per_game": {
+   "all": 154.09412900709376,
+   "one legal move": 0.00823291925
+  },
+  "evaluations_by_menu_size": {
+   "0": 13.71875,
+   "1": 10688.8125,
+   "2+": 44109.46875
+  },
+  "evaluation_seconds_by_menu_size": {
+   "0": 0.00313355853125,
+   "1": 3.2773793108125,
+   "2+": 16.90873509171875
+  },
+  "wall_seconds_per_game": 508.84970899484324,
+  "wall_share": {
+   "own CPU": 0.3169336527913723,
+   "waiting for the coordinator": 0.5771188606602236,
+   "other, mostly the interpreter lock": 0.1059474865484041
+  },
+  "game_processes": 8,
+  "process_cpu_seconds_per_game": 161.5405024375,
+  "unaccounted_process_cpu_seconds_per_game": 0.2689054439375127
+ },
+ "native": [
+  {
+   "at_seconds": 150.0,
+   "seconds": 20,
+   "pid": 30912,
+   "samples_on_cpu": 19890,
+   "engine_samples": 16748,
+   "engine_share_of_on_cpu": 0.8420311714429362,
+   "engine_share": {
+    "actionMenu": 0.33938380702173393,
+    "step": 0.3521017434917602,
+    "encodeZoneInput": 0.09672796751850968,
+    "resolveChance": 0.0760090757105326,
+    "cloneForSearch": 0.05469309768330547,
+    "cloneForSearchContinuing": 0.01731550035825173,
+    "legalInterrupts": 0.010508717458801052
+   },
+   "function_share_of_engine": {
+    "traceSupply": 0.16055648435634107,
+    "visitNavalRoutes": 0.12288034392166229,
+    "validateNavalRoute": 0.12234296632433724,
+    "economyActions": 0.19453069023166944,
+    "canFactoryBuy": 0.14007642703606402,
+    "capacity": 0.14258418915691426,
+    "solveReachablePlan": 0.03558633866730356,
+    "State::State": 0.07003821351803201,
+    "State::planningKey": 0.08353236207308336,
+    "writeState": 0.06054454263195606,
+    "contentDigest": 0.023286362550752327,
+    "State::validate": 0.05660377358490566,
+    "blockadedNow": 0.057260568426080724,
+    "buildContext": 0.0690828755672319,
+    "Catalog::unit": 0.027227131597802722,
+    "_platform_memcmp": 0.1929782660616193,
+    "operator new": 0.13350847862431334
+   },
+   "function_split_by_engine_call": {
+    "traceSupply": {
+     "step": 0.8296764596504277,
+     "actionMenu": 0.17032354034957234
+    },
+    "visitNavalRoutes": {
+     "step": 0.6282798833819242,
+     "actionMenu": 0.3717201166180758
+    },
+    "validateNavalRoute": {
+     "step": 0.6388482186432406,
+     "actionMenu": 0.3611517813567594
+    },
+    "economyActions": {
+     "step": 0.6372007366482505,
+     "actionMenu": 0.36279926335174956
+    },
+    "canFactoryBuy": {
+     "step": 0.691389599317988,
+     "actionMenu": 0.30861040068201195
+    },
+    "capacity": {
+     "step": 0.6922110552763819,
+     "actionMenu": 0.30778894472361806
+    },
+    "solveReachablePlan": {
+     "actionMenu": 0.9714765100671141,
+     "step": 0.028523489932885907
+    },
+    "State::State": {
+     "cloneForSearch": 0.5336743393009378,
+     "cloneForSearchContinuing": 0.2463768115942029,
+     "actionMenu": 0.18840579710144928,
+     "step": 0.028132992327365727,
+     "resolveChance": 0.0034100596760443308
+    },
+    "State::planningKey": {
+     "step": 0.6032880629020729,
+     "resolveChance": 0.39671193709792707
+    },
+    "writeState": {
+     "step": 0.5848126232741617,
+     "resolveChance": 0.4151873767258383
+    },
+    "contentDigest": {
+     "step": 0.5897435897435898,
+     "resolveChance": 0.31025641025641026,
+     "actionMenu": 0.08974358974358974,
+     "other": 0.010256410256410256
+    },
+    "State::validate": {
+     "step": 0.6434599156118144,
+     "resolveChance": 0.35654008438818563
+    },
+    "blockadedNow": {
+     "step": 0.9781021897810219,
+     "actionMenu": 0.021897810218978103
+    },
+    "buildContext": {
+     "step": 0.4874675885911841,
+     "actionMenu": 0.4658599827139153,
+     "resolveChance": 0.046672428694900604
+    },
+    "Catalog::unit": {
+     "step": 0.5964912280701754,
+     "actionMenu": 0.3574561403508772,
+     "resolveChance": 0.046052631578947366
+    },
+    "_platform_memcmp": {
+     "step": 0.43719059405940597,
+     "actionMenu": 0.42048267326732675,
+     "resolveChance": 0.0640470297029703,
+     "encodeZoneInput": 0.04888613861386139,
+     "legalInterrupts": 0.027227722772277228,
+     "other": 0.002165841584158416
+    },
+    "operator new": {
+     "actionMenu": 0.3559928443649374,
+     "step": 0.2580500894454383,
+     "cloneForSearch": 0.15161001788908765,
+     "cloneForSearchContinuing": 0.07915921288014312,
+     "encodeZoneInput": 0.06663685152057246,
+     "resolveChance": 0.04740608228980322,
+     "other": 0.03577817531305903,
+     "legalInterrupts": 0.005366726296958855
+    }
+   },
+   "in_supply_callers": {
+    "allowanceNow": 0.4125230202578269,
+    "capacity": 0.37790055248618787,
+    "validateNavalRoute": 0.18858195211786372,
+    "AirRules::actions": 0.010313075506445672,
+    "upgradeUnitLegal": 0.004788213627992633,
+    "strategicPickup": 0.0029465930018416206
+   },
+   "top_of_stack": [
+    [
+     21205,
+     "read",
+     "libsystem_kernel.dylib"
+    ],
+    [
+     19473,
+     "__psynch_cvwait",
+     "libsystem_kernel.dylib"
+    ],
+    [
+     3232,
+     "_platform_memcmp",
+     "libsystem_platform.dylib"
+    ],
+    [
+     1379,
+     "nanov2_malloc_type_zero_on_alloc",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     945,
+     "_PyEval_EvalFrameDefault",
+     "python3.13"
+    ],
+    [
+     912,
+     "_nanov2_free",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     765,
+     "game::campaign::(anonymous namespace)::writeString(std::basic_string<char>&, std::basic_string<char> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     592,
+     "_platform_memmove",
+     "libsystem_platform.dylib"
+    ],
+    [
+     487,
+     "DYLD-STUB$$memcmp",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     437,
+     "game::campaign::(anonymous namespace)::blockadedNow(game::campaign::State const&, std::basic_string<char> const&, std::basic_string<char> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     419,
+     "<deduplicated_symbol>",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     378,
+     "game::campaign::contentDigest(std::basic_string<char> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     352,
+     "_free",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     293,
+     "_platform_memset",
+     "libsystem_platform.dylib"
+    ],
+    [
+     266,
+     "malloc_type_malloc",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     228,
+     "game::json::Value::find(std::basic_string<char> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     190,
+     "std::__hash_table<std::__hash_value_type<std::basic_string<char>, int>>::find<std::basic_string<char>>(std::basic_string<char> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     186,
+     "game::campaign::Catalog::unit(std::basic_string<char> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     166,
+     "__thread_selfusage",
+     "libsystem_kernel.dylib"
+    ],
+    [
+     162,
+     "game::campaign::encodeZoneInput(game::campaign::State const&, game::campaign::ZoneSchedule const&, std::vector<game::campaign::ZoneOption> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ]
+   ]
+  },
+  {
+   "at_seconds": 360.0,
+   "seconds": 20,
+   "pid": 30913,
+   "samples_on_cpu": 23602,
+   "engine_samples": 20746,
+   "engine_share_of_on_cpu": 0.8789933056520634,
+   "engine_share": {
+    "actionMenu": 0.453002988527909,
+    "step": 0.32184517497348886,
+    "encodeZoneInput": 0.09057167646775283,
+    "resolveChance": 0.03552492046659597,
+    "cloneForSearch": 0.0408753494649571,
+    "cloneForSearchContinuing": 0.007953340402969246,
+    "legalInterrupts": 0.007567723898582859
+   },
+   "function_share_of_engine": {
+    "traceSupply": 0.22862238503807963,
+    "visitNavalRoutes": 0.24298659982647258,
+    "validateNavalRoute": 0.24231177094379638,
+    "economyActions": 0.097223561168418,
+    "canFactoryBuy": 0.05191362190301745,
+    "capacity": 0.06970018316783959,
+    "solveReachablePlan": 0.09982647257302613,
+    "State::State": 0.08001542466017546,
+    "State::planningKey": 0.0628072881519329,
+    "writeState": 0.04473151450882098,
+    "contentDigest": 0.01764195507567724,
+    "State::validate": 0.04183939072592307,
+    "blockadedNow": 0.04675600115684951,
+    "buildContext": 0.04579195989588354,
+    "Catalog::unit": 0.030993926540055915,
+    "_platform_memcmp": 0.21555962595199074,
+    "operator new": 0.12595199074520388
+   },
+   "function_split_by_engine_call": {
+    "traceSupply": {
+     "step": 0.6470588235294118,
+     "actionMenu": 0.35294117647058826
+    },
+    "visitNavalRoutes": {
+     "actionMenu": 0.5016861733782979,
+     "step": 0.49831382662170204
+    },
+    "validateNavalRoute": {
+     "step": 0.5098468271334792,
+     "actionMenu": 0.49015317286652077
+    },
+    "economyActions": {
+     "step": 0.6841844323252355,
+     "actionMenu": 0.3158155676747645
+    },
+    "canFactoryBuy": {
+     "step": 0.7511606313834726,
+     "actionMenu": 0.2488393686165274
+    },
+    "capacity": {
+     "step": 0.7302904564315352,
+     "actionMenu": 0.2697095435684647
+    },
+    "solveReachablePlan": {
+     "actionMenu": 0.9338483824239497,
+     "step": 0.06277160791887977,
+     "resolveChance": 0.003380009657170449
+    },
+    "State::State": {
+     "actionMenu": 0.42048192771084336,
+     "cloneForSearch": 0.4114457831325301,
+     "cloneForSearchContinuing": 0.09939759036144578,
+     "step": 0.06746987951807229,
+     "resolveChance": 0.0006024096385542169,
+     "other": 0.0006024096385542169
+    },
+    "State::planningKey": {
+     "step": 0.760552570990023,
+     "resolveChance": 0.23944742900997698
+    },
+    "writeState": {
+     "step": 0.7640086206896551,
+     "resolveChance": 0.23599137931034483
+    },
+    "contentDigest": {
+     "step": 0.7295081967213115,
+     "resolveChance": 0.2185792349726776,
+     "actionMenu": 0.04371584699453552,
+     "other": 0.00819672131147541
+    },
+    "State::validate": {
+     "step": 0.7465437788018433,
+     "resolveChance": 0.2534562211981567
+    },
+    "blockadedNow": {
+     "step": 0.9618556701030928,
+     "actionMenu": 0.03814432989690722
+    },
+    "buildContext": {
+     "actionMenu": 0.4968421052631579,
+     "step": 0.46842105263157896,
+     "resolveChance": 0.034736842105263156
+    },
+    "Catalog::unit": {
+     "actionMenu": 0.6080870917573873,
+     "step": 0.37636080870917576,
+     "resolveChance": 0.015552099533437015
+    },
+    "_platform_memcmp": {
+     "actionMenu": 0.5708855098389982,
+     "step": 0.3477191413237925,
+     "encodeZoneInput": 0.03756708407871199,
+     "resolveChance": 0.024821109123434704,
+     "legalInterrupts": 0.0176654740608229,
+     "other": 0.0013416815742397137
+    },
+    "operator new": {
+     "actionMenu": 0.440107156525067,
+     "step": 0.2606199770378875,
+     "cloneForSearch": 0.14925373134328357,
+     "encodeZoneInput": 0.06735553004209721,
+     "cloneForSearchContinuing": 0.03291236127057023,
+     "resolveChance": 0.029468044393417527,
+     "other": 0.018752391886720246,
+     "legalInterrupts": 0.0015308075009567547
+    }
+   },
+   "in_supply_callers": {
+    "allowanceNow": 0.8188269672302233,
+    "capacity": 0.13107910665831768,
+    "upgradeUnitLegal": 0.017324149446879565,
+    "AirRules::actions": 0.012940930912126905,
+    "placements": 0.011271133375078271,
+    "validateNavalRoute": 0.008557712377374243
+   },
+   "top_of_stack": [
+    [
+     19120,
+     "read",
+     "libsystem_kernel.dylib"
+    ],
+    [
+     18377,
+     "__psynch_cvwait",
+     "libsystem_kernel.dylib"
+    ],
+    [
+     4472,
+     "_platform_memcmp",
+     "libsystem_platform.dylib"
+    ],
+    [
+     1557,
+     "nanov2_malloc_type_zero_on_alloc",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     1136,
+     "_nanov2_free",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     838,
+     "_PyEval_EvalFrameDefault",
+     "python3.13"
+    ],
+    [
+     734,
+     "_platform_memmove",
+     "libsystem_platform.dylib"
+    ],
+    [
+     638,
+     "DYLD-STUB$$memcmp",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     619,
+     "game::campaign::(anonymous namespace)::writeString(std::basic_string<char>&, std::basic_string<char> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     496,
+     "game::campaign::(anonymous namespace)::blockadedNow(game::campaign::State const&, std::basic_string<char> const&, std::basic_string<char> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     464,
+     "<deduplicated_symbol>",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     407,
+     "game::json::Value::find(std::basic_string<char> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     387,
+     "_free",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     374,
+     "_platform_memset",
+     "libsystem_platform.dylib"
+    ],
+    [
+     356,
+     "game::campaign::contentDigest(std::basic_string<char> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     269,
+     "malloc_type_malloc",
+     "libsystem_malloc.dylib"
+    ],
+    [
+     265,
+     "game::campaign::Catalog::unit(std::basic_string<char> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     205,
+     "game::campaign::(anonymous namespace)::traceSupply(game::campaign::State const&, std::basic_string<char> const&, std::basic_string<char> const&, std::optional<std::basic_string<char>> const&, bool)::$_1::operator()(std::vector<std::basic_string<char>> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     198,
+     "game::campaign::encodeZoneInput(game::campaign::State const&, game::campaign::ZoneSchedule const&, std::vector<game::campaign::ZoneOption> const&)",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ],
+    [
+     193,
+     "std::__hash_table<std::__hash_value_type<std::basic_string<char>, int>>::find<std::basic_string<char>>(std::basic_string<char> const&) const",
+     "gwrl_cpp.cpython-313-darwin.so"
+    ]
+   ]
+  }
+ ]
+}
