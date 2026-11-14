@@ -22,7 +22,7 @@ from __future__ import annotations
 import math
 import os
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 import torch
@@ -182,6 +182,219 @@ def _head(inputs: int, dim: int, outputs: int) -> nn.Sequential:
     return nn.Sequential(nn.Linear(inputs, dim), nn.GELU(), nn.Linear(dim, outputs))
 
 
+# The layers above, applied with their own parameters as their modules apply them,
+# without a module call's own cost.
+def _linear(layer: nn.Linear, x: Tensor) -> Tensor:
+    return F.linear(x, layer.weight, layer.bias)
+
+
+def _norm(layer: nn.LayerNorm, x: Tensor) -> Tensor:
+    return F.layer_norm(x, layer.normalized_shape, layer.weight, layer.bias, layer.eps)
+
+
+def _apply_block(block: nn.Sequential, x: Tensor) -> Tensor:
+    return _norm(block[2], F.gelu(_linear(block[0], x)))
+
+
+def _apply_head(head: nn.Sequential, x: Tensor) -> Tensor:
+    return _linear(head[2], F.gelu(_linear(head[0], x)))
+
+
+def _by_network(x: Tensor, sizes: Sequence[int], layers: Sequence[Any],
+                apply: Callable[[Any, Tensor], Tensor]) -> Tensor:
+    """apply(layer, rows) for each network's own rows of x, which come in network order:
+    sizes[i] rows for layers[i]."""
+    parts = [(layer, size) for layer, size in zip(layers, sizes, strict=True) if size]
+    if len(parts) <= 1:
+        return apply(parts[0][0] if parts else layers[0], x)
+    return torch.cat([apply(layer, rows) for (layer, _), rows in zip(parts, x.split([size for _, size in parts]))])
+
+
+def _border_indices(spec_sources: Tensor, spec_targets: Tensor, in_degree: Tensor, positions: int,
+                    zones: int) -> tuple[Tensor, Tensor, Tensor]:
+    """Every position's borders as rows of the batch's zone vectors, and each zone's in-degree."""
+    shift = torch.arange(positions, device=spec_sources.device).repeat_interleave(len(spec_sources)) * zones
+    return spec_sources.repeat(positions) + shift, spec_targets.repeat(positions) + shift, in_degree.repeat(positions, 1)
+
+
+class _OneNetwork:
+    """A pass's view of one network: its own tables and fixed terms, worked out for
+    this pass, so that training reaches every parameter."""
+
+    def __init__(self, model: "CampaignPolicyValueNet") -> None:
+        self.models = (model,)
+        self.zone_table = model.zone_columns.weight
+        self.global_table = model.global_columns.weight
+        self.option_table = model.option_columns.weight
+        self.no_zone = model.no_zone.unsqueeze(0)
+
+    def zone_terms(self, batch: ZoneBatch, t: dict[str, Tensor]) -> tuple[Tensor, Tensor]:
+        model = self.models[0]
+        return model.zone_identity.weight, _linear(model.map_facts, model.zone_static)
+
+    def border_terms(self, layer: int, batch: ZoneBatch, t: dict[str, Tensor]) -> Tensor:
+        model = self.models[0]
+        return _linear(model.border_facts[layer], model.edge_static).repeat(batch.positions, 1)
+
+    def borders(self, positions: int, zones: int) -> tuple[Tensor, Tensor, Tensor]:
+        model = self.models[0]
+        return _border_indices(model.edge_source, model.edge_target, model.in_degree, positions, zones)
+
+
+class NetworkStack:
+    """Several networks of one layout evaluated in one pass, each on its own decisions.
+
+    A pass costs much more than its share of arithmetic: about as much again as
+    a few positions, whatever its size (measured in
+    docs/archive/records/coordinator_one_pass_2026_11_14.md). The coordinator
+    therefore evaluates the three alliances' positions together
+    (studies/campaign/shared_evaluator.py).
+    Each network's answers read its own rows of the networks' tables, laid end
+    to end, and each of its layers reads only its own decisions' rows, so every
+    output is the network's own, up to floating-point rounding.
+
+    The stack reads the networks' weights once, when it is built, and is for
+    inference only; build a new one after the weights change.
+    """
+
+    def __init__(self, models: Sequence["CampaignPolicyValueNet"]) -> None:
+        models = tuple(models)
+        if not models:
+            raise ValueError("A network stack needs at least one network")
+        first = models[0]
+        for model in models[1:]:
+            if model.config != first.config or model.layout_version != first.layout_version:
+                raise ValueError("Stacked networks must share their configuration and input layout")
+        self.models, self.spec, self.config = models, first.spec, first.config
+        with torch.inference_mode():
+            self.zone_table = torch.cat([model.zone_columns.weight for model in models])
+            self.global_table = torch.cat([model.global_columns.weight for model in models])
+            self.option_table = torch.cat([model.option_columns.weight for model in models])
+            self.no_zone = torch.stack([model.no_zone for model in models])
+            self.identity = torch.stack([model.zone_identity.weight for model in models])
+            self.facts = torch.stack([_linear(model.map_facts, model.zone_static) for model in models])
+            self.border = [torch.stack([_linear(model.border_facts[layer], model.edge_static) for model in models])
+                           for layer in range(first.config.message_layers)]
+        self._borders: dict[int, tuple[Tensor, Tensor, Tensor]] = {}
+        self._repeated: dict[tuple[int, int, int], Tensor] = {}
+
+    def _single(self, batch: ZoneBatch) -> int | None:
+        present = [index for index, size in enumerate(batch.network_positions) if size]
+        return present[0] if len(present) == 1 else None
+
+    def zone_terms(self, batch: ZoneBatch, t: dict[str, Tensor]) -> tuple[Tensor, Tensor]:
+        single = self._single(batch)
+        if single is not None:
+            return self.identity[single], self.facts[single]
+        network = t["position_network"]
+        return self.identity.index_select(0, network), self.facts.index_select(0, network)
+
+    def border_terms(self, layer: int, batch: ZoneBatch, t: dict[str, Tensor]) -> Tensor:
+        single, positions = self._single(batch), batch.positions
+        if single is None:
+            return self.border[layer].index_select(0, t["position_network"]).view(-1, self.config.hidden_dim)
+        key = (layer, single, positions)
+        repeated = self._repeated.get(key)
+        if repeated is None:
+            if len(self._repeated) >= 64:  # A few megabytes at most.
+                self._repeated.clear()
+            repeated = self._repeated[key] = self.border[layer][single].repeat(positions, 1)
+        return repeated
+
+    def borders(self, positions: int, zones: int) -> tuple[Tensor, Tensor, Tensor]:
+        found = self._borders.get(positions)
+        if found is None:
+            if len(self._borders) > 256:
+                self._borders.clear()
+            model = self.models[0]
+            found = self._borders[positions] = _border_indices(model.edge_source, model.edge_target,
+                                                               model.in_degree, positions, zones)
+        return found
+
+    def forward_packed(self, batch: ZoneBatch, *, non_blocking: bool = False) -> tuple[Tensor, Tensor]:
+        """Every listed option's logit, in position order, and each position's values,
+        for decisions packed with features.pack_zone_arrays(..., network_positions)."""
+        if len(batch.network_positions) != len(self.models):
+            raise ValueError("The batch names a different number of networks")
+        return _forward(self, batch, non_blocking=non_blocking)
+
+
+def _forward(networks: Any, batch: ZoneBatch, *, non_blocking: bool = False) -> tuple[Tensor, Tensor]:
+    """The network: every listed option's logit, in position order, and each position's values.
+
+    `networks` is one network (_OneNetwork) or several (NetworkStack); each
+    layer reads each network's own rows. With non_blocking, keep `batch` until
+    the outputs are read (batch_tensors).
+    """
+    models = networks.models
+    model = models[0]
+    device = model.value_head[-1].weight.device
+    if device.type == "mps":
+        # Also covers callers using the normal PyTorch model.to('mps') API.
+        _require_no_mps_fallback()
+    t = batch_tensors(batch, device, non_blocking=non_blocking)
+    positions, zones, dim = batch.positions, batch.zones, model.config.hidden_dim
+    nodes = positions * zones
+    sizes = batch.network_positions
+    node_sizes = [size * zones for size in sizes]
+    identity, facts = networks.zone_terms(batch, t)
+    local = _bag(networks.zone_table, t["zone_column"], t["zone_weight"], t["zone_bags"])
+    local = local.view(positions, zones, dim) + identity + facts
+    h = _by_network(local.view(nodes, dim), node_sizes, [m.zone_norm for m in models], _norm)
+    u = _by_network(_bag(networks.global_table, t["global_column"], t["global_weight"], t["global_bags"]),
+                    sizes, [m.global_norm for m in models], _norm)
+    sources, targets, degree = networks.borders(positions, zones)
+    for layer in range(model.config.message_layers):
+        sent = F.gelu(_by_network(h, node_sizes, [m.messages[layer] for m in models], _linear).index_select(0, sources)
+                      + networks.border_terms(layer, batch, t))
+        received = h.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
+        h = h + _by_network(torch.cat((h, received, u.repeat_interleave(zones, 0)), dim=1), node_sizes,
+                            [m.zone_updates[layer] for m in models], _apply_block)
+        u = u + _by_network(torch.cat((u, h.view(positions, zones, dim).mean(1)), dim=1), sizes,
+                            [m.position_updates[layer] for m in models], _apply_block)
+    grid = h.view(positions, zones, dim)
+    states = _by_network(torch.cat((u, grid.mean(1), grid.amax(1)), dim=1), sizes,
+                         [m.state_encoder for m in models], _apply_block)
+    values = _by_network(states, sizes, [m.value_head for m in models], _apply_head)  # Raw-value/value_scale units.
+    if not batch.options:
+        return values.new_empty((0,)), values
+    option_sizes = batch.network_options
+    options = _by_network(_bag(networks.option_table, t["action_column"], t["action_weight"], t["action_bags"]),
+                          option_sizes, [m.option_norm for m in models], _norm)
+    bank = torch.cat((h, networks.no_zone))
+    path = h.new_zeros((batch.options, dim)).index_add_(
+        0, t["path_option"], bank.index_select(0, t["path_zone"])) * t["path_scale"]
+    latent = _by_network(torch.cat((options, bank.index_select(0, t["action_source"]),
+                                    bank.index_select(0, t["action_target"]), path), dim=1),
+                         option_sizes, [m.option_encoder for m in models], _apply_block)
+    scores = _by_network(torch.cat((states.index_select(0, t["action_position"]), latent), dim=1), option_sizes,
+                         [m.policy_head for m in models], _apply_head).squeeze(1)
+    if model.config.policy_factorization:
+        scores = _readout(models, states, latent, scores, t, batch)
+    return scores, values
+
+
+def _readout(models: Sequence[Any], states: Tensor, latent: Tensor, scores: Tensor, t: dict[str, Tensor],
+             batch: ZoneBatch) -> Tensor:
+    """Normalize kind -> what acts -> how it travels -> what it acts on -> exact option.
+
+    These are neural conditional readouts of the same complete legal menu.
+    No option is inserted, reordered, merged or pruned; each level scores a
+    group from the mean vector of its options. Every group of every level and
+    every option is normalized among those sharing its parent in one softmax
+    pass, and an option's log-probability is the sum along its branch.
+    """
+    groups = batch.groups
+    means = latent.new_zeros((groups, latent.shape[1])).index_add_(
+        0, t["readout_owners"], latent.repeat(GROUP_LEVELS, 1)) / t["readout_counts"]
+    heads = [model.factor_heads[level] for level in range(GROUP_LEVELS) for model in models]
+    group_scores = _by_network(torch.cat((states.index_select(0, t["readout_rows"]), means), dim=1),
+                               batch.readout_sizes, heads, _apply_head).squeeze(1)
+    normalized = _conditional_log_softmax(torch.cat((group_scores, scores)), t["readout_segments"],
+                                          batch.positions + groups)
+    return normalized.index_select(0, t["readout_terms"]).view(GROUP_LEVELS + 1, -1).sum(0)
+
+
 class CampaignPolicyValueNet(nn.Module):
     """Zone-graph policy/value network for one alliance.
 
@@ -249,60 +462,9 @@ class CampaignPolicyValueNet(nn.Module):
         The pass for decisions already laid out by features.pack_zone_arrays.
         With non_blocking, keep `batch` until the outputs are read (batch_tensors).
         """
-        device = self.value_head[-1].weight.device
-        if device.type == "mps":
-            # Also covers callers using the normal PyTorch model.to('mps') API.
-            _require_no_mps_fallback()
-        t = batch_tensors(batch, device, non_blocking=non_blocking)
-        positions, zones, dim = batch.positions, batch.zones, self.config.hidden_dim
-        nodes = positions * zones
-        local = _bag(self.zone_columns.weight, t["zone_column"], t["zone_weight"], t["zone_bags"])
-        local = local.view(positions, zones, dim) + self.zone_identity.weight + self.map_facts(self.zone_static)
-        h = self.zone_norm(local).reshape(nodes, dim)
-        u = self.global_norm(_bag(self.global_columns.weight, t["global_column"], t["global_weight"], t["global_bags"]))
-        shift = torch.arange(positions, device=device).repeat_interleave(len(self.edge_source)) * zones
-        sources, targets = self.edge_source.repeat(positions) + shift, self.edge_target.repeat(positions) + shift
-        degree = self.in_degree.repeat(positions, 1)
-        for message, border, zone_update, position_update in zip(
-                self.messages, self.border_facts, self.zone_updates, self.position_updates, strict=True):
-            sent = F.gelu(message(h).index_select(0, sources) + border(self.edge_static).repeat(positions, 1))
-            received = h.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
-            h = h + zone_update(torch.cat((h, received, u.repeat_interleave(zones, 0)), dim=1))
-            u = u + position_update(torch.cat((u, h.view(positions, zones, dim).mean(1)), dim=1))
-        grid = h.view(positions, zones, dim)
-        states = self.state_encoder(torch.cat((u, grid.mean(1), grid.amax(1)), dim=1))
-        values = self.value_head(states)  # Unbounded, in raw-value/value_scale units.
-        if not batch.options:
-            return values.new_empty((0,)), values
-        options = self.option_norm(_bag(self.option_columns.weight, t["action_column"], t["action_weight"],
-                                        t["action_bags"]))
-        bank = torch.cat((h, self.no_zone.unsqueeze(0)))
-        path = h.new_zeros((batch.options, dim)).index_add_(
-            0, t["path_option"], bank.index_select(0, t["path_zone"])) * t["path_scale"]
-        latent = self.option_encoder(torch.cat((options, bank.index_select(0, t["action_source"]),
-                                                bank.index_select(0, t["action_target"]), path), dim=1))
-        scores = self.policy_head(torch.cat((states.index_select(0, t["action_position"]), latent), dim=1)).squeeze(1)
-        if self.config.policy_factorization:
-            scores = self._factored(states, latent, scores, t, batch)
-        return scores, values
-
-    def _factored(self, states: Tensor, latent: Tensor, scores: Tensor, t: dict[str, Tensor],
-                  batch: ZoneBatch) -> Tensor:
-        """Normalize kind -> what acts -> how it travels -> what it acts on -> exact option.
-
-        These are neural conditional readouts of the same complete legal menu.
-        No option is inserted, reordered, merged or pruned; each level scores
-        a group from the mean vector of its options.
-        """
-        joint = torch.zeros_like(scores)
-        parents = batch.positions
-        for level, head in enumerate(self.factor_heads):
-            owners, count = t[f"group{level}_owners"], batch.group_counts[level]
-            means = latent.new_zeros((count, latent.shape[1])).index_add_(0, owners, latent) / t[f"group{level}_counts"]
-            group_scores = head(torch.cat((states.index_select(0, t[f"group{level}_rows"]), means), dim=1)).squeeze(1)
-            joint = joint + _conditional_log_softmax(group_scores, t[f"group{level}_parents"], parents).index_select(0, owners)
-            parents = count
-        return joint + _conditional_log_softmax(scores, t[f"group{GROUP_LEVELS - 1}_owners"], parents)
+        if len(batch.network_positions) != 1:
+            raise ValueError("A batch for several networks needs a NetworkStack")
+        return _forward(_OneNetwork(self), batch, non_blocking=non_blocking)
 
 
 def _gpu_evaluation_outputs(logits: Sequence[Tensor], values: Tensor, counts: Sequence[int],

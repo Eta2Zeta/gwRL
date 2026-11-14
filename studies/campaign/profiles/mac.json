@@ -19,7 +19,8 @@
   "measured": [
     "2 November 2026, zone network, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, fresh networks: 124 games per hour with learning at these settings.",
     "The same layout evaluating on the GPU (neural_device mps) played 58.7 games per hour, and ten processes each evaluating their own games 84.",
-    "The coordinator that evaluates every game's positions was busy 89% of the time, so it limits this layout."
+    "The coordinator that evaluates every game's positions was then busy 89% of the time, so it limited this layout.",
+    "14 November 2026, the same settings, with the coordinator answering each round in one network pass: about 252,000 decisions per hour while playing under 2.3 cores of other work, the coordinator busy 85% of the time and the training using 9.9 cores."
   ],
   "notes": [
     "python: PyTorch 2.14 from requirements-gpu-mps.txt, which the GPU needs for long runs; the numbers above were measured with it.",

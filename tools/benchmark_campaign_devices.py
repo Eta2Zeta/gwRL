@@ -687,7 +687,7 @@ def shared_selfplay(config, device, models, weights, deadline, persist, runtime_
     Each process plays `games_per_process` games at once, one per thread, taking
     seeds from one queue, so a finished game's slot starts the next game. See
     studies/campaign/shared_evaluator.py for the request protocol. Returns the
-    report and, as parallel_selfplay does, the traffic as model forwards and
+    report and, as parallel_selfplay does, the traffic as network passes and
     evaluator calls.
     """
     from functools import partial
@@ -752,8 +752,8 @@ def all_slots_busy(games, samples):
 def shared_summary(config, games, stats, samples, *, task, game_process_cpu_seconds, coordinator_cpu_seconds):
     """shared_selfplay's report from its game records and the server's statistics.
 
-    Like parallel_selfplay, it also returns the traffic as model forwards (one
-    per alliance model with positions in a serving round) and evaluator calls
+    Like parallel_selfplay, it also returns the traffic as network passes (one
+    per serving round, for every alliance's positions) and evaluator calls
     (one per serving round).
     """
     order = {seed: index for index, seed in enumerate(config.seeds)}
@@ -771,7 +771,7 @@ def shared_summary(config, games, stats, samples, *, task, game_process_cpu_seco
     busy = all_slots_busy(games, samples)
     per_game = sum(game["evaluations"] for game in finished) / len(finished) if finished else None
     mean_seconds = sum(game["game_seconds"] for game in finished) / len(finished) if finished else None
-    positions = sum(size * count for size, count in stats.positions_per_forward.items())
+    positions = sum(size * count for size, count in stats.positions_per_pass.items())
     result = {"task": task,
         "status": "game_error" if failed or missing else "completed" if complete else "truncated", "root_noise": True,
         "selection": "visit-policy sampling, independent per-game policy/search RNG streams",
@@ -799,15 +799,15 @@ def shared_summary(config, games, stats, samples, *, task, game_process_cpu_seco
         "inference_requests": stats.requests, "serving_rounds": stats.rounds,
         "mean_requests_per_serving_round": stats.requests / stats.rounds if stats.rounds else None,
         "requests_per_serving_round": dict(sorted(stats.requests_per_round.items())),
-        "model_forwards": stats.forwards,
-        "mean_positions_per_model_forward": positions / stats.forwards if stats.forwards else None,
-        "positions_per_model_forward": dict(sorted(stats.positions_per_forward.items())),
+        "network_passes": stats.passes,
+        "mean_positions_per_network_pass": positions / stats.passes if stats.passes else None,
+        "positions_per_network_pass": dict(sorted(stats.positions_per_pass.items())),
         "server_seconds": {"receiving_requests": stats.receive_seconds,
                            "forward_including_merge_transfer_and_outputs": stats.forward_seconds,
                            "sending_replies": stats.reply_seconds, "waiting_for_requests": stats.idle_seconds},
         "games": games}
-    forward = {"seconds": stats.forward_seconds, "calls": stats.forwards,
-               "batch_sizes": dict(sorted(stats.positions_per_forward.items()))}
+    forward = {"seconds": stats.forward_seconds, "calls": stats.passes,
+               "batch_sizes": dict(sorted(stats.positions_per_pass.items()))}
     evaluated = {"synchronized_seconds": stats.receive_seconds + stats.forward_seconds + stats.reply_seconds,
                  "calls": stats.rounds, "requests": stats.requests,
                  "batch_sizes": dict(sorted(stats.requests_per_round.items()))}

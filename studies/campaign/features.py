@@ -113,14 +113,31 @@ class ZoneBatch:
     Answers are grouped by the bag they add into, in bag order: each zone of
     each position, each position, or each option. A bag array holds where each
     bag's answers start, then the end of the last. Option zones index the
-    batch's zone vectors, with one extra slot, positions * zones, meaning "no
-    zone". Policy-group ids are numbered across the batch; a level's parents
-    are groups of the level above, and level 0's parents are the positions.
+    batch's zone vectors, followed by one "no zone" slot per network.
+
+    The policy readout scores the policy groups of all four levels and every
+    option, then normalizes each among those sharing its parent, in one pass
+    (neural._readout). The groups of all levels are numbered one after another,
+    level 0 first, each level's groups in position order. `readout_segments`
+    names each group's and each option's parent: for level 0 its position, for
+    the other levels and for options a group of the level above, counted after
+    the positions. `readout_terms` lists, for each option, its group at each
+    level and then the option itself, level by level.
+
+    One pass may evaluate decisions for several networks of one layout
+    (neural.NetworkStack): `network_positions` says how many decisions each
+    network has, in order, and the decisions come grouped that way. Each
+    network's answers then read its own rows of the networks' tables, laid end
+    to end, and each network's layers read its own rows of every kind; the
+    `network_*` and `readout_sizes` lists give those rows' counts.
     """
     positions: int
     zones: int
     option_counts: list[int]
-    group_counts: list[int]
+    network_positions: list[int]
+    network_options: list[int]
+    # Policy groups for each level and network, level by level: one group head each.
+    readout_sizes: list[int]
     integers: dict[str, np.ndarray]
     floats: dict[str, np.ndarray]
     # Host copies a device transfer may still be reading; see neural.batch_tensors.
@@ -130,12 +147,25 @@ class ZoneBatch:
     def options(self) -> int:
         return sum(self.option_counts)
 
+    @property
+    def groups(self) -> int:
+        return sum(self.readout_sizes)
 
-def pack_zone_arrays(items: Sequence[Mapping[str, np.ndarray]], spec: ZoneSpec) -> ZoneBatch:
-    """Lay decisions out for one pass, checking every index the network reads."""
+
+def pack_zone_arrays(items: Sequence[Mapping[str, np.ndarray]], spec: ZoneSpec,
+                     network_positions: Sequence[int] | None = None) -> ZoneBatch:
+    """Lay decisions out for one pass, checking every index the network reads.
+
+    With `network_positions`, the first network_positions[0] decisions belong
+    to the first of several networks, the next ones to the second, and so on.
+    """
     zones = len(spec.zones)
     count = len(items)
-    none = count * zones
+    networks = [count] if network_positions is None else [int(size) for size in network_positions]
+    if not networks or min(networks) < 0 or sum(networks) != count:
+        raise ValueError("The networks' decision counts do not add up to the decisions")
+    network = np.repeat(np.arange(len(networks), dtype=np.int64), networks)
+    several = len(networks) > 1
     options = [len(item["action_source"]) for item in items]
     zone_index = _join([item["zone_index"] for item in items], np.int64)
     _check_range(zone_index, 0, zones, "zone")
@@ -154,20 +184,29 @@ def pack_zone_arrays(items: Sequence[Mapping[str, np.ndarray]], spec: ZoneSpec) 
         order = np.argsort(zone_rows, kind="stable")
         zone_rows, zone_column, zone_value = zone_rows[order], zone_column[order], zone_value[order]
     entries = np.concatenate([np.diff(item["action_offsets"]) for item in items]) if items else np.zeros(0, np.int64)
+    global_counts = [len(item["global_column"]) for item in items]
+    option_network = np.repeat(network, options)
+    if several:
+        # Each network's answers read its own rows of the tables laid end to end.
+        zone_column = zone_column + network[zone_rows // zones] * spec.zone_columns
+        global_column = global_column + np.repeat(network, global_counts) * spec.global_columns
+        action_column = action_column + np.repeat(option_network, entries) * spec.action_columns
     integers = {"zone_bags": _bag_offsets(np.bincount(zone_rows, minlength=count * zones)), "zone_column": zone_column,
-                "global_bags": _bag_offsets([len(item["global_column"]) for item in items]),
+                "global_bags": _bag_offsets(global_counts),
                 "global_column": global_column, "action_bags": _bag_offsets(entries), "action_column": action_column}
+    if several:
+        integers["position_network"] = network
     floats = {"zone_weight": _signed_log(zone_value),
               "global_weight": _signed_log(_join([item["global_value"] for item in items], np.int32)),
               "action_weight": _signed_log(_join([item["action_value"] for item in items], np.int32))}
-    group_counts = [0] * GROUP_LEVELS
+    readout_sizes = [0] * (GROUP_LEVELS * len(networks))
     if sum(options):
         owner_position = np.repeat(np.arange(count, dtype=np.int64), options)
 
         def zone_slots(name: str) -> np.ndarray:
             values = _join([item[name] for item in items], np.int64)
             _check_range(values, -1, zones, "option zone")
-            return np.where(values >= 0, values + owner_position * zones, none)
+            return np.where(values >= 0, values + owner_position * zones, count * zones + option_network)
 
         path_counts = _join([np.diff(item["path_offsets"]) for item in items], np.int64)
         path_zone = _join([item["path_zone"] for item in items], np.int64)
@@ -187,22 +226,31 @@ def pack_zone_arrays(items: Sequence[Mapping[str, np.ndarray]], spec: ZoneSpec) 
         shifts = np.cumsum(per_position, axis=0) - per_position
         owners = groups + shifts[owner_position]
         totals = per_position.sum(axis=0)
-        rows = None
+        # Then numbered across the levels, level 0 first.
+        starts = np.cumsum(totals) - totals
+        rows, segments = [], []
         for level in range(GROUP_LEVELS):
-            total = int(totals[level])
             if level == 0:
                 parents = np.repeat(np.arange(count, dtype=np.int64), per_position[:, 0])
-                rows = parents
+                rows.append(parents)
+                segments.append(parents)
             else:
-                parents = np.empty(total, dtype=np.int64)
+                parents = np.empty(int(totals[level]), dtype=np.int64)
                 parents[owners[:, level]] = owners[:, level - 1]
-                rows = rows[parents]
-            integers[f"group{level}_owners"] = np.ascontiguousarray(owners[:, level])
-            integers[f"group{level}_parents"] = parents
-            integers[f"group{level}_rows"] = rows
-            floats[f"group{level}_counts"] = np.bincount(owners[:, level], minlength=total).astype(np.float32)[:, None]
-            group_counts[level] = total
-    return ZoneBatch(count, zones, options, group_counts, integers, floats)
+                rows.append(rows[-1][parents])
+                segments.append(count + starts[level - 1] + parents)
+            readout_sizes[level * len(networks):(level + 1) * len(networks)] = np.bincount(
+                network, weights=per_position[:, level], minlength=len(networks)).astype(np.int64).tolist()
+        segments.append(count + starts[-1] + owners[:, -1])  # An option's parent is its last group.
+        readout_owners = (owners + starts).T.ravel()  # Each option's group at each level, level by level.
+        groups_total = int(totals.sum())
+        integers.update(readout_owners=readout_owners, readout_rows=np.concatenate(rows),
+                        readout_segments=np.concatenate(segments),
+                        readout_terms=np.concatenate((readout_owners,
+                                                      groups_total + np.arange(len(owners), dtype=np.int64))))
+        floats["readout_counts"] = np.bincount(readout_owners, minlength=groups_total).astype(np.float32)[:, None]
+    network_options = np.bincount(network, weights=options, minlength=len(networks)).astype(np.int64).tolist()
+    return ZoneBatch(count, zones, options, networks, network_options, readout_sizes, integers, floats)
 
 
 def pack_zone_inputs(inputs: Sequence[ZoneInput], spec: ZoneSpec) -> ZoneBatch:

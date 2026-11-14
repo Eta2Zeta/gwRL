@@ -229,8 +229,8 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
     def summarize_shared(self, games):
         config = Config(mode="selfplay", devices=("mps",), threads=1, search_evaluation="per_search", processes=2,
                         games_per_process=2, seeds=(1, 2, 3, 4, 5))
-        stats = ServerStats(requests=2000, rounds=500, requests_per_round={4: 500}, forwards=800,
-                            positions_per_forward={2: 400, 3: 400}, forward_seconds=30., reply_seconds=2.)
+        stats = ServerStats(requests=2000, rounds=500, requests_per_round={4: 500}, passes=800,
+                            positions_per_pass={2: 400, 3: 400}, forward_seconds=30., reply_seconds=2.)
         samples = [(1000., 0), (1050., 500), (1150., 1500), (1250., 2000)]
         return shared_summary(config, games, stats, samples, task={"calendar_rounds": 3},
                               game_process_cpu_seconds=100., coordinator_cpu_seconds=50.)
@@ -264,7 +264,7 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         self.assertEqual(result["all_slots_busy"], {"seconds": 100., "evaluations": 1000.,
                                                     "evaluations_per_second": 10.})
         self.assertAlmostEqual(result["steady_state_games_per_hour"], 10. * 3600 / 400.)  # 400 evaluations a game.
-        self.assertEqual((result["mean_requests_per_serving_round"], result["mean_positions_per_model_forward"]),
+        self.assertEqual((result["mean_requests_per_serving_round"], result["mean_positions_per_network_pass"]),
                          (4., 2.5))
         self.assertEqual((forward["calls"], forward["seconds"], forward["batch_sizes"]), (800, 30., {2: 400, 3: 400}))
         self.assertEqual((evaluated["calls"], evaluated["requests"], evaluated["synchronized_seconds"]), (500, 2000, 32.))

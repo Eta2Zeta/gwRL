@@ -14,8 +14,8 @@ from torch import nn
 
 import gwrl_cpp
 from studies.campaign.curriculum import make_env
-from studies.campaign.features import default_zone_spec, make_zone_input
-from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
+from studies.campaign.features import default_zone_spec, make_zone_input, pack_zone_arrays
+from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NetworkStack, NeuralEvaluator
 from studies.shared.multiplayer_mcts import PLAYERS
 
 
@@ -179,6 +179,68 @@ class CampaignNeuralTests(unittest.TestCase):
         torch.testing.assert_close(shuffled, full[order], rtol=1e-5, atol=1e-5)
         torch.testing.assert_close(shuffled_values, full_values, rtol=1e-6, atol=1e-6)
         torch.testing.assert_close(value_only, full_values, rtol=1e-6, atol=1e-6)
+
+    def test_the_readout_multiplies_the_probabilities_along_each_branch(self):
+        # With every head's last layer at zero, each group is as likely as its
+        # siblings and each option as the others in its last group, so an
+        # option's probability follows from the group tree alone.
+        model = self.model()
+        with torch.no_grad():
+            for head in (*model.factor_heads, model.policy_head):
+                head[2].weight.zero_()
+                head[2].bias.zero_()
+        with torch.inference_mode():
+            logits, _ = model.forward_batch(self.decisions)
+        for item, scores in zip(self.decisions, logits, strict=True):
+            groups = [tuple(row) for row in item.arrays()["factor_groups"].reshape(-1, 4).tolist()]
+            expected = []
+            for option in groups:
+                probability = 1.0
+                for level in range(4):
+                    # A group's parent is its options' group one level up; level 0's is the position.
+                    siblings = {other[level] for other in groups if level == 0 or other[level - 1] == option[level - 1]}
+                    probability /= len(siblings)
+                probability /= sum(other[3] == option[3] for other in groups)
+                expected.append(probability)
+            torch.testing.assert_close(scores.exp(), torch.tensor(expected), rtol=1e-5, atol=1e-6)
+            self.assertAlmostEqual(float(scores.exp().sum()), 1.0, places=5)
+
+    def test_a_stack_gives_each_network_its_own_outputs_in_one_pass(self):
+        models = [self.model() for _ in PLAYERS]
+        with torch.no_grad():
+            for model in models:
+                for table in (model.zone_columns, model.global_columns, model.option_columns):
+                    torch.nn.init.normal_(table.weight)
+        items = [item.arrays() for item in (*self.decisions, self.chance)]
+        alone = []
+        with torch.inference_mode():
+            for model in models:
+                scores, values = model.forward_packed(pack_zone_arrays(items, model.spec))
+                alone.append((scores, values))
+            stack = NetworkStack(models)
+            # The first network rates the first three positions, the third the rest; the second none.
+            sizes = [3, 0, len(items) - 3]
+            batch = pack_zone_arrays(items, stack.spec, sizes)
+            scores, values = stack.forward_packed(batch)
+            options = [len(item["action_source"]) for item in items]
+            first = sum(options[:3])
+            torch.testing.assert_close(scores[:first], alone[0][0][:first], rtol=1e-5, atol=1e-5)
+            torch.testing.assert_close(scores[first:], alone[2][0][first:], rtol=1e-5, atol=1e-5)
+            torch.testing.assert_close(values[:3], alone[0][1][:3], rtol=1e-5, atol=1e-5)
+            torch.testing.assert_close(values[3:], alone[2][1][3:], rtol=1e-5, atol=1e-5)
+            # One network alone in a stack's pass.
+            scores, values = stack.forward_packed(pack_zone_arrays(items, stack.spec, [0, len(items), 0]))
+            torch.testing.assert_close(scores, alone[1][0], rtol=1e-5, atol=1e-5)
+            torch.testing.assert_close(values, alone[1][1], rtol=1e-5, atol=1e-5)
+        self.assertFalse(torch.allclose(alone[0][1], alone[2][1]))
+        with self.assertRaisesRegex(ValueError, "add up"):
+            pack_zone_arrays(items, stack.spec, [1, 1])
+        with self.assertRaisesRegex(ValueError, "number of networks"):
+            stack.forward_packed(pack_zone_arrays(items, stack.spec))
+        with self.assertRaisesRegex(ValueError, "NetworkStack"):
+            models[0].forward_packed(batch)
+        with self.assertRaisesRegex(ValueError, "configuration"):
+            NetworkStack([models[0], self.model(policy_factorization=False)])
 
     def test_factorization_changes_only_the_readout(self):
         flat = self.model(policy_factorization=False)

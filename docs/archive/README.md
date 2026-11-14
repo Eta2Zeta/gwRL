@@ -49,6 +49,7 @@ the first learning stage.
 | 12 Nov | [The fused column lookup, in the code](records/coordinator_lookups_2026_11_12.md) | Identical outputs; decisions per hour rose 17.6% in matched batches. |
 | 13 Nov | [Where the game processes' time goes](records/game_processes_2026_11_13.md) | Playing a move and listing the legal moves cost about a millisecond each, two thirds of the game threads' CPU. |
 | 14 Nov | [Supply answers cached while a move is played](records/supply_cache_2026_11_14.md) | Identical play; playing a move costs 42% less CPU and a game process 16% less per decision, but decisions per hour rose only about 3%: the coordinator now limits self-play. |
+| 14 Nov | [One network pass per coordinator round](records/coordinator_one_pass_2026_11_14.md) | A pass cost about 0.4 ms whatever its size; one pass for all three networks makes a round 32% cheaper with the same replies, and decisions per hour rose 13% in matched batches. |
 
 ### The engine
 

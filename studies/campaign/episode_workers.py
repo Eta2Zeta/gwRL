@@ -177,7 +177,7 @@ class SharedEpisodeWorkers:
     def report(self) -> dict[str, Any]:
         """The last batch's evaluator traffic."""
         stats = self.serving
-        return {"evaluations": stats.requests, "serving_rounds": stats.rounds, "model_forwards": stats.forwards,
+        return {"evaluations": stats.requests, "serving_rounds": stats.rounds, "network_passes": stats.passes,
                 "forward_seconds": stats.forward_seconds, "idle_seconds": stats.idle_seconds}
 
     def terminate(self) -> None:

@@ -4,16 +4,18 @@ Game processes keep the rules, the search and the network's input
 preparation. For each position a search asks about, a game thread writes the
 decision's zone input, a few integer arrays, into its own shared-memory buffer
 and sends a short header through its own pipe. The serving process merges
-every waiting position into one batch per alliance model, evaluates it on its
-device and replies with the priors and values. A thread waits for its reply
-before preparing its next position, so its buffer is never overwritten while
-the server reads it. When the server stops, it closes the pipes still open,
-and a thread waiting for a reply raises EvaluatorClosed instead of waiting
-forever.
+every waiting position into one pass of the three alliance networks, each
+network reading its own alliance's positions, evaluates it on its device and
+replies with the priors and values. A thread waits for its reply before
+preparing its next position, so its buffer is never overwritten while the
+server reads it. When the server stops, it closes the pipes still open, and a
+thread waiting for a reply raises EvaluatorClosed instead of waiting forever.
 
 The server lays the waiting positions out with features.pack_zone_arrays and
-runs CampaignPolicyValueNet.forward_packed, the pass NeuralEvaluator also
-uses, so results match NeuralEvaluator's up to floating-point summation order.
+runs neural.NetworkStack, whose pass is the one NeuralEvaluator's networks
+run, so results match NeuralEvaluator's up to floating-point rounding. A pass
+costs much more than its share of arithmetic, so one pass per round, rather
+than one per alliance, saves most of that cost.
 """
 from __future__ import annotations
 
@@ -103,17 +105,19 @@ class RemoteEvaluator:
         self.connection.close()
 
 
-def forward_prepared(model: Any, items: Sequence[dict[str, np.ndarray]], device: Any) -> tuple[Any, list[int], Any, Any]:
-    """CampaignPolicyValueNet.forward_batch for positions already in arrays.
+def forward_prepared(model: Any, items: Sequence[dict[str, np.ndarray]], device: Any,
+                     network_positions: Sequence[int] | None = None) -> tuple[Any, list[int], Any, Any]:
+    """One network pass for positions already in arrays.
 
-    Returns every legal option's logit in position order, each position's option
-    count, the raw value rows, and the batch, whose host buffers the device
-    copies read and which must stay alive until the outputs are collected.
+    `model` is a CampaignPolicyValueNet, or a neural.NetworkStack whose networks
+    have network_positions[i] positions each, in order. Returns every legal
+    option's logit in position order, each position's option count, the raw
+    value rows, and the batch, whose host buffers the device copies read and
+    which must stay alive until the outputs are collected.
     """
     from .features import pack_zone_arrays
-    batch = pack_zone_arrays(items, model.spec)
-    # The server queues every model's pass before reading any back; the batch
-    # it returns keeps the copies' host buffers alive until collect.
+    batch = pack_zone_arrays(items, model.spec, network_positions)
+    # Device copies may still read the batch's host buffers; it stays alive until collect.
     scores, values = model.forward_packed(batch, non_blocking=True)
     return scores, batch.option_counts, values, batch
 
@@ -157,10 +161,11 @@ class ServerStats:
     requests: int = 0
     rounds: int = 0                  # Serving rounds: the waiting requests answered together.
     requests_per_round: dict[int, int] = field(default_factory=dict)
-    forwards: int = 0                # Model forwards: one per alliance model with positions in a round.
-    positions_per_forward: dict[int, int] = field(default_factory=dict)
+    passes: int = 0                  # Network passes: one per round, for every alliance's positions.
+    # Positions per pass; a chance position counts once for each of the three networks.
+    positions_per_pass: dict[int, int] = field(default_factory=dict)
     receive_seconds: float = 0.0     # Reading requests from the ready pipes.
-    forward_seconds: float = 0.0     # Merge, transfer, forward and host outputs.
+    forward_seconds: float = 0.0     # Answering: reading, laying out, the pass and host outputs.
     reply_seconds: float = 0.0       # Sending priors and values back.
     idle_seconds: float = 0.0
 
@@ -178,7 +183,16 @@ class SharedEvaluatorServer:
         self.connections = list(connections)
         self.memories = {connection: shared_memory.SharedMemory(name=name)
                          for connection, name in zip(connections, buffer_names, strict=True)}
+        self._stack = None
         self.stats = ServerStats()
+
+    @property
+    def stack(self) -> Any:
+        """The three networks for one pass, which reads their weights once, at the first request."""
+        if self._stack is None:
+            from .neural import NetworkStack
+            self._stack = NetworkStack([self.models[player] for player in PLAYERS])
+        return self._stack
 
     def serve(self, keep_running: Callable[[], bool]) -> None:
         """Answer requests until every client closes its pipe or keep_running() is false.
@@ -210,7 +224,7 @@ class SharedEvaluatorServer:
     def answer(self, requests: Sequence[tuple[Connection, tuple]]) -> None:
         import torch
         started = time.perf_counter()
-        groups: dict[str, list[int]] = {player: [] for player in PLAYERS}
+        rows: dict[str, list[int]] = {player: [] for player in PLAYERS}
         items = []
         for row, (connection, (actor, count, layout, header)) in enumerate(requests):
             readers = PLAYERS if actor is None else (actor,)
@@ -218,37 +232,35 @@ class SharedEvaluatorServer:
                 raise ValueError("A game sent a zone input of another layout")
             items.append(read_arrays(self.memories[connection].buf, header))
             for player in readers:
-                groups[player].append(row)
+                rows[player].append(row)
+        # One pass for every alliance's positions, grouped by alliance network.
+        order = [row for player in PLAYERS for row in rows[player]]
+        with torch.inference_mode():
+            outputs = forward_prepared(self.stack, [items[row] for row in order], self.device,
+                                       [len(rows[player]) for player in PLAYERS])
+            row_priors, row_values = collect(self.stack, *outputs)
         priors: list[list[float]] = [[] for _ in requests]
         chance: dict[int, list[list[float]]] = {}
         values: list[list[float] | None] = [None] * len(requests)
-        with torch.inference_mode():
-            # Queue every model's work before reading any result back, so the
-            # host lays out one model's batch while the device runs another's.
-            launched = [(player, rows, forward_prepared(self.models[player], [items[row] for row in rows], self.device))
-                        for player, rows in groups.items() if rows]
-            for player, rows, outputs in launched:
-                row_priors, row_values = collect(self.models[player], *outputs)
-                for row, prior, value in zip(rows, row_priors, row_values, strict=True):
-                    if requests[row][1][0] is None:
-                        chance.setdefault(row, []).append(value)
-                    else:
-                        priors[row], values[row] = prior, value
-        for row, rows in chance.items():
-            values[row] = [sum(value[i] for value in rows) / len(PLAYERS) for i in range(3)]
+        for row, prior, value in zip(order, row_priors, row_values, strict=True):
+            if requests[row][1][0] is None:
+                chance.setdefault(row, []).append(value)
+            else:
+                priors[row], values[row] = prior, value
+        for row, found in chance.items():
+            values[row] = [sum(value[i] for value in found) / len(PLAYERS) for i in range(3)]
         sending = time.perf_counter()
         for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
             connection.send((row_priors, value))
         sent = time.perf_counter()
         if self.runtime_policy is not None:
-            self.runtime_policy.completed(len(launched))
+            self.runtime_policy.completed(1)
         stats = self.stats
         stats.requests += len(requests)
         stats.rounds += 1
         stats.requests_per_round[len(requests)] = stats.requests_per_round.get(len(requests), 0) + 1
-        stats.forwards += len(launched)
-        for _, rows, _ in launched:
-            stats.positions_per_forward[len(rows)] = stats.positions_per_forward.get(len(rows), 0) + 1
+        stats.passes += 1
+        stats.positions_per_pass[len(order)] = stats.positions_per_pass.get(len(order), 0) + 1
         stats.reply_seconds += sent - sending
         # Graph-cache housekeeping after the replies counts as device work.
         stats.forward_seconds += (sending - started) + (time.perf_counter() - sent)

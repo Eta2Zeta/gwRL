@@ -1458,21 +1458,25 @@ memory stops. How to start, stop and resume a run is in the
 
 **The coordinator.** Game threads do not run the network themselves. A game thread
 that needs an evaluation writes the position's input into shared memory and waits.
-Over and over, the coordinator reads every waiting request, groups them by
-alliance network, merges each group into one call of that network, runs it and
-sends back each position's priors and values
-(`studies/campaign/shared_evaluator.py`). A call with more positions costs less
-per position: the network's forward pass, computing its outputs from an input,
-takes 0.44 ms for one position and 0.73 ms for four
-([record](../archive/records/coordinator_lookups_2026_11_12.md#the-forward-pass)). Until
-12 November the column lookups (section 6.3) were the largest part of a call;
-since then one fused operation does them, and the largest part is the GELU curve,
-mostly in the border messages (section 6.6). The coordinator is busy about 90% of
-the time, while the game processes and the coordinator together use about 9.2 of
-the 11 cores. Inferred: the coordinator limits this layout, and a faster
-coordinator, larger calls or a second coordinator could add up to about 20%
-before the cores run out
-([record](../archive/records/supply_cache_2026_11_14.md#what-this-does-and-does-not-show)).
+Over and over, the coordinator reads every waiting request, evaluates all of them
+in one pass of the three alliance networks, and sends back each position's priors
+and values (`studies/campaign/shared_evaluator.py`). In that pass each network's
+learned layers read only its own alliance's positions, so every output is that
+network's own, up to floating-point rounding; a chance position, which all three
+networks rate, appears once for each (`NetworkStack` in
+`studies/campaign/neural.py`). One pass per round matters because a pass costs
+much more than its share of arithmetic: in a profiled training batch, a pass of
+one network took 0.57 ms for one position and 1.02 ms for four, about 0.4 ms
+whatever its size
+([record](../archive/records/coordinator_one_pass_2026_11_14.md#where-the-coordinators-time-went)).
+Most of that fixed cost is Python's and PyTorch's own work for each of the pass's
+hundreds of operations. Of the arithmetic, the GELU curve (section 6.2) takes the
+most, mostly in the border messages (section 6.6). The coordinator is busy about
+85% of the time, and the game processes and the coordinator together use about
+9.9 of the 11 cores. Inferred: the training now runs close to both limits, so
+further speed needs less engine work per move, which frees the most CPU, and a
+coordinator that keeps up with it
+([record](../archive/records/coordinator_one_pass_2026_11_14.md#what-this-does-and-does-not-show)).
 
 **The game processes** do about 90% of the CPU work. In a profile on 13 November,
 two thirds of it went to two engine calls of about a millisecond each: listing a
@@ -1525,9 +1529,16 @@ to 211 ([record](../archive/records/coordinator_lookups_2026_11_12.md)).
 On 14 November playing a move began to use the position's cache (above). In
 matched Mac-profile batches the game processes used 16% less CPU per decision,
 but decisions per hour while playing rose only about 3%, from about 246,200 to
-254,200, a smaller difference than between runs of the same code. The coordinator
-now limits the layout
+254,200, a smaller difference than between runs of the same code: the
+coordinator limited the layout
 ([record](../archive/records/supply_cache_2026_11_14.md#training-batches)).
+
+The same day the coordinator began answering each round in one pass of the three
+networks instead of one pass per alliance (above), which made a round about a
+third cheaper. In matched Mac-profile batches, on a Mac whose other work used
+about 2.3 cores, decisions per hour while playing rose by 13%, from about 222,500
+to 252,200, and the training used 9.9 cores instead of 8.9
+([record](../archive/records/coordinator_one_pass_2026_11_14.md#matched-training-batches)).
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
@@ -1640,11 +1651,13 @@ measured and what would settle it.
   [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
-- **Self-play on the Mac is limited by the coordinator.** It is busy about 90% of
-  the time, while the game processes and the coordinator use about 9.2 of the 11
-  training cores. A faster coordinator, larger calls or a second coordinator could
-  add up to about 20% (inferred); until then, work on the engine saves CPU but
-  adds little throughput. Within the engine, listing a position's legal moves now
+- **Self-play on the Mac is close to two limits.** The coordinator is busy about
+  85% of the time, and the game processes and the coordinator use about 9.9 of
+  the 11 training cores
+  ([record](../archive/records/coordinator_one_pass_2026_11_14.md)). The game
+  processes do 90% of the CPU work, so less engine work per move frees the most,
+  but the coordinator then has to keep up: laying a round's positions out takes
+  a seventh of its time. Within the engine, listing a position's legal moves now
   costs more per call than playing a move, and enumerating naval routes and
   listing the economy's options each take about 15% of the engine's time, more
   than the supply search
@@ -1709,11 +1722,10 @@ new position with the network of the alliance that decides there, so one search
 compares values that different networks gave.
 
 **Alternative.** One network told which alliance is choosing. Its policy would
-learn from all three alliances' decisions, and the coordinator would make one
-larger call where it now makes up to three smaller ones; its calls carried 3.9
-positions on average on 2 November
-([record](../archive/records/coordinator_lookups_2026_11_04.md)). **The catch:** one
-network must hold three different strategies.
+learn from all three alliances' decisions. Speed is not a reason for it: the
+coordinator already evaluates the three networks in one pass
+([section 9.2](#92-running-training-on-the-mac)). **The catch:** one network must
+hold three different strategies.
 
 **Measured** on 9 November, with networks after one update
 ([record](../archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):

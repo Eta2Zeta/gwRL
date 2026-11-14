@@ -1,0 +1,426 @@
+{
+ "coordinator_profile": {
+  "setup": "tools/profile_coordinator.py on one Mac-profile batch at commit 0060135: 8 game processes of 4 games, coordinator on the CPU, PyTorch 2.14, 32 eleven-round games with learning, fresh 64x2 networks, 64 simulations, depth 16, seed 20261104, every 200th serving round saved; about 4 cores of other work on the Mac, so only shares are compared",
+  "decisions_per_hour_playing": 195799,
+  "serve_wall_seconds": 552.3,
+  "seconds_by_step": {
+   "waiting": 32.14,
+   "receiving": 9.47,
+   "reading": 8.65,
+   "packing": 69.03,
+   "forward": 393.07,
+   "collecting": 11.18,
+   "replying": 13.65,
+   "other": 7.71
+  },
+  "share_by_step": {
+   "waiting": 0.0582,
+   "receiving": 0.0172,
+   "reading": 0.0157,
+   "packing": 0.125,
+   "forward": 0.7116,
+   "collecting": 0.0202,
+   "replying": 0.0247,
+   "other": 0.014
+  },
+  "requests": 1522829,
+  "rounds": 172142,
+  "passes": 389594,
+  "requests_per_round": 8.85,
+  "passes_per_round": 2.26,
+  "positions_per_pass": 3.91,
+  "pass_ms_by_positions": {
+   "1": 0.568,
+   "2": 0.714,
+   "3": 0.859,
+   "4": 1.02,
+   "5": 1.194,
+   "6": 1.364,
+   "7": 1.575,
+   "8": 1.682,
+   "9": 1.807,
+   "10": 1.924,
+   "11": 2.013,
+   "12": 2.131,
+   "13": 2.256,
+   "14": 2.375,
+   "15": 2.482,
+   "16": 2.528
+  },
+  "share_of_passes_by_positions": {
+   "1": 0.2808,
+   "2": 0.1898,
+   "3": 0.1367,
+   "4": 0.0903,
+   "5": 0.061,
+   "6": 0.0473,
+   "7": 0.0413,
+   "8": 0.0368,
+   "9": 0.0313,
+   "10": 0.0252,
+   "11": 0.019,
+   "12": 0.0134,
+   "13": 0.0091,
+   "14": 0.0061,
+   "15": 0.0039,
+   "16": 0.0026
+  }
+ },
+ "replay": {
+  "setup": "860 serving rounds (7,774 requests) saved from the profiled batch (every 200th round); replayed through each checkout's SharedEvaluatorServer.answer by tools/replay_coordinator_rounds.py, pipes replaced by in-memory stand-ins, one tensor thread, MallocNanoZone unset, PyTorch 2.14; networks 64x2 with each column table filled with normal(0, 0.5) numbers (seed 20261114); best of 3 passes over all rounds after one warm-up pass",
+  "before_us_per_round": 2347.8,
+  "after_us_per_round": 1603.1,
+  "before_us_per_request": 259.7,
+  "after_us_per_request": 177.3,
+  "merge_bound": {
+   "what": "each round's positions through one network in one pass, current code otherwise (an upper bound for merging without per-network layers)",
+   "separate_us_per_round": [
+    2303,
+    2249
+   ],
+   "one_pass_us_per_round": [
+    1640,
+    1636
+   ]
+  },
+  "after_steps_us_per_round": {
+   "packing": 233,
+   "forward": 1279,
+   "collecting": 34
+  },
+  "replies": 7774,
+  "identical_replies": 7764,
+  "max_prior_difference": 3.873572762547184e-08,
+  "max_value_difference": 0.0
+ },
+ "single_network_pass": {
+  "setup": "the first 300 saved rounds' decisions grouped by alliance network, 688 passes through CampaignPolicyValueNet.forward_packed, before and after; and 20 training-like steps on 8 random Axis decisions each (values squared plus the first option's negative log-probability)",
+  "passes": 688,
+  "identical_passes": 682,
+  "max_logit_difference": 4.77e-07,
+  "max_value_difference": 0.0,
+  "gradient_steps": 20,
+  "parameters": 69,
+  "worst_gradient_difference_relative_to_largest": 1.74e-06
+ },
+ "coordinator_native_samples": {
+  "setup": "macOS sample of the coordinator (the trainer's main thread) for 20 s at 150 s and at 330 s into the profiled batch, 1 ms interval; each sample's own time per function, grouped by library and function name",
+  "share_of_samples": {
+   "python interpreter": [
+    0.203,
+    0.213
+   ],
+   "torch dispatch and Python bindings": [
+    0.121,
+    0.122
+   ],
+   "GELU": [
+    0.111,
+    0.096
+   ],
+   "malloc, free, memset, memmove": [
+    0.091,
+    0.097
+   ],
+   "other element-wise kernels": [
+    0.089,
+    0.088
+   ],
+   "numpy": [
+    0.077,
+    0.073
+   ],
+   "embedding_bag lookups": [
+    0.059,
+    0.058
+   ],
+   "BLAS matrix products": [
+    0.052,
+    0.056
+   ],
+   "madvise (freed pages returned)": [
+    0.048,
+    0.055
+   ],
+   "scatter, gather and index operations": [
+    0.037,
+    0.031
+   ],
+   "other libtorch": [
+    0.028,
+    0.03
+   ],
+   "cat": [
+    0.021,
+    0.023
+   ],
+   "layer normalization": [
+    0.02,
+    0.017
+   ],
+   "pipes (read, write, poll)": [
+    0.019,
+    0.017
+   ],
+   "uncategorized": [
+    0.024,
+    0.025
+   ]
+  },
+  "madvise_callers_at_150s": {
+   "c10::StorageImpl::~StorageImpl (freeing tensors)": 566,
+   "numpy array_dealloc": 72,
+   "Accelerate": 67
+  }
+ },
+ "matched_batches": {
+  "setup": "Mac profile (8 game processes of 4 games, one coordinator on the CPU), 32 complete eleven-round games with learning per batch, 64 simulations, depth 16, network 64x2, fresh networks, seed 20261104, as on 12 and 14 November; before = commit 0060135, after = this change, each from its own clean copy of the code; batches in the order old1, new1, old2, new2, new3, old3; every process's CPU time and memory logged with ps every 5 s",
+  "order": [
+   "old1",
+   "new1",
+   "old2",
+   "new2",
+   "new3",
+   "old3"
+  ],
+  "compared": {
+   "before": [
+    "old1",
+    "old2",
+    "old3"
+   ],
+   "after": [
+    "new1",
+    "new3"
+   ],
+   "not_compared": {
+    "new2": "other work averaged 3.5 cores (Spotlight indexing, Chrome, FaceTime) against 2.1 to 2.6 in the others"
+   }
+  },
+  "batches": {
+   "old1": {
+    "games": 32,
+    "playing_seconds": 517.2,
+    "learning_seconds": 2.515639582881704,
+    "decisions": 30201,
+    "decisions_per_game": 943.8,
+    "decisions_per_hour_playing": 210222,
+    "games_per_hour_playing": 222.7,
+    "evaluations": 1524132,
+    "evaluations_per_game": 47629,
+    "serving_rounds": 187121,
+    "passes": 404364,
+    "requests_per_round": 8.15,
+    "coordinator_busy": 0.892,
+    "coordinator_us_per_evaluation": 302.6,
+    "coordinator_ms_per_round": 2.465,
+    "game_process_cpu_ms_per_decision": 131.6,
+    "coordinator_cpu_ms_per_decision": 15.41,
+    "cores_in_use": 8.62,
+    "game_process_cores": 7.71,
+    "coordinator_cores": 0.9,
+    "other_cores_mean": 2.55,
+    "other_cores_max": 4.25,
+    "other_cores_p90": 2.96,
+    "peak_rss_bytes": 5720870320,
+    "status": "completed",
+    "failed_games": 0
+   },
+   "new1": {
+    "games": 32,
+    "playing_seconds": 456.3,
+    "learning_seconds": 2.48592595779337,
+    "decisions": 30661,
+    "decisions_per_game": 958.2,
+    "decisions_per_hour_playing": 241918,
+    "games_per_hour_playing": 252.5,
+    "evaluations": 1555933,
+    "evaluations_per_game": 48623,
+    "serving_rounds": 260110,
+    "passes": 260110,
+    "requests_per_round": 5.98,
+    "coordinator_busy": 0.845,
+    "coordinator_us_per_evaluation": 247.7,
+    "coordinator_ms_per_round": 1.482,
+    "game_process_cpu_ms_per_decision": 131.1,
+    "coordinator_cpu_ms_per_decision": 12.79,
+    "cores_in_use": 9.72,
+    "game_process_cores": 8.85,
+    "coordinator_cores": 0.86,
+    "other_cores_mean": 2.28,
+    "other_cores_max": 5.04,
+    "other_cores_p90": 2.99,
+    "peak_rss_bytes": 5790633416,
+    "status": "completed",
+    "failed_games": 0
+   },
+   "old2": {
+    "games": 32,
+    "playing_seconds": 485.0,
+    "learning_seconds": 2.4882710829842836,
+    "decisions": 29665,
+    "decisions_per_game": 927.0,
+    "decisions_per_hour_playing": 220195,
+    "games_per_hour_playing": 237.5,
+    "evaluations": 1496030,
+    "evaluations_per_game": 46751,
+    "serving_rounds": 172780,
+    "passes": 390675,
+    "requests_per_round": 8.66,
+    "coordinator_busy": 0.893,
+    "coordinator_us_per_evaluation": 289.6,
+    "coordinator_ms_per_round": 2.507,
+    "game_process_cpu_ms_per_decision": 129.8,
+    "coordinator_cpu_ms_per_decision": 15.04,
+    "cores_in_use": 8.86,
+    "game_process_cores": 7.94,
+    "coordinator_cores": 0.92,
+    "other_cores_mean": 2.29,
+    "other_cores_max": 5.54,
+    "other_cores_p90": 2.91,
+    "peak_rss_bytes": 6029774400,
+    "status": "completed",
+    "failed_games": 0
+   },
+   "new2": {
+    "games": 32,
+    "playing_seconds": 508.4,
+    "learning_seconds": 2.5570130408741534,
+    "decisions": 30583,
+    "decisions_per_game": 955.7,
+    "decisions_per_hour_playing": 216579,
+    "games_per_hour_playing": 226.6,
+    "evaluations": 1547628,
+    "evaluations_per_game": 48363,
+    "serving_rounds": 266180,
+    "passes": 266180,
+    "requests_per_round": 5.81,
+    "coordinator_busy": 0.833,
+    "coordinator_us_per_evaluation": 273.7,
+    "coordinator_ms_per_round": 1.591,
+    "game_process_cpu_ms_per_decision": 130.0,
+    "coordinator_cpu_ms_per_decision": 13.69,
+    "cores_in_use": 8.69,
+    "game_process_cores": 7.86,
+    "coordinator_cores": 0.83,
+    "other_cores_mean": 3.5,
+    "other_cores_max": 7.85,
+    "other_cores_p90": 4.58,
+    "peak_rss_bytes": 6259297688,
+    "status": "completed",
+    "failed_games": 0
+   },
+   "new3": {
+    "games": 32,
+    "playing_seconds": 408.1,
+    "learning_seconds": 2.167755083879456,
+    "decisions": 29745,
+    "decisions_per_game": 929.5,
+    "decisions_per_hour_playing": 262391,
+    "games_per_hour_playing": 282.3,
+    "evaluations": 1502157,
+    "evaluations_per_game": 46942,
+    "serving_rounds": 234643,
+    "passes": 234643,
+    "requests_per_round": 6.4,
+    "coordinator_busy": 0.856,
+    "coordinator_us_per_evaluation": 232.7,
+    "coordinator_ms_per_round": 1.49,
+    "game_process_cpu_ms_per_decision": 123.8,
+    "coordinator_cpu_ms_per_decision": 12.11,
+    "cores_in_use": 9.99,
+    "game_process_cores": 9.1,
+    "coordinator_cores": 0.89,
+    "other_cores_mean": 2.53,
+    "other_cores_max": 3.88,
+    "other_cores_p90": 3.51,
+    "peak_rss_bytes": 6196038536,
+    "status": "completed",
+    "failed_games": 0
+   },
+   "old3": {
+    "games": 32,
+    "playing_seconds": 450.4,
+    "learning_seconds": 2.12666945788078,
+    "decisions": 29658,
+    "decisions_per_game": 926.8,
+    "decisions_per_hour_playing": 237071,
+    "games_per_hour_playing": 255.8,
+    "evaluations": 1493077,
+    "evaluations_per_game": 46659,
+    "serving_rounds": 174763,
+    "passes": 386572,
+    "requests_per_round": 8.54,
+    "coordinator_busy": 0.884,
+    "coordinator_us_per_evaluation": 266.8,
+    "coordinator_ms_per_round": 2.279,
+    "game_process_cpu_ms_per_decision": 125.5,
+    "coordinator_cpu_ms_per_decision": 14.17,
+    "cores_in_use": 9.2,
+    "game_process_cores": 8.27,
+    "coordinator_cores": 0.93,
+    "other_cores_mean": 2.11,
+    "other_cores_max": 3.66,
+    "other_cores_p90": 2.48,
+    "peak_rss_bytes": 5615062400,
+    "status": "completed",
+    "failed_games": 0
+   }
+  },
+  "probe": {
+   "what": "one after-batch run before the alternation, under 2.3 cores of other work; not part of the comparison",
+   "games": 32,
+   "playing_seconds": 430.3,
+   "learning_seconds": 2.437135790940374,
+   "decisions": 30816,
+   "decisions_per_game": 963.0,
+   "decisions_per_hour_playing": 257826,
+   "games_per_hour_playing": 267.7,
+   "evaluations": 1559272,
+   "evaluations_per_game": 48727,
+   "serving_rounds": 247391,
+   "passes": 247391,
+   "requests_per_round": 6.3,
+   "coordinator_busy": 0.859,
+   "coordinator_us_per_evaluation": 237.0,
+   "coordinator_ms_per_round": 1.494,
+   "game_process_cpu_ms_per_decision": 127.1,
+   "coordinator_cpu_ms_per_decision": 12.14,
+   "cores_in_use": 9.98,
+   "game_process_cores": 9.11,
+   "coordinator_cores": 0.87,
+   "other_cores_mean": 2.34,
+   "other_cores_max": 4.7,
+   "other_cores_p90": 3.02,
+   "peak_rss_bytes": 5937499664,
+   "status": "completed",
+   "failed_games": 0
+  },
+  "derived": {
+   "decisions_per_hour_before_mean": 222496,
+   "decisions_per_hour_after_mean": 252155,
+   "change": 0.133,
+   "adjacent_pairs": {
+    "old1_new1": 0.151,
+    "old3_new3": 0.107
+   },
+   "coordinator_cpu_ms_per_decision": [
+    14.87,
+    12.45
+   ],
+   "game_process_cpu_ms_per_decision": [
+    128.97,
+    127.45
+   ],
+   "cores_in_use": [
+    8.89,
+    9.86
+   ],
+   "coordinator_busy": [
+    0.89,
+    0.851
+   ]
+  },
+  "metric_notes": "cores_in_use = CPU-seconds of the trainer (coordinator) and its game processes over the playing window / its length; other_cores = CPU of every other process, from the same ps log; coordinator_busy = the coordinator's answering time / playing time"
+ }
+}

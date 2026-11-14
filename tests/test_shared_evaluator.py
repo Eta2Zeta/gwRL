@@ -191,9 +191,10 @@ class SharedEvaluatorTests(unittest.TestCase):
             stats = server.stats
             self.assertEqual(stats.requests, 4)
             self.assertEqual(sum(size * count for size, count in stats.requests_per_round.items()), 4)
-            # Three decisions take one model forward each; the chance cutoff takes all three.
-            self.assertEqual(sum(size * count for size, count in stats.positions_per_forward.items()), 6)
-            self.assertEqual(stats.forwards, sum(stats.positions_per_forward.values()))
+            # Three decisions take one position each in a pass; the chance cutoff one per network.
+            self.assertEqual(sum(size * count for size, count in stats.positions_per_pass.items()), 6)
+            self.assertEqual(stats.passes, stats.rounds)
+            self.assertEqual(stats.passes, sum(stats.positions_per_pass.values()))
             server.close()
         finally:
             for memory in memories:
