@@ -1812,34 +1812,110 @@ compute, compared on held-out value error and in evaluation games.
 **Now.** The Mac profile runs a 64×2 network (section 6) with 64 simulations per
 decision (section 4), and no training run has played more than about 500 games:
 the night run of 2 November played 467, with a 256×8 network. After $k$ message
-layers a zone's vector reflects zones up to $k$ borders away, so a 64×2 network
-sees two borders, plus the average of all zones through the position vector.
-Inferred, not measured: in China many threats are three or more borders away.
+layers a zone's vector reflects zones up to $k$ borders away (section 6.6). The
+map is 7 borders across, from Tokyo to Sinkiang, and two zones are on average
+3.2 borders apart. So a 64×2 network relates each zone to about a third of the
+others, and to the average of all zones through the position vector; 7 message
+layers would relate every zone to every other. Inferred, not measured: in China
+many threats are three or more borders away.
 
-**What published systems used.** Systems that learned a game by self-play used
-far more arithmetic per evaluation, longer searches and many more games:
+**How big published networks are.** AlphaZero's networks, and most that
+followed them, are stacks of *residual blocks*. A block is two convolutions
+(section 6.10), each a learned layer applied at every point of the board to the
+vectors at and around that point, and the block adds their result to its input.
+A message layer here is two learned layers as well (section 6.6), and where a
+convolution carries information one point further, a message layer carries it
+one border further. So blocks there compare with message layers here, and
+widths with widths. Parameters compare too, since both kinds of network apply
+the same learned numbers at every point or zone, but arithmetic grows also with
+the number of points: 361 in Go, 64 in chess, 37 zones here.
 
-| System | Game | Network, and operations per evaluation | Simulations per move | Self-play games | Hardware and time |
-| --- | --- | --- | --- | ---: | --- |
-| [AlphaGo Zero](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf), first run | Go | 20 blocks, 256 wide; about 17 billion | 1,600 | 4.9 million | 3 days |
-| [AlphaZero](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf) | chess | 20 blocks, 256 wide; about 3 billion | 800 | 44 million | 9 hours, 5,000 TPUs playing |
-| [KataGo](https://arxiv.org/abs/1902.10565), 2019 run | Go | grown to 20 blocks, 256 wide | 600 to 1,000 on a quarter of the moves, 100 to 200 on the rest | 4.2 million | 19 days, at most 28 GPUs |
-| [Gumbel MuZero](https://openreview.net/forum?id=bERaNdoegnO) | 9×9 Go | 6 layers, 256 wide | from 2 to 200; it learned even with 2 | not stated | not stated |
-| [TD-Gammon 2.1](https://www.bkgm.com/articles/tesauro/tdl.html) | backgammon | one layer of 80 units | none; a 2-ply lookahead in play | 1.5 million | not stated |
-| [DORA](https://arxiv.org/abs/2110.02924) | Diplomacy, two players | 9 to 25 million parameters | an equilibrium search each turn | not stated | 192 GPUs, about a week per stage |
-| [AlphaZero.jl](https://jonathan-laurent.github.io/AlphaZero.jl/stable/tutorial/connect_four/) | Connect Four | 5 blocks, 128 wide | 600 | 75,000 | one GPU, about a day |
-| This project | this game | 64×2; 3.4 million | 64 | at most about 500 per run | the Mac |
+| Network | Game | Blocks or layers | Width | Parameters | Operations per evaluation | Reach |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| [AlphaGo Zero](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf), first run | Go, 361 points | 20 | 256 | 23 million | 16 billion | 2.2 |
+| AlphaGo Zero, second run | Go | 40 | 256 | 46 million | 33 billion | 4.4 |
+| [AlphaZero](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf) | chess, 64 squares | 20 | 256 | 23 million | 3 billion | 5.6 |
+| [KataGo](https://arxiv.org/abs/1902.10565), 2019 run, four sizes in turn | Go | 6, 10, 15, 20 | 96, 128, 192, 256 | 1, 3, 10, 24 million | 0.8, 2.2, 7, 17 billion | 0.8 to 2.3 |
+| [DORA](https://arxiv.org/abs/2110.02924), a transformer | Diplomacy, 81 locations | 5 or 10 | 192 or 224 | 9 to 25 million | not worked out | the whole map in every block |
+| [AlphaZero.jl](https://jonathan-laurent.github.io/AlphaZero.jl/stable/tutorial/connect_four/) | Connect Four, 42 points | 5 | 128 | 1.5 million | 120 million | 1.8 |
+| [TD-Gammon 2.1](https://www.bkgm.com/articles/tesauro/tdl.html) | backgammon | 1 | 80 | about 20,000 | about 40,000 | the whole board in its one layer |
+| This project, 64×2 | this game, 37 zones | 2 | 64 | 0.13 million | 3.4 million | 0.3 |
+| This project, 256×8 | this game | 8 | 256 | 4.4 million | 173 million | 1.1 |
+| This project, 512×16 | this game | 16 | 512 | 30 million | 1.3 billion | 2.3 |
 
-Operations per evaluation are worked out here from the published sizes, two per
-multiply-add of each 3×3 convolution at every point of the board, as section 9.3
-counts this network's. By that measure a pass of the 64×2 network over one
-position does about a nine-hundredth of the arithmetic of AlphaZero's chess
-network, and a 512×16 network about half. A game here has about 1,000
-decisions, many more than a game of chess or Go has moves, so it holds more
-decisions to learn from, but its final score comes much later. Published work on
-war and strategy board games is small: an AlphaZero-style agent for a
-hex-and-counter wargame was trained on a 5×5 map with two kinds of unit and grew
-weaker on larger maps ([arXiv 2502.13918](https://arxiv.org/abs/2502.13918)).
+The published networks' parameters and operations are worked out here from
+their published sizes, counting the convolutions' parameters and two operations
+per multiply-add of each convolution at every point, as section 9.3 counts this
+network's; their output layers add little. DORA's parameters are as published;
+TD-Gammon's are estimated from its 198 board inputs and a few features (Sutton
+and Barto, section 16.1). This project's counts are for one of its three
+networks and leave out the first layer's tables (section 6.3), which have no
+counterpart in those networks: 3.9 million parameters at 64×2, 15.8 million at
+256×8 and 31.6 million at 512×16. *Reach* is how many points or borders the
+layers carry information, divided by the largest distance on the board: 18 king
+steps in Go, 7 in chess, 6 in Connect Four and 7 borders here. KataGo's
+networks, like this one through its position vector, also hand every point a
+summary of the whole board.
+
+Against these, the 64×2 network is small in every measure: a quarter of the
+usual width of 256; an eighth of the parameters of KataGo's first network and
+about a 170th of AlphaZero's; about a 220th of the arithmetic of KataGo's first
+network and a 900th of AlphaZero's; and a reach of a third of the map. A 256×8
+network is about as large as the smallest published ones: more parameters than
+KataGo's first two networks or AlphaZero.jl's, less arithmetic than KataGo's,
+since it has 37 zones to their 361 points, and a reach of the whole map. A
+512×16 network has a little more than AlphaZero's parameters, under half its
+arithmetic and the reach of KataGo's final network.
+
+**What those sizes were enough for.** TD-Gammon 2.1's 80 units played
+backgammon at a strong master level after 1.5 million games. KataGo's first
+network reached strong amateur strength after 0.4 million games, its second
+strong professional strength after 1.0 million and its third superhuman strength
+after 2.5 million, at searches of 1,600 nodes (tables 6 and 7 of its paper). In
+two-player Diplomacy, each larger transformer DORA tried played better, up to
+25 million parameters, and a graph network of 47 million like earlier Diplomacy
+networks played worse than all three (table 2 of its paper), so the kind of
+network mattered as well as its size.
+
+**How the size was chosen.** None of these sizes follows from a rule; each was
+found by trying sizes. KataGo began small and grew its network three times
+during the run: it trained the next size on the same games and switched when the
+larger network's loss caught up with the smaller one's, at 0.75, 1.75 and 7.5
+days. In a study of AlphaZero on Connect Four and Pentago
+([Neumann and Gros 2022](https://arxiv.org/abs/2210.00849)), strength grew as a
+power of the number of parameters while compute lasted, and the number of
+parameters $N$ that did best for a compute budget $C$ grew as
+
+$$N \propto C^{0.62}$$
+
+so ten times the compute called for about four times the parameters. Larger
+networks also played better after the same number of games. Extrapolated, the
+trend puts AlphaGo Zero and AlphaZero well below the best size for their
+compute, by up to a hundred times, but the study's networks were small
+multilayer networks on two small games, and its authors leave open whether the
+trend carries over.
+
+**Their searches and games.** The same systems searched more and played many
+more games:
+
+| System | Simulations per move | Self-play games | Hardware and time |
+| --- | --- | ---: | --- |
+| AlphaGo Zero, first run | 1,600 | 4.9 million | 3 days |
+| AlphaGo Zero, second run | 1,600 | 29 million | about 40 days |
+| AlphaZero, chess | 800 | 44 million | 9 hours, 5,000 TPUs playing |
+| KataGo, 2019 run | 600 to 1,000 on a quarter of the moves, 100 to 200 on the rest | 4.2 million | 19 days, at most 28 GPUs |
+| [Gumbel MuZero](https://openreview.net/forum?id=bERaNdoegnO), 9×9 Go | from 2 to 200; it learned even with 2 | not stated | not stated |
+| DORA, two-player Diplomacy | an equilibrium search each turn | not stated | 192 GPUs, about a week per stage |
+| AlphaZero.jl, Connect Four | 600 | 75,000 | one GPU, about a day |
+| TD-Gammon 2.1 | none; a 2-ply lookahead in play | 1.5 million | not stated |
+| This project | 64 | at most about 500 per run | the Mac |
+
+A game here has about 1,000 decisions, many more than a game of chess or Go has
+moves, so it holds more decisions to learn from, but its final score comes much
+later. Published work on war and strategy board games is small: an
+AlphaZero-style agent for a hex-and-counter wargame was trained on a 5×5 map
+with two kinds of unit and grew weaker on larger maps
+([arXiv 2502.13918](https://arxiv.org/abs/2502.13918)).
 
 **What it would cost here.** On the Mac, about 57 days per 100,000 games at
 256×8 with 256 simulations, limited by its cores, and about 450 days at 512×16
@@ -1859,9 +1935,13 @@ budget and the search method are one question.
 **Would settle it:** a ladder of runs at growing sizes, each given the same
 compute and compared in held-out evaluation (section 10), with the search's
 targets checked as in [the question on 64 simulations](#are-64-simulations-enough-on-large-menus),
-then repeated with more compute. The size that does best for a budget is the
-target for that budget, and section 9.3's costs at that size say which part of a
-computer limits it, and so what hardware it needs.
+then repeated with more compute; or one long run that grows its network, as
+KataGo's did. Inferred from the published networks, not measured: a first ladder
+would run from 64×2 through 256×8, the smallest of the measured sizes whose
+layers reach across the map, to 512×16, a little more than AlphaZero's
+parameters. The size that does best for a budget is the target for that budget,
+and section 9.3's costs at that size say which part of a computer limits it, and
+so what hardware it needs.
 
 #### How should a count count?
 
@@ -2130,3 +2210,11 @@ Terms in the order the document introduces them.
   search tree in memory.
 - **Decisions per hour:** decisions searched per hour across all games in
   flight, the measure of self-play speed.
+
+**Size (section 11)**
+
+- **Residual block:** two convolutions whose result is added to their input;
+  AlphaZero's networks are stacks of them, as this one is a stack of message
+  layers.
+- **Reach:** how many points or borders a network's layers carry information,
+  divided by the largest distance on its board: 0.3 for a 64×2 network here.
