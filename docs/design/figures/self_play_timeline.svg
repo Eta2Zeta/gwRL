@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="470" viewBox="0 0 960 470" role="img" aria-labelledby="title desc">
+  <title id="title">What the cores and the GPU do during self-play on the Mac</title>
+  <desc id="desc">A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, the others work, because the engine releases Python's lock. Seven more game processes do the same on their own cores. The coordinator, on one core, runs round after round: it reads the waiting requests, evaluates them in one pass of the three networks on the CPU and sends the replies. The GPU does nothing.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <pattern id="idle" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#d0d7de" stroke-width="2"/>
+    </pattern>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .label { font-size: 12px; fill: #57606a; }
+      .inbar { font-size: 11px; fill: #1f2328; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="469" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">What the cores and the GPU do during self-play on the Mac</text>
+  <text class="sub" x="24" y="58">Schematic, a few milliseconds of one game process of eight, and the coordinator. Blocks are not drawn to scale.</text>
+  <rect x="24" y="69" width="16" height="12" rx="2" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="label" x="46" y="80">engine and search work (CPU)</text>
+  <rect x="273.6" y="69" width="16" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="label" x="295.6" y="80">waiting for the coordinator</text>
+  <rect x="516.0" y="69" width="16" height="12" rx="2" fill="#dafbe1" stroke="#4ac26b"/>
+  <text class="label" x="538.0" y="80">coordinator round: one network pass on the CPU for all waiting requests</text>
+  <text class="body" x="24" y="128">Game thread 1</text>
+  <rect x="352.0" y="112" width="93.5" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="547.5" y="112" width="183.6" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="833.1" y="112" width="96.9" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="250.0" y="112" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="445.5" y="112" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="731.1" y="112" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="inbar" x="301.0" y="128" text-anchor="middle">list, play, encode</text>
+  <text class="body" x="24" y="168">Game thread 2</text>
+  <rect x="250.0" y="152" width="54.4" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="406.4" y="152" width="134.3" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="642.7" y="152" width="183.6" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="928.3" y="152" width="1.7" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="304.4" y="152" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="540.7" y="152" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="826.3" y="152" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="body" x="24" y="208">Game thread 3</text>
+  <rect x="250.0" y="192" width="122.4" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="474.4" y="192" width="161.5" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="737.9" y="192" width="183.6" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="372.4" y="192" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="635.9" y="192" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="921.5" y="192" width="8.5" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="body" x="24" y="248">Game thread 4</text>
+  <rect x="250.0" y="232" width="176.8" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="528.8" y="232" width="107.1" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="737.9" y="232" width="183.6" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="426.8" y="232" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="635.9" y="232" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="921.5" y="232" width="8.5" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="body" x="24" y="368">Game processes 2 to 8</text>
+  <rect x="250" y="352" width="680" height="24" rx="3" fill="#ffffff" stroke="#54aeff" stroke-dasharray="5 4"/>
+  <text class="inbar" x="590.0" y="368" text-anchor="middle">the same, four game threads each, on their own cores</text>
+  <text class="body" x="24" y="308">Coordinator (one core)</text>
+  <rect x="260.2" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <text class="inbar" x="301.0" y="308" text-anchor="middle">round</text>
+  <rect x="355.4" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <rect x="450.6" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <rect x="545.8" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <rect x="641.0" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <rect x="736.2" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <rect x="831.4" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
+  <text class="body" x="24" y="418">GPU</text>
+  <rect x="250" y="402" width="680" height="24" fill="url(#idle)" stroke="#d0d7de"/>
+  <rect x="440.0" y="406" width="300" height="16" fill="#ffffff"/>
+  <text class="inbar" x="590.0" y="418" text-anchor="middle">idle: the network runs on the coordinator's core</text>
+  <path d="M 352.0 136 L 355.0 289" fill="none" stroke="#57606a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text class="label" x="346.0" y="280" text-anchor="end">request</text>
+  <path d="M 434.0 292 L 442.0 139" fill="none" stroke="#57606a" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text class="label" x="445.0" y="280">reply</text>
+  <text class="label" x="24" y="448">In the 14 November batches the 32 game threads and the coordinator kept about 9.9 of the 11 cores busy.</text>
+</svg>

@@ -50,6 +50,7 @@ the first learning stage.
 | 13 Nov | [Where the game processes' time goes](records/game_processes_2026_11_13.md) | Playing a move and listing the legal moves cost about a millisecond each, two thirds of the game threads' CPU. |
 | 14 Nov | [Supply answers cached while a move is played](records/supply_cache_2026_11_14.md) | Identical play; playing a move costs 42% less CPU and a game process 16% less per decision, but decisions per hour rose only about 3%: the coordinator now limits self-play. |
 | 14 Nov | [One network pass per coordinator round](records/coordinator_one_pass_2026_11_14.md) | A pass cost about 0.4 ms whatever its size; one pass for all three networks makes a round 32% cheaper with the same replies, and decisions per hour rose 13% in matched batches. |
+| 14 Nov | [What a larger network and a longer search cost](records/network_and_search_cost_2026_11_14.md) | Networks from 64×2 to 512×16 on one core, four threads and the GPU, and searches of 64 to 1,024 simulations: the GPU pays only with many positions per pass, a simulation costs about the same CPU at any budget, and a tree holds about 0.17 to 0.25 MB per simulation. |
 
 ### The engine
 

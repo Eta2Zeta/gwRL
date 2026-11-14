@@ -1,0 +1,762 @@
+{
+ "record": "docs/archive/records/network_and_search_cost_2026_11_14.md",
+ "commit": "c4e9260",
+ "machine": "Apple M4 Max, 14 CPU cores (10 performance, 4 efficiency), 36 GB, 32-core GPU",
+ "python": "tmp/gpu-mps-env/bin/python, PyTorch 2.14, MallocNanoZone unset",
+ "network": {
+  "tool": "tools/benchmark_network_sizes.py",
+  "one_cpu_core": {
+   "device": "cpu",
+   "threads": 1,
+   "torch": "2.14.0",
+   "positions": 624,
+   "options_median": 14.0,
+   "options_p90": 118,
+   "sizes": {
+    "64x2": {
+     "hidden": 64,
+     "layers": 2,
+     "parameters": 4081096,
+     "table_parameters": 3947712,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 0.455,
+       "positions_per_second": 2198.2
+      },
+      "4": {
+       "passes": 400,
+       "ms_per_pass": 0.963,
+       "positions_per_second": 4153.6
+      },
+      "16": {
+       "passes": 400,
+       "ms_per_pass": 2.735,
+       "positions_per_second": 5849.6
+      },
+      "64": {
+       "passes": 194,
+       "ms_per_pass": 10.251,
+       "positions_per_second": 6243.2
+      },
+      "256": {
+       "passes": 48,
+       "ms_per_pass": 42.091,
+       "positions_per_second": 6082.1
+      }
+     },
+     "train_ms_per_step": 56.67,
+     "train_rows": 128,
+     "train_rows_per_second": 2258.8
+    },
+    "128x4": {
+     "hidden": 128,
+     "layers": 4,
+     "parameters": 8612232,
+     "table_parameters": 7895424,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 0.802,
+       "positions_per_second": 1246.4
+      },
+      "4": {
+       "passes": 400,
+       "ms_per_pass": 1.985,
+       "positions_per_second": 2015.3
+      },
+      "16": {
+       "passes": 273,
+       "ms_per_pass": 7.231,
+       "positions_per_second": 2212.6
+      },
+      "64": {
+       "passes": 69,
+       "ms_per_pass": 29.317,
+       "positions_per_second": 2183.0
+      },
+      "256": {
+       "passes": 17,
+       "ms_per_pass": 121.384,
+       "positions_per_second": 2109.0
+      }
+     },
+     "train_ms_per_step": 144.79,
+     "train_rows": 128,
+     "train_rows_per_second": 884.0
+    },
+    "256x8": {
+     "hidden": 256,
+     "layers": 8,
+     "parameters": 20204296,
+     "table_parameters": 15790848,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 2.776,
+       "positions_per_second": 360.3
+      },
+      "4": {
+       "passes": 253,
+       "ms_per_pass": 7.915,
+       "positions_per_second": 505.3
+      },
+      "16": {
+       "passes": 72,
+       "ms_per_pass": 27.718,
+       "positions_per_second": 577.2
+      },
+      "64": {
+       "passes": 19,
+       "ms_per_pass": 106.726,
+       "positions_per_second": 599.7
+      },
+      "256": {
+       "passes": 6,
+       "ms_per_pass": 388.974,
+       "positions_per_second": 658.1
+      }
+     },
+     "train_ms_per_step": 432.81,
+     "train_rows": 128,
+     "train_rows_per_second": 295.7
+    },
+    "384x12": {
+     "hidden": 384,
+     "layers": 12,
+     "parameters": 37135496,
+     "table_parameters": 23686272,
+     "passes": {
+      "1": {
+       "passes": 362,
+       "ms_per_pass": 5.429,
+       "positions_per_second": 184.2
+      },
+      "4": {
+       "passes": 120,
+       "ms_per_pass": 16.901,
+       "positions_per_second": 236.7
+      },
+      "16": {
+       "passes": 34,
+       "ms_per_pass": 59.868,
+       "positions_per_second": 267.3
+      },
+      "64": {
+       "passes": 10,
+       "ms_per_pass": 200.699,
+       "positions_per_second": 318.9
+      },
+      "256": {
+       "passes": 3,
+       "ms_per_pass": 809.776,
+       "positions_per_second": 316.1
+      }
+     },
+     "train_ms_per_step": 886.57,
+     "train_rows": 128,
+     "train_rows_per_second": 144.4
+    },
+    "512x16": {
+     "hidden": 512,
+     "layers": 16,
+     "parameters": 61765128,
+     "table_parameters": 31581696,
+     "passes": {
+      "1": {
+       "passes": 159,
+       "ms_per_pass": 11.48,
+       "positions_per_second": 87.1
+      },
+      "4": {
+       "passes": 59,
+       "ms_per_pass": 34.189,
+       "positions_per_second": 117.0
+      },
+      "16": {
+       "passes": 16,
+       "ms_per_pass": 127.718,
+       "positions_per_second": 125.3
+      },
+      "64": {
+       "passes": 6,
+       "ms_per_pass": 365.389,
+       "positions_per_second": 175.2
+      },
+      "256": {
+       "passes": 3,
+       "ms_per_pass": 1543.499,
+       "positions_per_second": 165.9
+      }
+     },
+     "train_ms_per_step": 1618.3,
+     "train_rows": 128,
+     "train_rows_per_second": 79.1
+    }
+   },
+   "seconds": 120.3
+  },
+  "four_cpu_threads": {
+   "device": "cpu",
+   "threads": 4,
+   "torch": "2.14.0",
+   "positions": 624,
+   "options_median": 14.0,
+   "options_p90": 118,
+   "sizes": {
+    "64x2": {
+     "hidden": 64,
+     "layers": 2,
+     "parameters": 4081096,
+     "table_parameters": 3947712,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 1.074,
+       "positions_per_second": 931.5
+      },
+      "4": {
+       "passes": 400,
+       "ms_per_pass": 2.186,
+       "positions_per_second": 1829.5
+      },
+      "16": {
+       "passes": 400,
+       "ms_per_pass": 4.529,
+       "positions_per_second": 3532.6
+      },
+      "64": {
+       "passes": 195,
+       "ms_per_pass": 10.184,
+       "positions_per_second": 6284.6
+      },
+      "256": {
+       "passes": 69,
+       "ms_per_pass": 29.558,
+       "positions_per_second": 8660.9
+      }
+     },
+     "train_ms_per_step": 40.78,
+     "train_rows": 128,
+     "train_rows_per_second": 3138.5
+    },
+    "128x4": {
+     "hidden": 128,
+     "layers": 4,
+     "parameters": 8612232,
+     "table_parameters": 7895424,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 1.974,
+       "positions_per_second": 506.6
+      },
+      "4": {
+       "passes": 400,
+       "ms_per_pass": 3.642,
+       "positions_per_second": 1098.3
+      },
+      "16": {
+       "passes": 202,
+       "ms_per_pass": 9.942,
+       "positions_per_second": 1609.3
+      },
+      "64": {
+       "passes": 90,
+       "ms_per_pass": 22.305,
+       "positions_per_second": 2869.4
+      },
+      "256": {
+       "passes": 30,
+       "ms_per_pass": 68.193,
+       "positions_per_second": 3754.1
+      }
+     },
+     "train_ms_per_step": 79.7,
+     "train_rows": 128,
+     "train_rows_per_second": 1606.0
+    },
+    "256x8": {
+     "hidden": 256,
+     "layers": 8,
+     "parameters": 20204296,
+     "table_parameters": 15790848,
+     "passes": {
+      "1": {
+       "passes": 354,
+       "ms_per_pass": 5.576,
+       "positions_per_second": 179.3
+      },
+      "4": {
+       "passes": 155,
+       "ms_per_pass": 12.701,
+       "positions_per_second": 314.9
+      },
+      "16": {
+       "passes": 69,
+       "ms_per_pass": 29.115,
+       "positions_per_second": 549.6
+      },
+      "64": {
+       "passes": 28,
+       "ms_per_pass": 72.719,
+       "positions_per_second": 880.1
+      },
+      "256": {
+       "passes": 9,
+       "ms_per_pass": 229.463,
+       "positions_per_second": 1115.6
+      }
+     },
+     "train_ms_per_step": 229.24,
+     "train_rows": 128,
+     "train_rows_per_second": 558.4
+    },
+    "384x12": {
+     "hidden": 384,
+     "layers": 12,
+     "parameters": 37135496,
+     "table_parameters": 23686272,
+     "passes": {
+      "1": {
+       "passes": 185,
+       "ms_per_pass": 10.809,
+       "positions_per_second": 92.5
+      },
+      "4": {
+       "passes": 74,
+       "ms_per_pass": 27.638,
+       "positions_per_second": 144.7
+      },
+      "16": {
+       "passes": 34,
+       "ms_per_pass": 60.401,
+       "positions_per_second": 264.9
+      },
+      "64": {
+       "passes": 14,
+       "ms_per_pass": 144.305,
+       "positions_per_second": 443.5
+      },
+      "256": {
+       "passes": 5,
+       "ms_per_pass": 479.097,
+       "positions_per_second": 534.3
+      }
+     },
+     "train_ms_per_step": 488.39,
+     "train_rows": 128,
+     "train_rows_per_second": 262.1
+    },
+    "512x16": {
+     "hidden": 512,
+     "layers": 16,
+     "parameters": 61765128,
+     "table_parameters": 31581696,
+     "passes": {
+      "1": {
+       "passes": 156,
+       "ms_per_pass": 12.704,
+       "positions_per_second": 78.7
+      },
+      "4": {
+       "passes": 56,
+       "ms_per_pass": 37.358,
+       "positions_per_second": 107.1
+      },
+      "16": {
+       "passes": 23,
+       "ms_per_pass": 89.886,
+       "positions_per_second": 178.0
+      },
+      "64": {
+       "passes": 9,
+       "ms_per_pass": 221.266,
+       "positions_per_second": 289.2
+      },
+      "256": {
+       "passes": 3,
+       "ms_per_pass": 791.978,
+       "positions_per_second": 323.2
+      }
+     },
+     "train_ms_per_step": 899.61,
+     "train_rows": 128,
+     "train_rows_per_second": 142.3
+    }
+   },
+   "seconds": 104.1
+  },
+  "gpu": {
+   "device": "mps",
+   "threads": 1,
+   "torch": "2.14.0",
+   "positions": 624,
+   "options_median": 14.0,
+   "options_p90": 118,
+   "sizes": {
+    "64x2": {
+     "hidden": 64,
+     "layers": 2,
+     "parameters": 4081096,
+     "table_parameters": 3947712,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 2.061,
+       "positions_per_second": 485.1
+      },
+      "4": {
+       "passes": 400,
+       "ms_per_pass": 3.687,
+       "positions_per_second": 1084.9
+      },
+      "16": {
+       "passes": 400,
+       "ms_per_pass": 4.676,
+       "positions_per_second": 3422.0
+      },
+      "64": {
+       "passes": 304,
+       "ms_per_pass": 6.507,
+       "positions_per_second": 9835.2
+      },
+      "256": {
+       "passes": 164,
+       "ms_per_pass": 12.239,
+       "positions_per_second": 20916.4
+      }
+     },
+     "train_ms_per_step": 52.7,
+     "train_rows": 128,
+     "train_rows_per_second": 2428.8
+    },
+    "128x4": {
+     "hidden": 128,
+     "layers": 4,
+     "parameters": 8612232,
+     "table_parameters": 7895424,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 2.549,
+       "positions_per_second": 392.4
+      },
+      "4": {
+       "passes": 400,
+       "ms_per_pass": 3.974,
+       "positions_per_second": 1006.5
+      },
+      "16": {
+       "passes": 362,
+       "ms_per_pass": 5.526,
+       "positions_per_second": 2895.6
+      },
+      "64": {
+       "passes": 245,
+       "ms_per_pass": 8.026,
+       "positions_per_second": 7974.4
+      },
+      "256": {
+       "passes": 103,
+       "ms_per_pass": 18.963,
+       "positions_per_second": 13500.3
+      }
+     },
+     "train_ms_per_step": 70.32,
+     "train_rows": 128,
+     "train_rows_per_second": 1820.2
+    },
+    "256x8": {
+     "hidden": 256,
+     "layers": 8,
+     "parameters": 20204296,
+     "table_parameters": 15790848,
+     "passes": {
+      "1": {
+       "passes": 400,
+       "ms_per_pass": 4.619,
+       "positions_per_second": 216.5
+      },
+      "4": {
+       "passes": 313,
+       "ms_per_pass": 6.278,
+       "positions_per_second": 637.2
+      },
+      "16": {
+       "passes": 243,
+       "ms_per_pass": 8.247,
+       "positions_per_second": 1940.0
+      },
+      "64": {
+       "passes": 140,
+       "ms_per_pass": 14.212,
+       "positions_per_second": 4503.3
+      },
+      "256": {
+       "passes": 51,
+       "ms_per_pass": 39.07,
+       "positions_per_second": 6552.3
+      }
+     },
+     "train_ms_per_step": 95.64,
+     "train_rows": 128,
+     "train_rows_per_second": 1338.3
+    },
+    "384x12": {
+     "hidden": 384,
+     "layers": 12,
+     "parameters": 37135496,
+     "table_parameters": 23686272,
+     "passes": {
+      "1": {
+       "passes": 366,
+       "ms_per_pass": 4.719,
+       "positions_per_second": 211.9
+      },
+      "4": {
+       "passes": 220,
+       "ms_per_pass": 8.218,
+       "positions_per_second": 486.7
+      },
+      "16": {
+       "passes": 126,
+       "ms_per_pass": 12.645,
+       "positions_per_second": 1265.4
+      },
+      "64": {
+       "passes": 72,
+       "ms_per_pass": 24.464,
+       "positions_per_second": 2616.1
+      },
+      "256": {
+       "passes": 27,
+       "ms_per_pass": 76.341,
+       "positions_per_second": 3353.4
+      }
+     },
+     "train_ms_per_step": 147.99,
+     "train_rows": 128,
+     "train_rows_per_second": 864.9
+    },
+    "512x16": {
+     "hidden": 512,
+     "layers": 16,
+     "parameters": 61765128,
+     "table_parameters": 31581696,
+     "passes": {
+      "1": {
+       "passes": 310,
+       "ms_per_pass": 5.623,
+       "positions_per_second": 177.8
+      },
+      "4": {
+       "passes": 190,
+       "ms_per_pass": 9.886,
+       "positions_per_second": 404.6
+      },
+      "16": {
+       "passes": 100,
+       "ms_per_pass": 17.4,
+       "positions_per_second": 919.5
+      },
+      "64": {
+       "passes": 48,
+       "ms_per_pass": 39.006,
+       "positions_per_second": 1640.8
+      },
+      "256": {
+       "passes": 15,
+       "ms_per_pass": 134.549,
+       "positions_per_second": 1902.6
+      }
+     },
+     "train_ms_per_step": 218.35,
+     "train_rows": 128,
+     "train_rows_per_second": 586.2
+    }
+   },
+   "seconds": 93.4
+  }
+ },
+ "search": {
+  "tool": "tools/benchmark_search_budgets.py",
+  "by_simulations": {
+   "64": {
+    "positions": 77,
+    "scripted_decisions": 3744,
+    "single_option_decisions": 629,
+    "budgets": {
+     "64": {
+      "cpu_ms_per_search": {
+       "median": 62.0,
+       "mean": 78.7
+      },
+      "cpu_ms_per_simulation_mean": 1.23,
+      "evaluations_per_search_mean": 65.0,
+      "tree_nodes_mean": 69.1,
+      "memory_trees_kept": 8,
+      "memory_nodes_kept": 601,
+      "memory_bytes_grown": 97370112,
+      "memory_bytes_per_node": 162013
+     }
+    },
+    "seconds": 38.5
+   },
+   "256": {
+    "positions": 77,
+    "scripted_decisions": 3744,
+    "single_option_decisions": 629,
+    "budgets": {
+     "256": {
+      "cpu_ms_per_search": {
+       "median": 252.6,
+       "mean": 322.7
+      },
+      "cpu_ms_per_simulation_mean": 1.26,
+      "evaluations_per_search_mean": 256.4,
+      "tree_nodes_mean": 274.2,
+      "memory_trees_kept": 8,
+      "memory_nodes_kept": 2307,
+      "memory_bytes_grown": 472023040,
+      "memory_bytes_per_node": 204604
+     }
+    },
+    "seconds": 61.6
+   },
+   "1024": {
+    "positions": 77,
+    "scripted_decisions": 3744,
+    "single_option_decisions": 629,
+    "budgets": {
+     "1024": {
+      "cpu_ms_per_search": {
+       "median": 1090.9,
+       "mean": 1323.5
+      },
+      "cpu_ms_per_simulation_mean": 1.292,
+      "evaluations_per_search_mean": 1017.5,
+      "tree_nodes_mean": 1081.4,
+      "memory_trees_kept": 8,
+      "memory_nodes_kept": 9238,
+      "memory_bytes_grown": 2165571584,
+      "memory_bytes_per_node": 234419
+     }
+    },
+    "seconds": 151.5
+   }
+  }
+ },
+ "worked_out": {
+  "assumptions": {
+   "game_cpu_s_per_decision_at_64": 0.12,
+   "evaluations_per_decision_at_64": 50.0,
+   "cores": 11,
+   "memory_bytes": 30000000000.0,
+   "base_memory_bytes": 8000000000.0,
+   "decisions": 100000000.0
+  },
+  "rows": [
+   {
+    "size": "64x2",
+    "simulations": 64,
+    "evaluations_per_decision": 50.0,
+    "game_cpu_s_per_decision": 0.12,
+    "tree_mb": 11.2,
+    "games_that_fit": 1965,
+    "gpu_batch": 64,
+    "engine_limit_decisions_per_h": 300000,
+    "one_core_network_decisions_per_h": 421171,
+    "gpu_network_decisions_per_h": 708134,
+    "decisions_per_h": 300000,
+    "limit": "engine (cores)",
+    "days_per_1e8_decisions": 13.9,
+    "core_hours_per_1e8": 3333,
+    "gpu_hours_per_1e8": 66
+   },
+   {
+    "size": "128x4",
+    "simulations": 128,
+    "evaluations_per_decision": 99.1,
+    "game_cpu_s_per_decision": 0.244,
+    "tree_mb": 24.2,
+    "games_that_fit": 908,
+    "gpu_batch": 64,
+    "engine_limit_decisions_per_h": 147532,
+    "one_core_network_decisions_per_h": 80396,
+    "gpu_network_decisions_per_h": 289753,
+    "decisions_per_h": 147532,
+    "limit": "engine (cores)",
+    "days_per_1e8_decisions": 28.2,
+    "core_hours_per_1e8": 6778,
+    "gpu_hours_per_1e8": 204
+   },
+   {
+    "size": "256x8",
+    "simulations": 256,
+    "evaluations_per_decision": 197.2,
+    "game_cpu_s_per_decision": 0.492,
+    "tree_mb": 56.1,
+    "games_that_fit": 392,
+    "gpu_batch": 64,
+    "engine_limit_decisions_per_h": 73164,
+    "one_core_network_decisions_per_h": 10535,
+    "gpu_network_decisions_per_h": 82198,
+    "decisions_per_h": 73164,
+    "limit": "engine (cores)",
+    "days_per_1e8_decisions": 56.9,
+    "core_hours_per_1e8": 13668,
+    "gpu_hours_per_1e8": 836
+   },
+   {
+    "size": "384x12",
+    "simulations": 400,
+    "evaluations_per_decision": 307.0,
+    "game_cpu_s_per_decision": 0.778,
+    "tree_mb": 89.4,
+    "games_that_fit": 245,
+    "gpu_batch": 64,
+    "engine_limit_decisions_per_h": 46262,
+    "one_core_network_decisions_per_h": 3134,
+    "gpu_network_decisions_per_h": 30677,
+    "decisions_per_h": 30677,
+    "limit": "network on GPU",
+    "days_per_1e8_decisions": 135.8,
+    "core_hours_per_1e8": 21616,
+    "gpu_hours_per_1e8": 2543
+   },
+   {
+    "size": "512x16",
+    "simulations": 800,
+    "evaluations_per_decision": 611.9,
+    "game_cpu_s_per_decision": 1.573,
+    "tree_mb": 191.0,
+    "games_that_fit": 115,
+    "gpu_batch": 57,
+    "engine_limit_decisions_per_h": 22887,
+    "one_core_network_decisions_per_h": 737,
+    "gpu_network_decisions_per_h": 9197,
+    "decisions_per_h": 9197,
+    "limit": "network on GPU",
+    "days_per_1e8_decisions": 453.1,
+    "core_hours_per_1e8": 43693,
+    "gpu_hours_per_1e8": 8934
+   }
+  ]
+ },
+ "load": [
+  "11:28  up 14 days, 15:48, 2 users, load averages: 7.12 5.04 5.44",
+  "cpu1 exit 0",
+  "11:30  up 14 days, 15:50, 2 users, load averages: 8.06 5.98 5.74",
+  "cpu4 exit 0",
+  "11:31  up 14 days, 15:52, 2 users, load averages: 7.65 6.37 5.91",
+  "mps exit 0",
+  "11:33  up 14 days, 15:53, 2 users, load averages: 7.48 6.55 6.02",
+  "search 64 exit 0",
+  "11:34  up 14 days, 15:54, 2 users, load averages: 7.75 6.72 6.11",
+  "search 256 exit 0",
+  "11:35  up 14 days, 15:55, 2 users, load averages: 6.95 6.74 6.16",
+  "search 1024 exit 0",
+  "11:37  up 14 days, 15:57, 2 users, load averages: 4.24 5.75 5.85"
+ ]
+}

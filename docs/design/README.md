@@ -647,7 +647,8 @@ Comintern's network after its first update, the network that faced that decision
 A network's size is written width × message layers, both explained below: 64×2
 here and in the Mac profile's measurements (section 9.2), 256×8 in the night run
 of 2 November.
-Which plays better is [open](#how-wide-and-how-deep).
+Which plays better, and how big a network this game needs, is
+[open](#how-big-should-the-network-and-the-search-be).
 
 In the usual picture of a neural network, the lines of answers of section 5 are
 its *input layer*, and learned layers follow. Section 6.2 defines a learned
@@ -1478,6 +1479,33 @@ further speed needs less engine work per move, which frees the most CPU, and a
 coordinator that keeps up with it
 ([record](../archive/records/coordinator_one_pass_2026_11_14.md#what-this-does-and-does-not-show)).
 
+**What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
+all the cores work at the same time. A game thread works in the engine and the
+search, listing moves, playing them on copies of the game and building the
+network's input, until a position needs the network. Then it sends the
+coordinator a request and waits for the reply. The engine releases Python's lock
+while it works, so the four game threads of a process can compute at once, and a
+thread that waits leaves its core to the others. That is why each process plays
+four games: in the 14 November batches a game thread computed less than a third
+of the time, yet the game threads and the coordinator kept about 9.9 of the 11
+cores busy. The coordinator, on a core of its own, answers round after
+round.
+
+![A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, others work. Seven more game processes do the same on their own cores. The coordinator, on one core, runs round after round: one network pass on the CPU for all waiting requests. The GPU is idle.](figures/self_play_timeline.svg)
+
+**Why the network runs on the CPU.** A pass on the Mac's GPU has a larger fixed
+cost than a pass on one CPU core. A pass of the 64×2 network over one position
+takes 2.1 ms on the GPU and 0.46 ms on one core, and over 16 positions 4.7 ms
+and 2.7 ms
+([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)).
+A round holds about six positions, so one core answers it sooner. The GPU is
+faster only for larger networks and many positions per pass
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). The GPU has
+never limited self-play. When the coordinator ran its passes there, up to the
+night of 2 November, a network with five times the parameters played about as
+many decisions per hour as the small one on the CPU (table below): the engine
+and each pass's fixed costs set the pace, not the GPU's arithmetic.
+
 **The game processes** do about 90% of the CPU work. In a profile on 13 November,
 two thirds of it went to two engine calls of about a millisecond each: listing a
 position's legal moves and playing a move
@@ -1511,8 +1539,9 @@ input of section 5.
 
 On 2 November the Mac profile played 124 eleven-round games per hour with learning
 (64×2, CPU evaluation). The night run's network had about five times the
-parameters at no cost in throughput, but it did not make the agents stronger: the
-learning, not the speed, is the current limit.
+parameters at no cost in throughput. In its 467 games it did not make the agents
+stronger, but so few games cannot show whether a larger network helps
+([open question](#how-big-should-the-network-and-the-search-be)).
 
 On 4 November the search began keeping a copy of the game at each tree position
 ([section 4.7](#47-more-detail-on-the-search)). In a matched batch of the Mac
@@ -1547,7 +1576,93 @@ fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for moves
 that leave the game unchanged, and `tools/check_zone_names.py` for names the
 network's input does not list.
 
-### 9.3 How the Campaign Observatory shows a game
+### 9.3 What a larger network and a longer search cost
+
+Training has so far used the 64×2 network and 64 simulations per decision, far
+less than published game-playing systems used
+([open question](#how-big-should-the-network-and-the-search-be)). A larger
+system costs in three places: the network's arithmetic, on the CPU or the GPU;
+the engine's work for each simulation, on the CPU; and the search trees, in
+memory. Each was measured on 14 November, on positions from two scripted
+eleven-round games
+([record](../archive/records/network_and_search_cost_2026_11_14.md)).
+
+**The network.** Most of a pass's arithmetic is the message layers' learned
+layers, applied to each of the 37 zones (section 6.6), so it grows with the
+width squared times the number of layers. Most of the parameters, by contrast,
+are rows of the first layer's tables, of which a decision reads only a few
+hundred (section 6.9), so the parameter count says little about the cost.
+Positions evaluated per second, through the coordinator's own code:
+
+| Network | Arithmetic per position | One CPU core, 16 per pass | GPU, 64 per pass | GPU, 256 per pass |
+| --- | ---: | ---: | ---: | ---: |
+| 64×2 | 3.4 million operations | 5,850 | 9,840 | 20,900 |
+| 128×4 | 23 million | 2,210 | 7,970 | 13,500 |
+| 256×8 | 173 million | 577 | 4,500 | 6,550 |
+| 384×12 | 565 million | 267 | 2,620 | 3,350 |
+| 512×16 | 1,320 million | 125 | 1,640 | 1,900 |
+
+One core slows down nearly as fast as the arithmetic grows. Four threads on one
+pass are at most about twice as fast as one core, and slower than one core on
+passes of a few positions. The GPU is 7 to 15 times as fast as one core for the
+three larger networks, but only with many positions in a pass: a pass over a
+single position costs it 2 to 6 ms, and up to 256×8 one core is faster.
+Training adds little: with 5% of decisions kept and each drawn about ten times,
+the networks train on about half a sample per decision, against 50 or more
+evaluations per decision in self-play.
+
+**The search.** A simulation costs the game process about the same CPU whatever
+the network and however many simulations a search runs: 1.23 ms of a core at 64
+simulations, 1.26 ms at 256 and 1.29 ms at 1,024, measured alone on the Mac. In
+the 14 November training batches the same work cost about twice as much, about
+2.4 ms per evaluation (120 ms per decision, about 50 evaluations). There every
+core is busy and each process runs four games; the gap has not been broken down.
+A search keeps a copy of the game at each node of its tree
+([section 4.7](#47-more-detail-on-the-search)), about 160 to 230 KB each, so a
+tree holds about 11 MB at 64 simulations, 56 MB at 256 and 250 MB at 1,024 until
+its move is chosen. Each game in flight, that is each game being played at the
+moment, holds one tree.
+
+**Which part limits.** Every evaluation needs its share of engine work on the
+cores and its share of a network pass, and the slower of the two supplies sets
+the pace:
+
+$$\text{decisions per hour} = 3600 \times \min\left(\frac{\text{cores for games}}{\text{core seconds per decision}}, \frac{\text{positions the network evaluates per second}}{\text{evaluations per decision}}\right)$$
+
+A pass's speed depends on its positions, and so on the games in flight: a pass of
+64 positions needs about 128 games in flight, half of them waiting in the pass
+while the other half work in the engine, and each holds its tree in memory. On
+the Mac, with 10 cores for games, one for the coordinator, the GPU and 30 GB:
+
+| Network and search | Evaluations per decision | Core time per decision | Tree per game | Decisions per hour | Limited by | Days per 100,000 games |
+| --- | ---: | ---: | ---: | ---: | --- | ---: |
+| 64×2, 64 simulations | 50 | 0.12 s | 11 MB | 300,000 | the cores | 14 |
+| 128×4, 128 simulations | 99 | 0.24 s | 24 MB | 148,000 | the cores | 28 |
+| 256×8, 256 simulations | 197 | 0.49 s | 56 MB | 73,000 | the cores, the GPU nearly | 57 |
+| 384×12, 400 simulations | 307 | 0.78 s | 89 MB | 31,000 | the GPU | 136 |
+| 512×16, 800 simulations | 612 | 1.57 s | 191 MB | 9,200 | the GPU | 453 |
+
+The table is worked out from the measurements above, not measured in training
+runs. For today's setup it gives 300,000 decisions an hour where the batches
+measured about 252,000, so read every row as an upper bound, about a fifth too
+high. Days per 100,000 games assume about 1,000 decisions a game; the
+14 November batches averaged about 940. Three things follow, inferred:
+
+- **The engine is the main cost of a simulation.** An evaluation takes about
+  2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8, so the
+  Mac's 10 cores for games supply about 4,200 evaluations a second, which its GPU
+  can match up to about 256×8. With larger networks the GPU limits and cores
+  wait.
+- **Memory grows with the search.** At about 0.24 MB per simulation for each game
+  in flight, the 128 games that fill passes of 64 positions hold about 24 GB of
+  trees at 800 simulations.
+- **What each part of a computer buys.** While the engine limits, throughput
+  grows in proportion to the cores. A faster GPU helps only with a larger network
+  and only with enough cores to feed it, about one core for every 400
+  evaluations a second. Memory must hold a tree for every game in flight. Less
+  engine work per simulation helps at every size.
+
+### 9.4 How the Campaign Observatory shows a game
 
 The Campaign Observatory is a viewer for recorded games, apart from training. It
 lets you stop a recorded game at any event and inspect both the board and the
@@ -1646,8 +1761,11 @@ measured and what would settle it.
   one process, but that is unproven. A ThreadSanitizer run is the suggested next
   step.
 - **Learning strength is unmeasured.** Neither the larger network nor the zone
-  input has yet made the agents stronger. Two design questions below may be part
-  of the reason: the [objective](#is-the-final-wealth-gap-the-right-goal) and
+  input has yet made the agents stronger. No run has played more than about 500
+  games, far fewer than published systems needed
+  ([how big](#how-big-should-the-network-and-the-search-be)), and two design
+  questions below may also be part of the reason: the
+  [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
@@ -1689,19 +1807,61 @@ alongside the parts, keeps that distinction at some cost per answer.
 **Measured:** nothing yet. **Would settle it:** both versions trained with equal
 compute, compared on held-out value error and in evaluation games.
 
-#### How wide and how deep?
+#### How big should the network and the search be?
 
-**Now.** 64×2 in the Mac profile's measurements and 256×8 in the night run of
-2 November (section 6). After $k$ message layers a zone's vector reflects zones
-up to $k$ borders away, so a 64×2 network sees two borders, plus the average of all
-zones through the position vector. Inferred, not measured: in China many threats
-are three or more borders away.
+**Now.** The Mac profile runs a 64×2 network (section 6) with 64 simulations per
+decision (section 4), and no training run has played more than about 500 games:
+the night run of 2 November played 467, with a 256×8 network. After $k$ message
+layers a zone's vector reflects zones up to $k$ borders away, so a 64×2 network
+sees two borders, plus the average of all zones through the position vector.
+Inferred, not measured: in China many threats are three or more borders away.
 
-**Measured:** the cost of each size ([section 9.2](#92-running-training-on-the-mac),
-[zone network record](../archive/records/zone_network_2026_11_02.md)). **Unmeasured:**
-whether a larger network plays better at equal compute, and whether depth or
-width matters more. **Would settle it:** equal-compute runs at a few sizes,
-including deep but narrow ones such as 64×6.
+**What published systems used.** Systems that learned a game by self-play used
+far more arithmetic per evaluation, longer searches and many more games:
+
+| System | Game | Network, and operations per evaluation | Simulations per move | Self-play games | Hardware and time |
+| --- | --- | --- | --- | ---: | --- |
+| [AlphaGo Zero](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf), first run | Go | 20 blocks, 256 wide; about 17 billion | 1,600 | 4.9 million | 3 days |
+| [AlphaZero](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf) | chess | 20 blocks, 256 wide; about 3 billion | 800 | 44 million | 9 hours, 5,000 TPUs playing |
+| [KataGo](https://arxiv.org/abs/1902.10565), 2019 run | Go | grown to 20 blocks, 256 wide | 600 to 1,000 on a quarter of the moves, 100 to 200 on the rest | 4.2 million | 19 days, at most 28 GPUs |
+| [Gumbel MuZero](https://openreview.net/forum?id=bERaNdoegnO) | 9×9 Go | 6 layers, 256 wide | from 2 to 200; it learned even with 2 | not stated | not stated |
+| [TD-Gammon 2.1](https://www.bkgm.com/articles/tesauro/tdl.html) | backgammon | one layer of 80 units | none; a 2-ply lookahead in play | 1.5 million | not stated |
+| [DORA](https://arxiv.org/abs/2110.02924) | Diplomacy, two players | 9 to 25 million parameters | an equilibrium search each turn | not stated | 192 GPUs, about a week per stage |
+| [AlphaZero.jl](https://jonathan-laurent.github.io/AlphaZero.jl/stable/tutorial/connect_four/) | Connect Four | 5 blocks, 128 wide | 600 | 75,000 | one GPU, about a day |
+| This project | this game | 64×2; 3.4 million | 64 | at most about 500 per run | the Mac |
+
+Operations per evaluation are worked out here from the published sizes, two per
+multiply-add of each 3×3 convolution at every point of the board, as section 9.3
+counts this network's. By that measure a pass of the 64×2 network over one
+position does about a nine-hundredth of the arithmetic of AlphaZero's chess
+network, and a 512×16 network about half. A game here has about 1,000
+decisions, many more than a game of chess or Go has moves, so it holds more
+decisions to learn from, but its final score comes much later. Published work on
+war and strategy board games is small: an AlphaZero-style agent for a
+hex-and-counter wargame was trained on a 5×5 map with two kinds of unit and grew
+weaker on larger maps ([arXiv 2502.13918](https://arxiv.org/abs/2502.13918)).
+
+**What it would cost here.** On the Mac, about 57 days per 100,000 games at
+256×8 with 256 simulations, limited by its cores, and about 450 days at 512×16
+with 800 simulations, limited by its GPU; both are upper bounds
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). AlphaGo
+Zero's first run played 4.9 million games, 49 times as many, and KataGo's 2019
+run 4.2 million.
+
+**Unmeasured:** whether a larger network or a longer search learns faster here
+for the same compute, whether depth or width matters more, and how many games
+this game needs. In Hex, the strength a fixed amount of compute buys falls
+predictably as the board grows, and compute spent in training can stand in for
+search at play time ([Jones 2021](https://arxiv.org/abs/2104.03113)). Gumbel
+search learned with a few simulations where plain search failed, so the search
+budget and the search method are one question.
+
+**Would settle it:** a ladder of runs at growing sizes, each given the same
+compute and compared in held-out evaluation (section 10), with the search's
+targets checked as in [the question on 64 simulations](#are-64-simulations-enough-on-large-menus),
+then repeated with more compute. The size that does best for a budget is the
+target for that budget, and section 9.3's costs at that size say which part of a
+computer limits it, and so what hardware it needs.
 
 #### How should a count count?
 
@@ -1954,3 +2114,19 @@ Terms in the order the document introduces them.
 - **Update:** the 700 training steps after a batch.
 - **Model export:** the saved networks after an update.
 - **Checkpoint:** a full save of a run, for resuming it.
+
+**Running it (section 9)**
+
+- **Game process:** an operating-system process that plays several games, one
+  per game thread; the Mac profile runs 8 of 4.
+- **Game thread:** a thread that plays one game, searching at every decision.
+- **Coordinator:** the process that evaluates every game's positions with the
+  three networks and sends each game thread its priors and values.
+- **Request:** a position a game thread sends the coordinator to be evaluated.
+- **Round:** one turn of the coordinator: it reads every waiting request,
+  evaluates them in one pass and replies.
+- **Pass:** one run of the networks over several positions at once.
+- **Games in flight:** the games being played at the moment, each holding its
+  search tree in memory.
+- **Decisions per hour:** decisions searched per hour across all games in
+  flight, the measure of self-play speed.
