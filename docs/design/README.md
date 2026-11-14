@@ -125,8 +125,8 @@ writes it:
 
 The other three attacks differ only in the path's second zone. The fifth move,
 ending the phase, has the kind `end_phase` and no details. Long orders, such as a
-fleet's, are built one step at a time with bounded choices: see the
-[AI order interface](../archive/records/action_interface_2026_10_24.md).
+fleet's, are built one step at a time with bounded choices: see
+[the rules engine, section 3](../engine/README.md#3-positions-and-moves).
 
 ### 2.4 The final score
 

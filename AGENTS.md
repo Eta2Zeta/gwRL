@@ -100,7 +100,8 @@
 - Verify statements against the code and say what is measured, what is inferred
   and what is open.
 - Never draw a diagram, table or formula in plain text, in any document. Draw
-  diagrams as SVG figures in `docs/design/figures/` (tracked despite the image
+  diagrams as SVG figures in the `figures/` folder beside the page
+  (`docs/design/figures/`, `docs/engine/figures/`; tracked despite the image
   ignore rule), with a title, a description and alt text, and look at them
   rendered before committing. Write tables as Markdown tables and formulas as
   math. Code blocks are for commands and code only.

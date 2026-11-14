@@ -1,0 +1,3393 @@
+{
+ "first_seed": 9000,
+ "games": 240,
+ "finished": 240,
+ "decisions": 312365,
+ "decisions_per_game": {
+  "least": 972,
+  "median": 1286,
+  "most": 1829
+ },
+ "largest_menu": 620,
+ "kinds_seen": 94,
+ "kinds": {
+  "air_begin_bombing": {
+   "games": 34,
+   "offered_at": 121,
+   "chosen": 62,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9001,
+    "round": 10,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "air_mission_1"
+    }
+   },
+   "phases": {
+    "combat": 121
+   },
+   "decision_kinds": {
+    "combat": 121
+   },
+   "nations": {
+    "kmt": 14,
+    "japan": 107
+   },
+   "answers": {
+    "own move": 121
+   }
+  },
+  "air_bomb": {
+   "games": 40,
+   "offered_at": 274,
+   "chosen": 62,
+   "parameters": [
+    "kind",
+    "path",
+    "target",
+    "unit"
+   ],
+   "example": {
+    "seed": 9001,
+    "round": 10,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "kind": "facility",
+     "path": [
+      "land_manchuria_rehe",
+      "sea_p14",
+      "sea_p32",
+      "land_formosa"
+     ],
+     "target": "economy_facility_73",
+     "unit": "economy_unit_99"
+    }
+   },
+   "phases": {
+    "combat_movement": 274
+   },
+   "decision_kinds": {
+    "combat_movement": 274
+   },
+   "nations": {
+    "kmt": 23,
+    "japan": 251
+   },
+   "answers": {
+    "own move": 274
+   }
+  },
+  "air_choose_casualty": {
+   "games": 1,
+   "offered_at": 1,
+   "chosen": 1,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9058,
+    "round": 10,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "air_mission_2",
+     "unit": "economy_unit_93"
+    }
+   },
+   "phases": {
+    "combat": 1
+   },
+   "decision_kinds": {
+    "air_casualty": 1
+   },
+   "nations": {
+    "japan": 1
+   },
+   "answers": {
+    "a waiting decision": 1
+   }
+  },
+  "air_choose_rail_border": {
+   "games": 21,
+   "offered_at": 29,
+   "chosen": 29,
+   "parameters": [
+    "battle",
+    "neighbor"
+   ],
+   "example": {
+    "seed": 9022,
+    "round": 6,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "air_mission_1",
+     "neighbor": "land_china_hopeh"
+    }
+   },
+   "phases": {
+    "combat": 29
+   },
+   "decision_kinds": {
+    "air_rail_border": 29
+   },
+   "nations": {
+    "japan": 25,
+    "kmt": 4
+   },
+   "answers": {
+    "a waiting decision": 29
+   }
+  },
+  "air_decline_intercept": {
+   "games": 1,
+   "offered_at": 1,
+   "chosen": 1,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9120,
+    "round": 5,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "air_mission_2",
+     "unit": "economy_unit_36"
+    }
+   },
+   "phases": {
+    "combat": 1
+   },
+   "decision_kinds": {
+    "air_interception": 1
+   },
+   "nations": {
+    "kmt": 1
+   },
+   "answers": {
+    "a waiting decision": 1
+   }
+  },
+  "air_decline_scramble": {
+   "games": 55,
+   "offered_at": 71,
+   "chosen": 40,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_11",
+     "unit": "japan_fighter_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "combat": 71
+   },
+   "decision_kinds": {
+    "air_scramble": 71
+   },
+   "nations": {
+    "japan": 71
+   },
+   "answers": {
+    "a waiting decision": 71
+   }
+  },
+  "air_defend": {
+   "games": 166,
+   "offered_at": 363,
+   "chosen": 190,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 5,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_33",
+     "unit": "setup_japan_land_jap_tokyo_fighter_1"
+    }
+   },
+   "phases": {
+    "combat": 363
+   },
+   "decision_kinds": {
+    "air_ground_or_defend": 363
+   },
+   "nations": {
+    "japan": 352,
+    "kmt": 11
+   },
+   "answers": {
+    "a waiting decision": 363
+   }
+  },
+  "air_end_patrol": {
+   "games": 240,
+   "offered_at": 9578,
+   "chosen": 1307,
+   "parameters": [
+    "destination",
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "destination": "land_jap_hokkaido",
+     "path": [
+      "sea_p15",
+      "land_jap_hokkaido"
+     ],
+     "unit": "japan_fighter_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 9578
+   },
+   "decision_kinds": {
+    "non_combat_movement": 9578
+   },
+   "nations": {
+    "japan": 9524,
+    "kmt": 54
+   },
+   "answers": {
+    "own move": 9578
+   }
+  },
+  "air_escort": {
+   "games": 10,
+   "offered_at": 59,
+   "chosen": 3,
+   "parameters": [
+    "battle",
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9039,
+    "round": 10,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "air_mission_2",
+     "path": [
+      "land_china_nanking",
+      "land_china_hunan",
+      "land_kwangtung"
+     ],
+     "unit": "japan_fighter_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 59
+   },
+   "decision_kinds": {
+    "combat_movement": 59
+   },
+   "nations": {
+    "japan": 59
+   },
+   "answers": {
+    "own move": 59
+   }
+  },
+  "air_failed_landing": {
+   "games": 149,
+   "offered_at": 4908,
+   "chosen": 238,
+   "parameters": [
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "unit": "setup_japan_land_jap_tokyo_tactical_bomber_2"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 4906,
+    "combat_movement": 2
+   },
+   "decision_kinds": {
+    "non_combat_movement": 4906,
+    "combat_movement": 2
+   },
+   "nations": {
+    "japan": 4908
+   },
+   "answers": {
+    "own move": 4908
+   }
+  },
+  "air_fly": {
+   "games": 225,
+   "offered_at": 11036,
+   "chosen": 2127,
+   "parameters": [
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "path": [
+      "sea_p15",
+      "sea_p14",
+      "land_china_beiping"
+     ],
+     "unit": "japan_tactical_bomber_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 11003,
+    "combat": 1,
+    "combat_movement": 32
+   },
+   "decision_kinds": {
+    "non_combat_movement": 11003,
+    "combat": 1,
+    "combat_movement": 32
+   },
+   "nations": {
+    "japan": 10478,
+    "kmt": 517,
+    "mongolia": 41
+   },
+   "answers": {
+    "own move": 11036
+   }
+  },
+  "air_ground": {
+   "games": 183,
+   "offered_at": 470,
+   "chosen": 280,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_11",
+     "unit": "setup_japan_land_jap_okinawa_seaplane_1"
+    }
+   },
+   "phases": {
+    "combat": 470
+   },
+   "decision_kinds": {
+    "air_ground_or_defend": 470
+   },
+   "nations": {
+    "japan": 458,
+    "kmt": 12
+   },
+   "answers": {
+    "a waiting decision": 470
+   }
+  },
+  "air_ground_attack": {
+   "games": 240,
+   "offered_at": 12832,
+   "chosen": 2495,
+   "parameters": [
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "path": [
+      "sea_p15",
+      "sea_p32",
+      "land_china_hunan"
+     ],
+     "unit": "japan_fighter_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 12832
+   },
+   "decision_kinds": {
+    "combat_movement": 12832
+   },
+   "nations": {
+    "japan": 12721,
+    "kmt": 111
+   },
+   "answers": {
+    "own move": 12832
+   }
+  },
+  "air_intercept": {
+   "games": 1,
+   "offered_at": 1,
+   "chosen": 0,
+   "parameters": [
+    "battle",
+    "source",
+    "unit"
+   ],
+   "example": {
+    "seed": 9120,
+    "round": 5,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "air_mission_2",
+     "source": "local",
+     "unit": "economy_unit_36"
+    }
+   },
+   "phases": {
+    "combat": 1
+   },
+   "decision_kinds": {
+    "air_interception": 1
+   },
+   "nations": {
+    "kmt": 1
+   },
+   "answers": {
+    "a waiting decision": 1
+   }
+  },
+  "air_land": {
+   "games": 237,
+   "offered_at": 1882,
+   "chosen": 1882,
+   "parameters": [
+    "battle",
+    "destination",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_13",
+     "destination": "land_formosa",
+     "unit": "japan_tactical_bomber_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "combat": 1882
+   },
+   "decision_kinds": {
+    "air_landing": 1882
+   },
+   "nations": {
+    "japan": 1834,
+    "kmt": 48
+   },
+   "answers": {
+    "a waiting decision": 1882
+   }
+  },
+  "air_land_noncombat": {
+   "games": 236,
+   "offered_at": 16707,
+   "chosen": 2070,
+   "parameters": [
+    "destination",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "destination": "land_formosa",
+     "unit": "japan_tactical_bomber_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 16342,
+    "combat_movement": 364,
+    "combat": 1
+   },
+   "decision_kinds": {
+    "non_combat_movement": 16342,
+    "combat_movement": 364,
+    "combat": 1
+   },
+   "nations": {
+    "japan": 16052,
+    "kmt": 613,
+    "mongolia": 42
+   },
+   "answers": {
+    "own move": 16707
+   }
+  },
+  "air_load": {
+   "games": 26,
+   "offered_at": 442,
+   "chosen": 18,
+   "parameters": [
+    "cargo",
+    "unit"
+   ],
+   "example": {
+    "seed": 9013,
+    "round": 2,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "cargo": "economy_unit_7",
+     "unit": "economy_unit_6"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 430,
+    "combat_movement": 12
+   },
+   "decision_kinds": {
+    "non_combat_movement": 430,
+    "combat_movement": 12
+   },
+   "nations": {
+    "japan": 225,
+    "kmt": 203,
+    "mongolia": 14
+   },
+   "answers": {
+    "own move": 442
+   }
+  },
+  "air_scramble": {
+   "games": 55,
+   "offered_at": 71,
+   "chosen": 31,
+   "parameters": [
+    "battle",
+    "source",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_11",
+     "source": "facility_korea_airfield",
+     "unit": "japan_fighter_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "combat": 71
+   },
+   "decision_kinds": {
+    "air_scramble": 71
+   },
+   "nations": {
+    "japan": 71
+   },
+   "answers": {
+    "a waiting decision": 71
+   }
+  },
+  "air_screen_continue": {
+   "games": 4,
+   "offered_at": 26,
+   "chosen": 1,
+   "parameters": [
+    "battle",
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9027,
+    "round": 7,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "land_battle_50",
+     "path": [
+      "land_china_sinkiang",
+      "land_china_tsinghai",
+      "land_china_szechwan",
+      "land_china_hunan",
+      "land_china_nanking"
+     ],
+     "unit": "economy_unit_64"
+    }
+   },
+   "phases": {
+    "combat_movement": 26
+   },
+   "decision_kinds": {
+    "combat_movement": 26
+   },
+   "nations": {
+    "kmt": 9,
+    "japan": 17
+   },
+   "answers": {
+    "own move": 26
+   }
+  },
+  "air_start_patrol": {
+   "games": 240,
+   "offered_at": 16128,
+   "chosen": 1610,
+   "parameters": [
+    "path",
+    "range",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "path": [
+      "sea_p15",
+      "sea_p14"
+     ],
+     "range": 1,
+     "unit": "japan_fighter_p15_fleet_carrier_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 16128
+   },
+   "decision_kinds": {
+    "combat_movement": 16128
+   },
+   "nations": {
+    "japan": 16044,
+    "kmt": 84
+   },
+   "answers": {
+    "own move": 16128
+   }
+  },
+  "air_support": {
+   "games": 239,
+   "offered_at": 7912,
+   "chosen": 496,
+   "parameters": [
+    "battle",
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_3",
+     "path": [
+      "sea_p15",
+      "sea_p14",
+      "land_china_beiping"
+     ],
+     "unit": "japan_fighter_p15_light_carrier_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 7912
+   },
+   "decision_kinds": {
+    "combat_movement": 7912
+   },
+   "nations": {
+    "japan": 7872,
+    "kmt": 40
+   },
+   "answers": {
+    "own move": 7912
+   }
+  },
+  "air_unload": {
+   "games": 8,
+   "offered_at": 111,
+   "chosen": 8,
+   "parameters": [
+    "cargo",
+    "unit"
+   ],
+   "example": {
+    "seed": 9019,
+    "round": 5,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "cargo": "setup_japan_land_jap_tokyo_infantry_1",
+     "unit": "economy_unit_16"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 111
+   },
+   "decision_kinds": {
+    "non_combat_movement": 111
+   },
+   "nations": {
+    "japan": 8,
+    "kmt": 91,
+    "mongolia": 12
+   },
+   "answers": {
+    "own move": 111
+   }
+  },
+  "economy_advance": {
+   "games": 240,
+   "offered_at": 15741,
+   "chosen": 693,
+   "parameters": [
+    "project"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "project": "japan_queue_fleet_carrier"
+    }
+   },
+   "phases": {
+    "production": 15741
+   },
+   "decision_kinds": {
+    "production": 15741
+   },
+   "nations": {
+    "japan": 11076,
+    "kmt": 4665
+   },
+   "answers": {
+    "own move": 15741
+   }
+  },
+  "economy_approve_rail": {
+   "games": 77,
+   "offered_at": 106,
+   "chosen": 55,
+   "parameters": [],
+   "example": {
+    "seed": 9001,
+    "round": 1,
+    "phase": "production",
+    "player": "comintern",
+    "nation": "mongolia",
+    "parameters": {}
+   },
+   "phases": {
+    "production": 106
+   },
+   "decision_kinds": {
+    "economy_rail_permission": 106
+   },
+   "nations": {
+    "mongolia": 106
+   },
+   "answers": {
+    "a waiting decision": 106
+   }
+  },
+  "economy_decline_rail": {
+   "games": 77,
+   "offered_at": 106,
+   "chosen": 51,
+   "parameters": [],
+   "example": {
+    "seed": 9001,
+    "round": 1,
+    "phase": "production",
+    "player": "comintern",
+    "nation": "mongolia",
+    "parameters": {}
+   },
+   "phases": {
+    "production": 106
+   },
+   "decision_kinds": {
+    "economy_rail_permission": 106
+   },
+   "nations": {
+    "mongolia": 106
+   },
+   "answers": {
+    "a waiting decision": 106
+   }
+  },
+  "economy_finish_research": {
+   "games": 240,
+   "offered_at": 5657,
+   "chosen": 2811,
+   "parameters": [],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {}
+   },
+   "phases": {
+    "production": 5657
+   },
+   "decision_kinds": {
+    "production": 5657
+   },
+   "nations": {
+    "japan": 5320,
+    "kmt": 337
+   },
+   "answers": {
+    "own move": 5657
+   }
+  },
+  "economy_lease_declare": {
+   "games": 161,
+   "offered_at": 1130,
+   "chosen": 185,
+   "parameters": [
+    "project",
+    "recipient"
+   ],
+   "example": {
+    "seed": 9001,
+    "round": 2,
+    "phase": "production",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "project": "economy_mountain_infantry_19",
+     "recipient": "mongolia"
+    }
+   },
+   "phases": {
+    "production": 1130
+   },
+   "decision_kinds": {
+    "production": 1130
+   },
+   "nations": {
+    "kmt": 930,
+    "japan": 200
+   },
+   "answers": {
+    "own move": 1130
+   }
+  },
+  "economy_lease_deliver": {
+   "games": 18,
+   "offered_at": 45,
+   "chosen": 26,
+   "parameters": [
+    "factory",
+    "project",
+    "sea",
+    "zone"
+   ],
+   "example": {
+    "seed": 9013,
+    "round": 7,
+    "phase": "place_units",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "factory": "evolution_factory_11",
+     "project": "economy_cavalry_79",
+     "zone": "land_mongolia_central_mongolia"
+    }
+   },
+   "phases": {
+    "place_units": 45
+   },
+   "decision_kinds": {
+    "place_units": 45
+   },
+   "nations": {
+    "kmt": 32,
+    "japan": 13
+   },
+   "answers": {
+    "own move": 45
+   }
+  },
+  "economy_lease_place": {
+   "games": 3,
+   "offered_at": 5,
+   "chosen": 4,
+   "parameters": [
+    "border",
+    "project",
+    "target",
+    "zone"
+   ],
+   "example": {
+    "seed": 9053,
+    "round": 11,
+    "phase": "place_units",
+    "player": "comintern",
+    "nation": "mongolia",
+    "parameters": {
+     "project": "economy_lease_90",
+     "target": "political_militia_14"
+    }
+   },
+   "phases": {
+    "place_units": 5
+   },
+   "decision_kinds": {
+    "place_units": 5
+   },
+   "nations": {
+    "mongolia": 2,
+    "japan": 3
+   },
+   "answers": {
+    "own move": 5
+   }
+  },
+  "economy_lease_upgrade": {
+   "games": 182,
+   "offered_at": 3799,
+   "chosen": 31,
+   "parameters": [
+    "recipient"
+   ],
+   "example": {
+    "seed": 9001,
+    "round": 1,
+    "phase": "production",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "recipient": "mongolia"
+    }
+   },
+   "phases": {
+    "production": 3799
+   },
+   "decision_kinds": {
+    "production": 3799
+   },
+   "nations": {
+    "kmt": 3417,
+    "japan": 379,
+    "ccp": 3
+   },
+   "answers": {
+    "own move": 3799
+   }
+  },
+  "economy_place": {
+   "games": 240,
+   "offered_at": 12887,
+   "chosen": 12113,
+   "parameters": [
+    "facility",
+    "project",
+    "target",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "place_units",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "project": "economy_militia_1",
+     "zone": "land_china_shensi"
+    }
+   },
+   "phases": {
+    "place_units": 12887
+   },
+   "decision_kinds": {
+    "place_units": 12887
+   },
+   "nations": {
+    "ccp": 3202,
+    "japan": 5377,
+    "kmt": 4308
+   },
+   "answers": {
+    "own move": 12887
+   }
+  },
+  "economy_purchase": {
+   "games": 240,
+   "offered_at": 24382,
+   "chosen": 20186,
+   "parameters": [
+    "price",
+    "row",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "price": "printed",
+     "row": "ccp_minor_militia"
+    }
+   },
+   "phases": {
+    "production": 24382
+   },
+   "decision_kinds": {
+    "production": 24382
+   },
+   "nations": {
+    "ccp": 3658,
+    "japan": 12027,
+    "kmt": 8697
+   },
+   "answers": {
+    "own move": 24382
+   }
+  },
+  "economy_repair": {
+   "games": 28,
+   "offered_at": 333,
+   "chosen": 18,
+   "parameters": [
+    "damage",
+    "endpoint",
+    "facility",
+    "target"
+   ],
+   "example": {
+    "seed": 9021,
+    "round": 10,
+    "phase": "production",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "damage": 1,
+     "facility": "economy_facility_57",
+     "target": "japan_fleet_carrier_p15_setup_1"
+    }
+   },
+   "phases": {
+    "production": 333
+   },
+   "decision_kinds": {
+    "production": 333
+   },
+   "nations": {
+    "japan": 82,
+    "kmt": 238,
+    "ccp": 13
+   },
+   "answers": {
+    "own move": 333
+   }
+  },
+  "economy_request_rail": {
+   "games": 240,
+   "offered_at": 7478,
+   "chosen": 106,
+   "parameters": [
+    "border",
+    "price",
+    "row",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "border": "land_mongolia_kerulen",
+     "price": "printed",
+     "row": "japan_major_railroad",
+     "zone": "land_manchuria_western"
+    }
+   },
+   "phases": {
+    "production": 7478
+   },
+   "decision_kinds": {
+    "production": 7478
+   },
+   "nations": {
+    "japan": 3538,
+    "kmt": 3940
+   },
+   "answers": {
+    "own move": 7478
+   }
+  },
+  "economy_research": {
+   "games": 240,
+   "offered_at": 3027,
+   "chosen": 2846,
+   "parameters": [
+    "facility",
+    "technology"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "facility": "setup_japan_tokyo_major_factory",
+     "technology": "advanced_artillery"
+    }
+   },
+   "phases": {
+    "production": 3027
+   },
+   "decision_kinds": {
+    "production": 3027
+   },
+   "nations": {
+    "japan": 2856,
+    "kmt": 171
+   },
+   "answers": {
+    "own move": 3027
+   }
+  },
+  "end_phase": {
+   "games": 240,
+   "offered_at": 165934,
+   "chosen": 53026,
+   "parameters": [],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {}
+   },
+   "phases": {
+    "production": 31779,
+    "combat_movement": 50992,
+    "combat": 10788,
+    "non_combat_movement": 59666,
+    "place_units": 12709
+   },
+   "decision_kinds": {
+    "production": 31779,
+    "combat_movement": 50992,
+    "combat": 10788,
+    "non_combat_movement": 59666,
+    "place_units": 12709
+   },
+   "nations": {
+    "ccp": 22087,
+    "mongolia": 16555,
+    "japan": 69457,
+    "kmt": 57835
+   },
+   "answers": {
+    "own move": 165934
+   }
+  },
+  "influence_roll": {
+   "games": 230,
+   "offered_at": 522,
+   "chosen": 236,
+   "parameters": [
+    "spend",
+    "target"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "place_units",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "spend": 0,
+     "target": "warlord_beiping_hopeh"
+    }
+   },
+   "phases": {
+    "place_units": 522
+   },
+   "decision_kinds": {
+    "place_units": 522
+   },
+   "nations": {
+    "ccp": 450,
+    "japan": 72
+   },
+   "answers": {
+    "own move": 522
+   }
+  },
+  "land_begin_battle": {
+   "games": 240,
+   "offered_at": 14297,
+   "chosen": 13232,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "battle": "land_battle_1"
+    }
+   },
+   "phases": {
+    "combat": 14297
+   },
+   "decision_kinds": {
+    "combat": 14297
+   },
+   "nations": {
+    "ccp": 3173,
+    "japan": 6039,
+    "kmt": 4738,
+    "mongolia": 347
+   },
+   "answers": {
+    "own move": 14297
+   }
+  },
+  "land_continue_fighting": {
+   "games": 240,
+   "offered_at": 8676,
+   "chosen": 4328,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_3"
+    }
+   },
+   "phases": {
+    "combat": 8676
+   },
+   "decision_kinds": {
+    "land_retreat_or_continue": 8676
+   },
+   "nations": {
+    "japan": 2432,
+    "kmt": 3764,
+    "ccp": 2273,
+    "mongolia": 204,
+    "dadao": 3
+   },
+   "answers": {
+    "a waiting decision": 8676
+   }
+  },
+  "land_pair_artillery": {
+   "games": 28,
+   "offered_at": 159,
+   "chosen": 159,
+   "parameters": [
+    "artillery",
+    "attacking",
+    "battle",
+    "companion"
+   ],
+   "example": {
+    "seed": 9004,
+    "round": 7,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "artillery": "economy_unit_50",
+     "attacking": false,
+     "battle": "land_battle_26",
+     "companion": "setup_kmt_land_china_shantung_infantry_1"
+    }
+   },
+   "phases": {
+    "combat": 159
+   },
+   "decision_kinds": {
+    "land_artillery_pairing": 159
+   },
+   "nations": {
+    "kmt": 43,
+    "japan": 116
+   },
+   "answers": {
+    "a waiting decision": 159
+   }
+  },
+  "land_progress_battle": {
+   "games": 233,
+   "offered_at": 1255,
+   "chosen": 1252,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "battle": "land_battle_11"
+    }
+   },
+   "phases": {
+    "combat": 1255
+   },
+   "decision_kinds": {
+    "combat": 1255
+   },
+   "nations": {
+    "ccp": 107,
+    "kmt": 397,
+    "japan": 726,
+    "mongolia": 25
+   },
+   "answers": {
+    "own move": 1255
+   }
+  },
+  "land_retreat_begin": {
+   "games": 240,
+   "offered_at": 8720,
+   "chosen": 4392,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_3"
+    }
+   },
+   "phases": {
+    "combat": 8720
+   },
+   "decision_kinds": {
+    "land_retreat_or_continue": 8720
+   },
+   "nations": {
+    "japan": 2461,
+    "kmt": 3776,
+    "ccp": 2275,
+    "mongolia": 204,
+    "dadao": 4
+   },
+   "answers": {
+    "a waiting decision": 8720
+   }
+  },
+  "land_retreat_unit": {
+   "games": 240,
+   "offered_at": 5735,
+   "chosen": 5735,
+   "parameters": [
+    "battle",
+    "unit",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "land_battle_6",
+     "unit": "setup_warlord_sinkiang_land_china_sinkiang_infantry_2",
+     "zone": "land_china_sikang"
+    }
+   },
+   "phases": {
+    "combat": 5735
+   },
+   "decision_kinds": {
+    "land_retreat_destination": 5735
+   },
+   "nations": {
+    "kmt": 3434,
+    "ccp": 1365,
+    "japan": 826,
+    "mongolia": 108,
+    "dadao": 2
+   },
+   "answers": {
+    "a waiting decision": 5735
+   }
+  },
+  "land_take_casualty": {
+   "games": 240,
+   "offered_at": 12046,
+   "chosen": 12046,
+   "parameters": [
+    "battle",
+    "targeted",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "battle": "land_battle_1",
+     "targeted": false,
+     "unit": "setup_ccp_land_china_shensi_mountain_infantry_1"
+    }
+   },
+   "phases": {
+    "combat": 12046
+   },
+   "decision_kinds": {
+    "land_casualty": 12046
+   },
+   "nations": {
+    "ccp": 3033,
+    "warlord_suiyuan": 53,
+    "japan": 3840,
+    "warlord_beiping_hopeh": 152,
+    "kmt": 4518,
+    "mongolia": 389,
+    "warlord_kwangtung_hainan": 24,
+    "warlord_tsinghai": 28,
+    "dadao": 7,
+    "warlord_sinkiang": 2
+   },
+   "answers": {
+    "a waiting decision": 12046
+   }
+  },
+  "movement_route": {
+   "games": 240,
+   "offered_at": 102194,
+   "chosen": 51976,
+   "parameters": [
+    "combat",
+    "mode",
+    "path",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "combat": true,
+     "mode": "ordinary",
+     "path": [
+      "land_china_shensi",
+      "land_china_hopeh"
+     ],
+     "unit": "setup_ccp_land_china_shensi_cavalry_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 43298,
+    "non_combat_movement": 58894,
+    "combat": 2
+   },
+   "decision_kinds": {
+    "combat_movement": 43298,
+    "non_combat_movement": 58894,
+    "combat": 2
+   },
+   "nations": {
+    "ccp": 6743,
+    "mongolia": 3146,
+    "japan": 50346,
+    "kmt": 41828,
+    "dadao": 131
+   },
+   "answers": {
+    "own move": 102194
+   }
+  },
+  "naval_air_attack": {
+   "games": 30,
+   "offered_at": 158,
+   "chosen": 19,
+   "parameters": [
+    "path",
+    "sea",
+    "unit"
+   ],
+   "example": {
+    "seed": 9003,
+    "round": 11,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "path": [
+      "land_china_hopeh",
+      "sea_p14"
+     ],
+     "sea": "sea_p14",
+     "unit": "economy_unit_117"
+    }
+   },
+   "phases": {
+    "combat_movement": 158
+   },
+   "decision_kinds": {
+    "combat_movement": 158
+   },
+   "nations": {
+    "kmt": 116,
+    "japan": 42
+   },
+   "answers": {
+    "own move": 158
+   }
+  },
+  "naval_begin_assault": {
+   "games": 237,
+   "offered_at": 2946,
+   "chosen": 1531,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "amphibious_1"
+    }
+   },
+   "phases": {
+    "combat": 2946
+   },
+   "decision_kinds": {
+    "combat": 2946
+   },
+   "nations": {
+    "japan": 2946
+   },
+   "answers": {
+    "own move": 2946
+   }
+  },
+  "naval_begin_battle": {
+   "games": 42,
+   "offered_at": 160,
+   "chosen": 79,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9003,
+    "round": 11,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "naval_battle_1"
+    }
+   },
+   "phases": {
+    "combat": 160
+   },
+   "decision_kinds": {
+    "combat": 160
+   },
+   "nations": {
+    "kmt": 116,
+    "japan": 38,
+    "ccp": 6
+   },
+   "answers": {
+    "own move": 160
+   }
+  },
+  "naval_continue_fighting": {
+   "games": 11,
+   "offered_at": 23,
+   "chosen": 12,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9012,
+    "round": 7,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_1"
+    }
+   },
+   "phases": {
+    "combat": 23
+   },
+   "decision_kinds": {
+    "naval_retreat_or_continue": 23
+   },
+   "nations": {
+    "japan": 4,
+    "kmt": 19
+   },
+   "answers": {
+    "a waiting decision": 23
+   }
+  },
+  "naval_declare_assault": {
+   "games": 240,
+   "offered_at": 14135,
+   "chosen": 1739,
+   "parameters": [
+    "cargo",
+    "transport",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "cargo": "setup_japan_land_jap_hokkaido_infantry_1",
+     "transport": "setup_japan_sea_p15_naval_transport_2",
+     "zone": "land_china_beiping"
+    }
+   },
+   "phases": {
+    "combat_movement": 14135
+   },
+   "decision_kinds": {
+    "combat_movement": 14135
+   },
+   "nations": {
+    "japan": 14135
+   },
+   "answers": {
+    "own move": 14135
+   }
+  },
+  "naval_decline_scramble": {
+   "games": 17,
+   "offered_at": 55,
+   "chosen": 24,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9021,
+    "round": 9,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_sea_p15_battleship_2"
+    }
+   },
+   "phases": {
+    "combat": 55
+   },
+   "decision_kinds": {
+    "naval_scramble": 55
+   },
+   "nations": {
+    "japan": 55
+   },
+   "answers": {
+    "a waiting decision": 55
+   }
+  },
+  "naval_designate_raider": {
+   "games": 240,
+   "offered_at": 22866,
+   "chosen": 811,
+   "parameters": [
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "unit": "setup_japan_sea_p15_battlecruiser_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 22866
+   },
+   "decision_kinds": {
+    "combat_movement": 22866
+   },
+   "nations": {
+    "japan": 22861,
+    "kmt": 5
+   },
+   "answers": {
+    "own move": 22866
+   }
+  },
+  "naval_discover_raider": {
+   "games": 3,
+   "offered_at": 3,
+   "chosen": 0,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9069,
+    "round": 4,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "naval_battle_1",
+     "unit": "setup_japan_sea_p15_battlecruiser_1"
+    }
+   },
+   "phases": {
+    "combat": 3
+   },
+   "decision_kinds": {
+    "naval_engage_raider": 3
+   },
+   "nations": {
+    "kmt": 3
+   },
+   "answers": {
+    "a waiting decision": 3
+   }
+  },
+  "naval_engage_force": {
+   "games": 4,
+   "offered_at": 5,
+   "chosen": 1,
+   "parameters": [
+    "plan"
+   ],
+   "example": {
+    "seed": 9012,
+    "round": 7,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "plan": "naval_plan_205"
+    }
+   },
+   "phases": {
+    "combat_movement": 5
+   },
+   "decision_kinds": {
+    "naval_force_selection": 5
+   },
+   "nations": {
+    "kmt": 1,
+    "japan": 4
+   },
+   "answers": {
+    "a waiting decision": 5
+   }
+  },
+  "naval_enter_port": {
+   "games": 240,
+   "offered_at": 20676,
+   "chosen": 11751,
+   "parameters": [
+    "facility",
+    "unit",
+    "unload"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "facility": "facility_honshu_northwest_major_shipyard",
+     "unit": "setup_japan_sea_p14_heavy_cruiser_1",
+     "unload": false
+    }
+   },
+   "phases": {
+    "non_combat_movement": 20676
+   },
+   "decision_kinds": {
+    "non_combat_movement": 20676
+   },
+   "nations": {
+    "japan": 20653,
+    "kmt": 20,
+    "ccp": 3
+   },
+   "answers": {
+    "own move": 20676
+   }
+  },
+  "naval_finish_shore_selection": {
+   "games": 237,
+   "offered_at": 2073,
+   "chosen": 1531,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "amphibious_1"
+    }
+   },
+   "phases": {
+    "combat": 2073
+   },
+   "decision_kinds": {
+    "naval_shore_selection": 2073
+   },
+   "nations": {
+    "japan": 2073
+   },
+   "answers": {
+    "a waiting decision": 2073
+   }
+  },
+  "naval_force_add": {
+   "games": 240,
+   "offered_at": 24277,
+   "chosen": 5081,
+   "parameters": [
+    "plan",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "plan": "naval_plan_1",
+     "unit": "setup_japan_sea_p14_light_cruiser_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 18762,
+    "non_combat_movement": 5515
+   },
+   "decision_kinds": {
+    "naval_force_selection": 24277
+   },
+   "nations": {
+    "japan": 24274,
+    "kmt": 3
+   },
+   "answers": {
+    "a waiting decision": 24277
+   }
+  },
+  "naval_ignore_raider": {
+   "games": 3,
+   "offered_at": 3,
+   "chosen": 3,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9069,
+    "round": 4,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "naval_battle_1",
+     "unit": "setup_japan_sea_p15_battlecruiser_1"
+    }
+   },
+   "phases": {
+    "combat": 3
+   },
+   "decision_kinds": {
+    "naval_engage_raider": 3
+   },
+   "nations": {
+    "kmt": 3
+   },
+   "answers": {
+    "a waiting decision": 3
+   }
+  },
+  "naval_load": {
+   "games": 240,
+   "offered_at": 37728,
+   "chosen": 2994,
+   "parameters": [
+    "transport",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "transport": "setup_japan_sea_p15_naval_transport_1",
+     "unit": "setup_japan_land_jap_hokkaido_infantry_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 27400,
+    "non_combat_movement": 10328
+   },
+   "decision_kinds": {
+    "combat_movement": 27400,
+    "non_combat_movement": 10328
+   },
+   "nations": {
+    "japan": 37683,
+    "kmt": 42,
+    "dadao": 2,
+    "ccp": 1
+   },
+   "answers": {
+    "own move": 37728
+   }
+  },
+  "naval_patrol_attack": {
+   "games": 6,
+   "offered_at": 14,
+   "chosen": 7,
+   "parameters": [
+    "unit"
+   ],
+   "example": {
+    "seed": 9012,
+    "round": 7,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "unit": "setup_japan_land_jap_okinawa_seaplane_1"
+    }
+   },
+   "phases": {
+    "combat": 14
+   },
+   "decision_kinds": {
+    "combat": 14
+   },
+   "nations": {
+    "japan": 6,
+    "kmt": 8
+   },
+   "answers": {
+    "own move": 14
+   }
+  },
+  "naval_patrol_decline": {
+   "games": 3,
+   "offered_at": 4,
+   "chosen": 3,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9055,
+    "round": 8,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_land_jap_okinawa_seaplane_1"
+    }
+   },
+   "phases": {
+    "combat": 4
+   },
+   "decision_kinds": {
+    "naval_patrol_participation": 4
+   },
+   "nations": {
+    "japan": 4
+   },
+   "answers": {
+    "a waiting decision": 4
+   }
+  },
+  "naval_patrol_engage": {
+   "games": 3,
+   "offered_at": 4,
+   "chosen": 1,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9055,
+    "round": 8,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_land_jap_okinawa_seaplane_1"
+    }
+   },
+   "phases": {
+    "combat": 4
+   },
+   "decision_kinds": {
+    "naval_patrol_participation": 4
+   },
+   "nations": {
+    "japan": 4
+   },
+   "answers": {
+    "a waiting decision": 4
+   }
+  },
+  "naval_port_attack": {
+   "games": 45,
+   "offered_at": 319,
+   "chosen": 29,
+   "parameters": [
+    "facility",
+    "path",
+    "sea",
+    "unit"
+   ],
+   "example": {
+    "seed": 9003,
+    "round": 11,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "facility": "economy_facility_7",
+     "path": [
+      "land_china_hopeh",
+      "sea_p14",
+      "sea_p15"
+     ],
+     "sea": "sea_p15",
+     "unit": "economy_unit_117"
+    }
+   },
+   "phases": {
+    "combat_movement": 319
+   },
+   "decision_kinds": {
+    "combat_movement": 319
+   },
+   "nations": {
+    "kmt": 111,
+    "japan": 208
+   },
+   "answers": {
+    "own move": 319
+   }
+  },
+  "naval_progress_battle": {
+   "games": 22,
+   "offered_at": 34,
+   "chosen": 34,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9003,
+    "round": 11,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "naval_battle_1"
+    }
+   },
+   "phases": {
+    "combat": 34
+   },
+   "decision_kinds": {
+    "combat": 34
+   },
+   "nations": {
+    "kmt": 24,
+    "japan": 10
+   },
+   "answers": {
+    "own move": 34
+   }
+  },
+  "naval_reaction_decline": {
+   "games": 7,
+   "offered_at": 12,
+   "chosen": 7,
+   "parameters": [
+    "plan"
+   ],
+   "example": {
+    "seed": 9012,
+    "round": 6,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "plan": "naval_move_188"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 1,
+    "combat_movement": 11
+   },
+   "decision_kinds": {
+    "naval_movement_reaction": 12
+   },
+   "nations": {
+    "japan": 11,
+    "kmt": 1
+   },
+   "answers": {
+    "a waiting decision": 12
+   }
+  },
+  "naval_reaction_engage": {
+   "games": 7,
+   "offered_at": 12,
+   "chosen": 5,
+   "parameters": [
+    "plan"
+   ],
+   "example": {
+    "seed": 9012,
+    "round": 6,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "plan": "naval_move_188"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 1,
+    "combat_movement": 11
+   },
+   "decision_kinds": {
+    "naval_movement_reaction": 12
+   },
+   "nations": {
+    "japan": 11,
+    "kmt": 1
+   },
+   "answers": {
+    "a waiting decision": 12
+   }
+  },
+  "naval_remove_raider": {
+   "games": 238,
+   "offered_at": 11100,
+   "chosen": 391,
+   "parameters": [
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 5,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "unit": "setup_japan_sea_p15_battlecruiser_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 11100
+   },
+   "decision_kinds": {
+    "combat_movement": 11100
+   },
+   "nations": {
+    "japan": 11085,
+    "kmt": 15
+   },
+   "answers": {
+    "own move": 11100
+   }
+  },
+  "naval_retreat_begin": {
+   "games": 11,
+   "offered_at": 23,
+   "chosen": 11,
+   "parameters": [
+    "battle"
+   ],
+   "example": {
+    "seed": 9012,
+    "round": 7,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_1"
+    }
+   },
+   "phases": {
+    "combat": 23
+   },
+   "decision_kinds": {
+    "naval_retreat_or_continue": 23
+   },
+   "nations": {
+    "japan": 4,
+    "kmt": 19
+   },
+   "answers": {
+    "a waiting decision": 23
+   }
+  },
+  "naval_retreat_unit": {
+   "games": 2,
+   "offered_at": 2,
+   "chosen": 2,
+   "parameters": [
+    "battle",
+    "unit",
+    "zone"
+   ],
+   "example": {
+    "seed": 9110,
+    "round": 6,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_sea_p15_torpedo_boat_destroyer_1",
+     "zone": "sea_p15"
+    }
+   },
+   "phases": {
+    "combat": 2
+   },
+   "decision_kinds": {
+    "naval_retreat_destination": 2
+   },
+   "nations": {
+    "japan": 1,
+    "kmt": 1
+   },
+   "answers": {
+    "a waiting decision": 2
+   }
+  },
+  "naval_roll_capture": {
+   "games": 96,
+   "offered_at": 430,
+   "chosen": 231,
+   "parameters": [
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "place_units",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "unit": "setup_japan_sea_p15_naval_transport_2"
+    }
+   },
+   "phases": {
+    "place_units": 430
+   },
+   "decision_kinds": {
+    "place_units": 430
+   },
+   "nations": {
+    "kmt": 307,
+    "ccp": 112,
+    "japan": 7,
+    "mongolia": 4
+   },
+   "answers": {
+    "own move": 430
+   }
+  },
+  "naval_route": {
+   "games": 240,
+   "offered_at": 45500,
+   "chosen": 40418,
+   "parameters": [
+    "plan",
+    "request"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "plan": "naval_plan_1",
+     "request": {
+      "combat": true,
+      "destination_facility": null,
+      "origin_facility": null,
+      "path": [
+       "sea_p14",
+       "sea_p15"
+      ],
+      "strategic": false,
+      "units": [
+       "setup_japan_sea_p14_heavy_cruiser_1"
+      ]
+     }
+    }
+   },
+   "phases": {
+    "combat_movement": 34834,
+    "non_combat_movement": 10666
+   },
+   "decision_kinds": {
+    "naval_force_selection": 45500
+   },
+   "nations": {
+    "japan": 45471,
+    "kmt": 24,
+    "dadao": 2,
+    "ccp": 3
+   },
+   "answers": {
+    "a waiting decision": 45500
+   }
+  },
+  "naval_scramble": {
+   "games": 17,
+   "offered_at": 55,
+   "chosen": 31,
+   "parameters": [
+    "battle",
+    "facility",
+    "unit"
+   ],
+   "example": {
+    "seed": 9021,
+    "round": 9,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "facility": "facility_rehe_major_port",
+     "unit": "setup_japan_sea_p15_battleship_2"
+    }
+   },
+   "phases": {
+    "combat": 55
+   },
+   "decision_kinds": {
+    "naval_scramble": 55
+   },
+   "nations": {
+    "japan": 55
+   },
+   "answers": {
+    "a waiting decision": 55
+   }
+  },
+  "naval_screen_add": {
+   "games": 18,
+   "offered_at": 28,
+   "chosen": 28,
+   "parameters": [
+    "plan",
+    "unit"
+   ],
+   "example": {
+    "seed": 9013,
+    "round": 6,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "plan": "naval_move_344",
+     "unit": "setup_japan_sea_p15_destroyer_2"
+    }
+   },
+   "phases": {
+    "combat_movement": 28
+   },
+   "decision_kinds": {
+    "naval_screening_force": 28
+   },
+   "nations": {
+    "kmt": 19,
+    "ccp": 2,
+    "japan": 7
+   },
+   "answers": {
+    "a waiting decision": 28
+   }
+  },
+  "naval_screen_confirm": {
+   "games": 18,
+   "offered_at": 28,
+   "chosen": 28,
+   "parameters": [
+    "plan"
+   ],
+   "example": {
+    "seed": 9013,
+    "round": 6,
+    "phase": "combat_movement",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "plan": "naval_move_344"
+    }
+   },
+   "phases": {
+    "combat_movement": 28
+   },
+   "decision_kinds": {
+    "naval_screening_force": 28
+   },
+   "nations": {
+    "kmt": 19,
+    "ccp": 2,
+    "japan": 7
+   },
+   "answers": {
+    "a waiting decision": 28
+   }
+  },
+  "naval_select_bombardment": {
+   "games": 229,
+   "offered_at": 984,
+   "chosen": 542,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 3,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "amphibious_1",
+     "unit": "setup_japan_sea_p15_battlecruiser_1"
+    }
+   },
+   "phases": {
+    "combat": 984
+   },
+   "decision_kinds": {
+    "naval_shore_selection": 984
+   },
+   "nations": {
+    "japan": 984
+   },
+   "answers": {
+    "a waiting decision": 984
+   }
+  },
+  "naval_shore_casualty": {
+   "games": 89,
+   "offered_at": 110,
+   "chosen": 110,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9002,
+    "round": 9,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "battle": "amphibious_4",
+     "unit": "setup_kmt_land_china_hunan_infantry_1"
+    }
+   },
+   "phases": {
+    "combat": 110
+   },
+   "decision_kinds": {
+    "naval_shore_casualty": 110
+   },
+   "nations": {
+    "kmt": 83,
+    "japan": 13,
+    "warlord_kwangtung_hainan": 3,
+    "warlord_beiping_hopeh": 4,
+    "ccp": 7
+   },
+   "answers": {
+    "a waiting decision": 110
+   }
+  },
+  "naval_start_move": {
+   "games": 240,
+   "offered_at": 67425,
+   "chosen": 40419,
+   "parameters": [
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "unit": "japan_fleet_carrier_p15_setup_1"
+    }
+   },
+   "phases": {
+    "combat_movement": 46153,
+    "non_combat_movement": 21272
+   },
+   "decision_kinds": {
+    "combat_movement": 46153,
+    "non_combat_movement": 21272
+   },
+   "nations": {
+    "japan": 67152,
+    "ccp": 24,
+    "kmt": 206,
+    "dadao": 43
+   },
+   "answers": {
+    "own move": 67425
+   }
+  },
+  "naval_strategic_continue": {
+   "games": 117,
+   "offered_at": 248,
+   "chosen": 120,
+   "parameters": [
+    "plan"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 2,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "plan": "naval_move_54"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 248
+   },
+   "decision_kinds": {
+    "naval_strategic_pickup": 248
+   },
+   "nations": {
+    "japan": 248
+   },
+   "answers": {
+    "a waiting decision": 248
+   }
+  },
+  "naval_strategic_pickup": {
+   "games": 117,
+   "offered_at": 248,
+   "chosen": 128,
+   "parameters": [
+    "plan",
+    "transport",
+    "unit"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 2,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "plan": "naval_move_54",
+     "transport": "setup_japan_sea_p16_naval_transport_1",
+     "unit": "setup_japan_land_jap_honshu_motorized_infantry_1"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 248
+   },
+   "decision_kinds": {
+    "naval_strategic_pickup": 248
+   },
+   "nations": {
+    "japan": 248
+   },
+   "answers": {
+    "a waiting decision": 248
+   }
+  },
+  "naval_sub_decline": {
+   "games": 12,
+   "offered_at": 21,
+   "chosen": 9,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9037,
+    "round": 9,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_sea_p15_submarine_2"
+    }
+   },
+   "phases": {
+    "combat": 21
+   },
+   "decision_kinds": {
+    "naval_submarine_participation": 21
+   },
+   "nations": {
+    "japan": 21
+   },
+   "answers": {
+    "a waiting decision": 21
+   }
+  },
+  "naval_sub_protected": {
+   "games": 14,
+   "offered_at": 26,
+   "chosen": 4,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9021,
+    "round": 9,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_sea_p15_submarine_2"
+    }
+   },
+   "phases": {
+    "combat": 26
+   },
+   "decision_kinds": {
+    "naval_submarine_participation": 26
+   },
+   "nations": {
+    "japan": 26
+   },
+   "answers": {
+    "a waiting decision": 26
+   }
+  },
+  "naval_sub_unprotected": {
+   "games": 14,
+   "offered_at": 26,
+   "chosen": 13,
+   "parameters": [
+    "battle",
+    "unit"
+   ],
+   "example": {
+    "seed": 9021,
+    "round": 9,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "battle": "naval_battle_2",
+     "unit": "setup_japan_sea_p15_submarine_2"
+    }
+   },
+   "phases": {
+    "combat": 26
+   },
+   "decision_kinds": {
+    "naval_submarine_participation": 26
+   },
+   "nations": {
+    "japan": 26
+   },
+   "answers": {
+    "a waiting decision": 26
+   }
+  },
+  "naval_take_casualty": {
+   "games": 40,
+   "offered_at": 80,
+   "chosen": 80,
+   "parameters": [
+    "battle",
+    "targeted",
+    "unit"
+   ],
+   "example": {
+    "seed": 9007,
+    "round": 7,
+    "phase": "combat",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "battle": "naval_battle_1",
+     "targeted": false,
+     "unit": "setup_japan_sea_p15_torpedo_boat_destroyer_1"
+    }
+   },
+   "phases": {
+    "combat": 79,
+    "combat_movement": 1
+   },
+   "decision_kinds": {
+    "naval_casualty": 80
+   },
+   "nations": {
+    "ccp": 4,
+    "kmt": 38,
+    "japan": 38
+   },
+   "answers": {
+    "a waiting decision": 80
+   }
+  },
+  "naval_unload": {
+   "games": 240,
+   "offered_at": 14475,
+   "chosen": 1003,
+   "parameters": [
+    "transport",
+    "unit",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "non_combat_movement",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "transport": "setup_japan_sea_p15_naval_transport_1",
+     "unit": "setup_japan_land_jap_hokkaido_infantry_1",
+     "zone": "land_jap_hokkaido"
+    }
+   },
+   "phases": {
+    "non_combat_movement": 14475
+   },
+   "decision_kinds": {
+    "non_combat_movement": 14475
+   },
+   "nations": {
+    "japan": 14452,
+    "kmt": 23
+   },
+   "answers": {
+    "own move": 14475
+   }
+  },
+  "pass_interrupt": {
+   "games": 240,
+   "offered_at": 746,
+   "chosen": 365,
+   "parameters": [],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "allies",
+    "nation": null,
+    "parameters": null
+   },
+   "phases": {
+    "production": 559,
+    "combat_movement": 164,
+    "combat": 15,
+    "non_combat_movement": 4,
+    "place_units": 4
+   },
+   "decision_kinds": {
+    "declaration_offer": 746
+   },
+   "nations": {
+    "?": 746
+   },
+   "answers": {
+    "own move": 746
+   }
+  },
+  "politics_choose_capital": {
+   "games": 206,
+   "offered_at": 207,
+   "chosen": 207,
+   "parameters": [
+    "factory",
+    "zone"
+   ],
+   "example": {
+    "seed": 9001,
+    "round": 1,
+    "phase": "combat",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "factory": false,
+     "zone": "land_china_beiping"
+    }
+   },
+   "phases": {
+    "combat": 207
+   },
+   "decision_kinds": {
+    "politics_evolution": 207
+   },
+   "nations": {
+    "kmt": 206,
+    "ccp": 1
+   },
+   "answers": {
+    "a waiting decision": 207
+   }
+  },
+  "politics_declare_war": {
+   "games": 240,
+   "offered_at": 746,
+   "chosen": 381,
+   "parameters": [
+    "target"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "allies",
+    "nation": "kmt",
+    "parameters": {
+     "target": "japan"
+    }
+   },
+   "phases": {
+    "production": 559,
+    "combat_movement": 164,
+    "combat": 15,
+    "non_combat_movement": 4,
+    "place_units": 4
+   },
+   "decision_kinds": {
+    "declaration_offer": 746
+   },
+   "nations": {
+    "kmt": 469,
+    "ccp": 277
+   },
+   "answers": {
+    "own move": 746
+   }
+  },
+  "politics_give_capture": {
+   "games": 61,
+   "offered_at": 84,
+   "chosen": 56,
+   "parameters": [
+    "recipient",
+    "requires_withdrawal",
+    "zone"
+   ],
+   "example": {
+    "seed": 9009,
+    "round": 2,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "recipient": "ccp",
+     "requires_withdrawal": true,
+     "zone": "land_china_beiping"
+    }
+   },
+   "phases": {
+    "combat": 84
+   },
+   "decision_kinds": {
+    "politics_chinese_liberation": 84
+   },
+   "nations": {
+    "japan": 84
+   },
+   "answers": {
+    "a waiting decision": 84
+   }
+  },
+  "politics_keep_capture": {
+   "games": 61,
+   "offered_at": 84,
+   "chosen": 28,
+   "parameters": [
+    "zone"
+   ],
+   "example": {
+    "seed": 9009,
+    "round": 2,
+    "phase": "combat",
+    "player": "axis",
+    "nation": "japan",
+    "parameters": {
+     "zone": "land_china_beiping"
+    }
+   },
+   "phases": {
+    "combat": 84
+   },
+   "decision_kinds": {
+    "politics_chinese_liberation": 84
+   },
+   "nations": {
+    "japan": 84
+   },
+   "answers": {
+    "a waiting decision": 84
+   }
+  },
+  "politics_priority_declare": {
+   "games": 173,
+   "offered_at": 173,
+   "chosen": 99,
+   "parameters": [
+    "declaring_nation",
+    "target"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "declaring_nation": "ccp",
+     "target": "japan"
+    }
+   },
+   "phases": {
+    "production": 152,
+    "combat_movement": 20,
+    "combat": 1
+   },
+   "decision_kinds": {
+    "politics_declaration_priority": 173
+   },
+   "nations": {
+    "ccp": 173
+   },
+   "answers": {
+    "a waiting decision": 173
+   }
+  },
+  "politics_priority_decline": {
+   "games": 240,
+   "offered_at": 339,
+   "chosen": 240,
+   "parameters": [],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "production",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {}
+   },
+   "phases": {
+    "production": 274,
+    "combat_movement": 57,
+    "combat": 5,
+    "place_units": 2,
+    "non_combat_movement": 1
+   },
+   "decision_kinds": {
+    "politics_declaration_priority": 339
+   },
+   "nations": {
+    "ccp": 339
+   },
+   "answers": {
+    "a waiting decision": 339
+   }
+  },
+  "recruitment_place_infantry": {
+   "games": 219,
+   "offered_at": 688,
+   "chosen": 222,
+   "parameters": [
+    "beneficiary",
+    "zone"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "place_units",
+    "player": "comintern",
+    "nation": "mongolia",
+    "parameters": {
+     "beneficiary": "mongolia",
+     "zone": "land_mongolia_central_mongolia"
+    }
+   },
+   "phases": {
+    "place_units": 688
+   },
+   "decision_kinds": {
+    "recruitment_choice": 688
+   },
+   "nations": {
+    "mongolia": 385,
+    "ccp": 301,
+    "dadao": 2
+   },
+   "answers": {
+    "a waiting decision": 688
+   }
+  },
+  "recruitment_place_militia": {
+   "games": 219,
+   "offered_at": 688,
+   "chosen": 466,
+   "parameters": [
+    "beneficiary",
+    "zones"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "place_units",
+    "player": "comintern",
+    "nation": "mongolia",
+    "parameters": {
+     "beneficiary": "mongolia",
+     "zones": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_central_mongolia"
+     ]
+    }
+   },
+   "phases": {
+    "place_units": 688
+   },
+   "decision_kinds": {
+    "recruitment_choice": 688
+   },
+   "nations": {
+    "mongolia": 385,
+    "ccp": 301,
+    "dadao": 2
+   },
+   "answers": {
+    "a waiting decision": 688
+   }
+  },
+  "recruitment_roll": {
+   "games": 240,
+   "offered_at": 6838,
+   "chosen": 2613,
+   "parameters": [
+    "beneficiary"
+   ],
+   "example": {
+    "seed": 9000,
+    "round": 1,
+    "phase": "place_units",
+    "player": "comintern",
+    "nation": "ccp",
+    "parameters": {
+     "beneficiary": "ccp"
+    }
+   },
+   "phases": {
+    "place_units": 6838
+   },
+   "decision_kinds": {
+    "place_units": 6838
+   },
+   "nations": {
+    "ccp": 4233,
+    "mongolia": 2570,
+    "japan": 35
+   },
+   "answers": {
+    "own move": 6838
+   }
+  }
+ },
+ "decision_kinds": {
+  "non_combat_movement": 74958,
+  "combat_movement": 67728,
+  "naval_force_selection": 45500,
+  "production": 37436,
+  "combat": 26984,
+  "place_units": 25783,
+  "land_casualty": 12046,
+  "land_retreat_or_continue": 8720,
+  "land_retreat_destination": 5735,
+  "naval_shore_selection": 2073,
+  "air_landing": 1882,
+  "declaration_offer": 746,
+  "recruitment_choice": 688,
+  "air_ground_or_defend": 470,
+  "politics_declaration_priority": 339,
+  "naval_strategic_pickup": 248,
+  "politics_evolution": 207,
+  "land_artillery_pairing": 159,
+  "naval_shore_casualty": 110,
+  "economy_rail_permission": 106,
+  "politics_chinese_liberation": 84,
+  "naval_casualty": 80,
+  "air_scramble": 71,
+  "naval_screening_force": 56,
+  "naval_scramble": 55,
+  "air_rail_border": 29,
+  "naval_submarine_participation": 26,
+  "naval_retreat_or_continue": 23,
+  "naval_movement_reaction": 12,
+  "naval_patrol_participation": 4,
+  "naval_engage_raider": 3,
+  "naval_retreat_destination": 2,
+  "air_casualty": 1,
+  "air_interception": 1
+ },
+ "dice": [
+  {
+   "purpose": "land_combat_roll",
+   "dice": "D12",
+   "rolls": 34633
+  },
+  {
+   "purpose": "recruitment_roll",
+   "dice": "D12",
+   "rolls": 2613
+  },
+  {
+   "purpose": "naval_shore_roll",
+   "dice": "D12",
+   "rolls": 548
+  },
+  {
+   "purpose": "warlord_alignment",
+   "dice": "D12",
+   "rolls": 358
+  },
+  {
+   "purpose": "influence_roll",
+   "dice": "D12",
+   "rolls": 236
+  },
+  {
+   "purpose": "naval_port_capture",
+   "dice": "D12",
+   "rolls": 231
+  },
+  {
+   "purpose": "economy_research:jet_fighters",
+   "dice": "D12",
+   "rolls": 200
+  },
+  {
+   "purpose": "economy_research:large_ship_construction",
+   "dice": "D12",
+   "rolls": 196
+  },
+  {
+   "purpose": "economy_research:amphibious_doctrine",
+   "dice": "D12",
+   "rolls": 188
+  },
+  {
+   "purpose": "economy_research:heavy_strategic_bombers",
+   "dice": "D12",
+   "rolls": 185
+  },
+  {
+   "purpose": "economy_research:airborne_doctrine",
+   "dice": "D12",
+   "rolls": 185
+  },
+  {
+   "purpose": "economy_research:advanced_artillery",
+   "dice": "D12",
+   "rolls": 183
+  },
+  {
+   "purpose": "economy_research:improved_factories",
+   "dice": "D12",
+   "rolls": 182
+  },
+  {
+   "purpose": "economy_research:improved_construction",
+   "dice": "D12",
+   "rolls": 179
+  },
+  {
+   "purpose": "economy_research:heavy_armor",
+   "dice": "D12",
+   "rolls": 179
+  },
+  {
+   "purpose": "economy_research:advanced_submarines",
+   "dice": "D12",
+   "rolls": 177
+  },
+  {
+   "purpose": "economy_research:long_range_aircraft",
+   "dice": "D12",
+   "rolls": 176
+  },
+  {
+   "purpose": "economy_research:strategic_rockets",
+   "dice": "D12",
+   "rolls": 173
+  },
+  {
+   "purpose": "economy_research:anti_submarine_warfare",
+   "dice": "D12",
+   "rolls": 173
+  },
+  {
+   "purpose": "economy_research:improved_logistics",
+   "dice": "D12",
+   "rolls": 170
+  },
+  {
+   "purpose": "naval_combat_roll",
+   "dice": "D12",
+   "rolls": 157
+  },
+  {
+   "purpose": "economy_research:advanced_mechanized_infantry",
+   "dice": "D12",
+   "rolls": 156
+  },
+  {
+   "purpose": "economy_research:radar",
+   "dice": "D12",
+   "rolls": 144
+  },
+  {
+   "purpose": "air_bomb_damage",
+   "dice": "D6",
+   "rolls": 62
+  },
+  {
+   "purpose": "naval_port_aa",
+   "dice": "D12",
+   "rolls": 29
+  },
+  {
+   "purpose": "air_facility_aa",
+   "dice": "D12",
+   "rolls": 7
+  }
+ ]
+}

@@ -2,10 +2,10 @@
 
 The approved target, scenario decisions and wealth objective of the regional
 campaign, the recorded rule decisions, the verification policy and the open work.
-Milestones M0–M11 implemented the rules: see the [M0 review](../archive/milestones/m0/README.md)
-and the milestone pages linked from the [README](../../README.md). The
-[project history](../archive/README.md) records how; commit `037cb60` keeps this
-plan's earlier milestone narrative and status notes. Reusable official-rule
+The engine implements these rules: see [the rules engine](../engine/README.md)
+and, for the scenario itself, [the campaign](../engine/scenario.md). The
+[archive](../archive/README.md) records how it was built; commit `037cb60` keeps
+this plan's earlier milestone narrative and status notes. Reusable official-rule
 decisions live in the
 [shared rule clarification register](../../game_content/rules/clarifications.md)
 with stable RCL IDs. Record future rule conflicts there for the user's developer

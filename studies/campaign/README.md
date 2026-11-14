@@ -158,11 +158,11 @@ The network's input is built in C++ by the engine's zone encoder. Reports name
 the input layout in `software.network_input`. Checkpoints and exports of the
 earlier graph-input network cannot be loaded.
 
-Self-play uses the versioned [AI order interface](../../docs/archive/records/action_interface_2026_10_24.md)
+Self-play uses the versioned [AI order interface](../../docs/engine/README.md#3-positions-and-moves)
 by default. Fleet and screening selection make forward progress; undo/cancel
 editing is kept in the ordinary game API. Unchanged role/deck configuration
 cycles and repeated declined railway requests are also bounded. Finished
-battles [clear themselves](../../docs/archive/records/battle_clearing_2026_10_31.md)
+battles [clear themselves](../../docs/engine/land_combat.md#6-finished-battles)
 instead of waiting for a click. Context and checkpoint compatibility identify
 `campaign-orders-v2`; old replay/optimizer state is not implicitly migrated, and
 `campaign-orders-v1` recordings are rejected. Recordings from before the

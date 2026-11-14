@@ -3,10 +3,11 @@
 The scenario the campaign engine loads: a closed 37-node map projection, the
 source-audited official setup in `m0/` and the faction index in `m1/`. The engine
 plays it from July 1936 through the complete July 1941 round under the rules
-profiles in `game_content/rules`. The [M0 review](../../../docs/archive/milestones/m0/README.md)
-records the approved specification, and the milestone pages from
-[M2](../../../docs/archive/milestones/m2/README.md) to [M11](../../../docs/archive/milestones/m11/README.md)
-describe the engine modules. Mongolia remains distinct under direct Comintern
+profiles in `game_content/rules`. [The campaign page](../../../docs/engine/scenario.md)
+describes what it holds, the
+[plan](../../../docs/plans/japan_china_full_rules_plan.md#approved-scenario-decisions)
+records the approved decisions, and the [engine pages](../../../docs/engine/README.md)
+describe the rules modules. Mongolia remains distinct under direct Comintern
 control and acts in the normal USSR turn position: CCP -> Mongolia -> Japan ->
 KMT, with no Soviet participant or account. The
 [shared rule register](../../rules/clarifications.md)
@@ -34,8 +35,8 @@ profiles cite. Change those files only together with their recorded hashes.
   reconciliation and source provenance for later catalog implementation.
 - [Frozen baseline](m0/frozen_baseline.json):
   records the specification freeze and verified artifacts.
-- [M0 review](../../../docs/archive/milestones/m0/README.md): rules ledger, national
-  audits, purchase-price tables, approved decisions and completed verification.
+- [Rules and data](../../../docs/rules/README.md): the rules ledger, the setup
+  audits, the price tables and the source reconciliation.
 - [build_theatre_scenario.py](../../../tools/build_theatre_scenario.py)
   is the builder. Run the command below from the repository root.
 

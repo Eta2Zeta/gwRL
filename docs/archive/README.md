@@ -7,7 +7,7 @@ questions and next steps are those of that date.
 
 | Part | What it holds |
 | --- | --- |
-| [Dated records](#dated-records) | One page per measurement, experiment or rule change from 24 October to 13 November 2026, each with its data file. |
+| [Dated records](#dated-records) | One page per measurement, experiment or rule change since 24 October 2026, each with its data file. |
 | [Milestone pages](#milestone-pages) | The delivery reports of the engine's twelve build stages, M0 to M11, from October 2026. |
 | [Removed on 2 November 2026](#removed-on-2-november-2026) | What the earlier work found, for the files no longer in the tree, and where git keeps them. |
 
@@ -48,6 +48,12 @@ the first learning stage.
 | 4 Nov | [The coordinator's column lookups](records/coordinator_lookups_2026_11_04.md) | The lookups were 22% to 49% of the network's forward pass; a fused replacement measured. |
 | 12 Nov | [The fused column lookup, in the code](records/coordinator_lookups_2026_11_12.md) | Identical outputs; decisions per hour rose 17.6% in matched batches. |
 | 13 Nov | [Where the game processes' time goes](records/game_processes_2026_11_13.md) | Playing a move and listing the legal moves cost about a millisecond each, two thirds of the game threads' CPU. |
+
+### The engine
+
+| Date | Record | What it found |
+| --- | --- | --- |
+| 14 Nov | [Where each kind of move is offered](records/move_census_2026_11_14.md) | 240 random games met 93 of the engine's 141 kinds of move, each in the phase the engine pages name; the Chinese Truce never came up. |
 
 ### Rule changes
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
-  "ledger_sha256": "03565e47e03ec725a054b77ee777ade251bf9467dbe120d95114e6623c1d2b91",
+  "ledger_sha256": "4baa0c7c3f6802d9d8e0f1c97172cf09e03d83c2f21278f369320f56eb729ecf",
   "evidence_file_sha256": {
     "src/air.cpp": "c60631a1ffc1f56e4416e00bbdf8f59ba561c5c9f3689bcfeee270406509775b",
     "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",

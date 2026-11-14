@@ -1,17 +1,17 @@
-# M0 core-rule applicability and acceptance ledger
+# Core rules ledger: which printed rules apply in this campaign
 
-Audit date: 12 September 2026. This is a **specification and future test inventory**,
-not a statement that these rules already work in the simulator. Each `R...` ID is
-stable and can become a fixture identifier; none denotes a test run completed in
-M0. The current tiny environment must eventually use the same corrected engine.
+Every printed rule the campaign could touch has one row here, R000 to R142, with
+its source, whether it applies in this campaign, and why not if it does not.
 
-**21 October 2026 synchronization:** the canonical interpretation/status
-register is now [Rule clarifications and open questions](../../game_content/rules/clarifications.md).
-All RCL items are adopted or closed. The **M0 specification was verified and frozen
-on 21 October 2026**, with 106 repository tests passing. The
-[M0 review](../archive/milestones/m0/README.md) and
-[frozen baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
-record the result; this does not certify a playable full-rules engine.
+The rows were drawn up on 12 September 2026, before the engine existed, as the
+list of what it would have to do, and were frozen with the campaign's
+specification on 21 October 2026
+([report](../archive/milestones/m0/README.md),
+[frozen baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)).
+The engine now implements the rows that apply: the
+[runtime evidence index](runtime_coverage_ledger.md) names the code and the test
+fixture for each. Unclear rules are settled in the
+[rule clarifications](../../game_content/rules/clarifications.md).
 
 ## Contract, sources and notation
 
@@ -22,8 +22,7 @@ The setup contains 99 deployed pieces, 3 setup factories and 19 static facilitie
 Convoys, interdiction and Kido Butai are inactive by user choice; normal MAP and
 blockades remain. Start with official pieces
 on included nodes only; no invisible outside armies, external routes, income
-events or reinforcements. Do not confuse a rule's absence from the current toy
-engine with a reason to omit it from the future shared engine.
+events or reinforcements.
 
 Source abbreviations below use printed/PDF pages for **RB** (they coincide), and
 one-based PDF pages for national sheets:

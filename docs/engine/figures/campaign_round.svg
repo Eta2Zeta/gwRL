@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="456" viewBox="0 0 960 456" role="img" aria-labelledby="title desc">
+  <title id="title">One round of the campaign</title>
+  <desc id="desc">One round of the campaign. Four national turns in a fixed order: the CCP and then Mongolia, both played by the Comintern; Japan, played by the Axis; the KMT, played by the Allies. After the KMT&#x27;s turn the next round begins, and after the KMT&#x27;s turn of round 11 the game ends and is scored. Every national turn has five phases, in this order. Production: buy, pay for what is being built, repair, research. Combat Movement: move the units that will attack, and declare air and sea attacks. Combat: fight every battle; both sides choose casualties and retreats. Noncombat Movement: move everything else, land aircraft, bring ships into port. Place Units: place what was built, recruit, then collect income. The other alliances also choose during a turn: a defender picks its casualties and retreats and may scramble aircraft. A declaration of war on a major power can come between any two moves.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <marker id="small" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .heading { font-size: 16px; font-weight: 600; }
+    .subheading { font-size: 12.5px; fill: #57606a; }
+    .title { font-size: 14px; font-weight: 600; }
+    .phase { font-size: 13px; font-weight: 600; }
+    .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+    .body { font-size: 12px; }
+    .label { font-size: 12px; fill: #57606a; }
+    .note { font-size: 12px; fill: #57606a; }
+    .step { font-size: 12px; font-weight: 700; fill: #ffffff; }
+  </style>
+  <rect x="0.5" y="0.5" width="959" height="455" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="heading" x="24" y="36" text-anchor="start">One round of the campaign</text>
+  <text class="subheading" x="24" y="58" text-anchor="start">A game is 11 rounds of half a year: July 1936, then every January and July to July 1941.</text>
+  <rect x="40" y="82" width="178" height="62" rx="10" fill="#f6f8fa" stroke="#afb8c1"/>
+  <circle cx="64" cy="106" r="12" fill="#57606a"/>
+  <text class="step" x="64" y="110.5" text-anchor="middle">1</text>
+  <text class="title" x="86" y="111" text-anchor="start">The CCP</text>
+  <text class="sub" x="56" y="132" text-anchor="start">played by the Comintern</text>
+  <line x1="222" y1="113.0" x2="256" y2="113.0" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="262" y="82" width="178" height="62" rx="10" fill="#f6f8fa" stroke="#afb8c1"/>
+  <circle cx="286" cy="106" r="12" fill="#57606a"/>
+  <text class="step" x="286" y="110.5" text-anchor="middle">2</text>
+  <text class="title" x="308" y="111" text-anchor="start">Mongolia</text>
+  <text class="sub" x="278" y="132" text-anchor="start">played by the Comintern</text>
+  <line x1="444" y1="113.0" x2="478" y2="113.0" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="484" y="82" width="178" height="62" rx="10" fill="#f6f8fa" stroke="#afb8c1"/>
+  <circle cx="508" cy="106" r="12" fill="#57606a"/>
+  <text class="step" x="508" y="110.5" text-anchor="middle">3</text>
+  <text class="title" x="530" y="111" text-anchor="start">Japan</text>
+  <text class="sub" x="500" y="132" text-anchor="start">played by the Axis</text>
+  <line x1="666" y1="113.0" x2="700" y2="113.0" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="706" y="82" width="178" height="62" rx="10" fill="#f6f8fa" stroke="#afb8c1"/>
+  <circle cx="730" cy="106" r="12" fill="#57606a"/>
+  <text class="step" x="730" y="110.5" text-anchor="middle">4</text>
+  <text class="title" x="752" y="111" text-anchor="start">The KMT</text>
+  <text class="sub" x="722" y="132" text-anchor="start">played by the Allies</text>
+  <path d="M 888 113.0 L 914 113.0 Q 930 113.0 930 129.0 L 930 158 Q 930 174 914 174 L 36 174 Q 20 174 20 158 L 20 127.0 Q 20 113.0 32 113.0" fill="none" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="242.0" y="159" width="440" height="30" rx="15" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="label" x="462.0" y="178.5" text-anchor="middle">next round · after the KMT&#x27;s turn of round 11 the game ends and is scored</text>
+  <rect x="24" y="224" width="912" height="172" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="40" y="250" text-anchor="start">Every national turn has five phases, in this order</text>
+  <rect x="40" y="266" width="164" height="112" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
+  <circle cx="64" cy="292" r="12" fill="#0969da"/>
+  <text class="step" x="64" y="296.5" text-anchor="middle">1</text>
+  <text class="phase" x="84" y="297" text-anchor="start">Production</text>
+  <text class="body" x="52" y="330" text-anchor="start">Buy, pay for what is</text>
+  <text class="body" x="52" y="347" text-anchor="start">being built, repair,</text>
+  <text class="body" x="52" y="364" text-anchor="start">research.</text>
+  <line x1="205" y1="322.0" x2="215" y2="322.0" stroke="#57606a" stroke-width="2" marker-end="url(#small)"/>
+  <rect x="218" y="266" width="164" height="112" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
+  <circle cx="242" cy="292" r="12" fill="#0969da"/>
+  <text class="step" x="242" y="296.5" text-anchor="middle">2</text>
+  <text class="phase" x="262" y="289" text-anchor="start">Combat</text>
+  <text class="phase" x="262" y="305" text-anchor="start">Movement</text>
+  <text class="body" x="230" y="330" text-anchor="start">Move the units that</text>
+  <text class="body" x="230" y="347" text-anchor="start">will attack. Declare</text>
+  <text class="body" x="230" y="364" text-anchor="start">air and sea attacks.</text>
+  <line x1="383" y1="322.0" x2="393" y2="322.0" stroke="#57606a" stroke-width="2" marker-end="url(#small)"/>
+  <rect x="396" y="266" width="164" height="112" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
+  <circle cx="420" cy="292" r="12" fill="#0969da"/>
+  <text class="step" x="420" y="296.5" text-anchor="middle">3</text>
+  <text class="phase" x="440" y="297" text-anchor="start">Combat</text>
+  <text class="body" x="408" y="330" text-anchor="start">Fight every battle.</text>
+  <text class="body" x="408" y="347" text-anchor="start">Both sides choose</text>
+  <text class="body" x="408" y="364" text-anchor="start">casualties and retreats.</text>
+  <line x1="561" y1="322.0" x2="571" y2="322.0" stroke="#57606a" stroke-width="2" marker-end="url(#small)"/>
+  <rect x="574" y="266" width="164" height="112" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
+  <circle cx="598" cy="292" r="12" fill="#0969da"/>
+  <text class="step" x="598" y="296.5" text-anchor="middle">4</text>
+  <text class="phase" x="618" y="289" text-anchor="start">Noncombat</text>
+  <text class="phase" x="618" y="305" text-anchor="start">Movement</text>
+  <text class="body" x="586" y="330" text-anchor="start">Move everything else.</text>
+  <text class="body" x="586" y="347" text-anchor="start">Land aircraft. Bring</text>
+  <text class="body" x="586" y="364" text-anchor="start">ships into port.</text>
+  <line x1="739" y1="322.0" x2="749" y2="322.0" stroke="#57606a" stroke-width="2" marker-end="url(#small)"/>
+  <rect x="752" y="266" width="164" height="112" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
+  <circle cx="776" cy="292" r="12" fill="#0969da"/>
+  <text class="step" x="776" y="296.5" text-anchor="middle">5</text>
+  <text class="phase" x="796" y="297" text-anchor="start">Place Units</text>
+  <text class="body" x="764" y="330" text-anchor="start">Place what was built.</text>
+  <text class="body" x="764" y="347" text-anchor="start">Recruit. Then collect</text>
+  <text class="body" x="764" y="364" text-anchor="start">income.</text>
+  <text class="note" x="24" y="422" text-anchor="start">The other alliances also choose during a turn: a defender picks its casualties and retreats and may scramble aircraft.</text>
+  <text class="note" x="24" y="440" text-anchor="start">A declaration of war on a major power can come between any two moves.</text>
+</svg>
