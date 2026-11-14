@@ -731,7 +731,10 @@ void continueRoute(State &s, const Id &id) {
     encounter(s, id);
 }
 void execute(State &s, const NavalRouteRequest &r) {
-  const auto valid = validateNavalRoute(s, r);
+  const auto valid = [&] {
+    const PositionScope scope(s);  // The check only reads the position.
+    return validateNavalRoute(s, r);
+  }();
   require(valid.allowed, valid.reason);
   const auto n = s.units.at(r.units.front()).owner;
   detachAircraft(s, r.units, r.path.front());
@@ -1060,29 +1063,35 @@ private:
 void routeChoices(State &s, BattleState &b) {
   const auto selected = readIds(b.data.require("selected"));
   std::vector<Action> options;
-  for (const auto &[id, u] : s.units)
-    if (u.zone == b.zone && u.owner == b.attacker &&
-        available(s, u, s.clock.phase != Phase::NonCombatMovement))
-      options.push_back(action(
-          s, b.attacker,
-          std::find(selected.begin(), selected.end(), id) == selected.end()
-              ? "naval_force_add"
-              : "naval_force_remove",
-          {{"plan", V(b.id)}, {"unit", V(id)}}));
-  options.push_back(
-      action(s, b.attacker, "naval_cancel_move", {{"plan", V(b.id)}}));
-  if (!selected.empty() && s.clock.phase != Phase::NonCombatMovement &&
-      sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone) &&
-      !raiderWouldCombine(s, b.zone, b.attacker, selected, "standard") &&
-      engagementKeepsLanding(s, selected, b.zone))
+  {
+    // Listing the choices only reads the position, so its facts stay open
+    // until the decision is recorded: each route's movement allowance and
+    // each supply question are worked out once.
+    const PositionScope scope(s);
+    for (const auto &[id, u] : s.units)
+      if (u.zone == b.zone && u.owner == b.attacker &&
+          available(s, u, s.clock.phase != Phase::NonCombatMovement))
+        options.push_back(action(
+            s, b.attacker,
+            std::find(selected.begin(), selected.end(), id) == selected.end()
+                ? "naval_force_add"
+                : "naval_force_remove",
+            {{"plan", V(b.id)}, {"unit", V(id)}}));
     options.push_back(
-        action(s, b.attacker, "naval_engage_force", {{"plan", V(b.id)}}));
-  visitNavalRoutes(s, selected, [&](const NavalRouteRequest &request) {
-    options.push_back(action(s, b.attacker, "naval_route",
-                             {{"plan", V(b.id)},
-                              {"request", requestJson(request)}}));
-    return false;
-  });
+        action(s, b.attacker, "naval_cancel_move", {{"plan", V(b.id)}}));
+    if (!selected.empty() && s.clock.phase != Phase::NonCombatMovement &&
+        sea(s, b.zone) && anyEnemy(s, b.attacker, b.zone) &&
+        !raiderWouldCombine(s, b.zone, b.attacker, selected, "standard") &&
+        engagementKeepsLanding(s, selected, b.zone))
+      options.push_back(
+          action(s, b.attacker, "naval_engage_force", {{"plan", V(b.id)}}));
+    visitNavalRoutes(s, selected, [&](const NavalRouteRequest &request) {
+      options.push_back(action(s, b.attacker, "naval_route",
+                               {{"plan", V(b.id)},
+                                {"request", requestJson(request)}}));
+      return false;
+    });
+  }
   decision(s, b, b.attacker, "naval_force_selection", std::move(options));
 }
 } // namespace
@@ -1158,26 +1167,38 @@ void forwardNavalOrderDecision(State &s) {
   const auto selected = readIds(plan.data.require("selected"));
   require(!selected.empty() && std::is_sorted(selected.begin(), selected.end()),
           "Forward naval order requires an ascending nonempty fleet");
-  NavalOrderCompletion completion(s);
-  if (std::any_of(pending.options.begin(), pending.options.end(),
-                  [](const Action &candidate) {
-                    return candidate.kind == "naval_route" ||
-                           candidate.kind == "naval_engage_force";
-                  }))
-    completion.rememberComplete(selected);
-  std::erase_if(pending.options, [&](const Action &candidate) {
-    if (candidate.kind == "naval_cancel_move" ||
-        candidate.kind == "naval_force_remove")
-      return true;
-    if (candidate.kind != "naval_force_add")
-      return false;
-    const auto &unit = candidate.parameters.require("unit").asString();
-    if (unit <= selected.back())
-      return true;
-    auto next = selected;
-    next.push_back(unit);
-    return !completion.possible(next);
-  });
+  // Which options lead nowhere is read off the unchanged position, with its
+  // facts open, before any option is removed.
+  std::vector<bool> leadsNowhere;
+  {
+    const PositionScope scope(s);
+    NavalOrderCompletion completion(s);
+    if (std::any_of(pending.options.begin(), pending.options.end(),
+                    [](const Action &candidate) {
+                      return candidate.kind == "naval_route" ||
+                             candidate.kind == "naval_engage_force";
+                    }))
+      completion.rememberComplete(selected);
+    for (const auto &candidate : pending.options)
+      leadsNowhere.push_back([&] {
+        if (candidate.kind == "naval_cancel_move" ||
+            candidate.kind == "naval_force_remove")
+          return true;
+        if (candidate.kind != "naval_force_add")
+          return false;
+        const auto &unit = candidate.parameters.require("unit").asString();
+        if (unit <= selected.back())
+          return true;
+        auto next = selected;
+        next.push_back(unit);
+        return !completion.possible(next);
+      }());
+  }
+  std::vector<Action> kept;
+  for (std::size_t i = 0; i < pending.options.size(); ++i)
+    if (!leadsNowhere[i])
+      kept.push_back(std::move(pending.options[i]));
+  pending.options = std::move(kept);
   require(!pending.options.empty(), "Forward naval order has no completion");
 }
 

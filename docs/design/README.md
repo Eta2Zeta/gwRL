@@ -1357,21 +1357,30 @@ takes 0.44 ms for one position and 0.73 ms for four
 ([record](../archive/records/coordinator_lookups_2026_11_12.md#the-forward-pass)). Until
 12 November the column lookups (section 6.3) were the largest part of a call;
 since then one fused operation does them, and the largest part is the GELU curve,
-mostly in the border messages (section 6.7). The coordinator is still busy 87% to
-88% of the time, but the game processes and the coordinator together now use 9.5
-to 10.5 of the 11 cores. Inferred: the coordinator and the cores limit this layout
-about equally, so a faster coordinator alone would add at most 4% to 15% more
-([record](../archive/records/coordinator_lookups_2026_11_12.md#what-this-does-and-does-not-show)).
+mostly in the border messages (section 6.7). The coordinator is busy about 90% of
+the time, while the game processes and the coordinator together use about 9.2 of
+the 11 cores. Inferred: the coordinator limits this layout, and a faster
+coordinator, larger calls or a second coordinator could add up to about 20%
+before the cores run out
+([record](../archive/records/supply_cache_2026_11_14.md#what-this-does-and-does-not-show)).
 
-**The game processes** do about 90% of the CPU work. In a profiled batch on 13
-November, a game thread used 151 ms of CPU per decision, two thirds of it in two
-engine calls of about a millisecond each: playing a move and listing a position's
-legal moves. Inside the engine a few rule checks take the most: searching the map
-for a nation's Supply Path to a zone, enumerating every route a naval force could
-sail, listing the economy's options, and finding landing plans for aircraft in
-flight. Playing a move also redoes much of what the position's list of legal moves
-already worked out, without the cache that listing uses
-([record](../archive/records/game_processes_2026_11_13.md)).
+**The game processes** do about 90% of the CPU work. In a profile on 13 November,
+two thirds of it went to two engine calls of about a millisecond each: listing a
+position's legal moves and playing a move
+([record](../archive/records/game_processes_2026_11_13.md)). Inside the engine a
+few rule checks take the most: searching the map for a nation's Supply Path to a
+zone, enumerating every route a naval force could sail, listing the economy's
+options, and finding landing plans for aircraft in flight. While the engine lists
+a position's legal moves, it keeps a cache of facts about that position, such as
+whether a zone is in supply for a nation, so that each is worked out once
+(`PositionScope` in `include/game/position_facts.hpp`). Playing a move opens the
+same cache for the checks it makes while the position is still unchanged, such as
+whether a fleet's chosen route is legal, and closes it before the move changes
+anything. The supply search also works out only once per search which naval
+facilities it may use. Since these two changes, playing a move takes about 0.6 ms
+in random play instead of 1.1 ms, and the game processes use 16% less CPU per
+decision in training batches, about 117 ms
+([record](../archive/records/supply_cache_2026_11_14.md)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1402,6 +1411,13 @@ On 12 November the fused column lookup cut the coordinator's time per evaluation
 by 18%. In two matched pairs of Mac-profile batches, decisions per hour while
 playing rose by 17.6%, from about 192,700 to 226,600, and games per hour from 182
 to 211 ([record](../archive/records/coordinator_lookups_2026_11_12.md)).
+
+On 14 November playing a move began to use the position's cache (above). In
+matched Mac-profile batches the game processes used 16% less CPU per decision,
+but decisions per hour while playing rose only about 3%, from about 246,200 to
+254,200, a smaller difference than between runs of the same code. The coordinator
+now limits the layout
+([record](../archive/records/supply_cache_2026_11_14.md#training-batches)).
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
@@ -1514,16 +1530,15 @@ measured and what would settle it.
   [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules.
-- **Self-play on the Mac is near two limits at once.** Since the fused column
-  lookup of 12 November, the coordinator is busy 87% to 88% of the time, and the
-  game processes and the coordinator use 9.5 to 10.5 of the 11 training cores. A
-  faster or a second coordinator could add at most 4% to 15% (inferred). The
-  larger lever is the game processes' own work, about 90% of the CPU: playing a
-  move and listing the legal moves cost about a millisecond each and are two
-  thirds of it. Caching supply answers while a move is played, and letting a move
-  reuse what its position's list of legal moves worked out, are the first
-  candidates; their savings are unmeasured
-  ([record](../archive/records/game_processes_2026_11_13.md)).
+- **Self-play on the Mac is limited by the coordinator.** It is busy about 90% of
+  the time, while the game processes and the coordinator use about 9.2 of the 11
+  training cores. A faster coordinator, larger calls or a second coordinator could
+  add up to about 20% (inferred); until then, work on the engine saves CPU but
+  adds little throughput. Within the engine, listing a position's legal moves now
+  costs more per call than playing a move, and enumerating naval routes and
+  listing the economy's options each take about 15% of the engine's time, more
+  than the supply search
+  ([record](../archive/records/supply_cache_2026_11_14.md)).
 
 ### Open design questions
 

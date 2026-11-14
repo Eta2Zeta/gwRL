@@ -1,0 +1,416 @@
+{
+ "random_play": {
+  "setup": "60 eleven-round games, seeds 7000-7059, each move drawn uniformly with random.Random('trace:<seed>') except that end_phase is chosen with probability 2%, 5% or 10% by seed; the four versions ran at the same time, 3 processes each, on the M4 Max; thread CPU time of each engine call",
+  "versions": {
+   "before": "commit 82859a2",
+   "scopes": "position cache opened for four read-only checks while a move is played",
+   "kept": "scopes plus the supply search's per-search facility table and landfall memory (this commit)",
+   "per_nation_search": "kept plus one search per nation and position for all supplied zones (not kept)"
+  },
+  "results": {
+   "before": {
+    "games": 60,
+    "steps": 89100,
+    "engine_cpu_seconds": {
+     "legal_actions": 76.13,
+     "apply_action": 82.95,
+     "resolve_chance": 3.83
+    },
+    "calls": {
+     "legal_actions": 78376,
+     "apply_action": 78376,
+     "resolve_chance": 10724
+    },
+    "microseconds_per_call": {
+     "legal_actions": 971.3,
+     "apply_action": 1058.3,
+     "resolve_chance": 357.3
+    }
+   },
+   "scopes": {
+    "games": 60,
+    "steps": 89100,
+    "engine_cpu_seconds": {
+     "legal_actions": 77.49,
+     "apply_action": 49.96,
+     "resolve_chance": 3.86
+    },
+    "calls": {
+     "legal_actions": 78376,
+     "apply_action": 78376,
+     "resolve_chance": 10724
+    },
+    "microseconds_per_call": {
+     "legal_actions": 988.7,
+     "apply_action": 637.4,
+     "resolve_chance": 360.0
+    }
+   },
+   "kept": {
+    "games": 60,
+    "steps": 89100,
+    "engine_cpu_seconds": {
+     "legal_actions": 73.72,
+     "apply_action": 47.71,
+     "resolve_chance": 3.86
+    },
+    "calls": {
+     "legal_actions": 78376,
+     "apply_action": 78376,
+     "resolve_chance": 10724
+    },
+    "microseconds_per_call": {
+     "legal_actions": 940.6,
+     "apply_action": 608.8,
+     "resolve_chance": 359.5
+    }
+   },
+   "per_nation_search": {
+    "games": 60,
+    "steps": 89100,
+    "engine_cpu_seconds": {
+     "legal_actions": 69.55,
+     "apply_action": 47.92,
+     "resolve_chance": 3.89
+    },
+    "calls": {
+     "legal_actions": 78376,
+     "apply_action": 78376,
+     "resolve_chance": 10724
+    },
+    "microseconds_per_call": {
+     "legal_actions": 887.3,
+     "apply_action": 611.4,
+     "resolve_chance": 363.1
+    }
+   }
+  }
+ },
+ "random_play_first_per_nation_search": {
+  "setup": "the same 60 games, three versions at the same time, 4 processes each",
+  "versions": {
+   "before": "commit 82859a2",
+   "scopes": "position cache opened while a move is played",
+   "per_nation_search_without_table": "scopes plus one supply search per nation, without the facility table"
+  },
+  "results": {
+   "before": {
+    "engine_cpu_seconds": {
+     "legal_actions": 82.59,
+     "apply_action": 89.28,
+     "resolve_chance": 4.13
+    },
+    "microseconds_per_call": {
+     "legal_actions": 1053.7,
+     "apply_action": 1139.1,
+     "resolve_chance": 385.2
+    }
+   },
+   "scopes": {
+    "engine_cpu_seconds": {
+     "legal_actions": 83.3,
+     "apply_action": 54.25,
+     "resolve_chance": 4.16
+    },
+    "microseconds_per_call": {
+     "legal_actions": 1062.8,
+     "apply_action": 692.2,
+     "resolve_chance": 388.0
+    }
+   },
+   "per_nation_search_without_table": {
+    "engine_cpu_seconds": {
+     "legal_actions": 98.56,
+     "apply_action": 76.6,
+     "resolve_chance": 4.18
+    },
+    "microseconds_per_call": {
+     "legal_actions": 1257.6,
+     "apply_action": 977.3,
+     "resolve_chance": 390.0
+    }
+   }
+  }
+ },
+ "search_driven_games": {
+  "setup": "complete eleven-round games, seeds 41-45, 64 simulations, depth 16, networks 64x2 with parameters plus 0.05 x normal noise (torch seed 20261114), evaluation one position at a time on one CPU thread in the game's process; CPU seconds of the whole process",
+  "games": {
+   "41": {
+    "events": 1374,
+    "decisions": 1210,
+    "cpu_seconds_before": 249.2,
+    "cpu_seconds_after": 210.3
+   },
+   "42": {
+    "events": 1377,
+    "decisions": 1195,
+    "cpu_seconds_before": 191.4,
+    "cpu_seconds_after": 162.9
+   },
+   "43": {
+    "events": 1487,
+    "decisions": 1324,
+    "cpu_seconds_before": 274.6,
+    "cpu_seconds_after": 217.3
+   },
+   "44": {
+    "events": 1293,
+    "decisions": 1150,
+    "cpu_seconds_before": 266.7,
+    "cpu_seconds_after": 198.8
+   },
+   "45": {
+    "events": 1456,
+    "decisions": 1251,
+    "cpu_seconds_before": 223.7,
+    "cpu_seconds_after": 205.1
+   }
+  }
+ },
+ "matched_batches": {
+  "setup": "Mac profile (8 game processes of 4 games, one coordinator evaluating on the CPU), 32 complete eleven-round games with learning per batch, 64 simulations, depth 16, network 64x2, seed 20261104; batches alternated before (commit 82859a2) and after, in the order old1, new1, old2, new2, old3",
+  "compared": {
+   "before": [
+    "old2"
+   ],
+   "after": [
+    "new1",
+    "new2"
+   ],
+   "not_compared": {
+    "old1": "other work during its first minutes",
+    "old3": "other work throughout"
+   }
+  },
+  "batches": {
+   "old1": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 537.4,
+    "learning_seconds": 2.1,
+    "games_per_hour_playing": 214.4,
+    "decisions_per_game": 1104,
+    "decisions_per_hour_playing": 236675,
+    "evaluations_per_game": 56439,
+    "coordinator_busy": 0.887,
+    "game_process_cpu_seconds_per_game": 160.7,
+    "coordinator_cpu_seconds_per_game": 15.4,
+    "peak_rss_bytes": 5905223016,
+    "evaluator": {
+     "evaluations": 1806038,
+     "forward_seconds": 476.87442578421906,
+     "idle_seconds": 34.40975981391966,
+     "model_forwards": 515091,
+     "serving_rounds": 232254
+    }
+   },
+   "new1": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 478.5,
+    "learning_seconds": 2.1,
+    "games_per_hour_playing": 240.8,
+    "decisions_per_game": 1054,
+    "decisions_per_hour_playing": 253849,
+    "evaluations_per_game": 53756,
+    "coordinator_busy": 0.902,
+    "game_process_cpu_seconds_per_game": 123.1,
+    "coordinator_cpu_seconds_per_game": 14.0,
+    "peak_rss_bytes": 5609115104,
+    "evaluator": {
+     "evaluations": 1720203,
+     "forward_seconds": 431.7411642742809,
+     "idle_seconds": 22.408893496962264,
+     "model_forwards": 420249,
+     "serving_rounds": 174128
+    }
+   },
+   "old2": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 509.2,
+    "learning_seconds": 2.1,
+    "games_per_hour_playing": 226.2,
+    "decisions_per_game": 1088,
+    "decisions_per_hour_playing": 246157,
+    "evaluations_per_game": 55229,
+    "coordinator_busy": 0.901,
+    "game_process_cpu_seconds_per_game": 151.6,
+    "coordinator_cpu_seconds_per_game": 15.1,
+    "peak_rss_bytes": 6662668288,
+    "evaluator": {
+     "evaluations": 1767333,
+     "forward_seconds": 458.7459625576157,
+     "idle_seconds": 25.721817939076573,
+     "model_forwards": 497981,
+     "serving_rounds": 214233
+    }
+   },
+   "new2": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 475.3,
+    "learning_seconds": 2.4,
+    "games_per_hour_playing": 242.4,
+    "decisions_per_game": 1050,
+    "decisions_per_hour_playing": 254479,
+    "evaluations_per_game": 53430,
+    "coordinator_busy": 0.89,
+    "game_process_cpu_seconds_per_game": 122.8,
+    "coordinator_cpu_seconds_per_game": 14.0,
+    "peak_rss_bytes": 7420133376,
+    "evaluator": {
+     "evaluations": 1709763,
+     "forward_seconds": 423.17104483093135,
+     "idle_seconds": 28.040040251333266,
+     "model_forwards": 416046,
+     "serving_rounds": 174876
+    }
+   },
+   "old3": {
+    "games": 32,
+    "failed_games": 0,
+    "collection_seconds": 717.0,
+    "learning_seconds": 2.7,
+    "games_per_hour_playing": 160.7,
+    "decisions_per_game": 1054,
+    "decisions_per_hour_playing": 169343,
+    "evaluations_per_game": 53713,
+    "coordinator_busy": 0.862,
+    "game_process_cpu_seconds_per_game": 163.0,
+    "coordinator_cpu_seconds_per_game": 17.6,
+    "peak_rss_bytes": 5215292776,
+    "evaluator": {
+     "evaluations": 1718831,
+     "forward_seconds": 617.8274399221409,
+     "idle_seconds": 57.03537309169769,
+     "model_forwards": 485060,
+     "serving_rounds": 223864
+    }
+   }
+  },
+  "derived": {
+   "old1": {
+    "game_process_cpu_ms_per_decision": 145.6,
+    "coordinator_cpu_ms_per_decision": 13.9,
+    "positions_per_network_call": 3.51,
+    "coordinator_busy_microseconds_per_position": 264,
+    "cores_in_use": 10.49
+   },
+   "new1": {
+    "game_process_cpu_ms_per_decision": 116.8,
+    "coordinator_cpu_ms_per_decision": 13.3,
+    "positions_per_network_call": 4.09,
+    "coordinator_busy_microseconds_per_position": 251,
+    "cores_in_use": 9.17
+   },
+   "old2": {
+    "game_process_cpu_ms_per_decision": 139.3,
+    "coordinator_cpu_ms_per_decision": 13.9,
+    "positions_per_network_call": 3.55,
+    "coordinator_busy_microseconds_per_position": 260,
+    "cores_in_use": 10.48
+   },
+   "new2": {
+    "game_process_cpu_ms_per_decision": 117.0,
+    "coordinator_cpu_ms_per_decision": 13.3,
+    "positions_per_network_call": 4.11,
+    "coordinator_busy_microseconds_per_position": 248,
+    "cores_in_use": 9.21
+   },
+   "old3": {
+    "game_process_cpu_ms_per_decision": 154.6,
+    "coordinator_cpu_ms_per_decision": 16.7,
+    "positions_per_network_call": 3.54,
+    "coordinator_busy_microseconds_per_position": 359,
+    "cores_in_use": 8.06
+   }
+  },
+  "machine_load": {
+   "method": "every 15 s: the 1-minute load average and the six busiest processes by ps %CPU; 'other' sums those of the six that are not the batch's own processes",
+   "notes": {
+    "old1": "another session's test suite (zone_encoding_tests, campaign_env_tests and others) ran during its first minutes",
+    "old3": "ran at 08:14, an hour after the others, while another project's web server (next-server), the window server and a macOS XProtect scan were busy"
+   },
+   "batches": {
+    "old1": {
+     "window": [
+      "06:25:00",
+      "06:34:00"
+     ],
+     "samples": 34,
+     "mean_load_average_1min": 26.1,
+     "mean_other_cpu_percent_in_top_six": 16
+    },
+    "new1": {
+     "window": [
+      "06:34:30",
+      "06:42:00"
+     ],
+     "samples": 30,
+     "mean_load_average_1min": 18.3,
+     "mean_other_cpu_percent_in_top_six": 13
+    },
+    "old2": {
+     "window": [
+      "06:42:30",
+      "06:51:00"
+     ],
+     "samples": 33,
+     "mean_load_average_1min": 18.0,
+     "mean_other_cpu_percent_in_top_six": 11
+    },
+    "new2": {
+     "window": [
+      "06:51:30",
+      "06:59:00"
+     ],
+     "samples": 30,
+     "mean_load_average_1min": 15.9,
+     "mean_other_cpu_percent_in_top_six": 5
+    },
+    "old3": {
+     "window": [
+      "08:14:30",
+      "08:26:30"
+     ],
+     "samples": 48,
+     "mean_load_average_1min": 27.4,
+     "mean_other_cpu_percent_in_top_six": 108
+    }
+   }
+  }
+ },
+ "native_samples": {
+  "setup": "macOS sample, 40 s of one process playing random games (seeds 7000-7011) at 1 ms intervals; shares are inclusive on-CPU samples over those inside Engine::actionMenu and Engine::step",
+  "results": {
+   "before": {
+    "menu_samples": 8495,
+    "step_samples": 9951,
+    "supply_samples": 5833,
+    "supply_share_of_moves": 0.316,
+    "naval_facility_usable_share_of_moves": 0.171,
+    "naval_routes_share_of_moves": 0.278,
+    "economy_menu_share_of_moves": 0.186
+   },
+   "scopes": {
+    "menu_samples": 11218,
+    "step_samples": 7665,
+    "supply_samples": 2538,
+    "supply_share_of_moves": 0.134,
+    "naval_facility_usable_share_of_moves": 0.061,
+    "naval_routes_share_of_moves": 0.171,
+    "economy_menu_share_of_moves": 0.149
+   },
+   "kept": {
+    "menu_samples": 8925,
+    "step_samples": 6027,
+    "supply_samples": 1457,
+    "supply_share_of_moves": 0.097,
+    "naval_facility_usable_share_of_moves": 0.043,
+    "naval_routes_share_of_moves": 0.157,
+    "economy_menu_share_of_moves": 0.151
+   }
+  }
+ }
+}

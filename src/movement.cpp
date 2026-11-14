@@ -928,6 +928,23 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
       ports.push_back({id, initial.at(f.zone), {id}});
       visitedPorts.insert(id);
     }
+  // Whether a facility is usable, and the sea zones it opens onto, stay the
+  // same while the search runs. They are worked out once, when a sea zone is
+  // first reached, and kept by sea zone in the order of the facilities.
+  std::optional<std::map<Id, std::vector<Id>>> openOnto;
+  const std::vector<Id> noFacilities;
+  auto facilitiesOnto = [&](const Id &sea) -> const std::vector<Id> & {
+    if (!openOnto) {
+      openOnto.emplace();
+      for (const auto &[id, f] : s.facilities)
+        if (usable(id))
+          for (const auto &access : navalFacilitySeaZones(s, id))
+            (*openOnto)[access].push_back(id);
+    }
+    const auto found = openOnto->find(sea);
+    return found == openOnto->end() ? noFacilities : found->second;
+  };
+  std::set<Id> missedLandfalls;  // Landfall zones whose land search missed the destination.
   while (!ports.empty()) {
     auto port = std::move(ports.front());
     ports.pop_front();
@@ -955,12 +972,11 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
       seas.pop_front();
       if (sea.sea == destination)
         return {true, sea.path, port.facilities};
-      for (const auto &[id, f] : s.facilities)
-        if (id != port.facility && usable(id)) {
-          const auto accesses = navalFacilitySeaZones(s, id);
-          if (std::find(accesses.begin(), accesses.end(), sea.sea) ==
-              accesses.end())
-            continue;
+      for (const auto &id : facilitiesOnto(sea.sea)) {
+        if (id == port.facility)
+          continue;
+        const auto &f = s.facilities.at(id);
+        if (!missedLandfalls.contains(f.zone)) {
           const auto afterLandfall = landPaths({f.zone});
           if (afterLandfall.contains(destination)) {
             auto path = sea.path;
@@ -970,16 +986,18 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
             facilities.push_back(id);
             return {true, path, facilities};
           }
-          // Refresh while the path remains at sea; landfall is considered
-          // only by the terminal land search above. A shortest path never
-          // needs to revisit the same refreshing facility.
-          if (navalFacilityUsable(s, nation, id) &&
-              visitedPorts.insert(id).second) {
-            auto facilities = port.facilities;
-            facilities.push_back(id);
-            ports.push_back({id, sea.path, std::move(facilities)});
-          }
+          missedLandfalls.insert(f.zone);
         }
+        // Refresh while the path remains at sea; landfall is considered
+        // only by the terminal land search above. A shortest path never
+        // needs to revisit the same refreshing facility.
+        if (navalFacilityUsable(s, nation, id) &&
+            visitedPorts.insert(id).second) {
+          auto facilities = port.facilities;
+          facilities.push_back(id);
+          ports.push_back({id, sea.path, std::move(facilities)});
+        }
+      }
       if (sea.distance >=
           navalRange(origin) +
               (hasTech(s, nation, "improved_logistics") ? 1 : 0))

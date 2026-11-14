@@ -8,12 +8,12 @@
     "src/campaign_runtime.cpp": "ce0ece719b3373f65a6f86533c386b93eb605fc6b47426b89d22d635a78bf164",
     "src/campaign_setup.cpp": "a38e5de640b2c73c0e6a8d658709bebdea8286c882ddaffeb2e32cfdfb175579",
     "src/catalog.cpp": "46ce44b2a91f0207d780063a19dbba23fa1f5d5d42a779d801785592deaecc38",
-    "src/economy.cpp": "09ec786fcc9acebcda216427243967a14627cce10c4310678930b39978413f11",
+    "src/economy.cpp": "2e8599687bdc8c47949ff07d1dd616d10a0abe4ecf231d44e8c731744d6136be",
     "src/economy_lendlease.cpp": "32a721a0f4b4f2458499e32cd34adc251c6ac5fad457cf941c374b63f5932ff8",
     "src/land_combat.cpp": "a6be30607ce8040c508720764c02cb321eacf56724511ca35874bceec22cea96",
-    "src/movement.cpp": "4cfb4da832fae79b78ef606772c0efe9e3d7794a5c830ec3a44bb8cb3138923a",
+    "src/movement.cpp": "4e92b1e8df1f07ceb4692290a40f73c33c2406219186b3c946ac43600018717c",
     "src/naval_combat.cpp": "89628d29300555c8924eb73409fce6aeb8268e04f68d7deed4f303ba123b9e15",
-    "src/naval_movement.cpp": "1fcaa7fa44f4941f4a330b6558d9625d1a7ece53745aa02f4d08ffcc2c2b0ac5",
+    "src/naval_movement.cpp": "e482f983d07f42123b94d10afc3203edccbc1a6b1c34850ba9d7548fe748c531",
     "src/naval_operations.cpp": "29b9de6c565f0c1f565d5bfeb661d3377d09d304f1938c67cdad11a47211415b",
     "src/politics.cpp": "f7de86964343014b53b28d55916b07aee67f4522b2f1fa424dd9ab18e3bfddd6",
     "src/politics_influence.cpp": "0f5c8c2b659a7ee4016ee97b27a9908a83f132aa82d95d6917756c0eab9c52a1",
@@ -799,12 +799,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "supplyRoute",
-          "line": 1000
+          "line": 1018
         },
         {
           "file": "src/movement.cpp",
           "symbol": "inSupply",
-          "line": 1016
+          "line": 1034
         }
       ],
       "fixtures": [
@@ -2021,12 +2021,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "beginEconomyTurn",
-          "line": 480
+          "line": 481
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1042
+          "line": 1047
         }
       ],
       "fixtures": [
@@ -2080,12 +2080,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "beginEconomyTurn",
-          "line": 480
+          "line": 481
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1042
+          "line": 1047
         }
       ],
       "fixtures": [
@@ -2289,7 +2289,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 477
+          "line": 478
         },
         {
           "file": "src/catalog.cpp",
@@ -2349,7 +2349,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         },
         {
           "file": "src/air.cpp",
@@ -2833,12 +2833,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::actions",
-          "line": 1009
+          "line": 1014
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         }
       ],
       "fixtures": [
@@ -2905,7 +2905,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "damageConstruction",
-          "line": 510
+          "line": 511
         },
         {
           "file": "src/politics.cpp",
@@ -2938,12 +2938,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 948
+          "line": 953
         }
       ],
       "fixtures": [
@@ -2981,12 +2981,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 948
+          "line": 953
         }
       ],
       "fixtures": [
@@ -3035,12 +3035,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 948
+          "line": 953
         }
       ],
       "fixtures": [
@@ -3094,7 +3094,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1004
+          "line": 1022
         }
       ],
       "fixtures": [
@@ -3167,12 +3167,12 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "navalMovementActions",
-          "line": 1527
+          "line": 1548
         },
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         }
       ],
       "fixtures": [
@@ -3276,7 +3276,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         }
       ],
       "fixtures": [
@@ -3326,7 +3326,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         },
         {
           "file": "src/naval_combat.cpp",
@@ -3459,12 +3459,12 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "navalMovementActions",
-          "line": 1527
+          "line": 1548
         },
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         }
       ],
       "fixtures": [
@@ -3514,7 +3514,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "validateNavalRoute",
-          "line": 1230
+          "line": 1251
         }
       ],
       "fixtures": [
@@ -3540,7 +3540,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         },
         {
           "file": "src/air.cpp",
@@ -3600,7 +3600,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         },
         {
           "file": "src/naval_operations.cpp",
@@ -3650,7 +3650,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementChance",
-          "line": 1792
+          "line": 1813
         },
         {
           "file": "src/naval_combat.cpp",
@@ -5052,12 +5052,12 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "validateNavalRoute",
-          "line": 1230
+          "line": 1251
         },
         {
           "file": "src/naval_movement.cpp",
           "symbol": "applyNavalMovementAction",
-          "line": 1568
+          "line": 1589
         }
       ],
       "fixtures": [
@@ -5093,7 +5093,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "validateNavalRoute",
-          "line": 1230
+          "line": 1251
         },
         {
           "file": "src/naval_movement.cpp",
@@ -5228,12 +5228,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 477
+          "line": 478
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         }
       ],
       "fixtures": [
@@ -5277,7 +5277,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         }
       ],
       "fixtures": [
@@ -5313,12 +5313,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 948
+          "line": 953
         }
       ],
       "fixtures": [
@@ -5377,7 +5377,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1004
+          "line": 1022
         }
       ],
       "fixtures": [
@@ -5533,12 +5533,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "evaluateIncome",
-          "line": 421
+          "line": 422
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::finishTurn",
-          "line": 1060
+          "line": 1065
         },
         {
           "file": "src/campaign_runtime.cpp",
@@ -5864,7 +5864,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "validateNavalRoute",
-          "line": 1230
+          "line": 1251
         },
         {
           "file": "src/naval_combat.cpp",
@@ -5994,7 +5994,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 477
+          "line": 478
         },
         {
           "file": "src/movement.cpp",
@@ -6084,7 +6084,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 477
+          "line": 478
         }
       ],
       "fixtures": [
@@ -6213,7 +6213,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 477
+          "line": 478
         },
         {
           "file": "src/movement.cpp",
@@ -6364,7 +6364,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         },
         {
           "file": "src/movement.cpp",
@@ -6816,7 +6816,7 @@
         {
           "file": "src/naval_movement.cpp",
           "symbol": "navalCargoFits",
-          "line": 1216
+          "line": 1237
         },
         {
           "file": "src/land_combat.cpp",
@@ -6874,7 +6874,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1035
+          "line": 1040
         }
       ],
       "fixtures": [

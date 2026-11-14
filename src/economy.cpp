@@ -4,6 +4,7 @@
 #include "game/movement.hpp"
 #include "game/naval.hpp"
 #include "game/politics.hpp"
+#include "game/position_facts.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -695,7 +696,11 @@ bool applyEconomyAction(State &s, const Action &a) {
         return false;
     if (applyLendLeaseAction(s, a))
         return true;
-    const auto options = economyActions(s);
+    const auto options = [&] {
+        // The check only reads the position: each facility's supply is traced once.
+        const PositionScope scope(s);
+        return economyActions(s);
+    }();
     require(std::any_of(options.begin(), options.end(),
                         [&](const auto &option) {
                             return canonicalJson(actionJson(option)) == canonicalJson(actionJson(a));
