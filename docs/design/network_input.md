@@ -46,10 +46,10 @@ in the 2 November profile: about 4%, a rough estimate.
 The input for one decision is one bundle with three parts:
 
 1. **The board:** each of the 37 zones (31 land and 6 sea) answers the same list
-   of 42,737 zone questions.
-2. **The position as a whole:** 6,637 questions about the round, the phase,
+   of 42,532 zone questions.
+2. **The position as a whole:** 6,524 questions about the round, the phase,
    whose turn it is, treasuries, wars and so on.
-3. **Each legal move:** every move on the menu answers the same list of 12,673
+3. **Each legal move:** every move on the menu answers the same list of 12,627
    move questions about itself.
 
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
@@ -168,7 +168,7 @@ these include:
 
 ### Every move has the same format
 
-Every legal move answers the same fixed list of 12,673 move questions. So every
+Every legal move answers the same fixed list of 12,627 move questions. So every
 move is a line of the same length in the moves' grid, almost all zeros, and only
 its non-zero answers are stored. A move fills in only the questions that apply to
 it: the fighter attacking Hunan fills in 17, the airbase purchase 10.
@@ -650,6 +650,9 @@ nation; a rare situation keeps its question.
 - **Railroads at sea.** Railroads join land zones only, so the railroad questions
   added on 4 November (`rail_repair_toward`, `rail_endpoint`, `rail_damage`) have
   no sea-zone versions.
+- **Names no code writes.** The lists hold only names the engine's code can
+  write. Ten names left over from a removed benchmark, two kinds of move and
+  eight marks, came off them on 14 November 2026, and 364 questions with them.
 - **Kept on purpose:** the coastal defense ship, reserved for nobody and
   capturable; and "warlords never own ships or planes", which lend-lease and
   recruitment might break, so it could not be proved.
@@ -669,11 +672,10 @@ Facts that never change come with the layout, not with each position:
 - the 160 directed borders, with 22 facts each, such as rivers, narrow crossings,
   railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-1d3c25d19abf2937`, is a hash of every
+The layout version, now `campaign-zone-v1-f59f909e705f9148`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
-and a run cannot resume across a layout change. It last changed on 4 November
-2026, for a patrol plane's own choice in a sea battle
-([record](../archive/records/patrol_choice_2026_11_04.md)).
+and a run cannot resume across a layout change. It last changed on 14 November
+2026, when ten names that no code writes were taken off the lists.
 
 ## 10. Why the encoder translates names
 

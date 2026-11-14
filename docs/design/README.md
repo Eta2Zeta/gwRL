@@ -537,7 +537,7 @@ These are all the non-zero answers of the zone Shensi at decision 612:
 | `unit_stat:comintern:mountain_infantry:move_1` | 1 | ... with 1 movement point left |
 | `rail_to:land_china_hopeh` | 1 | a railroad runs from here to Hopeh |
 
-Shensi's other 42,728 zone questions have the answer 0. Hopeh, next door, has 28
+Shensi's other 42,523 zone questions have the answer 0. Hopeh, next door, has 28
 non-zero answers: the KMT holds it and is building a fortification and a major
 shipyard there, and none of its answers says a unit is there.
 
@@ -546,10 +546,10 @@ shipyard there, and none of its answers says a unit is there.
 The input for one decision has three parts:
 
 1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same list of
-   42,737 zone questions, such as `units:ccp:mountain_infantry`.
-2. **The position as a whole:** one list of 6,637 position questions, such as the
+   42,532 zone questions, such as `units:ccp:mountain_infantry`.
+2. **The position as a whole:** one list of 6,524 position questions, such as the
    round, the phase, whose turn it is, treasuries and wars.
-3. **Each legal move:** every move on the menu answers the same list of 12,673
+3. **Each legal move:** every move on the menu answers the same list of 12,627
    move questions about itself, such as which kind of move it is, which unit it
    moves and which zones it names.
 
@@ -564,14 +564,14 @@ column per zone question, the position as one line, and the moves as one line pe
 legal move. That is why questions are also called *columns*. Almost every cell
 is 0, and only the non-zero cells are stored.
 
-![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,737 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 6,637 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 191 non-zero answers in all.](figures/answer_grid.svg)
+![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,532 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 6,524 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 191 non-zero answers in all.](figures/answer_grid.svg)
 
 A line of a grid holds one zone's, the position's or one move's answers. It is
 not what section 6 calls a row.
 
 ### 5.4 A move's answers, and the zones it is linked to
 
-![A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,673 move columns. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.](figures/move_answers.svg)
+![A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,627 move columns. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.](figures/move_answers.svg)
 
 These are all 19 answers of the attack on Hopeh:
 
@@ -621,7 +621,7 @@ with each decision:
   directions: 160 *directed borders*. The border from Shensi to Hopeh is land to
   land, crosses a river, carries a railway connection and is passable.
 
-The *layout version*, now `campaign-zone-v1-1d3c25d19abf2937`, is a hash of every
+The *layout version*, now `campaign-zone-v1-f59f909e705f9148`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change.
 
@@ -668,17 +668,17 @@ part's questions, one row per question, in question order:
 
 | Table | Rows | One row for each |
 | --- | ---: | --- |
-| Zone table | 42,737 | zone question |
-| Position table | 6,637 | position question |
-| Move table | 12,673 | move question |
+| Zone table | 42,532 | zone question |
+| Position table | 6,524 | position question |
+| Move table | 12,627 | move question |
 
 A question's number is its row's number: `units:ccp:mountain_infantry` is
-question 191 of the zone questions, and its row is row 191 of the zone table. In
+question 188 of the zone questions, and its row is row 188 of the zone table. In
 machine-learning terms a table is an *embedding table* and a row an *embedding*.
 The right side of the figure shows how Shensi's answers use their rows, which
 section 6.3 explains.
 
-![Top: one row, the 64 learned numbers the Comintern's network keeps for the zone question units:ccp:mountain_infantry, row 191 of its zone table after one update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone table, one row per zone question, 42,737 rows of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 189 and 191 (units:ccp:militia and units:ccp:mountain_infantry), 307 (units:kmt:fighter, still all zeros because no kept sample had a KMT fighter), 9,844, 9,845, 9,992 and 9,994 (Comintern militia and mountain infantry counts and movement points left), 29,446 (rail_to:land_china_hopeh) and the last, 42,736 (battle_order). The 9 rows Shensi's answers pick are highlighted. A fresh network's rows are all zeros; after one update 1,840 have moved. Right: Shensi's 9 answers, each 1, weigh ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,446; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 rows: Shensi's other 42,728 answers are 0.](figures/rows_and_tables.svg)
+![Top: one row, the 64 learned numbers the Comintern's network keeps for the zone question units:ccp:mountain_infantry, row 188 of its zone table after one update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone table, one row per zone question, 42,532 rows of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 189 and 191 (units:ccp:militia and units:ccp:mountain_infantry), 307 (units:kmt:fighter, still all zeros because no kept sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 rows Shensi's answers pick are highlighted. A fresh network's rows are all zeros; after one update 1,840 have moved. Right: Shensi's 9 answers, each 1, weigh ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 rows: Shensi's other 42,523 answers are 0.](figures/rows_and_tables.svg)
 
 **A row belongs to a question, not to a zone.** `units:ccp:mountain_infantry` has
 one row, the network's own description, in 64 numbers, of "a CCP mountain
@@ -686,13 +686,13 @@ infantry is here", added in whichever zone that is true. No number in a row has 
 meaning chosen by hand.
 
 **Each of a row's numbers is one parameter,** so the zone table alone holds
-42,737 × 64 = 2,735,168 parameters, and the three tables 3.97 million of the
-network's 4.10 million.
+42,532 × 64 = 2,722,048 parameters, and the three tables 3.95 million of the
+network's 4.08 million.
 
 **Rows start at zero** (since 3 November 2026), and training moves a row only when
 it trains on samples that answer the row's question
 ([section 8.5](#85-which-numbers-a-step-moves)). After the first update of the
-5 November run, 1,840 of the zone table's 42,737 rows had moved; the row of
+5 November run, 1,840 of the zone table's 42,532 rows had moved; the row of
 `units:kmt:fighter` was still all zeros, because no kept sample had a KMT fighter.
 Starting at zero means a question training has never reached adds nothing,
 instead of a random row added at full strength. In a test on a fixed set of
@@ -758,10 +758,10 @@ mountain infantry's `units` and `count` questions: in every sample so far these
 questions were answered together, so training moved them alike
 ([section 8.5](#85-which-numbers-a-step-moves)).
 
-**Why this is called a lookup.** Multiplying Shensi's whole line of 42,737
+**Why this is called a lookup.** Multiplying Shensi's whole line of 42,532
 weighted answers by the zone table, as a matrix multiplication, gives the
 same 64 numbers (checked: equal to within $3 \times 10^{-8}$, float rounding),
-but it would multiply 42,728 zeros. So the network fetches only the rows of the
+but it would multiply 42,523 zeros. So the network fetches only the rows of the
 answered columns, a *column lookup*, and adds them up. One PyTorch operation,
 `embedding_bag`, does this for every zone at once: it fetches each answered row,
 multiplies it by its weight and adds it to its zone's sum, without first copying
@@ -957,13 +957,13 @@ count as "what acts" and so on comes from the roles explained in
 
 All the bricks together, for decision 612:
 
-![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,737 rows to 37 zone vectors; the position's 191 answers through the position table of 6,637 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,673 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
+![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,532 rows to 37 zone vectors; the position's 191 answers through the position table of 6,524 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,627 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
 
-**Its size.** A 64×2 network has 4,104,392 parameters. Most, 3.97 million or 97%,
-are rows; the learned layers hold the rest. At 256×8 there are 20.30 million, 78%
+**Its size.** A 64×2 network has 4,081,096 parameters. Most, 3.95 million or 97%,
+are rows; the learned layers hold the rest. At 256×8 there are 20.20 million, 78%
 of them rows, since wider layers weigh more. A decision reads only the rows of its
 answers: at decision 612, 1,111 row lookups (840 + 191 + 80) of 596 different
-rows, out of 62,047.
+rows, out of 61,683.
 
 **A fresh network gives every position the same values.** Its rows are all zero,
 so every answer adds nothing: each zone's vector is only its identity vector and
@@ -1102,7 +1102,7 @@ alliance chose (section 8.4). The step lowers their sum.
 
 ### 8.2 The gradient
 
-A step nudges each of the network's 4.10 million parameters the way that lowers
+A step nudges each of the network's 4.08 million parameters the way that lowers
 the loss. For that, training first works out every parameter's *gradient*
 (`loss.backward()`): how fast the loss on the step's samples would change if that
 one number were raised a little. A positive gradient means that raising the
@@ -1250,9 +1250,12 @@ the second step also moved the 59 rows that only the first decision answered.
 
 | Table | Rows moved, Axis network | Allies | Comintern | Rows in the table |
 | --- | ---: | ---: | ---: | ---: |
-| Zone table | 1,840 | 1,840 | 1,840 | 42,737 |
-| Position table | 670 | 670 | 670 | 6,637 |
-| Move table | 948 | 430 | 242 | 12,673 |
+| Zone table | 1,840 | 1,840 | 1,840 | 42,532 |
+| Position table | 670 | 670 | 670 | 6,524 |
+| Move table | 948 | 430 | 242 | 12,627 |
+
+The tables of that run had 364 more rows, for ten names that no code writes.
+None of those rows ever moved, and they have since been removed.
 
 The three networks moved the same zone and position rows, because every network
 learns values from every sample. Move rows feed only the move probabilities,
@@ -1536,7 +1539,7 @@ that training rarely meets keeps a row near zero.
 the unit type, one for the property. Every part is trained wherever it appears,
 and the tables shrink about tenfold: unit statistics would need 5 + 45 + 74 = 124
 part rows instead of their 13,321 combination rows, and the three tables about
-6,400 instead of 62,047.
+6,400 instead of 61,683.
 
 **The catch.** Added parts lose which part went with which. With Axis infantry
 with one move left and Axis tanks with two in one zone, a sum of parts cannot

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="436" viewBox="0 0 960 436" role="img" aria-labelledby="title desc">
   <title id="title">Decision 612's legal moves as a grid of answers</title>
-  <desc id="desc">A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,673 move columns: kind:movement_route, kind:end_phase, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path for Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and true:combat. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.</desc>
+  <desc id="desc">A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,627 move columns: kind:movement_route, kind:end_phase, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path for Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and true:combat. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -21,7 +21,7 @@
   </defs>
   <rect x="0.5" y="0.5" width="959" height="435" rx="10" fill="#ffffff" stroke="#d0d7de"/>
   <text class="title" x="24" y="36">Decision 612's legal moves, drawn as a grid of answers, and the zones each move is linked to</text>
-  <text class="body bold" x="24" y="64">One line per legal move; every move answers the same 12,673 move questions, one column each</text>
+  <text class="body bold" x="24" y="64">One line per legal move; every move answers the same 12,627 move questions, one column each</text>
   <text class="mono" x="164.0" y="246" transform="rotate(-40 164.0 246)">kind:movement_route</text>
   <text class="mono" x="204.0" y="246" transform="rotate(-40 204.0 246)">kind:end_phase</text>
   <text class="mono" x="244.0" y="246" transform="rotate(-40 244.0 246)">unit:0_source:ccp:mountain_infantry</text>
@@ -32,7 +32,7 @@
   <text class="mono" x="444.0" y="246" transform="rotate(-40 444.0 246)">zone:1_path:land_china_szechwan</text>
   <text class="mono" x="484.0" y="246" transform="rotate(-40 484.0 246)">zone:1_path:land_china_tsinghai</text>
   <text class="mono" x="524.0" y="246" transform="rotate(-40 524.0 246)">true:combat</text>
-  <text class="label" x="556" y="242">… 12,663 more</text>
+  <text class="label" x="556" y="242">… 12,617 more</text>
   <text class="label" x="698" y="242" text-anchor="middle">non-zero answers</text>
   <text class="body bold" x="30" y="274">1 → Hopeh</text>
   <rect x="151" y="259" width="34" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
