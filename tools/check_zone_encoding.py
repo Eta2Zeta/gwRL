@@ -9,7 +9,7 @@ For every decision it encodes the position and its options, then checks that
     same encoding: otherwise two different moves look alike.
 It also reports names that fell into an "other" column, and the stored size
 and build time of the zone input. The comparison with the graph input it
-replaced is recorded in docs/stage_a/zone_encoding_2026_11_02.md.
+replaced is recorded in docs/archive/records/zone_encoding_2026_11_02.md.
 
 Run from the repository root:
 

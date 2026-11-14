@@ -562,7 +562,7 @@
         "available_production_capacity"
       ],
       "opening_treasury_debit_ipp": 0,
-      "reconciliation_document": "docs/m0/source_reconciliation.md",
+      "reconciliation_document": "docs/rules/source_reconciliation.md",
       "reconciliation_status": "source_reconciled"
     },
     {
@@ -605,7 +605,7 @@
         "available_production_capacity"
       ],
       "opening_treasury_debit_ipp": 0,
-      "reconciliation_document": "docs/m0/source_reconciliation.md",
+      "reconciliation_document": "docs/rules/source_reconciliation.md",
       "reconciliation_status": "source_reconciled"
     }
   ],

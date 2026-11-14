@@ -9,8 +9,9 @@ loop together. One real decision, called decision 612 and introduced in
 A section's last part, headed "More detail", can be skipped on a first reading.
 
 The document is revised whenever a question digs into part of the design (see
-`AGENTS.md`). Measurements and the reasons for past changes stay in the dated
-[Stage A records](../stage_a/README.md), which this document links to. The page
+`AGENTS.md`). The measurements behind its numbers are in the dated
+[records of the archive](../archive/README.md#dated-records), which it links to
+as evidence. The page
 [The network's input](network_input.md) goes deeper into how a decision becomes
 numbers.
 
@@ -107,7 +108,7 @@ thousand decisions.
 **A legal move is a small record:** a kind plus labelled details. The running
 example of this document is decision 612 of a game the networks played on
 5 November, after their first update
-([record](../stage_a/training_sample_2026_11_05.md)). In round 5, during the CCP's
+([record](../archive/records/training_sample_2026_11_05.md)). In round 5, during the CCP's
 Combat Movement, the Comintern chooses for the CCP. The CCP's mountain infantry in
 Shensi has one movement point left and may attack one of four neighbouring zones
 the KMT holds, Hopeh, Suiyuan, Szechwan or Tsinghai, or the CCP may end its Combat
@@ -125,7 +126,7 @@ writes it:
 The other three attacks differ only in the path's second zone. The fifth move,
 ending the phase, has the kind `end_phase` and no details. Long orders, such as a
 fleet's, are built one step at a time with bounded choices: see the
-[AI order interface](../stage_a/action_interface_2026_10_24.md).
+[AI order interface](../archive/records/action_interface_2026_10_24.md).
 
 ### 2.4 The final score
 
@@ -316,7 +317,7 @@ At decision 612 the noise changed the five priors of [section
 Szechwan and Tsinghai to 0.177 and 0.268. The simulations ran one after another,
 numbered 1 to 64 in the order they ran. Each began by scoring the five moves and
 playing the move with the highest score. The figure shows the move each began with
-([trace](../stage_a/training_sample_2026_11_05.md#how-the-64-simulations-were-spent)).
+([trace](../archive/records/training_sample_2026_11_05.md#how-the-64-simulations-were-spent)).
 
 ![The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the move it began with. Simulations 1 to 14 tried every move; the two that began with the attack on Hopeh, 6 and 11, stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a position rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37; simulation 33's scores are in the table below. Simulation 53 stopped at the depth limit at a position rated −106.02, and simulations 54 to 64 all began with the other moves.](figures/sample_simulations.svg)
 
@@ -380,7 +381,7 @@ the network than the position: simulations 49 and 50 stopped at chance events,
 which all three networks rate together
 ([section 4.7](#47-more-detail-on-the-search)), and there the Axis network gave
 the Comintern about 5 points less than the Comintern's own network did
-([record](../stage_a/depth_limit_2026_11_09.md#simulation-53-at-decision-612)).
+([record](../archive/records/depth_limit_2026_11_09.md#simulation-53-at-decision-612)).
 The bottom of the scale, at −102.64 since simulation 38 tried Szechwan again,
 moved to −106.02, so all five first terms
 crowded between 0.70 and 0.90, and the second terms decided: 0.025 for the
@@ -440,7 +441,7 @@ how far ahead a search can look along one continuation. Like the other learning
 settings, 16 is the value of the 2 November speed test (section 9.2), not a tuned
 one.
 
-**How much it matters** ([record](../stage_a/depth_limit_2026_11_09.md)). A
+**How much it matters** ([record](../archive/records/depth_limit_2026_11_09.md)). A
 replay of the game of decision 612, with the networks after one update, ran
 68,800 simulations in 1,075 searches: 41% stopped after one step, 90% within five
 and 18 at the limit, in 10 searches, all at decisions with two to five legal
@@ -478,7 +479,7 @@ copy left it (`clone_for_search_continuing`), so the dice come out exactly as if
 the simulation had played its whole path on one copy.
 
 **A search at a larger decision**
-([measurements](../stage_a/search_replays_2026_11_04.md)). At a round-5 Japanese
+([measurements](../archive/records/search_replays_2026_11_04.md)). At a round-5 Japanese
 Combat Movement decision with 24 legal moves, the network was asked 65 times: once
 for the current position and once per simulation. 24 simulations, all among the
 first 31, each tried a different one of the 24 moves and stopped after one step.
@@ -497,10 +498,10 @@ that tree held about 11 MB; each tree is dropped after its decision. Until
 position and played its whole path again: 123 moves instead of 57 in the example,
 and about half of the time the game threads (section 9.2) spent not waiting for
 the network
-([measurements](../stage_a/search_replays_2026_11_04.md)). Saving copies gave
+([measurements](../archive/records/search_replays_2026_11_04.md)). Saving copies gave
 identical search results on 151 real positions and played 59% fewer moves. In a
 matched training batch it raised games per hour while playing from 152 to 184,
-for 0.5 GB more peak memory ([record](../stage_a/search_copies_2026_11_04.md)).
+for 0.5 GB more peak memory ([record](../archive/records/search_copies_2026_11_04.md)).
 
 ## 5. How a decision becomes numbers
 
@@ -765,7 +766,7 @@ answered columns, a *column lookup*, and adds them up. One PyTorch operation,
 `embedding_bag`, does this for every zone at once: it fetches each answered row,
 multiplies it by its weight and adds it to its zone's sum, without first copying
 the fetched rows into a temporary array (`_bag` in `studies/campaign/neural.py`,
-since 12 November; [record](../stage_a/coordinator_lookups_2026_11_12.md)).
+since 12 November; [record](../archive/records/coordinator_lookups_2026_11_12.md)).
 
 ### 6.4 Learned layers
 
@@ -848,7 +849,7 @@ layer normalization.
 
 A coordinator call (section 9.2) does these lookups for every zone of every
 position, every position and every move at once: about 6,000 rows for a call of
-four positions ([record](../stage_a/coordinator_lookups_2026_11_04.md)).
+four positions ([record](../archive/records/coordinator_lookups_2026_11_04.md)).
 
 ### 6.7 Messages along the borders
 
@@ -969,12 +970,12 @@ so every answer adds nothing: each zone's vector is only its identity vector and
 its fixed facts, the same in every position, and so are the position vector, the
 summary and the values. On 5 November a fresh 64×2 network gave the same three
 values at four different positions of a game
-([record](../stage_a/training_sample_2026_11_05.md#a-fresh-network-gives-every-position-the-same-values)).
+([record](../archive/records/training_sample_2026_11_05.md#a-fresh-network-gives-every-position-the-same-values)).
 Its move probabilities still differ between moves, because a move's combined
 vector also carries the vectors of the zones it is linked to.
 
 Measurements of this network are in the
-[zone network record](../stage_a/zone_network_2026_11_02.md).
+[zone network record](../archive/records/zone_network_2026_11_02.md).
 
 ## 7. Self-play and training samples
 
@@ -1012,7 +1013,7 @@ four things (`_decide` and `play_episode` in `studies/campaign/learning.py`):
 
 **Decision 612, as a sample.** The game of decision 612 was played for this
 example and kept every decision
-([record](../stage_a/training_sample_2026_11_05.md)); this is its sample:
+([record](../archive/records/training_sample_2026_11_05.md)); this is its sample:
 
 ![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 191 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
 
@@ -1113,7 +1114,7 @@ Comintern value the network predicts. In the first step of the 5 November update
 the fresh network predicted the Comintern's final scores 109 points too high on
 average on the step's samples, so raising that bias would have raised the loss
 further: its gradient was positive, 0.728, and the step lowered it
-([record](../stage_a/adam_steps_2026_11_09.md)).
+([record](../archive/records/adam_steps_2026_11_09.md)).
 
 ### 8.3 Adam
 
@@ -1162,7 +1163,7 @@ of one network, by `optimizer.step()`. Each of the three networks has its own
 Adam, whose averages carry over from one update to the next and are saved in
 checkpoints, the full saves from which a run can resume.
 
-**A real update, run again** ([record](../stage_a/adam_steps_2026_11_09.md)).
+**A real update, run again** ([record](../archive/records/adam_steps_2026_11_09.md)).
 Re-running the 5 November update from that run's fresh networks and its 1,611
 samples gave exactly the networks that update had produced. In the first step,
 211,741 of the Comintern network's 221,675 numbers with a nonzero gradient moved
@@ -1203,7 +1204,7 @@ them to its *replay buffer* once all 32 games of the batch have ended. The buffe
 is a list of the latest samples, at most 8,000, from which the oldest leave
 first. On 5 November one batch kept 1,611 samples from 33,062 decisions, so a
 full buffer holds about the last five batches
-([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
+([record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
 
 **An update** follows each batch. It runs in the main training process, on the
 CPU, while the game processes wait, and it is 700 *training steps* in a row. Each
@@ -1274,7 +1275,7 @@ independent samples shrinks like $1/\sqrt{n}$. And one step on 32 decisions cost
 far less than 32 steps on one: in a separate timing on a busy machine it took
 78 ms, and a step on a single sample 21 ms (the update's own steps took 70 ms
 each)
-([record](../stage_a/training_sample_2026_11_05.md#the-update-after-the-batch)).
+([record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
 Averaging all 8,000 in every step would read 250 times as many decisions per step
 but shrink that error only about 16 times, $\sqrt{250}$. So for the same time,
 many cheap steps with a little noise make more progress than a few exact ones;
@@ -1303,7 +1304,7 @@ The buffer's size cancels: it sets how old a sample may be, about five batches,
 not how often a sample is drawn. Longer games keep more samples per batch, and
 each is then drawn less often: 8 times on 31 October, when a batch of longer games
 kept about 2,750 samples
-([record](../stage_a/training_sample_2026_11_05.md#draws-per-kept-sample-in-recorded-runs)).
+([record](../archive/records/training_sample_2026_11_05.md#draws-per-kept-sample-in-recorded-runs)).
 A run's first samples are drawn more often, because the buffer is not yet full: in
 the first update of the 5 November run, its 1,611 samples shared all 22,400 draws,
 14 each in that one update.
@@ -1350,14 +1351,14 @@ sends back each position's priors and values
 (`studies/campaign/shared_evaluator.py`). A call with more positions costs less
 per position: the network's forward pass, computing its outputs from an input,
 takes 0.44 ms for one position and 0.73 ms for four
-([record](../stage_a/coordinator_lookups_2026_11_12.md#the-forward-pass)). Until
+([record](../archive/records/coordinator_lookups_2026_11_12.md#the-forward-pass)). Until
 12 November the column lookups (section 6.3) were the largest part of a call;
 since then one fused operation does them, and the largest part is the GELU curve,
 mostly in the border messages (section 6.7). The coordinator is still busy 87% to
 88% of the time, but the game processes and the coordinator together now use 9.5
 to 10.5 of the 11 cores. Inferred: the coordinator and the cores limit this layout
 about equally, so a faster coordinator alone would add at most 4% to 15% more
-([record](../stage_a/coordinator_lookups_2026_11_12.md#what-this-does-and-does-not-show)).
+([record](../archive/records/coordinator_lookups_2026_11_12.md#what-this-does-and-does-not-show)).
 
 **The game processes** do about 90% of the CPU work. In a profiled batch on 13
 November, a game thread used 151 ms of CPU per decision, two thirds of it in two
@@ -1367,7 +1368,7 @@ for a nation's Supply Path to a zone, enumerating every route a naval force coul
 sail, listing the economy's options, and finding landing plans for aircraft in
 flight. Playing a move also redoes much of what the position's list of legal moves
 already worked out, without the cache that listing uses
-([record](../stage_a/game_processes_2026_11_13.md)).
+([record](../archive/records/game_processes_2026_11_13.md)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1392,12 +1393,12 @@ On 4 November the search began keeping a copy of the game at each tree position
 profile, with little training, that raised decisions per hour while playing by
 15.5%, from about 162,000 to 188,000. Games per hour rose more, from 152 to 184,
 because that batch's games were shorter
-([record](../stage_a/search_copies_2026_11_04.md)).
+([record](../archive/records/search_copies_2026_11_04.md)).
 
 On 12 November the fused column lookup cut the coordinator's time per evaluation
 by 18%. In two matched pairs of Mac-profile batches, decisions per hour while
 playing rose by 17.6%, from about 192,700 to 226,600, and games per hour from 182
-to 211 ([record](../stage_a/coordinator_lookups_2026_11_12.md)).
+to 211 ([record](../archive/records/coordinator_lookups_2026_11_12.md)).
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
@@ -1519,7 +1520,7 @@ measured and what would settle it.
   thirds of it. Caching supply answers while a move is played, and letting a move
   reuse what its position's list of legal moves worked out, are the first
   candidates; their savings are unmeasured
-  ([record](../stage_a/game_processes_2026_11_13.md)).
+  ([record](../archive/records/game_processes_2026_11_13.md)).
 
 ### Open design questions
 
@@ -1556,7 +1557,7 @@ zones through the position vector. Inferred, not measured: in China many threats
 are three or more borders away.
 
 **Measured:** the cost of each size ([section 9.2](#92-running-training-on-the-mac),
-[zone network record](../stage_a/zone_network_2026_11_02.md)). **Unmeasured:**
+[zone network record](../archive/records/zone_network_2026_11_02.md)). **Unmeasured:**
 whether a larger network plays better at equal compute, and whether depth or
 width matters more. **Would settle it:** equal-compute runs at a few sizes,
 including deep but narrow ones such as 64×6.
@@ -1583,11 +1584,11 @@ compares values that different networks gave.
 learn from all three alliances' decisions, and the coordinator would make one
 larger call where it now makes up to three smaller ones; its calls carried 3.9
 positions on average on 2 November
-([record](../stage_a/coordinator_lookups_2026_11_04.md)). **The catch:** one
+([record](../archive/records/coordinator_lookups_2026_11_04.md)). **The catch:** one
 network must hold three different strategies.
 
 **Measured** on 9 November, with networks after one update
-([record](../stage_a/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):
+([record](../archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):
 at eight positions that all three networks rated, their values for one alliance
 differed by 2.5 to 17 points, while the best and worst moves' average results in a
 search lay a median 1.45 points apart. In one game 9.3% of the simulations stopped
@@ -1607,7 +1608,7 @@ combined wealth after the July 1941 round, the approved objective
 ([plan](../plans/japan_china_full_rules_plan.md#wealth-definition-and-approved-accounting-decisions)).
 
 **Measured.** In the [decision
-review](../stage_a/decision_review_2026_10_31.md#the-objective-rewards-a-passive-japan),
+review](../archive/records/decision_review_2026_10_31.md#the-objective-rewards-a-passive-japan),
 a Japan that never attacks beat the scripted attacking Japan in 4 of 4 three-round
 seeds and 3 of 4 eleven-round seeds. Japan's first attack makes every warlord join
 China at once, ends the KMT–CCP civil war and costs about 100 IPP of units. So the
@@ -1624,10 +1625,10 @@ received becomes the policy target (section 4.5).
 **Measured** on 31 October: at Japan's opening, with 308 options, the search tried
 63 of them, almost all once, and in an eleven-round game 60% of Japan's Combat
 Movement decisions had at least 64 options
-([decision review](../stage_a/decision_review_2026_10_31.md#training-findings)).
+([decision review](../archive/records/decision_review_2026_10_31.md#training-findings)).
 Such targets say little more than which moves were tried. Since then Combat
 Movement menus have shrunk to about a third
-([record](../stage_a/combat_movement_combats_only_2026_11_01.md)); the spread of
+([record](../archive/records/combat_movement_combats_only_2026_11_01.md)); the spread of
 targets has not been measured again.
 
 **Alternatives:** more simulations where menus are large, fewer options per
@@ -1675,7 +1676,7 @@ Merging identical units touches the menu, the network input and the search, so i
 needs its own check.
 
 **Measured:** the shares above
-([record](../stage_a/never_better_choices_2026_11_05.md)). Fewer options would
+([record](../archive/records/never_better_choices_2026_11_05.md)). Fewer options would
 also help the 64 simulations of the question above. **Would settle it:** the
 user's decision on the two left, then learning compared at equal compute.
 

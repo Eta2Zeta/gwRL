@@ -5,7 +5,7 @@ numbers a network reads. It belongs to the [design document](README.md), whose
 section 5 summarizes it. The encoder is C++ (`src/zone_encoding.cpp`);
 `studies/campaign/features.py` turns its output into arrays and
 `studies/campaign/neural.py` reads them. Measurements and the reasons for the
-design are in the [zone encoding record](../stage_a/zone_encoding_2026_11_02.md).
+design are in the [zone encoding record](../archive/records/zone_encoding_2026_11_02.md).
 
 ## 1. When and how the input is built
 
@@ -524,7 +524,7 @@ its side of the railroad toward Manchuria Western.
 
 Until 4 November 2026 this move reached the network as `value:target:other`, with
 the zone's role unknown and the amount as an unknown number, so which railroad
-it repaired was lost ([record](../stage_a/rail_repair_encoding_2026_11_04.md)).
+it repaired was lost ([record](../archive/records/rail_repair_encoding_2026_11_04.md)).
 
 ## 7. Names the encoder doesn't know
 
@@ -586,7 +586,7 @@ to 9239, 314,594 decisions), measured on 5 November 2026. One of the latter,
 seed 9239, reaches a question removed as impossible (section 8): an air
 transport carrying motorized infantry. The rules forbid that cargo, and the
 engine made it by upgrading an infantry already aboard
-([record](../stage_a/zone_name_check_early_end_2026_11_05.md)). Since
+([record](../archive/records/zone_name_check_early_end_2026_11_05.md)). Since
 [RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)
 the engine no longer offers that upgrade.
 
@@ -597,7 +597,7 @@ Construction turned up on 4 November. The engine's source named 20 more battle
 notes that random games had not reached, such as those of a fleet slipping out
 of a damaged port. And the words in battle notes were dropped without being
 counted, so no check could see them. The
-[record](../stage_a/zone_names_2026_11_04.md) lists them all. The lists had been
+[record](../archive/records/zone_names_2026_11_04.md) lists them all. The lists had been
 collected from the engine code and a few short games when the encoder was
 written on 2 November.
 
@@ -673,7 +673,7 @@ The layout version, now `campaign-zone-v1-1d3c25d19abf2937`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change. It last changed on 4 November
 2026, for a patrol plane's own choice in a sea battle
-([record](../stage_a/patrol_choice_2026_11_04.md)).
+([record](../archive/records/patrol_choice_2026_11_04.md)).
 
 ## 10. Why the encoder translates names
 
@@ -688,7 +688,7 @@ The first network input, used until 2 November 2026, really did read text: it
 printed each position as JSON, cut every name into word pieces and hashed the
 pieces into 16,384 slots. The zone encoding replaced it with a fixed list of
 questions built straight from the engine's memory: 49 to 64 times smaller and 5
-to 6 times faster to build ([record](../stage_a/zone_encoding_2026_11_02.md)). It
+to 6 times faster to build ([record](../archive/records/zone_encoding_2026_11_02.md)). It
 left the engine's names as they were and translates them instead.
 
 Reading a move's named details also lets one piece of code describe all 144

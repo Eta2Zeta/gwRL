@@ -448,5 +448,5 @@
   "implementation_conventions": [
     "Automatic shared-zone battles resolve in stable queue order within the existing phase; actual faction controllers own battle choices."
   ],
-  "implementation_notes": "Current behavior is documented in docs/m7/README.md; dated historical source audits and verification records are retained in game_content/scenarios/japan_china_1936/m7/."
+  "implementation_notes": "Current behavior is documented in docs/engine."
 }

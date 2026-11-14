@@ -6,12 +6,14 @@ This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
 An adopted project clarification is not evidence that the publisher endorsed it.
 Record each rule conflict with its source, decision and developer clarification
-status. Implementation details and verification belong in milestone documents.
+status. Implementation details belong in the
+[engine documentation](../../docs/engine/README.md).
 
 Campaign-specific exclusions, controllers, setup choices and reward definitions
-belong in the [M0 campaign review](/Users/home/Desktop/gwRL/docs/m0/README.md),
+belong in the
+[approved scenario decisions](../../docs/plans/japan_china_full_rules_plan.md#approved-scenario-decisions),
 not here. Map-reading uncertainties remain in the
-[map notes](/Users/home/Desktop/gwRL/game_content/README.md) and map audits;
+[map notes](../README.md) and map audits;
 uncertain artwork is not automatically an error in the official rules.
 
 ## Status and source conventions

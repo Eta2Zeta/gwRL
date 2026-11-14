@@ -7,7 +7,7 @@
     "japan_setup.json",
     "china_minor_setup.json"
   ],
-  "review_document": "docs/m0/README.md",
+  "review_document": "docs/archive/milestones/m0/README.md",
   "decision_review": {
     "status": "complete",
     "completed_on": "2026-10-21",
@@ -252,7 +252,7 @@
   "source_reconciliation": {
     "status": "complete",
     "date": "2026-10-21",
-    "document": "docs/m0/source_reconciliation.md",
+    "document": "docs/rules/source_reconciliation.md",
     "catalog_source_checks": "catalog_source_checks.json",
     "starting_queue_paid_ipp": 10,
     "opening_treasury_debit_ipp": 0

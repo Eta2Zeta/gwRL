@@ -167,7 +167,8 @@ def _bag(table: Tensor, columns: Tensor, weights: Tensor, bags: Tensor) -> Tenso
 
     Bag i adds the rows of columns[bags[i]:bags[i + 1]], each times its weight;
     an empty bag is zero. One fused lookup, without first gathering every
-    answer's row into a temporary array (docs/stage_a/coordinator_lookups_2026_11_12.md).
+    answer's row into a temporary array (measured in
+    docs/archive/records/coordinator_lookups_2026_11_12.md).
     """
     return F.embedding_bag(columns, table, bags, mode="sum", per_sample_weights=weights.to(table.dtype),
                            include_last_offset=True)

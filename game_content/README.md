@@ -29,14 +29,14 @@ answered by the sources; their earlier records remain in
 national build definitions used by the campaign engine. It covers every printed
 Japanese/Chinese build-chart row and preserves conditional abilities, surviving
 damage states and source-only unbuildable types. See the
-[M3 record](../docs/m3/README.md) for queries and verification.
+[M3 record](../docs/archive/milestones/m3/README.md) for queries and verification.
 
 ## Political rules
 
 `rules/gw36_politics_v43.json` records the source-backed M4 political rules,
 explicit retained Home Country memberships, adopted clarifications and the
 closed-campaign Dadao controller ruling. The
-[M4 implementation record](../docs/m4/README.md) describes
+[M4 implementation record](../docs/archive/milestones/m4/README.md) describes
 the executable transitions and their boundaries with later rule modules.
 
 ## Maps
@@ -208,5 +208,5 @@ fully audited sea zones. Existing outside-region warnings still apply.
   pieces, 3 setup factories and 19 static facilities), and the faction index in
   `m1/`. FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
   See its [README](scenarios/japan_china_1936/README.md) and the
-  [M0 review](../docs/m0/README.md), which links the rules checklist, price
+  [M0 review](../docs/archive/milestones/m0/README.md), which links the rules checklist, price
   tables and source reconciliation.

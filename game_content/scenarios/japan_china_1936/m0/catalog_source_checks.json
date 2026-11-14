@@ -2,7 +2,7 @@
   "schema_version": 1,
   "status": "source_reconciliation_only_not_executable_catalog",
   "reconciled_on": "2026-10-21",
-  "review_document": "docs/m0/source_reconciliation.md",
+  "review_document": "docs/rules/source_reconciliation.md",
   "sources": [
     {
       "id": "rulebook",

@@ -81,7 +81,7 @@ class M0SpecificationTests(unittest.TestCase):
             self.assertTrue((SCENARIO / "m0" / filename).is_file())
 
     def test_core_ledger_has_unique_traceable_fixture_ids(self):
-        ledger = (ROOT / "docs/m0/core_rules_ledger.md").read_text()
+        ledger = (ROOT / "docs/rules/core_rules_ledger.md").read_text()
         rows = re.findall(r"^\| (R\d{3}); (.+)$", ledger, flags=re.MULTILINE)
         fixture_ids = [row[0] for row in rows]
         self.assertTrue(fixture_ids)

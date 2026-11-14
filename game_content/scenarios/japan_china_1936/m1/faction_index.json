@@ -393,7 +393,7 @@
     },
     "japan_setup": {
       "path": "game_content/scenarios/japan_china_1936/m0/japan_setup.json",
-      "sha256": "e812bbaa0c19bc2049f2aa0fae95161316c38282b06561620ff22e9ec7be288c"
+      "sha256": "6f4acfe2054e70845a29d2181aa9d87393845456a3ee4a44c1ff785592911b3c"
     },
     "china_setup": {
       "path": "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json",

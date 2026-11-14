@@ -57,8 +57,30 @@
   the best learning method or that this campaign can train to useful strength on
   the available hardware; keep those claims subject to measured evaluation.
 
-## Design documentation
+## Documentation
 
+- The documentation describes the program as it is now. `docs/README.md` is its
+  starting point and says what to read for each purpose: `docs/design/` for how
+  learning works, `docs/engine/` for how the rules engine works, by subject,
+  `docs/rules/` for which rules are implemented and where the data comes from,
+  and the guides beside the code they describe.
+- When a change alters what a page describes, update that page in the same
+  commit. Never describe a change in a new page instead. The reason for a
+  choice that still holds belongs in the page that describes it; how the change
+  came about belongs in the commit message.
+- History lives in git and in `docs/archive/`. No current page may need the
+  archive to be understood. Write a dated record in `docs/archive/records/` only
+  for a measurement or an experiment someone may want to check again, such as a
+  speed comparison or a training result: one short page with the setup, the
+  numbers and what they do and do not show, beside its data file, plus a line in
+  the archive's index. A current page cites a record as evidence for a number,
+  never as the explanation of how something works.
+- Test counts, random-game tallies and other check results go in the commit
+  message, not in a document. A settled rules question goes in
+  `game_content/rules/clarifications.md` and in the page of the rule it changes.
+- Outside `docs/archive/`, name no file or folder after a date, a milestone or a
+  stage. `tests/test_documentation.py` checks this, every relative link, and
+  every document the data or the code cites.
 - `docs/design/README.md` is the central design document of the learning
   system: the game interface, search, the network's input, the network,
   training, runs, evaluation and their data structures. It builds the design up
@@ -68,18 +90,15 @@
   part uses it, and the last sections assemble the whole training loop. A
   mention of a later part must point ahead explicitly. Details a first reading
   can skip go in a section's closing "More detail" part.
-- When the user asks how or why something in the learning design works, put the
-  explanation in the design document, then answer in chat briefly with a link to
-  the section. Do not leave a design explanation only in chat.
+- When the user asks how or why something works, put the explanation in the
+  page that covers it (the design document for learning, the engine pages for
+  the rules engine), then answer in chat briefly with a link to the section. Do
+  not leave an explanation only in chat.
 - When a question digs into a detail of an existing explanation, revise that
   section in place: rewrite, merge or reorganize it so the document stays
   layered and readable, instead of appending another layer of explanation.
 - Verify statements against the code and say what is measured, what is inferred
-  and what is open. When a change alters something the document describes,
-  update the document in the same commit.
-- Keep measurements and the reasons for past changes in dated records such as
-  `docs/stage_a/`, and link to them from the design document rather than
-  copying them.
+  and what is open.
 - Never draw a diagram, table or formula in plain text, in any document. Draw
   diagrams as SVG figures in `docs/design/figures/` (tracked despite the image
   ignore rule), with a title, a description and alt text, and look at them

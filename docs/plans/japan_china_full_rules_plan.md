@@ -2,9 +2,9 @@
 
 The approved target, scenario decisions and wealth objective of the regional
 campaign, the recorded rule decisions, the verification policy and the open work.
-Milestones M0–M11 implemented the rules: see the [M0 review](../m0/README.md)
+Milestones M0–M11 implemented the rules: see the [M0 review](../archive/milestones/m0/README.md)
 and the milestone pages linked from the [README](../../README.md). The
-[project history](../history.md) records how; commit `037cb60` keeps this
+[project history](../archive/README.md) records how; commit `037cb60` keeps this
 plan's earlier milestone narrative and status notes. Reusable official-rule
 decisions live in the
 [shared rule clarification register](../../game_content/rules/clarifications.md)
@@ -91,7 +91,7 @@ reduces cash while increasing its net value. Do not substitute historical income
 or pay the full wealth score repeatedly every turn. The adopted construction
 policy scores cumulative already-paid amounts while a project is unfinished.
 At completion, replace that entry with the full completed catalog value; do not
-count both. The [source reconciliation](../m0/source_reconciliation.md)
+count both. The [source reconciliation](../rules/source_reconciliation.md)
 establishes 5 IPP already paid for each setup queue ship; do not debit these past
 payments from initial cash. Shared facility IDs and rail borders are
 valued once, not once per directed access edge. Purchase-price tables for setup-only
@@ -359,7 +359,7 @@ Use these layers of verification throughout:
 - **Playing strength.** No run has yet shown robust strength. Expand learning and
   held-out evaluation across training and dice seeds, starting positions,
   horizons and opponent pairs before claiming it (section 2).
-- **Objective.** The [decision review](../stage_a/decision_review_2026_10_31.md)
+- **Objective.** The [decision review](../archive/records/decision_review_2026_10_31.md)
   found that the approved terminal wealth-gap objective rewards a passive Japan.
   How to address that is open.
 - **Opponents and algorithms.** Add archived opponents if evaluation shows

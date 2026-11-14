@@ -52,19 +52,19 @@
     {
       "id": "faction_index",
       "path": "game_content/scenarios/japan_china_1936/m1/faction_index.json",
-      "sha256": "1cb2e77200703bc0fbe73ec582a2d2bfb0693ae649119db15052074e593b245a",
+      "sha256": "3f33fb1fecbf8185620c6584b1d877ff494a44dde44f7bdce7fb957c39c2a119",
       "kind": "frozen_identity_bridge"
     },
     {
       "id": "scenario_contract",
       "path": "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
-      "sha256": "7bc9bd9656a1ede04dd22b266464d8bacbaf344a10aed237fba17d730eb6a1af",
+      "sha256": "6a43839e8e1c9c4999ed05270b9f03ebc254a7f6f0db2e55c2ef8d9e62fe6eda",
       "kind": "approved_campaign_specification"
     },
     {
       "id": "clarifications",
       "path": "game_content/rules/clarifications.md",
-      "sha256": "3279ebfbd1ddef846108616d6203cd18862420d080d9fd79e1427003f0af20cf",
+      "sha256": "c835136e05b9c9499c4eb34eec873779fffec03e52629a8c0f18697052886704",
       "kind": "project_rule_register"
     },
     {

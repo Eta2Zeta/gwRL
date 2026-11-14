@@ -2,7 +2,7 @@
 
 The engine describes a decision as nonzero answers to fixed questions about
 each zone of the map, about the position as a whole and about each legal
-option (src/zone_encoding.cpp; docs/stage_a/zone_encoding_2026_11_02.md).
+option (src/zone_encoding.cpp; docs/design/network_input.md).
 Every answer is an integer and every question has one fixed column. This
 module fetches that encoding and lays several decisions out as flat arrays
 for one network pass.

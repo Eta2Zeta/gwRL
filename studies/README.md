@@ -2,7 +2,7 @@
 
 | Study | Entry point | Read |
 | --- | --- | --- |
-| [Regional campaign](campaign/README.md) | `python -m studies.campaign.run` | [Zone encoding](../docs/stage_a/zone_encoding_2026_11_02.md) and [zone network](../docs/stage_a/zone_network_2026_11_02.md) |
+| [Regional campaign](campaign/README.md) | `python -m studies.campaign.run` | [How gwRL learns](../docs/design/README.md) |
 
 Run commands from the repository root with `./.venv/bin/python`.
 
@@ -25,4 +25,4 @@ studies/
 
 New training and diagnostic commands write into fresh, ignored `runs/` folders.
 The composition and mini-Japan studies were removed on 2 November 2026; the
-[project history](../docs/history.md) records their results.
+[project history](../docs/archive/README.md) records their results.

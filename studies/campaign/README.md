@@ -2,9 +2,9 @@
 
 This study uses the approved 1936 China campaign and the shared C++ engine.
 Three separate policy/value networks guide vector MCTS. Each reads the engine's
-fixed [zone encoding](../../docs/stage_a/zone_encoding_2026_11_02.md) of a
+fixed [zone encoding](../../docs/design/README.md#5-how-a-decision-becomes-numbers) of a
 decision: the 37 map zones answer fixed questions, and messages pass along the
-map's borders ([network](../../docs/stage_a/zone_network_2026_11_02.md)). A rollout
+map's borders ([network](../../docs/design/README.md#6-inside-a-network-brick-by-brick)). A rollout
 batch freezes all three policies; training then updates all three together.
 Each policy learns choices made by its actual alliance, including reactions and
 controlled minors. Every value target retains `[Axis, Allies, Comintern]`.
@@ -158,11 +158,11 @@ The network's input is built in C++ by the engine's zone encoder. Reports name
 the input layout in `software.network_input`. Checkpoints and exports of the
 earlier graph-input network cannot be loaded.
 
-Self-play uses the versioned [AI order interface](../../docs/stage_a/action_interface_2026_10_24.md)
+Self-play uses the versioned [AI order interface](../../docs/archive/records/action_interface_2026_10_24.md)
 by default. Fleet and screening selection make forward progress; undo/cancel
 editing is kept in the ordinary game API. Unchanged role/deck configuration
 cycles and repeated declined railway requests are also bounded. Finished
-battles [clear themselves](../../docs/stage_a/battle_clearing_2026_10_31.md)
+battles [clear themselves](../../docs/archive/records/battle_clearing_2026_10_31.md)
 instead of waiting for a click. Context and checkpoint compatibility identify
 `campaign-orders-v2`; old replay/optimizer state is not implicitly migrated, and
 `campaign-orders-v1` recordings are rejected. Recordings from before the
@@ -218,6 +218,6 @@ and scalar/batched inference on actual retained states. Rule transitions use
 clones and the report checks that live state and execution RNG are unchanged.
 It includes first-use parsing and warm calls; menu size and game phase matter.
 
-The [project history](../../docs/history.md) records the earlier pilots, the
+The [project history](../../docs/archive/README.md) records the earlier pilots, the
 three-round experiment and the performance work, and the
 [full plan](../../docs/plans/japan_china_full_rules_plan.md) the approved campaign.
