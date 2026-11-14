@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scenario_id": "japan_china_1936_1941",
-  "status": "m0_frozen_specification_not_playable",
+  "status": "frozen_specification",
   "scope": "Specification and source-audit data only. No engine state, reward evaluator, search or training is implemented here.",
   "setup_files": [
     "japan_setup.json",
@@ -146,7 +146,7 @@
     "completed_price_basis": {
       "status": "user_confirmed",
       "value": "undiscounted_catalog_price",
-      "note": "Approved completed-asset policy recorded in the M0 README: setup, recruited and purchased units use full catalog value, subject to the existing remaining-repair-price deduction. Actual purchase discounts still change payments."
+      "note": "Approved completed-asset policy: setup, recruited and purchased units use full catalog value, subject to the existing remaining-repair-price deduction. Actual purchase discounts still change payments."
     },
     "minimum_surviving_asset_value": null,
     "free_capital_ship_repair": "Deducts zero IPP under the literal formula; do not invent a damage discount.",
@@ -252,7 +252,7 @@
   "source_reconciliation": {
     "status": "complete",
     "date": "2026-10-21",
-    "document": "docs/rules/source_reconciliation.md",
+    "document": "docs/archive/milestones/m0/source_reconciliation.md",
     "catalog_source_checks": "catalog_source_checks.json",
     "starting_queue_paid_ipp": 10,
     "opening_treasury_debit_ipp": 0
@@ -377,10 +377,10 @@
     "scope": "Specification, source data and map bridge only; not full-game mechanics or training."
   },
   "freeze": {
-    "version": "M0-2026-10-21",
+    "version": "2026-10-21",
     "date": "2026-10-21",
-    "status": "frozen_specification_not_playable",
-    "baseline": "game_content/scenarios/japan_china_1936/m0/frozen_baseline.json",
+    "status": "frozen_specification",
+    "baseline": "docs/archive/milestones/m0/frozen_baseline.json",
     "revision_policy": "Subsequent changes to the approved specification must explicitly revise the baseline."
   }
 }

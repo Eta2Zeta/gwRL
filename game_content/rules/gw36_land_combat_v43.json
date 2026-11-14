@@ -1,6 +1,5 @@
 {
   "schema_version": 1,
-  "milestone": "M7",
   "sources": [
     {
       "id": "rulebook",
@@ -163,7 +162,7 @@
     },
     {
       "id": "LC005",
-      "rule": "Rivers penalize first-round land attacks except Marines, airborne assault infantry, and artillery. Direction comes from the reviewed M5 approach query.",
+      "rule": "Rivers penalize first-round land attacks except Marines, airborne assault infantry, and artillery. Direction comes from the movement module's reviewed approach query.",
       "source_refs": [
         {
           "source_id": "rulebook",
@@ -306,7 +305,7 @@
     },
     {
       "id": "LC018",
-      "rule": "Carpet bombing only attacks land in round one, is reduced by city fortification, cannot be hit by ordinary nonfighter defensive fire, and then exits to the M8 landing handler.",
+      "rule": "Carpet bombing only attacks land in round one, is reduced by city fortification, cannot be hit by ordinary nonfighter defensive fire, and then exits to the air module's landing handler.",
       "source_refs": [
         {
           "source_id": "rulebook",
@@ -317,7 +316,7 @@
     },
     {
       "id": "LC019",
-      "rule": "M8 owns scramble/grounding choices, surviving airborne transport landing after the combined Fighter/AAA stage and before ordinary attacks, and final aircraft landings. Developer-corrected RCL-001 links airborne cargo and transporting aircraft as one casualty in steps 3 and 4.",
+      "rule": "The air module owns scramble/grounding choices, surviving airborne transport landing after the combined Fighter/AAA stage and before ordinary attacks, and final aircraft landings. Developer-corrected RCL-001 links airborne cargo and transporting aircraft as one casualty in steps 3 and 4.",
       "source_refs": [
         {
           "source_id": "rulebook",
@@ -429,7 +428,7 @@
       "tests": [
         "tests/land_combat_tests.cpp"
       ],
-      "implementation_audit": "M10 source correction, 2026-10-22"
+      "implementation_audit": "Source correction, 2026-10-22"
     }
   ],
   "inactive_rules": [
@@ -439,11 +438,11 @@
     }
   ],
   "integration_boundaries": [
-    "Naval/amphibious battle creation and shore bombardment are M9. M7 retains amphibious unit commitments for retreat and blitz restrictions.",
+    "Naval/amphibious battle creation and shore bombardment belong to the naval module. Land combat retains amphibious unit commitments for retreat and blitz restrictions.",
     "Airborne assault follows developer-corrected RCL001; a destroyed linked transport and cargo do not land or attack.",
     "Battle continuation JSON is serialized in BattleState.data; no module-owned mutable state or casualty policy exists."
   ],
-  "status": "complete_land_battle_layer_not_playable_campaign",
+  "status": "implemented",
   "pending_decisions": [],
   "implementation_conventions": [
     "Automatic shared-zone battles resolve in stable queue order within the existing phase; actual faction controllers own battle choices."

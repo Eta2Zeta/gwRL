@@ -39,7 +39,7 @@ void refreshPoliticalState(State&);
 void refreshAlliances(State&);
 void changePossession(State&, const Id& zone, const Id& recipient, PossessionCause,
                       const std::optional<Id>& conqueror = std::nullopt);
-// The withdrawal set is supplied by M5's route validator, never by a policy.
+// The withdrawal set is supplied by the movement module's route validator, never by a policy.
 void captureLand(State&, const Id& attacker, const Id& zone,
                  const std::set<Id>& withdrawalEligibleRecipients = {});
 PoliticalPermission mayDeclareWar(const State&, const Id& actor, const Id& target,
@@ -73,7 +73,7 @@ std::vector<Action> influenceActions(const State&);
 bool applyInfluenceAction(State&, const Action&);
 bool applyInfluenceChance(State&, const ChanceRequest&, const ChanceOutcome&);
 
-// Compose M4 politics with later gameplay modules. Without an accounting module,
+// Compose politics with the other gameplay modules. Without an accounting module,
 // an unevaluated national income cannot silently become zero or be collected.
 class PoliticsRules final : public Rules {
   public:

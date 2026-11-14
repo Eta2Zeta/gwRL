@@ -8,7 +8,7 @@ questions and next steps are those of that date.
 | Part | What it holds |
 | --- | --- |
 | [Dated records](#dated-records) | One page per measurement, experiment or rule change since 24 October 2026, each with its data file. |
-| [Milestone pages](#milestone-pages) | The delivery reports of the engine's twelve build stages, M0 to M11, from October 2026. |
+| [Milestone pages](#milestone-pages) | The delivery reports of the engine's twelve build stages, M0 to M11, from October 2026, and the source reviews made with them. |
 | [Removed on 2 November 2026](#removed-on-2-november-2026) | What the earlier work found, for the files no longer in the tree, and where git keeps them. |
 
 An earlier archive, made on 27 October 2026 on a branch that was retired four
@@ -91,8 +91,22 @@ same modules as they are now.
 | [M10](milestones/m10/README.md) | The complete campaign, integrated | 23 Oct |
 | [M11](milestones/m11/README.md) | The environment for agents, and the search | 23 Oct |
 
-The ledgers and source audits these stages produced are still current and live
-in [`docs/rules`](../rules/README.md).
+Some stages left reviews of the printed sources beside their report. They are
+dated like the reports and are kept with them:
+
+| Review | What it checked |
+| --- | --- |
+| [Japan setup audit](milestones/m0/japan_setup_audit.md) | Japan's starting pieces, read from its national sheet |
+| [China and minor setup audit](milestones/m0/china_minor_setup_audit.md) | The starting pieces of the KMT, the CCP, the warlords and Mongolia |
+| [Asset price audit](milestones/m0/asset_price_audit.md) | Purchase and repair prices of every type |
+| [Source reconciliation](milestones/m0/source_reconciliation.md) | The payments on Japan's starting ship queues and the research chart |
+| [Convoy audit](milestones/m0/convoy_audit.md) | The printed convoy lines in the six sea zones, which the campaign leaves out |
+| Source coverage of the [catalog](milestones/m3/source_coverage.md), [politics](milestones/m4/source_coverage.md), [movement](milestones/m5/source_coverage.md) and the [economy](milestones/m6/source_coverage.md) | Which printed pages stand behind each module's rules |
+| [Frozen baseline](milestones/m0/frozen_baseline.json) | The hashes of the campaign's files when its specification was frozen on 21 October 2026 |
+
+The data these reviews checked is current and is described in
+[Rules and data](../rules/README.md), as are the rules ledger and its evidence
+index.
 
 ## Removed on 2 November 2026
 

@@ -5,7 +5,7 @@ campaign, the recorded rule decisions, the verification policy and the open work
 The engine implements these rules: see [the rules engine](../engine/README.md)
 and, for the scenario itself, [the campaign](../engine/scenario.md). The
 [archive](../archive/README.md) records how it was built; commit `037cb60` keeps
-this plan's earlier milestone narrative and status notes. Reusable official-rule
+this plan's earlier account of the build and its status notes. Reusable official-rule
 decisions live in the
 [shared rule clarification register](../../game_content/rules/clarifications.md)
 with stable RCL IDs. Record future rule conflicts there for the user's developer
@@ -91,15 +91,16 @@ reduces cash while increasing its net value. Do not substitute historical income
 or pay the full wealth score repeatedly every turn. The adopted construction
 policy scores cumulative already-paid amounts while a project is unfinished.
 At completion, replace that entry with the full completed catalog value; do not
-count both. The [source reconciliation](../rules/source_reconciliation.md)
+count both. The [source reconciliation](../archive/milestones/m0/source_reconciliation.md)
 establishes 5 IPP already paid for each setup queue ship; do not debit these past
 payments from initial cash. Shared facility IDs and rail borders are
 valued once, not once per directed access edge. Purchase-price tables for setup-only
-types/discounts remain in section 3 and the M0 review. The user approved controlled
+types/discounts remain in section 3 and the
+[review of the approved campaign](../archive/milestones/m0/README.md). The user approved controlled
 minor assets going to their controlling alliance and uncontrolled unaligned
 assets going to nobody, without granting extra collection rights. Starting cash
 is theatre-adjusted: Japan 15, KMT 6, CCP 2; minors zero; no FEC/USSR accounts. The capped-local
-formula is documented in M0 as a scenario derivation, not an official setup rule.
+formula is recorded in the scenario contract as a scenario derivation, not an official setup rule.
 
 On **21 October 2026**, the user approved the remaining city and railway scoring
 choices. A city label has no additional asset price; its income and distinct
@@ -271,12 +272,12 @@ Tannu Tuva is not included and its political ambiguity is deferred.
    50/50 between endpoint possessors. Same-alliance endpoints aggregate to full
    value, and an uncontrolled minor's share counts toward nobody. The railway
    split affects scoring only.
-2. **Initial local accounts/setup:** theatre-adjusted cash is authorized and M0
-   uses Japan 15, KMT 6 and CCP 2; FEC is excluded. Both ordinary Japanese national
+2. **Initial local accounts/setup:** theatre-adjusted cash is authorized: the
+   scenario uses Japan 15, KMT 6 and CCP 2; FEC is excluded. Both ordinary Japanese national
    queue ships are retained and score their cumulative already-paid amounts.
    Source reconciliation establishes 5 IPP paid for each ship, with 5 remaining
    for the Heavy Cruiser and 10 for the Fleet Carrier. USA-triggered Light Carrier
-   entries are excluded and carrier attachments are recorded in M0.
+   entries are excluded and carrier attachments are recorded in the Japan setup file.
    The user chose official pieces on included tiles only; do not import outside
    forces or an assumed full-global budget.
    Use the fixed July 1941 full-round deadline; no extra early terminal rule is
@@ -303,10 +304,9 @@ Tannu Tuva is not included and its political ambiguity is deferred.
    unresolved in the source map. Excluded external edges are cut away, not
    certified by copying. Tannu Tuva is explicitly excluded; defer its national
    identity/home-country/controller interpretation to a future expanded profile.
-7. **Rail damage implementation:** all drawn tracks on the chosen border are
-   affected. Implement targeted-side ownership, repair responsibility and terrain
-   caps from the reconciled sources in the later catalog/movement/economy/combat
-   milestones, without bringing back named railroad segments.
+7. **Rail damage:** all drawn tracks on the chosen border are affected.
+   Targeted-side ownership, repair responsibility and terrain caps follow the
+   reconciled sources and RCL-019, without named railroad segments.
 8. **In-scope Japanese setup:** preserve the audited starting forces and queue
    stages; no unprinted in-port, damage, cargo or MAP status is invented.
    Printed setup totals include queued ships; do not also instantiate them on-map.
@@ -323,7 +323,7 @@ Tannu Tuva is not included and its political ambiguity is deferred.
     rules. See the shared register's closed-source-check section. No outside
     U.S. event is fabricated for this campaign.
 
-M0 is verified and frozen; source
+The campaign's specification is verified and frozen; source
 reconciliation records numeric queue payments and research thresholds. Ship values, queue
 scope and scoring, Mongolia timing, starting-cash adjustment, controlled-minor
 attribution, city/rail scoring and RCL-002–003/009 are recorded decisions;

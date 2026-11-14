@@ -7,7 +7,7 @@ The rows were drawn up on 12 September 2026, before the engine existed, as the
 list of what it would have to do, and were frozen with the campaign's
 specification on 21 October 2026
 ([report](../archive/milestones/m0/README.md),
-[frozen baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)).
+[frozen baseline](../archive/milestones/m0/frozen_baseline.json)).
 The engine now implements the rows that apply: the
 [runtime evidence index](runtime_coverage_ledger.md) names the code and the test
 fixture for each. Unclear rules are settled in the
@@ -48,13 +48,16 @@ Timing abbreviations: **P** Production, **CM** Combat Movement, **Cmb** Combat,
 Calendar Turn. `owner` means the relevant nation/controller's alliance policy,
 not necessarily the active turn's policy. `chance` means a rule-defined die roll.
 
-Module labels are proposed responsibility boundaries, not files already present:
-`definitions`, `scenario`, `politics`, `scheduler`, `economy`, `technology`,
-`movement`, `supply`, `combat`, `air`, `naval`, `facilities`, `objective`.
+The Subject column sorts the rules under thirteen labels: `definitions`,
+`scenario`, `politics`, `scheduler`, `economy`, `technology`, `movement`,
+`supply`, `combat`, `air`, `naval`, `facilities`, `objective`. They are for
+looking rules up and are not the engine's modules; the
+[runtime evidence index](runtime_coverage_ledger.md) names the code that carries
+each row.
 
 ## 0-2. Identity, board semantics and setup
 
-| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Future module | Acceptance fixture |
+| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Subject | Acceptance fixture |
 | --- | --- | --- | --- | --- | --- |
 | R000; RB §§0.1-0.2 pp5-8 | R: possession, original nation, control, alignment, alliance and war are different facts; sea zones have no possession | Original/current owner, controller, relations, Major/Minor flag | Engine; every query | definitions, politics | Japan at war only with Minor KMT has not entered a Major-Power war; Axis reward affiliation does not grant movement access |
 | R001; RB §0.2 pp6-7 | R: Japan Home Country is the four home tiles; retained Chinese Home Country includes specified Chinese/Manchukuo/Mongolian original zones and Formosa; source Hong Kong membership does not retain its excluded node | Immutable home sets and canonical IDs | Engine; all home-country gates | definitions | Okinawa is Japanese but not Japanese Home Country; Korea is not Chinese Home Country merely because selected |
@@ -63,7 +66,7 @@ Module labels are proposed responsibility boundaries, not files already present:
 | R004; RB §0.4 p9 | R: movement counts crossed borders, not within-zone carrier exits; no vertex-only adjacency | Routes, points remaining, selected graph | Moving owner; CM/NC | movement | Reject a route through a removed node or corner; moving aircraft off carrier into its sea costs 0 |
 | R005; RB §0.5 p9 | R: highest positive and highest negative combat modifiers, not sum of all terrain bonuses; named Japan exceptions; minimum 1, N/A remains N/A; movement facility bonuses do not stack | Permanent stats, modifier provenance and duration | Engine; each roll/move | combat, movement | Mountain+river gives one -1, not -2; Dug in Defense stacks as specified; AAA cannot give Militia an attack value |
 | R006; RB §§1.1-1.4 p10 | R: named zone identity; physical facility location/access matters; shared facilities remain one object | Node/edge IDs, facility IDs and access sea set | Scenario loader; setup | scenario, facilities | Nanking access in two seas does not double capacity/value; two real Honshu shipyards remain distinct |
-| R007; RB §1.5 p10, §10.9 pp71-72; M0 convoy audit | I: all convoy play is excluded by campaign choice, including the geographically local Nagasaki Line; source route/5-IPP loss-cap evidence is reference-only | Disabled convoy profile; source evidence separate | Scenario | scenario, naval | No active convoy record, raid, loss cap or extra income in this campaign; global source routes remain intact |
+| R007; RB §1.5 p10, §10.9 pp71-72; convoy audit | I: all convoy play is excluded by campaign choice, including the geographically local Nagasaki Line; source route/5-IPP loss-cap evidence is reference-only | Disabled convoy profile; source evidence separate | Scenario | scenario, naval | No active convoy record, raid, loss cap or extra income in this campaign; global source routes remain intact |
 | R008; RB §§1.6-1.7 pp10-11 | R: rails/gauges; intrinsic destination terrain versus directional first-round border terrain; starting-zone terrain ignored for ordinary entering cost | Directed border terrain, intrinsic terrain, gauge, impassability | Moving owner; each route leg | movement, combat | Multi-source attack preserves separate approach penalties; second leg reevaluates entered terrain |
 | R009; RB §§1.7.1-1.7.5 pp11-12 | R/C: mountain/desert/jungle/marsh/tundra movement ends and blitz restrictions; cavalry mountain exception; type-specific combat penalties; tundra one-round limit if encountered | Unit class, entering terrain, round limit | Moving/attacking owner | movement, combat | Mountain Cavalry can continue; jungle armor -2; tundra unresolved attacker retreats or is destroyed if no retreat |
 | R010; RB §1.7.6 p12 | R: river crossing penalty first round only, excluding Marines/assaulting airborne/artillery; strategic river connectivity is separate | Per-approach river crossing, navigable river links and bank control | Engine; combat/route validation | movement, supply, combat | River-flow edge without combat crossing remains usable for strategic route; artillery ignores crossing penalty |
@@ -78,7 +81,7 @@ Module labels are proposed responsibility boundaries, not files already present:
 
 ## 3-7. Objectives, relations, diplomacy and turn scheduling
 
-| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Future module | Acceptance fixture |
+| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Subject | Acceptance fixture |
 | --- | --- | --- | --- | --- | --- |
 | R019; RB §§3.1-3.2 p20, §3.4 pp24-25 | O: official VP winner, July1944 end roll and sudden death replaced by user wealth-gap/fixed July1941 endpoint | Calendar, three wealth values | Engine after full final round | objective, scheduler | Run all included PTs before terminal scoring; no 1944 die or early VP termination |
 | R020; RB §3.3 pp20-24; K/C p2 | C: objective **mechanical bonuses remain**, notably evolution factory and CCP One China troops; do not award evolution factory twice under two headings | Objective flags, one-time award flags, legal placement | Beneficiary owner; trigger and PU | politics, economy | Evolution earns one factory total; One China condition and KMT-surrender placement wording reviewed together |
@@ -108,10 +111,10 @@ Module labels are proposed responsibility boundaries, not files already present:
 
 ## 8. Production, research, purchases and aid
 
-| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Future module | Acceptance fixture |
+| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Subject | Acceptance fixture |
 | --- | --- | --- | --- | --- | --- |
 | R044; RB §§8.1-8.2 p45 | R/C: one research die per undamaged possessed Major Factory; same technology at most once CT; stageIII unavailable before July1939; immediate completion effects | Factory damage, technology stages, per-CT attempts, calendar | Nation chooses tech; chance; P | technology | Damaged Major Factory grants no die; choose different tech with additional die; January1939 cannot progress into locked stage |
-| R045; RB §8.2.1 pp45-50; catalog_source_checks.json | R/C: technology chart thresholds are successful high-roll thresholds, not generic combat hit-under tests; exact 16-row transcription is recorded in M0 source checks | Per-tech stage thresholds | Chance; P | technology | Use each transcribed stage threshold, not a generic attack-value convention; completion updates abilities immediately |
+| R045; RB §8.2.1 pp45-50; catalog_source_checks.json | R/C: technology chart thresholds are successful high-roll thresholds, not generic combat hit-under tests; exact 16-row transcription is recorded in the catalog source checks | Per-tech stage thresholds | Chance; P | technology | Use each transcribed stage threshold, not a generic attack-value convention; completion updates abilities immediately |
 | R046; RB §8.2.1 pp45-46 | C: Advanced Mechanized2:1 blitz pairing; Advanced Artillery/self-propelled variants and attrition; no automatic upgrade of all existing ordinary artillery | Tech flags, build options, pairing | Purchasing/attacking owner | technology, combat | Unlock advanced purchase type without mutating existing ordinary Artillery |
 | R047; RB §8.2.1 p46 | C: Radar affects independently applicable raider/interception rolls, unlimited base/naval scramble, rocket AAA and heavy-carrier fighters; convoy/interdiction effects are inactive | Tech flags, battle modifiers, scramble quota | Owner/chance at relevant windows | technology, air, naval | Radar +1 interception stacks with correct base; normal carrier still no heavy-carrier-only ability |
 | R048; RB §8.2.1 p46 | C: ASW transport defense vs submarines and seaplane+2 MAP remain; convoy-defense effect is inactive | Enemy unit type and mission, tech | Engine; combat | technology, naval | Transport gets defense1 against attacking submarine but not every normal attacker |
@@ -134,7 +137,7 @@ Module labels are proposed responsibility boundaries, not files already present:
 
 ## 9-10. Movement commitments and combat resolution
 
-| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Future module | Acceptance fixture |
+| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Subject | Acceptance fixture |
 | --- | --- | --- | --- | --- | --- |
 | R065; RB §9.1 p54 | R: declare all intended combats and mission types; sea entry/Coastal Artillery crossing when DoW possible belongs in CM; intent/response window per entry | Mission commitments, routes, pending responses | Moving owner then opponent; CM | scheduler, movement | Peaceful sea co-location may continue if neither declares; defender DoW still permits attacker to commit reinforcements |
 | R066; RB §9.2 p54 | R: enter enemy land then stop absent later blitz; Militia start/end Home Country where movable | Per-unit movement and commitment, home set | Moving owner; CM | movement | No pre-combat path through hostile land; Chinese Minor Militia cannot be given Major-style movement |
@@ -169,13 +172,13 @@ Module labels are proposed responsibility boundaries, not files already present:
 | R095; RB §10.7 p69 | R: carrier loss gives defending aircraft immediate 1 movement legal landing or elimination | Carrier capacity, aircraft location, landing choice | Defending aircraft owner; immediately | air, naval | Sunk-carrier fighters do not silently survive with no free capacity |
 | R096; RB §§10.8.1-10.8.2 p70 | R/C: amphibious screen first, surviving nonsubmerged subs may hit continuing force; bombard only ships not fought naval; maximum ships = landing units; Coastal Artillery first strike | Screen outcome, landed-unit count, bombard eligibility, coastal shots | Attacker commitment/defender reaction | naval, combat | Same battleship cannot screen then bombard; first-strike sunk transport destroys cargo before landing |
 | R097; RB §10.8.3 pp70-71 | R/C: infantry/air first round, non-infantry cargo waits unless attack transport/undefended; double-casualty exemptions; at least one first-round land survivor; assault casualties before other land | Landing-origin tags, transport type, round, doctrine | Both owners; assault | combat, naval | All first-wave infantry dead prevents second-wave armor rescue; adjacent land/air can retreat while assault land cannot |
-| R098; RB §10.9 pp71-72; M0 convoy audit | I: convoy raiding is excluded by campaign choice, including Nagasaki; global route/raiding evidence remains source-only | Disabled convoy profile | Scenario | naval, economy | No convoy losses, escort volleys or raiding actions; ordinary MAP combat and blockades remain active |
+| R098; RB §10.9 pp71-72; convoy audit | I: convoy raiding is excluded by campaign choice, including Nagasaki; global route/raiding evidence remains source-only | Disabled convoy profile | Scenario | naval, economy | No convoy losses, escort volleys or raiding actions; ordinary MAP combat and blockades remain active |
 | R099; RB §§10.10-10.10.1 p73 | R: landing after combat via remaining range, not newly captured/liberated zone; land unit required for capture; destroy fort/coastal/unfinished; national income adjustment; liberation/China gift options | Survivors, original owner, current capture, treasury/income | Attacker capture/gift; engine validation | combat, politics, economy | Air-only victory does not conquer; captured finished factory retained but unfinished removed; own-alliance liberation restores owner |
 | R100; RB §§10.10.2-10.10.3 p73 | R/C: capital capture loses owner's treasury to bank; relocated capital only for eligible nations; KMT/CCP exceptions before evolution | Capital, treasury, surrender, original home | Engine and eligible capital chooser; aftermath | politics, economy | Capturing Tokyo does not award Japan's cash to attacker; Nanking as Minor KMT is not a generic capital-loss shortcut |
 
 ## 11-12. Non-combat logistics, placement and collection
 
-| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Future module | Acceptance fixture |
+| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Subject | Acceptance fixture |
 | --- | --- | --- | --- | --- | --- |
 | R101; RB §11.1 p74 | R: NC only unused units; no newly captured land entry except named cases; militia home restriction | Moved/attacked flags, capture ages | Unit owner; NC | movement | Unit passed CM may move NC; unit retreated from combat cannot move again |
 | R102; RB §§11.2-11.2.1 pp74-75 | R: strategic rail/rivers any distance, beginning-of-PT possession, Asia capacity 1, regional crossing consumes both; aligned permission; gauge change requires Logistics | Rail/river path, gauge, regional quotas, damage, riverbanks | Moving owner/permission owner; NC | movement, supply | Train-plus-river route consumes 1 Asia move; cannot use Hokkaido crossing as rail; rebuilt-this-PT rail not a same-turn strategic route |
@@ -195,19 +198,21 @@ Module labels are proposed responsibility boundaries, not files already present:
 
 ## 13-15. Catalog-specific and national capability inventory
 
-The [asset price audit](asset_price_audit.md)
-lists all catalog-priced types and the two retained setup-only types with approved
-reference values (Torpedo Boat Destroyer 5 IPP, Coastal Submarine 4 IPP). Catalog tests
-must cover every row, not just currently buyable early-game units.
+The catalog in `game_content/catalog/gw36_v43` prices every type that can be
+bought. The two retained setup-only types have approved reference values
+(Torpedo Boat Destroyer 5 IPP, Coastal Submarine 4 IPP). The
+[asset price audit](../archive/milestones/m0/asset_price_audit.md) of October
+2026 lists them all with their sources. Catalog tests must cover every row, not
+just the units that can be bought early in the game.
 
-| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Future module | Acceptance fixture |
+| ID / source | Status and enforceable rule | Required state | Decision owner / timing | Subject | Acceptance fixture |
 | --- | --- | --- | --- | --- | --- |
 | R116; RB §13.1.1 pp83-84 | R/C: all locally legal infantry types, purchase caps, artillery support, city/fortification benefits, Marine river/narrow/amphibious traits and Mountain Infantry; FEC colonial access inactive | Registry/class traits, nation/status/date | Engine; all phases | definitions, combat | Setup Mountain Infantry keeps correct stats without granting minor build permission; artillery supports infantry class, not Cavalry vehicle class |
 | R117; RB §13.1.2 p85 | R/C: Cavalry vehicle class, Motorized Infantry towing 1:1, armor blitz/targeting, national/gated variants | Typed unit traits, pairings, dates | Owner/engine | definitions, movement | Cavalry takes city vehicle penalty; Tank Destroyer 3[3]/4[3] selection restricted to legal class, cap 2 |
 | R118; RB §13.1.3 p86 | R: artillery first strike, infantry attack support 1:1, river immunity, unpaired artillery -1 unless matched with infantry/vehicle; reevaluate after casualties | Support assignments, surviving classes | Owners choose pairing; each round | combat | 10 Artillery plus 6 Infantry has 4 unsupported; after 3 Infantry losses, 7 unsupported; no fixed initial support forever |
 | R119; RB §13.1.4 p87 | R: AAA separate class; only air first-round rolls; towed movement; later casualty eligible | AAA targets/pairings | Owner/engine | definitions, combat | AAA does not count as normal artillery support/first strike |
 | R120; RB §13.1.5 pp87-89 | R/C: aircraft registry with interception/MAP/strategic damage/cargo/caps and technology; surrounded-city exception to terrain immunity | Aircraft stats/missions | Engine/owner | definitions, air | Fighter interception 3, normal 6; Tactical Bomber target selection 1-3 land/naval; Seaplane restricted target set |
-| R121; RB §13.1.6 pp89-92 | R/C: naval registry includes setup-only TBD/Coastal Submarine, damage/movement and carrier load, bombardment, surface/submarine classes; no Coastal Defense Ship spawn | Naval traits, hits, cargo, N/A build price, approved scoring reference value | Engine/owner | definitions, naval | Price N/A does not disable existing unit; exact full damaged-ship battle-board matrix is an M3 catalog implementation deliverable, not a remaining M0 decision |
+| R121; RB §13.1.6 pp89-92 | R/C: naval registry includes setup-only TBD/Coastal Submarine, damage/movement and carrier load, bombardment, surface/submarine classes; no Coastal Defense Ship spawn | Naval traits, hits, cargo, N/A build price, approved scoring reference value | Engine/owner | definitions, naval | Price N/A does not disable existing unit; the full damaged-ship battle-board matrix is in the catalog |
 | R122; RB §13.1.7 p92 | C: rockets not normal casualties; alone with enemy land unit eliminated; no move and fire same PT | Unit movement/fired flags | Owner/engine | definitions, air | Capturing rocket-only zone removes rocket and captures without combat roll |
 | R123; RB §13.2 pp92-93 | R: physical facility identity, supply/start-location bonuses do not stack; cities one minor and one major naval facility | IDs, access, slot capacity, age | Owner build choice/engine | facilities | Two ports do not give +2 ship movement; factories are land assets, not naval-access edges |
 | R124; RB §13.2.1 p93 | R: factory tier cost/capacity/damage, Major research, Home Country build limits; capture medium/major to minor preserving original tier/damage cap; restore on reconquest | Original/current tier, damage, owner, technology | Owner/engine; capture/P/PU | facilities, economy | Captured Major Factory with 10 damage survives as damaged minor with original damage cap 20; reconquest restores tier |
@@ -255,28 +260,22 @@ Japan setup/Kamikaze readings. Do not reopen those as unidentified conflicts.
 RCL-004's closure records the user's developer communication, not an independently
 checked publication or version number.
 
-The [source reconciliation](source_reconciliation.md)
-records exact research thresholds and initial queue payments. Full damaged-ship
-battle-board transcription belongs to M3 catalog certification; rail repair and
-ownership handlers belong to the later movement/economy/combat milestones. These
-are implementation tasks, not unresolved M0 choices. Reward accounting is scenario
-policy, not an erratum. Kido Butai, convoys and interdiction are excluded by user
-choice; the convoy audit remains reference material, not an active M0 dependency.
+The exact research thresholds and the payments already made on Japan's starting
+queues are in `catalog_source_checks.json`, in the scenario's folder; the
+[source reconciliation](../archive/milestones/m0/source_reconciliation.md) of
+October 2026 records how they were read from the sheets. Reward accounting is
+scenario policy, not an erratum. Kido Butai, convoys and interdiction are
+excluded by user choice; the convoy audit is reference material only.
 
-## Coverage and handoff gate
+## Coverage
 
 This ledger covers the operative main-rule chapters 0-15 by either required/
 conditional fixture rows or explicit inactive/replaced classification. Chapter 16
-is designer commentary, not an additional action system. The detailed national
-setup and political/accounting decisions live in companion M0 documents. M0's
-artifact checks and specification freeze are complete. The future combat/economy
-fixtures below remain implementation obligations rather than a certification of
-a playable rules engine.
+is designer commentary, not an additional action system. The national setups
+and the political and accounting decisions are in the scenario's data files
+([where the numbers come from](README.md#where-the-scenarios-numbers-come-from)).
 
-The next implementation phase should attach each fixture ID to executable tests
-and rule-handler IDs, then add boundary and stochastic property tests: legal
-action/step equivalence; exact integer unit/cargo conservation; treasury/project
-accounting; begin-turn snapshot consistency; joint-defense control; cloned-state
-and RNG replay; absence of all outside-node paths; and terminal scoring after all
-final-round reactions. Until then, passing existing Python map tests is **not**
-evidence that any of the combat/economy fixtures above pass.
+The [runtime evidence index](runtime_coverage_ledger.md) ties each row that
+applies to the rule handlers that carry it and to the test fixtures that
+exercise it. It is generated from this page, and
+`python3 tools/build_campaign_coverage.py --check` says whether it still matches.

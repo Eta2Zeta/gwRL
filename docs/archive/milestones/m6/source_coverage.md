@@ -1,4 +1,4 @@
-# Economy: source coverage
+# M6 source coverage
 
 Sources are local official PDFs, the frozen M0 contract, and the separately identified 2026-10-22 user ruling. The runtime economy profile records source hashes and page references. Relevant tables were reviewed as complete rendered pages, rather than inferred solely from extraction.
 

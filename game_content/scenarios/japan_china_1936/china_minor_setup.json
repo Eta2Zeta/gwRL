@@ -1,11 +1,11 @@
 {
   "map_revalidation": {
     "date": "2026-10-21",
-    "source_map_sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+    "source_map_sha256": "5afddbbc72126a2563db6d8255982e2d0b0fe8ef206e70aca5134f55590520a3",
     "scope": "Approved 37-node closed campaign; retained source placements, owner names, income and physical facility references reconciled without altering the world map."
   },
   "schema_version": 1,
-  "status": "frozen_specification_not_playable",
+  "status": "frozen_specification",
   "scope": "Approved July 1936 KMT, CCP, eight unaligned Chinese warlords and directly Comintern-controlled Mongolia on the 37-node closed theatre. FEC/Hong Kong source rows are preserved only in excluded_setup; Japanese forces are in japan_setup.json.",
   "sources": {
     "kmt_nrs": {
@@ -53,7 +53,7 @@
     },
     "global_map": {
       "path": "game_content/maps/gw36_manual_map.json",
-      "sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+      "sha256": "5afddbbc72126a2563db6d8255982e2d0b0fe8ef206e70aca5134f55590520a3",
       "status": "revalidated_against_schema_2_world_map_2026_10_07"
     }
   },
@@ -1142,5 +1142,5 @@
     }
   ],
   "open_rule_interpretations": [],
-  "specification_version": "M0-2026-10-21"
+  "specification_version": "2026-10-21"
 }

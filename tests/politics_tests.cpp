@@ -102,7 +102,7 @@ void initialIdentityAndHomeCountry() {
     check(!state.nations.contains("dadao") && state.definition->factions.at("dadao").dormant,
           "Dadao identity must remain dormant until created");
     for (const auto& [id, faction] : state.definition->factions)
-        check(faction.homeCountryKnown, "Unresolved M4 Home Country: " + id);
+        check(faction.homeCountryKnown, "Unresolved Home Country: " + id);
     check(state.definition->factions.at("mongolia").homeCountry == std::set<Id>({
         "land_mongolia_central_mongolia", "land_mongolia_kerulen",
         "land_mongolia_kobdo", "land_mongolia_ulyassutai"}), "Mongolian original homeland changed");
@@ -119,7 +119,7 @@ void initialIdentityAndHomeCountry() {
     check(!state.nations.contains("ussr") && state.definition->turnOrder == std::vector<Id>({"ccp", "mongolia", "japan", "kmt"}),
           "An absent Soviet identity or extra calendar turn appeared");
     check(state.units.size() == 99 && state.construction.size() == 2,
-          "M4 loader changed the frozen initial force inventory");
+          "The loader changed the frozen initial force inventory");
     for (const auto& [id, project] : state.construction)
         check(project.paidIpp == 5 && project.owner == "japan", "Initial ship's already-paid cost changed");
 }
@@ -445,7 +445,7 @@ void declarationGatesAndUnknownAccounting() {
     const auto rules = std::make_shared<PoliticsRules>();
     Engine engine(state, rules);
     const auto before = engine.serialize();
-    rejects([&] { engine.step(action(engine.legalActions(), "end_phase")); }, "M4 silently fabricated missing M6 income accounting");
+    rejects([&] { engine.step(action(engine.legalActions(), "end_phase")); }, "Politics silently fabricated missing income accounting");
     check(engine.serialize() == before, "Failed unevaluated income collection partially committed a turn");
 
     auto minor = fixture("mongolia", Phase::PlaceUnits);

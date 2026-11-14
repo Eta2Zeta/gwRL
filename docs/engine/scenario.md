@@ -170,16 +170,15 @@ Everything is under `game_content/scenarios/japan_china_1936`, and
 | --- | --- | --- |
 | `manifest.json` | The list of the 37 zones to keep | by hand |
 | `map.json` | Those zones cut out of the world map, with every border to an outside zone removed | `tools/build_theatre_scenario.py` |
-| `m0/scenario_contract.json` | The campaign's rules of play: calendar, turn order, starting money, what is switched off, how wealth is scored | by hand |
-| `m0/japan_setup.json`, `m0/china_minor_setup.json` | The starting pieces | by hand, from the printed setup charts |
-| `m1/faction_index.json` | Every nation's identifier and the names the sources use for it | `tools/scenario_factions.py` |
+| `scenario_contract.json` | The campaign's rules of play: calendar, turn order, starting money, what is switched off, how wealth is scored | by hand |
+| `japan_setup.json`, `china_minor_setup.json` | The starting pieces | by hand, from the printed setup charts |
+| `faction_index.json` | Every nation's identifier and the names the sources use for it | `tools/scenario_factions.py` |
 
-The folders `m0` and `m1` are named after the build stages that made them. The
-world map itself is `game_content/maps/gw36_manual_map.json`
+The world map itself is `game_content/maps/gw36_manual_map.json`
 ([game content](../../game_content/README.md)).
 
 The engine checks what it loads. The rules profiles record the SHA-256 of the
 files they depend on, these scenario files among them, and loading stops if one
-has changed without its recorded hash. Where each starting piece and price
-comes from in the printed game is traced in the
-[setup and price audits](../rules/README.md).
+has changed without its recorded hash. Each starting piece and each price is
+recorded with the printed page it was read from
+([where the numbers come from](../rules/README.md#where-the-scenarios-numbers-come-from)).

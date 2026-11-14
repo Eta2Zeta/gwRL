@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
-  "ledger_sha256": "4baa0c7c3f6802d9d8e0f1c97172cf09e03d83c2f21278f369320f56eb729ecf",
+  "ledger_sha256": "f0f404611cdc70c7cbfefcf75195b4edfb333dac0ecfc7870ff757f5a953a389",
   "evidence_file_sha256": {
-    "src/air.cpp": "c60631a1ffc1f56e4416e00bbdf8f59ba561c5c9f3689bcfeee270406509775b",
+    "src/air.cpp": "722ee67c23382796f6954e830f1a08078bd91d28fdc00065b5874d29b365f25a",
     "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
     "src/campaign_runtime.cpp": "ce0ece719b3373f65a6f86533c386b93eb605fc6b47426b89d22d635a78bf164",
-    "src/campaign_setup.cpp": "7549257a3a9f960e62db022d363a0683076669ba5a181f258bcadd068f5af4d1",
-    "src/catalog.cpp": "a27c9f1d0ec4a04111e4a100a206c342bfff8b402e2102cb18eab6ccba147515",
+    "src/campaign_setup.cpp": "a38e5de640b2c73c0e6a8d658709bebdea8286c882ddaffeb2e32cfdfb175579",
+    "src/catalog.cpp": "46ce44b2a91f0207d780063a19dbba23fa1f5d5d42a779d801785592deaecc38",
     "src/economy.cpp": "09ec786fcc9acebcda216427243967a14627cce10c4310678930b39978413f11",
     "src/economy_lendlease.cpp": "32a721a0f4b4f2458499e32cd34adc251c6ac5fad457cf941c374b63f5932ff8",
-    "src/land_combat.cpp": "1a51984bc8625a516f5f5601235d0bbbad83fa50a664878ed2773e038e285084",
-    "src/movement.cpp": "a68a4aa61fa852dedb3f0a32f5765d3a82183851af56294550130daf7840572a",
+    "src/land_combat.cpp": "a6be30607ce8040c508720764c02cb321eacf56724511ca35874bceec22cea96",
+    "src/movement.cpp": "4cfb4da832fae79b78ef606772c0efe9e3d7794a5c830ec3a44bb8cb3138923a",
     "src/naval_combat.cpp": "89628d29300555c8924eb73409fce6aeb8268e04f68d7deed4f303ba123b9e15",
     "src/naval_movement.cpp": "1fcaa7fa44f4941f4a330b6558d9625d1a7ece53745aa02f4d08ffcc2c2b0ac5",
     "src/naval_operations.cpp": "29b9de6c565f0c1f565d5bfeb661d3377d09d304f1938c67cdad11a47211415b",
-    "src/politics.cpp": "69d643476c9170fbcf6bbf35e5c789ff8b51ebf2d350bd35e1b255673b6940ee",
-    "src/politics_influence.cpp": "09f0cb583bff3c7eec7208b6ef7de8392484f4a7b8de17e43b8cf3fd4a672b06",
+    "src/politics.cpp": "f7de86964343014b53b28d55916b07aee67f4522b2f1fa424dd9ab18e3bfddd6",
+    "src/politics_influence.cpp": "0f5c8c2b659a7ee4016ee97b27a9908a83f132aa82d95d6917756c0eab9c52a1",
     "src/politics_warlords.cpp": "b174f2d281be9a78f7b90782804db25f9421a4bcea6dc04a34d9144d2af6a91a",
     "tests/air_integration_tests.cpp": "ab2ea27c3665f5b81b30995d2e14882cf4d0370cfdf95ce995ffd73d935f0a59",
     "tests/air_logistics_tests.cpp": "b2b05f93888b2997d4e90aa6b388ef4c415bddac34973d76e19e455eed166777",
@@ -24,27 +24,27 @@
     "tests/air_tests.cpp": "f339fa3c671fe3940b1002fce78d0810bc1447c09db295e90af0edbaba64fd5b",
     "tests/campaign_env_tests.cpp": "218ee2348e24b47384c3a2893ff5f5a5c2d501b85ae3e997c3844a8e160da4ce",
     "tests/campaign_integration_tests.cpp": "db272d8017f37e54fc1fb7675ebffd984a2579a8e002df98bc63b70f6dd27f72",
-    "tests/campaign_runtime_tests.cpp": "4f71d80aa6b602e4a2af881cb6d2bce1bdc77b9eeaaaca809da02e2a43fe152d",
-    "tests/campaign_setup_tests.cpp": "f9074b0bbaff4e4a5a2162865f09c6902569ac8ba9371c1c6b375687b89e3228",
+    "tests/campaign_runtime_tests.cpp": "64e744440dd1e9b2e6ad889dedec37c724443bf5ba9db681e5a1b6ae7ecc5dd9",
+    "tests/campaign_setup_tests.cpp": "85b8850f5363c4454de6de319d7a8f0ed72b33e70cd678c8f27249d0134b1977",
     "tests/campaign_state_tests.cpp": "75c11a63037d60a391d5eb84e199eded1ec2b586cd8e0709866a66b2154d0ad6",
-    "tests/catalog_tests.cpp": "c7f66c250d83b7488d3337dc979c4fbaeb2b6542921f46929379e8d44acf5ada",
+    "tests/catalog_tests.cpp": "b7baf0e41dab8e24f59ae65353f5f242cdd766162659f231df1a281b99148852",
     "tests/economy_tests.cpp": "317153b7ff4ada1d7775963d120f4b3d08de5b5b5dbea0d45f30cecc6fefc5ec",
     "tests/land_combat_tests.cpp": "8bd796622b4fdb81a19e31ca05237d5e3322899ac7fabfcf47367d8bc4d5c638",
     "tests/land_truce_tests.cpp": "ef2affb6b04f3085200aaf2393c7dd6149e94c3c619b9e601a378d6c24a8e858",
-    "tests/movement_tests.cpp": "39d10017e343b69ec6ee46d00ba518003dc9bd17e251a707b3a6d6213f513ec7",
+    "tests/movement_tests.cpp": "81aa5382d700d96d4b50da3b17963469840b389472a246e75ef983b5efc5a0af",
     "tests/naval_combat_tests.cpp": "bfe9ce8e47c4241fa1272872b2fc53548aa96f2630e007d0c8dae2d19dfee140",
     "tests/naval_movement_tests.cpp": "97f8bf4712ca73a10b2895f4c1d1da97f78930c428763470f8168adc261733d8",
     "tests/naval_operations_tests.cpp": "b4398a26693a2b17f1fe6a27e9b7d69e3777e6bc0f6018552511b704a368e37d",
-    "tests/politics_influence_tests.cpp": "30e20976bfae61ec2caa412ef8cc3e4180a11c11d91d2c03cd67dff4cb380ec2",
-    "tests/politics_tests.cpp": "8296760c0250eac58b6984b0dd17b202e2c2e101a7ef6f2bc6b21d152a192349",
-    "tests/politics_warlords_tests.cpp": "d2b84c35dc0717d59e67b67721998715dad53befacbd183159ed8e8067ce9dde"
+    "tests/politics_influence_tests.cpp": "2a2599db8bb79ebec9532693d001ce9650c0c9860d8cd8072c3caefd8adba972",
+    "tests/politics_tests.cpp": "7440d4764e1776e02a083356329d7cf3aac3f809b0304d4d0430a0bb95990c97",
+    "tests/politics_warlords_tests.cpp": "1d6f320ee2daa72b0aa5ca669fa6b195ad1e18759acb58479dce7f01b58eecbe"
   },
   "rows": [
     {
       "id": "R000",
       "source": "RB \u00a7\u00a70.1-0.2 pp5-8",
       "contract": "R: possession, original nation, control, alignment, alliance and war are different facts; sea zones have no possession",
-      "m0_acceptance": "Japan at war only with Minor KMT has not entered a Major-Power war; Axis reward affiliation does not grant movement access",
+      "acceptance_fixture": "Japan at war only with Minor KMT has not entered a Major-Power war; Axis reward affiliation does not grant movement access",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -71,14 +71,14 @@
           "behavior_assertions": [
             "Dormant Dadao became an active setup nation",
             "Dadao identity must remain dormant until created",
-            "Unresolved M4 Home Country: ",
+            "Unresolved Home Country: ",
             "Mongolian original homeland changed",
             "Offshore Hainan was incorrectly assigned to Guangxi's mainland homeland",
             "Chinese Home Country was confused with original national homelands",
             "Dadao inherited a printed homeland",
             "Mongolia's separate direct control/no-account policy changed",
             "An absent Soviet identity or extra calendar turn appeared",
-            "M4 loader changed the frozen initial force inventory",
+            "The loader changed the frozen initial force inventory",
             "Initial ship's already-paid cost changed"
           ]
         }
@@ -88,7 +88,7 @@
       "id": "R001",
       "source": "RB \u00a70.2 pp6-7",
       "contract": "R: Japan Home Country is the four home tiles; retained Chinese Home Country includes specified Chinese/Manchukuo/Mongolian original zones and Formosa; source Hong Kong membership does not retain its excluded node",
-      "m0_acceptance": "Okinawa is Japanese but not Japanese Home Country; Korea is not Chinese Home Country merely because selected",
+      "acceptance_fixture": "Okinawa is Japanese but not Japanese Home Country; Korea is not Chinese Home Country merely because selected",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -115,14 +115,14 @@
           "behavior_assertions": [
             "Dormant Dadao became an active setup nation",
             "Dadao identity must remain dormant until created",
-            "Unresolved M4 Home Country: ",
+            "Unresolved Home Country: ",
             "Mongolian original homeland changed",
             "Offshore Hainan was incorrectly assigned to Guangxi's mainland homeland",
             "Chinese Home Country was confused with original national homelands",
             "Dadao inherited a printed homeland",
             "Mongolia's separate direct control/no-account policy changed",
             "An absent Soviet identity or extra calendar turn appeared",
-            "M4 loader changed the frozen initial force inventory",
+            "The loader changed the frozen initial force inventory",
             "Initial ship's already-paid cost changed"
           ]
         }
@@ -132,7 +132,7 @@
       "id": "R002",
       "source": "RB \u00a70.3 pp8-9",
       "contract": "R: land sharing requires alignment or Chinese Truce; neutral sea co-location is allowed",
-      "m0_acceptance": "KMT/CCP can co-defend under truce but cannot freely share before it",
+      "acceptance_fixture": "KMT/CCP can co-defend under truce but cannot freely share before it",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -190,7 +190,7 @@
       "id": "R003",
       "source": "RB \u00a70.3 pp8-9",
       "contract": "R: nonparticipating neutral defenders relocate after conquest; joint defense may cross alliance boundaries when both are enemies of attacker; joint attack requires shared PT",
-      "m0_acceptance": "Allies/Comintern co-defenders do not become one permanent coalition; casualty disagreement uses prescribed die arbitration",
+      "acceptance_fixture": "Allies/Comintern co-defenders do not become one permanent coalition; casualty disagreement uses prescribed die arbitration",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -274,7 +274,7 @@
       "id": "R004",
       "source": "RB \u00a70.4 p9",
       "contract": "R: movement counts crossed borders, not within-zone carrier exits; no vertex-only adjacency",
-      "m0_acceptance": "Reject a route through a removed node or corner; moving aircraft off carrier into its sea costs 0",
+      "acceptance_fixture": "Reject a route through a removed node or corner; moving aircraft off carrier into its sea costs 0",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -317,7 +317,7 @@
       "id": "R005",
       "source": "RB \u00a70.5 p9",
       "contract": "R: highest positive and highest negative combat modifiers, not sum of all terrain bonuses; named Japan exceptions; minimum 1, N/A remains N/A; movement facility bonuses do not stack",
-      "m0_acceptance": "Mountain+river gives one -1, not -2; Dug in Defense stacks as specified; AAA cannot give Militia an attack value",
+      "acceptance_fixture": "Mountain+river gives one -1, not -2; Dug in Defense stacks as specified; AAA cannot give Militia an attack value",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -376,7 +376,7 @@
       "id": "R006",
       "source": "RB \u00a7\u00a71.1-1.4 p10",
       "contract": "R: named zone identity; physical facility location/access matters; shared facilities remain one object",
-      "m0_acceptance": "Nanking access in two seas does not double capacity/value; two real Honshu shipyards remain distinct",
+      "acceptance_fixture": "Nanking access in two seas does not double capacity/value; two real Honshu shipyards remain distinct",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -391,14 +391,14 @@
           "symbol": "main",
           "line": 39,
           "behavior_assertions": [
-            "Starting unit total differs from M0",
-            "Land total differs from M0",
-            "Canonical faction count differs from M1",
+            "Starting unit total differs from the setup",
+            "Land total differs from the setup",
+            "Canonical faction count differs from the faction index",
             "Map facilities and setup factories not distinct",
             "Closed map changed",
             "Convoys became active",
             "Turn order changed",
-            "M3 catalog movement missing",
+            "Catalog movement missing",
             "National setup counts changed",
             "Opening accounts changed",
             "An excluded account was restored",
@@ -416,7 +416,7 @@
             "User display name lost",
             "Japan home-country table lost",
             "Home-country membership was inferred from possession",
-            "M4 original mainland home-country predicate unresolved",
+            "Original mainland home-country predicate unresolved",
             "Printed IPP was silently treated as evaluated legal income",
             "Actual campaign setup fails round trip",
             "Clone copied immutable definition",
@@ -430,13 +430,13 @@
     },
     {
       "id": "R007",
-      "source": "RB \u00a71.5 p10, \u00a710.9 pp71-72; M0 convoy audit",
+      "source": "RB \u00a71.5 p10, \u00a710.9 pp71-72; convoy audit",
       "contract": "I: all convoy play is excluded by campaign choice, including the geographically local Nagasaki Line; source route/5-IPP loss-cap evidence is reference-only",
-      "m0_acceptance": "No active convoy record, raid, loss cap or extra income in this campaign; global source routes remain intact",
+      "acceptance_fixture": "No active convoy record, raid, loss cap or extra income in this campaign; global source routes remain intact",
       "status": "inactive_in_frozen_profile",
       "reason": "all convoy play is excluded by campaign choice, including the geographically local Nagasaki Line; source route/5-IPP loss-cap evidence is reference-only",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -445,7 +445,7 @@
       "id": "R008",
       "source": "RB \u00a7\u00a71.6-1.7 pp10-11",
       "contract": "R: rails/gauges; intrinsic destination terrain versus directional first-round border terrain; starting-zone terrain ignored for ordinary entering cost",
-      "m0_acceptance": "Multi-source attack preserves separate approach penalties; second leg reevaluates entered terrain",
+      "acceptance_fixture": "Multi-source attack preserves separate approach penalties; second leg reevaluates entered terrain",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -504,7 +504,7 @@
       "id": "R009",
       "source": "RB \u00a7\u00a71.7.1-1.7.5 pp11-12",
       "contract": "R/C: mountain/desert/jungle/marsh/tundra movement ends and blitz restrictions; cavalry mountain exception; type-specific combat penalties; tundra one-round limit if encountered",
-      "m0_acceptance": "Mountain Cavalry can continue; jungle armor -2; tundra unresolved attacker retreats or is destroyed if no retreat",
+      "acceptance_fixture": "Mountain Cavalry can continue; jungle armor -2; tundra unresolved attacker retreats or is destroyed if no retreat",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -555,7 +555,7 @@
       "id": "R010",
       "source": "RB \u00a71.7.6 p12",
       "contract": "R: river crossing penalty first round only, excluding Marines/assaulting airborne/artillery; strategic river connectivity is separate",
-      "m0_acceptance": "River-flow edge without combat crossing remains usable for strategic route; artillery ignores crossing penalty",
+      "acceptance_fixture": "River-flow edge without combat crossing remains usable for strategic route; artillery ignores crossing penalty",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -614,7 +614,7 @@
       "id": "R011",
       "source": "RB \u00a71.7.7 p13",
       "contract": "R: city maximum three rounds; vehicle attack -2 and defender infantry +1/target-selection unless surrounded; surround requires all adjacent land hostile and no usable qualifying base/naval facility",
-      "m0_acceptance": "Neutral adjacent tile prevents surround; surround removes infantry bonus, adds all-defender -1; surprise attack changes cap",
+      "acceptance_fixture": "Neutral adjacent tile prevents surround; surround removes infantry bonus, adds all-defender -1; surprise attack changes cap",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -655,7 +655,7 @@
       "id": "R012",
       "source": "RB \u00a7\u00a71.7.7-1.7.8 pp13-14",
       "contract": "R: multi-terrain modifier durations; city inherent AAA/strategic damage and facility slot limits",
-      "m0_acceptance": "Mountain city changes modifier by unit type; first-round border penalty expires without erasing intrinsic terrain",
+      "acceptance_fixture": "Mountain city changes modifier by unit type; first-round border penalty expires without erasing intrinsic terrain",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -714,11 +714,11 @@
       "id": "R013",
       "source": "RB \u00a71.8 pp14-15",
       "contract": "I: named closed straits/canals and forcing procedure absent from selected graph; do not apply it to every narrow crossing",
-      "m0_acceptance": "Hokkaido-Honshu narrow crossing is not invented as a named closure strait; no Panama/Suez action",
+      "acceptance_fixture": "Hokkaido-Honshu narrow crossing is not invented as a named closure strait; no Panama/Suez action",
       "status": "inactive_in_frozen_profile",
       "reason": "named closed straits/canals and forcing procedure absent from selected graph; do not apply it to every narrow crossing",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -727,7 +727,7 @@
       "id": "R014",
       "source": "RB \u00a71.9 p16",
       "contract": "R: narrow crossing capacity; Marines only for combat/amphibious; infantry-class NC; begin/end on opposite banks; no strategic rail use; enemy sea forces and Coastal Artillery block as specified",
-      "m0_acceptance": "Hokkaido-Honshu crossing allows at most printed 2; no ordinary rail/vehicle crossing; threat in any touching sea blocks",
+      "acceptance_fixture": "Hokkaido-Honshu crossing allows at most printed 2; no ordinary rail/vehicle crossing; threat in any touching sea blocks",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -753,7 +753,7 @@
       "id": "R015",
       "source": "RB \u00a71.10 p16",
       "contract": "R: cities are special fortification areas; other listed areas excluded",
-      "m0_acceptance": "One city fortification protects all applicable borders; ordinary noncity fortification does not",
+      "acceptance_fixture": "One city fortification protects all applicable borders; ordinary noncity fortification does not",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -793,7 +793,7 @@
       "id": "R016",
       "source": "RB \u00a71.11 pp16-17",
       "contract": "R: supply combines owned/controlled/aligned beginning-of-turn undamaged rail/river and naval facilities; minor range 2/major 4; refresh each facility once; no sea re-entry after landing; blockade applies but interdiction is excluded",
-      "m0_acceptance": "Local Japan-to-Rehe supply works if route exists; prune an outside-only alternative; prevent infinite facility refresh loop",
+      "acceptance_fixture": "Local Japan-to-Rehe supply works if route exists; prune an outside-only alternative; prevent infinite facility refresh loop",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -848,11 +848,11 @@
       "id": "R017",
       "source": "RB \u00a7\u00a71.12-1.14 p17",
       "contract": "I: Burma/Ledo roads, Northern Sea Route and Great Barrier Reef have missing required nodes",
-      "m0_acceptance": "July 1938 alone does not unlock Yunnan artillery via absent Burma; no A9-P1 shortcut",
+      "acceptance_fixture": "July 1938 alone does not unlock Yunnan artillery via absent Burma; no A9-P1 shortcut",
       "status": "inactive_in_frozen_profile",
       "reason": "Burma/Ledo roads, Northern Sea Route and Great Barrier Reef have missing required nodes",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -861,7 +861,7 @@
       "id": "R018",
       "source": "RB \u00a7\u00a72.1-2.4 pp18-19; J/K/C/Neutral setup charts",
       "contract": "R/O: three alliance policies replace human seat assignment, not national turns; approved on-map pieces and ordinary Japanese queues retained; treasury adjusted by explicit scenario formula",
-      "m0_acceptance": "99 deployed pieces, 3 setup factories and 19 static facilities; two queues have 5IPP paid each; FEC and USA-triggered carriers excluded; no double-counted facility",
+      "acceptance_fixture": "99 deployed pieces, 3 setup factories and 19 static facilities; two queues have 5IPP paid each; FEC and USA-triggered carriers excluded; no double-counted facility",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -876,14 +876,14 @@
           "symbol": "main",
           "line": 39,
           "behavior_assertions": [
-            "Starting unit total differs from M0",
-            "Land total differs from M0",
-            "Canonical faction count differs from M1",
+            "Starting unit total differs from the setup",
+            "Land total differs from the setup",
+            "Canonical faction count differs from the faction index",
             "Map facilities and setup factories not distinct",
             "Closed map changed",
             "Convoys became active",
             "Turn order changed",
-            "M3 catalog movement missing",
+            "Catalog movement missing",
             "National setup counts changed",
             "Opening accounts changed",
             "An excluded account was restored",
@@ -901,7 +901,7 @@
             "User display name lost",
             "Japan home-country table lost",
             "Home-country membership was inferred from possession",
-            "M4 original mainland home-country predicate unresolved",
+            "Original mainland home-country predicate unresolved",
             "Printed IPP was silently treated as evaluated legal income",
             "Actual campaign setup fails round trip",
             "Clone copied immutable definition",
@@ -917,7 +917,7 @@
       "id": "R019",
       "source": "RB \u00a7\u00a73.1-3.2 p20, \u00a73.4 pp24-25",
       "contract": "O: official VP winner, July1944 end roll and sudden death replaced by user wealth-gap/fixed July1941 endpoint",
-      "m0_acceptance": "Run all included PTs before terminal scoring; no 1944 die or early VP termination",
+      "acceptance_fixture": "Run all included PTs before terminal scoring; no 1944 die or early VP termination",
       "status": "replaced_by_approved_campaign_policy",
       "handlers": [
         {
@@ -960,7 +960,7 @@
       "id": "R020",
       "source": "RB \u00a73.3 pp20-24; K/C p2",
       "contract": "C: objective **mechanical bonuses remain**, notably evolution factory and CCP One China troops; do not award evolution factory twice under two headings",
-      "m0_acceptance": "Evolution earns one factory total; One China condition and KMT-surrender placement wording reviewed together",
+      "acceptance_fixture": "Evolution earns one factory total; One China condition and KMT-surrender placement wording reviewed together",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1005,11 +1005,11 @@
       "id": "R021",
       "source": "RB \u00a73.3 p21; J p3",
       "contract": "I: Kido Butai is disabled by campaign choice",
-      "m0_acceptance": "No local fleet comparison or Kido Butai discount; normal Improved Construction remains available",
+      "acceptance_fixture": "No local fleet comparison or Kido Butai discount; normal Improved Construction remains available",
       "status": "inactive_in_frozen_profile",
       "reason": "Kido Butai is disabled by campaign choice",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1018,11 +1018,11 @@
       "id": "R022",
       "source": "RB \u00a73.3 pp21-24",
       "contract": "I: bonuses requiring Wake/Midway/Guam, Borneo/Java/Sumatra, Burma/SEAsia, Europe/Africa/Americas absent; retain source reason",
-      "m0_acceptance": "Owning all retained Japanese land does not satisfy omitted-island objectives; no free outside factories or historical bonuses",
+      "acceptance_fixture": "Owning all retained Japanese land does not satisfy omitted-island objectives; no free outside factories or historical bonuses",
       "status": "inactive_in_frozen_profile",
       "reason": "bonuses requiring Wake/Midway/Guam, Borneo/Java/Sumatra, Burma/SEAsia, Europe/Africa/Americas absent; retain source reason",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1031,7 +1031,7 @@
       "id": "R023",
       "source": "RB \u00a7\u00a74.1-4.4 p26; adopted campaign control",
       "contract": "R: Japan Major, KMT/CCP Minor until evolution; Mongolia distinct and directly controlled by Comintern; neutral warlords no alliance asset attribution before control",
-      "m0_acceptance": "Alliance policy controls permitted decisions only; controlled-minor asset score does not grant income collection; no USSR or FEC participant",
+      "acceptance_fixture": "Alliance policy controls permitted decisions only; controlled-minor asset score does not grant income collection; no USSR or FEC participant",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1058,14 +1058,14 @@
           "behavior_assertions": [
             "Dormant Dadao became an active setup nation",
             "Dadao identity must remain dormant until created",
-            "Unresolved M4 Home Country: ",
+            "Unresolved Home Country: ",
             "Mongolian original homeland changed",
             "Offshore Hainan was incorrectly assigned to Guangxi's mainland homeland",
             "Chinese Home Country was confused with original national homelands",
             "Dadao inherited a printed homeland",
             "Mongolia's separate direct control/no-account policy changed",
             "An absent Soviet identity or extra calendar turn appeared",
-            "M4 loader changed the frozen initial force inventory",
+            "The loader changed the frozen initial force inventory",
             "Initial ship's already-paid cost changed"
           ]
         }
@@ -1075,7 +1075,7 @@
       "id": "R024",
       "source": "RB \u00a74.5 pp26-27",
       "contract": "C: neutral minor defense/control after attack, controller permissions, no income/research/diplomacy/DoW on its behalf; KMT/CCP separate-sheet exceptions",
-      "m0_acceptance": "Minor survives attack, defender choices routed correctly before formal control; cannot declare new war via generic control",
+      "acceptance_fixture": "Minor survives attack, defender choices routed correctly before formal control; cannot declare new war via generic control",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1110,7 +1110,7 @@
       "id": "R025",
       "source": "RB \u00a74.6 pp27-28",
       "contract": "C: aligned Major nations cooperate but keep identity; aligned ordinary minor absorbed; timing affects same-turn use; KMT/CCP not absorbed",
-      "m0_acceptance": "Dadao absorption changes ownership once; KMT alignment does not merge treasury; carrier sharing between Major Powers still forbidden",
+      "acceptance_fixture": "Dadao absorption changes ownership once; KMT alignment does not merge treasury; carrier sharing between Major Powers still forbidden",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1152,7 +1152,7 @@
       "id": "R026",
       "source": "RB \u00a74.7 p29; adopted campaign control",
       "contract": "R/O: Mongolia retains its identity under direct Comintern control and uses the normal USSR turn position; source USSR-incorporation behavior is inactive because USSR is excluded",
-      "m0_acceptance": "Mongolia acts after CCP and before Japan; no attack or scheduling decision creates Soviet possession, account or abilities; Tannu Tuva omitted",
+      "acceptance_fixture": "Mongolia acts after CCP and before Japan; no attack or scheduling decision creates Soviet possession, account or abilities; Tannu Tuva omitted",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1216,7 +1216,7 @@
       "id": "R027",
       "source": "RB \u00a74.7 p29, \u00a715.4 p105; J p4",
       "contract": "C: Dadao special attack/alignment behavior; Chinese attack differs from non-Chinese; Japan-China+Major war can absorb it",
-      "m0_acceptance": "KMT attacking Dadao does not automatically absorb it into Japan; foreign attack does",
+      "acceptance_fixture": "KMT attacking Dadao does not automatically absorb it into Japan; foreign attack does",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1258,11 +1258,11 @@
       "id": "R028",
       "source": "RB \u00a7\u00a74.7-4.8 pp28-30",
       "contract": "I: unrelated European/Iraq/Siam alignments and Soviet sphere restricted by absent original Soviet Home borders",
-      "m0_acceptance": "No automatic Siam income/units January1939; Mongolia is not treated as neutral Soviet sphere",
+      "acceptance_fixture": "No automatic Siam income/units January1939; Mongolia is not treated as neutral Soviet sphere",
       "status": "inactive_in_frozen_profile",
       "reason": "unrelated European/Iraq/Siam alignments and Soviet sphere restricted by absent original Soviet Home borders",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1271,7 +1271,7 @@
       "id": "R029",
       "source": "RB \u00a74.9 pp30-31",
       "contract": "R: eight warlord entities, including multi-zone pairs; CCP/Dadao attack aligns surviving warlord to KMT end Cmb unless KMT surrendered",
-      "m0_acceptance": "Attack Hopeh moves remaining Beiping warlord forces together, not all eight warlords",
+      "acceptance_fixture": "Attack Hopeh moves remaining Beiping warlord forces together, not all eight warlords",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1354,7 +1354,7 @@
       "id": "R030",
       "source": "RB \u00a74.9 pp30-31; adopted RCL-003",
       "contract": "R: foreign attack on original Chinese faction/warlord zone declares war on China; all warlords align end Cmb using the existing border/D12 table once per whole warlord; evaluate relevant neighbors across that warlord's territories",
-      "m0_acceptance": "KMT-only if no CCP/Dadao neighbor; only-one-neighbor 1-6/7-12 split; both-neighbor 1-5/6-10/11-12 split; one result transfers every territory and unit of the warlord together",
+      "acceptance_fixture": "KMT-only if no CCP/Dadao neighbor; only-one-neighbor 1-6/7-12 split; both-neighbor 1-5/6-10/11-12 split; one result transfers every territory and unit of the warlord together",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1437,7 +1437,7 @@
       "id": "R031",
       "source": "RB \u00a74.9 p30",
       "contract": "C: KMT cannot attack warlords until CCP eliminated; such attack revives/aligns to CCP; surrendered KMT does not receive default alignment",
-      "m0_acceptance": "No automatic transfer of all warlords to KMT: foreign invasion follows R030; eliminate CCP then KMT warlord attack revives CCP correctly",
+      "acceptance_fixture": "No automatic transfer of all warlords to KMT: foreign invasion follows R030; eliminate CCP then KMT warlord attack revives CCP correctly",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1520,11 +1520,11 @@
       "id": "R032",
       "source": "RB \u00a7\u00a74.10-4.11 pp31-34",
       "contract": "I: Spain, French surrender/Vichy/FreeFrance event systems have no included starting participant/trigger geography",
-      "m0_acceptance": "No Vichy event creates fleets in retained seas",
+      "acceptance_fixture": "No Vichy event creates fleets in retained seas",
       "status": "inactive_in_frozen_profile",
       "reason": "Spain, French surrender/Vichy/FreeFrance event systems have no included starting participant/trigger geography",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1533,7 +1533,7 @@
       "id": "R033",
       "source": "RB \u00a75.1 pp35-36",
       "contract": "R: out-of-turn Major DoW windows with active alliance priority; Minor DoW via land CM; nation-specific gates; no same-alliance DoW",
-      "m0_acceptance": "Japan may declare war on KMT under its national rules; unevolved KMT cannot attack Japanese Home Country; Major evolution changes allowed targets",
+      "acceptance_fixture": "Japan may declare war on KMT under its national rules; unevolved KMT cannot attack Japanese Home Country; Major evolution changes allowed targets",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1561,7 +1561,7 @@
             "A common enemy invented a non-incorporating Mongolia/CCP alignment",
             "The derived allies cache granted unsupported Mongolia/CCP alignment",
             "Major-war interrupt occurred during strategic naval movement",
-            "M4 silently fabricated missing M6 income accounting",
+            "Politics silently fabricated missing income accounting",
             "Failed unevaluated income collection partially committed a turn",
             "Mongolia collected or redirected ordinary income"
           ]
@@ -1591,7 +1591,7 @@
       "id": "R034",
       "source": "RB \u00a7\u00a75.1-5.4 pp35-37; national sheets",
       "contract": "R/C: applicable Major-war effects and local national bonuses use retained participant state; no absent-world mobilization or income inputs",
-      "m0_acceptance": "War with unevolved KMT is not Major-Power war; Japan-China actions create no FEC/USA account or income event",
+      "acceptance_fixture": "War with unevolved KMT is not Major-Power war; Japan-China actions create no FEC/USA account or income event",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1619,7 +1619,7 @@
             "A common enemy invented a non-incorporating Mongolia/CCP alignment",
             "The derived allies cache granted unsupported Mongolia/CCP alignment",
             "Major-war interrupt occurred during strategic naval movement",
-            "M4 silently fabricated missing M6 income accounting",
+            "Politics silently fabricated missing income accounting",
             "Failed unevaluated income collection partially committed a turn",
             "Mongolia collected or redirected ordinary income"
           ]
@@ -1649,11 +1649,11 @@
       "id": "R035",
       "source": "RB \u00a7\u00a75.5-5.6 pp37-38",
       "contract": "I: Monroe Doctrine and named annexations have missing participants/targets",
-      "m0_acceptance": "No worldwide auto-DoW from local naval movement; normal conquest never treated as annexation",
+      "acceptance_fixture": "No worldwide auto-DoW from local naval movement; normal conquest never treated as annexation",
       "status": "inactive_in_frozen_profile",
       "reason": "Monroe Doctrine and named annexations have missing participants/targets",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1662,7 +1662,7 @@
       "id": "R036",
       "source": "RB \u00a75.7 pp38-39; J/K/C p1",
       "contract": "R/C: Japan surrender at end its PT if Tokyo enemy-held; KMT if no possessed land; CCP never surrenders; minors elimination distinct; USSR absent",
-      "m0_acceptance": "Tokyo capture not immediately final if restored before Japan end; CCP losing land with surviving units differs from eliminated CCP",
+      "acceptance_fixture": "Tokyo capture not immediately final if restored before Japan end; CCP losing land with surviving units differs from eliminated CCP",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1723,7 +1723,7 @@
       "id": "R037",
       "source": "RB \u00a75.7 p39",
       "contract": "C: surrendering nation's queued ships roll1-7 scuttle,8-12 captured; captured construction can continue",
-      "m0_acceptance": "Do not reuse in-port10-12 capture threshold for queued ships",
+      "acceptance_fixture": "Do not reuse in-port10-12 capture threshold for queued ships",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1759,11 +1759,11 @@
       "id": "R038",
       "source": "RB \u00a7\u00a76.1-6.3 p40",
       "contract": "I: Japan-Soviet pact requires USSR participation, excluded in this campaign; reusable handler retains no attacks/border clashes/lend-lease to opponent's enemies, 5IPP break cost and no re-signing",
-      "m0_acceptance": "Mongolia's USSR-slot turn does not activate a Japan-Soviet pact; relation distinct from Chinese Truce",
+      "acceptance_fixture": "Mongolia's USSR-slot turn does not activate a Japan-Soviet pact; relation distinct from Chinese Truce",
       "status": "inactive_in_frozen_profile",
       "reason": "Japan-Soviet pact requires USSR participation, excluded in this campaign; reusable handler retains no attacks/border clashes/lend-lease to opponent's enemies, 5IPP break cost and no re-signing",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1772,11 +1772,11 @@
       "id": "R039",
       "source": "RB \u00a7\u00a76.4-6.5 pp40-42",
       "contract": "I: Molotov-Ribbentrop and Moscow Peace Treaty missing Germany/Poland/Finland prerequisites",
-      "m0_acceptance": "No 5IPP/3IPP global trade or Soviet free technology roll at round end",
+      "acceptance_fixture": "No 5IPP/3IPP global trade or Soviet free technology roll at round end",
       "status": "inactive_in_frozen_profile",
       "reason": "Molotov-Ribbentrop and Moscow Peace Treaty missing Germany/Poland/Finland prerequisites",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -1785,7 +1785,7 @@
       "id": "R040",
       "source": "RB \u00a76.6 p42",
       "contract": "R/C: Chinese Truce offered immediately end foreign attack Cmb; both must agree; movement/co-defense but no attacks; recaptured Chinese land goes to capturing faction",
-      "m0_acceptance": "Declining is legal; reward enemies do not override truce; truce does not allow foreign entry without China DoW",
+      "acceptance_fixture": "Declining is legal; reward enemies do not override truce; truce does not allow foreign entry without China DoW",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1842,7 +1842,7 @@
       "id": "R041",
       "source": "RB \u00a76.6 p42; closed RCL-007",
       "contract": "C: separation may occur in the preceding CM under ordinary movement restrictions; the decision to break the truce and formal break occur during Cmb; remaining co-located forces fight; KMT low-morale10+ eliminated; Major evolution auto-ends truce and blocks future signing",
-      "m0_acceptance": "No retroactive or extra movement phase; no declaration or prior commitment to breaking the truce is required in CM; no retreat-to-origin for KMT truce-break failures; separation permission does not grant unrestricted new attacks",
+      "acceptance_fixture": "No retroactive or extra movement phase; no declaration or prior commitment to breaking the truce is required in CM; no retreat-to-origin for KMT truce-break failures; separation permission does not grant unrestricted new attacks",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1918,7 +1918,7 @@
       "id": "R042",
       "source": "RB \u00a7\u00a77.1,7.3 pp43-44; adopted Mongolia timing",
       "contract": "R: local order CCP -> Mongolia (normal USSR slot) -> Japan -> KMT; Mongolia movement/recruitment follows the phases it would use with USSR present; five phases",
-      "m0_acceptance": "All three alliance policies may act during one Japan PT; Mongolia recruitment occurs at its Place Units phase; final round includes KMT after Japan; no Soviet participant/account",
+      "acceptance_fixture": "All three alliance policies may act during one Japan PT; Mongolia recruitment occurs at its Place Units phase; final round includes KMT after Japan; no Soviet participant/account",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -1982,7 +1982,7 @@
       "id": "R043",
       "source": "RB \u00a77.2 p43",
       "contract": "O: optional overlapping human continuous play disabled; deterministic sequential scheduler instead",
-      "m0_acceptance": "Identical action/chance transcript replays identically; no overlapping side effects",
+      "acceptance_fixture": "Identical action/chance transcript replays identically; no overlapping side effects",
       "status": "replaced_by_approved_campaign_policy",
       "handlers": [
         {
@@ -2015,7 +2015,7 @@
       "id": "R044",
       "source": "RB \u00a7\u00a78.1-8.2 p45",
       "contract": "R/C: one research die per undamaged possessed Major Factory; same technology at most once CT; stageIII unavailable before July1939; immediate completion effects",
-      "m0_acceptance": "Damaged Major Factory grants no die; choose different tech with additional die; January1939 cannot progress into locked stage",
+      "acceptance_fixture": "Damaged Major Factory grants no die; choose different tech with additional die; January1939 cannot progress into locked stage",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2073,8 +2073,8 @@
     {
       "id": "R045",
       "source": "RB \u00a78.2.1 pp45-50; catalog_source_checks.json",
-      "contract": "R/C: technology chart thresholds are successful high-roll thresholds, not generic combat hit-under tests; exact 16-row transcription is recorded in M0 source checks",
-      "m0_acceptance": "Use each transcribed stage threshold, not a generic attack-value convention; completion updates abilities immediately",
+      "contract": "R/C: technology chart thresholds are successful high-roll thresholds, not generic combat hit-under tests; exact 16-row transcription is recorded in the catalog source checks",
+      "acceptance_fixture": "Use each transcribed stage threshold, not a generic attack-value convention; completion updates abilities immediately",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2133,7 +2133,7 @@
       "id": "R046",
       "source": "RB \u00a78.2.1 pp45-46",
       "contract": "C: Advanced Mechanized2:1 blitz pairing; Advanced Artillery/self-propelled variants and attrition; no automatic upgrade of all existing ordinary artillery",
-      "m0_acceptance": "Unlock advanced purchase type without mutating existing ordinary Artillery",
+      "acceptance_fixture": "Unlock advanced purchase type without mutating existing ordinary Artillery",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2194,7 +2194,7 @@
       "id": "R047",
       "source": "RB \u00a78.2.1 p46",
       "contract": "C: Radar affects independently applicable raider/interception rolls, unlimited base/naval scramble, rocket AAA and heavy-carrier fighters; convoy/interdiction effects are inactive",
-      "m0_acceptance": "Radar +1 interception stacks with correct base; normal carrier still no heavy-carrier-only ability",
+      "acceptance_fixture": "Radar +1 interception stacks with correct base; normal carrier still no heavy-carrier-only ability",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2250,7 +2250,7 @@
       "id": "R048",
       "source": "RB \u00a78.2.1 p46",
       "contract": "C: ASW transport defense vs submarines and seaplane+2 MAP remain; convoy-defense effect is inactive",
-      "m0_acceptance": "Transport gets defense1 against attacking submarine but not every normal attacker",
+      "acceptance_fixture": "Transport gets defense1 against attacking submarine but not every normal attacker",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2283,7 +2283,7 @@
       "id": "R049",
       "source": "RB \u00a78.2.1 p46",
       "contract": "C: Improved Factories capacities minor2/medium5/major8 and shipyards2/8; no inherited benefit for captor",
-      "m0_acceptance": "Capture improved factory does not transfer national technology",
+      "acceptance_fixture": "Capture improved factory does not transfer national technology",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2343,7 +2343,7 @@
       "id": "R050",
       "source": "RB \u00a78.2.1 pp46-47",
       "contract": "C: Improved Construction choose -1/stage or condense first2 stages; factory/city bombing reduction per PT",
-      "m0_acceptance": "Multiple bomber/rocket attacks share same per-PT reduction allowance, not one allowance per attack",
+      "acceptance_fixture": "Multiple bomber/rocket attacks share same per-PT reduction allowance, not one allowance per attack",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2386,7 +2386,7 @@
       "id": "R051",
       "source": "RB \u00a78.2.1 p47",
       "contract": "C: Airborne Doctrine elite conversion, Heavy Air Transport, no city inherent AAA against airborne, fortification first strike cannot hit assault cargo/transport",
-      "m0_acceptance": "All existing airborne become elite; protected airborne pair cannot absorb fortification hit",
+      "acceptance_fixture": "All existing airborne become elite; protected airborne pair cannot absorb fortification hit",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2471,7 +2471,7 @@
       "id": "R052",
       "source": "RB \u00a78.2.1 pp47-48",
       "contract": "C: Amphibious Doctrine prevents infantry-class double casualties; Attack Naval Transport first-round cargo and Marine bonus",
-      "m0_acceptance": "Ordinary non-infantry cargo still waits until round2 unless attack transport exception",
+      "acceptance_fixture": "Ordinary non-infantry cargo still waits until round2 unless attack transport exception",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2523,7 +2523,7 @@
       "id": "R053",
       "source": "RB \u00a78.2.1 p48",
       "contract": "C: Heavy Armor and Jet Fighters unlock stats/types; Long-range Aircraft +1 normal movement and specific MAP changes; convoy-defense effect is inactive",
-      "m0_acceptance": "Fighter MAP remains1 despite long-range; Medium Bomber MAP rises2; base-start Seaplane MAP conditional",
+      "acceptance_fixture": "Fighter MAP remains1 despite long-range; Medium Bomber MAP rises2; base-start Seaplane MAP conditional",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2580,7 +2580,7 @@
       "id": "R054",
       "source": "RB \u00a78.2.1 pp48-49",
       "contract": "C: Advanced Submarines wolfpack bonus and advanced type only attacked by MAP aircraft rather than paired Destroyer; doubled-interdiction effect is inactive",
-      "m0_acceptance": "Regular submarine affected by doctrine; advanced submarine excludes paired-Destroyer attack hit",
+      "acceptance_fixture": "Regular submarine affected by doctrine; advanced submarine excludes paired-Destroyer attack hit",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2629,7 +2629,7 @@
       "id": "R055",
       "source": "RB \u00a78.2.1 p49",
       "contract": "C: Large Ship Construction permits Heavy Battleship and Heavy Fleet Carrier with distinct hit/cargo capacities",
-      "m0_acceptance": "Heavy Battleship3 hits versus Heavy Fleet Carrier2; heavy carrier lawful cargo combinations",
+      "acceptance_fixture": "Heavy Battleship3 hits versus Heavy Fleet Carrier2; heavy carrier lawful cargo combinations",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2690,7 +2690,7 @@
       "id": "R056",
       "source": "RB \u00a78.2.1 p49",
       "contract": "C: Improved Logistics rail+1/gauge crossing, supply+1, strategic naval+2/range+1, factory moves in home and anti-diplomacy",
-      "m0_acceptance": "Moving factory cannot research/build/upgrade/repair that PT; damaged state travels intact",
+      "acceptance_fixture": "Moving factory cannot research/build/upgrade/repair that PT; damaged state travels intact",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2756,7 +2756,7 @@
       "id": "R057",
       "source": "RB \u00a78.2.1 pp49-50",
       "contract": "C: Heavy Strategic Bombers weakens facility AAA, enables carpet bombing; Strategic Rockets range3, no hostile-neutral overflight, max2 purchases, one use",
-      "m0_acceptance": "No ordinary bomber carpet-bomb before doctrine; rocket use removes unit exactly once",
+      "acceptance_fixture": "No ordinary bomber carpet-bomb before doctrine; rocket use removes unit exactly once",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2827,7 +2827,7 @@
       "id": "R058",
       "source": "RB \u00a78.3 pp50-51; national build charts",
       "contract": "R: only national legal types, calendar/tech/caps, sufficient cash and capacity; staged ships/facilities; completed box not immediately on map",
-      "m0_acceptance": "Jan1940 gates for mechanized/TD/medium armor/strategic bomber; TD cap2; old setup pieces exempt from purchase availability",
+      "acceptance_fixture": "Jan1940 gates for mechanized/TD/medium armor/strategic bomber; TD cap2; old setup pieces exempt from purchase availability",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2899,7 +2899,7 @@
       "id": "R059",
       "source": "RB \u00a78.3.2 p51",
       "contract": "C: construction site and queue refer to same project; unfinished facility no inherent AAA, takes3damage then pushed stage/removal; repair before resume",
-      "m0_acceptance": "5damage to stage2 pushes back one with2damage; capture removes unfinished site/queue together",
+      "acceptance_fixture": "5damage to stage2 pushes back one with2damage; capture removes unfinished site/queue together",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2932,7 +2932,7 @@
       "id": "R060",
       "source": "RB \u00a78.4 p51; \u00a712.3 p80",
       "contract": "R/C: Militia->Infantry2, Infantry->Motorized1, each cap2; upgraded type buildability; used unit may upgrade, newly placed cannot; undeliverable upgrade waits",
-      "m0_acceptance": "Target dies before PU: upgrade stays pending rather than resurrecting target",
+      "acceptance_fixture": "Target dies before PU: upgrade stays pending rather than resurrecting target",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -2975,7 +2975,7 @@
       "id": "R061",
       "source": "RB \u00a7\u00a78.5-8.6 p51",
       "contract": "R/C: eligible alignments in P; paid city/facility repairs finish PU,1IPP/damage; destroyed city cannot repair",
-      "m0_acceptance": "Newly paid factory repair does not increase same-turn production capacity",
+      "acceptance_fixture": "Newly paid factory repair does not increase same-turn production capacity",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3029,7 +3029,7 @@
       "id": "R062",
       "source": "RB \u00a78.6 p51",
       "contract": "R/C: Capital Ship repair costs0, consumes slots, locks actions except optional entering repair port; can repair2 hits for2 slots",
-      "m0_acceptance": "Damaged carrier cannot sail away while repair pending; repair-price wealth deduction is0",
+      "acceptance_fixture": "Damaged carrier cannot sail away while repair pending; repair-price wealth deduction is0",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3078,7 +3078,7 @@
       "id": "R063",
       "source": "RB \u00a78.7 pp52-53; J p4",
       "contract": "C: local lend-lease only with real source/recipient/route; one repair/base/unit/militia upgrade per recipient PT, no technology-only units; special Japan->Dadao permission",
-      "m0_acceptance": "Japan can aid controlled Dadao per explicit exception despite condensed J p3 table; no off-map USA/FEC-home delivery",
+      "acceptance_fixture": "Japan can aid controlled Dadao per explicit exception despite condensed J p3 table; no off-map USA/FEC-home delivery",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3148,11 +3148,11 @@
       "id": "R064",
       "source": "RB \u00a7\u00a74.2-4.3 p26, \u00a7\u00a74.8-4.9 p30, \u00a78.8 p53; closed RCL-008",
       "contract": "C: Major-war diplomacy, undamaged Major Factory capacity, supply to neutral Home Country, stage0->1->2 on2orless; one roll/nation/CT, recall/capacity loss; Chinese warlords are ineligible for ordinary diplomacy under the source classifications",
-      "m0_acceptance": "Reject ordinary diplomacy targeting a Chinese warlord even when factory capacity and supply requirements are met; retain the separate warlord influence/alignment procedures",
+      "acceptance_fixture": "Reject ordinary diplomacy targeting a Chinese warlord even when factory capacity and supply requirements are met; retain the separate warlord influence/alignment procedures",
       "status": "inactive_in_frozen_profile",
       "reason": "No eligible neutral Minor Power can arise in the frozen participant set: Chinese warlords are ineligible for ordinary diplomacy; Mongolia and Dadao are controlled minors; KMT/CCP have separate Chinese rules. No ordinary diplomacy roll handler is asserted here. Anti-diplomacy in R056 is likewise inactive.",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -3161,7 +3161,7 @@
       "id": "R065",
       "source": "RB \u00a79.1 p54",
       "contract": "R: declare all intended combats and mission types; sea entry/Coastal Artillery crossing when DoW possible belongs in CM; intent/response window per entry",
-      "m0_acceptance": "Peaceful sea co-location may continue if neither declares; defender DoW still permits attacker to commit reinforcements",
+      "acceptance_fixture": "Peaceful sea co-location may continue if neither declares; defender DoW still permits attacker to commit reinforcements",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3216,7 +3216,7 @@
       "id": "R066",
       "source": "RB \u00a79.2 p54",
       "contract": "R: enter enemy land then stop absent later blitz; Militia start/end Home Country where movable",
-      "m0_acceptance": "No pre-combat path through hostile land; Chinese Minor Militia cannot be given Major-style movement",
+      "acceptance_fixture": "No pre-combat path through hostile land; Chinese Minor Militia cannot be given Major-style movement",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3260,7 +3260,7 @@
       "id": "R067",
       "source": "RB \u00a79.3 p55",
       "contract": "R: neutral overflight constraints, enemy Fighter screening, legal return landing at CM end; cannot assume future fighter kill shortens return route; carrier aircraft independent",
-      "m0_acceptance": "Attack with no legal precombat landing plan rejected; no carrier movement plus full aircraft movement exploit",
+      "acceptance_fixture": "Attack with no legal precombat landing plan rejected; no carrier movement plus full aircraft movement exploit",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3315,7 +3315,7 @@
       "id": "R068",
       "source": "RB \u00a79.3.1 pp55-56",
       "contract": "R/C: MAP start/range, optional attack, pass-through single-round reactions, Fighter screening, paired Destroyer, ending patrol, loss of landing spot",
-      "m0_acceptance": "Moving carrier out of range can destroy its stranded patrol; defender carrier aircraft may act as MAP against passing submarines",
+      "acceptance_fixture": "Moving carrier out of range can destroy its stranded patrol; defender carrier aircraft may act as MAP against passing submarines",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3368,7 +3368,7 @@
       "id": "R069",
       "source": "RB \u00a79.3.2 p56",
       "contract": "C: aircraft pick up airborne before/during CM, one enemy target; cargo loses independent combat behavior while transported",
-      "m0_acceptance": "Same airborne unit cannot be committed to both land move and transport assault",
+      "acceptance_fixture": "Same airborne unit cannot be committed to both land move and transport assault",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3453,7 +3453,7 @@
       "id": "R070",
       "source": "RB \u00a79.4 pp57-60",
       "contract": "R/C: naval entry depends on surface ships, MAP and submarine state; some compulsory/optional single-round combats occur during movement; submerged ignored",
-      "m0_acceptance": "Surviving ships continue after eligible one-round submarine engagement without losing extra movement",
+      "acceptance_fixture": "Surviving ships continue after eligible one-round submarine engagement without losing extra movement",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3508,7 +3508,7 @@
       "id": "R071",
       "source": "RB \u00a79.4.1 p57",
       "contract": "R: Major surface ships without naval supply -1movement; cumulative with capital damage; raiding Battlecruiser exception",
-      "m0_acceptance": "Damaged Battleship with no supply has0movement, not1",
+      "acceptance_fixture": "Damaged Battleship with no supply has0movement, not1",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3534,7 +3534,7 @@
       "id": "R072",
       "source": "RB \u00a79.4.2 p58",
       "contract": "R/C: screening/continuing force split, deferred continuation on success, repeat screens; enemy Fighter screen has different success target; no airborne continuing force",
-      "m0_acceptance": "Failed screen retreats continuing force; successful screen may be mutual annihilation if blocking enemies eliminated",
+      "acceptance_fixture": "Failed screen retreats continuing force; successful screen may be mutual annihilation if blocking enemies eliminated",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3594,7 +3594,7 @@
       "id": "R073",
       "source": "RB \u00a79.4.3 p58",
       "contract": "R: transport pickup before/during movement, cargo must not have moved; destroy cargo with transport; unload into multiple adjacent zones then stop",
-      "m0_acceptance": "No mixed CM/NC split debark; no cargo free moves before pickup",
+      "acceptance_fixture": "No mixed CM/NC split debark; no cargo free moves before pickup",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3644,7 +3644,7 @@
       "id": "R074",
       "source": "RB \u00a79.4.4 pp58-59",
       "contract": "C: retain independently applicable Battlecruiser raider declaration/removal, slip checks, +6 and opposition modifiers, reroll ties, no joint attack while raider; convoy/interdiction missions remain excluded",
-      "m0_acceptance": "Two raiders make separate checks; winning defender may stay unengaged in same sea; no teleport retreat or implicit convoy mission",
+      "acceptance_fixture": "Two raiders make separate checks; winning defender may stay unengaged in same sea; no teleport retreat or implicit convoy mission",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3688,11 +3688,11 @@
       "id": "R075",
       "source": "RB \u00a79.4.5 pp59-60",
       "contract": "I: escort defenses whose prerequisites are convoy raiding or interdiction are inactive with those excluded missions; source restrictions retained for broader scenarios",
-      "m0_acceptance": "No convoy/interdiction escort volley occurs; independent ordinary naval movement/combat permissions are unchanged",
+      "acceptance_fixture": "No convoy/interdiction escort volley occurs; independent ordinary naval movement/combat permissions are unchanged",
       "status": "inactive_in_frozen_profile",
       "reason": "escort defenses whose prerequisites are convoy raiding or interdiction are inactive with those excluded missions; source restrictions retained for broader scenarios",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -3701,7 +3701,7 @@
       "id": "R076",
       "source": "RB \u00a79.4.6 p60; closed RCL-005",
       "contract": "R/C: 3 same-alliance Surface Warships with no enemy Surface Warships blockade; every access sea needed for two-access facility; no neutral blockade; major-yard build-in-port exception",
-      "m0_acceptance": "Blockading only one of Nanking's seas does not blockade physical port; enemy Surface Warships prevent a blockade, but enemy submarines alone do not",
+      "acceptance_fixture": "Blockading only one of Nanking's seas does not blockade physical port; enemy Surface Warships prevent a blockade, but enemy submarines alone do not",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3760,7 +3760,7 @@
       "id": "R077",
       "source": "RB \u00a710.1 p61",
       "contract": "R: attacker chooses battle order; each unit one battle/PT except named movement/blitz/port exceptions",
-      "m0_acceptance": "Bomb Airbase first may remove later scramble; no arbitrary repeated Fighter defense beyond listed exceptions",
+      "acceptance_fixture": "Bomb Airbase first may remove later scramble; no arbitrary repeated Fighter defense beyond listed exceptions",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3824,7 +3824,7 @@
       "id": "R078",
       "source": "RB \u00a710.2 pp61-62",
       "contract": "R: first-strike simultaneous between both sides and removes casualties before ordinary return; air superiority and AAA first round; normal casualty return fire; typed target selection",
-      "m0_acceptance": "First-strike killed regular Infantry does not fire; first-strike artillery killed by first-strike still fires simultaneously",
+      "acceptance_fixture": "First-strike killed regular Infantry does not fire; first-strike artillery killed by first-strike still fires simultaneously",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3883,7 +3883,7 @@
       "id": "R079",
       "source": "RB \u00a710.2 pp61-62",
       "contract": "R: each AAA has min(aircraft,3) shots, not globally capshots; may remain casualty after first round; double-casualty target selection selects only one",
-      "m0_acceptance": "2AAA versus2aircraft rolls4dice; unqualified target-selection hit becomes normal casualty",
+      "acceptance_fixture": "2AAA versus2aircraft rolls4dice; unqualified target-selection hit becomes normal casualty",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3935,7 +3935,7 @@
       "id": "R080",
       "source": "RB \u00a710.3 p62",
       "contract": "R: voluntary retreat before next round, all retreatable forces; eligible source-adjacent destinations can split; assault forces remain; submarines submerge after first round",
-      "m0_acceptance": "Mixed adjacent+amphibious attack only adjacent forces retreat; cannot retreat into never-used source",
+      "acceptance_fixture": "Mixed adjacent+amphibious attack only adjacent forces retreat; cannot retreat into never-used source",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -3984,7 +3984,7 @@
       "id": "R081",
       "source": "RB \u00a710.4 p63",
       "contract": "R/C: facility-specific scramble types/counts, allied use, Radar expansion; needs friendly defending unit/target facility; no scramble into surprise/specific one-round encounters; return or die if origin lost",
-      "m0_acceptance": "Airbase provides3Fighters max withoutRadar; already-used scramble unit cannot join unrelated later battle",
+      "acceptance_fixture": "Airbase provides3Fighters max withoutRadar; already-used scramble unit cannot join unrelated later battle",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4032,7 +4032,7 @@
       "id": "R082",
       "source": "RB \u00a710.5 pp63-64",
       "contract": "R: full land-combat sequence incl choice to ground defender aircraft; ordinary simultaneous fire; retreat/round cap then capture",
-      "m0_acceptance": "Grounded fighters die when land defense defeated; no deterministic fractional casualty shortcut",
+      "acceptance_fixture": "Grounded fighters die when land defense defeated; no deterministic fractional casualty shortcut",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4096,7 +4096,7 @@
       "id": "R083",
       "source": "RB \u00a710.5.1 p64",
       "contract": "R/C: blitz after <=2rounds with remaining movement; eligible armor/pairing; terrain/fortification/city/amphibious prohibitions per origin",
-      "m0_acceptance": "Unit entering over fortified border cannot blitz although another attacking origin's unit may",
+      "acceptance_fixture": "Unit entering over fortified border cannot blitz although another attacking origin's unit may",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4148,11 +4148,11 @@
       "id": "R084",
       "source": "RB \u00a710.5.2 pp64-65; J p1; adopted RCL-009",
       "contract": "I: following Japan NRS, Japanese border-clash attacks may target Soviet units only in Chita, Amur or Primorsky Krai; retain shared-border, one-round/no-conquest and pact restrictions; inactive here because USSR is excluded",
-      "m0_acceptance": "Soviet ownership or incorporation of Mongolian tiles adds no Japanese clash target; do not infer symmetric restrictions on Soviet attack origins or override USSR NRS",
+      "acceptance_fixture": "Soviet ownership or incorporation of Mongolian tiles adds no Japanese clash target; do not infer symmetric restrictions on Soviet attack origins or override USSR NRS",
       "status": "inactive_in_frozen_profile",
       "reason": "following Japan NRS, Japanese border-clash attacks may target Soviet units only in Chita, Amur or Primorsky Krai; retain shared-border, one-round/no-conquest and pact restrictions; inactive here because USSR is excluded",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -4161,7 +4161,7 @@
       "id": "R085",
       "source": "RB \u00a710.5.3 p65",
       "contract": "C: advanced-artillery attrition from beginning-of-PT adjacent position, one round, no return, no movement same PT, no terrain modifier; fortification lowers effective hit value",
-      "m0_acceptance": "Adjacent artillery cannot move then attrition; separate normal battle in same target permitted with different units",
+      "acceptance_fixture": "Adjacent artillery cannot move then attrition; separate normal battle in same target permitted with different units",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4201,7 +4201,7 @@
       "id": "R086",
       "source": "RB \u00a710.6 p65",
       "contract": "R/C: Seaplane only hits subs/transports with restricted targets, no land combat; air transports last casualties and no land defense alone",
-      "m0_acceptance": "Seaplane hit cannot kill cruiser; lone transport plane is eliminated by ground attacker",
+      "acceptance_fixture": "Seaplane hit cannot kill cruiser; lone transport plane is eliminated by ground attacker",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4240,7 +4240,7 @@
       "id": "R087",
       "source": "RB \u00a710.6.1 pp65-66",
       "contract": "C: RCL-001 adopted; step 4 attacking AAA plus both sides' fighters, step 5 defending AAA; each regular AAA fires once; separate inherent city AA; transport/cargo linkage, landing and no-airborne-retreat rules retained",
-      "m0_acceptance": "No double-firing AAA; destroyed transport loses cargo; facility AA adds no airborne volley; doctrine disables city AA, not regular AAA",
+      "acceptance_fixture": "No double-firing AAA; destroyed transport loses cargo; facility AA adds no airborne volley; doctrine disables city AA, not regular AAA",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4325,7 +4325,7 @@
       "id": "R088",
       "source": "RB \u00a710.6.2 pp66-67",
       "contract": "R/C: strategic bombing interception first, damage then inherent facility AAA; units' AAA not used; cap facilitydamage; rockets special pre-damage Radar interception",
-      "m0_acceptance": "Destroyed bomber after facility AAA still dealt its rolled damage; hit rocket underRadar dealsnone",
+      "acceptance_fixture": "Destroyed bomber after facility AAA still dealt its rolled damage; hit rocket underRadar dealsnone",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4379,7 +4379,7 @@
       "id": "R089",
       "source": "RB \u00a710.6.2 p67",
       "contract": "C: city each 20 damage loses 1 IPP permanently; capital maximum 60/other city 45; destroyed city unreparable, tech stage down, still terrain",
-      "m0_acceptance": "Repairing surviving damage cannot restore previously permanently destroyed income; maximum damage triggers once",
+      "acceptance_fixture": "Repairing surviving damage cannot restore previously permanently destroyed income; maximum damage triggers once",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4416,7 +4416,7 @@
       "id": "R090",
       "source": "RB \u00a710.6.2 p67",
       "contract": "R/C: railroad bombing chooses one target-zone border after rolling; all tracks on that border; no inherentAAA; only targeted-zone owner need be enemy",
-      "m0_acceptance": "Two artworktracks or reciprocal edges are one damaged crossing; neutral opposite owner does not immunize hostile-side rail target",
+      "acceptance_fixture": "Two artworktracks or reciprocal edges are one damaged crossing; neutral opposite owner does not immunize hostile-side rail target",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4442,7 +4442,7 @@
       "id": "R091",
       "source": "RB \u00a710.6.3 pp67-68",
       "contract": "C: interception uses reduced values for one round; adjacent Airbase/heavy Radar-carrier eligibility; source loss destroys interceptor",
-      "m0_acceptance": "Use Fighter 3, not 6, before Radar; interceptors do not join normal attack as free second battle",
+      "acceptance_fixture": "Use Fighter 3, not 6, before Radar; interceptors do not join normal attack as free second battle",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4496,7 +4496,7 @@
       "id": "R092",
       "source": "RB \u00a710.6.4 p68",
       "contract": "R/C: port attack one round, reachable adjacent sea, eligible aircraft; ships defend 0, fighters/facility AAA may defend; submarine-base attack need not be MAP",
-      "m0_acceptance": "Aircraft can attack ported submarine without MAP; AAA unit in territory does not add to inherent port AAA",
+      "acceptance_fixture": "Aircraft can attack ported submarine without MAP; AAA unit in territory does not add to inherent port AAA",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4539,7 +4539,7 @@
       "id": "R093",
       "source": "RB \u00a710.6.5 p68",
       "contract": "C: doctrine-enabled carpet bombing first round only; land targets; only defending Fighters/AAA may hit bombers; combines with normal combat",
-      "m0_acceptance": "Bombers land after first round instead of firing again in round 2",
+      "acceptance_fixture": "Bombers land after first round instead of firing again in round 2",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4587,7 +4587,7 @@
       "id": "R094",
       "source": "RB \u00a710.7 pp68-69",
       "contract": "R: submarine first strike negated by Destroyer, no air hits, selective participation/casualty eligibility, defending submerge; transport last/cargo loss; raider battle 1 round",
-      "m0_acceptance": "Subs cannot absorb arbitrary fleet hits when protected; no normal targeting of aircraft by submarine",
+      "acceptance_fixture": "Subs cannot absorb arbitrary fleet hits when protected; no normal targeting of aircraft by submarine",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4632,7 +4632,7 @@
       "id": "R095",
       "source": "RB \u00a710.7 p69",
       "contract": "R: carrier loss gives defending aircraft immediate 1 movement legal landing or elimination",
-      "m0_acceptance": "Sunk-carrier fighters do not silently survive with no free capacity",
+      "acceptance_fixture": "Sunk-carrier fighters do not silently survive with no free capacity",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4657,7 +4657,7 @@
       "id": "R096",
       "source": "RB \u00a7\u00a710.8.1-10.8.2 p70",
       "contract": "R/C: amphibious screen first, surviving nonsubmerged subs may hit continuing force; bombard only ships not fought naval; maximum ships = landing units; Coastal Artillery first strike",
-      "m0_acceptance": "Same battleship cannot screen then bombard; first-strike sunk transport destroys cargo before landing",
+      "acceptance_fixture": "Same battleship cannot screen then bombard; first-strike sunk transport destroys cargo before landing",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4714,7 +4714,7 @@
       "id": "R097",
       "source": "RB \u00a710.8.3 pp70-71",
       "contract": "R/C: infantry/air first round, non-infantry cargo waits unless attack transport/undefended; double-casualty exemptions; at least one first-round land survivor; assault casualties before other land",
-      "m0_acceptance": "All first-wave infantry dead prevents second-wave armor rescue; adjacent land/air can retreat while assault land cannot",
+      "acceptance_fixture": "All first-wave infantry dead prevents second-wave armor rescue; adjacent land/air can retreat while assault land cannot",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4764,13 +4764,13 @@
     },
     {
       "id": "R098",
-      "source": "RB \u00a710.9 pp71-72; M0 convoy audit",
+      "source": "RB \u00a710.9 pp71-72; convoy audit",
       "contract": "I: convoy raiding is excluded by campaign choice, including Nagasaki; global route/raiding evidence remains source-only",
-      "m0_acceptance": "No convoy losses, escort volleys or raiding actions; ordinary MAP combat and blockades remain active",
+      "acceptance_fixture": "No convoy losses, escort volleys or raiding actions; ordinary MAP combat and blockades remain active",
       "status": "inactive_in_frozen_profile",
       "reason": "convoy raiding is excluded by campaign choice, including Nagasaki; global route/raiding evidence remains source-only",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -4779,7 +4779,7 @@
       "id": "R099",
       "source": "RB \u00a7\u00a710.10-10.10.1 p73",
       "contract": "R: landing after combat via remaining range, not newly captured/liberated zone; land unit required for capture; destroy fort/coastal/unfinished; national income adjustment; liberation/China gift options",
-      "m0_acceptance": "Air-only victory does not conquer; captured finished factory retained but unfinished removed; own-alliance liberation restores owner",
+      "acceptance_fixture": "Air-only victory does not conquer; captured finished factory retained but unfinished removed; own-alliance liberation restores owner",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4868,7 +4868,7 @@
       "id": "R100",
       "source": "RB \u00a7\u00a710.10.2-10.10.3 p73",
       "contract": "R/C: capital capture loses owner's treasury to bank; relocated capital only for eligible nations; KMT/CCP exceptions before evolution",
-      "m0_acceptance": "Capturing Tokyo does not award Japan's cash to attacker; Nanking as Minor KMT is not a generic capital-loss shortcut",
+      "acceptance_fixture": "Capturing Tokyo does not award Japan's cash to attacker; Nanking as Minor KMT is not a generic capital-loss shortcut",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4896,7 +4896,7 @@
       "id": "R101",
       "source": "RB \u00a711.1 p74",
       "contract": "R: NC only unused units; no newly captured land entry except named cases; militia home restriction",
-      "m0_acceptance": "Unit passed CM may move NC; unit retreated from combat cannot move again",
+      "acceptance_fixture": "Unit passed CM may move NC; unit retreated from combat cannot move again",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4940,7 +4940,7 @@
       "id": "R102",
       "source": "RB \u00a7\u00a711.2-11.2.1 pp74-75",
       "contract": "R: strategic rail/rivers any distance, beginning-of-PT possession, Asia capacity 1, regional crossing consumes both; aligned permission; gauge change requires Logistics",
-      "m0_acceptance": "Train-plus-river route consumes 1 Asia move; cannot use Hokkaido crossing as rail; rebuilt-this-PT rail not a same-turn strategic route",
+      "acceptance_fixture": "Train-plus-river route consumes 1 Asia move; cannot use Hokkaido crossing as rail; rebuilt-this-PT rail not a same-turn strategic route",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -4997,7 +4997,7 @@
       "id": "R103",
       "source": "RB \u00a7\u00a711.3-11.3.1 p75",
       "contract": "R/C: air NC overflight/landing, independent carrier movement, MAP return; air cargo identity and allied load-own/move-carrier/unload-own turn cycle",
-      "m0_acceptance": "No same-CT free ride plus move with allied cargo; transport loss removes cargo",
+      "acceptance_fixture": "No same-CT free ride plus move with allied cargo; transport loss removes cargo",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5046,7 +5046,7 @@
       "id": "R104",
       "source": "RB \u00a7\u00a711.4-11.4.1 pp75-76",
       "contract": "R: naval NC entry restrictions and one-round submarine/MAP reactions; transport loads unmoved cargo, stops on unloading; no post-debark move; allied timeline",
-      "m0_acceptance": "NC not assumed combat-free; no split combat and NC cargo drop",
+      "acceptance_fixture": "NC not assumed combat-free; no split combat and NC cargo drop",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5087,7 +5087,7 @@
       "id": "R105",
       "source": "RB \u00a711.4.2 pp76-77; K/C p1",
       "contract": "R/C: strategic naval transport and cargo each consume unit quota, major start/minor or major end, supply range 4; no enemy departure/entry, no opportunistic neutral DoW; Chinese Majors quota 1 from NRS",
-      "m0_acceptance": "Transport plus 2 cargo costs 3 moves; evolved CCP uses explicit NRS 1, not generic all-others 0; no outside Commonwealth objective +1",
+      "acceptance_fixture": "Transport plus 2 cargo costs 3 moves; evolved CCP uses explicit NRS 1, not generic all-others 0; no outside Commonwealth objective +1",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5128,7 +5128,7 @@
       "id": "R106",
       "source": "RB \u00a711.5 pp77-78",
       "contract": "R: port designation end NC; undamaged major facility for surface ships/submarine base for subs; carriers must unload planes; remove escort/raider; departure costs 0; damaged-port exit choice up to 3 else locked",
-      "m0_acceptance": "Damaged port forces choice but not automatic fleet destruction; newly captured amphibious-port exception limited",
+      "acceptance_fixture": "Damaged port forces choice but not automatic fleet destruction; newly captured amphibious-port exception limited",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5197,7 +5197,7 @@
       "id": "R107",
       "source": "RB \u00a711.5 p78",
       "contract": "R/C: eligible large ported ship supplies temporary Militia; casualty causes skeleton-crew lock through next PT; crew free replenishment; no separate asset",
-      "m0_acceptance": "Lost crew Militia does not destroy ship; same ship cannot spawn new crew defense while locked",
+      "acceptance_fixture": "Lost crew Militia does not destroy ship; same ship cannot spawn new crew defense while locked",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5222,7 +5222,7 @@
       "id": "R108",
       "source": "RB \u00a712.1 p79",
       "contract": "R: place completed projects at eligible beginning-of-PT-owned supplied factory/shipyard capacity; Capital Ships major only; new/upgraded capacity next PT; DoW route failure waits",
-      "m0_acceptance": "Repaired/upgraded factory uses old capacity this PT; withheld unit not refunded or spawned elsewhere",
+      "acceptance_fixture": "Repaired/upgraded factory uses old capacity this PT; withheld unit not refunded or spawned elsewhere",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5271,7 +5271,7 @@
       "id": "R109",
       "source": "RB \u00a712.1 p79; \u00a713.1.1 pp83-84",
       "contract": "R: militia placement IPP/minimum 1 caps, one per non-original zone, Major outside-home garrison cap; colonial original outside-home IPP cap; Chinese Decentralized override",
-      "m0_acceptance": "Neutral alignment with excess militia keeps it; recruitment exempt from purchased-militia placement cap",
+      "acceptance_fixture": "Neutral alignment with excess militia keeps it; recruitment exempt from purchased-militia placement cap",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5307,7 +5307,7 @@
       "id": "R110",
       "source": "RB \u00a7\u00a712.2-12.3 pp79-80",
       "contract": "R/C: repairs/upgrades complete PU after placement; supply required for upgrades; used unit eligible but new unit not; repair berth age/capacity",
-      "m0_acceptance": "Construction completion/repair does not retroactively allow earlier production; paid upgrade survives missing target",
+      "acceptance_fixture": "Construction completion/repair does not retroactively allow earlier production; paid upgrade survives missing target",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5361,7 +5361,7 @@
       "id": "R111",
       "source": "RB \u00a712.4 p80",
       "contract": "C: lend-lease Home Country origin to recipient Home Country first entry, per-leg facilities legal; no naval via land; bases/upgrades recipient next PU; blocked waits",
-      "m0_acceptance": "Local Dadao aid not mistaken for free unit teleport; no FEC aid origin from absent India",
+      "acceptance_fixture": "Local Dadao aid not mistaken for free unit teleport; no FEC aid origin from absent India",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5431,11 +5431,11 @@
       "id": "R112",
       "source": "RB \u00a712.5 pp80-81",
       "contract": "I: interdiction is excluded by campaign choice; source attack/escort/capacity effects remain reference-only",
-      "m0_acceptance": "No interdiction roll or response blocks supply, movement or placement; normal route legality and blockade still apply",
+      "acceptance_fixture": "No interdiction roll or response blocks supply, movement or placement; normal route legality and blockade still apply",
       "status": "inactive_in_frozen_profile",
       "reason": "interdiction is excluded by campaign choice; source attack/escort/capacity effects remain reference-only",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -5444,7 +5444,7 @@
       "id": "R113",
       "source": "RB \u00a712.6 p81",
       "contract": "R/C: ships in conquered port D12 1-9 scuttle/10-12 capture in current damage/crew state",
-      "m0_acceptance": "Use port threshold, not queued-ships 8-12 threshold; captured ship retains damage",
+      "acceptance_fixture": "Use port threshold, not queued-ships 8-12 threshold; captured ship retains damage",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5475,7 +5475,7 @@
       "id": "R114",
       "source": "RB \u00a712.7 p82",
       "contract": "R/C: controlled-minor D12 <= eligible land count grants 1 Infantry/2 Militia OR ship stage OR full facility repair; offshore excluded from count; different from CCP special recruitment",
-      "m0_acceptance": "Mongolia's 2 retained starting units not confused with its 4 eligible mainland territories; Dadao Hainan does not inflate continental roll",
+      "acceptance_fixture": "Mongolia's 2 retained starting units not confused with its 4 eligible mainland territories; Dadao Hainan does not inflate continental roll",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5527,7 +5527,7 @@
       "id": "R115",
       "source": "RB \u00a7\u00a712.8-12.11 p82",
       "contract": "R: influence then income; controlled minors no income; end CT after KMT rather than absent USA; convoy reset and Molotov/1944 events inactive",
-      "m0_acceptance": "Wealth uses rate, not cumulated collections; receive income once per PT; full July 1941 collection precedes reward",
+      "acceptance_fixture": "Wealth uses rate, not cumulated collections; receive income once per PT; full July 1941 collection precedes reward",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5590,7 +5590,7 @@
       "id": "R116",
       "source": "RB \u00a713.1.1 pp83-84",
       "contract": "R/C: all locally legal infantry types, purchase caps, artillery support, city/fortification benefits, Marine river/narrow/amphibious traits and Mountain Infantry; FEC colonial access inactive",
-      "m0_acceptance": "Setup Mountain Infantry keeps correct stats without granting minor build permission; artillery supports infantry class, not Cavalry vehicle class",
+      "acceptance_fixture": "Setup Mountain Infantry keeps correct stats without granting minor build permission; artillery supports infantry class, not Cavalry vehicle class",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5654,7 +5654,7 @@
       "id": "R117",
       "source": "RB \u00a713.1.2 p85",
       "contract": "R/C: Cavalry vehicle class, Motorized Infantry towing 1:1, armor blitz/targeting, national/gated variants",
-      "m0_acceptance": "Cavalry takes city vehicle penalty; Tank Destroyer 3[3]/4[3] selection restricted to legal class, cap 2",
+      "acceptance_fixture": "Cavalry takes city vehicle penalty; Tank Destroyer 3[3]/4[3] selection restricted to legal class, cap 2",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5728,7 +5728,7 @@
       "id": "R118",
       "source": "RB \u00a713.1.3 p86",
       "contract": "R: artillery first strike, infantry attack support 1:1, river immunity, unpaired artillery -1 unless matched with infantry/vehicle; reevaluate after casualties",
-      "m0_acceptance": "10 Artillery plus 6 Infantry has 4 unsupported; after 3 Infantry losses, 7 unsupported; no fixed initial support forever",
+      "acceptance_fixture": "10 Artillery plus 6 Infantry has 4 unsupported; after 3 Infantry losses, 7 unsupported; no fixed initial support forever",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5754,7 +5754,7 @@
       "id": "R119",
       "source": "RB \u00a713.1.4 p87",
       "contract": "R: AAA separate class; only air first-round rolls; towed movement; later casualty eligible",
-      "m0_acceptance": "AAA does not count as normal artillery support/first strike",
+      "acceptance_fixture": "AAA does not count as normal artillery support/first strike",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5806,7 +5806,7 @@
       "id": "R120",
       "source": "RB \u00a713.1.5 pp87-89",
       "contract": "R/C: aircraft registry with interception/MAP/strategic damage/cargo/caps and technology; surrounded-city exception to terrain immunity",
-      "m0_acceptance": "Fighter interception 3, normal 6; Tactical Bomber target selection 1-3 land/naval; Seaplane restricted target set",
+      "acceptance_fixture": "Fighter interception 3, normal 6; Tactical Bomber target selection 1-3 land/naval; Seaplane restricted target set",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5858,7 +5858,7 @@
       "id": "R121",
       "source": "RB \u00a713.1.6 pp89-92",
       "contract": "R/C: naval registry includes setup-only TBD/Coastal Submarine, damage/movement and carrier load, bombardment, surface/submarine classes; no Coastal Defense Ship spawn",
-      "m0_acceptance": "Price N/A does not disable existing unit; exact full damaged-ship battle-board matrix is an M3 catalog implementation deliverable, not a remaining M0 decision",
+      "acceptance_fixture": "Price N/A does not disable existing unit; the full damaged-ship battle-board matrix is in the catalog",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5929,7 +5929,7 @@
       "id": "R122",
       "source": "RB \u00a713.1.7 p92",
       "contract": "C: rockets not normal casualties; alone with enemy land unit eliminated; no move and fire same PT",
-      "m0_acceptance": "Capturing rocket-only zone removes rocket and captures without combat roll",
+      "acceptance_fixture": "Capturing rocket-only zone removes rocket and captures without combat roll",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -5988,7 +5988,7 @@
       "id": "R123",
       "source": "RB \u00a713.2 pp92-93",
       "contract": "R: physical facility identity, supply/start-location bonuses do not stack; cities one minor and one major naval facility",
-      "m0_acceptance": "Two ports do not give +2 ship movement; factories are land assets, not naval-access edges",
+      "acceptance_fixture": "Two ports do not give +2 ship movement; factories are land assets, not naval-access edges",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6032,14 +6032,14 @@
           "symbol": "main",
           "line": 39,
           "behavior_assertions": [
-            "Starting unit total differs from M0",
-            "Land total differs from M0",
-            "Canonical faction count differs from M1",
+            "Starting unit total differs from the setup",
+            "Land total differs from the setup",
+            "Canonical faction count differs from the faction index",
             "Map facilities and setup factories not distinct",
             "Closed map changed",
             "Convoys became active",
             "Turn order changed",
-            "M3 catalog movement missing",
+            "Catalog movement missing",
             "National setup counts changed",
             "Opening accounts changed",
             "An excluded account was restored",
@@ -6057,7 +6057,7 @@
             "User display name lost",
             "Japan home-country table lost",
             "Home-country membership was inferred from possession",
-            "M4 original mainland home-country predicate unresolved",
+            "Original mainland home-country predicate unresolved",
             "Printed IPP was silently treated as evaluated legal income",
             "Actual campaign setup fails round trip",
             "Clone copied immutable definition",
@@ -6073,7 +6073,7 @@
       "id": "R124",
       "source": "RB \u00a713.2.1 p93",
       "contract": "R: factory tier cost/capacity/damage, Major research, Home Country build limits; capture medium/major to minor preserving original tier/damage cap; restore on reconquest",
-      "m0_acceptance": "Captured Major Factory with 10 damage survives as damaged minor with original damage cap 20; reconquest restores tier",
+      "acceptance_fixture": "Captured Major Factory with 10 damage survives as damaged minor with original damage cap 20; reconquest restores tier",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6131,7 +6131,7 @@
       "id": "R125",
       "source": "RB \u00a713.2.2 pp93-94",
       "contract": "R/C: Airbase/Seaplane/Submarine Base use/movement/scramble/capacity/damage; no inherent AAA under construction; no lend-lease send/receive by base alone",
-      "m0_acceptance": "Airbase count maximum 1 per land zone; Seaplane/Submarine Bases unlimited but distinct access; damaged base cannot grant movement",
+      "acceptance_fixture": "Airbase count maximum 1 per land zone; Seaplane/Submarine Bases unlimited but distinct access; damaged base cannot grant movement",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6207,7 +6207,7 @@
       "id": "R126",
       "source": "RB \u00a7\u00a713.2.3-13.2.5 pp94-96",
       "contract": "R/C: minor/major ports, dockyards, shipyards have different repair/production/port/supply rules; only Major Shipyard builds Capital Ships; allied shipyard use cannot produce",
-      "m0_acceptance": "Port repairs no Capital Ships; Major Shipyard 5 shared production/repair slots; Major Dockyard 5 repair slots, no production",
+      "acceptance_fixture": "Port repairs no Capital Ships; Major Shipyard 5 shared production/repair slots; Major Dockyard 5 repair slots, no production",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6251,14 +6251,14 @@
           "symbol": "main",
           "line": 39,
           "behavior_assertions": [
-            "Starting unit total differs from M0",
-            "Land total differs from M0",
-            "Canonical faction count differs from M1",
+            "Starting unit total differs from the setup",
+            "Land total differs from the setup",
+            "Canonical faction count differs from the faction index",
             "Map facilities and setup factories not distinct",
             "Closed map changed",
             "Convoys became active",
             "Turn order changed",
-            "M3 catalog movement missing",
+            "Catalog movement missing",
             "National setup counts changed",
             "Opening accounts changed",
             "An excluded account was restored",
@@ -6276,7 +6276,7 @@
             "User display name lost",
             "Japan home-country table lost",
             "Home-country membership was inferred from possession",
-            "M4 original mainland home-country predicate unresolved",
+            "Original mainland home-country predicate unresolved",
             "Printed IPP was silently treated as evaluated legal income",
             "Actual campaign setup fails round trip",
             "Clone copied immutable definition",
@@ -6292,7 +6292,7 @@
       "id": "R127",
       "source": "RB \u00a713.2.6 pp96-97",
       "contract": "R/C: fortification facing, maximum 1 per border, 2 first-strike rolls at 5/infantry +2 first; reduces bombardment/attrition/city carpet hit value by 1; facing casualty provenance; cannot bomb or choose as casualty; removed on capture",
-      "m0_acceptance": "Fortification-derived hit only targets forces crossing protected border; no Bomb Fortification action",
+      "acceptance_fixture": "Fortification-derived hit only targets forces crossing protected border; no Bomb Fortification action",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6332,7 +6332,7 @@
       "id": "R128",
       "source": "RB \u00a713.2.7 pp97-98",
       "contract": "R/C: Coastal Artillery 3 shots maximum/PT across passage/scramble/bombard/unload, first strike at 3; multiple per border; removed on capture; cannot bomb or choose as casualty",
-      "m0_acceptance": "2 passing ships leave only 1 shot for later amphibious assault in same PT",
+      "acceptance_fixture": "2 passing ships leave only 1 shot for later amphibious assault in same PT",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6358,7 +6358,7 @@
       "id": "R129",
       "source": "RB \u00a713.2.8 pp98-99",
       "contract": "R/C: rail-border cost normal 2/other 4, damage 1/2, permissions, new gauge by location (Mongolia broad), no impassable rail; one crossing covers zone",
-      "m0_acceptance": "Chinese player cannot build into independent neutral warlord without control; Mongolian rail creates gauge transition",
+      "acceptance_fixture": "Chinese player cannot build into independent neutral warlord without control; Mongolian rail creates gauge transition",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6417,11 +6417,11 @@
       "id": "R130",
       "source": "RB \u00a7\u00a714.1-14.2 p100",
       "contract": "I: Spanish Civil War/Italian Abyssinia campaign missing locations/participants",
-      "m0_acceptance": "No Spanish/Abyssinian troops or victory award appears in local reset",
+      "acceptance_fixture": "No Spanish/Abyssinian troops or victory award appears in local reset",
       "status": "inactive_in_frozen_profile",
       "reason": "Spanish Civil War/Italian Abyssinia campaign missing locations/participants",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -6430,7 +6430,7 @@
       "id": "R131",
       "source": "RB \u00a714.3 p101",
       "contract": "R: Chinese Civil War initial KMT-CCP war; foreign entry even friendly requires DoW except Dadao; ends when faction has no surviving units",
-      "m0_acceptance": "CCP with units but no land still has not ended civil war; Dadao attack exception does not declare Japan's whole China war",
+      "acceptance_fixture": "CCP with units but no land still has not ended civil war; Dadao attack exception does not declare Japan's whole China war",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6473,7 +6473,7 @@
       "id": "R132",
       "source": "RB \u00a714.3.1 p101; K/C p1; RCL-006 closed after checking",
       "contract": "C: evolution immediately when possessed land totals 13+ IPP, including outside the faction's turn; choose capital/free factory, Major catalog/research/aid/outside-Home-Country permission; lose minor abilities except same-PT decentralized exception",
-      "m0_acceptance": "Reaching or exceeding 13 evolves without waiting for collection or turn boundary; only one factory; CCP stops recruitment/influence; KMT stops Low Morale; same-PT evolution still allows decentralized placement",
+      "acceptance_fixture": "Reaching or exceeding 13 evolves without waiting for collection or turn boundary; only one factory; CCP stops recruitment/influence; KMT stops Low Morale; same-PT evolution still allows decentralized placement",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6543,7 +6543,7 @@
       "id": "R133",
       "source": "RB \u00a715.2 pp103-104; C p3",
       "contract": "R/C: CCP decentralized, special recruitment D12 <= land count, influence adjacent held zone with unit since start PT; RCL-002 caps pre-roll spending at unmodified success threshold; natural 12 backfires to KMT",
-      "m0_acceptance": "One influence attempt/PT; reject spending above base threshold; pay before chance; natural 12 still backfires; align target warlord's whole group",
+      "acceptance_fixture": "One influence attempt/PT; reject spending above base threshold; pay before chance; natural 12 still backfires; align target warlord's whole group",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6630,11 +6630,11 @@
       "id": "R134",
       "source": "RB \u00a715.2 p103; C pp2-3; closed RCL-004",
       "contract": "I: Comintern Brothers requires an undamaged railroad from CCP-possessed to Soviet-possessed land during Production; place qualifying purchases in connected CCP-possessed territory; CCP +2 bonus separately needs Soviet Home Country",
-      "m0_acceptance": "Generic river/sea supply cannot satisfy the purchase rule; both Soviet-dependent abilities remain inactive in this USSR-excluded campaign; Mongolia's turn slot creates no Soviet possession",
+      "acceptance_fixture": "Generic river/sea supply cannot satisfy the purchase rule; both Soviet-dependent abilities remain inactive in this USSR-excluded campaign; Mongolia's turn slot creates no Soviet possession",
       "status": "inactive_in_frozen_profile",
       "reason": "Comintern Brothers requires an undamaged railroad from CCP-possessed to Soviet-possessed land during Production; place qualifying purchases in connected CCP-possessed territory; CCP +2 bonus separately needs Soviet Home Country",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -6643,11 +6643,11 @@
       "id": "R135",
       "source": "RB \u00a715.3 pp104-105; S",
       "contract": "I: USSR is excluded as a participant; its Scorched Earth, national production and military permissions remain inactive",
-      "m0_acceptance": "Mongolia's direct Comintern control and USSR-slot timing do not create a Soviet ledger, possession, technology or income profile",
+      "acceptance_fixture": "Mongolia's direct Comintern control and USSR-slot timing do not create a Soviet ledger, possession, technology or income profile",
       "status": "inactive_in_frozen_profile",
       "reason": "USSR is excluded as a participant; its Scorched Earth, national production and military permissions remain inactive",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -6656,7 +6656,7 @@
       "id": "R136",
       "source": "RB \u00a715.4 p105; J p4",
       "contract": "R/C: Dadao influence adjacency/spending/natural 12, recruitment and Japan aid; RCL-002 uses the same adopted spending cap as R133; no automatic all-China alignment from Dadao attacks",
-      "m0_acceptance": "Japan influence creates controlled minor, not immediate Japan possession/cash collection; cap enforced before roll",
+      "acceptance_fixture": "Japan influence creates controlled minor, not immediate Japan possession/cash collection; cap enforced before roll",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6743,7 +6743,7 @@
       "id": "R137",
       "source": "RB \u00a715.4 pp105-106; J p4",
       "contract": "C: first Japan DoW on Allies Major can Surprise Attack single zone or linked sea plus amphibious; aircraft first strike/enemy -1 first; no scramble/port AAA; city cap removed; +1 eligible movement stacks",
-      "m0_acceptance": "KMT must first evolve to Major Power and Japan must initiate the qualifying declaration; unevolved KMT and absent FEC cannot supply the trigger",
+      "acceptance_fixture": "KMT must first evolve to Major Power and Japan must initiate the qualifying declaration; unevolved KMT and absent FEC cannot supply the trigger",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6789,7 +6789,7 @@
             "A common enemy invented a non-incorporating Mongolia/CCP alignment",
             "The derived allies cache granted unsupported Mongolia/CCP alignment",
             "Major-war interrupt occurred during strategic naval movement",
-            "M4 silently fabricated missing M6 income accounting",
+            "Politics silently fabricated missing income accounting",
             "Failed unevaluated income collection partially committed a turn",
             "Mongolia collected or redirected ordinary income"
           ]
@@ -6810,7 +6810,7 @@
       "id": "R138",
       "source": "RB \u00a715.4 p106; J p4",
       "contract": "R/C: Destroyer carries 1 Marine, -1 move, stops on debark; Dug in Defense infantry +1 in Japanese Home Country",
-      "m0_acceptance": "Honshu defender bonus stacks with terrain as named exception; Okinawa not Home Country; do not extend Destroyer transport to TBD without source",
+      "acceptance_fixture": "Honshu defender bonus stacks with terrain as named exception; Okinawa not Home Country; do not extend Destroyer transport to TBD without source",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6850,11 +6850,11 @@
       "id": "R139",
       "source": "RB \u00a715.4 p105; J p4",
       "contract": "I: Kamikaze requires USA Wartime Income; absent USA state cannot reach this trigger",
-      "m0_acceptance": "No January 1941 timer substitute for USA income; eligible marked seas alone insufficient",
+      "acceptance_fixture": "No January 1941 timer substitute for USA income; eligible marked seas alone insufficient",
       "status": "inactive_in_frozen_profile",
       "reason": "Kamikaze requires USA Wartime Income; absent USA state cannot reach this trigger",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -6863,7 +6863,7 @@
       "id": "R140",
       "source": "RB \u00a715.7 p107; K p3",
       "contract": "R/C: KMT decentralized and Low Morale regular Infantry/Cavalry attack 10+ retreat; must roll even undefended; cannot be casualty; lost on evolution",
-      "m0_acceptance": "Undefended land with all KMT attackers failing morale not captured; casualty chooser excludes retreaters",
+      "acceptance_fixture": "Undefended land with all KMT attackers failing morale not captured; casualty chooser excludes retreaters",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
         {
@@ -6932,11 +6932,11 @@
       "id": "R141",
       "source": "RB \u00a715.7 p107; K p3",
       "contract": "I: Burma/Ledo artillery purchase and lend-lease prerequisites absent",
-      "m0_acceptance": "Yunnan owned July 1938 does not alone unlock artillery",
+      "acceptance_fixture": "Yunnan owned July 1938 does not alone unlock artillery",
       "status": "inactive_in_frozen_profile",
       "reason": "Burma/Ledo artillery purchase and lend-lease prerequisites absent",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]
@@ -6945,11 +6945,11 @@
       "id": "R142",
       "source": "RB \u00a7\u00a715.1,15.5-15.6,15.8 pp102-107",
       "contract": "I: Germany/France/USA and FEC/British Commonwealth abilities and turns have no participating nation; outside aid is absent",
-      "m0_acceptance": "No FEC/Commonwealth turn, treasury, reaction, GB home Militia or USA aid appears from off-map",
+      "acceptance_fixture": "No FEC/Commonwealth turn, treasury, reaction, GB home Militia or USA aid appears from off-map",
       "status": "inactive_in_frozen_profile",
       "reason": "Germany/France/USA and FEC/British Commonwealth abilities and turns have no participating nation; outside aid is absent",
       "profile_evidence": [
-        "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
+        "game_content/scenarios/japan_china_1936/scenario_contract.json",
         "game_content/scenarios/japan_china_1936/manifest.json",
         "tests/campaign_setup_tests.cpp"
       ]

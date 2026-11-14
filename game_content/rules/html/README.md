@@ -70,5 +70,5 @@ annotation bodies is escaped.
 
 Reader assets are maintained in `tools/rules_reader_template.html`,
 `tools/rules_reader.css`, and `tools/rules_reader.js`. Source PDFs, the existing
-clarification register, engine profiles, and historical milestone records are
+clarification register, engine profiles, and the archived records are
 not changed by this generator.

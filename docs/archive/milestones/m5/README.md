@@ -42,7 +42,7 @@ The engine does not restore cropped routes or open impassable Himalayan borders.
 The immutable M5 source profile overlays individually reviewed gauge, river and
 region values on the retained map. It is included in the definition fingerprint;
 the frozen M0 map is unchanged. See
-[source coverage](../../../rules/movement_sources.md).
+[source coverage](source_coverage.md).
 
 `movement_tests` contains 14 fixture groups covering the M5 exit cases, both
 Improved Logistics bonuses, factory relocation, cargo/withdrawal capacity, the

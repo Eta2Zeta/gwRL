@@ -155,7 +155,7 @@ waits in the queue.
 
 Tests: `tests/economy_tests.cpp` and `tests/catalog_tests.cpp`. In 240 random
 games every economy move came up except `economy_lease_repair`
-([record](../archive/records/move_census_2026_11_14.md)). The printed pages
-behind these rules are listed in
-[Economy: source coverage](../rules/economy_sources.md) and
-[Catalog: source coverage](../rules/catalog_sources.md).
+([record](../archive/records/move_census_2026_11_14.md)). The printed page
+behind each rule is recorded beside the rule in the rules data, and the page
+behind each price and value beside it in the catalog
+([where the numbers come from](../rules/README.md#where-the-scenarios-numbers-come-from)).

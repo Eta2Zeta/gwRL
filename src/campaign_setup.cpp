@@ -35,7 +35,7 @@ int integerOr(const json::Value& record, const std::string& name, int fallback) 
 void verifyIndexSource(const json::Value& index, const std::string& name, const Source& source) {
     const auto& expected = index.require("sources").require(name).require("sha256").asString();
     if (contentDigest(source.bytes) != expected) {
-        throw std::runtime_error("Stale M1 faction index: source hash differs for " + name);
+        throw std::runtime_error("Stale faction index: source hash differs for " + name);
     }
 }
 
@@ -71,10 +71,10 @@ void addUnits(State& state, const Id& owner, const Id& zone, const json::Value& 
 
 State loadScenario(const std::filesystem::path& directory) {
     const Source map = readSource(directory / "map.json");
-    const Source contract = readSource(directory / "m0/scenario_contract.json");
-    const Source japan = readSource(directory / "m0/japan_setup.json");
-    const Source china = readSource(directory / "m0/china_minor_setup.json");
-    const Source index = readSource(directory / "m1/faction_index.json");
+    const Source contract = readSource(directory / "scenario_contract.json");
+    const Source japan = readSource(directory / "japan_setup.json");
+    const Source china = readSource(directory / "china_minor_setup.json");
+    const Source index = readSource(directory / "faction_index.json");
     const Source home = readSource(directory / "../../maps/gw36_nation_home_country.json");
     const Source politics = readSource(directory / "../../rules/gw36_politics_v43.json");
     const Source movement = readSource(directory / "../../rules/gw36_movement_v43.json");

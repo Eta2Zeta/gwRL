@@ -1173,7 +1173,7 @@ void detachCargo(State &s, const Id &transport, const Id &cargo,
 MovementRules::MovementRules(std::shared_ptr<const Rules> gameplay)
     : gameplay_(std::move(gameplay)) {}
 Id MovementRules::id() const {
-  return "gw36_v43_m5_movement" + (gameplay_ ? "+" + gameplay_->id() : "");
+  return "gw36_v43_movement" + (gameplay_ ? "+" + gameplay_->id() : "");
 }
 std::vector<Action> MovementRules::actions(const State &s) const {
   auto out = gameplay_ ? gameplay_->actions(s) : std::vector<Action>{};

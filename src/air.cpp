@@ -1409,7 +1409,7 @@ bool collectsAirborne(const State &s, const UnitState &u, const Id &zone) {
 
 AirRules::AirRules(std::shared_ptr<const Rules> gameplay) : gameplay_(std::move(gameplay)) {}
 Id AirRules::id() const {
-    return "gw36_v43_m8_air" + (gameplay_ ? "+" + gameplay_->id() : "");
+    return "gw36_v43_air" + (gameplay_ ? "+" + gameplay_->id() : "");
 }
 std::vector<Action> AirRules::interrupts(const State &s) const {
     return gameplay_ ? gameplay_->interrupts(s) : std::vector<Action>{};

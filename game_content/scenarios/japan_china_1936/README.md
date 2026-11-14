@@ -1,7 +1,7 @@
 # Japan–China 1936 campaign scenario
 
 The scenario the campaign engine loads: a closed 37-node map projection, the
-source-audited official setup in `m0/` and the faction index in `m1/`. The engine
+source-audited official setup and the faction index. The engine
 plays it from July 1936 through the complete July 1941 round under the rules
 profiles in `game_content/rules`. [The campaign page](../../../docs/engine/scenario.md)
 describes what it holds, the
@@ -21,22 +21,22 @@ profiles cite. Change those files only together with their recorded hashes.
 
 - `manifest.json`: explicit tile selection and approved campaign choices.
 - `map.json`: generated, lossless projection of `../../maps/gw36_manual_map.json`.
-- `m0/scenario_contract.json`: source-audit contract, local accounts, wealth
+- `scenario_contract.json`: source-audit contract, local accounts, wealth
   conventions and reconciliation status; not an executable rules profile.
-- `m0/japan_setup.json`, `m0/china_minor_setup.json`: source-linked setup rows,
+- `japan_setup.json`, `china_minor_setup.json`: source-linked setup rows,
   original PDF hashes and excluded source entries. Together: **99 deployed units**
   (Japan 48, KMT 12, CCP 5, warlords 32, Mongolia 2), three setup factories and
   references to 19 existing physical map facilities. Japan also retains two
   ordinary construction-queue ships, each with 5 IPP already paid.
-- `m0/convoy_audit.json`: source evidence for the fully local Nagasaki Line and
+- `convoy_audit.json`: source evidence for the fully local Nagasaki Line and
   cut Tokyo Line. Convoy play is excluded by campaign choice; this is reference
   evidence only. The global map preserves its convoy layer.
-- `m0/catalog_source_checks.json`: exact research thresholds, queue-payment
-  reconciliation and source provenance for later catalog implementation.
-- [Frozen baseline](m0/frozen_baseline.json):
-  records the specification freeze and verified artifacts.
-- [Rules and data](../../../docs/rules/README.md): the rules ledger, the setup
-  audits, the price tables and the source reconciliation.
+- `catalog_source_checks.json`: exact research thresholds, queue-payment
+  reconciliation and source provenance.
+- `faction_index.json`: generated; every nation's identifier and the names the
+  sources use for it.
+- [Rules and data](../../../docs/rules/README.md): the rules ledger and where
+  each number comes from.
 - [build_theatre_scenario.py](../../../tools/build_theatre_scenario.py)
   is the builder. Run the command below from the repository root.
 
@@ -44,12 +44,26 @@ profiles cite. Change those files only together with their recorded hashes.
 ./.venv/bin/python tools/build_theatre_scenario.py
 ```
 
-After editing the authoritative map generator, rebuild both artifacts:
+After editing the authoritative map generator, rebuild the world map and the
+two files made from it, which record its hash: the nations' home-country data
+and this scenario's map.
 
 ```sh
 ./.venv/bin/python tools/build_manual_map_json.py
+./.venv/bin/python tools/build_nation_home_country_json.py
 ./.venv/bin/python tools/build_theatre_scenario.py
 ```
+
+After a change to the map or to a setup file, rebuild the faction index, which
+records their hashes:
+
+```sh
+./.venv/bin/python tools/scenario_factions.py
+```
+
+Then update the hashes that the rules profiles in `game_content/rules` record
+for the files that changed. The engine refuses to load the scenario while one
+of them is stale, and its error names the stale source.
 
 Other scenarios use the same extractor:
 

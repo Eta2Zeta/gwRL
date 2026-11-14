@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "M5-2026-10-22",
+  "version": "2026-10-22",
   "scenario_id": "japan_china_1936_1941",
   "sources": [
     {
@@ -25,7 +25,7 @@
       "docs/map_audits/full_world/evidence/ap_naval_japan.png",
       "docs/map_audits/full_world/evidence/ap_mongolia_north_edges.png"
     ],
-    "scope": "Overlay only; frozen M0 map and M1 bridge are unchanged."
+    "scope": "Overlay only; the frozen map and the faction index are unchanged."
   },
   "rail_regions": {
     "land_china_beiping": "asia",

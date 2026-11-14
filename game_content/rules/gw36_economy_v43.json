@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scope": "M6 closed Japan/China economy and production; sourced rules plus separately identified campaign ruling",
+  "scope": "Closed Japan/China economy and production; sourced rules plus separately identified campaign ruling",
   "sources": [
     {
       "id": "rulebook",
@@ -28,9 +28,9 @@
     },
     {
       "id": "scenario_contract",
-      "path": "game_content/scenarios/japan_china_1936/m0/scenario_contract.json",
-      "sha256": "6a43839e8e1c9c4999ed05270b9f03ebc254a7f6f0db2e55c2ef8d9e62fe6eda",
-      "version": "frozen M0"
+      "path": "game_content/scenarios/japan_china_1936/scenario_contract.json",
+      "sha256": "aa58db0cad628e243bba808eaf77f987a26e9560bfd53950d6f53249e4bdd96e",
+      "version": "frozen 2026-10-21"
     },
     {
       "id": "user_dadao_delivery_2026_10_22",
@@ -369,7 +369,7 @@
         ],
         "placement": "possessed Chinese Home Country held since turn beginning",
         "factory_required": false,
-        "evolution": "M4 same-own-turn grace only"
+        "evolution": "same-own-turn grace only, as in the politics rules"
       },
       "source_refs": [
         {

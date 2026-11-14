@@ -547,6 +547,7 @@ offered for them until the ship is in port or the units are ashore.
 ## Maintenance
 
 Keep issue IDs stable. Record sources, the rule question, resolution or remaining
-question, and the authority for any ruling. Keep implementation history and
-checks in the milestone documents. Do not promote community discussion to a
-publisher ruling without verifying its authority.
+question, and the authority for any ruling. How a ruling is implemented belongs
+in the engine page of the rule it changes (`docs/engine`); the history of the
+change and its check results belong in the commit message. Do not promote
+community discussion to a publisher ruling without verifying its authority.

@@ -104,7 +104,7 @@ class TheatreScenarioIntegrationTests(unittest.TestCase):
             "official_setup_on_included_tiles_only",
         )
         objective = self.manifest["wealth_objective"]
-        self.assertEqual(objective["status"], "planned_not_implemented")
+        self.assertEqual(objective["status"], "implemented")
         self.assertEqual(objective["income_definition"], "current_income_per_turn_rate_not_cumulative_collections")
         self.assertEqual(objective["completed_asset_valuation"], "undiscounted_catalog_price_minus_remaining_repair_price")
         self.assertTrue(objective["include_setup_asset_value"])
@@ -119,10 +119,8 @@ class TheatreScenarioIntegrationTests(unittest.TestCase):
         self.assertTrue(objective["railway_valuation"]["count_once"])
         self.assertEqual(objective["railway_valuation"]["endpoint_owner_share"], 0.5)
         self.assertEqual(objective["open_decisions"], [])
-        specification = self.manifest["m0_specification"]
-        self.assertIn(specification["status"], {
-            "synchronized_pending_verification_not_playable", "frozen_specification_not_playable",
-        })
+        specification = self.manifest["specification"]
+        self.assertEqual(specification["status"], "frozen_specification")
         self.assertEqual(specification["starting_treasury_ipp"], {"japan": 15, "kmt": 6, "ccp": 2})
         self.assertEqual(specification["inventory"], {
             "deployed_units": 99, "additional_setup_factories": 3,

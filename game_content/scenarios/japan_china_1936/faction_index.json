@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scenario_id": "japan_china_1936_1941",
   "artifact_type": "scenario_faction_index",
-  "status": "bridge_identity_data_not_playable",
+  "status": "identity_data",
   "alias_normalization": "remove_whitespace_then_casefold; preserve_punctuation_and_spelling",
   "scope": "Original national identity and approved setup control are separate. This index does not align factions, transfer possession or implement runtime state.",
   "factions": {
@@ -389,15 +389,15 @@
   "sources": {
     "theatre_map": {
       "path": "game_content/scenarios/japan_china_1936/map.json",
-      "sha256": "27c9e9cd007dfa5e290ec816d6e1be962f50ab2a8a5b541cbc52d70bd1373670"
+      "sha256": "05b405ae273d177fbe8aa04d4701d0d9ebd11b5cb0d73ef85a65b911105bd2c7"
     },
     "japan_setup": {
-      "path": "game_content/scenarios/japan_china_1936/m0/japan_setup.json",
-      "sha256": "6f4acfe2054e70845a29d2181aa9d87393845456a3ee4a44c1ff785592911b3c"
+      "path": "game_content/scenarios/japan_china_1936/japan_setup.json",
+      "sha256": "ffe3d6cfa10f0cefa2e849ee7d73bcf5460cf13eb470fd1823ae726abb6df0dc"
     },
     "china_setup": {
-      "path": "game_content/scenarios/japan_china_1936/m0/china_minor_setup.json",
-      "sha256": "6ee467595f6aad4ceab5292900eb97c0d8ab1a5d41f55719eebdc07ffb4d142d"
+      "path": "game_content/scenarios/japan_china_1936/china_minor_setup.json",
+      "sha256": "76113b7410289304aee0c280cd09cd46857cbaa23a7b3e7ce16176ab9a356bd4"
     }
   }
 }

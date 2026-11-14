@@ -25,7 +25,7 @@
       "current_owner_semantics": "Legacy setup hint only; original_owner is static identity. Neither current_owner nor is_capital is runtime state.",
       "rail_semantics": "Land-border railway_connection describes printed rail. Legacy coast railway_connection artwork is retained pending AM-229 and grants no rail movement into a sea. printed_rail_coverage is true when a land-border railroad establishes coverage, otherwise unknown. Gauge changes require verified gauges on both sides, never ownership.",
       "geographic_features_source": "game_content/maps/authoring/geographic_features.json",
-      "geographic_features_source_sha256": "3a49158431888d7e32f0f6e6b39b2922f9d6e4375d7ea344e398bb41fd1ad6eb",
+      "geographic_features_source_sha256": "12445cb297b2759282f5b6c9f5acacb93bf97ebb8f69d37e46ced6ce7657baf9",
       "geographic_rules_profile": "game_content/rules/map_geography_rules.json",
       "feature_uncertainties": {
         "rail_region_membership": "The rulebook capacity table names seven regions but audited territory memberships are not complete. Do not infer from current control.",
@@ -53,7 +53,7 @@
         "end": "1941-07",
         "end_timing": "after_full_calendar_round",
         "calendar_rounds": 11,
-        "setup_basis": "Official July 1936 starting pieces on included tiles only; off-map pieces omitted. M0 records 99 deployed units, 3 additional setup factories and 19 distinct static map facilities. The user retains the national Heavy Cruiser in queue #2 and Fleet Carrier in queue #3 without inventing a starting tile; their source-audited paid values are in the Japan setup specification.",
+        "setup_basis": "Official July 1936 starting pieces on included tiles only; off-map pieces omitted. The setup records 99 deployed units, 3 additional setup factories and 19 distinct static map facilities. The user retains the national Heavy Cruiser in queue #2 and Fleet Carrier in queue #3 without inventing a starting tile; their source-audited paid values are in the Japan setup specification.",
         "starting_piece_scope": "official_setup_on_included_tiles_only",
         "national_turn_order": [
           "ccp",
@@ -68,13 +68,13 @@
         "allies",
         "comintern"
       ],
-      "m0_specification": {
-        "status": "frozen_specification_not_playable",
-        "contract": "m0/scenario_contract.json",
-        "convoy_audit": "m0/convoy_audit.json",
+      "specification": {
+        "status": "frozen_specification",
+        "contract": "scenario_contract.json",
+        "convoy_audit": "convoy_audit.json",
         "setup_files": [
-          "m0/japan_setup.json",
-          "m0/china_minor_setup.json"
+          "japan_setup.json",
+          "china_minor_setup.json"
         ],
         "starting_treasury_policy": "theatre_adjusted_cap_at_retained_directly_possessed_original_land_ipp",
         "starting_treasury_ipp": {
@@ -89,17 +89,16 @@
           "unique_retained_map_facilities": 19,
           "national_queue_ships_not_deployed": 2
         },
-        "version": "M0-2026-10-21",
-        "baseline": "m0/frozen_baseline.json"
+        "version": "2026-10-21"
       },
       "agent_control": {
-        "status": "planned_not_implemented",
+        "status": "implemented",
         "nation_turns_and_treasuries": "remain_separate",
         "minor_control": "Mongolia is directly assigned to Comintern; other minors and Chinese warlords follow the retained control, alignment and influence rules.",
         "notes": "Alliance agents preserve distinct national possessions and turns. Mongolia retains its minor identity and uses the USSR turn position; no USSR or FEC participant account exists. One alignment roll applies to the whole warlord."
       },
       "wealth_objective": {
-        "status": "planned_not_implemented",
+        "status": "implemented",
         "comparison": "own_wealth_minus_combined_other_two_sides",
         "components": [
           "income_rate",
@@ -189,7 +188,7 @@
       ],
       "known_limitations": [
         "Tannu Tuva is excluded by user choice; global source uncertainties are preserved and do not create scenario possessions.",
-        "The map itself does not contain starting units, setup factories, construction queues or mutable diplomacy. Frozen M0 files define a specification, not an implemented playable initial state or runtime rules.",
+        "The map itself does not contain starting units, setup factories, construction queues or mutable diplomacy. The setup files beside the map hold the starting units, factories and queues, and the engine builds the starting position from them.",
         "Hong Kong/FEC and USSR are excluded. Mongolia retains its separate identity under direct Comintern control and is not Soviet-possessed.",
         "Hokkaido's P7 port access is deliberately absent because P7 is outside this closed map.",
         "Outside neighbors and any facilities carried solely on those edges are removed. Cut-edge provenance is not a movement, supply or reinforcement interface.",
@@ -2483,9 +2482,9 @@
       }
     ],
     "source_map": "game_content/maps/gw36_manual_map.json",
-    "source_map_sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+    "source_map_sha256": "5afddbbc72126a2563db6d8255982e2d0b0fe8ef206e70aca5134f55590520a3",
     "manifest": "game_content/scenarios/japan_china_1936/manifest.json",
-    "manifest_sha256": "57d35100b04d00682f1cd31713492278dcc75372272a0062f667877bc081f4b0"
+    "manifest_sha256": "de4d580e10a9c92f520c65a35fae2c61f6fb6666cf21e6ddb86e4175570a4334"
   },
   "nodes": {
     "land_china_beiping": {

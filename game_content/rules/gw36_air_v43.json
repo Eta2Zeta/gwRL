@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "M8-2026-10-23",
+  "version": "2026-10-23",
   "status": "implemented_air_layer",
   "sources": [
     {
@@ -210,7 +210,7 @@
         55,
         56
       ],
-      "status": "implemented_logistics_naval_engagement_M9"
+      "status": "implemented_logistics_naval_engagement"
     },
     {
       "id": "carpet_bombing",
@@ -228,7 +228,7 @@
       "pdf_pages": [
         68
       ],
-      "status": "naval_combat_integration_M9"
+      "status": "naval_combat_integration"
     },
     {
       "id": "advanced_artillery_city_bombing",

@@ -437,7 +437,7 @@ void captureLand(State& s,const Id& attacker,const Id& zone,const std::set<Id>& 
                 {"zone",V(zone)},{"recipient",V(std::string(china))},
                 {"requires_withdrawal",V(!politicallyFriendly(s,attacker,china))}})));
         // An unaligned transfer needs an actual friendly retreat/transport path.
-        // M5 supplies that proof; a policy flag never substitutes for validation.
+        // The movement module supplies that proof; a policy flag never substitutes for validation.
         if(options.size()>1)queuePoliticalDecision(s,attacker,"politics_chinese_liberation",std::move(options));
     }
     queueNeutralRelocation(s,zone,neutralNonparticipants);
@@ -532,7 +532,7 @@ void surrenderNation(State& s,const Id& nation,const Id& attacker) {
 }
 
 PoliticsRules::PoliticsRules(std::shared_ptr<const Rules> gameplay):gameplay_(std::move(gameplay)) {}
-Id PoliticsRules::id() const {return "gw36_v43_m4_politics"+(gameplay_?"+"+gameplay_->id():"");}
+Id PoliticsRules::id() const {return "gw36_v43_politics"+(gameplay_?"+"+gameplay_->id():"");}
 std::vector<Action> PoliticsRules::actions(const State& s) const {
     auto out=influenceActions(s);auto warlords=warlordActions(s);out.insert(out.end(),warlords.begin(),warlords.end());
     if(gameplay_) {auto more=gameplay_->actions(s);out.insert(out.end(),more.begin(),more.end());}
@@ -648,7 +648,7 @@ void PoliticsRules::finishTurn(State& s) const {
     else {
         auto& n=s.nations.at(s.currentNation());
         const bool incomeAccount=s.currentNation()=="japan"||s.currentNation()=="ccp"||s.currentNation()=="kmt"||n.powerStatus=="major";
-        require(!incomeAccount||n.incomeKnown,"M6 national income evaluation is not installed");
+        require(!incomeAccount||n.incomeKnown,"National income evaluation is not installed");
         int income=0;for(const auto& [id,value]:n.incomeComponents)income+=value;
         if(incomeAccount&&n.treasury&&(n.powerStatus!="major"||ownCapital(s,s.currentNation()))) {
             require(income>=0&&*n.treasury<=std::numeric_limits<int>::max()-income,"Invalid income collection");*n.treasury+=income;

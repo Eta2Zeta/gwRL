@@ -3,8 +3,9 @@
 `docs/README.md` is the starting point of the documentation. These checks keep
 it navigable when pages move: every relative link in a tracked Markdown file
 must lead to an existing file and, in a Markdown file, to an existing heading;
-every document the game data or the code cites must exist; and dated records
-may live only under `docs/archive`.
+every document the game data or the code cites must exist; dated records may
+live only under `docs/archive`; and nothing outside it is named after one of
+the engine's build stages.
 """
 from __future__ import annotations
 
@@ -19,8 +20,6 @@ ROOT = Path(__file__).resolve().parents[1]
 # Source scans, map crops and rulebook PDFs are deliberately not in git, so a
 # clean clone lacks them. A link to one is checked only where the file exists.
 LOCAL_ONLY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf"}
-# A record of the files as they were when the scenario was frozen in October 2026.
-FROZEN_RECORDS = {"game_content/scenarios/japan_china_1936/m0/frozen_baseline.json"}
 
 LINK = re.compile(r"!?\[(?:[^\[\]]|\[[^\[\]]*\])*\]\(\s*<?([^()\s<>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
 FENCED = re.compile(r"^(```|~~~).*?^\1[^\n]*$", re.MULTILINE | re.DOTALL)
@@ -30,6 +29,13 @@ HTML_ANCHOR = re.compile(r"<a\s+(?:id|name)=\"([^\"]+)\"")
 CITED_DOCUMENT = re.compile(r"\bdocs/[A-Za-z0-9_./-]*[A-Za-z0-9_/]")
 DATED_NAME = re.compile(r"(19|20)\d\d[_-]\d\d[_-]\d\d")
 STAGE_NAME = re.compile(r"^(m\d+|milestones?|stage_\w+)$")
+STAGE_FILE = re.compile(r"(^|_)m\d+_")
+# The labels of the engine's build stages. "M4 Max" is the machine, not a stage.
+STAGE_LABEL = re.compile(r"\bM(?:1[0-2]|\d)\b(?! Max)|\bStage [A-D]\b")
+# Pages about the board, whose Mediterranean sea zones are printed M1 to M12.
+BOARD_PAGES = ("docs/map_audits/", "game_content/maps/")
+# The page that states this rule has to name the labels it rules out.
+STATES_THE_RULE = "AGENTS.md"
 
 
 def tracked(*patterns: str) -> list[str]:
@@ -85,7 +91,7 @@ class DocumentationTests(unittest.TestCase):
         cited_from = tracked("game_content/*.json", "src", "include", "studies/*.py", "tools/*.py", "tests/*.py",
                              "tests/*.cpp")
         for name in cited_from:
-            if name in FROZEN_RECORDS or name.startswith("game_content/maps/authoring/"):
+            if name.startswith("game_content/maps/authoring/"):
                 continue
             if name == "tests/test_documentation.py":
                 continue
@@ -96,13 +102,26 @@ class DocumentationTests(unittest.TestCase):
         self.assertEqual(missing, [], "\n" + "\n".join(sorted(missing)))
 
     def test_history_lives_in_the_archive(self):
-        """Outside docs/archive nothing is named after a date, a milestone or a stage."""
+        """Outside docs/archive no document is named after a date."""
         current = [name for name in tracked("docs") if not name.startswith("docs/archive/")]
         dated = [name for name in current if DATED_NAME.search(name)]
         self.assertEqual(dated, [], "Dated records belong in docs/archive/records:\n" + "\n".join(dated))
-        staged = [name for name in current if any(STAGE_NAME.match(part) for part in Path(name).parts[:-1])]
-        self.assertEqual(staged, [], "Name folders by subject, not by build stage:\n" + "\n".join(staged))
         self.assertTrue((ROOT / "docs/README.md").is_file(), "docs/README.md is the documentation's starting point")
+
+    def test_nothing_current_is_named_after_a_build_stage(self):
+        """A stage label says when a thing was built, not what it is; only the archive uses them."""
+        current = [name for name in tracked() if not name.startswith("docs/archive/")]
+        staged = [name for name in current
+                  if any(STAGE_NAME.match(part) for part in Path(name).parts[:-1])
+                  or STAGE_FILE.search(Path(name).name)]
+        self.assertEqual(staged, [], "Name files and folders by subject, not by build stage:\n" + "\n".join(staged))
+        labelled = []
+        for name in current:
+            if not name.endswith(".md") or name.startswith(BOARD_PAGES) or name == STATES_THE_RULE:
+                continue
+            for label in sorted(set(STAGE_LABEL.findall(prose((ROOT / name).read_text())))):
+                labelled.append(f"{name}: {label}")
+        self.assertEqual(labelled, [], "Say what the thing is, not the stage that built it:\n" + "\n".join(labelled))
 
 
 if __name__ == "__main__":

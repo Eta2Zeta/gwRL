@@ -1,4 +1,4 @@
-"""M0 transcription/contract checks, not tests of unimplemented game mechanics."""
+"""Checks of the scenario's data: the contract, the setup transcriptions and their sources."""
 
 from collections import Counter
 import hashlib
@@ -54,31 +54,27 @@ def map_facilities(nodes):
     return result
 
 
-class M0SpecificationTests(unittest.TestCase):
+class ScenarioSpecificationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = read_json(SCENARIO / "manifest.json")
-        cls.contract = read_json(SCENARIO / "m0/scenario_contract.json")
-        cls.japan = read_json(SCENARIO / "m0/japan_setup.json")
-        cls.china = read_json(SCENARIO / "m0/china_minor_setup.json")
-        cls.convoys = read_json(SCENARIO / "m0/convoy_audit.json")
-        cls.catalog_sources = read_json(SCENARIO / "m0/catalog_source_checks.json")
+        cls.contract = read_json(SCENARIO / "scenario_contract.json")
+        cls.japan = read_json(SCENARIO / "japan_setup.json")
+        cls.china = read_json(SCENARIO / "china_minor_setup.json")
+        cls.convoys = read_json(SCENARIO / "convoy_audit.json")
+        cls.catalog_sources = read_json(SCENARIO / "catalog_source_checks.json")
         cls.map = read_json(SCENARIO / "map.json")
         cls.nodes = cls.map["nodes"]
 
-    def test_settled_specification_remains_distinct_from_a_playable_game(self):
-        self.assertIn(self.contract["status"], {
-            "synchronized_pending_verification_not_playable", "m0_frozen_specification_not_playable",
-        })
+    def test_specification_is_settled(self):
+        self.assertEqual(self.contract["status"], "frozen_specification")
         for document in (self.japan, self.china):
-            self.assertIn(document["status"], {
-                "synchronized_pending_verification_not_playable", "frozen_specification_not_playable",
-            })
-        self.assertEqual(self.manifest["m0_specification"]["contract"], "m0/scenario_contract.json")
+            self.assertEqual(document["status"], "frozen_specification")
+        self.assertEqual(self.manifest["specification"]["contract"], "scenario_contract.json")
         self.assertEqual(self.contract["pending_decisions"], [])
         self.assertEqual(self.contract["decision_review"]["status"], "complete")
         for filename in self.contract["setup_files"]:
-            self.assertTrue((SCENARIO / "m0" / filename).is_file())
+            self.assertTrue((SCENARIO / filename).is_file())
 
     def test_core_ledger_has_unique_traceable_fixture_ids(self):
         ledger = (ROOT / "docs/rules/core_rules_ledger.md").read_text()
@@ -350,7 +346,7 @@ class M0SpecificationTests(unittest.TestCase):
             self.assertEqual(account["treasury_ipp"], min(account["official_starting_ipp"], retained))
             actual[account["nation"]] = account["treasury_ipp"]
         self.assertEqual(actual, {"japan": 15, "kmt": 6, "ccp": 2})
-        self.assertEqual(actual, self.manifest["m0_specification"]["starting_treasury_ipp"])
+        self.assertEqual(actual, self.manifest["specification"]["starting_treasury_ipp"])
         for key in ("controlled_minor_treasury_ipp", "unaligned_minor_treasury_ipp"):
             self.assertEqual(accounts[key], 0)
         self.assertNotIn("local_ussr_initial_treasury_ipp", accounts)
@@ -431,8 +427,6 @@ class M0SpecificationTests(unittest.TestCase):
             thresholds = row["minimum_success_roll_by_destination"]
             self.assertEqual(set(thresholds), set(research["destination_columns"]))
             self.assertTrue(all(type(value) is int and 1 <= value <= research["die_sides"] for value in thresholds.values()))
-        for gate in checks["later_implementation_gates"]:
-            self.assertFalse(gate["blocks_m0_source_reconciliation"])
 
 
 if __name__ == "__main__":

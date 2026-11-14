@@ -21,7 +21,7 @@ void rejects(const std::function<void()>& action) {
     throw std::runtime_error("Invalid scenario was accepted");
 }
 struct TemporaryScenario {
-    fs::path root = fs::temp_directory_path() / ("gwrl-m2-setup-" + std::to_string(
+    fs::path root = fs::temp_directory_path() / ("gwrl-setup-" + std::to_string(
         std::chrono::steady_clock::now().time_since_epoch().count()));
     fs::path scenario = root / "game_content/scenarios/campaign";
     TemporaryScenario() {
@@ -39,9 +39,9 @@ struct TemporaryScenario {
 int main() {
     try {
         State state = loadScenario(source);
-        require(state.units.size() == 99, "Starting unit total differs from M0");
-        require(state.territories.size() == 31, "Land total differs from M0");
-        require(state.nations.size() == 12, "Canonical faction count differs from M1");
+        require(state.units.size() == 99, "Starting unit total differs from the setup");
+        require(state.territories.size() == 31, "Land total differs from the setup");
+        require(state.nations.size() == 12, "Canonical faction count differs from the faction index");
         require(state.facilities.size() == 22, "Map facilities and setup factories not distinct");
         require(state.definition->geography.require("nodes").asObject().size() == 37, "Closed map changed");
         require(state.definition->geography.require("convoy_lines").asArray().empty(), "Convoys became active");
@@ -49,7 +49,7 @@ int main() {
         std::map<Id, int> units;
         for (const auto& [id, unit] : state.units) {
             ++units[unit.owner];
-            require(unit.movementRemaining && unit.movementAllowance, "M3 catalog movement missing");
+            require(unit.movementRemaining && unit.movementAllowance, "Catalog movement missing");
         }
         require(units["japan"] == 48 && units["kmt"] == 12 && units["ccp"] == 5 && units["mongolia"] == 2,
                 "National setup counts changed");
@@ -86,7 +86,7 @@ int main() {
                 "Home-country membership was inferred from possession");
         require(state.definition->factions.at("mongolia").homeCountryKnown
                 && state.definition->factions.at("mongolia").homeCountry.size()==4,
-                "M4 original mainland home-country predicate unresolved");
+                "Original mainland home-country predicate unresolved");
         require(!state.nations.at("japan").incomeKnown, "Printed IPP was silently treated as evaluated legal income");
         std::cout << "PASS carrier identities, queues, source names and independent home-country membership\n";
 
@@ -113,7 +113,7 @@ int main() {
         std::cout << "PASS cloning and restore after setup files are removed\n";
         {
             TemporaryScenario temporary;
-            std::ofstream changed(temporary.scenario / "m0/japan_setup.json", std::ios::app);
+            std::ofstream changed(temporary.scenario / "japan_setup.json", std::ios::app);
             changed << ' ';
             changed.close();
             rejects([&] { loadScenario(temporary.scenario); });
@@ -121,7 +121,7 @@ int main() {
         std::cout << "PASS stale source-index rejection\n";
         for (const auto& malformed : {"193x-07", "1936-7x", "1936-00", "1936-04"}) {
             TemporaryScenario temporary;
-            const auto path = temporary.scenario / "m0/scenario_contract.json";
+            const auto path = temporary.scenario / "scenario_contract.json";
             auto contract = game::json::parseFile(path).asObject();
             auto calendar = contract.at("calendar").asObject();
             calendar["start"] = game::json::Value(std::string(malformed));

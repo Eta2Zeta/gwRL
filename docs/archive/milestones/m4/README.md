@@ -11,7 +11,7 @@ combat resolution and final economy rules remain the following milestones.
 The public interface is [politics.hpp](../../../../include/game/politics.hpp).
 The implementation is split between common political events, warlords/truce,
 and influence/recruitment. The [source profile](../../../../game_content/rules/gw36_politics_v43.json)
-and [source coverage](../../../rules/politics_sources.md) retain
+and [source coverage](source_coverage.md) retain
 rulebook pages, national-sheet conditions, adopted rulings and campaign choices.
 
 ## Political transitions

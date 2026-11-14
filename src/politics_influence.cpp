@@ -212,7 +212,7 @@ void applyRecruitmentChoice(State& state, const Action& action) {
         project.remainingPayments.erase(project.remainingPayments.begin());
         --project.queuePosition;
         // Free recruitment work is not an IPP payment. A finished ship waits
-        // for M6 placement rather than spawning at an invented location.
+        // for the economy module's placement rather than spawning at an invented location.
         if (project.remainingPayments.empty()) project.flags["completed"] = 1;
     } else if (action.kind == "recruitment_repair_facility") {
         const auto id = action.parameters.require("facility").asString();

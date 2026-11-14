@@ -11,7 +11,7 @@ records adopted and closed official-rule interpretations. The setup inventories,
 scenario contract, manifest, extracted map, detailed audits, milestone plan and
 data tests now agree with these decisions. Excluded FEC and convoy records remain
 as clearly labeled source evidence. The
-[frozen baseline](../../../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
+[frozen baseline](frozen_baseline.json)
 records the verified files and their SHA-256 hashes. Later changes to the approved
 specification should explicitly revise this baseline. No full-rules engine or
 training was implemented in this work.
@@ -213,7 +213,7 @@ choices in this review. Completed units already use full catalog value.
 
 Mongolia scheduling, paid-construction scoring and whole-warlord alignment are
 settled above. **The decision-review checklist item is complete.** The
-[source reconciliation](../../../rules/source_reconciliation.md)
+[source reconciliation](source_reconciliation.md)
 confirms the initial queue amounts: Heavy Cruiser **5 IPP paid / 5 remaining**;
 Fleet Carrier **5 paid / 10 remaining**. Both are national queues with no initial
 tile. Their already-paid total is **10 IPP**, separate from the **23 IPP** opening
@@ -276,17 +276,17 @@ they do not activate those mechanics in this scenario.
 
 | File | Purpose / revision status |
 | --- | --- |
-| [Scenario contract](../../../../game_content/scenarios/japan_china_1936/m0/scenario_contract.json) | Frozen machine-readable scope, scoring, accounts and decisions; no pending decisions |
-| [Japan setup data](../../../../game_content/scenarios/japan_china_1936/m0/japan_setup.json) / [audit](../../../rules/japan_setup_audit.md) | 48 deployed units, three factories, carrier assignments, setup-only values and two reconciled national queues |
-| [China/minor setup data](../../../../game_content/scenarios/japan_china_1936/m0/china_minor_setup.json) / [audit](../../../rules/china_minor_setup_audit.md) | 51 retained units, direct Comintern control of Mongolia, preserved owner names and separately excluded FEC records |
+| [Scenario contract](../../../../game_content/scenarios/japan_china_1936/scenario_contract.json) | Frozen machine-readable scope, scoring, accounts and decisions; no pending decisions |
+| [Japan setup data](../../../../game_content/scenarios/japan_china_1936/japan_setup.json) / [audit](japan_setup_audit.md) | 48 deployed units, three factories, carrier assignments, setup-only values and two reconciled national queues |
+| [China/minor setup data](../../../../game_content/scenarios/japan_china_1936/china_minor_setup.json) / [audit](china_minor_setup_audit.md) | 51 retained units, direct Comintern control of Mongolia, preserved owner names and separately excluded FEC records |
 | [Core rules ledger](../../../rules/core_rules_ledger.md) | Source-linked coverage and campaign applicability, including the settled clarification register |
-| [Asset price audit](../../../rules/asset_price_audit.md) | Published catalog/repair costs, confirmed setup-only values and city/rail scoring |
-| [Convoy audit](../../../rules/convoy_audit.md) / [data](../../../../game_content/scenarios/japan_china_1936/m0/convoy_audit.json) | Reference only for a future expanded profile; no longer required for this campaign |
+| [Asset price audit](asset_price_audit.md) | Published catalog/repair costs, confirmed setup-only values and city/rail scoring |
+| [Convoy audit](convoy_audit.md) / [data](../../../../game_content/scenarios/japan_china_1936/convoy_audit.json) | Reference only for a future expanded profile; no longer required for this campaign |
 | [Manifest](../../../../game_content/scenarios/japan_china_1936/manifest.json) / [extracted map](../../../../game_content/scenarios/japan_china_1936/map.json) | 37 nodes, 19 static facilities, no active convoy lines; deterministic extraction from the reviewed world map |
-| [Source reconciliation](../../../rules/source_reconciliation.md) / [catalog source checks](../../../../game_content/scenarios/japan_china_1936/m0/catalog_source_checks.json) | Queue payments, research chart and rule/price source checks, with later catalog work identified |
-| [M0 data tests](../../../../tests/test_m0_spec.py) | Verified setup, scope, provenance, accounts, queues, carrier assignments, scoring and exclusions |
+| [Source reconciliation](source_reconciliation.md) / [catalog source checks](../../../../game_content/scenarios/japan_china_1936/catalog_source_checks.json) | Queue payments, research chart and rule/price source checks, with later catalog work identified |
+| [M0 data tests](../../../../tests/test_scenario_specification.py) | Verified setup, scope, provenance, accounts, queues, carrier assignments, scoring and exclusions |
 | [Full milestone plan](../../../plans/japan_china_full_rules_plan.md) | M0 closed; subsequent state, catalog and rule implementation work remains |
-| [Frozen baseline](../../../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json) | Versioned file hashes and verification record for this completed M0 specification |
+| [Frozen baseline](frozen_baseline.json) | Versioned file hashes and verification record for this completed M0 specification |
 
 The original setup audit inspected embedded setup-table images as well as text;
 row-level citations and PDF hashes are in the JSON. It inherited geography from

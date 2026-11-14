@@ -70,7 +70,7 @@ void coverageAndEveryPrintedRow(const Catalog& catalog) {
     check(catalog.facilities().size() == 15 && catalog.technologies().size() == 16,
           "Facility/technology coverage incomplete");
     catalog.requireComplete();
-    check(catalog.unresolvedFields().empty(), "Unresolved source values survived M3 certification");
+    check(catalog.unresolvedFields().empty(), "Unresolved source values survived catalog certification");
     const auto restored = Catalog::fromJson(catalog.sourceData());
     check(restored->fingerprint() == catalog.fingerprint(), "In-memory catalog reconstruction changed identity");
 
@@ -318,7 +318,7 @@ void technologyAndConstruction(const Catalog& catalog) {
 }
 
 void nationalRuleScopes(const Catalog& catalog) {
-    // These are retained conditional handlers for later combat milestones,
+    // These are retained conditional handlers for the combat modules,
     // not unconditional changes to shared unit stats.
     for (const auto& [id, unit] : catalog.units()) {
         const auto& surprise = rule(unit.rules, "japanese_surprise_attack_defense");

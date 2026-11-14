@@ -176,7 +176,7 @@
       "note": "Visible near Singapore and the southern Indonesian seas; not in any of the six selected sea zones. Complete global route audit not performed."
     }
   ],
-  "remaining_implementation_gap": "None for this campaign: convoys are excluded and no convoy gameplay is required for M0. Existing canonical world-map geography is retained; this source audit can support a future expanded profile.",
+  "remaining_implementation_gap": "None for this campaign: convoys are excluded and no convoy gameplay is required. Existing canonical world-map geography is retained; this source audit can support a future expanded profile.",
   "acceptance_tests": [
     "Nagasaki retained only when both endpoint nodes and every traversed sea zone exist.",
     "Tokyo excluded without fabricating a shortcut across absent P34 or a replacement endpoint for P50.",

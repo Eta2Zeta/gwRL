@@ -20,7 +20,7 @@
     "current_owner_semantics": "Legacy setup hint only; original_owner is static identity. Neither current_owner nor is_capital is runtime state.",
     "rail_semantics": "Land-border railway_connection describes printed rail. Legacy coast railway_connection artwork is retained pending AM-229 and grants no rail movement into a sea. printed_rail_coverage is true when a land-border railroad establishes coverage, otherwise unknown. Gauge changes require verified gauges on both sides, never ownership.",
     "geographic_features_source": "game_content/maps/authoring/geographic_features.json",
-    "geographic_features_source_sha256": "3a49158431888d7e32f0f6e6b39b2922f9d6e4375d7ea344e398bb41fd1ad6eb",
+    "geographic_features_source_sha256": "12445cb297b2759282f5b6c9f5acacb93bf97ebb8f69d37e46ced6ce7657baf9",
     "geographic_rules_profile": "game_content/rules/map_geography_rules.json",
     "feature_uncertainties": {
       "rail_region_membership": "The rulebook capacity table names seven regions but audited territory memberships are not complete. Do not infer from current control.",
@@ -65695,7 +65695,7 @@
         "WG-036"
       ],
       "evidence": [
-        "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+        "game_content/scenarios/japan_china_1936/convoy_audit.json"
       ]
     },
     {
@@ -65729,7 +65729,7 @@
         "WG-037"
       ],
       "evidence": [
-        "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+        "game_content/scenarios/japan_china_1936/convoy_audit.json"
       ]
     }
   ],

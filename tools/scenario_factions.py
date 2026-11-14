@@ -24,9 +24,9 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = ROOT / "game_content/scenarios/japan_china_1936"
 DEFAULT_MAP = SCENARIO / "map.json"
-DEFAULT_JAPAN_SETUP = SCENARIO / "m0/japan_setup.json"
-DEFAULT_CHINA_SETUP = SCENARIO / "m0/china_minor_setup.json"
-DEFAULT_OUTPUT = SCENARIO / "m1/faction_index.json"
+DEFAULT_JAPAN_SETUP = SCENARIO / "japan_setup.json"
+DEFAULT_CHINA_SETUP = SCENARIO / "china_minor_setup.json"
+DEFAULT_OUTPUT = SCENARIO / "faction_index.json"
 CONTROL_FIELDS = (
     "controller_id", "alliance_id", "status", "source_controller_id",
     "turn_slot", "source_turn_slot", "national_identity_retained",
@@ -159,7 +159,7 @@ def build_index(japan_setup, china_setup, theatre_map):
         "schema_version": 1,
         "scenario_id": scenario_id,
         "artifact_type": "scenario_faction_index",
-        "status": "bridge_identity_data_not_playable",
+        "status": "identity_data",
         "alias_normalization": "remove_whitespace_then_casefold; preserve_punctuation_and_spelling",
         "scope": "Original national identity and approved setup control are separate. This index does not align factions, transfer possession or implement runtime state.",
         "factions": {faction["id"]: faction for faction in factions},

@@ -197,5 +197,5 @@ or the repair of a facility.
 
 Tests: `tests/politics_tests.cpp`, `tests/politics_warlords_tests.cpp`,
 `tests/politics_influence_tests.cpp` and `tests/land_truce_tests.cpp`. The
-printed pages behind these rules are listed in
-[Politics: source coverage](../rules/politics_sources.md).
+printed page behind each rule is recorded beside the rule in the rules data
+([where the numbers come from](../rules/README.md#where-the-scenarios-numbers-come-from)).

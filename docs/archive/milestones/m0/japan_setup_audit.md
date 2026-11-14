@@ -2,18 +2,18 @@
 
 Status: **M0 specification verified and frozen on 21 October 2026**; not a playable full-rules state. Scope: the July 1936 Japan setup projected onto the approved 37-node China/Japan theatre. No game engine or training behavior is changed by this audit.
 
-**21 October 2026 synchronization:** see the [M0 review](../archive/milestones/m0/README.md)
+**21 October 2026 synchronization:** see the [M0 review](README.md)
 for approved setup/scope decisions and the
-[shared rule register](../../game_content/rules/clarifications.md)
+[shared rule register](../../../../game_content/rules/clarifications.md)
 for the adopted/closed rule interpretations. The carrier-footnote, ship-placement
 and Kamikaze misreadings below have been corrected. The M0 review records the
 completed verification and freeze.
 
 ## Sources and method
 
-The primary source is [Japan NRS v4.3](../../game_content/rules/GW36%20-%20NRS%20-%20Japan%20v4.3.pdf), PDF pages 1-9. All nine pages were rendered and visually inspected. The setup on page 9 is an image: ordinary PDF text extraction returns only its heading and misses every unit. Page numbers below are one-based PDF page numbers; the NRS has no printed page numbers.
+The primary source is [Japan NRS v4.3](../../../../game_content/rules/GW36%20-%20NRS%20-%20Japan%20v4.3.pdf), PDF pages 1-9. All nine pages were rendered and visually inspected. The setup on page 9 is an image: ordinary PDF text extraction returns only its heading and misses every unit. Page numbers below are one-based PDF page numbers; the NRS has no printed page numbers.
 
-The [v4.3 rulebook](../../game_content/rules/Global%20War%201936%20v4.3%20Rulebook.pdf) uses matching printed/PDF page numbers. Sections 2.3-2.4, page 18, require setup-sheet units/facilities and national starting IPPs. Sections 8.3 (page 50), 8.6 (page 51), 12.1 (page 79), and 13.1.6 (pages 89-91) explain construction, repairs, placement and naval prices/capacities. The setup and relevant naval tables were also visually inspected.
+The [v4.3 rulebook](../../../../game_content/rules/Global%20War%201936%20v4.3%20Rulebook.pdf) uses matching printed/PDF page numbers. Sections 2.3-2.4, page 18, require setup-sheet units/facilities and national starting IPPs. Sections 8.3 (page 50), 8.6 (page 51), 12.1 (page 79), and 13.1.6 (pages 89-91) explain construction, repairs, placement and naval prices/capacities. The setup and relevant naval tables were also visually inspected.
 
 Source SHA-256 values:
 
@@ -21,7 +21,7 @@ Source SHA-256 values:
 - Rulebook: `240d04e5bb9d20928f375ce115836c360ad614fc6215da8b901d7a1806eef11d`.
 - Original September audit's global map JSON: `97061d40dacc5a23c570d063f21279c9aef24cd3f4533c166bb04fa241b61e24` (historical provenance; current generated-map hashes are recorded in the artifacts).
 
-Machine-readable transcription, citations and approved setup choices: [japan_setup.json](../../game_content/scenarios/japan_china_1936/m0/japan_setup.json).
+Machine-readable transcription, citations and approved setup choices: [japan_setup.json](../../../../game_content/scenarios/japan_china_1936/japan_setup.json).
 
 ## Retained official pieces
 
@@ -174,6 +174,6 @@ exclusion and Kido Butai exclusion. Those are no longer unanswered questions.
 Paid-queue valuation is decided: score cumulative paid amounts until completion,
 then substitute full completed catalog value. Source reconciliation establishes
 the initial payments at 5 IPP each. The M0 specification is verified and frozen;
-the [baseline](../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json)
+the [baseline](frozen_baseline.json)
 records the frozen artifacts. Neither this audit nor the shared register
 implements mechanics.

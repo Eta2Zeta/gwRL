@@ -679,7 +679,7 @@ and a run cannot resume across a layout change. It last changed on 14 November
 
 ## 10. Why the encoder translates names
 
-The engine came first. It was written (milestones M0 to M11) to follow the
+The engine came first. It was written to follow the
 rulebook, and many parts of the project use it: the Python interface, the tests,
 saved games and replays, the map viewer, and training checkpoints, which store
 the whole game as JSON. Names keep all of these readable, let the engine load its

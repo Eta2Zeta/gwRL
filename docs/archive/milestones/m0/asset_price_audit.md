@@ -4,7 +4,7 @@ Original audit: 12 September 2026; campaign synchronization: 21 October 2026.
 **M0 specification verified and frozen on 21 October 2026**; no reward evaluator
 or unit catalog has been implemented by this document.
 
-**5 October 2026 accounting update:** the [M0 review](../archive/milestones/m0/README.md)
+**5 October 2026 accounting update:** the [M0 review](README.md)
 records the adopted setup-only values (Torpedo Boat Destroyer 5 IPP; Coastal
 Submarine 4), full catalog valuation for completed assets, and cumulative
 already-paid value for unfinished construction. The retained inventory below

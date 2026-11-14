@@ -28,7 +28,7 @@ void near(double actual, double expected) {
 
 State initialState() {
     Definition definition;
-    definition.scenarioId = "synthetic_m2_fixture";
+    definition.scenarioId = "synthetic_foundation_fixture";
     definition.geography = V(O{{"nodes", V(O{
         {"land_a", V(O{{"id", V(std::string("land_a"))}, {"type", V(std::string("land"))}})},
         {"land_b", V(O{{"id", V(std::string("land_b"))}, {"type", V(std::string("land"))}})}
@@ -58,7 +58,7 @@ State initialState() {
 // fixture actions implements production, combat, movement or income rules.
 class FixtureRules : public Rules {
   public:
-    std::string identity {"synthetic_m2_rules_v1"};
+    std::string identity {"synthetic_foundation_rules_v1"};
     bool throwOnChance {false};
     bool missingIncome {false};
     bool finalPendingWork {false};

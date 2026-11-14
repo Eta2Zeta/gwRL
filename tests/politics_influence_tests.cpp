@@ -462,7 +462,7 @@ void dadaoRecruitmentAfterJapanSurrenders() {
 
 class FixtureRules final : public Rules {
   public:
-    Id id() const override { return "m4_influence_recruitment_fixture"; }
+    Id id() const override { return "influence_recruitment_fixture"; }
     std::vector<Action> actions(const State& state) const override { return influenceActions(state); }
     bool phaseComplete(const State&) const override { return false; }
     void apply(State& state, const Action& action) const override {

@@ -133,5 +133,6 @@ decisions, more than any other move except `end_phase`
 ([record](../archive/records/move_census_2026_11_14.md)). The other two never
 came up in those games.
 
-Tests: `tests/movement_tests.cpp`. The printed pages behind these rules are
-listed in [Movement: source coverage](../rules/movement_sources.md).
+Tests: `tests/movement_tests.cpp`. The printed pages behind each rule are
+recorded beside the rule in the rules data
+([where the numbers come from](../rules/README.md#where-the-scenarios-numbers-come-from)).

@@ -199,11 +199,11 @@ def build():
         if not re.match(r"\| R\d{3};", line): continue
         columns=[x.strip() for x in line.split("|")[1:-1]]
         row_id, source = columns[0].split(";",1)
-        item={"id":row_id,"source":source.strip(),"contract":columns[1],"m0_acceptance":columns[-1]}
+        item={"id":row_id,"source":source.strip(),"contract":columns[1],"acceptance_fixture":columns[-1]}
         inactive=columns[1].startswith("I:") or row_id in INACTIVE_EXTRA
         if inactive:
             item.update(status="inactive_in_frozen_profile",reason=INACTIVE_EXTRA.get(row_id,columns[1][3:]))
-            item["profile_evidence"]=["game_content/scenarios/japan_china_1936/m0/scenario_contract.json","game_content/scenarios/japan_china_1936/manifest.json","tests/campaign_setup_tests.cpp"]
+            item["profile_evidence"]=["game_content/scenarios/japan_china_1936/scenario_contract.json","game_content/scenarios/japan_china_1936/manifest.json","tests/campaign_setup_tests.cpp"]
         else:
             if row_id not in E: raise ValueError(f"Unmapped active contract {row_id}")
             item.update(status="replaced_by_approved_campaign_policy" if columns[1].startswith("O:") else "runtime_and_executable_evidence_indexed")

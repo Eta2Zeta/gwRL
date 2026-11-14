@@ -2,9 +2,9 @@
 
 This directory keeps source material and authored game data separate from engine and training code.
 
-The campaign's rules are implemented (milestones M0–M11), including the naval
-source review, complete 44-turn campaigns and the multi-agent API and vector
-search. Reviewed rule profiles supplement the frozen M0 map. RCL-012 is
+The campaign's rules are implemented, including the naval source review,
+complete 44-turn campaigns and the multi-agent API and vector search. Reviewed
+rule profiles supplement the frozen scenario map. RCL-012 is
 closed; RCL-013 is adopted. RCL-014 is closed following developer clarification:
 evacuating ships defend and the enemy fleet already at sea attacks. RCL-015
 remains provisionally adopted. Consult the shared
@@ -203,9 +203,9 @@ fully audited sea zones. Existing outside-region warnings still apply.
 
 - `japan_china_1936/` is the campaign scenario: a closed 37-node map projection
   (31 land, 6 sea; Tannu Tuva and Hong Kong excluded), the source-audited official
-  setup in `m0/` with theatre-adjusted accounts and approved decisions (99 deployed
-  pieces, 3 setup factories and 19 static facilities), and the faction index in
-  `m1/`. FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
+  setup with theatre-adjusted accounts and approved decisions (99 deployed
+  pieces, 3 setup factories and 19 static facilities), and the faction index.
+  FEC/USSR accounts, convoys, interdiction and Kido Butai are excluded.
   See its [README](scenarios/japan_china_1936/README.md),
-  [the campaign page](../docs/engine/scenario.md) and, for the rules checklist,
-  price tables and source reconciliation, [Rules and data](../docs/rules/README.md).
+  [the campaign page](../docs/engine/scenario.md) and, for the rules checklist
+  and where each number comes from, [Rules and data](../docs/rules/README.md).

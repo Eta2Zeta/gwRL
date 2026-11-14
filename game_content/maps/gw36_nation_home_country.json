@@ -8,7 +8,7 @@
       "game_content/maps/gw36_manual_map.json",
       "game_content/rules/Global War 1936 v4.3 Rulebook.pdf"
     ],
-    "source_map_sha256": "bd6a5727504672e54bbbccb3921ac53ebadad28c46746060d5db465a13186fed",
+    "source_map_sha256": "5afddbbc72126a2563db6d8255982e2d0b0fe8ef206e70aca5134f55590520a3",
     "membership_basis": "Rules geography and printed original identity, never current control or graph reachability."
   },
   "non_listed_nation_rule": "Non-listed nations: all originally possessed land zones except offshore territories.",

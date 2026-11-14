@@ -17,7 +17,7 @@ struct WealthComponents {
     double total() const;
 };
 
-// The approved M0 objective, in original IPP-like units. This is an evaluation
+// The approved objective, in original IPP-like units. This is an evaluation
 // of the current position, not an intermediate reward or a collection event.
 std::array<WealthComponents, 3> allianceWealth(const State&);
 std::array<double, 3> wealthGaps(const State&);

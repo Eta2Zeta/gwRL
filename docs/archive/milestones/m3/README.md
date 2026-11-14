@@ -89,4 +89,4 @@ git diff --check
 
 The acceptance checks cover every printed row, setup type and surviving unit
 state, alongside independent source-hash, source-page and chart-coverage checks.
-See [source coverage](../../../rules/catalog_sources.md).
+See [source coverage](source_coverage.md).

@@ -31,7 +31,7 @@ State fixture(const std::vector<std::pair<Id, Id>>& links = {}, bool withDadao =
               bool secondActive = false, bool impassable = false) {
     static const auto catalog = Catalog::load(std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/catalog/gw36_v43");
     Definition definition;
-    definition.scenarioId = "synthetic_m4_warlord_fixture";
+    definition.scenarioId = "synthetic_warlord_fixture";
     definition.catalog = catalog;
     definition.players = {"axis", "allies", "comintern"};
     definition.turnOrder = {"ccp", "mongolia", "japan", "kmt"};

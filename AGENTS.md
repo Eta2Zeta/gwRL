@@ -78,9 +78,13 @@
 - Test counts, random-game tallies and other check results go in the commit
   message, not in a document. A settled rules question goes in
   `game_content/rules/clarifications.md` and in the page of the rule it changes.
-- Outside `docs/archive/`, name no file or folder after a date, a milestone or a
-  stage. `tests/test_documentation.py` checks this, every relative link, and
-  every document the data or the code cites.
+- Name things by what they are. Outside `docs/archive/`, no file, folder,
+  identifier or data field is named after a date, a milestone or a build stage,
+  and no page or data string refers to one by its label (M0 to M11, Stage A):
+  say "the scenario contract" or "the movement module". A stage label says
+  when a thing was built, not what it is. `tests/test_documentation.py` checks
+  the file names and the pages, every relative link, and every document the
+  data or the code cites.
 - `docs/design/README.md` is the central design document of the learning
   system: the game interface, search, the network's input, the network,
   training, runs, evaluation and their data structures. It builds the design up

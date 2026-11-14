@@ -1313,7 +1313,7 @@ std::vector<Action> landBattleClearing(const State &s) {
 
 LandCombatRules::LandCombatRules(std::shared_ptr<const Rules> next) : gameplay_(std::move(next)) {}
 Id LandCombatRules::id() const {
-    return "gw36_v43_m7_land_combat" + (gameplay_ ? "+" + gameplay_->id() : "");
+    return "gw36_v43_land_combat" + (gameplay_ ? "+" + gameplay_->id() : "");
 }
 std::vector<Action> LandCombatRules::actions(const State &s) const {
     auto out = gameplay_ ? gameplay_->actions(s) : std::vector<Action>{};

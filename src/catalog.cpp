@@ -206,7 +206,7 @@ CatalogContext buildContext(const State& state,const Id& owner,const std::option
     if(zone) {const auto& faction=state.definition->factions.at(owner);const bool home=faction.homeCountryKnown&&faction.homeCountry.contains(*zone);c.flags["movement_starts_in_owner_home_country"]=home;c.flags["movement_ends_in_owner_home_country"]=home;}
     if(!state.nations.contains("ussr"))c.disabledFlags.insert("ccp_soviet_rail_production");
     // These source predicates cannot be satisfied by a generic supply flag in
-    // the closed theatre. Geography/rail path evaluation belongs to M4/M5.
+    // the closed theatre. Geography/rail path evaluation belongs to the politics and movement modules.
     if(state.definition->scenarioId=="japan_china_1936_1941")c.disabledFlags.insert("kmt_burma_road");
     for(const auto& [key,value]:n.turnFlags)if(key.rfind("purchased:",0)==0)c.purchases[key.substr(10)]=value;
     return c;

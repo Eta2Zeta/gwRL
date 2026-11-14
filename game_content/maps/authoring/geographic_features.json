@@ -491,7 +491,7 @@
         "WG-036"
       ],
       "evidence": [
-        "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+        "game_content/scenarios/japan_china_1936/convoy_audit.json"
       ]
     },
     {
@@ -525,7 +525,7 @@
         "WG-037"
       ],
       "evidence": [
-        "game_content/scenarios/japan_china_1936/m0/convoy_audit.json"
+        "game_content/scenarios/japan_china_1936/convoy_audit.json"
       ]
     }
   ],

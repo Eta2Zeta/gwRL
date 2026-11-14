@@ -10,7 +10,7 @@ using namespace game::campaign;
 // Explicit measurement fixture, not an implementation of production or combat.
 class BenchmarkRules final : public Rules {
   public:
-    Id id() const override { return "m2_control_flow_benchmark_v1"; }
+    Id id() const override { return "control_flow_benchmark_v1"; }
     std::vector<Action> actions(const State&) const override { return {}; }
     bool phaseComplete(const State&) const override { return true; }
     void apply(State&, const Action&) const override { throw std::runtime_error("No benchmark gameplay action"); }
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
             engine.step(engine.legalActions().front());
         });
         std::cout << "{\n"
-            << "  \"scope\": \"M2 control-flow fixture, 99 real setup units; no gameplay handlers\",\n"
+            << "  \"scope\": \"Control-flow fixture, 99 real setup units; no gameplay handlers\",\n"
             << "  \"clone_per_second\": " << clones << ",\n"
             << "  \"legal_actions_per_second\": " << legal << ",\n"
             << "  \"planning_keys_per_second\": " << keys << ",\n"

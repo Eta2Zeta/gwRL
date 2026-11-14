@@ -1,4 +1,4 @@
-"""The M1 identity bridge must not rewrite nationality or frozen setup policy."""
+"""The faction index must not rewrite nationality or frozen setup policy."""
 
 import copy
 import hashlib

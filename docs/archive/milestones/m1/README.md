@@ -12,7 +12,7 @@ the M0 scenario decisions. No user decision is required for this milestone.
   [manifest](../../../../game_content/scenarios/japan_china_1936/manifest.json)
   and [generated map](../../../../game_content/scenarios/japan_china_1936/map.json).
 - [Faction identity bridge](../../../../tools/scenario_factions.py)
-  and [generated faction index](../../../../game_content/scenarios/japan_china_1936/m1/faction_index.json).
+  and [generated faction index](../../../../game_content/scenarios/japan_china_1936/faction_index.json).
 
 The map contains **37 nodes** (31 land and 6 sea), **160 directed internal
 edges**, **19 physical map facilities** and **47 recorded boundary cuts**.
@@ -59,7 +59,7 @@ From the repository root:
 
 M1 adds an identity sidecar. It does not change the frozen scenario contract,
 setup, manifest or map recorded by the
-[M0 baseline](../../../../game_content/scenarios/japan_china_1936/m0/frozen_baseline.json).
+[M0 baseline](../m0/frozen_baseline.json).
 
 This milestone establishes the static map and identity bridge. Source-unknown
 rail-region membership and navigable river routes remain explicitly marked as

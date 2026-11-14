@@ -385,7 +385,7 @@ struct RandomStreams {
 std::vector<int> effectiveResults(const ChanceRequest&, const ChanceOutcome&);
 double outcomeProbability(const ChanceRequest&, const ChanceOutcome&);
 
-// M3+ modules provide game rules. There is deliberately no permissive default
+// Rules modules provide the game's rules. There is deliberately no permissive default
 // implementation that would present phase-only stepping as a playable campaign.
 // Modules are immutable/stateless: all decision-relevant effects belong in
 // State fields and flags. State.history is an audit log, not hidden rule state.

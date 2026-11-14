@@ -84,7 +84,7 @@ struct Puzzle {
   State state(Phase phase = Phase::NonCombatMovement) {
     auto s = baseline().clone();
     Definition def = *s.definition;
-    def.scenarioId = "m5_route_puzzle";
+    def.scenarioId = "route_puzzle";
     def.geography = V(O{{"nodes", V(nodes)},
                         {"facilities", V(O{})},
                         {"rail_geography", V(O{{"memberships", V(regions)}})}});
