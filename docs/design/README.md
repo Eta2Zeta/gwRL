@@ -35,15 +35,15 @@ numbers.
      [5.5 Facts that never change](#55-facts-that-never-change) ·
      [5.6 More detail](#56-more-detail-how-the-encoder-builds-the-input)
 6. [Inside a network, brick by brick](#6-inside-a-network-brick-by-brick)
-   - [6.1 Vectors](#61-vectors) · [6.2 Rows and tables](#62-rows-and-tables) ·
-     [6.3 A weighted sum of rows](#63-from-answers-to-a-vector-a-weighted-sum-of-rows) ·
-     [6.4 Learned layers](#64-learned-layers) ·
-     [6.5 A zone's vector](#65-a-zones-vector) ·
-     [6.6 Position and move vectors](#66-the-position-vector-and-the-move-vectors) ·
-     [6.7 Messages](#67-messages-along-the-borders) ·
-     [6.8 The values](#68-the-values) ·
-     [6.9 The move probabilities](#69-the-move-probabilities) ·
-     [6.10 The whole network](#610-the-whole-network)
+   - [6.1 Vectors](#61-vectors) · [6.2 Learned layers](#62-learned-layers) ·
+     [6.3 The first layer](#63-the-first-layer-rows-and-tables) ·
+     [6.4 A zone's vector](#64-a-zones-vector) ·
+     [6.5 Position and move vectors](#65-the-position-vector-and-the-move-vectors) ·
+     [6.6 Messages](#66-messages-along-the-borders) ·
+     [6.7 The values](#67-the-values) ·
+     [6.8 The move probabilities](#68-the-move-probabilities) ·
+     [6.9 The whole network](#69-the-whole-network) ·
+     [6.10 More detail](#610-more-detail-how-other-game-networks-read-their-input)
 7. [Self-play and training samples](#7-self-play-and-training-samples)
 8. [Training the networks](#8-training-the-networks)
    - [8.1 The loss](#81-the-loss) · [8.2 The gradient](#82-the-gradient) ·
@@ -566,8 +566,10 @@ is 0, and only the non-zero cells are stored.
 
 ![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,532 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 6,524 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 191 non-zero answers in all.](figures/answer_grid.svg)
 
-A line of a grid holds one zone's, the position's or one move's answers. It is
-not what section 6 calls a row.
+A line of a grid holds one zone's, the position's or one move's answers. In the
+usual picture of a neural network, the lines are its input layer, which the
+network's first layer reads ([section 6.3](#63-the-first-layer-rows-and-tables)).
+A line is not what section 6 calls a row: a row holds learned numbers.
 
 ### 5.4 A move's answers, and the zones it is linked to
 
@@ -606,7 +608,7 @@ starts from, the zone it acts on and its path's zones. The attack on Hopeh start
 from Shensi, acts on Hopeh and travels through Shensi and Hopeh; ending the phase
 names no zone. Through the links the network reads those zones' descriptions
 together with the move's own answers
-([section 6.9](#69-the-move-probabilities)).
+([section 6.8](#68-the-move-probabilities)).
 
 ### 5.5 Facts that never change
 
@@ -647,12 +649,18 @@ here and in the Mac profile's measurements (section 9.2), 256×8 in the night ru
 of 2 November.
 Which plays better is [open](#how-wide-and-how-deep).
 
+In the usual picture of a neural network, the lines of answers of section 5 are
+its *input layer*, and learned layers follow. Section 6.2 defines a learned
+layer, and section 6.3 shows the first one, the layer that reads the answers.
+Nothing else stands between the answers and the network: the rest of this
+section builds on that first layer.
+
 ### 6.1 Vectors
 
 A *vector* is a list of numbers. Inside the network, every zone, the position as a
 whole and every legal move is described by a vector of 64 numbers, the network's
 *width*. At decision 612, Shensi's vector begins −0.294, 1.957, −1.422, −0.203,
-and goes on to 64 numbers ([section 6.5](#65-a-zones-vector) derives them).
+and goes on to 64 numbers ([section 6.4](#64-a-zones-vector) derives them).
 
 A vector is the network's own description of its zone, position or move: no
 number in it has a meaning chosen by hand. The network computes every vector from
@@ -660,11 +668,72 @@ the answers of section 5 and its learned numbers, and training (section 8) adjus
 the learned numbers until the vectors are useful for predicting values and good
 moves.
 
-### 6.2 Rows and tables
+### 6.2 Learned layers
 
-**A row** is the list of 64 learned numbers that a network keeps for one
-question: one number per place in a vector. **A table** holds the rows of one
-part's questions, one row per question, in question order:
+A *learned layer* turns a vector of $n$ numbers into a vector of $m$ numbers: it
+multiplies it by a learned matrix of $m \times n$ numbers, its *weights*, adds a
+learned vector of $m$ numbers, its *bias*, and most layers then bend each result
+with a fixed curve, GELU. A toy layer with 3 inputs, 1, 2 and 3, and 2 outputs,
+$y_1$ and $y_2$, whose weights are 0.5, 0.2 and 0.1, with bias 0.1, for the first
+output, and 0.1, 0.3 and −0.4, with bias 0, for the second:
+
+$$
+y_1 = \operatorname{GELU}(0.5 \times 1 + 0.2 \times 2 + 0.1 \times 3 + 0.1) = \operatorname{GELU}(1.3) \approx 1.17
+$$
+
+$$
+y_2 = \operatorname{GELU}(0.1 \times 1 + 0.3 \times 2 - 0.4 \times 3 + 0) = \operatorname{GELU}(-0.5) \approx -0.15
+$$
+
+The figure draws this layer the usual way, as Sutton and Barto do in
+*Reinforcement Learning: An Introduction* (2nd edition, section 9.7): each input
+and each output is a *unit*, every input unit has a *link* to every output unit,
+and every link carries one weight.
+
+![The toy layer drawn as units and links. Left: three input units hold 1, 2 and 3, and two output units are y1 and y2. Every input is linked to every output, and each link carries one learned weight: from input 1, 0.5 to y1 and 0.1 to y2; from input 2, 0.2 and 0.3; from input 3, 0.1 and −0.4. With the biases 0.1 and 0, y1 adds up to 1.3, which GELU turns into 1.17, and y2 to −0.5, which becomes −0.15. Right: the same layer read input by input. The weights that leave one input are its row: input 1's row is (0.5, 0.1), input 2's (0.2, 0.3) and input 3's (0.1, −0.4). 1 × (0.5, 0.1) + 2 × (0.2, 0.3) + 3 × (0.1, −0.4) + (0.1, 0) = (1.3, −0.5) before the curve. An input of 0 adds nothing, so its row can be skipped.](figures/learned_layer.svg)
+
+**A row: the weights that leave one input.** Read by input instead of by output,
+the layer is a sum of rows. The weights on the links that leave one input, one
+for each output, are that input's *row*: input 1's row is (0.5, 0.1). Before the
+curve, the outputs are each input times its row, added up, plus the bias:
+
+$$
+(1.3, -0.5) = 1 \times (0.5, 0.1) + 2 \times (0.2, 0.3) + 3 \times (0.1, -0.4) + (0.1, 0)
+$$
+
+An input of 0 adds nothing, so a layer can skip the rows of its zero inputs. The
+network's first layer, in section 6.3, has almost only such inputs.
+
+**The curve.** GELU multiplies a number by the chance that a standard normal
+variable falls below it, $\operatorname{GELU}(x) = x \Phi(x)$: large positive
+numbers pass almost unchanged and negative ones are squashed toward 0. Without
+such curves any stack of layers would amount to a single multiplication and could
+only add effects up.
+
+A layer's weights and biases are parameters, adjusted by training (section 8).
+When a layer reads several vectors, they are first joined end to end into one:
+three vectors of 64 numbers make one of 192.
+
+**Layer normalization** rescales a vector's numbers to an average of 0 and a
+spread (standard deviation) of 1, then multiplies each by a learned number and
+adds another. It keeps vectors on a common scale, whatever went into them.
+
+### 6.3 The first layer: rows and tables
+
+**The input layer.** A zone's line of answers (section 5.3) is the input layer for
+that zone: one input unit for each of the 42,532 zone questions. An input unit
+holds its answer after a fixed scaling, explained below, which turns an answer of
+1 into 0.69 and leaves 0 at 0. The first learned layer links every input unit to
+each of 64 output units, the 64 places of a vector; as the code computes it, it
+has no bias and no curve. Its 64 outputs are the first part of the zone's vector,
+to which section 6.4 adds two more.
+
+![Decision 612, the Comintern's network after one update. Left, the input layer: Shensi's line of answers, one input unit per zone question, 42,532 in all, each holding its answer after a fixed scaling, 0.69 for an answer of 1 and 0 for an answer of 0. Shown are rows 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842, the Comintern militia's count and moves left (0.69 each), 9,989 and 9,991, the Comintern mountain infantry's count and moves left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the first layer: 64 output units, of which outputs 1 to 4 and 64 are shown, with −0.001, 0.137, −0.118, −0.104 and −0.073. Every input unit has a link to every output unit. The links that leave units:ccp:mountain_infantry carry its row, row 188 of the zone table, beginning 0.019, 0.001, −0.030, 0.021. Each output adds up input times weight over its 42,532 links; the inputs of 0 add nothing, so the output is 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244, and only 9 rows are fetched. In all 42,532 × 64 = 2,722,048 links, whose weights make up the zone table.](figures/first_layer.svg)
+
+**Rows and tables.** As in the toy layer, the 64 weights on the links that leave
+one input unit are that question's *row*. The first layer's weights, stored one
+row per question in question order, are a *table*. Each part of the input has its
+own first layer and so its own table:
 
 | Table | Rows | One row for each |
 | --- | ---: | --- |
@@ -675,52 +744,45 @@ part's questions, one row per question, in question order:
 A question's number is its row's number: `units:ccp:mountain_infantry` is
 question 188 of the zone questions, and its row is row 188 of the zone table. In
 machine-learning terms a table is an *embedding table* and a row an *embedding*.
-The right side of the figure shows how Shensi's answers use their rows, which
-section 6.3 explains.
 
-![Top: one row, the 64 learned numbers the Comintern's network keeps for the zone question units:ccp:mountain_infantry, row 188 of its zone table after one update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone table, one row per zone question, 42,532 rows of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 189 and 191 (units:ccp:militia and units:ccp:mountain_infantry), 307 (units:kmt:fighter, still all zeros because no kept sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 rows Shensi's answers pick are highlighted. A fresh network's rows are all zeros; after one update 1,840 have moved. Right: Shensi's 9 answers, each 1, weigh ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 rows: Shensi's other 42,523 answers are 0.](figures/rows_and_tables.svg)
-
-**A row belongs to a question, not to a zone.** `units:ccp:mountain_infantry` has
-one row, the network's own description, in 64 numbers, of "a CCP mountain
-infantry is here", added in whichever zone that is true. No number in a row has a
-meaning chosen by hand.
-
-**Each of a row's numbers is one parameter,** so the zone table alone holds
-42,532 × 64 = 2,722,048 parameters, and the three tables 3.95 million of the
-network's 4.08 million.
-
-**Rows start at zero** (since 3 November 2026), and training moves a row only when
-it trains on samples that answer the row's question
-([section 8.5](#85-which-numbers-a-step-moves)). After the first update of the
-5 November run, 1,840 of the zone table's 42,532 rows had moved; the row of
-`units:kmt:fighter` was still all zeros, because no kept sample had a KMT fighter.
-Starting at zero means a question training has never reached adds nothing,
-instead of a random row added at full strength. In a test on a fixed set of
-saved samples it gave a slightly lower value error on samples held out of
-training (0.0076 against 0.0081) and the same policy loss
-([section 8.1](#81-the-loss)): no harm shown, not a strength gain.
-
-### 6.3 From answers to a vector: a weighted sum of rows
-
-A zone's vector starts as a weighted sum of rows. Each of the zone's non-zero
-answers picks its question's row from the zone table and multiplies it by a
-weight that depends on the answer, and the products are added up. Shensi has 9
-non-zero answers, so its vector starts as the sum of 9 weighted rows: the right
-of the figure above.
-
-**The weight** is a fixed formula of the answer $a$, written by hand, not learned
-(`_signed_log` in `studies/campaign/features.py`):
+**Skipping the zeros: a column lookup.** Each output adds up all 42,532 inputs,
+each times its weight, so the 64 outputs together are the sum of every input
+times its row. An input of 0 adds nothing, and 42,523 of Shensi's 42,532 inputs
+are 0. So the network fetches only the rows of the 9 non-zero inputs, multiplies
+each by its input and adds them up. With $x_q$ for the input of question $q$ and
+$r_q$ for its row,
 
 $$
-w(a) = \operatorname{sign}(a) \ln(1 + |a|)
+\text{output of the first layer} = \sum_{q} x_q r_q
+$$
+
+where only the questions with $x_q \neq 0$ count. Multiplying Shensi's whole line
+of 42,532 inputs by the zone table, as a matrix multiplication, gives the same 64
+numbers (checked: equal to within $3 \times 10^{-8}$, float rounding), but it
+would multiply 42,523 zeros. Fetching only the rows of the answered columns is a
+*column lookup*. One PyTorch operation, `embedding_bag`, does it for every zone at
+once: it fetches each answered row, multiplies it by its input and adds it to its
+zone's sum, without first copying the fetched rows into a temporary array (`_bag`
+in `studies/campaign/neural.py`, since 12 November;
+[record](../archive/records/coordinator_lookups_2026_11_12.md)). The table view
+of the same layer, with real rows:
+
+![Top: one row, the 64 learned numbers the Comintern's network keeps for the zone question units:ccp:mountain_infantry, row 188 of its zone table after one update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone table, one row per zone question, 42,532 rows of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 186 and 188 (units:ccp:militia and units:ccp:mountain_infantry), 304 (units:kmt:fighter, still all zeros because no kept sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 rows Shensi's answers pick are highlighted. A fresh network's rows are all zeros; after one update 1,840 have moved. Right: Shensi's 9 answers, each 1, enter as ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 rows: Shensi's other 42,523 answers are 0.](figures/rows_and_tables.svg)
+
+**The scaling of an answer.** An input unit holds not its answer $a$ but a fixed
+formula of it, written by hand, not learned (`_signed_log` in
+`studies/campaign/features.py`):
+
+$$
+x = \operatorname{sign}(a) \ln(1 + |a|)
 $$
 
 where $\ln$ is the natural logarithm. Answers are counts and yes-or-no flags, so
-in practice $a \ge 0$ and the weight is $\ln(1 + a)$; no answer was negative in
-60 decisions sampled from a game, and the sign only keeps the formula defined for
+in practice $a \ge 0$ and the input is $\ln(1 + a)$; no answer was negative in 60
+decisions sampled from a game, and the sign only keeps the formula defined for
 negative numbers:
 
-| Answer $a$ | Weight $w(a)$ | Compared with an answer of 1 |
+| Answer $a$ | Input $x$ | Compared with an answer of 1 |
 | ---: | ---: | ---: |
 | 1 | $\ln 2 \approx 0.69$ | 1 |
 | 2 | $\ln 3 \approx 1.10$ | 1.58 |
@@ -733,10 +795,11 @@ times as strongly as one, not ten times, so a big stack does not drown out
 everything else in its zone. That an answer of 1 counts 0.69 rather than 1 makes
 no difference, because the row it multiplies is learned and training can make it
 as large as it needs; the formula fixes only how counts compare with one another.
-The curve was chosen, not compared with others ([open
-question](#how-should-a-count-count)).
+Scaling inputs to comparable sizes before a network is common practice; this
+curve was chosen, not compared with others
+([open question](#how-should-a-count-count)).
 
-**Shensi's sum, in numbers.** Each of Shensi's answers is 1, so each weight is
+**Shensi's sum, in numbers.** Each of Shensi's answers is 1, so each input is
 0.69. The first 4 of the 64 numbers of each row, from the Comintern's network
 after one update:
 
@@ -758,54 +821,42 @@ mountain infantry's `units` and `count` questions: in every sample so far these
 questions were answered together, so training moved them alike
 ([section 8.5](#85-which-numbers-a-step-moves)).
 
-**Why this is called a lookup.** Multiplying Shensi's whole line of 42,532
-weighted answers by the zone table, as a matrix multiplication, gives the
-same 64 numbers (checked: equal to within $3 \times 10^{-8}$, float rounding),
-but it would multiply 42,523 zeros. So the network fetches only the rows of the
-answered columns, a *column lookup*, and adds them up. One PyTorch operation,
-`embedding_bag`, does this for every zone at once: it fetches each answered row,
-multiplies it by its weight and adds it to its zone's sum, without first copying
-the fetched rows into a temporary array (`_bag` in `studies/campaign/neural.py`,
-since 12 November; [record](../archive/records/coordinator_lookups_2026_11_12.md)).
+**A row belongs to a question, not to a zone.** `units:ccp:mountain_infantry` has
+one row, the network's own description, in 64 numbers, of "a CCP mountain
+infantry is here", added in whichever zone that is true. No number in a row has a
+meaning chosen by hand. Nor is a row computed from the answer: it stays the same
+from position to position until training changes it, and the answer only sets how
+strongly it is added.
 
-### 6.4 Learned layers
+**Each of a row's numbers is one parameter,** so the zone table alone holds
+42,532 × 64 = 2,722,048 parameters, and the three tables 3.95 million of the
+network's 4.08 million.
 
-The rest of the network is built from *learned layers*. A learned layer turns a
-vector of $n$ numbers into a vector of $m$ numbers: it multiplies it by a learned
-matrix of $m \times n$ numbers, adds a learned vector of $m$ numbers (the
-*bias*), and most layers then bend each result with a fixed curve, GELU. A toy
-layer with 3 inputs, 1, 2 and 3, and 2 outputs, $y_1$ and $y_2$, whose learned
-numbers are 0.5, 0.2, 0.1 and bias 0.1 for the first output, and 0.1, 0.3, −0.4
-and bias 0 for the second:
+**Rows start at zero** (since 3 November 2026), and training moves a row only when
+it trains on samples that answer the row's question
+([section 8.5](#85-which-numbers-a-step-moves)). After the first update of the
+5 November run, 1,840 of the zone table's 42,532 rows had moved; the row of
+`units:kmt:fighter` was still all zeros, because no kept sample had a KMT fighter.
+Starting at zero means a question training has never reached adds nothing,
+instead of a random row added at full strength. In a test on a fixed set of
+saved samples it gave a slightly lower value error on samples held out of
+training (0.0076 against 0.0081) and the same policy loss
+([section 8.1](#81-the-loss)): no harm shown, not a strength gain.
 
-$$
-y_1 = \operatorname{GELU}(0.5 \times 1 + 0.2 \times 2 + 0.1 \times 3 + 0.1) = \operatorname{GELU}(1.3) \approx 1.17
-$$
+Computing a first layer by adding up the rows of its non-zero inputs is common
+wherever inputs are mostly 0; chess programs compute theirs the same way
+([section 6.10](#610-more-detail-how-other-game-networks-read-their-input)).
 
-$$
-y_2 = \operatorname{GELU}(0.1 \times 1 + 0.3 \times 2 - 0.4 \times 3 + 0) = \operatorname{GELU}(-0.5) \approx -0.15
-$$
-
-GELU multiplies a number by the chance that a standard normal variable falls
-below it, $\operatorname{GELU}(x) = x \Phi(x)$: large positive numbers pass almost
-unchanged and negative ones are squashed toward 0. Without such curves any stack
-of layers would amount to a single multiplication and could only add effects up.
-The layer's $m \times n$ and $m$ numbers are parameters, adjusted by training like
-the rows. When a layer reads several vectors, they are first joined end to end
-into one: three vectors of 64 numbers make one of 192.
-
-**Layer normalization** rescales a vector's numbers to an average of 0 and a
-spread (standard deviation) of 1, then multiplies each by a learned number and
-adds another. It keeps vectors on a common scale, whatever went into them.
-
-### 6.5 A zone's vector
+### 6.4 A zone's vector
 
 A zone's vector, before the borders come in, adds three things and normalizes
 the result:
 
-1. **the weighted sum of its answers' rows** (section 6.3);
+1. **the first layer's output:** the rows of the zone's non-zero answers, each
+   times its input (section 6.3);
 2. **the zone's identity vector:** 64 learned numbers for each of the 37 zones,
-   so the network can tell zones apart. Unlike rows, these start random;
+   so the network can tell zones apart. Unlike the tables' rows, these start
+   random;
 3. **its 39 fixed facts** (section 5.5), turned into 64 numbers by a learned
    layer without a curve.
 
@@ -814,16 +865,22 @@ of the 64 numbers:
 
 | Part | First 4 numbers |
 | --- | --- |
-| 1. Weighted sum of the 9 answers' rows | −0.001, 0.137, −0.118, −0.104 |
+| 1. The first layer: 9 rows, each times 0.69 | −0.001, 0.137, −0.118, −0.104 |
 | 2. Shensi's identity vector | 0.204, 1.874, −1.609, 0.437 |
 | 3. Its fixed facts, through a learned layer | −0.449, −0.205, 0.425, −0.504 |
 | Total | −0.246, 1.807, −1.302, −0.171 |
 | After layer normalization: Shensi's vector | −0.294, 1.957, −1.422, −0.203 |
 
+**Still one layer, in the usual picture.** The identity vector is the row of one
+more kind of input: 37 input units that say which zone this is, 1 for Shensi and
+0 for the other 36. The facts' layer adds 39 input units, one per fact, and a
+bias. So everything before the layer normalization is one learned layer with
+42,532 + 37 + 39 = 42,608 inputs, which the code computes in three pieces.
+
 After one update the answers are still a small part of it: measured over all 64
-numbers, the sum of the answers' rows is about a sixth the size of Shensi's
-identity vector (1.3 against 8.0, root of the sum of squares) and smaller than its
-facts' part (2.1). So this early network's description of Shensi still says mostly
+numbers, the first layer's output is about a sixth the size of Shensi's identity
+vector (1.3 against 8.0, root of the sum of squares) and smaller than its facts'
+part (2.1). So this early network's description of Shensi still says mostly
 "this is Shensi", whatever stands there. Inferred: that is part of why young
 networks rate different positions much alike.
 
@@ -837,11 +894,12 @@ Layer normalization also keeps a busy zone from dominating: sea zone P14, with 8
 answers at decision 612, does not get a vector many times larger than Szechwan,
 with 2.
 
-### 6.6 The position vector and the move vectors
+### 6.5 The position vector and the move vectors
 
 **The position vector** is built the same way from the position's answers and the
-position table: the weighted sum of the rows of its 191 answers at decision 612,
-then layer normalization. It has no identity vector and no fixed facts.
+position table: its first layer adds up the rows of its 191 non-zero answers at
+decision 612, each times its input, then layer normalization. It has no identity
+vector and no fixed facts.
 
 **A move vector** is built the same way from the move's own answers and the move
 table: 19 rows for each attack at decision 612 and 4 for ending the phase, then
@@ -851,7 +909,7 @@ A coordinator call (section 9.2) does these lookups for every zone of every
 position, every position and every move at once: about 6,000 rows for a call of
 four positions ([record](../archive/records/coordinator_lookups_2026_11_04.md)).
 
-### 6.7 Messages along the borders
+### 6.6 Messages along the borders
 
 A zone vector so far describes only its own zone. *Message layers* let each zone
 hear from its neighbours along the 160 directed borders. In each message layer:
@@ -893,7 +951,7 @@ $k$ borders away, and through the position vector, from the second message layer
 on, the average of all zones. Each message layer has its own learned layers; a
 64×2 network has 2 message layers.
 
-### 6.8 The values
+### 6.7 The values
 
 A learned layer (with its curve and a layer normalization) combines the position
 vector with the average and the largest value, number by number, of the 37 zone
@@ -903,7 +961,7 @@ predicted final scores of the Axis, the Allies and the Comintern, in hundreds of
 points. At decision 612 they were 0.251, −0.424 and −1.024: +25.1, −42.4 and
 −102.4 (section 3).
 
-### 6.9 The move probabilities
+### 6.8 The move probabilities
 
 **A logit for each move.** Each move vector is joined with three zone vectors,
 taken after the message layers, through the move's links (section 5.4): the zone
@@ -953,15 +1011,15 @@ listed move gets a probability; none is padded, merged or dropped. Which details
 count as "what acts" and so on comes from the roles explained in
 [The network's input](network_input.md#roles).
 
-### 6.10 The whole network
+### 6.9 The whole network
 
 All the bricks together, for decision 612:
 
 ![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,532 rows to 37 zone vectors; the position's 191 answers through the position table of 6,524 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,627 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
 
 **Its size.** A 64×2 network has 4,081,096 parameters. Most, 3.95 million or 97%,
-are rows; the learned layers hold the rest. At 256×8 there are 20.20 million, 78%
-of them rows, since wider layers weigh more. A decision reads only the rows of its
+are the rows of the three first layers; the other layers hold the rest. At 256×8
+there are 20.20 million, 78% of them rows, since wider layers weigh more. A decision reads only the rows of its
 answers: at decision 612, 1,111 row lookups (840 + 191 + 80) of 596 different
 rows, out of 61,683.
 
@@ -976,6 +1034,58 @@ vector also carries the vectors of the zones it is linked to.
 
 Measurements of this network are in the
 [zone network record](../archive/records/zone_network_2026_11_02.md).
+
+### 6.10 More detail: how other game networks read their input
+
+Reading a decision through a first layer of rows is the usual way to read sparse
+inputs. The shape of the network after it follows published networks for games
+played on maps rather than AlphaZero's grids:
+
+| Network | Its input | Its first learned layer | Its move output |
+| --- | --- | --- | --- |
+| AlphaGo Zero, for Go | 17 grids of 19 × 19 numbers, each 0 or 1 | a convolution: at every point, the same learned numbers for the facts at and around that point | a fixed list of 362: one per point and one for passing |
+| Stockfish's NNUE, for chess | for each side's view, 40,960 numbers, at most 30 of them 1 (HalfKP) | adds up the weights that leave its non-zero inputs | none: it gives a value only |
+| DipNet, for Diplomacy | the features of each of the board's 81 locations | a graph convolution along the map's adjacency | one order per location in turn, invalid orders masked |
+| This network | 42,532 answers per zone, 6,524 for the position and 12,627 per move, almost all 0 | adds up the rows of its non-zero inputs, with one table for every zone | one logit per listed move, from the move's own vector |
+
+**The first layer is the usual one.** Adding up the weights of the few non-zero
+inputs, instead of multiplying them all, is how a layer is computed wherever
+inputs are mostly 0. Sutton and Barto describe it for linear value functions over
+binary features, such as tile coding (section 9.5.4). Stockfish's NNUE computes
+its first layer this way and, after a move, adds and subtracts only the rows of
+the inputs that changed
+([nnue-pytorch documentation](https://github.com/official-stockfish/nnue-pytorch/blob/master/docs/nnue.md)).
+AlphaGo Zero's first convolution does the same on a grid: its inputs are 0 or 1,
+so at each point it adds up learned numbers for the facts at and around that
+point, with the same numbers at every point, as one table serves every zone here
+(Sutton and Barto, section 16.6.2, describe its input).
+
+**Why not a grid.** The 37 zones are not a grid: each has its own neighbours,
+along 160 directed borders, so messages travel along borders (section 6.6)
+rather than across a grid. A zone can answer any of 42,532 questions, where a
+point of a Go board answers 17. And the legal moves are no fixed list: decision
+612 has 5, others over a hundred (section 4.7), and their kinds change with the
+phase. So the network gives every listed move a logit from its own vector
+(section 6.8) instead of keeping one output for each possible move.
+
+**Networks for games on maps.** Networks for games on an irregular map, with many
+kinds of unit and a changing list of orders, are built like this one: a vector
+for each place or unit, layers that mix the vectors along the map's connections
+or by attention, and a score for each order from vectors of its own. DipNet, a
+network for the board game Diplomacy, is a published example
+([Paquette et al. 2019](https://arxiv.org/abs/1909.02128)): its 16
+graph-convolution layers mix the locations' vectors along the map, and it writes
+the orders one location at a time. Layers like the message layers of section 6.6
+make a *graph neural network*, in which the position vector plays the part of a
+vector shared by the whole graph
+([Battaglia et al. 2018](https://arxiv.org/abs/1806.01261)).
+
+**This project's own choices.** Three choices are this project's own and have not
+been compared with alternatives: one row per named combination of facts, such as
+one for CCP mountain infantry and another for KMT infantry
+([open question](#one-row-per-combination-or-rows-built-from-parts)); the
+logarithm that scales an answer ([open question](#how-should-a-count-count)); and
+the grouping of moves into the stages of section 6.8.
 
 ## 7. Self-play and training samples
 
@@ -1040,7 +1150,7 @@ searches start from them.
 the network to predict how a position will end.
 
 **In a run's first batch** the shares carry little. A fresh network gives every
-position the same values ([section 6.10](#610-the-whole-network)), so a
+position the same values ([section 6.9](#69-the-whole-network)), so a
 first-batch search splits its simulations by the network's arbitrary first
 guesses, the exploration noise and the rare game ends it reaches; only the final
 scores carry information. From the second batch on, the values differ between
@@ -1236,9 +1346,9 @@ steps are not passes through the buffer.
 ### 8.5 Which numbers a step moves
 
 Every sample passes through the learned layers, so nearly all of their numbers
-change in every step. A row is different: its gradient is zero unless its
-question is answered in one of the step's samples, because an unanswered
-question's row was never added in. So a step changes the rows of the questions
+change in every step. A row is different: like any weight whose input is 0, its
+gradient is zero unless its question is answered in one of the step's samples,
+because an unanswered question's row was never added in. So a step changes the rows of the questions
 those samples answer, and Adam's average $m$, which loses a tenth each step
 without a new gradient, keeps moving a recently answered row for a few dozen
 steps more. A row whose question has never appeared in a trained sample stays at
@@ -1357,7 +1467,7 @@ takes 0.44 ms for one position and 0.73 ms for four
 ([record](../archive/records/coordinator_lookups_2026_11_12.md#the-forward-pass)). Until
 12 November the column lookups (section 6.3) were the largest part of a call;
 since then one fused operation does them, and the largest part is the GELU curve,
-mostly in the border messages (section 6.7). The coordinator is busy about 90% of
+mostly in the border messages (section 6.6). The coordinator is busy about 90% of
 the time, while the game processes and the coordinator together use about 9.2 of
 the 11 cores. Inferred: the coordinator limits this layout, and a faster
 coordinator, larger calls or a second coordinator could add up to about 20%
@@ -1544,7 +1654,7 @@ measured and what would settle it.
 
 #### One row per combination, or rows built from parts?
 
-**Now.** Every question names a full combination and has its own row (section 6.2).
+**Now.** Every question names a full combination and has its own row (section 6.3).
 `unit_stat:axis:infantry:move_1`, an Axis infantry with one move left, and
 `unit_stat:allies:infantry:move_1`, the same for the Allies, share nothing. What
 training learns about one does not carry over to the other, and a combination
@@ -1583,7 +1693,7 @@ including deep but narrow ones such as 64×6.
 #### How should a count count?
 
 **Now.** An answer $a$ adds its row times $\operatorname{sign}(a)\ln(1 + |a|)$
-([section 6.3](#63-from-answers-to-a-vector-a-weighted-sum-of-rows)): 1 counts
+([section 6.3](#63-the-first-layer-rows-and-tables)): 1 counts
 0.69, 2 counts 1.10 and 10 counts 2.40. The curve was chosen, not compared.
 
 **Alternatives:** counts in proportion, or separate questions for count ranges
@@ -1722,8 +1832,8 @@ Terms in the order the document introduces them.
 - **Value:** a network's estimate of an alliance's final score, in hundreds of
   points.
 - **Prior:** a network's probability for a move, as the search uses it.
-- **Parameters:** all the numbers training adjusts: the rows and the learned
-  layers.
+- **Parameters:** all the numbers training adjusts: the weights and biases of
+  the learned layers, the rows among them, and the identity vectors.
 
 **Search (section 4)**
 
@@ -1765,22 +1875,28 @@ Terms in the order the document introduces them.
 
 **The network (section 6)**
 
+- **Input layer:** the lines of answers as the network's input, one input unit
+  per question.
 - **Vector:** a list of numbers. The vectors that describe a zone, the position
   or a move inside a network have as many numbers as the width.
 - **Width:** how many numbers each vector and row has: 64 in a 64×2 network.
-- **Row:** the learned numbers, as many as the width, that a network keeps for one
-  question; in machine-learning terms, an embedding.
-- **Table:** the rows of one part's questions, one per question: the zone table,
-  the position table and the move table; embedding tables.
-- **Weight of an answer:** the factor its row is multiplied by,
-  $\operatorname{sign}(a)\ln(1 + |a|)$ for an answer $a$.
-- **Column lookup:** fetching the rows of the questions a position answers and
-  adding them up, weighted.
-- **Learned layer:** a multiplication by a learned matrix plus a learned bias,
-  usually followed by the GELU curve.
+- **Learned layer:** a multiplication by a learned matrix, the layer's weights,
+  plus a learned bias, usually followed by the GELU curve.
+- **Unit and link:** in the usual drawing of a layer, each input and output is a
+  unit, and each weight a link from an input unit to an output unit.
+- **Row:** the weights on the links that leave one input unit, one per output; in
+  machine-learning terms, an embedding.
 - **GELU:** the fixed curve $x \Phi(x)$ that bends a layer's results.
 - **Layer normalization:** rescaling a vector to an average of 0 and a spread of
   1, then a learned scale and shift for each number.
+- **First layer:** the learned layer that reads one line of answers, without bias
+  or curve; the zones, the position and the moves each have their own.
+- **Table:** a first layer's weights, one row per question: the zone table, the
+  position table and the move table; embedding tables.
+- **Input of a question:** its answer $a$ after a fixed scaling,
+  $\operatorname{sign}(a)\ln(1 + |a|)$.
+- **Column lookup:** computing a first layer by fetching only the rows of its
+  non-zero inputs, each times its input, and adding them up.
 - **Identity vector:** a zone's own learned numbers, as many as the width, which
   let the network tell zones apart.
 - **Zone vector, position vector, move vector:** the vectors that describe a zone,

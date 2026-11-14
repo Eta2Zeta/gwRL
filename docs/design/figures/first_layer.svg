@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="670" viewBox="0 0 960 670" role="img" aria-labelledby="title desc">
+  <title id="title">The first layer at Shensi</title>
+  <desc id="desc">Decision 612, the Comintern's network after one update. Left, the input layer: Shensi's line of answers, one input unit per zone question, 42,532 in all, each holding its answer after a fixed scaling: an answer of 1 gives 0.69 and an answer of 0 gives 0. Shown are rows 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842 the Comintern militia's count and moves left (0.69 each), 9,989 and 9,991 the Comintern mountain infantry's count and moves left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the first layer: 64 output units, of which outputs 1 to 4 and 64 are shown, with the values −0.001, 0.137, −0.118, −0.104 and −0.073: Shensi's first 64 numbers. Every input unit is linked to every output unit. The links that leave units:ccp:mountain_infantry are drawn in orange: their 64 weights are its row, row 188 of the zone table, beginning 0.019, 0.001, −0.030, 0.021. The links of the 9 non-zero inputs are drawn in blue and those of inputs that are 0 here in grey. Each output adds up input times weight over its 42,532 links; the inputs of 0 add nothing, so the output is 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244, and only 9 rows are fetched. In all 42,532 × 64 = 2,722,048 links, whose weights make up the zone table.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; fill: #57606a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .num { font-size: 12px; font-weight: 600; }
+      .zero { font-size: 12px; fill: #8c959f; }
+      .unit { font-size: 13px; font-weight: 600; }
+      .w1 { font-size: 12px; font-weight: 600; fill: #0550ae; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+      .w2 { font-size: 12px; font-weight: 600; fill: #953800; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+      .c1 { fill: #0550ae; font-weight: 600; }
+      .c2 { fill: #953800; font-weight: 600; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="669" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">The first layer at Shensi: 42,532 input units, 64 output units</text>
+  <text class="sub" x="24" y="56">Decision 612, the Comintern's network after one update. An input is an answer after a fixed scaling: an answer of 1 gives 0.69, an answer of 0 gives 0.</text>
+  <text class="head" x="24" y="92">Input layer: Shensi's line of answers</text>
+  <text class="small" x="60" y="112" text-anchor="end">row</text>
+  <text class="small" x="70" y="112">question</text>
+  <text class="small" x="416" y="112" text-anchor="end">input</text>
+  <text class="label" x="436" y="184" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="224" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="264" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="304" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="344" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="408" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="448" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="488" text-anchor="middle">⋮</text>
+  <text class="label" x="436" y="528" text-anchor="middle">⋮</text>
+  <line x1="444.0" y1="134.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="134.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="134.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="134.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="134.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="158.0" x2="751.0" y2="164.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="158.0" x2="751.0" y2="235.6" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="158.0" x2="751.0" y2="307.2" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="158.0" x2="751.0" y2="378.8" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="158.0" x2="751.0" y2="522.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="198.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="198.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="198.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="198.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="198.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="238.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="238.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="238.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="238.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="238.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="318.0" x2="751.0" y2="164.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="318.0" x2="751.0" y2="235.6" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="318.0" x2="751.0" y2="307.2" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="318.0" x2="751.0" y2="378.8" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="318.0" x2="751.0" y2="522.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="358.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="358.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="358.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="358.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="358.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="382.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="382.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="382.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="382.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="382.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="422.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="422.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="422.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="422.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="422.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="462.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="462.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="462.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="462.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="462.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="502.0" x2="751.0" y2="164.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="502.0" x2="751.0" y2="235.6" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="502.0" x2="751.0" y2="307.2" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="502.0" x2="751.0" y2="378.8" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="502.0" x2="751.0" y2="522.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="444.0" y1="542.0" x2="751.0" y2="164.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="542.0" x2="751.0" y2="235.6" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="542.0" x2="751.0" y2="307.2" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="542.0" x2="751.0" y2="378.8" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="542.0" x2="751.0" y2="522.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="444.0" y1="278.0" x2="751.0" y2="164.0" stroke="#bc4c00" stroke-width="2.2"/>
+  <line x1="444.0" y1="278.0" x2="751.0" y2="235.6" stroke="#bc4c00" stroke-width="2.2"/>
+  <line x1="444.0" y1="278.0" x2="751.0" y2="307.2" stroke="#bc4c00" stroke-width="2.2"/>
+  <line x1="444.0" y1="278.0" x2="751.0" y2="378.8" stroke="#bc4c00" stroke-width="2.2"/>
+  <line x1="444.0" y1="278.0" x2="751.0" y2="522.0" stroke="#bc4c00" stroke-width="2.2"/>
+  <text class="small" x="60" y="138" text-anchor="end">0</text>
+  <text class="mono" x="70" y="138">possessor:ccp</text>
+  <text class="num" x="416" y="138" text-anchor="end">0.69</text>
+  <circle cx="436" cy="134" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="162" text-anchor="end">1</text>
+  <text class="mono" x="70" y="162">possessor:dadao</text>
+  <text class="zero" x="416" y="162" text-anchor="end">0</text>
+  <circle cx="436" cy="158" r="8" fill="#ffffff" stroke="#afb8c1" stroke-width="1.5"/>
+  <text class="small" x="60" y="202" text-anchor="end">14</text>
+  <text class="mono" x="70" y="202">turn_start_possessor:ccp</text>
+  <text class="num" x="416" y="202" text-anchor="end">0.69</text>
+  <circle cx="436" cy="198" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="242" text-anchor="end">186</text>
+  <text class="mono" x="70" y="242">units:ccp:militia</text>
+  <text class="num" x="416" y="242" text-anchor="end">0.69</text>
+  <circle cx="436" cy="238" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="282" text-anchor="end">188</text>
+  <text class="mono" x="70" y="282">units:ccp:mountain_infantry</text>
+  <text class="num" x="416" y="282" text-anchor="end">0.69</text>
+  <circle cx="436" cy="278" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="322" text-anchor="end">304</text>
+  <text class="mono" x="70" y="322">units:kmt:fighter</text>
+  <text class="zero" x="416" y="322" text-anchor="end">0</text>
+  <circle cx="436" cy="318" r="8" fill="#ffffff" stroke="#afb8c1" stroke-width="1.5"/>
+  <text class="small" x="60" y="362" text-anchor="end">9,841</text>
+  <text class="mono" x="70" y="362">unit_stat:comintern:militia:count</text>
+  <text class="num" x="416" y="362" text-anchor="end">0.69</text>
+  <circle cx="436" cy="358" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="386" text-anchor="end">9,842</text>
+  <text class="mono" x="70" y="386">unit_stat:comintern:militia:move_0</text>
+  <text class="num" x="416" y="386" text-anchor="end">0.69</text>
+  <circle cx="436" cy="382" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="426" text-anchor="end">9,989</text>
+  <text class="mono" x="70" y="426">unit_stat:comintern:mountain_infantry:count</text>
+  <text class="num" x="416" y="426" text-anchor="end">0.69</text>
+  <circle cx="436" cy="422" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="466" text-anchor="end">9,991</text>
+  <text class="mono" x="70" y="466">unit_stat:comintern:mountain_infantry:move_1</text>
+  <text class="num" x="416" y="466" text-anchor="end">0.69</text>
+  <circle cx="436" cy="462" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="506" text-anchor="end">29,244</text>
+  <text class="mono" x="70" y="506">rail_to:land_china_hopeh</text>
+  <text class="num" x="416" y="506" text-anchor="end">0.69</text>
+  <circle cx="436" cy="502" r="8" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text class="small" x="60" y="546" text-anchor="end">42,531</text>
+  <text class="mono" x="70" y="546">battle_order</text>
+  <text class="zero" x="416" y="546" text-anchor="end">0</text>
+  <circle cx="436" cy="542" r="8" fill="#ffffff" stroke="#afb8c1" stroke-width="1.5"/>
+  <text class="head" x="748" y="92">First layer: 64 outputs</text>
+  <circle cx="760" cy="164.0" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
+  <text class="body" x="778" y="168.0">output 1: −0.001</text>
+  <circle cx="760" cy="235.6" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
+  <text class="body" x="778" y="239.6">output 2: 0.137</text>
+  <circle cx="760" cy="307.2" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
+  <text class="body" x="778" y="311.2">output 3: −0.118</text>
+  <circle cx="760" cy="378.79999999999995" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
+  <text class="body" x="778" y="382.79999999999995">output 4: −0.104</text>
+  <circle cx="760" cy="522" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
+  <text class="body" x="778" y="526">output 64: −0.073</text>
+  <text class="label" x="760" y="454.4" text-anchor="middle">⋮</text>
+  <text class="label" x="748" y="556">Shensi's first 64 numbers</text>
+  <line x1="24.0" y1="586.0" x2="52.0" y2="586.0" stroke="#bc4c00" stroke-width="2.2"/>
+  <text class="label" x="60" y="590">The links that leave units:ccp:mountain_infantry. Their 64 weights are its row, row 188 of the zone table: 0.019, 0.001, −0.030, 0.021, …</text>
+  <line x1="24.0" y1="606.0" x2="52.0" y2="606.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
+  <text class="label" x="60" y="610">The links of the 9 non-zero inputs, each 0.69, the orange ones included. Each output adds up input × weight over its 42,532 links;</text>
+  <text class="label" x="60" y="628">the inputs of 0 add nothing, so the output is 0.69 × row 0 + 0.69 × row 14 + … + 0.69 × row 29,244, and only 9 rows are fetched.</text>
+  <line x1="24.0" y1="644.0" x2="52.0" y2="644.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
+  <text class="label" x="60" y="648">Links of inputs that are 0 here: 42,523 of the 42,532. In all 42,532 × 64 = 2,722,048 links, whose weights make up the zone table.</text>
+</svg>

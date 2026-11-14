@@ -103,10 +103,10 @@ These are all the non-zero board answers of the zone Shensi in that decision:
 | `unit_stat:comintern:mountain_infantry:move_1` | 2 | ... with 1 move left |
 | `rail_to:land_china_hopeh` | 1 | a railroad runs from here to Hopeh |
 
-The network keeps a learned row of numbers for every question and adds each
-answered question's row, weighted by $\operatorname{sign}(a)\ln(1 + |a|)$ for an
-answer $a$: see
-[a weighted sum of rows](README.md#63-from-answers-to-a-vector-a-weighted-sum-of-rows).
+The network's first layer keeps a learned row of numbers for every question and
+adds up the rows of the answered questions, each times
+$\operatorname{sign}(a)\ln(1 + |a|)$ for its answer $a$: see
+[the first layer](README.md#63-the-first-layer-rows-and-tables).
 
 ## 4. The board part
 

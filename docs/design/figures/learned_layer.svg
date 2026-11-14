@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="384" viewBox="0 0 960 384" role="img" aria-labelledby="title desc">
+  <title id="title">A learned layer: units and links</title>
+  <desc id="desc">Left: the toy layer drawn as units and links. Three input units hold the inputs 1, 2 and 3; two output units are y1 and y2. Each input is linked to each output, and each link carries one learned weight: from input 1, 0.5 to y1 and 0.1 to y2; from input 2, 0.2 and 0.3; from input 3, 0.1 and −0.4. y1 has the bias 0.1 and y2 the bias 0. So y1 adds 1 × 0.5 + 2 × 0.2 + 3 × 0.1 + 0.1 = 1.3, which the GELU curve turns into 1.17, and y2 adds 1 × 0.1 + 2 × 0.3 + 3 × (−0.4) + 0 = −0.5, which becomes −0.15. Right: the same layer read input by input. The weights on the links that leave one input, one per output, are that input's row: input 1's row is (0.5, 0.1), input 2's (0.2, 0.3) and input 3's (0.1, −0.4); the biases are (0.1, 0). 1 × (0.5, 0.1) + 2 × (0.2, 0.3) + 3 × (0.1, −0.4) + (0.1, 0) = (1.3, −0.5) before the curve. An input of 0 adds nothing, so its row can be skipped.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; fill: #57606a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .num { font-size: 12px; font-weight: 600; }
+      .zero { font-size: 12px; fill: #8c959f; }
+      .unit { font-size: 13px; font-weight: 600; }
+      .w1 { font-size: 12px; font-weight: 600; fill: #0550ae; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+      .w2 { font-size: 12px; font-weight: 600; fill: #953800; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; }
+      .c1 { fill: #0550ae; font-weight: 600; }
+      .c2 { fill: #953800; font-weight: 600; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="383" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">A learned layer: units and links</text>
+  <text class="sub" x="24" y="56">The toy layer of section 6.2: 3 inputs, 2 outputs, 6 weights and 2 biases</text>
+  <text class="head" x="40" y="88">Inputs</text>
+  <text class="head" x="380" y="88">Outputs</text>
+  <line x1="134.0" y1="128.0" x2="378.0" y2="168.0" stroke="#0969da" stroke-width="2"/>
+  <line x1="134.0" y1="128.0" x2="378.0" y2="248.0" stroke="#bc4c00" stroke-width="2"/>
+  <line x1="134.0" y1="208.0" x2="378.0" y2="168.0" stroke="#0969da" stroke-width="2"/>
+  <line x1="134.0" y1="208.0" x2="378.0" y2="248.0" stroke="#bc4c00" stroke-width="2"/>
+  <line x1="134.0" y1="288.0" x2="378.0" y2="168.0" stroke="#0969da" stroke-width="2"/>
+  <line x1="134.0" y1="288.0" x2="378.0" y2="248.0" stroke="#bc4c00" stroke-width="2"/>
+  <text class="w1" x="207" y="144" text-anchor="middle">0.5</text>
+  <text class="w2" x="207" y="168" text-anchor="middle">0.1</text>
+  <text class="w1" x="207" y="200" text-anchor="middle">0.2</text>
+  <text class="w2" x="207" y="224" text-anchor="middle">0.3</text>
+  <text class="w1" x="207" y="256" text-anchor="middle">0.1</text>
+  <text class="w2" x="207" y="280" text-anchor="middle">−0.4</text>
+  <circle cx="112" cy="128" r="22" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text class="unit" x="112" y="133" text-anchor="middle">1</text>
+  <text class="label" x="80" y="132" text-anchor="end">input 1</text>
+  <circle cx="112" cy="208" r="22" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text class="unit" x="112" y="213" text-anchor="middle">2</text>
+  <text class="label" x="80" y="212" text-anchor="end">input 2</text>
+  <circle cx="112" cy="288" r="22" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text class="unit" x="112" y="293" text-anchor="middle">3</text>
+  <text class="label" x="80" y="292" text-anchor="end">input 3</text>
+  <circle cx="400" cy="168" r="22" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+  <text class="unit" x="400" y="173" text-anchor="middle">y₁</text>
+  <circle cx="400" cy="248" r="22" fill="#ffffff" stroke="#bc4c00" stroke-width="2"/>
+  <text class="unit" x="400" y="253" text-anchor="middle">y₂</text>
+  <text class="label" x="432" y="164">bias <tspan class="c1">0.1</tspan></text>
+  <text class="body" x="432" y="180">1.3 → GELU → 1.17</text>
+  <text class="label" x="432" y="244">bias <tspan class="c2">0</tspan></text>
+  <text class="body" x="432" y="260">−0.5 → GELU → −0.15</text>
+  <line x1="592" y1="76" x2="592" y2="316" stroke="#d0d7de"/>
+  <text class="head" x="616" y="88">The same layer, input by input</text>
+  <text class="label" x="616" y="116">input 1's row</text>
+  <text class="body" x="728" y="116">(<tspan class="c1">0.5</tspan>, <tspan class="c2">0.1</tspan>)</text>
+  <text class="label" x="616" y="136">input 2's row</text>
+  <text class="body" x="728" y="136">(<tspan class="c1">0.2</tspan>, <tspan class="c2">0.3</tspan>)</text>
+  <text class="label" x="616" y="156">input 3's row</text>
+  <text class="body" x="728" y="156">(<tspan class="c1">0.1</tspan>, <tspan class="c2">−0.4</tspan>)</text>
+  <text class="label" x="616" y="176">the bias</text>
+  <text class="body" x="728" y="176">(<tspan class="c1">0.1</tspan>, <tspan class="c2">0</tspan>)</text>
+  <text class="mono" x="728" y="206">1 × (0.5, 0.1)</text>
+  <text class="mono" x="728" y="224">+ 2 × (0.2, 0.3)</text>
+  <text class="mono" x="728" y="242">+ 3 × (0.1, −0.4)</text>
+  <text class="mono" x="728" y="260">+ (0.1, 0)</text>
+  <text class="body" x="728" y="280">= (<tspan class="c1">1.3</tspan>, <tspan class="c2">−0.5</tspan>)</text>
+  <text class="label" x="616" y="280">before the curve</text>
+  <text class="label" x="616" y="304">An input of 0 adds nothing: its row can be skipped.</text>
+  <text class="label" x="24" y="346">Every link carries one learned weight. The weights on the links that leave one input, one per output,</text>
+  <text class="label" x="24" y="364">are that input's row: input 1's row is (0.5, 0.1). Each output adds up its inputs times their weights, plus its bias.</text>
+</svg>
