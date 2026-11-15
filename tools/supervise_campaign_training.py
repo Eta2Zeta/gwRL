@@ -56,6 +56,10 @@ except ImportError:  # Windows locks a byte with msvcrt instead.
     import msvcrt
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from studies.shared.file_replace import replace_file  # noqa: E402
+
 SCHEMA = "campaign-training-supervisor-v1"
 PROFILES = ROOT / "studies/campaign/profiles"
 PROFILE_SCHEMA = "campaign-machine-profile-v1"
@@ -74,8 +78,6 @@ _TREES: dict = {}
 
 def _windows():
     """Windows process control, imported only where it runs."""
-    if str(ROOT) not in sys.path:
-        sys.path.insert(0, str(ROOT))
     from tools import windows_process_tree
     return windows_process_tree
 
@@ -218,7 +220,7 @@ def atomic_json(path: Path, value):
             handle.write("\n")
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temporary, path)
+        replace_file(temporary, path)
         if os.name != "nt":  # Windows cannot open a directory to flush it.
             directory = os.open(path.parent, os.O_RDONLY)
             try:

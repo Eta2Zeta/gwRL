@@ -23,6 +23,7 @@ import numpy as np
 import torch
 from torch import nn
 
+from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import (
     PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
 )
@@ -947,7 +948,7 @@ class CampaignLearner:
         os.close(handle)
         try:
             torch.save(self.checkpoint(), temporary, pickle_protocol=5)
-            os.replace(temporary, target)
+            replace_file(temporary, target)
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)

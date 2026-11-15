@@ -24,6 +24,7 @@ from uuid import uuid4
 import numpy as np
 import torch
 
+from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
@@ -132,7 +133,7 @@ def _json(path: Path, value):
             handle.write(json.dumps(value, sort_keys=True, indent=2, allow_nan=False) + "\n")
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temporary, path)
+        replace_file(temporary, path)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
@@ -188,11 +189,11 @@ def _save(path: Path, learner: CampaignLearner, runner: dict, *, backup_current=
             os.unlink(backup)
             try:
                 os.link(path, backup)
-                os.replace(backup, path.with_name(path.name + ".previous"))
+                replace_file(backup, path.with_name(path.name + ".previous"))
             finally:
                 if os.path.exists(backup):
                     os.unlink(backup)
-        os.replace(temporary, path)
+        replace_file(temporary, path)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)

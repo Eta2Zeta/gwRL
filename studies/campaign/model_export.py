@@ -19,6 +19,7 @@ from typing import Any
 import numpy as np
 import torch
 
+from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import compatibility, make_env, task_manifest
 from .learning import _model_digest
@@ -86,7 +87,7 @@ def save_model_export(path: str | Path, learner, runner: dict) -> dict:
             torch.save(payload, handle)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temporary, path)
+        replace_file(temporary, path)
         if os.name != "nt":  # Windows cannot open a directory to flush it.
             directory = os.open(path.parent, os.O_RDONLY)
             try:
