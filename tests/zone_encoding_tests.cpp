@@ -1,5 +1,6 @@
 #include "game/campaign_actions.hpp"
 #include "game/campaign_env.hpp"
+#include "game/politics.hpp"
 #include "game/zone_encoding.hpp"
 
 #include <algorithm>
@@ -319,6 +320,158 @@ void incomeQuestionsFollowTheRules() {
             "A ruled-out or unevaluated income is reported");
 }
 
+std::set<std::string> questionsOf(const ZoneEncodingSpec& spec, const std::string& family) {
+    std::set<std::string> out;
+    for (const auto& name : spec.globalColumnNames)
+        if (name == family || name.rfind(family + ":", 0) == 0) out.insert(name);
+    return out;
+}
+
+// The position asks about a nation only what the rules can make of it (the
+// rules in politics.hpp and economy.hpp). An answer they allow, however rare,
+// has its own question; one they rule out is counted in its family's shared
+// column and reported.
+void nationQuestionsFollowTheRules() {
+    CampaignEnv env(scenario, 1, true);
+    const auto spec = zoneEncodingSpec(env.engine().state());
+    const auto impossible = [](const std::string& family) { return family + ":~impossible"; };
+    require(questionsOf(*spec, "treasury") ==
+                std::set<std::string>{"treasury:ccp", "treasury:japan", "treasury:kmt", "treasury:~impossible"} &&
+                questionsOf(*spec, "has_treasury").empty(),
+            "Only the three nations that keep an account have a treasury question");
+    require(questionsOf(*spec, "turn_nation") ==
+                std::set<std::string>{"turn_nation:ccp", "turn_nation:japan", "turn_nation:kmt", "turn_nation:mongolia",
+                                      "turn_nation:~impossible"} &&
+                questionsOf(*spec, "completed_turns").size() == 5,
+            "Only the nations of the turn order take turns");
+    std::set<std::string> statuses{"power_status:ccp:major", "power_status:ccp:minor", "power_status:dadao:minor",
+                                   "power_status:japan:major", "power_status:kmt:major", "power_status:kmt:minor",
+                                   "power_status:mongolia:minor", "power_status:~impossible"};
+    std::set<std::string> sides{"alliance:ccp:comintern", "alliance:dadao:axis", "alliance:japan:axis",
+                                "alliance:kmt:allies", "alliance:mongolia:comintern", "alliance:~impossible"};
+    std::set<std::string> controllers{"controller:ccp:ccp", "controller:dadao:japan", "controller:dadao:~none",
+                                      "controller:japan:japan", "controller:kmt:kmt", "controller:mongolia:~none",
+                                      "controller:~impossible"};
+    std::set<std::string> attacks{"attacked_warlord:~impossible"}, queue{"alignment_queue:~impossible"};
+    int warlords = 0;
+    for (const auto& nation : spec->nations) {
+        if (!isWarlord(nation)) continue;
+        ++warlords;
+        statuses.insert("power_status:" + nation + ":warlord");
+        for (const std::string side : {"allies", "axis", "comintern", "~none"}) sides.insert("alliance:" + nation + ":" + side);
+        for (const std::string by : {"ccp", "dadao", "japan", "kmt", "~none"}) controllers.insert("controller:" + nation + ":" + by);
+        for (const std::string by : {"ccp", "dadao", "japan", "mongolia"}) attacks.insert("attacked_warlord:" + nation + ":" + by);
+        queue.insert("alignment_queue:" + nation);
+    }
+    require(warlords == 8 && questionsOf(*spec, "power_status") == statuses && questionsOf(*spec, "alliance") == sides &&
+                questionsOf(*spec, "player").size() == sides.size() && questionsOf(*spec, "controller") == controllers,
+            "A nation's status, alliance, player and controller questions are the ones it can answer");
+    require(questionsOf(*spec, "attacked_warlord") == attacks && questionsOf(*spec, "alignment_queue") == queue,
+            "Only warlords are attacked as warlords or wait to be aligned");
+    require(questionsOf(*spec, "allied") == std::set<std::string>{"allied:ccp:kmt", "allied:kmt:ccp", "allied:~impossible"} &&
+                questionsOf(*spec, "surrendered") ==
+                    std::set<std::string>{"surrendered:japan", "surrendered:kmt", "surrendered:~impossible"} &&
+                questionsOf(*spec, "evolution_awarded") ==
+                    std::set<std::string>{"evolution_awarded:ccp", "evolution_awarded:kmt", "evolution_awarded:~impossible"} &&
+                questionsOf(*spec, "china_invader") ==
+                    std::set<std::string>{"china_invader:japan", "china_invader:mongolia", "china_invader:~impossible"} &&
+                questionsOf(*spec, "state_flag_nation") ==
+                    std::set<std::string>{"state_flag_nation:evolution_pending:ccp", "state_flag_nation:evolution_pending:kmt",
+                                          "state_flag_nation:~impossible"},
+            "Allies, surrender, evolution and invasion are asked of the nations they can happen to");
+    const auto technologies = spec->technologies.size();
+    require(questionsOf(*spec, "technology_stage").size() == 3 * technologies + 1 &&
+                questionsOf(*spec, "researched_round").size() == 3 * technologies + 1 &&
+                spec->globalColumnNames.end() != std::find(spec->globalColumnNames.begin(), spec->globalColumnNames.end(),
+                                                           "technology_stage:ccp:radar") &&
+                !questionsOf(*spec, "technology_stage").contains("technology_stage:mongolia:radar") &&
+                !questionsOf(*spec, "technology_stage").contains("technology_stage:japan:other"),
+            "Only nations that can become major powers have technology questions");
+    const auto wars = questionsOf(*spec, "at_war");
+    require(wars.size() == 13 * 13 - 13 - 8 * 7 - 2 + 1 && wars.contains("at_war:ccp:mongolia") &&
+                wars.contains("at_war:dadao:warlord_tibet") && !wars.contains("at_war:japan:japan") &&
+                !wars.contains("at_war:japan:dadao") && !wars.contains("at_war:warlord_tibet:warlord_yunnan"),
+            "No nation fights itself, no warlord a warlord, and Japan never Dadao");
+
+    // The opening answers only kept questions.
+    auto s = env.engine().state().clone();
+    zoneEncodingUnknowns(true);
+    auto answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
+    require(zoneEncodingUnknowns(true).empty(), "The opening answers no ruled-out question");
+    for (const std::string expected :
+         {"treasury:japan", "alliance:japan:axis", "player:mongolia:comintern", "controller:mongolia:~none",
+          "controller:kmt:kmt", "power_status:kmt:minor", "power_status:warlord_tibet:warlord", "at_war:ccp:kmt",
+          "alliance:warlord_tibet:~none", "turn_nation:ccp"})
+        require(answers.contains(expected), "The opening answers " + expected);
+    require(answers.at("treasury:japan") == 15 && !answers.contains("completed_turns:ccp"), "The opening's values are read");
+
+    // Rare answers the rules allow have their own questions.
+    ensureDadao(s);
+    auto& tibet = s.nations.at("warlord_tibet");
+    tibet.controllerNation = "japan";
+    tibet.player = tibet.alliance = "axis";
+    s.nations.at("ccp").powerStatus = "major";
+    s.nations.at("ccp").technologyStages["radar"] = 1;
+    s.nations.at("ccp").gameFlags["economy_researched_round:radar"] = 1;
+    s.nations.at("ccp").atWarWith.insert("mongolia");
+    s.nations.at("ccp").allies.insert("kmt");
+    s.nations.at("dadao").atWarWith.insert("warlord_yunnan");
+    s.politics.surrendered.insert("kmt");
+    s.politics.evolutionAwarded.insert("ccp");
+    s.politics.chinaInvader = "mongolia";
+    s.politics.attackedWarlords["warlord_yunnan"].insert("dadao");
+    s.politics.alignmentQueue.push_back("warlord_yunnan");
+    s.flags["evolution_pending_ccp"] = 1;
+    answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
+    require(zoneEncodingUnknowns(true).empty(), "Rare answers the rules allow are not reported");
+    for (const std::string expected :
+         {"nation_present:dadao", "power_status:dadao:minor", "alliance:dadao:axis", "player:dadao:axis",
+          "controller:dadao:japan", "controller:warlord_tibet:japan", "alliance:warlord_tibet:axis",
+          "player:warlord_tibet:axis", "power_status:ccp:major", "technology_stage:ccp:radar", "researched_round:ccp:radar",
+          "at_war:ccp:mongolia", "allied:ccp:kmt", "at_war:dadao:warlord_yunnan", "surrendered:kmt", "evolution_awarded:ccp",
+          "china_invader:mongolia", "attacked_warlord:warlord_yunnan:dadao", "alignment_queue:warlord_yunnan",
+          "state_flag_nation:evolution_pending:ccp"})
+        require(answers.contains(expected), "A rare answer has its question: " + expected);
+
+    // An answer the rules rule out is counted in its family's shared column and reported.
+    auto broken = env.engine().state().clone();
+    auto& mongolia = broken.nations.at("mongolia");
+    mongolia.treasury = 3;
+    mongolia.alliance = mongolia.player = "axis";
+    mongolia.controllerNation = "japan";
+    mongolia.powerStatus = "major";
+    mongolia.technologyStages["radar"] = 2;
+    mongolia.gameFlags["economy_researched_round:radar"] = 1;
+    mongolia.allies.insert("ccp");
+    broken.nations.at("japan").treasury.reset();
+    broken.nations.at("warlord_tibet").atWarWith.insert("warlord_yunnan");
+    broken.completedTurns["dadao"] = 1;
+    broken.politics.surrendered.insert("ccp");
+    broken.politics.evolutionAwarded.insert("japan");
+    broken.politics.chinaInvader = "kmt";
+    broken.politics.attackedWarlords["warlord_tibet"].insert("kmt");
+    broken.politics.alignmentQueue.push_back("japan");
+    broken.flags["evolution_pending_japan"] = 1;
+    answers = positionAnswers(*spec, encodeZoneInput(broken, scheduleOf(env), {}));
+    const auto unknown = zoneEncodingUnknowns(true);
+    for (const std::string family :
+         {"treasury", "alliance", "player", "controller", "power_status", "technology_stage", "researched_round", "allied",
+          "at_war", "completed_turns", "surrendered", "evolution_awarded", "china_invader", "attacked_warlord",
+          "alignment_queue", "state_flag_nation"})
+        require(answers.contains(impossible(family)), "A ruled-out answer still counts: " + family);
+    require(answers.at("treasury:~impossible") == 3, "A ruled-out treasury keeps its amount");
+    for (const std::string report :
+         {"impossible_treasury:mongolia", "treasury_missing:japan", "impossible_alliance:mongolia:axis",
+          "impossible_player:mongolia:axis", "impossible_controller:mongolia:japan", "impossible_power_status:mongolia:major",
+          "impossible_technology_stage:mongolia:radar", "impossible_researched_round:mongolia:radar",
+          "impossible_allied:mongolia:ccp", "impossible_at_war:warlord_tibet:warlord_yunnan",
+          "impossible_completed_turns:dadao", "impossible_surrendered:ccp", "impossible_evolution_awarded:japan",
+          "impossible_china_invader:kmt", "impossible_attacked_warlord:warlord_tibet:kmt",
+          "impossible_alignment_queue:japan", "impossible_state_flag_nation:evolution_pending:japan"})
+        require(unknown.contains(report), "A ruled-out answer is reported: " + report);
+    require(!answers.contains("treasury:japan"), "A missing treasury is reported, not read as empty");
+}
+
 // A battle's notes keep their words: its steps, situation, result, the classes
 // a hit may take and the nations and players named. A unit lost earlier this
 // turn is skipped; a new word is counted in an "other" column and reported.
@@ -443,6 +596,7 @@ int main() {
                  {"a railroad repair names its border", railroadRepairNamesItsBorder},
                  {"unknown names are counted, not dropped", unknownNamesAreCountedNotDropped},
                  {"income questions follow the rules", incomeQuestionsFollowTheRules},
+                 {"nation questions follow the rules", nationQuestionsFollowTheRules},
                  {"battle notes keep their words", battleNotesKeepTheirWords},
                  {"repairs and rare values have columns", repairsAndRareValuesHaveColumns},
                  {"scheduling state is part of the position", schedulingStateIsPartOfThePosition}}) {

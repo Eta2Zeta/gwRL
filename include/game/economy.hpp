@@ -15,11 +15,20 @@ int effectiveTerritorialIpp(const State &, const Id &zone);
 // one, with cargo it may carry. An upgrade that would not waits on the build
 // queue (user ruling RCL-021; RB 12.3).
 bool upgradeKeepsCargo(const State &, const UnitState &unit, const Id &type);
+// Whether the nation keeps an account, its treasury. The scenario opens one for
+// Japan, the KMT and the CCP (campaign_setup.cpp). None is opened or closed
+// afterwards; a lost capital or a surrender only empties one. The network's
+// input asks about these three treasuries only (zone_encoding.cpp).
+bool keepsAccount(const Id &nation);
 // Whether the rules can ever give this nation this part of an income: land
 // for the three nations that keep an account, and Japan's bonus for the
 // Chinese land it holds. evaluateIncome names no other part, and the network's
-// input asks about these pairs only (zone_encoding.cpp).
+// input asks about these pairs only.
 bool incomePartPossible(const Id &nation, const Id &part);
+// Whether the nation can ever research. Only a major power is given research
+// capacity, on its own turn (beginEconomyTurn), so only a nation that is or
+// can become one ever holds a technology stage or a research attempt.
+bool researchPossible(const Id &nation);
 // The nation's income as the position stands: its parts, whether the nation
 // may collect it, and the total it would collect.
 IncomeBreakdown evaluateIncome(const State &, const Id &nation);

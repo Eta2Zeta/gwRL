@@ -166,7 +166,7 @@ search (section 4) needs to know how each position it reaches looks to whichever
 alliance chooses there.
 
 Until section 6 the network is a closed box: what goes in and what comes out is
-all the next section needs. Inside are 4.1 million learned numbers, its
+all the next section needs. Inside are 3.9 million learned numbers, its
 *parameters*; training (section 8) adjusts them. Section 5 shows how a decision
 is turned into numbers the network can read, and section 6 how it turns them into
 values and probabilities.
@@ -547,14 +547,14 @@ The input for one decision has three parts:
 
 1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same list of
    42,532 zone questions, such as `units:ccp:mountain_infantry`.
-2. **The position as a whole:** one list of 6,477 position questions, such as the
+2. **The position as a whole:** one list of 4,076 position questions, such as the
    round, the phase, whose turn it is, treasuries and wars.
 3. **Each legal move:** every move on the menu answers the same list of 12,627
    move questions about itself, such as which kind of move it is, which unit it
    moves and which zones it names.
 
 At decision 612 the board has 840 non-zero answers, from 2 in Szechwan to 86 in
-sea zone P14, the position 179, and the moves 80: 19 for each attack and 4 for
+sea zone P14, the position 176, and the moves 80: 19 for each attack and 4 for
 ending the phase.
 
 ### 5.3 The input as grids of answers
@@ -564,7 +564,7 @@ column per zone question, the position as one line, and the moves as one line pe
 legal move. That is why questions are also called *columns*. Almost every cell
 is 0, and only the non-zero cells are stored.
 
-![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,532 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 6,477 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 179 non-zero answers in all.](figures/answer_grid.svg)
+![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,532 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 4,076 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 176 non-zero answers in all.](figures/answer_grid.svg)
 
 A line of a grid holds one zone's, the position's or one move's answers. In the
 usual picture of a neural network, the lines are its input layer, which the
@@ -623,7 +623,7 @@ with each decision:
   directions: 160 *directed borders*. The border from Shensi to Hopeh is land to
   land, crosses a river, carries a railway connection and is passable.
 
-The *layout version*, now `campaign-zone-v1-ed3184ce805f1af5`, is a hash of every
+The *layout version*, now `campaign-zone-v1-9e192fe5c085f13e`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change.
 
@@ -739,7 +739,7 @@ own first layer and so its own table:
 | Table | Rows | One row for each |
 | --- | ---: | --- |
 | Zone table | 42,532 | zone question |
-| Position table | 6,477 | position question |
+| Position table | 4,076 | position question |
 | Move table | 12,627 | move question |
 
 A question's number is its row's number: `units:ccp:mountain_infantry` is
@@ -830,8 +830,8 @@ from position to position until training changes it, and the answer only sets ho
 strongly it is added.
 
 **Each of a row's numbers is one parameter,** so the zone table alone holds
-42,532 × 64 = 2,722,048 parameters, and the three tables 3.94 million of the
-network's 4.08 million.
+42,532 × 64 = 2,722,048 parameters, and the three tables 3.79 million of the
+network's 3.92 million.
 
 **Rows start at zero** (since 3 November 2026), and training moves a row only when
 it trains on samples that answer the row's question
@@ -898,7 +898,7 @@ with 2.
 ### 6.5 The position vector and the move vectors
 
 **The position vector** is built the same way from the position's answers and the
-position table: its first layer adds up the rows of its 179 non-zero answers at
+position table: its first layer adds up the rows of its 176 non-zero answers at
 decision 612, each times its input, then layer normalization. It has no identity
 vector and no fixed facts.
 
@@ -1016,13 +1016,13 @@ count as "what acts" and so on comes from the roles explained in
 
 All the bricks together, for decision 612:
 
-![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,532 rows to 37 zone vectors; the position's 179 answers through the position table of 6,477 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,627 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
+![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,532 rows to 37 zone vectors; the position's 176 answers through the position table of 4,076 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,627 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
 
-**Its size.** A 64×2 network has 4,078,088 parameters. Most, 3.94 million or 97%,
+**Its size.** A 64×2 network has 3,924,424 parameters. Most, 3.79 million or 97%,
 are the rows of the three first layers; the other layers hold the rest. At 256×8
-there are 20.19 million, 78% of them rows, since wider layers weigh more. A decision reads only the rows of its
-answers: at decision 612, 1,099 row lookups (840 + 179 + 80) of 584 different
-rows, out of 61,636.
+there are 19.58 million, 77% of them rows, since wider layers weigh more. A decision reads only the rows of its
+answers: at decision 612, 1,096 row lookups (840 + 176 + 80) of 581 different
+rows, out of 59,235.
 
 **A fresh network gives every position the same values.** Its rows are all zero,
 so every answer adds nothing: each zone's vector is only its identity vector and
@@ -1047,7 +1047,7 @@ played on maps rather than AlphaZero's grids:
 | AlphaGo Zero, for Go | 17 grids of 19 × 19 numbers, each 0 or 1 | a convolution: at every point, the same learned numbers for the facts at and around that point | a fixed list of 362: one per point and one for passing |
 | Stockfish's NNUE, for chess | for each side's view, 40,960 numbers, at most 30 of them 1 (HalfKP) | adds up the weights that leave its non-zero inputs | none: it gives a value only |
 | DipNet, for Diplomacy | the features of each of the board's 81 locations | a graph convolution along the map's adjacency | one order per location in turn, invalid orders masked |
-| This network | 42,532 answers per zone, 6,477 for the position and 12,627 per move, almost all 0 | adds up the rows of its non-zero inputs, with one table for every zone | one logit per listed move, from the move's own vector |
+| This network | 42,532 answers per zone, 4,076 for the position and 12,627 per move, almost all 0 | adds up the rows of its non-zero inputs, with one table for every zone | one logit per listed move, from the move's own vector |
 
 **The first layer is the usual one.** Adding up the weights of the few non-zero
 inputs, instead of multiplying them all, is how a layer is computed wherever
@@ -1126,16 +1126,17 @@ four things (`_decide` and `play_episode` in `studies/campaign/learning.py`):
 example and kept every decision
 ([record](../archive/records/training_sample_2026_11_05.md)); this is its sample:
 
-![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 179 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
+![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 176 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
 
 Part 1 is the input of section 5, 12 KB in all. Part 3 is the search of
 [section 4.6](#46-a-real-search-decision-612): its shares differ most from the
 network's probabilities for the attack on Hopeh and for ending Combat Movement,
 both because the search found the attack better than the rest. Part 4 is the
 game's end: Axis +49.0, Allies −63.8 and Comintern −106.2, which every sample of
-the game stores. The record counts 191 position answers, not 179: when it was
-made, twelve more said that a nation's income had been worked out, which is
-true of every position and is no longer asked.
+the game stores. The record counts 191 position answers, not 176: when it was
+made, twelve more said that a nation's income had been worked out and three that
+Japan, the KMT and the CCP keep a treasury. Both are true of every position and
+are no longer asked.
 
 ### 7.3 Why these targets
 
@@ -1215,7 +1216,7 @@ alliance chose (section 8.4). The step lowers their sum.
 
 ### 8.2 The gradient
 
-A step nudges each of the network's 4.08 million parameters the way that lowers
+A step nudges each of the network's 3.92 million parameters the way that lowers
 the loss. For that, training first works out every parameter's *gradient*
 (`loss.backward()`): how fast the loss on the step's samples would change if that
 one number were raised a little. A positive gradient means that raising the
@@ -1364,12 +1365,15 @@ the second step also moved the 59 rows that only the first decision answered.
 | Table | Rows moved, Axis network | Allies | Comintern | Rows in the table |
 | --- | ---: | ---: | ---: | ---: |
 | Zone table | 1,840 | 1,840 | 1,840 | 42,532 |
-| Position table | 670 | 670 | 670 | 6,477 |
+| Position table | 670 | 670 | 670 | 4,076 |
 | Move table | 948 | 430 | 242 | 12,627 |
 
-The tables of that run had 411 more rows than today's. Of the rows removed
-since, only twelve had moved: each said that a nation's income had been worked
-out, which is true of every position. They are among the 670.
+The tables of that run had 2,812 more rows than today's. Of the rows removed
+since, only fifteen had moved: twelve said that a nation's income had been
+worked out and three that Japan, the KMT or the CCP keeps a treasury, each true
+of every position. They are among the 670. No other removed row had moved: each
+asked about something that cannot happen
+([list](network_input.md#8-questions-removed-as-impossible)).
 
 The three networks moved the same zone and position rows, because every network
 learns values from every sample. Move rows feed only the move probabilities,
@@ -1830,7 +1834,11 @@ measured and what would settle it.
   [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
-  warlords never owning ships or planes, and per-flag unit-class rules.
+  warlords never owning ships or planes, and per-flag unit-class rules. Nor
+  does each kind of thing have its own list of marks yet, so some questions
+  pair a nation, or the game as a whole, with a mark that only units or
+  territories carry
+  ([what is still asked](network_input.md#what-the-position-asks-about-a-nation)).
 - **Self-play on the Mac is close to two limits.** The coordinator is busy about
   85% of the time, and the game processes and the coordinator use about 9.9 of
   the 11 training cores
@@ -1857,7 +1865,7 @@ that training rarely meets keeps a row near zero.
 the unit type, one for the property. Every part is trained wherever it appears,
 and the tables shrink about tenfold: unit statistics would need 5 + 45 + 74 = 124
 part rows instead of their 13,321 combination rows, and the three tables about
-6,400 instead of 61,636.
+6,400 instead of 59,235.
 
 **The catch.** Added parts lose which part went with which. With Axis infantry
 with one move left and Axis tanks with two in one zone, a sum of parts cannot
@@ -1912,8 +1920,8 @@ network's; their output layers add little. DORA's parameters are as published;
 TD-Gammon's are estimated from its 198 board inputs and a few features (Sutton
 and Barto, section 16.1). This project's counts are for one of its three
 networks and leave out the first layer's tables (section 6.3), which have no
-counterpart in those networks: 3.9 million parameters at 64×2, 15.8 million at
-256×8 and 31.6 million at 512×16. *Reach* is how many points or borders the
+counterpart in those networks: 3.8 million parameters at 64×2, 15.2 million at
+256×8 and 30.3 million at 512×16. *Reach* is how many points or borders the
 layers carry information, divided by the largest distance on the board: 18 king
 steps in Go, 7 in chess, 6 in Connect Four and 7 borders here. KataGo's
 networks, like this one through its position vector, also hand every point a

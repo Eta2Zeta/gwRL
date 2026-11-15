@@ -195,6 +195,78 @@ void queueDeclarationPriority(State& s,const Id& actor,const Id& target) {
 }
 
 bool isWarlord(const Id& nation) {return nation.rfind("warlord_",0)==0;}
+
+// The answers a nation can ever have (politics.hpp). Each follows from the only
+// places that write the fact; change one of those and its rule here with it.
+bool canEvolve(const Id& nation) {return nation=="ccp"||nation=="kmt";}
+bool canBeMajorPower(const Id& nation) {return nation=="japan"||canEvolve(nation);}
+// Setup makes Japan a major power and the unaligned warlords warlords; every
+// other nation starts as a minor, and so does Dadao when ensureDadao creates it.
+// The only later change is the promotion in refreshPoliticalState.
+bool powerStatusPossible(const Id& nation,const Id& status) {
+    if(nation=="japan")return status=="major";
+    if(isWarlord(nation))return status=="warlord";
+    return status=="minor"||(status=="major"&&canEvolve(nation));
+}
+// Setup puts Japan in the Axis, the KMT in the Allies and the CCP and Mongolia
+// in the Comintern, each with the player of that name, and ensureDadao creates
+// Dadao in the Axis. After that incorporateNation gives the nation it
+// incorporates its recipient's alliance and player. It refuses the KMT, the CCP
+// and a major power, and is called only for a warlord, or for Dadao joining
+// Japan, which leaves Dadao in the Axis. surrenderNation changes the two only
+// for a nation the surrendered one controlled without incorporating: Dadao,
+// which stays in the Axis.
+bool alliancePossible(const Id& nation,const std::optional<Id>& alliance) {
+    if(isWarlord(nation))return true;
+    if(!alliance)return false;
+    if(nation=="japan"||nation=="dadao")return *alliance=="axis";
+    if(nation=="kmt")return *alliance=="allies";
+    return (nation=="ccp"||nation=="mongolia")&&*alliance=="comintern";
+}
+// Setup makes Japan, the KMT and the CCP their own controllers and gives
+// Mongolia and the warlords none. ensureDadao puts Dadao under Japan, and
+// surrenderNation leaves it under nobody if Japan surrenders first.
+// incorporateNation puts a warlord under its recipient: the KMT, the CCP or
+// Dadao, or Japan once Dadao has itself joined Japan (applyInfluenceChance).
+bool controllerPossible(const Id& nation,const std::optional<Id>& controller) {
+    if(nation=="japan"||nation=="kmt"||nation=="ccp")return controller==nation;
+    if(nation=="dadao")return !controller||*controller=="japan";
+    if(isWarlord(nation))return !controller||*controller=="kmt"||*controller=="ccp"||*controller=="dadao"||*controller=="japan";
+    return !controller;
+}
+// surrenderNation is called for the KMT when it holds no land
+// (refreshPoliticalState) and for Japan when an enemy holds its capital
+// (PoliticsRules::finishTurn), and it refuses the CCP.
+bool canSurrender(const Id& nation) {return nation=="kmt"||nation=="japan";}
+// recordLandAttack records the invader only when the attacker is not Chinese.
+bool canInvadeChina(const Id& nation) {return !chinese(nation);}
+// A war starts in one of three ways. A nation declares it: mayDeclareWar lets
+// only Japan, the KMT, the CCP and Dadao declare, and never on their own
+// alliance. A nation that is not Chinese attacks Chinese land: recordLandAttack
+// puts it at war with the KMT, the CCP and the warlords. Or a nation is
+// incorporated: incorporateNation hands its wars to the recipient, except
+// those with the recipient's own alliance. Setup has one war, between the KMT
+// and the CCP. So no warlord fights a warlord, and Japan and Dadao, both in
+// the Axis for good, never fight.
+bool warPossible(const Id& first,const Id& second) {
+    if(first==second||(isWarlord(first)&&isWarlord(second)))return false;
+    return !((first=="japan"&&second=="dadao")||(first=="dadao"&&second=="japan"));
+}
+// refreshAlliances lists as a nation's allies those politicallyFriendly to it:
+// the KMT and the CCP under the Chinese Truce, or two major powers of one
+// alliance with a common major enemy. The only possible major powers, Japan,
+// the KMT and the CCP, are in three different alliances for good.
+bool alliesPossible(const Id& first,const Id& second) {
+    return (first=="ccp"&&second=="kmt")||(first=="kmt"&&second=="ccp");
+}
+// recordLandAttack records who attacked a warlord's land, unless it is the
+// KMT, whose attack makes the warlord join the CCP there and then. Only the
+// nation whose turn it is, or Dadao on Japan's turn, moves units
+// (movementController), and a warlord is never either.
+bool warlordAttackPossible(const Id& warlord,const Id& attacker) {
+    return isWarlord(warlord)&&!isWarlord(attacker)&&attacker!="kmt";
+}
+
 Id originalNation(const State& s,const Id& zone) {
     const auto* index=s.definition->rules.find("faction_index");
     if(index)return index->require("land_original_owners").require(zone).require("original_faction_id").asString();

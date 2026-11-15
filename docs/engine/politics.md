@@ -41,9 +41,13 @@ a war out of turn, the alliance whose turn it is first gets a decision
 (`politics_priority_declare`) or decline (`politics_priority_decline`). The
 out-of-turn declaration then takes effect.
 
-**Becoming allies.** Two nations of one alliance that are at war with the same
-major power become allies, which lets them share zones and defend together.
-Being in the same alliance is not enough by itself.
+**Becoming allies.** Two major powers of one alliance that are at war with the
+same major power become allies, which lets them share zones and defend
+together (`politicallyFriendly`). Being in the same alliance is not enough by
+itself. In this campaign it never happens: the only possible major powers,
+Japan, the KMT and the CCP, are in three different alliances. The only allies
+are the KMT and the CCP under the Chinese Truce
+([section 3](#3-the-chinese-truce)).
 
 ## 2. The warlords
 
@@ -58,7 +62,8 @@ land that was captured. A warlord joins a side in one of four ways.
 
 **A foreign power invades China.** The invasion is a land attack, by a nation
 that is not Chinese, on a zone that was originally the KMT's, the CCP's or a
-warlord's (`recordLandAttack`). In this campaign that means Japan. The attack
+warlord's (`recordLandAttack`). In this campaign that is Japan or, more rarely,
+Mongolia, which starts no war itself. The attack
 puts the invader at war with the KMT, the CCP and every unaligned warlord at
 once, and every such warlord picks a side at the end of that Combat Phase. All
 the warlords' neighbours are noted first, so that one warlord's result cannot
@@ -195,7 +200,31 @@ or the repair of a facility.
 | `recruitment_roll` | Place Units | the alliance of the nation whose turn it is | Rolls to recruit |
 | `recruitment_place_infantry`, `recruitment_place_militia`, `recruitment_advance_ship`, `recruitment_repair_facility` | Place Units | the same alliance | Takes what the roll gave |
 
+## 9. What a nation can ever be
+
+Whatever happens in a game, the rules above leave each nation only a few
+possible answers to some questions. The functions declared at the top of
+`include/game/politics.hpp` state them, and the reason for each is beside its
+definition in `src/politics.cpp`. The network's input asks only the questions
+they allow
+([the network's input](../design/network_input.md#what-the-position-asks-about-a-nation)),
+so a rule change that allows a new answer must change its function too.
+
+| Function | What it states |
+| --- | --- |
+| `canEvolve`, `canBeMajorPower` | Only the KMT and the CCP are promoted. With Japan they are the only possible major powers. |
+| `powerStatusPossible` | Japan is always a major power, Mongolia and Dadao are always minor powers, and a warlord is always a warlord. |
+| `alliancePossible` | A nation keeps its alliance and its player for good. Only a warlord's change, to those of the nation that incorporates it. |
+| `controllerPossible` | A warlord is under nobody, or under the nation that incorporated it: the KMT, the CCP, Dadao, or Japan once Dadao has joined Japan. Dadao is under Japan, or under nobody if Japan surrenders first. |
+| `canSurrender` | Only the KMT and Japan surrender. |
+| `canInvadeChina` | Only a nation that is not Chinese, so Japan or Mongolia, is recorded as invading China. |
+| `warPossible` | No warlord is at war with a warlord, and Japan and Dadao are never at war. |
+| `alliesPossible` | Only the KMT and the CCP are ever allies. |
+| `warlordAttackPossible` | A warlord is recorded as attacked by the CCP, Japan, Dadao or Mongolia, never by the KMT or by a warlord. |
+
 Tests: `tests/politics_tests.cpp`, `tests/politics_warlords_tests.cpp`,
-`tests/politics_influence_tests.cpp` and `tests/land_truce_tests.cpp`. The
+`tests/politics_influence_tests.cpp` and `tests/land_truce_tests.cpp`; the
+functions of section 9 are checked through the network's input, in
+`tests/zone_encoding_tests.cpp`. The
 printed page behind each rule is recorded beside the rule in the rules data
 ([where the numbers come from](../rules/README.md#where-the-scenarios-numbers-come-from)).

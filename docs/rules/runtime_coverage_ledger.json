@@ -8,14 +8,14 @@
     "src/campaign_runtime.cpp": "80953646e1d4f4df7e31fee0306029df4bb4d79c52c77fee764cdc312a4a4de8",
     "src/campaign_setup.cpp": "a38e5de640b2c73c0e6a8d658709bebdea8286c882ddaffeb2e32cfdfb175579",
     "src/catalog.cpp": "46ce44b2a91f0207d780063a19dbba23fa1f5d5d42a779d801785592deaecc38",
-    "src/economy.cpp": "c4030e7a000f87af4753ee5d35e853460c9e2a23e316fba72fbcb7576bca83bb",
+    "src/economy.cpp": "a60e9ffe96b3973669bf7e895b3dd17bac97a4b3dadbdf57a7ea806475505fc7",
     "src/economy_lendlease.cpp": "32a721a0f4b4f2458499e32cd34adc251c6ac5fad457cf941c374b63f5932ff8",
     "src/land_combat.cpp": "96202e3993a134fc5297e9c3160371a824b10988bc25b9a96b4e569d797e6e56",
     "src/movement.cpp": "00ff6a7e8d3708e21369ae3728a43742ca195a8bf811ec95ce6b26fd79f414e0",
     "src/naval_combat.cpp": "89628d29300555c8924eb73409fce6aeb8268e04f68d7deed4f303ba123b9e15",
     "src/naval_movement.cpp": "e482f983d07f42123b94d10afc3203edccbc1a6b1c34850ba9d7548fe748c531",
     "src/naval_operations.cpp": "29b9de6c565f0c1f565d5bfeb661d3377d09d304f1938c67cdad11a47211415b",
-    "src/politics.cpp": "75b49c65a46cb71738404e66d8fb8eb669463b316f1944574d5c912e3e8adf58",
+    "src/politics.cpp": "18736bee3aa923c3eddac3cc55bb3ecc91e25e4a9d524671b116e014486de61e",
     "src/politics_influence.cpp": "0f5c8c2b659a7ee4016ee97b27a9908a83f132aa82d95d6917756c0eab9c52a1",
     "src/politics_warlords.cpp": "b174f2d281be9a78f7b90782804db25f9421a4bcea6dc04a34d9144d2af6a91a",
     "tests/air_integration_tests.cpp": "ab2ea27c3665f5b81b30995d2e14882cf4d0370cfdf95ce995ffd73d935f0a59",
@@ -25,8 +25,8 @@
     "tests/campaign_env_tests.cpp": "218ee2348e24b47384c3a2893ff5f5a5c2d501b85ae3e997c3844a8e160da4ce",
     "tests/campaign_integration_tests.cpp": "36878d1e05382b9d30640d3895c9d50a6cc378439ba4653889d0f3638673b5fd",
     "tests/campaign_runtime_tests.cpp": "64e744440dd1e9b2e6ad889dedec37c724443bf5ba9db681e5a1b6ae7ecc5dd9",
-    "tests/campaign_setup_tests.cpp": "85b8850f5363c4454de6de319d7a8f0ed72b33e70cd678c8f27249d0134b1977",
-    "tests/campaign_state_tests.cpp": "75c11a63037d60a391d5eb84e199eded1ec2b586cd8e0709866a66b2154d0ad6",
+    "tests/campaign_setup_tests.cpp": "0a6fbe8c2d0fba8004bcb8a1831ab5de3551160ad1b6fbdb59c95cbd4383bcc5",
+    "tests/campaign_state_tests.cpp": "dc512d2272dbe1c014f9dcbb9531ca1a0fdf4d656a7db8538a9f75625169fd55",
     "tests/catalog_tests.cpp": "b7baf0e41dab8e24f59ae65353f5f242cdd766162659f231df1a281b99148852",
     "tests/economy_tests.cpp": "317153b7ff4ada1d7775963d120f4b3d08de5b5b5dbea0d45f30cecc6fefc5ec",
     "tests/land_combat_tests.cpp": "8bd796622b4fdb81a19e31ca05237d5e3322899ac7fabfcf47367d8bc4d5c638",
@@ -50,17 +50,17 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 198
+          "line": 270
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 234
+          "line": 306
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 230
+          "line": 302
         }
       ],
       "fixtures": [
@@ -94,17 +94,17 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 198
+          "line": 270
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 234
+          "line": 306
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 230
+          "line": 302
         }
       ],
       "fixtures": [
@@ -143,7 +143,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 234
+          "line": 306
         }
       ],
       "fixtures": [
@@ -196,7 +196,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 418
+          "line": 490
         },
         {
           "file": "src/land_combat.cpp",
@@ -389,7 +389,7 @@
         {
           "file": "tests/campaign_setup_tests.cpp",
           "symbol": "main",
-          "line": 39,
+          "line": 44,
           "behavior_assertions": [
             "Starting unit total differs from the setup",
             "Land total differs from the setup",
@@ -874,7 +874,7 @@
         {
           "file": "tests/campaign_setup_tests.cpp",
           "symbol": "main",
-          "line": 39,
+          "line": 44,
           "behavior_assertions": [
             "Starting unit total differs from the setup",
             "Land total differs from the setup",
@@ -966,7 +966,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 350
+          "line": 422
         }
       ],
       "fixtures": [
@@ -1037,17 +1037,17 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 198
+          "line": 270
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 234
+          "line": 306
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 230
+          "line": 302
         }
       ],
       "fixtures": [
@@ -1081,7 +1081,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 476
+          "line": 548
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1116,7 +1116,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "incorporateNation",
-          "line": 297
+          "line": 369
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1163,7 +1163,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 639
+          "line": 711
         }
       ],
       "fixtures": [
@@ -1222,7 +1222,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "incorporateNation",
-          "line": 297
+          "line": 369
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1277,7 +1277,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 476
+          "line": 548
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1360,7 +1360,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 476
+          "line": 548
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1443,7 +1443,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 476
+          "line": 548
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1539,12 +1539,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "mayDeclareWar",
-          "line": 446
+          "line": 518
         },
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 472
+          "line": 544
         }
       ],
       "fixtures": [
@@ -1597,12 +1597,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "mayDeclareWar",
-          "line": 446
+          "line": 518
         },
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 472
+          "line": 544
         }
       ],
       "fixtures": [
@@ -1668,12 +1668,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 506
+          "line": 578
         },
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 350
+          "line": 422
         }
       ],
       "fixtures": [
@@ -1729,12 +1729,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 506
+          "line": 578
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::applyChance",
-          "line": 612
+          "line": 684
         }
       ],
       "fixtures": [
@@ -1929,7 +1929,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 639
+          "line": 711
         }
       ],
       "fixtures": [
@@ -2021,12 +2021,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "beginEconomyTurn",
-          "line": 486
+          "line": 492
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1049
+          "line": 1055
         }
       ],
       "fixtures": [
@@ -2080,12 +2080,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "beginEconomyTurn",
-          "line": 486
+          "line": 492
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1049
+          "line": 1055
         }
       ],
       "fixtures": [
@@ -2289,7 +2289,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 483
+          "line": 489
         },
         {
           "file": "src/catalog.cpp",
@@ -2349,7 +2349,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         },
         {
           "file": "src/air.cpp",
@@ -2833,12 +2833,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::actions",
-          "line": 1017
+          "line": 1023
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         }
       ],
       "fixtures": [
@@ -2905,12 +2905,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "damageConstruction",
-          "line": 515
+          "line": 521
         },
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 418
+          "line": 490
         }
       ],
       "fixtures": [
@@ -2938,12 +2938,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 957
+          "line": 963
         }
       ],
       "fixtures": [
@@ -2981,12 +2981,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 957
+          "line": 963
         }
       ],
       "fixtures": [
@@ -3035,12 +3035,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 957
+          "line": 963
         }
       ],
       "fixtures": [
@@ -4790,7 +4790,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 418
+          "line": 490
         },
         {
           "file": "src/air.cpp",
@@ -4874,7 +4874,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 418
+          "line": 490
         }
       ],
       "fixtures": [
@@ -5228,12 +5228,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 483
+          "line": 489
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         }
       ],
       "fixtures": [
@@ -5277,7 +5277,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         }
       ],
       "fixtures": [
@@ -5313,12 +5313,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 957
+          "line": 963
         }
       ],
       "fixtures": [
@@ -5533,12 +5533,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "evaluateIncome",
-          "line": 427
+          "line": 433
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::finishTurn",
-          "line": 1066
+          "line": 1072
         },
         {
           "file": "src/campaign_runtime.cpp",
@@ -5994,7 +5994,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 483
+          "line": 489
         },
         {
           "file": "src/movement.cpp",
@@ -6030,7 +6030,7 @@
         {
           "file": "tests/campaign_setup_tests.cpp",
           "symbol": "main",
-          "line": 39,
+          "line": 44,
           "behavior_assertions": [
             "Starting unit total differs from the setup",
             "Land total differs from the setup",
@@ -6079,12 +6079,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 418
+          "line": 490
         },
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 483
+          "line": 489
         }
       ],
       "fixtures": [
@@ -6213,7 +6213,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 483
+          "line": 489
         },
         {
           "file": "src/movement.cpp",
@@ -6249,7 +6249,7 @@
         {
           "file": "tests/campaign_setup_tests.cpp",
           "symbol": "main",
-          "line": 39,
+          "line": 44,
           "behavior_assertions": [
             "Starting unit total differs from the setup",
             "Land total differs from the setup",
@@ -6364,7 +6364,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         },
         {
           "file": "src/movement.cpp",
@@ -6436,12 +6436,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 476
+          "line": 548
         },
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 350
+          "line": 422
         }
       ],
       "fixtures": [
@@ -6479,7 +6479,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 350
+          "line": 422
         }
       ],
       "fixtures": [
@@ -6749,7 +6749,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 472
+          "line": 544
         },
         {
           "file": "src/land_combat.cpp",
@@ -6874,7 +6874,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1043
+          "line": 1049
         }
       ],
       "fixtures": [

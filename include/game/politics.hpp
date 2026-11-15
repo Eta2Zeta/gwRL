@@ -15,6 +15,39 @@ struct PoliticalPermission {
 };
 
 bool isWarlord(const Id& nation);
+
+// What the rules can ever make of a nation of this campaign: which answers a
+// nation can have at all. The reason for each is beside its definition in
+// politics.cpp. The network's input asks only about these (zone_encoding.cpp)
+// and reports a position that breaks one. A rare answer counts as possible;
+// these rule out only what no game can reach.
+//
+// Japan is a major power from the start, and only the KMT and the CCP are
+// promoted to one.
+bool canEvolve(const Id& nation);
+bool canBeMajorPower(const Id& nation);
+bool powerStatusPossible(const Id& nation, const Id& status);
+// A nation's alliance and its player bear the same name and change together,
+// and only a warlord's ever change, when it is incorporated. Before that a
+// warlord has neither.
+bool alliancePossible(const Id& nation, const std::optional<Id>& alliance);
+// The nation that controls a nation: itself for Japan, the KMT and the CCP,
+// Japan or nobody for Dadao, nobody for Mongolia, and for a warlord nobody or
+// the nation that incorporated it (the KMT, the CCP, Dadao or Japan).
+bool controllerPossible(const Id& nation, const std::optional<Id>& controller);
+// Only the KMT, which loses its last land, and Japan, which loses Tokyo, surrender.
+bool canSurrender(const Id& nation);
+// The invader recorded when Chinese land is attacked is not Chinese.
+bool canInvadeChina(const Id& nation);
+// Whether the two can ever be at war. One side of every war is Japan, the KMT,
+// the CCP, Dadao or Mongolia, and Japan and Dadao share an alliance for good.
+bool warPossible(const Id& first, const Id& second);
+// Whether the two can ever be allies: only the KMT and the CCP, under their truce.
+bool alliesPossible(const Id& first, const Id& second);
+// Whether `attacker` can be recorded as having attacked this warlord. A warlord
+// attacks nobody, and one the KMT attacks joins the CCP at once instead.
+bool warlordAttackPossible(const Id& warlord, const Id& attacker);
+
 Id originalNation(const State&, const Id& zone);
 std::vector<Id> possessedLand(const State&, const Id& nation);
 std::vector<Id> originalLand(const State&, const Id& nation);

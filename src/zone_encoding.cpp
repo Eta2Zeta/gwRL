@@ -384,7 +384,7 @@ struct Context {
         zBattleData, zBattleDataUnit, zBattleDataRank, zBattleDataZone, zBattleDataWord, zBattleHits, zBattleOrder;
     // Global families.
     int gRound, gCompletedRounds, gRoundsLeft, gPhase, gTurnNation, gIncomeCollected, gTerminal, gPresent, gAlliance,
-        gPlayer, gPower, gController, gTreasury, gHasTreasury, gIncome, gTech, gWar, gAlly, gNationFlag,
+        gPlayer, gPower, gController, gTreasury, gIncome, gTech, gWar, gAlly, gNationFlag,
         gResearched, gCompletedTurns, gSurrendered, gEvolved, gTruce, gTruceEnded, gForeignWarPending,
         gTruceOfferPending, gInvader, gAttackedWarlord, gAlignmentQueue, gPending, gPendingNation, gPendingValue,
         gDecisionKind, gDecisionNation, gDecisionReaction, gDecisionDepth, gDecisionStack, gAdapterKind, gOwner,
@@ -720,37 +720,55 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gCompletedRounds = g.add("completed_rounds", {});
     c->gRoundsLeft = g.add("rounds_left", {});
     c->gPhase = g.add("phase", {&c->phases});
-    c->gTurnNation = g.add("turn_nation", {&c->nations});
+    // What the position asks about a nation follows what the rules can make
+    // of it. Each rule below is stated, with its reason, beside the engine code
+    // that settles it (politics.cpp, economy.cpp); a nation never has any
+    // other answer, and one that did would be reported.
+    const auto nationName = [&](int n) -> const std::string& { return c->nations.names()[static_cast<std::size_t>(n)]; };
+    const auto orNone = [](const std::string& name) { return name == "~none" ? std::optional<Id>() : std::optional<Id>(name); };
+    // The turn passes only along the scenario's turn order (State::currentNation).
+    const std::set<Id> turnOrder(s.definition->turnOrder.begin(), s.definition->turnOrder.end());
+    const auto takesTurns = [&](const Cell& x) { return turnOrder.contains(nationName(x[0])); };
+    const auto side = [&](const Cell& x) {
+        return alliancePossible(nationName(x[0]), orNone(c->playerOrNone.names()[static_cast<std::size_t>(x[1])]));
+    };
+    // A technology is always one of the catalog's, so no cell is kept for an unlisted one.
+    const auto researches = [&](const Cell& x) { return researchPossible(nationName(x[0])) && x[1] != c->technologies.other(); };
+    c->gTurnNation = g.add("turn_nation", {&c->nations}, takesTurns);
     c->gIncomeCollected = g.add("income_collected", {});
     c->gTerminal = g.add("terminal", {});
     c->gPresent = g.add("nation_present", {&c->nations});
-    c->gAlliance = g.add("alliance", {&c->nations, &c->playerOrNone});
-    c->gPlayer = g.add("player", {&c->nations, &c->playerOrNone});
-    c->gPower = g.add("power_status", {&c->nations, &c->powerStatuses});
-    c->gController = g.add("controller", {&c->nations, &c->nationOrNone});
-    c->gTreasury = g.add("treasury", {&c->nations});
-    c->gHasTreasury = g.add("has_treasury", {&c->nations});
-    // Only Japan, the KMT and the CCP keep an income account, and only Japan
-    // has the bonus for Chinese land (incomePartPossible in economy.cpp).
-    c->gIncome = g.add("income", {&c->nations, &c->incomeComponents}, [&](const Cell& x) {
-        return incomePartPossible(c->nations.names()[static_cast<std::size_t>(x[0])],
-                                  c->incomeComponents.names()[static_cast<std::size_t>(x[1])]);
+    c->gAlliance = g.add("alliance", {&c->nations, &c->playerOrNone}, side);
+    c->gPlayer = g.add("player", {&c->nations, &c->playerOrNone}, side);
+    c->gPower = g.add("power_status", {&c->nations, &c->powerStatuses}, [&](const Cell& x) {
+        return powerStatusPossible(nationName(x[0]), c->powerStatuses.names()[static_cast<std::size_t>(x[1])]);
     });
-    c->gTech = g.add("technology_stage", {&c->nations, &c->technologies});
-    c->gWar = g.add("at_war", {&c->nations, &c->nations});
-    c->gAlly = g.add("allied", {&c->nations, &c->nations});
+    c->gController = g.add("controller", {&c->nations, &c->nationOrNone}, [&](const Cell& x) {
+        return controllerPossible(nationName(x[0]), orNone(c->nationOrNone.names()[static_cast<std::size_t>(x[1])]));
+    });
+    c->gTreasury = g.add("treasury", {&c->nations}, [&](const Cell& x) { return keepsAccount(nationName(x[0])); });
+    c->gIncome = g.add("income", {&c->nations, &c->incomeComponents}, [&](const Cell& x) {
+        return incomePartPossible(nationName(x[0]), c->incomeComponents.names()[static_cast<std::size_t>(x[1])]);
+    });
+    c->gTech = g.add("technology_stage", {&c->nations, &c->technologies}, researches);
+    c->gWar = g.add("at_war", {&c->nations, &c->nations},
+                    [&](const Cell& x) { return warPossible(nationName(x[0]), nationName(x[1])); });
+    c->gAlly = g.add("allied", {&c->nations, &c->nations},
+                     [&](const Cell& x) { return alliesPossible(nationName(x[0]), nationName(x[1])); });
     c->gNationFlag = g.add("nation_flag", {&c->nations, &c->actorFlags});
-    c->gResearched = g.add("researched_round", {&c->nations, &c->technologies});
-    c->gCompletedTurns = g.add("completed_turns", {&c->nations});
-    c->gSurrendered = g.add("surrendered", {&c->nations});
-    c->gEvolved = g.add("evolution_awarded", {&c->nations});
+    c->gResearched = g.add("researched_round", {&c->nations, &c->technologies}, researches);
+    c->gCompletedTurns = g.add("completed_turns", {&c->nations}, takesTurns);
+    c->gSurrendered = g.add("surrendered", {&c->nations}, [&](const Cell& x) { return canSurrender(nationName(x[0])); });
+    c->gEvolved = g.add("evolution_awarded", {&c->nations}, [&](const Cell& x) { return canEvolve(nationName(x[0])); });
     c->gTruce = g.add("chinese_truce", {});
     c->gTruceEnded = g.add("truce_permanently_ended", {});
     c->gForeignWarPending = g.add("foreign_china_war_pending", {});
     c->gTruceOfferPending = g.add("truce_offer_pending", {});
-    c->gInvader = g.add("china_invader", {&c->nations});
-    c->gAttackedWarlord = g.add("attacked_warlord", {&c->nations, &c->nations});
-    c->gAlignmentQueue = g.add("alignment_queue", {&c->nations});
+    c->gInvader = g.add("china_invader", {&c->nations}, [&](const Cell& x) { return canInvadeChina(nationName(x[0])); });
+    c->gAttackedWarlord = g.add("attacked_warlord", {&c->nations, &c->nations},
+                                [&](const Cell& x) { return warlordAttackPossible(nationName(x[0]), nationName(x[1])); });
+    // Only warlords wait to be aligned (beginCombatPoliticalResolution).
+    c->gAlignmentQueue = g.add("alignment_queue", {&c->nations}, [&](const Cell& x) { return isWarlord(nationName(x[0])); });
     c->gPending = g.add("pending", {&c->pendingNames});
     c->gPendingNation = g.add("pending_nation", {&c->pendingNames, &c->nations});
     c->gPendingValue = g.add("pending_value", {&c->pendingNames});
@@ -770,7 +788,11 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gChanceNation = g.add("chance_nation", {&c->nations});
     c->gChanceStat = g.add("chance_stat", {&c->chanceStats});
     c->gStateFlag = g.add("state_flag", {&c->recordFlags});
-    c->gStateFlagNation = g.add("state_flag_nation", {&c->recordFlags, &c->nations});
+    // The only game-wide mark that names a nation says its capital choice is
+    // pending, and only a nation that can evolve gets one (chooseEvolution).
+    c->gStateFlagNation = g.add("state_flag_nation", {&c->recordFlags, &c->nations}, [&](const Cell& x) {
+        return c->recordFlags.names()[static_cast<std::size_t>(x[0])] == "evolution_pending" && canEvolve(nationName(x[1]));
+    });
     c->gVisited = g.add("visited_configurations", {});
     c->gDeclinedRails = g.add("declined_rail_requests", {});
     c->gUnsitedProject = g.add("unsited_project", {&c->nations, &c->projectTypes},
@@ -1423,10 +1445,11 @@ void encodeNations(const Context& c, const State& s, Builder& b) {
         b.global(c.global.at(c.gPlayer, {nation, c.playerOrNone(n.player ? *n.player : "~none")}), 1);
         b.global(c.global.at(c.gPower, {nation, c.powerStatuses(n.powerStatus)}), 1);
         b.global(c.global.at(c.gController, {nation, c.nationOrNone(n.controllerNation ? *n.controllerNation : "~none")}), 1);
-        if (n.treasury) {
-            b.global(c.global.at(c.gHasTreasury, {nation}), 1);
-            b.global(c.global.at(c.gTreasury, {nation}), *n.treasury);
-        }
+        // Whether a nation keeps a treasury never changes (keepsAccount), so the
+        // position asks only how much is in it. A nation that should keep one
+        // and has none would read as an empty one, so it is reported.
+        if (n.treasury) b.global(c.global.at(c.gTreasury, {nation}), *n.treasury);
+        else if (keepsAccount(id)) noteUnknown("treasury_missing", id);
         for (const auto& [name, value] : n.incomeComponents)
             b.global(c.global.at(c.gIncome, {nation, c.incomeComponents(name)}), value);
         // Every income is worked out in a started campaign. One that is not

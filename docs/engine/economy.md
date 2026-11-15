@@ -13,7 +13,8 @@ Code: `include/game/economy.hpp`; `src/economy.cpp`,
 ## 1. Money
 
 The game's money is the IPP. Three nations have a treasury: Japan, the KMT and
-the CCP. Mongolia, Dadao and the warlords have none and earn nothing.
+the CCP (`keepsAccount`). Mongolia, Dadao and the warlords have none and earn
+nothing. No rule opens or closes a treasury during a game.
 
 A nation's income is collected at the end of each of its turns
 (`evaluateIncome`):
@@ -139,8 +140,9 @@ Airborne Infantry into Elite Airborne Infantry.
 - **The third stage is locked before July 1939.**
 - **An attempt costs nothing.**
 
-Only major powers research. Japan is one from the start; the KMT and the CCP
-are once they have become major powers ([politics](politics.md#4-becoming-a-major-power)).
+Only major powers research (`researchPossible`). Japan is one from the start;
+the KMT and the CCP are once they have become major powers
+([politics](politics.md#4-becoming-a-major-power)).
 
 ## 7. Lend-lease
 

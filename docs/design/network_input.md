@@ -47,14 +47,14 @@ The input for one decision is one bundle with three parts:
 
 1. **The board:** each of the 37 zones (31 land and 6 sea) answers the same list
    of 42,532 zone questions.
-2. **The position as a whole:** 6,477 questions about the round, the phase,
+2. **The position as a whole:** 4,076 questions about the round, the phase,
    whose turn it is, treasuries, wars and so on.
 3. **Each legal move:** every move on the menu answers the same list of 12,627
    move questions about itself.
 
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
 round 1, chosen by the Comintern player. It has 13 legal moves, and its input
-holds 326 board answers, 107 position answers and 244 answers across the 13
+holds 326 board answers, 104 position answers and 244 answers across the 13
 moves. Each earlier decision took the move that ends the phase, or else the first
 listed move.
 
@@ -79,7 +79,7 @@ listed move.
 Its name, such as `units:ccp:cavalry`, is a readable label for that meaning;
 the network only sees the number. A name is built as `family:part:part`. The
 family says what kind of question it is, and the parts say which nation, which
-unit type, which zone and so on. The board has 42 families, the position 56 and
+unit type, which zone and so on. The board has 42 families, the position 55 and
 the moves 45.
 
 **An answer** is a whole number: a count ("how many?"), 1 for "yes", or a value
@@ -165,6 +165,10 @@ In the seed-5 decision these include:
 | `treasury:japan` | 15 | Japan's money: 15 IPP, the game's unit of money |
 | `income:japan:territorial` | 15 | the income Japan's land gives it each turn |
 | `nation_present:<nation>` | 1 | one answer for each nation in the game |
+
+A question about a nation exists only where the rules can ever give that
+answer: there is no `treasury:mongolia`, because Mongolia keeps no treasury
+([section 8](#what-the-position-asks-about-a-nation)).
 
 An income answer is the nation's income as the position stands, not what it
 last collected. The engine brings it up to date at the end of every move, so
@@ -668,7 +672,10 @@ nation; a rare situation keeps its question.
   nation's income had been worked out. In a started game it always has been, so
   each only repeated that its nation is in the game (`nation_present`), and
   they went the same day. The encoder reports a position where an income has
-  not been worked out.
+  not been worked out. Thirteen more said whether a nation keeps a treasury,
+  which never changes during a game. They went with the questions
+  [listed below](#what-the-position-asks-about-a-nation), and the encoder
+  reports a treasury that is missing.
 - **Kept on purpose:** the coastal defense ship, reserved for nobody and
   capturable; and "warlords never own ships or planes", which lend-lease and
   recruitment might break, so it could not be proved.
@@ -679,6 +686,50 @@ dropped. Of 480 random games on 5 November, one met such a combination: an air
 transport carrying motorized infantry, which the rules forbid too and the engine
 no longer makes ([keeping the lists complete](#keeping-the-lists-complete)).
 
+### What the position asks about a nation
+
+The position asks about a nation only what the rules can ever make of it. Each
+rule is a short function in the engine's politics or economy module
+(`src/politics.cpp`, `src/economy.cpp`), with its reason beside it, and the
+layout keeps the questions the rule allows. On 14 November 2026 this took the
+position part from 6,477 questions to 4,076.
+
+| Questions | Kept for | Why no other answer can happen |
+| --- | --- | --- |
+| `treasury` | Japan, the KMT and the CCP | The scenario opens an account for these three. No rule opens or closes one later: a lost capital or a surrender only empties it. |
+| `technology_stage`, `researched_round` | Japan, the KMT and the CCP, each with the 16 technologies | Only a major power researches. Japan is one from the start, and only the KMT and the CCP are promoted to one. |
+| `power_status` | Japan as a major power; the KMT and the CCP as minor or major; Mongolia and Dadao as minor; each warlord as a warlord | Setup gives every nation its status. The only later change is the promotion of the KMT or the CCP. |
+| `alliance`, `player` | Japan and Dadao in the Axis; the KMT in the Allies; the CCP and Mongolia in the Comintern; each warlord in any of the three or in none | Only incorporation changes them. Only warlords are incorporated, and Dadao, which joins Japan and so stays in the Axis. |
+| `controller` | Japan, the KMT and the CCP under themselves; Mongolia under nobody; Dadao under Japan or nobody; each warlord under nobody, the KMT, the CCP, Dadao or Japan | A warlord comes under the nation that incorporates it. Dadao is created under Japan and is left under nobody if Japan surrenders. Nothing else changes a controller. |
+| `turn_nation`, `completed_turns` | the CCP, Mongolia, Japan and the KMT | The turn passes only along the scenario's turn order. |
+| `surrendered` | Japan and the KMT | The KMT surrenders when it holds no land, Japan when an enemy holds Tokyo at the end of Japan's turn. The CCP never surrenders, and no rule makes any other nation surrender. |
+| `evolution_awarded`, `state_flag_nation` | the KMT and the CCP | Only they evolve into major powers and then choose a capital. The mark that the choice is pending is the only game-wide mark that names a nation. |
+| `china_invader` | Japan and Mongolia | The invader is recorded only when the attacker is not Chinese. |
+| `attacked_warlord` | each warlord, attacked by the CCP, Japan, Dadao or Mongolia | A warlord never attacks. One the KMT attacks joins the CCP at once and is not recorded. |
+| `alignment_queue` | the warlords | Only warlords wait to be aligned at the end of the Combat Phase. |
+| `allied` | the KMT with the CCP | Nations are allies under the Chinese Truce, or as two major powers of one alliance. The only possible major powers, Japan, the KMT and the CCP, are in three different alliances. |
+| `at_war` | every pair except a nation with itself, two warlords, and Japan with Dadao | One side of every war is Japan, the KMT, the CCP, Dadao or Mongolia: only they declare war, invade China or take over the wars of a nation they incorporate. Japan and Dadao are both in the Axis for good. |
+
+A rare answer keeps its question. Mongolia cannot declare war, so it is the
+invader only when it attacks land that was Chinese at the start and is now held
+by a nation already at war with it, or by nobody. A warlord comes under Japan
+only if Japan wins it over after Dadao has joined Japan. Both have their
+questions.
+
+`tests/zone_encoding_tests.cpp` checks which of these questions exist, that the
+allowed rare answers are read, and that a ruled-out answer is counted in its
+family's `~impossible` question and reported.
+
+**Still asked, though nothing can answer them.** The marks are one shared list
+for units and nations, and another for territories, facilities, projects,
+battles and the game as a whole. So `nation_flag` asks every nation about every
+unit mark, such as `nation_flag:japan:air_battle`, and `state_flag` asks the game
+about every territory mark. Giving each kind of thing its own list of marks
+would remove these questions in all three parts; it has not been done. Three
+families that name nations have not been judged nation by nation either,
+because many rules write their answers: `pending_nation`, `chance_nation` and
+`unsited_project`.
+
 ## 9. Fixed facts and the layout version
 
 Facts that never change come with the layout, not with each position:
@@ -688,10 +739,10 @@ Facts that never change come with the layout, not with each position:
 - the 160 directed borders, with 22 facts each, such as rivers, narrow crossings,
   railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-ed3184ce805f1af5`, is a hash of every
+The layout version, now `campaign-zone-v1-9e192fe5c085f13e`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change. It last changed on 14 November
-2026, when the income questions that can never tell two positions apart were
+2026, when the position questions about nations that the rules rule out were
 removed.
 
 ## 10. Why the encoder translates names
