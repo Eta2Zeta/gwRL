@@ -1,0 +1,368 @@
+{
+ "date": "2026-11-15",
+ "question": "Which Mac-profile layout keeps the real CPU load within the owner's new 9-core allowance, and what it plays per hour",
+ "code": "main at 5eda50f, with this change's profile and supervisor allowance",
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "command": "env -u MallocNanoZone .venv/bin/python tools/supervise_campaign_training.py --profile mac --control-dir OUT-control --run-dir OUT --seconds 3600 --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --batches 1 --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 --batch-size 32 --epochs 50 --replay-capacity 8000 --sample-fraction 0.05 --transitions-per-batch 20000 --seed 20261104 [--episode-workers N --parallel-envs 4N]",
+ "load_measurement": "ps -axo pid,ppid,cputime,rss,comm every 5 s; the trainer (the coordinator while games play) and its game processes, in 30-second windows from the first to the last sample with game processes",
+ "reference_8x4": {
+  "source": "docs/archive/records/coordinator_one_pass_2026_11_14.md",
+  "code": "c4e9260",
+  "decisions_per_hour_while_playing": 252200,
+  "training_cores": 9.9,
+  "coordinator_busy": 0.85
+ },
+ "layouts": [
+  {
+   "layout": "7x4",
+   "game_processes": 7,
+   "games_per_process": 4,
+   "games_per_batch": 28,
+   "training_cpu_budget": 8,
+   "episodes": 28,
+   "decisions": 29402,
+   "transitions": 33451,
+   "collection_seconds": 462.1,
+   "decisions_per_hour_while_playing": 229043,
+   "games_per_hour_while_playing": 218.1,
+   "samples_kept": 1482,
+   "evaluator": {
+    "evaluations": 1512528,
+    "serving_rounds": 271953,
+    "network_passes": 271953,
+    "forward_seconds": 387.0,
+    "idle_seconds": 48.0,
+    "positions_per_round": 5.56,
+    "busy_share": 0.896
+   },
+   "peak_memory_bytes": 4736190984,
+   "real_load_cores": {
+    "mean_window": 8.99,
+    "median_window": 9.95,
+    "highest_window": 11.05,
+    "other_work_median": 2.57
+   },
+   "windows": [
+    {
+     "seconds_from_start": 5,
+     "batch_cores": 10.66,
+     "other_cores": 1.93
+    },
+    {
+     "seconds_from_start": 36,
+     "batch_cores": 11.05,
+     "other_cores": 1.88
+    },
+    {
+     "seconds_from_start": 66,
+     "batch_cores": 10.84,
+     "other_cores": 2.08
+    },
+    {
+     "seconds_from_start": 96,
+     "batch_cores": 9.74,
+     "other_cores": 2.01
+    },
+    {
+     "seconds_from_start": 127,
+     "batch_cores": 10.44,
+     "other_cores": 2.06
+    },
+    {
+     "seconds_from_start": 157,
+     "batch_cores": 9.95,
+     "other_cores": 2.91
+    },
+    {
+     "seconds_from_start": 187,
+     "batch_cores": 9.29,
+     "other_cores": 3.25
+    },
+    {
+     "seconds_from_start": 218,
+     "batch_cores": 9.91,
+     "other_cores": 2.91
+    },
+    {
+     "seconds_from_start": 248,
+     "batch_cores": 9.95,
+     "other_cores": 2.67
+    },
+    {
+     "seconds_from_start": 278,
+     "batch_cores": 10.3,
+     "other_cores": 2.27
+    },
+    {
+     "seconds_from_start": 308,
+     "batch_cores": 9.77,
+     "other_cores": 2.23
+    },
+    {
+     "seconds_from_start": 339,
+     "batch_cores": 10.09,
+     "other_cores": 2.57
+    },
+    {
+     "seconds_from_start": 369,
+     "batch_cores": 8.49,
+     "other_cores": 3.13
+    },
+    {
+     "seconds_from_start": 399,
+     "batch_cores": 2.64,
+     "other_cores": 3.89
+    },
+    {
+     "seconds_from_start": 430,
+     "batch_cores": 1.77,
+     "other_cores": 4.5
+    }
+   ]
+  },
+  {
+   "layout": "6x4",
+   "game_processes": 6,
+   "games_per_process": 4,
+   "games_per_batch": 24,
+   "training_cpu_budget": 8,
+   "episodes": 24,
+   "decisions": 26587,
+   "transitions": 30199,
+   "collection_seconds": 499.0,
+   "decisions_per_hour_while_playing": 191812,
+   "games_per_hour_while_playing": 173.1,
+   "samples_kept": 1354,
+   "evaluator": {
+    "evaluations": 1373647,
+    "serving_rounds": 277980,
+    "network_passes": 277980,
+    "forward_seconds": 420.0,
+    "idle_seconds": 50.0,
+    "positions_per_round": 4.94,
+    "busy_share": 0.9
+   },
+   "peak_memory_bytes": 4020506008,
+   "real_load_cores": {
+    "mean_window": 8.19,
+    "median_window": 8.88,
+    "highest_window": 10.33,
+    "other_work_median": 3.41
+   },
+   "windows": [
+    {
+     "seconds_from_start": 5,
+     "batch_cores": 10.33,
+     "other_cores": 1.8
+    },
+    {
+     "seconds_from_start": 36,
+     "batch_cores": 6.46,
+     "other_cores": 4.78
+    },
+    {
+     "seconds_from_start": 66,
+     "batch_cores": 8.79,
+     "other_cores": 3.61
+    },
+    {
+     "seconds_from_start": 96,
+     "batch_cores": 9.01,
+     "other_cores": 3.35
+    },
+    {
+     "seconds_from_start": 127,
+     "batch_cores": 8.96,
+     "other_cores": 3.35
+    },
+    {
+     "seconds_from_start": 157,
+     "batch_cores": 8.8,
+     "other_cores": 3.96
+    },
+    {
+     "seconds_from_start": 187,
+     "batch_cores": 8.12,
+     "other_cores": 4.09
+    },
+    {
+     "seconds_from_start": 218,
+     "batch_cores": 9.43,
+     "other_cores": 2.79
+    },
+    {
+     "seconds_from_start": 248,
+     "batch_cores": 9.26,
+     "other_cores": 2.74
+    },
+    {
+     "seconds_from_start": 278,
+     "batch_cores": 8.53,
+     "other_cores": 3.69
+    },
+    {
+     "seconds_from_start": 309,
+     "batch_cores": 8.98,
+     "other_cores": 3.46
+    },
+    {
+     "seconds_from_start": 339,
+     "batch_cores": 9.94,
+     "other_cores": 2.8
+    },
+    {
+     "seconds_from_start": 369,
+     "batch_cores": 9.48,
+     "other_cores": 1.87
+    },
+    {
+     "seconds_from_start": 400,
+     "batch_cores": 6.51,
+     "other_cores": 4.83
+    },
+    {
+     "seconds_from_start": 430,
+     "batch_cores": 6.9,
+     "other_cores": 3.27
+    },
+    {
+     "seconds_from_start": 460,
+     "batch_cores": 1.53,
+     "other_cores": 3.81
+    }
+   ]
+  },
+  {
+   "layout": "5x4",
+   "game_processes": 5,
+   "games_per_process": 4,
+   "games_per_batch": 20,
+   "training_cpu_budget": 8,
+   "episodes": 20,
+   "decisions": 21824,
+   "transitions": 24659,
+   "collection_seconds": 391.1,
+   "decisions_per_hour_while_playing": 200867,
+   "games_per_hour_while_playing": 184.1,
+   "samples_kept": 1097,
+   "evaluator": {
+    "evaluations": 1133105,
+    "serving_rounds": 291721,
+    "network_passes": 291721,
+    "forward_seconds": 321.7,
+    "idle_seconds": 49.1,
+    "positions_per_round": 3.88,
+    "busy_share": 0.875
+   },
+   "peak_memory_bytes": 3564833696,
+   "real_load_cores": {
+    "mean_window": 8.48,
+    "median_window": 8.91,
+    "highest_window": 10.18,
+    "other_work_median": 3.33
+   },
+   "windows": [
+    {
+     "seconds_from_start": 5,
+     "batch_cores": 10.18,
+     "other_cores": 2.88
+    },
+    {
+     "seconds_from_start": 35,
+     "batch_cores": 9.76,
+     "other_cores": 3.05
+    },
+    {
+     "seconds_from_start": 65,
+     "batch_cores": 8.85,
+     "other_cores": 3.35
+    },
+    {
+     "seconds_from_start": 96,
+     "batch_cores": 8.91,
+     "other_cores": 3.46
+    },
+    {
+     "seconds_from_start": 126,
+     "batch_cores": 9.6,
+     "other_cores": 2.9
+    },
+    {
+     "seconds_from_start": 156,
+     "batch_cores": 9.34,
+     "other_cores": 2.07
+    },
+    {
+     "seconds_from_start": 187,
+     "batch_cores": 9.18,
+     "other_cores": 2.99
+    },
+    {
+     "seconds_from_start": 217,
+     "batch_cores": 8.32,
+     "other_cores": 4.66
+    },
+    {
+     "seconds_from_start": 247,
+     "batch_cores": 8.92,
+     "other_cores": 3.89
+    },
+    {
+     "seconds_from_start": 277,
+     "batch_cores": 8.56,
+     "other_cores": 3.31
+    },
+    {
+     "seconds_from_start": 308,
+     "batch_cores": 8.18,
+     "other_cores": 3.46
+    },
+    {
+     "seconds_from_start": 338,
+     "batch_cores": 1.98,
+     "other_cores": 4.38
+    }
+   ]
+  }
+ ],
+ "capacity_with_7_cores_for_games": {
+  "note": "section 9.3's formula with the 14 November record's measured inputs and 7 cores for games instead of 10",
+  "output": [
+   "{",
+   " \"64\": {",
+   "  \"engine_evaluations_per_s\": 2917,",
+   "  \"engine_limit_decisions_per_h\": 210000,",
+   "  \"check_10_core_limit\": 300000,",
+   "  \"check_scaled\": 210000",
+   " },",
+   " \"256\": {",
+   "  \"engine_evaluations_per_s\": 2811,",
+   "  \"engine_limit_decisions_per_h\": 51220,",
+   "  \"check_10_core_limit\": 73164,",
+   "  \"check_scaled\": 51215",
+   " },",
+   " \"800\": {",
+   "  \"engine_evaluations_per_s\": 2724,",
+   "  \"engine_limit_decisions_per_h\": 16020,",
+   "  \"check_10_core_limit\": 22887,",
+   "  \"check_scaled\": 16021",
+   " }",
+   "}",
+   "   64x2   64:  210,000 limited by cores    (engine 210,000, network 708,134, network/engine 3.372) days per 1e8: 19.8",
+   "   64x2  256:   51,215 limited by cores    (engine 51,215, network 179,519, network/engine 3.505) days per 1e8: 81.4",
+   "   64x2  800:   16,021 limited by cores    (engine 16,021, network 52,975, network/engine 3.307) days per 1e8: 260.1",
+   "  128x4   64:  210,000 limited by cores    (engine 210,000, network 574,157, network/engine 2.734) days per 1e8: 19.8",
+   "  128x4  256:   51,215 limited by cores    (engine 51,215, network 145,555, network/engine 2.842) days per 1e8: 81.4",
+   "  128x4  800:   16,021 limited by cores    (engine 16,021, network 43,106, network/engine 2.691) days per 1e8: 260.1",
+   "  256x8   64:  210,000 limited by cores    (engine 210,000, network 324,238, network/engine 1.544) days per 1e8: 19.8",
+   "  256x8  256:   51,215 limited by cores    (engine 51,215, network 82,198, network/engine 1.605) days per 1e8: 81.4",
+   "  256x8  800:   16,021 limited by cores    (engine 16,021, network 24,693, network/engine 1.541) days per 1e8: 260.1",
+   " 384x12   64:  188,359 limited by network  (engine 210,000, network 188,359, network/engine 0.897) days per 1e8: 22.1",
+   " 384x12  256:   47,751 limited by network  (engine 51,215, network 47,751, network/engine 0.932) days per 1e8: 87.3",
+   " 384x12  800:   14,484 limited by network  (engine 16,021, network 14,484, network/engine 0.904) days per 1e8: 287.7",
+   " 512x16   64:  118,138 limited by network  (engine 210,000, network 118,138, network/engine 0.563) days per 1e8: 35.3",
+   " 512x16  256:   29,949 limited by network  (engine 51,215, network 29,949, network/engine 0.585) days per 1e8: 139.1",
+   " 512x16  800:    9,197 limited by network  (engine 16,021, network 9,197, network/engine 0.574) days per 1e8: 453.0"
+  ]
+ }
+}

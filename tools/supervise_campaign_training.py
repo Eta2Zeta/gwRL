@@ -13,7 +13,7 @@ Example (run from the repository root)::
       --control-dir studies/campaign/runs/example-control \
       --run-dir studies/campaign/runs/example --seconds 35000 -- \
       --calendar-rounds 3 --complete-episodes --batches 1000 \
-      --parallel-envs 6 --threads 4 --cpu-budget 11
+      --parallel-envs 4 --threads 3 --cpu-budget 8
 
 Repeat exactly that command to resume, including the original --seconds value.
 The runner validates source/binary/checkpoint compatibility. An exhausted episode
@@ -64,6 +64,9 @@ SCHEMA = "campaign-training-supervisor-v1"
 PROFILES = ROOT / "studies/campaign/profiles"
 PROFILE_SCHEMA = "campaign-machine-profile-v1"
 MEMORY_MARGIN_BYTES = 1_000_000_000
+# The owner's allowance: 9 cores, since the Mac's M4 Max has 10 performance
+# cores and one stays free for everything else. --all-cores passes it.
+CORE_ALLOWANCE = 9
 # Source/configuration errors normally exit 1 and must stop for inspection.
 if sys.platform == "win32":
     # Access violation, stack overflow, heap corruption and fail-fast exits.
@@ -186,12 +189,12 @@ def process_memory_charge(pid: int, resident_bytes: int) -> int:
 @dataclass(frozen=True)
 class SupervisorConfig:
     seconds: float
-    cpu_budget: int = 12
+    cpu_budget: int = CORE_ALLOWANCE
     memory_bytes: int = 30_000_000_000
     poll_seconds: float = 1.0
     shutdown_seconds: float = 60.0
     max_restarts: int = 2
-    # The owner's go-ahead to pass the usual 12 cores, its poll sharing the last one.
+    # The owner's go-ahead to pass the core allowance, its poll sharing the last core.
     all_cores: bool = False
 
     def __post_init__(self):
@@ -201,7 +204,7 @@ class SupervisorConfig:
                 raise ValueError(f"{name} must be finite and positive")
         if self.poll_seconds > 5:
             raise ValueError("Polling interval must be at most five seconds")
-        limit = (os.cpu_count() or 1) if self.all_cores else 12
+        limit = (os.cpu_count() or 1) if self.all_cores else CORE_ALLOWANCE
         if type(self.cpu_budget) is not int or not 2 <= self.cpu_budget <= limit:
             raise ValueError(f"CPU allowance must reserve a coordinator within the authorized {limit} cores")
         if type(self.memory_bytes) is not int or not MEMORY_MARGIN_BYTES < self.memory_bytes <= 30_000_000_000:
@@ -653,7 +656,7 @@ def main(argv=None) -> int:
                         help="Frozen runtime checkout used by the child; fixed across resumes")
     parser.add_argument("--seconds", type=float, required=True, help="Original fixed active-wall allowance; never reset on resume")
     parser.add_argument("--profile", help="Machine profile in studies/campaign/profiles, such as mac")
-    parser.add_argument("--cpu-budget", type=int, help="Default 12, or the profile's")
+    parser.add_argument("--cpu-budget", type=int, help=f"Default {CORE_ALLOWANCE}, or the profile's")
     parser.add_argument("--memory-bytes", type=int, help="Default 30,000,000,000, or the profile's")
     parser.add_argument("--max-restarts", type=int, default=2)
     parser.add_argument("--all-cores", action="store_true", help="The owner allowed every core for this run")
@@ -676,7 +679,7 @@ def main(argv=None) -> int:
         if not Path(python).is_file():
             raise SystemExit(f"Profile {args.profile!r} needs its Python at {python}")
     config = SupervisorConfig(seconds=args.seconds,
-                              cpu_budget=args.cpu_budget if args.cpu_budget is not None else limits.get("cpu_budget", 12),
+                              cpu_budget=args.cpu_budget if args.cpu_budget is not None else limits.get("cpu_budget", CORE_ALLOWANCE),
                               memory_bytes=args.memory_bytes if args.memory_bytes is not None
                               else limits.get("memory_bytes", 30_000_000_000),
                               all_cores=args.all_cores,

@@ -103,7 +103,9 @@ costs only that game, recorded with its seed in `failed_games`.
 
 `--cpu-budget N` checks the run's busy cores against the allowance: one per game
 process plus the coordinator, or tensor threads plus parallel search workers
-plus one coordinator without worker processes.
+plus one coordinator without worker processes. It counts and does not measure:
+a game process of four games keeps more than one core busy
+([Training on the Mac](#training-on-the-mac)).
 
 Native campaign calls release Python's interpreter lock while executing pure C++
 work. Each Python-facing environment protects its own operations with an
@@ -116,33 +118,43 @@ on a shared Python adapter; search workers own independent adapters.
 
 `tools/supervise_campaign_training.py` runs training under a fixed active-time
 budget, with bounded retries and graceful memory and deadline stops. It reserves
-its own core within the twelve-core allowance; `--all-cores` uses every core
-when the owner allows it.
+its own core within the owner's allowance of nine cores (`CORE_ALLOWANCE`): the
+Mac has ten performance cores, and one stays free for everything else.
+`--all-cores` uses every core when the owner allows it.
 
 ### Training on the Mac
 
 `--profile mac` gives the supervisor the setup measured on this Mac, kept in
 [profiles/mac.json](profiles/mac.json): PyTorch 2.14 from `tmp/gpu-mps-env`
-(built from `requirements-gpu-mps.txt`), eight game processes of four games
-each, whose positions one coordinating process evaluates on the CPU, 11 of the
-12 allowed cores for training and one for the supervisor, the 30 GB memory
-limit, the faster memory allocator and keeping the Mac awake. On 2 November 2026
-that played 124 eleven-round games per hour with learning, twice the same layout
-evaluating on the GPU (58.7): the zone network is so cheap per position that the
-GPU's cost per call outweighs its speed. Flags after `--` win over the profile,
-and the learning settings stay there:
+(built from `requirements-gpu-mps.txt`), six game processes of four games
+each, whose positions one coordinating process evaluates on the CPU, the 30 GB
+memory limit, the faster memory allocator and keeping the Mac awake. The
+supervisor counts one core per game process, one for the coordinator and one
+for itself, but a process of four games keeps 1.2 to 1.5 cores busy. So the
+layout was chosen by the load it puts on the Mac: on 15 November 2026 these six
+processes kept about 9 cores busy, the allowance, and played about 192,000
+decisions an hour while playing; seven, which also fit the count, kept about 10
+busy ([record](../../docs/archive/records/nine_core_layouts_2026_11_15.md)).
+Evaluating on the GPU instead played half as many games an hour on 2 November
+2026, with the eight game processes of the 12-core allowance then (58.7
+against 124): the zone network is so cheap per position that the GPU's cost per
+call outweighs its speed. Flags after `--` win over the profile, and the
+learning settings stay there:
 
 ```sh
 ./.venv/bin/python tools/supervise_campaign_training.py --profile mac \
   --control-dir studies/campaign/runs/NAME-control --run-dir studies/campaign/runs/NAME \
   --seconds 28800 -- --calendar-rounds 11 --complete-episodes --batches 1000 \
   --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 \
-  --batch-size 32 --epochs 700 --replay-capacity 8000 --sample-fraction 0.05 \
+  --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 \
   --transitions-per-batch 20000
 ```
 
-These learning settings are the speed test's, not tuned values. Repeat the same
-command to resume. Another machine gets its own file beside `mac.json`.
+These learning settings are the speed test's, not tuned values. A batch is the
+24 games the profile plays at once; with 525 steps an update draws each kept
+sample as often as the 700 steps did with the 32 games of the eight game
+processes before 15 November 2026. Repeat the same command to resume. Another
+machine gets its own file beside `mac.json`.
 
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.
@@ -166,8 +178,7 @@ built from `requirements-gpu-cuda.txt`, PyTorch 2.14 for CUDA 12.6. Build the ex
 `.gitattributes` keeps every text file's line endings LF, which the engine's
 data fingerprints need. That checkout syncs through OneDrive, so the environment
 and the run directories live outside it. Use the Mac's command with
-`--profile windows` and `--epochs 525`, which reads each kept sample as often
-with 24 games per batch as 700 epochs do with 32.
+`--profile windows`: both machines play 24 games a batch.
 
 The supervisor holds the trainer and every process it starts in a Windows job
 object. A safe stop is a Ctrl+Break to the trainer's console process group,

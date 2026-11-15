@@ -3,16 +3,16 @@
   "machine": "Apple M4 Max: 14 CPU cores (10 performance, 4 efficiency), 36 GB memory, 32-core GPU",
   "python": "tmp/gpu-mps-env/bin/python",
   "supervisor": {
-    "cpu_budget": 12,
+    "cpu_budget": 9,
     "memory_bytes": 30000000000
   },
   "training": {
-    "episode_workers": 8,
+    "episode_workers": 6,
     "games_per_process": 4,
-    "parallel_envs": 32,
+    "parallel_envs": 24,
     "neural_device": "cpu",
     "threads": 1,
-    "cpu_budget": 11
+    "cpu_budget": 8
   },
   "unset_environment": ["MallocNanoZone"],
   "keep_awake": true,
@@ -20,16 +20,20 @@
     "cpu_budget": 9
   },
   "measured": [
-    "2 November 2026, zone network, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, fresh networks: 124 games per hour with learning at these settings.",
+    "15 November 2026, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, one matched-recipe batch each: these 6 game processes of 4 games played about 192,000 decisions per hour while playing (173 games per hour) and kept about 9 cores busy (median half-minute window 8.9, mean 8.2), the coordinator busy 90% of the time.",
+    "The same day 7 processes, which also fit the supervisor's count of 9 cores, kept about 10 busy (median window 9.9) and played about 229,000; 5 processes kept about 9 busy (8.9) and played about 201,000, a difference from 6 within the spread of single batches (docs/archive/records/nine_core_layouts_2026_11_15.md).",
+    "Until 15 November 2026 this profile ran 8 game processes of 4 games, with 11 cores for training under a 12-core allowance. The measurements below are of that layout.",
+    "2 November 2026, zone network, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, fresh networks: 124 games per hour with learning.",
     "The same layout evaluating on the GPU (neural_device mps) played 58.7 games per hour, and ten processes each evaluating their own games 84.",
     "The coordinator that evaluates every game's positions was then busy 89% of the time, so it limited this layout.",
-    "14 November 2026, the same settings, with the coordinator answering each round in one network pass: about 252,000 decisions per hour while playing under 2.3 cores of other work, the coordinator busy 85% of the time and the training using 9.9 cores."
+    "14 November 2026, the same layout, with the coordinator answering each round in one network pass: about 252,000 decisions per hour while playing under 2.3 cores of other work, the coordinator busy 85% of the time and the training using 9.9 cores."
   ],
   "notes": [
     "python: PyTorch 2.14 from requirements-gpu-mps.txt, which the GPU needs for long runs; the numbers above were measured with it.",
     "unset_environment: agent shells set MallocNanoZone=0, which slows the allocator and costs 26 to 29% more CPU.",
     "keep_awake: caffeinate keeps the Mac awake while the supervisor runs.",
     "tests: a test's configuration uses at most 9 cores here (tests/machine.py).",
-    "The 12 cores and 30 GB are the owner's allowance; the supervisor's --all-cores uses all 14 cores when the owner allows it."
+    "The owner's allowance is 9 cores and 30 GB: the M4 Max has 10 performance cores, and one stays free for everything else. The supervisor counts one core per game process, one for the coordinator and one for itself, but a process of four games keeps 1.2 to 1.5 cores busy, so the layout is set by the measured load, not by that count. The supervisor's --all-cores uses all 14 cores when the owner allows it.",
+    "24 games a batch instead of 32: with the Mac command's --epochs 525 instead of 700, each kept sample is drawn as often as before."
   ]
 }

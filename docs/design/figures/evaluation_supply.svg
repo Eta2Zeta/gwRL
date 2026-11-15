@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="528" viewBox="0 0 960 528" role="img" aria-labelledby="title desc">
   <title id="title">What the cores can feed and what the network can answer, by network size, on the Mac</title>
-  <desc id="desc">A line chart of evaluations per second on a logarithmic scale, worked out from the 14 November measurements, for networks of 64×2, 128×4, 256×8, 384×12 and 512×16. A flat line at about 4,200 a second shows the evaluations the engine work of the Mac's 10 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840, 7,970, 4,500, 2,620 and 1,640 a second; on one CPU core, in passes of 16, 5,850, 2,210, 577, 267 and 125. Self-play gets the lower of the cores' rate and the faster network's: the cores' rate up to 256×8, where the GPU line crosses it, and the GPU's rate beyond.</desc>
+  <desc id="desc">A line chart of evaluations per second on a logarithmic scale, worked out from the 14 November measurements, for networks of 64×2, 128×4, 256×8, 384×12 and 512×16. A flat line at about 2,900 a second shows the evaluations the engine work of the 7 cores for games of the 9-core allowance can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840, 7,970, 4,500, 2,620 and 1,640 a second; on one CPU core, in passes of 16, 5,850, 2,210, 577, 267 and 125. Self-play gets the lower of the cores' rate and the faster network's: the cores' rate up to 256×8, the GPU line crossing it just before 384×12, and the GPU's rate from 384×12 on.</desc>
   <defs>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -18,7 +18,7 @@
   <text class="sub" x="24" y="58">Evaluations per second by network size, worked out from the 14 November measurements; logarithmic scale. Self-play gets the lower rate.</text>
   <line x1="24" y1="82" x2="46" y2="82" stroke="#2a78d6" stroke-width="2" stroke-linecap="round"/>
   <circle cx="35" cy="82" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <text class="label" x="56" y="86">the 10 cores for games: evaluations their engine work can feed</text>
+  <text class="label" x="56" y="86">the 7 cores for games: evaluations their engine work can feed</text>
   <line x1="500" y1="82" x2="522" y2="82" stroke="#eb6834" stroke-width="2" stroke-linecap="round"/>
   <circle cx="511" cy="82" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <text class="label" x="532" y="86">the network on the GPU, passes of 64 positions</text>
@@ -55,7 +55,7 @@
   <text class="body" x="690" y="472" text-anchor="middle">512×16</text>
   <text class="small" x="690" y="489" text-anchor="middle">1.3 billion</text>
   <text class="label" x="408.0" y="514" text-anchor="middle">network (width × message layers), with its arithmetic per position in operations</text>
-  <path d="M 150.0 238.8 L 285.0 238.8 L 420.0 238.8 L 439.3 238.8 L 555.0 265.2 L 690.0 291.6" fill="none" stroke="#1f2328" stroke-opacity="0.13" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 150.0 259.0 L 285.0 259.0 L 420.0 259.0 L 527.7 259.0 L 555.0 265.2 L 690.0 291.6" fill="none" stroke="#1f2328" stroke-opacity="0.13" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="150.0,219.6 285.0,274.6 420.0,350.8 555.0,394.4 690.0,437.4" fill="none" stroke="#1baf7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="150.0" cy="219.6" r="4" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
   <circle cx="285.0" cy="274.6" r="4" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
@@ -68,15 +68,15 @@
   <circle cx="420.0" cy="234.4" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <circle cx="555.0" cy="265.2" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <circle cx="690.0" cy="291.6" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
-  <polyline points="150.0,238.8 285.0,238.8 420.0,238.8 555.0,238.8 690.0,238.8" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="150.0" cy="238.8" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <circle cx="285.0" cy="238.8" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <circle cx="420.0" cy="238.8" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <circle cx="555.0" cy="238.8" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <circle cx="690.0" cy="238.8" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <text class="end" x="704" y="242.8">cores: about 4,200</text>
+  <polyline points="150.0,259.0 285.0,259.0 420.0,259.0 555.0,259.0 690.0,259.0" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="150.0" cy="259.0" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="285.0" cy="259.0" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="420.0" cy="259.0" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="555.0" cy="259.0" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="690.0" cy="259.0" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="end" x="704" y="263.0">cores: about 2,900</text>
   <text class="end" x="704" y="295.6">GPU: 1,640</text>
   <text class="end" x="704" y="441.4">one CPU core: 125</text>
-  <text class="label" x="345.0" y="264.8" text-anchor="middle">the cores limit</text>
+  <text class="label" x="345.0" y="246.0" text-anchor="middle">the cores limit</text>
   <text class="label" x="622.5" y="302.4" text-anchor="middle">the GPU limits</text>
 </svg>

@@ -27,6 +27,7 @@ import traceback
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+from tools.supervise_campaign_training import CORE_ALLOWANCE  # noqa: E402
 SCHEMA = "campaign-neural-device-benchmark-v1"
 FIXTURES = ("opening", "first_chance", "japan_combat_movement", "round2_japan_combat_movement")
 
@@ -43,8 +44,8 @@ class Config:
     warm_repeats: int = 3
     warmups: int = 1
     threads: int = 4
-    # The 12-core allowance, or every core of a smaller machine.
-    cpu_budget: int = min(12, os.cpu_count() or 1)
+    # The owner's core allowance, or every core of a smaller machine.
+    cpu_budget: int = min(CORE_ALLOWANCE, os.cpu_count() or 1)
     memory_bytes: int = 24_000_000_000
     seconds: float = 120.0
     simulations: int = 16
@@ -108,8 +109,8 @@ class Config:
         # Game processes run tensors on their search threads: one busy core per
         # process, plus this coordinator and its supervisor.
         cores = self.processes + 2 if self.processes > 1 else self.threads + roots + 3
-        if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(12, os.cpu_count() or 1) or cores > self.cpu_budget:
-            raise ValueError("Tensor threads, search workers and coordinators must fit the 12-core allowance")
+        if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(CORE_ALLOWANCE, os.cpu_count() or 1) or cores > self.cpu_budget:
+            raise ValueError(f"Tensor threads, search workers and coordinators must fit the {CORE_ALLOWANCE}-core allowance")
         if type(self.memory_bytes) is not int or not 2_000_000_000 < self.memory_bytes <= 30_000_000_000:
             raise ValueError("Aggregate memory must leave a CPU/monitor reserve and fit 30 GB")
         for name in ("seconds", "value_scale", "atol", "rtol"):

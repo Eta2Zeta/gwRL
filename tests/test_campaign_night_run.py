@@ -16,7 +16,7 @@ from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet,
 from studies.campaign.run import RunConfig, _learner, main
 from studies.shared.multiplayer_mcts import PLAYERS
 from tools.record_campaign_games import game_arguments
-from tools.supervise_campaign_training import SupervisorConfig, validate_training_arguments
+from tools.supervise_campaign_training import CORE_ALLOWANCE, SupervisorConfig, validate_training_arguments
 
 SMALL = ["--calendar-rounds", "1", "--batches", "1", "--transitions-per-batch", "4", "--parallel-envs", "1",
          "--simulations", "2", "--max-depth", "2", "--hidden-dim", "16"]
@@ -143,7 +143,7 @@ class AllCoresTests(unittest.TestCase):
 
     def test_all_cores_needs_the_owners_go_ahead(self):
         with patch("os.cpu_count", return_value=14):
-            with self.assertRaisesRegex(ValueError, "12 cores"):
+            with self.assertRaisesRegex(ValueError, f"{CORE_ALLOWANCE} cores"):
                 SupervisorConfig(seconds=2, cpu_budget=14)
             config = SupervisorConfig(seconds=2, cpu_budget=14, all_cores=True)
             with self.assertRaisesRegex(ValueError, "14 cores"):

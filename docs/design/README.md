@@ -1093,12 +1093,15 @@ the grouping of moves into the stages of section 6.8.
 ### 7.1 A batch of games
 
 Training alternates between playing and learning. A *batch* of games is played
-with all three networks frozen: 32 games at once, 8 game processes of 4 games
+with all three networks frozen: 24 games at once, 6 game processes of 4 games
 each ([section 9.2](#92-running-training-on-the-mac)). At every decision the
 alliance to move searches (section 4) and plays the move drawn from the shares.
-The numbers in sections 7 and 8 are those of the Mac training command in the
+The settings in sections 7 and 8 are those of the Mac training command in the
 [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
-which calls them the speed test's settings, not tuned values.
+which calls them the speed test's settings, not tuned values. The worked
+examples come from the 5 November run, when a batch was 32 games, in 8 game
+processes, and an update 700 training steps. Today an update is 525 steps,
+which draws each kept sample as often from batches of 24 games (section 8.7).
 
 **Which decisions are kept.** A random 5% of each game's decisions, because a
 game's thousand-odd positions are close to one another. A decision with only one
@@ -1314,15 +1317,16 @@ not foresight.
 **Where samples wait: the replay buffer.** A sample is made in a game process at
 the moment of its decision, and its final scores are added when its game ends.
 The game processes hand their samples to the main training process, which adds
-them to its *replay buffer* once all 32 games of the batch have ended. The buffer
+them to its *replay buffer* once all the games of the batch have ended. The buffer
 is a list of the latest samples, at most 8,000, from which the oldest leave
 first. On 5 November one batch kept 1,611 samples from 33,062 decisions, so a
 full buffer holds about the last five batches
 ([record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
 
 **An update** follows each batch. It runs in the main training process, on the
-CPU, while the game processes wait, and it is 700 *training steps* in a row. Each
-step does four things (`CampaignLearner.update` in `studies/campaign/learning.py`):
+CPU, while the game processes wait, and it is many *training steps* in a row, 700
+in the 5 November run and 525 today. Each step does four things
+(`CampaignLearner.update` in `studies/campaign/learning.py`):
 
 1. **Draw.** It picks 32 different samples at random from the whole buffer, so
    one step mixes decisions of many games and of all three alliances. Nothing is
@@ -1336,16 +1340,17 @@ step does four things (`CampaignLearner.update` in `studies/campaign/learning.py
 4. **Step.** Each network takes one Adam step (section 8.3) to lower the sum of
    its two losses; all three step together.
 
-The next step draws a new 32. After the 700th, the networks are saved as a *model
-export*, and the next batch of games plays with them. The 32 games take about 15
-minutes to play, and the 700 steps under a minute: 851 and 49 seconds on
-5 November, 881 and 46 seconds in the 2 November speed test, also 64×2.
+The next step draws a new 32. After the last, the networks are saved as a *model
+export*, and the next batch of games plays with them. Playing takes minutes and
+the steps under a minute: on 5 November the 32 games took 851 seconds and the
+700 steps 49, and on 15 November a batch of today's 24 games played in 499
+seconds, also 64×2.
 
-![Where a training step's 32 samples come from. 1: a batch of 32 games plays at once, 8 game processes of 4 games each, with the networks frozen; at each decision a random draw keeps it as a sample with chance 5%, and when a game ends its final scores are added to its samples; on 5 November one batch kept 1,611 samples from 33,062 decisions. 2: when all of the batch's games have ended, their samples join the replay buffer in the main training process, the latest 8,000 samples, about five batches, drawn as five bars from the oldest batch, whose samples leave first, to the newest; purple dots spread over all five bars mark one step's 32 samples, drawn at random. 3: one training step, 700 per update, each with a new draw: draw 32 different samples at random from the whole buffer; each of the three networks reads all 32 in one call; it compares its values with the final scores on all 32, and its move probabilities with the shares on its own alliance's samples; each network takes one Adam step. 4: after the 700th step the networks are saved for the next batch. With 64×2 networks on the CPU, a batch's 32 games take about 15 minutes to play and its 700 steps under a minute; no game plays during the steps.](figures/training_update.svg)
+![Where a training step's 32 samples come from. 1: a batch of 24 games plays at once, 6 game processes of 4 games each, with the networks frozen; at each decision a random draw keeps it as a sample with chance 5%, and when a game ends its final scores are added to its samples; on 5 November one batch of 32 games kept 1,611 samples from 33,062 decisions. 2: when all of the batch's games have ended, their samples join the replay buffer in the main training process, the latest 8,000 samples, about five batches, drawn as five bars from the oldest batch, whose samples leave first, to the newest; purple dots spread over all five bars mark one step's 32 samples, drawn at random. 3: one training step, 525 per update, each with a new draw: draw 32 different samples at random from the whole buffer; each of the three networks reads all 32 in one call; it compares its values with the final scores on all 32, and its move probabilities with the shares on its own alliance's samples; each network takes one Adam step. 4: after the last step the networks are saved for the next batch. With 64×2 networks on the CPU, a batch's 24 games take about 8 minutes to play and its 525 steps under a minute; no game plays during the steps.](figures/training_update.svg)
 
-In the training command the 32 is `--batch-size` and the 700 is `--epochs`. Both
-names mislead here: a step's 32 samples are not the batch of games, and the 700
-steps are not passes through the buffer.
+In the training command the 32 is `--batch-size` and the number of steps is
+`--epochs`. Both names mislead here: a step's 32 samples are not the batch of
+games, and the steps are not passes through the buffer.
 
 ### 8.5 Which numbers a step moves
 
@@ -1408,8 +1413,8 @@ learned Atari games, took mini-batches of 32 experiences drawn at random from a
 replay memory; AlphaGo trained its value network on one position from each
 self-play game; AlphaGo Zero took batches of 2,048 positions drawn at random from
 its latest 500,000 games (Sutton and Barto, *Reinforcement Learning: An
-Introduction*, 2nd edition, sections 16.5, 16.6.1 and 16.6.2). Whether 32 and 700
-suit this game has not been tested.
+Introduction*, 2nd edition, sections 16.5, 16.6.1 and 16.6.2). Whether 32 samples
+a step and these numbers of steps suit this game has not been tested.
 
 ### 8.7 How often a sample is drawn
 
@@ -1429,6 +1434,11 @@ kept about 2,750 samples
 A run's first samples are drawn more often, because the buffer is not yet full: in
 the first update of the 5 November run, its 1,611 samples shared all 22,400 draws,
 14 each in that one update.
+
+Today's 525 steps keep this for batches of 24 games: they draw 525 × 32 = 16,800
+times, 700 for each game of a batch as before. A batch of 24 games kept 1,354
+samples on 15 November, so each would be drawn about 12 times; those games were
+longer than on 5 November.
 
 ## 9. The whole loop, and running it
 
@@ -1456,12 +1466,19 @@ hardware is unproven: no run has yet shown robust playing strength.
 
 ### 9.2 Running training on the Mac
 
-**Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 8 game
+**Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 6 game
 processes of 4 games each. One coordinating process evaluates all their positions
 together, on the CPU: for this small network the GPU's cost per call outweighs its
-speed. Training uses 11 of the 12 allowed cores and stays within the 30 GB memory
-limit. `tools/supervise_campaign_training.py` handles the time budget, restarts and
-memory stops. How to start, stop and resume a run is in the
+speed. Training stays within the owner's allowance of 9 cores, the Mac's 10
+performance cores less one for everything else, and 30 GB of memory.
+`tools/supervise_campaign_training.py` handles the time budget, restarts and
+memory stops. It counts one core for each game process, one for the coordinator
+and one for itself, but a game process keeps 1.2 to 1.5 cores busy, because its
+game threads can compute at once (below). So the layout was chosen by the load it
+puts on the Mac: 6 processes kept about 9 cores busy, and 7, which also fit the
+count, about 10
+([record](../archive/records/nine_core_layouts_2026_11_15.md)). How to start,
+stop and resume a run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
 **The coordinator.** Game threads do not run the network themselves. A game thread
@@ -1480,11 +1497,11 @@ whatever its size
 Most of that fixed cost is Python's and PyTorch's own work for each of the pass's
 hundreds of operations. Of the arithmetic, the GELU curve (section 6.2) takes the
 most, mostly in the border messages (section 6.6). The coordinator is busy about
-85% of the time, and the game processes and the coordinator together use about
-9.9 of the 11 cores. Inferred: the training now runs close to both limits, so
-further speed needs less engine work per move, which frees the most CPU, and a
-coordinator that keeps up with it
-([record](../archive/records/coordinator_one_pass_2026_11_14.md#what-this-does-and-does-not-show)).
+90% of the time, so it limits the layout: a round costs about the same whatever
+it holds, and with 24 games in flight a round holds about 4.9 positions.
+Inferred: further speed needs a coordinator that answers more positions a round
+for the same cost, and less engine work per move, which frees the most CPU
+([record](../archive/records/nine_core_layouts_2026_11_15.md#what-this-does-and-does-not-show)).
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
 all the cores work at the same time. A game thread works in the engine and the
@@ -1493,12 +1510,11 @@ network's input, until a position needs the network. Then it sends the
 coordinator a request and waits for the reply. The engine releases Python's lock
 while it works, so the four game threads of a process can compute at once, and a
 thread that waits leaves its core to the others. That is why each process plays
-four games: in the 14 November batches a game thread computed less than a third
-of the time, yet the game threads and the coordinator kept about 9.9 of the 11
-cores busy. The coordinator, on a core of its own, answers round after
-round.
+four games: in a 15 November batch a game thread computed about a third of the
+time, yet the 24 game threads and the coordinator kept about 9 cores busy. The
+coordinator, on a core of its own, answers round after round.
 
-![A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, others work. Seven more game processes do the same on their own cores. The coordinator, on one core, runs round after round: one network pass on the CPU for all waiting requests. The GPU is idle.](figures/self_play_timeline.svg)
+![A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, others work. Five more game processes do the same. The coordinator, on one core, runs round after round: one network pass on the CPU for all waiting requests. The GPU is idle.](figures/self_play_timeline.svg)
 
 **Why the network runs on the CPU.** A pass on the Mac's GPU has a larger fixed
 cost than a pass on one CPU core. A pass of the 64×2 network over one position
@@ -1579,6 +1595,14 @@ about 2.3 cores, decisions per hour while playing rose by 13%, from about 222,50
 to 252,200, and the training used 9.9 cores instead of 8.9
 ([record](../archive/records/coordinator_one_pass_2026_11_14.md#matched-training-batches)).
 
+On 15 November the owner lowered the allowance from 12 cores to 9, and the
+profile went from 8 game processes to 6, which keep about 9 cores busy. In one
+batch each, 7 processes played about 229,000 decisions an hour while playing,
+6 about 192,000 and 5 about 201,000; one batch each cannot separate 6 from 5.
+Against the 252,200 of 8 processes the change costs about a quarter of the
+decisions an hour, on slightly different code and not in matched batches
+([record](../archive/records/nine_core_layouts_2026_11_15.md)).
+
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
 `failed-positions/` folder. Two random-play checks run before long runs: the
@@ -1638,27 +1662,27 @@ is asked about. A search asks about roughly one position per simulation
 (section 4.2), and decisions with a single legal move are not searched, so a
 decision uses about 50 evaluations at 64 simulations, 197 at 256 and 612 at 800.
 Each evaluation needs engine work from a core for games, about 2.4 ms in training,
-and a share of a network pass. So the Mac's 10 cores for games can feed the
-network about 4,200 evaluations a second, whatever its size, and the network can
-answer as many positions a second as the table above gives for its size and
-device. Self-play runs at the lower of the two rates:
+and a share of a network pass. So the 7 cores for games that the 9-core allowance
+leaves can feed the network about 2,900 evaluations a second, whatever its size,
+and the network can answer as many positions a second as the table above gives
+for its size and device. Self-play runs at the lower of the two rates:
 
 $$\text{decisions per hour} = \frac{3600}{\text{evaluations per decision}} \times \min\left(\frac{\text{cores for games}}{\text{core seconds per evaluation}}, \text{positions the network evaluates per second}\right)$$
 
-![A line chart on a logarithmic scale of evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 4,200 a second is what the engine work of the 10 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840 a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line just after 256×8. The network on one CPU core, in passes of 16, answers 5,850 at 64×2 falling to 125 at 512×16, below the flat line from 128×4 on. Self-play gets the lower rate: the cores' up to 256×8, the GPU's beyond.](figures/evaluation_supply.svg)
+![A line chart on a logarithmic scale of evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 2,900 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840 a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line just before 384×12. The network on one CPU core, in passes of 16, answers 5,850 at 64×2 falling to 125 at 512×16, below the flat line from 128×4 on. Self-play gets the lower rate: the cores' up to 256×8, the GPU's beyond.](figures/evaluation_supply.svg)
 
 **How decisions per hour changes with the network and the search.** The
 network's size changes only the second rate, and the search's budget divides
-both. Worked out for the Mac, with 10 cores for games, one for the coordinator,
-the network on whichever is faster of one core, in passes of 16 positions, and the
-GPU, in passes of 64, and 30 GB, decisions per hour are:
+both. Worked out for the Mac, with 7 cores for games, one for the coordinator and
+one for the supervisor, the network on whichever is faster of one core, in passes
+of 16 positions, and the GPU, in passes of 64, and 30 GB, decisions per hour are:
 
 | Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
 | --- | ---: | ---: | ---: | --- |
-| 64×2 | 300,000 | 73,000 | 23,000 | the cores |
-| 128×4 | 300,000 | 73,000 | 23,000 | the cores |
-| 256×8 | 300,000 | 73,000 | 23,000 | the cores, the GPU nearly |
-| 384×12 | 188,000 | 48,000 | 14,500 | the GPU |
+| 64×2 | 210,000 | 51,000 | 16,000 | the cores |
+| 128×4 | 210,000 | 51,000 | 16,000 | the cores |
+| 256×8 | 210,000 | 51,000 | 16,000 | the cores |
+| 384×12 | 188,000 | 48,000 | 14,500 | the GPU, the cores nearly |
 | 512×16 | 118,000 | 30,000 | 9,200 | the GPU |
 
 Down a column, decisions per hour stays the same while the cores limit. Up to
@@ -1667,17 +1691,18 @@ pace and the larger network costs nothing. The night of 2 November agrees: a
 256×8 network on the GPU played about as many decisions an hour as the 64×2
 network on the CPU (section 9.2). Beyond 256×8 the GPU limits, and decisions per
 hour falls, but much less than the arithmetic grows: 512×16 has about 390 times
-the arithmetic of 64×2 and plays about 40% as many decisions an hour, because the
-GPU's rate falls only six times over that range; a pass of a small network costs
-it mostly fixed overhead. With the network on one CPU core, as in today's profile,
-the network is close to limiting already at 64×2 (section 9.2) and would limit
-from 128×4 on, so every larger network needs the GPU.
+the arithmetic of 64×2 and plays a little more than half as many decisions an
+hour, because the GPU's rate falls only six times over that range; a pass of a
+small network costs it mostly fixed overhead. With the network on one CPU core, as
+in today's profile, the coordinator already limits at 64×2 (section 9.2), and the
+network's arithmetic alone would limit from 128×4 on, so every larger network
+needs the GPU.
 
 Along a row, decisions per hour falls in proportion to the simulations, whatever
 limits: four times the simulations, about a quarter of the decisions. So which
 part limits depends on the network, not on the search. A game has about 1,000
 decisions (the 14 November batches averaged about 940), so 100,000 games take
-about 14 days at 300,000 decisions an hour, 57 days at 73,000 and 453 days at
+about 20 days at 210,000 decisions an hour, 81 days at 51,000 and 453 days at
 9,200.
 
 A pass's speed depends on its positions, and so on the games in flight: a pass of
@@ -1687,10 +1712,11 @@ while the other half work in the engine, and each holds its tree in memory. At
 processes' other memory, so passes hold about 57 positions.
 
 The table is worked out from the measurements above, not measured in training
-runs. For today's setup it gives 300,000 decisions an hour where the batches
-measured about 252,000, so read every rate as an upper bound, about a fifth too
-high, and every number of days as a lower bound
-([record](../archive/records/network_and_search_cost_2026_11_14.md#which-part-limits-worked-out)).
+runs. For today's setup it gives 210,000 decisions an hour where a 15 November
+batch measured about 192,000, so read every rate as an upper bound, about a tenth
+too high, and every number of days as a lower bound
+([record](../archive/records/network_and_search_cost_2026_11_14.md#which-part-limits-worked-out);
+[with 7 cores](../archive/records/nine_core_layouts_2026_11_15.md)).
 
 **Comparing setups.** Decisions per hour is the speed of one setup, a network and
 a search. It compares two versions of the code on the same setup, as the matched
@@ -1703,20 +1729,22 @@ work out the rest with the formula. A change to the engine or the search changes
 the cores' rate, which is the same for every network. It raises decisions per hour
 wherever the cores limit, but only until the cores' line in the figure reaches the
 network's line above it. With the GPU in passes of 64, a cheaper engine can pay up
-to about 2.4 times at 64×2 but only about 1.1 times at 256×8, where the two rates
-are nearly equal; larger passes would raise that to at most about 1.6 times, with
-four times the games in flight. With the network on one core, as today, the
-coordinator is already busy about 85% of the time (section 9.2), so a cheaper
-engine alone would gain little even at 64×2. A change to the network's passes
-changes the network's rate and matters only where the network limits.
+to about 3.4 times at 64×2, about 1.5 times at 256×8 and not at all from 384×12
+on, where the GPU already limits; larger passes would raise the 256×8 figure to at
+most about 2.2 times, with four times the games in flight. With the network on one
+core, as today, the coordinator is already busy about 90% of the time (section
+9.2), so a cheaper engine alone would gain little even at 64×2. A change to the
+network's passes changes the network's rate and matters only where the network
+limits.
 
 Three things follow, inferred:
 
 - **The engine is the main cost of a simulation.** An evaluation takes about
   2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8. Keeping
   the Mac's GPU busy, in passes of 64, takes about 24 cores for games at 64×2,
-  11 at 256×8 and 4 at 512×16: the Mac's ten just keep it busy at 256×8, and for
-  smaller networks they cannot.
+  11 at 256×8, 6 at 384×12 and 4 at 512×16: the 7 of the allowance keep it busy
+  only from 384×12 on, and even all 10 performance cores would just keep it busy
+  at 256×8.
 - **Memory grows with the search.** A tree holds about 0.24 MB per simulation, so
   at 800 simulations each game in flight holds about 190 MB, and memory, not the
   GPU, sets how many games can fill a pass.
@@ -2270,7 +2298,7 @@ Terms in the order the document introduces them.
 **Running it (section 9)**
 
 - **Game process:** an operating-system process that plays several games, one
-  per game thread; the Mac profile runs 8 of 4.
+  per game thread; the Mac profile runs 6 of 4.
 - **Game thread:** a thread that plays one game, searching at every decision.
 - **Coordinator:** the process that evaluates every game's positions with the
   three networks and sends each game thread its priors and values.

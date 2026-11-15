@@ -51,11 +51,13 @@
   choices and resulting states for the same position and dice), never internal
   byte formats. Identical results are a cheap check for speed-only changes, not
   a design constraint; a faster method may change float rounding or randomness.
-- Respect the current user allowance of at most 12 CPU cores and 30,000,000,000
+- Respect the current user allowance of at most 9 CPU cores and 30,000,000,000
   bytes of memory, including worker/coordinator overhead, until the user changes
-  it. Efficient code does not by itself establish that AlphaZero-style search is
-  the best learning method or that this campaign can train to useful strength on
-  the available hardware; keep those claims subject to measured evaluation.
+  it. The Mac's M4 Max has 10 performance cores, and one stays free for
+  everything else. Efficient code does not by itself establish that
+  AlphaZero-style search is the best learning method or that this campaign can
+  train to useful strength on the available hardware; keep those claims subject
+  to measured evaluation.
 
 ## Documentation
 

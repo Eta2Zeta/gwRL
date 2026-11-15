@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="470" viewBox="0 0 960 470" role="img" aria-labelledby="title desc">
   <title id="title">What the cores and the GPU do during self-play on the Mac</title>
-  <desc id="desc">A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, the others work, because the engine releases Python's lock. Seven more game processes do the same on their own cores. The coordinator, on one core, runs round after round: it reads the waiting requests, evaluates them in one pass of the three networks on the CPU and sends the replies. The GPU does nothing.</desc>
+  <desc id="desc">A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, the others work, because the engine releases Python's lock. Five more game processes do the same. The coordinator, on one core, runs round after round: it reads the waiting requests, evaluates them in one pass of the three networks on the CPU and sends the replies. The GPU does nothing.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -19,7 +19,7 @@
   </defs>
   <rect x="0.5" y="0.5" width="959" height="469" rx="10" fill="#ffffff" stroke="#d0d7de"/>
   <text class="title" x="24" y="36">What the cores and the GPU do during self-play on the Mac</text>
-  <text class="sub" x="24" y="58">Schematic, a few milliseconds of one game process of eight, and the coordinator. Blocks are not drawn to scale.</text>
+  <text class="sub" x="24" y="58">Schematic, a few milliseconds of one game process of six, and the coordinator. Blocks are not drawn to scale.</text>
   <rect x="24" y="69" width="16" height="12" rx="2" fill="#ddf4ff" stroke="#54aeff"/>
   <text class="label" x="46" y="80">engine and search work (CPU)</text>
   <rect x="273.6" y="69" width="16" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
@@ -56,9 +56,9 @@
   <rect x="426.8" y="232" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
   <rect x="635.9" y="232" width="102.0" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
   <rect x="921.5" y="232" width="8.5" height="24" rx="3" fill="#ddf4ff" stroke="#54aeff"/>
-  <text class="body" x="24" y="368">Game processes 2 to 8</text>
+  <text class="body" x="24" y="368">Game processes 2 to 6</text>
   <rect x="250" y="352" width="680" height="24" rx="3" fill="#ffffff" stroke="#54aeff" stroke-dasharray="5 4"/>
-  <text class="inbar" x="590.0" y="368" text-anchor="middle">the same, four game threads each, on their own cores</text>
+  <text class="inbar" x="590.0" y="368" text-anchor="middle">the same, four game threads each</text>
   <text class="body" x="24" y="308">Coordinator (one core)</text>
   <rect x="260.2" y="292" width="81.6" height="24" rx="3" fill="#dafbe1" stroke="#4ac26b"/>
   <text class="inbar" x="301.0" y="308" text-anchor="middle">round</text>
@@ -76,5 +76,5 @@
   <text class="label" x="346.0" y="280" text-anchor="end">request</text>
   <path d="M 434.0 292 L 442.0 139" fill="none" stroke="#57606a" stroke-width="1.4" marker-end="url(#arrow)"/>
   <text class="label" x="445.0" y="280">reply</text>
-  <text class="label" x="24" y="448">In the 14 November batches the 32 game threads and the coordinator kept about 9.9 of the 11 cores busy.</text>
+  <text class="label" x="24" y="448">In a 15 November batch the 24 game threads and the coordinator kept about 9 cores busy.</text>
 </svg>
