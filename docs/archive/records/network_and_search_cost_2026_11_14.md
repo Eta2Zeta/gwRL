@@ -9,7 +9,8 @@ core, but only with many positions per pass; a simulation costs about 1.25 ms
 of a core alone and about twice that under a training batch's load, whatever
 the network; and a tree holds about 0.17 to 0.25 MB per simulation. Worked out
 from these, not measured in training runs: up to about 256×8 with 256
-simulations the cores limit self-play on the Mac, and beyond it the GPU. The
+simulations the cores limit self-play on the Mac, and beyond it the GPU; with the
+search held fixed, the cores limit up to 256×8 whatever the budget. The
 [design document](../../design/README.md#93-what-a-larger-network-and-a-longer-search-cost)
 describes the costs; the [evidence file](network_and_search_cost_2026_11_14.json)
 holds every value.
@@ -134,6 +135,22 @@ hold their trees (at 800 simulations only 115 fit, so 57 per pass).
 For today's setup the formula gives 300,000 decisions per hour; the batches
 measured about 252,000. The coordinator's own work besides passes, about 30% of
 its time, and the waits between rounds are not in it.
+
+With the search held fixed, the same assumptions give these decisions per hour
+for every network. The cores' limit depends only on the search: about
+4,167, 4,008 and 3,890 evaluations a second at 64, 256 and 800
+simulations. The network's depends on its size and its device, and at 800
+simulations on the 57 positions per pass that memory allows. At 256×8 the
+network's limit is 8% to 12% above the cores'. Every value, both limits
+included, is under `worked_out.by_network_and_search` in the evidence file.
+
+| Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
+| --- | ---: | ---: | ---: | --- |
+| 64×2 | 300,000 | 73,164 | 22,887 | the cores |
+| 128×4 | 300,000 | 73,164 | 22,887 | the cores |
+| 256×8 | 300,000 | 73,164 | 22,887 | the cores |
+| 384×12 | 188,359 | 47,751 | 14,484 | the GPU |
+| 512×16 | 118,138 | 29,949 | 9,197 | the GPU |
 
 ## What this does and does not show
 

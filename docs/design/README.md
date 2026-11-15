@@ -1526,7 +1526,10 @@ decision in training batches, about 117 ms
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
-([section 8.7](#87-how-often-a-sample-is-drawn)):
+([section 8.7](#87-how-often-a-sample-is-drawn)). Decisions per hour is the speed
+of one setup, a network and a search;
+[section 9.3](#93-what-a-larger-network-and-a-longer-search-cost) shows how it
+changes with the network's size and the search's budget. Measured on the Mac:
 
 | Setup | Network | Decisions per hour |
 | --- | --- | ---: |
@@ -1623,44 +1626,92 @@ tree holds about 11 MB at 64 simulations, 56 MB at 256 and 250 MB at 1,024 until
 its move is chosen. Each game in flight, that is each game being played at the
 moment, holds one tree.
 
-**Which part limits.** Every evaluation needs its share of engine work on the
-cores and its share of a network pass, and the slower of the two supplies sets
-the pace:
+**Which part limits.** Count both parts in evaluations, the positions the network
+is asked about. A search asks about roughly one position per simulation
+(section 4.2), and decisions with a single legal move are not searched, so a
+decision uses about 50 evaluations at 64 simulations, 197 at 256 and 612 at 800.
+Each evaluation needs engine work from a core for games, about 2.4 ms in training,
+and a share of a network pass. So the Mac's 10 cores for games can feed the
+network about 4,200 evaluations a second, whatever its size, and the network can
+answer as many positions a second as the table above gives for its size and
+device. Self-play runs at the lower of the two rates:
 
-$$\text{decisions per hour} = 3600 \times \min\left(\frac{\text{cores for games}}{\text{core seconds per decision}}, \frac{\text{positions the network evaluates per second}}{\text{evaluations per decision}}\right)$$
+$$\text{decisions per hour} = \frac{3600}{\text{evaluations per decision}} \times \min\left(\frac{\text{cores for games}}{\text{core seconds per evaluation}}, \text{positions the network evaluates per second}\right)$$
+
+![A line chart on a logarithmic scale of evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 4,200 a second is what the engine work of the 10 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840 a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line just after 256×8. The network on one CPU core, in passes of 16, answers 5,850 at 64×2 falling to 125 at 512×16, below the flat line from 128×4 on. Self-play gets the lower rate: the cores' up to 256×8, the GPU's beyond.](figures/evaluation_supply.svg)
+
+**How decisions per hour changes with the network and the search.** The
+network's size changes only the second rate, and the search's budget divides
+both. Worked out for the Mac, with 10 cores for games, one for the coordinator,
+the network on whichever is faster of one core, in passes of 16 positions, and the
+GPU, in passes of 64, and 30 GB, decisions per hour are:
+
+| Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
+| --- | ---: | ---: | ---: | --- |
+| 64×2 | 300,000 | 73,000 | 23,000 | the cores |
+| 128×4 | 300,000 | 73,000 | 23,000 | the cores |
+| 256×8 | 300,000 | 73,000 | 23,000 | the cores, the GPU nearly |
+| 384×12 | 188,000 | 48,000 | 14,500 | the GPU |
+| 512×16 | 118,000 | 30,000 | 9,200 | the GPU |
+
+Down a column, decisions per hour stays the same while the cores limit. Up to
+256×8, a network with about 50 times the arithmetic of 64×2, the engine sets the
+pace and the larger network costs nothing. The night of 2 November agrees: a
+256×8 network on the GPU played about as many decisions an hour as the 64×2
+network on the CPU (section 9.2). Beyond 256×8 the GPU limits, and decisions per
+hour falls, but much less than the arithmetic grows: 512×16 has about 390 times
+the arithmetic of 64×2 and plays about 40% as many decisions an hour, because the
+GPU's rate falls only six times over that range; a pass of a small network costs
+it mostly fixed overhead. With the network on one CPU core, as in today's profile,
+the network is close to limiting already at 64×2 (section 9.2) and would limit
+from 128×4 on, so every larger network needs the GPU.
+
+Along a row, decisions per hour falls in proportion to the simulations, whatever
+limits: four times the simulations, about a quarter of the decisions. So which
+part limits depends on the network, not on the search. A game has about 1,000
+decisions (the 14 November batches averaged about 940), so 100,000 games take
+about 14 days at 300,000 decisions an hour, 57 days at 73,000 and 453 days at
+9,200.
 
 A pass's speed depends on its positions, and so on the games in flight: a pass of
 64 positions needs about 128 games in flight, half of them waiting in the pass
-while the other half work in the engine, and each holds its tree in memory. On
-the Mac, with 10 cores for games, one for the coordinator, the GPU and 30 GB:
-
-| Network and search | Evaluations per decision | Core time per decision | Tree per game | Decisions per hour | Limited by | Days per 100,000 games |
-| --- | ---: | ---: | ---: | ---: | --- | ---: |
-| 64×2, 64 simulations | 50 | 0.12 s | 11 MB | 300,000 | the cores | 14 |
-| 128×4, 128 simulations | 99 | 0.24 s | 24 MB | 148,000 | the cores | 28 |
-| 256×8, 256 simulations | 197 | 0.49 s | 56 MB | 73,000 | the cores, the GPU nearly | 57 |
-| 384×12, 400 simulations | 307 | 0.78 s | 89 MB | 31,000 | the GPU | 136 |
-| 512×16, 800 simulations | 612 | 1.57 s | 191 MB | 9,200 | the GPU | 453 |
+while the other half work in the engine, and each holds its tree in memory. At
+800 simulations 30 GB holds the trees of only about 115 games beside the
+processes' other memory, so passes hold about 57 positions.
 
 The table is worked out from the measurements above, not measured in training
 runs. For today's setup it gives 300,000 decisions an hour where the batches
-measured about 252,000, so read every row as an upper bound, about a fifth too
-high. Days per 100,000 games assume about 1,000 decisions a game; the
-14 November batches averaged about 940. Three things follow, inferred:
+measured about 252,000, so read every rate as an upper bound, about a fifth too
+high, and every number of days as a lower bound
+([record](../archive/records/network_and_search_cost_2026_11_14.md#which-part-limits-worked-out)).
+
+**Comparing setups.** Decisions per hour is the speed of one setup, a network and
+a search. It compares two versions of the code on the same setup, as the matched
+batches of section 9.2 do, but not two setups: a larger network or a longer search
+plays fewer decisions an hour, and whether its better searches teach more per
+hour is unmeasured
+([open question](#how-big-should-the-network-and-the-search-be)). To judge a
+change of the code at a size not yet trained, measure the rate it changes and
+work out the rest with the formula. A change to the engine or the search changes
+the cores' rate, which is the same for every network, so it raises decisions per
+hour at every size where the cores limit, on the Mac up to about 256×8. A change
+to the network's passes changes the network's rate and matters only where the
+network limits.
+
+Three things follow, inferred:
 
 - **The engine is the main cost of a simulation.** An evaluation takes about
-  2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8, so the
-  Mac's 10 cores for games supply about 4,200 evaluations a second, which its GPU
-  can match up to about 256×8. With larger networks the GPU limits and cores
-  wait.
-- **Memory grows with the search.** At about 0.24 MB per simulation for each game
-  in flight, the 128 games that fill passes of 64 positions hold about 24 GB of
-  trees at 800 simulations.
-- **What each part of a computer buys.** While the engine limits, throughput
-  grows in proportion to the cores. A faster GPU helps only with a larger network
-  and only with enough cores to feed it, about one core for every 400
-  evaluations a second. Memory must hold a tree for every game in flight. Less
-  engine work per simulation helps at every size.
+  2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8, so on
+  the Mac all ten cores for games just keep the GPU busy at 256×8, and for
+  smaller networks they cannot.
+- **Memory grows with the search.** A tree holds about 0.24 MB per simulation, so
+  at 800 simulations each game in flight holds about 190 MB, and memory, not the
+  GPU, sets how many games can fill a pass.
+- **What each part of a computer buys.** More cores raise the cores' line in the
+  figure, and with it decisions per hour wherever the cores limit. A faster GPU
+  raises its line and moves the crossing to larger networks, but helps only with
+  enough cores to feed it, about one core for every 400 evaluations a second.
+  Memory must hold a tree for every game in flight.
 
 ### 9.4 How the Campaign Observatory shows a game
 
@@ -1917,12 +1968,12 @@ AlphaZero-style agent for a hex-and-counter wargame was trained on a 5×5 map
 with two kinds of unit and grew weaker on larger maps
 ([arXiv 2502.13918](https://arxiv.org/abs/2502.13918)).
 
-**What it would cost here.** On the Mac, about 57 days per 100,000 games at
-256×8 with 256 simulations, limited by its cores, and about 450 days at 512×16
-with 800 simulations, limited by its GPU; both are upper bounds
-([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). AlphaGo
-Zero's first run played 4.9 million games, 49 times as many, and KataGo's 2019
-run 4.2 million.
+**What it would cost here.** On the Mac, at least about 57 days per 100,000 games
+at 256×8 with 256 simulations, limited by its cores, and at least about 450 days
+at 512×16 with 800 simulations, limited by its GPU
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost), whose rates
+are upper bounds). AlphaGo Zero's first run played 4.9 million games, 49 times as
+many, and KataGo's 2019 run 4.2 million.
 
 **Unmeasured:** whether a larger network or a longer search learns faster here
 for the same compute, whether depth or width matters more, and how many games
@@ -2203,13 +2254,17 @@ Terms in the order the document introduces them.
 - **Coordinator:** the process that evaluates every game's positions with the
   three networks and sends each game thread its priors and values.
 - **Request:** a position a game thread sends the coordinator to be evaluated.
+- **Evaluation:** the network's answer for one position, its priors and values;
+  a search asks for about one per simulation.
 - **Round:** one turn of the coordinator: it reads every waiting request,
   evaluates them in one pass and replies.
 - **Pass:** one run of the networks over several positions at once.
 - **Games in flight:** the games being played at the moment, each holding its
   search tree in memory.
 - **Decisions per hour:** decisions searched per hour across all games in
-  flight, the measure of self-play speed.
+  flight, the measure of self-play speed for one network and search. It falls in
+  proportion to the search's simulations, and with the network's size only where
+  the network, not the cores, limits (section 9.3).
 
 **Size (section 11)**
 

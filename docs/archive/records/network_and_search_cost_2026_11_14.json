@@ -742,7 +742,208 @@
     "core_hours_per_1e8": 43693,
     "gpu_hours_per_1e8": 8934
    }
-  ]
+  ],
+  "by_network_and_search": {
+   "budgets": {
+    "64": {
+     "evaluations_per_decision": 50.0,
+     "game_cpu_s_per_decision": 0.12,
+     "game_cpu_ms_per_evaluation": 2.4,
+     "tree_mb": 11.2,
+     "games_that_fit": 1965,
+     "gpu_batch": 64,
+     "engine_evaluations_per_s": 4167,
+     "engine_limit_decisions_per_h": 300000
+    },
+    "256": {
+     "evaluations_per_decision": 197.2,
+     "game_cpu_s_per_decision": 0.492,
+     "game_cpu_ms_per_evaluation": 2.49,
+     "tree_mb": 56.1,
+     "games_that_fit": 392,
+     "gpu_batch": 64,
+     "engine_evaluations_per_s": 4008,
+     "engine_limit_decisions_per_h": 73164
+    },
+    "800": {
+     "evaluations_per_decision": 611.9,
+     "game_cpu_s_per_decision": 1.573,
+     "game_cpu_ms_per_evaluation": 2.57,
+     "tree_mb": 191.0,
+     "games_that_fit": 115,
+     "gpu_batch": 57,
+     "engine_evaluations_per_s": 3890,
+     "engine_limit_decisions_per_h": 22887
+    }
+   },
+   "rows": [
+    {
+     "size": "64x2",
+     "simulations": 64,
+     "one_core_positions_per_s": 5850,
+     "gpu_positions_per_s": 9835,
+     "network_limit_decisions_per_h": 708134,
+     "engine_limit_decisions_per_h": 300000,
+     "decisions_per_h": 300000,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 13.9
+    },
+    {
+     "size": "64x2",
+     "simulations": 256,
+     "one_core_positions_per_s": 5850,
+     "gpu_positions_per_s": 9835,
+     "network_limit_decisions_per_h": 179519,
+     "engine_limit_decisions_per_h": 73164,
+     "decisions_per_h": 73164,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 56.9
+    },
+    {
+     "size": "64x2",
+     "simulations": 800,
+     "one_core_positions_per_s": 5850,
+     "gpu_positions_per_s": 9005,
+     "network_limit_decisions_per_h": 52975,
+     "engine_limit_decisions_per_h": 22887,
+     "decisions_per_h": 22887,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 182.1
+    },
+    {
+     "size": "128x4",
+     "simulations": 64,
+     "one_core_positions_per_s": 2213,
+     "gpu_positions_per_s": 7974,
+     "network_limit_decisions_per_h": 574157,
+     "engine_limit_decisions_per_h": 300000,
+     "decisions_per_h": 300000,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 13.9
+    },
+    {
+     "size": "128x4",
+     "simulations": 256,
+     "one_core_positions_per_s": 2213,
+     "gpu_positions_per_s": 7974,
+     "network_limit_decisions_per_h": 145555,
+     "engine_limit_decisions_per_h": 73164,
+     "decisions_per_h": 73164,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 56.9
+    },
+    {
+     "size": "128x4",
+     "simulations": 800,
+     "one_core_positions_per_s": 2213,
+     "gpu_positions_per_s": 7327,
+     "network_limit_decisions_per_h": 43106,
+     "engine_limit_decisions_per_h": 22887,
+     "decisions_per_h": 22887,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 182.1
+    },
+    {
+     "size": "256x8",
+     "simulations": 64,
+     "one_core_positions_per_s": 577,
+     "gpu_positions_per_s": 4503,
+     "network_limit_decisions_per_h": 324238,
+     "engine_limit_decisions_per_h": 300000,
+     "decisions_per_h": 300000,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 13.9
+    },
+    {
+     "size": "256x8",
+     "simulations": 256,
+     "one_core_positions_per_s": 577,
+     "gpu_positions_per_s": 4503,
+     "network_limit_decisions_per_h": 82198,
+     "engine_limit_decisions_per_h": 73164,
+     "decisions_per_h": 73164,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 56.9
+    },
+    {
+     "size": "256x8",
+     "simulations": 800,
+     "one_core_positions_per_s": 577,
+     "gpu_positions_per_s": 4197,
+     "network_limit_decisions_per_h": 24693,
+     "engine_limit_decisions_per_h": 22887,
+     "decisions_per_h": 22887,
+     "limit": "engine (cores)",
+     "days_per_1e8_decisions": 182.1
+    },
+    {
+     "size": "384x12",
+     "simulations": 64,
+     "one_core_positions_per_s": 267,
+     "gpu_positions_per_s": 2616,
+     "network_limit_decisions_per_h": 188359,
+     "engine_limit_decisions_per_h": 300000,
+     "decisions_per_h": 188359,
+     "limit": "network on GPU",
+     "days_per_1e8_decisions": 22.1
+    },
+    {
+     "size": "384x12",
+     "simulations": 256,
+     "one_core_positions_per_s": 267,
+     "gpu_positions_per_s": 2616,
+     "network_limit_decisions_per_h": 47751,
+     "engine_limit_decisions_per_h": 73164,
+     "decisions_per_h": 47751,
+     "limit": "network on GPU",
+     "days_per_1e8_decisions": 87.3
+    },
+    {
+     "size": "384x12",
+     "simulations": 800,
+     "one_core_positions_per_s": 267,
+     "gpu_positions_per_s": 2462,
+     "network_limit_decisions_per_h": 14484,
+     "engine_limit_decisions_per_h": 22887,
+     "decisions_per_h": 14484,
+     "limit": "network on GPU",
+     "days_per_1e8_decisions": 287.7
+    },
+    {
+     "size": "512x16",
+     "simulations": 64,
+     "one_core_positions_per_s": 125,
+     "gpu_positions_per_s": 1641,
+     "network_limit_decisions_per_h": 118138,
+     "engine_limit_decisions_per_h": 300000,
+     "decisions_per_h": 118138,
+     "limit": "network on GPU",
+     "days_per_1e8_decisions": 35.3
+    },
+    {
+     "size": "512x16",
+     "simulations": 256,
+     "one_core_positions_per_s": 125,
+     "gpu_positions_per_s": 1641,
+     "network_limit_decisions_per_h": 29949,
+     "engine_limit_decisions_per_h": 73164,
+     "decisions_per_h": 29949,
+     "limit": "network on GPU",
+     "days_per_1e8_decisions": 139.1
+    },
+    {
+     "size": "512x16",
+     "simulations": 800,
+     "one_core_positions_per_s": 125,
+     "gpu_positions_per_s": 1563,
+     "network_limit_decisions_per_h": 9197,
+     "engine_limit_decisions_per_h": 22887,
+     "decisions_per_h": 9197,
+     "limit": "network on GPU",
+     "days_per_1e8_decisions": 453.1
+    }
+   ]
+  }
  },
  "load": [
   "11:28  up 14 days, 15:48, 2 users, load averages: 7.12 5.04 5.44",
