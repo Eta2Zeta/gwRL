@@ -28,6 +28,7 @@ the first learning stage.
 | 5 Nov | [One real training sample](records/training_sample_2026_11_05.md) | What a sample stores, shown with a real decision; a fresh network gives every position the same values. |
 | 9 Nov | [How often the depth limit stops a simulation](records/depth_limit_2026_11_09.md) | 18 of 68,800 simulations reached the limit of 16 steps; without it no most-visited move changed. |
 | 9 Nov | [What Adam did in one real update](records/adam_steps_2026_11_09.md) | Re-running the 5 November update gave generation 1 exactly; how the steps shrink. |
+| 14 Nov | [Does self-play learn three-round games?](records/three_round_training_2026_11_14.md) | 792 games on the PC taught the value heads the average scores, but no alliance played clearly better than the scripted policy; the untrained Axis, which with the noise off does almost nothing, scored best. |
 
 ### The network's input
 

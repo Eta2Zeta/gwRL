@@ -183,10 +183,14 @@ and the run directories live outside it. Use the Mac's command with
 The supervisor holds the trainer and every process it starts in a Windows job
 object. A safe stop is a Ctrl+Break to the trainer's console process group,
 which Python receives as `SIGBREAK`, so start the supervisor from a console
-window; Ctrl+Break or Ctrl+C there stops the supervisor and saves the run. On
-3 November 2026 this PC played 22 to 31 eleven-round games per hour with
-learning at those settings, about a quarter of the Mac's rate then: the game
-processes on its CPU limited it, not the network on its GPU.
+window; Ctrl+Break or Ctrl+C there stops the supervisor and saves the run.
+
+On the night of 14 November 2026 this PC trained on three-round games and made
+48,551 decisions an hour while playing
+([record](../../docs/archive/records/three_round_training_2026_11_14.md)). Its
+coordinator, on the GPU, answered about ten positions per pass and waited for
+requests only 5.6% of the time, so the coordinator probably set the pace. The
+profile lists the earlier measurements.
 
 ## The network's input and the order interface
 

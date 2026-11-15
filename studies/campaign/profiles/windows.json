@@ -24,7 +24,8 @@
     "Batches with longer games searched fewer decisions per hour whatever the network size, 27,600 at 1,223 decisions per game against 30,100 at 998, so single batches differ by about 10% for that reason alone.",
     "The shared evaluator was busy 51 to 60% of the time at every size, so the game engine on the CPU limits this machine.",
     "At 64 wide, evaluating on the CPU searched 32,600 decisions per hour against CUDA's 30,100 with the same game lengths, but learning took 118 seconds per batch against 31. The CPU was not measured at larger sizes.",
-    "Peak memory was 5.8 to 6.4 GB."
+    "Peak memory was 5.8 to 6.4 GB.",
+    "14 November 2026, commit ce4b3c4, a night of three-round games with fresh 64-wide networks on CUDA, 64 simulations, depth 16, a quarter of the decisions kept: 48,551 decisions per hour while playing, 792 games in 8.0 hours. The coordinator answered 10.1 positions per pass in 7.6 ms, 55% of the play time, and waited for requests only 5.6% of it, so on this code the coordinator, not the game engine, probably limits this machine. Sampled peak memory was 7.9 GB (docs/archive/records/three_round_training_2026_11_14.md)."
   ],
   "notes": [
     "python: Python 3.13 with requirements-gpu-cuda.txt (PyTorch 2.14 for CUDA 12.6), in a virtual environment outside the OneDrive-synced checkout.",

@@ -1830,6 +1830,17 @@ fuzzer now flags any move that leaves the game unchanged (`b26511f`). The lesson
 is general: search will find and use any move that does nothing, so the engine
 must not offer one.
 
+**Generation 0 is nearly passive with the noise off.** A fresh network gives every
+position the same values (section 6.9), so its search has little to go on. On
+14 November, the untrained networks playing one alliance against the scripted
+opponents ended almost every phase at once. The Axis made 23 decisions a game,
+against 338 for the scripted Axis. In self-play, with noise and the move drawn
+from the shares, the same networks made 208 Axis decisions a game
+([record](../archive/records/three_round_training_2026_11_14.md)). So comparing a
+trained network with generation 0 compares it with a player that does almost
+nothing. Over three rounds, that is the best Axis player measured (see
+[the objective](#is-the-final-wealth-gap-the-right-goal)).
+
 Small samples do not establish strength. The scripted opponents are simple
 controls, not expert play.
 
@@ -1856,11 +1867,18 @@ measured and what would settle it.
   together and none under changed timing suggest a race between game threads in
   one process, but that is unproven. A ThreadSanitizer run is the suggested next
   step.
-- **Learning strength is unmeasured.** Neither the larger network nor the zone
-  input has yet made the agents stronger. No run has played more than about 500
-  games, far fewer than published systems needed
-  ([how big](#how-big-should-the-network-and-the-search-be)), and two design
-  questions below may also be part of the reason: the
+- **No run has yet made the agents stronger.** The most games a run has played
+  is 792 three-round games, on the PC on the night of 14 November
+  ([record](../archive/records/three_round_training_2026_11_14.md)). Earlier runs
+  played at most about 500. Both are far fewer than published systems needed
+  ([how big](#how-big-should-the-network-and-the-search-be)). In that run:
+  - The value heads learned each alliance's average score.
+  - On 24 held-out seeds, no trained network beat the scripted policy in its seat
+    by a clear margin.
+  - Training made the Axis more active, away from the passive play that scores
+    best over three rounds.
+
+  Two design questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-64-simulations-enough-on-large-menus).
 - **Input pruning left out two rules** it could not prove for the whole game:
@@ -2093,6 +2111,12 @@ a Japan that never attacks beat the scripted attacking Japan in 4 of 4 three-rou
 seeds and 3 of 4 eleven-round seeds. Japan's first attack makes every warlord join
 China at once, ends the KMT–CCP civil war and costs about 100 IPP of units. So the
 goal itself may teach a passive Japan, however well the networks learn.
+
+On 24 held-out three-round seeds on 14 November, an untrained Axis network that
+ended almost every phase at once beat the scripted Axis by 10.5 ± 2.3 points,
+scoring higher in 19 seeds. After 792 three-round games of training, the Axis
+moved and fought far more and scored 12.9 ± 2.2 below the untrained network
+([record](../archive/records/three_round_training_2026_11_14.md)).
 
 **Would settle it:** the owner's decision on the objective. A changed objective
 can be checked first with the same scripted comparison.

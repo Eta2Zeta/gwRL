@@ -1,0 +1,2821 @@
+{
+ "schema": "three-round-training-record-v1",
+ "setup": {
+  "commit": "ce4b3c4",
+  "machine": "Intel Core i7-9700K (8 cores), 16 GB, NVIDIA GeForce RTX 3060 Ti, Windows 10",
+  "profile": "windows",
+  "network_input": "campaign-zone-v1-ed3184ce805f1af5",
+  "neural_device": "cuda",
+  "torch": "2.14.0+cu126",
+  "training": {
+   "calendar_rounds": 3,
+   "simulations": 64,
+   "max_depth": 16,
+   "hidden_dim": 64,
+   "message_layers": 2,
+   "batch_size": 32,
+   "epochs": 675,
+   "learning_rate": 0.001,
+   "replay_capacity": 8000,
+   "sample_fraction": 0.25,
+   "episode_workers": 6,
+   "games_per_process": 4,
+   "parallel_envs": 24,
+   "value_scale": 100.0,
+   "seed": 1936
+  },
+  "reward": "terminal wealth gap; zero intermediate reward; gamma=1",
+  "evaluation": {
+   "seeds": [
+    7100001,
+    7100002,
+    7100003,
+    7100004,
+    7100005,
+    7100006,
+    7100007,
+    7100008,
+    7100009,
+    7100010,
+    7100011,
+    7100012,
+    7100013,
+    7100014,
+    7100015,
+    7100016,
+    7100017,
+    7100018,
+    7100019,
+    7100020,
+    7100021,
+    7100022,
+    7100023,
+    7100024
+   ],
+   "simulations": 64,
+   "max_depth": 16,
+   "opponent_policy": "campaign-active-baseline-v2:balanced",
+   "root_noise": false,
+   "neural_device": "cpu",
+   "first": "models/generation-000000.pt",
+   "final": "models/generation-000033.pt",
+   "script": "the scripted balanced policy"
+  }
+ },
+ "training": {
+  "status": "completed",
+  "counters": {
+   "batches": 33,
+   "chance_events": 60384,
+   "decisions": 390483,
+   "episodes": 792,
+   "transitions": 450867,
+   "updates": 33
+  },
+  "timings_seconds": {
+   "checkpoint_save": 155.39681509975344,
+   "collection": 28952.127961500082,
+   "learning_updates": 1000.6415201011114,
+   "model_export": 17.45079769892618,
+   "progress_reporting": 6.574860798660666
+  },
+  "elapsed_seconds": 30132.481319500133,
+  "draws_per_sample_once_full_definition": "epochs x batch_size / new samples per batch: how often a sample is drawn over its stay once the replay buffer is full",
+  "batches": [
+   {
+    "batch": 0,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 607.7,
+    "update_seconds": 30.1,
+    "decisions": 7793,
+    "decisions_per_game_by_alliance": {
+     "axis": 208.5,
+     "allies": 60.4,
+     "comintern": 55.8
+    },
+    "mean_return": {
+     "axis": 31.98,
+     "allies": -46.94,
+     "comintern": -87.86
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.01652,
+      0.00086
+     ],
+     "allies": [
+      0.016,
+      0.00108
+     ],
+     "comintern": [
+      0.02051,
+      0.00062
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.355,
+      2.289
+     ],
+     "allies": [
+      2.153,
+      1.985
+     ],
+     "comintern": [
+      0.662,
+      0.625
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 14.9,
+     "movement_route": 33.2,
+     "naval_start_move": 41.2,
+     "economy_purchase": 12.6,
+     "end_phase": 60.9
+    },
+    "samples": 1982,
+    "draws_per_sample_once_full": 10.9,
+    "coordinator": {
+     "evaluations": 403145,
+     "network_passes": 45041,
+     "positions_per_pass": 8.95,
+     "answering_ms_per_pass": 7.45,
+     "answering_share_of_play": 0.552,
+     "waiting_share_of_play": 0.095
+    }
+   },
+   {
+    "batch": 1,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 738.2,
+    "update_seconds": 30.2,
+    "decisions": 9256,
+    "decisions_per_game_by_alliance": {
+     "axis": 231.0,
+     "allies": 92.4,
+     "comintern": 62.3
+    },
+    "mean_return": {
+     "axis": 32.36,
+     "allies": -46.52,
+     "comintern": -88.02
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00251,
+      0.00144
+     ],
+     "allies": [
+      0.00268,
+      0.00141
+     ],
+     "comintern": [
+      0.00232,
+      0.00064
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.307,
+      2.352
+     ],
+     "allies": [
+      2.423,
+      2.325
+     ],
+     "comintern": [
+      0.739,
+      0.724
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 17.8,
+     "movement_route": 62.8,
+     "naval_start_move": 45.7,
+     "economy_purchase": 19.7,
+     "end_phase": 61.0
+    },
+    "samples": 2315,
+    "draws_per_sample_once_full": 9.33,
+    "coordinator": {
+     "evaluations": 487310,
+     "network_passes": 55476,
+     "positions_per_pass": 8.78,
+     "answering_ms_per_pass": 7.37,
+     "answering_share_of_play": 0.554,
+     "waiting_share_of_play": 0.093
+    }
+   },
+   {
+    "batch": 2,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 814.5,
+    "update_seconds": 34.0,
+    "decisions": 10346,
+    "decisions_per_game_by_alliance": {
+     "axis": 262.8,
+     "allies": 104.6,
+     "comintern": 63.6
+    },
+    "mean_return": {
+     "axis": 30.52,
+     "allies": -43.67,
+     "comintern": -88.77
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00254,
+      0.00142
+     ],
+     "allies": [
+      0.00247,
+      0.00121
+     ],
+     "comintern": [
+      0.00173,
+      0.00067
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.393,
+      2.281
+     ],
+     "allies": [
+      2.469,
+      2.299
+     ],
+     "comintern": [
+      0.73,
+      0.692
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 19.1,
+     "movement_route": 70.3,
+     "naval_start_move": 55.6,
+     "economy_purchase": 20.3,
+     "end_phase": 61.0
+    },
+    "samples": 2648,
+    "draws_per_sample_once_full": 8.16,
+    "coordinator": {
+     "evaluations": 545794,
+     "network_passes": 62533,
+     "positions_per_pass": 8.73,
+     "answering_ms_per_pass": 7.16,
+     "answering_share_of_play": 0.55,
+     "waiting_share_of_play": 0.074
+    }
+   },
+   {
+    "batch": 3,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 833.8,
+    "update_seconds": 30.8,
+    "decisions": 11535,
+    "decisions_per_game_by_alliance": {
+     "axis": 302.8,
+     "allies": 113.8,
+     "comintern": 64.1
+    },
+    "mean_return": {
+     "axis": 30.97,
+     "allies": -45.19,
+     "comintern": -86.49
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00233,
+      0.00149
+     ],
+     "allies": [
+      0.00211,
+      0.00121
+     ],
+     "comintern": [
+      0.00166,
+      0.00079
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.361,
+      2.241
+     ],
+     "allies": [
+      2.408,
+      2.322
+     ],
+     "comintern": [
+      0.703,
+      0.725
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.0,
+     "movement_route": 77.7,
+     "naval_start_move": 70.0,
+     "economy_purchase": 21.4,
+     "end_phase": 61.0
+    },
+    "samples": 2903,
+    "draws_per_sample_once_full": 7.44,
+    "coordinator": {
+     "evaluations": 619420,
+     "network_passes": 61363,
+     "positions_per_pass": 10.09,
+     "answering_ms_per_pass": 7.67,
+     "answering_share_of_play": 0.564,
+     "waiting_share_of_play": 0.053
+    }
+   },
+   {
+    "batch": 4,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 854.9,
+    "update_seconds": 31.1,
+    "decisions": 11124,
+    "decisions_per_game_by_alliance": {
+     "axis": 288.0,
+     "allies": 109.5,
+     "comintern": 66.1
+    },
+    "mean_return": {
+     "axis": 32.21,
+     "allies": -46.56,
+     "comintern": -85.25
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00316,
+      0.0018
+     ],
+     "allies": [
+      0.00287,
+      0.00156
+     ],
+     "comintern": [
+      0.00235,
+      0.00105
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.24,
+      2.22
+     ],
+     "allies": [
+      2.344,
+      2.254
+     ],
+     "comintern": [
+      0.669,
+      0.741
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 21.8,
+     "movement_route": 76.2,
+     "naval_start_move": 61.6,
+     "economy_purchase": 21.2,
+     "end_phase": 61.0
+    },
+    "samples": 2846,
+    "draws_per_sample_once_full": 7.59,
+    "coordinator": {
+     "evaluations": 593766,
+     "network_passes": 67497,
+     "positions_per_pass": 8.8,
+     "answering_ms_per_pass": 7.17,
+     "answering_share_of_play": 0.566,
+     "waiting_share_of_play": 0.053
+    }
+   },
+   {
+    "batch": 5,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 875.3,
+    "update_seconds": 35.6,
+    "decisions": 11574,
+    "decisions_per_game_by_alliance": {
+     "axis": 293.0,
+     "allies": 124.5,
+     "comintern": 64.8
+    },
+    "mean_return": {
+     "axis": 33.33,
+     "allies": -45.2,
+     "comintern": -88.59
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.0033,
+      0.00184
+     ],
+     "allies": [
+      0.00274,
+      0.00169
+     ],
+     "comintern": [
+      0.0023,
+      0.00121
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.274,
+      2.203
+     ],
+     "allies": [
+      2.177,
+      2.196
+     ],
+     "comintern": [
+      0.701,
+      0.759
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.5,
+     "movement_route": 85.2,
+     "naval_start_move": 63.5,
+     "economy_purchase": 20.6,
+     "end_phase": 61.0
+    },
+    "samples": 2861,
+    "draws_per_sample_once_full": 7.55,
+    "coordinator": {
+     "evaluations": 623624,
+     "network_passes": 65340,
+     "positions_per_pass": 9.54,
+     "answering_ms_per_pass": 7.51,
+     "answering_share_of_play": 0.56,
+     "waiting_share_of_play": 0.063
+    }
+   },
+   {
+    "batch": 6,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 938.7,
+    "update_seconds": 31.0,
+    "decisions": 12755,
+    "decisions_per_game_by_alliance": {
+     "axis": 344.7,
+     "allies": 120.6,
+     "comintern": 66.1
+    },
+    "mean_return": {
+     "axis": 34.41,
+     "allies": -46.7,
+     "comintern": -89.29
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.0032,
+      0.00185
+     ],
+     "allies": [
+      0.0036,
+      0.0018
+     ],
+     "comintern": [
+      0.00284,
+      0.00097
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.18,
+      2.21
+     ],
+     "allies": [
+      2.22,
+      2.056
+     ],
+     "comintern": [
+      0.779,
+      0.788
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.9,
+     "movement_route": 85.8,
+     "naval_start_move": 81.2,
+     "economy_purchase": 22.3,
+     "end_phase": 61.0
+    },
+    "samples": 3150,
+    "draws_per_sample_once_full": 6.86,
+    "coordinator": {
+     "evaluations": 692999,
+     "network_passes": 69617,
+     "positions_per_pass": 9.95,
+     "answering_ms_per_pass": 7.45,
+     "answering_share_of_play": 0.552,
+     "waiting_share_of_play": 0.059
+    }
+   },
+   {
+    "batch": 7,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 918.1,
+    "update_seconds": 38.4,
+    "decisions": 12518,
+    "decisions_per_game_by_alliance": {
+     "axis": 324.0,
+     "allies": 124.5,
+     "comintern": 73.0
+    },
+    "mean_return": {
+     "axis": 35.33,
+     "allies": -49.15,
+     "comintern": -87.07
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00381,
+      0.0023
+     ],
+     "allies": [
+      0.00362,
+      0.00197
+     ],
+     "comintern": [
+      0.00294,
+      0.0011
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.254,
+      2.127
+     ],
+     "allies": [
+      2.196,
+      2.285
+     ],
+     "comintern": [
+      0.778,
+      0.739
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.7,
+     "movement_route": 85.8,
+     "naval_start_move": 70.7,
+     "economy_purchase": 23.8,
+     "end_phase": 61.0
+    },
+    "samples": 3091,
+    "draws_per_sample_once_full": 6.99,
+    "coordinator": {
+     "evaluations": 670296,
+     "network_passes": 66111,
+     "positions_per_pass": 10.14,
+     "answering_ms_per_pass": 7.64,
+     "answering_share_of_play": 0.55,
+     "waiting_share_of_play": 0.054
+    }
+   },
+   {
+    "batch": 8,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 868.6,
+    "update_seconds": 31.2,
+    "decisions": 12193,
+    "decisions_per_game_by_alliance": {
+     "axis": 326.0,
+     "allies": 109.2,
+     "comintern": 72.9
+    },
+    "mean_return": {
+     "axis": 33.07,
+     "allies": -49.37,
+     "comintern": -84.16
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00347,
+      0.00221
+     ],
+     "allies": [
+      0.00342,
+      0.00215
+     ],
+     "comintern": [
+      0.0024,
+      0.00109
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.225,
+      2.186
+     ],
+     "allies": [
+      2.052,
+      1.977
+     ],
+     "comintern": [
+      0.876,
+      0.847
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 24.0,
+     "movement_route": 79.1,
+     "naval_start_move": 73.1,
+     "economy_purchase": 20.8,
+     "end_phase": 61.0
+    },
+    "samples": 3048,
+    "draws_per_sample_once_full": 7.09,
+    "coordinator": {
+     "evaluations": 656556,
+     "network_passes": 59686,
+     "positions_per_pass": 11.0,
+     "answering_ms_per_pass": 7.98,
+     "answering_share_of_play": 0.548,
+     "waiting_share_of_play": 0.042
+    }
+   },
+   {
+    "batch": 9,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 941.6,
+    "update_seconds": 39.3,
+    "decisions": 12759,
+    "decisions_per_game_by_alliance": {
+     "axis": 338.6,
+     "allies": 121.8,
+     "comintern": 71.3
+    },
+    "mean_return": {
+     "axis": 36.63,
+     "allies": -51.46,
+     "comintern": -84.41
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00438,
+      0.00256
+     ],
+     "allies": [
+      0.00445,
+      0.00236
+     ],
+     "comintern": [
+      0.00358,
+      0.0012
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.224,
+      2.218
+     ],
+     "allies": [
+      2.015,
+      2.019
+     ],
+     "comintern": [
+      0.848,
+      0.921
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 24.5,
+     "movement_route": 82.2,
+     "naval_start_move": 75.8,
+     "economy_purchase": 23.0,
+     "end_phase": 61.0
+    },
+    "samples": 3107,
+    "draws_per_sample_once_full": 6.95,
+    "coordinator": {
+     "evaluations": 690946,
+     "network_passes": 67221,
+     "positions_per_pass": 10.28,
+     "answering_ms_per_pass": 7.76,
+     "answering_share_of_play": 0.554,
+     "waiting_share_of_play": 0.05
+    }
+   },
+   {
+    "batch": 10,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 921.6,
+    "update_seconds": 31.1,
+    "decisions": 12260,
+    "decisions_per_game_by_alliance": {
+     "axis": 315.5,
+     "allies": 125.8,
+     "comintern": 69.5
+    },
+    "mean_return": {
+     "axis": 34.3,
+     "allies": -47.23,
+     "comintern": -87.15
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00498,
+      0.00314
+     ],
+     "allies": [
+      0.00482,
+      0.00269
+     ],
+     "comintern": [
+      0.00348,
+      0.00171
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.231,
+      2.129
+     ],
+     "allies": [
+      1.886,
+      1.782
+     ],
+     "comintern": [
+      0.795,
+      0.834
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.7,
+     "movement_route": 84.3,
+     "naval_start_move": 71.0,
+     "economy_purchase": 20.9,
+     "end_phase": 61.0
+    },
+    "samples": 3024,
+    "draws_per_sample_once_full": 7.14,
+    "coordinator": {
+     "evaluations": 659313,
+     "network_passes": 67731,
+     "positions_per_pass": 9.73,
+     "answering_ms_per_pass": 7.47,
+     "answering_share_of_play": 0.549,
+     "waiting_share_of_play": 0.062
+    }
+   },
+   {
+    "batch": 11,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 816.4,
+    "update_seconds": 39.0,
+    "decisions": 11647,
+    "decisions_per_game_by_alliance": {
+     "axis": 296.0,
+     "allies": 110.4,
+     "comintern": 78.9
+    },
+    "mean_return": {
+     "axis": 32.23,
+     "allies": -47.31,
+     "comintern": -83.74
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00458,
+      0.00287
+     ],
+     "allies": [
+      0.00425,
+      0.0024
+     ],
+     "comintern": [
+      0.00344,
+      0.00143
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.167,
+      2.112
+     ],
+     "allies": [
+      2.118,
+      2.053
+     ],
+     "comintern": [
+      0.701,
+      0.767
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 24.5,
+     "movement_route": 74.9,
+     "naval_start_move": 69.0,
+     "economy_purchase": 20.1,
+     "end_phase": 61.0
+    },
+    "samples": 2848,
+    "draws_per_sample_once_full": 7.58,
+    "coordinator": {
+     "evaluations": 618544,
+     "network_passes": 57131,
+     "positions_per_pass": 10.83,
+     "answering_ms_per_pass": 7.7,
+     "answering_share_of_play": 0.539,
+     "waiting_share_of_play": 0.045
+    }
+   },
+   {
+    "batch": 12,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 897.8,
+    "update_seconds": 30.7,
+    "decisions": 12182,
+    "decisions_per_game_by_alliance": {
+     "axis": 311.0,
+     "allies": 120.5,
+     "comintern": 76.1
+    },
+    "mean_return": {
+     "axis": 32.23,
+     "allies": -44.35,
+     "comintern": -86.1
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00598,
+      0.00328
+     ],
+     "allies": [
+      0.00595,
+      0.00238
+     ],
+     "comintern": [
+      0.00507,
+      0.00168
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.291,
+      2.131
+     ],
+     "allies": [
+      2.16,
+      1.993
+     ],
+     "comintern": [
+      0.654,
+      0.653
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 25.4,
+     "movement_route": 83.5,
+     "naval_start_move": 70.5,
+     "economy_purchase": 22.0,
+     "end_phase": 61.0
+    },
+    "samples": 3008,
+    "draws_per_sample_once_full": 7.18,
+    "coordinator": {
+     "evaluations": 647326,
+     "network_passes": 68794,
+     "positions_per_pass": 9.41,
+     "answering_ms_per_pass": 7.4,
+     "answering_share_of_play": 0.567,
+     "waiting_share_of_play": 0.051
+    }
+   },
+   {
+    "batch": 13,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 879.4,
+    "update_seconds": 41.3,
+    "decisions": 11787,
+    "decisions_per_game_by_alliance": {
+     "axis": 308,
+     "allies": 108.1,
+     "comintern": 75
+    },
+    "mean_return": {
+     "axis": 34.03,
+     "allies": -50.28,
+     "comintern": -82.93
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00554,
+      0.00277
+     ],
+     "allies": [
+      0.00484,
+      0.00318
+     ],
+     "comintern": [
+      0.00488,
+      0.00194
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.27,
+      2.241
+     ],
+     "allies": [
+      2.065,
+      2.006
+     ],
+     "comintern": [
+      0.782,
+      0.774
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.3,
+     "movement_route": 75.1,
+     "naval_start_move": 69.0,
+     "economy_purchase": 21.3,
+     "end_phase": 61.0
+    },
+    "samples": 2969,
+    "draws_per_sample_once_full": 7.28,
+    "coordinator": {
+     "evaluations": 631231,
+     "network_passes": 62859,
+     "positions_per_pass": 10.04,
+     "answering_ms_per_pass": 7.64,
+     "answering_share_of_play": 0.546,
+     "waiting_share_of_play": 0.06
+    }
+   },
+   {
+    "batch": 14,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 893.2,
+    "update_seconds": 30.8,
+    "decisions": 11739,
+    "decisions_per_game_by_alliance": {
+     "axis": 299.0,
+     "allies": 123.4,
+     "comintern": 66.8
+    },
+    "mean_return": {
+     "axis": 32.02,
+     "allies": -44.06,
+     "comintern": -88.96
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00547,
+      0.00274
+     ],
+     "allies": [
+      0.00478,
+      0.00252
+     ],
+     "comintern": [
+      0.00456,
+      0.00239
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.378,
+      2.29
+     ],
+     "allies": [
+      2.206,
+      2.098
+     ],
+     "comintern": [
+      0.758,
+      0.771
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.3,
+     "movement_route": 86.0,
+     "naval_start_move": 66.0,
+     "economy_purchase": 22.9,
+     "end_phase": 61.0
+    },
+    "samples": 2997,
+    "draws_per_sample_once_full": 7.21,
+    "coordinator": {
+     "evaluations": 626124,
+     "network_passes": 61442,
+     "positions_per_pass": 10.19,
+     "answering_ms_per_pass": 7.79,
+     "answering_share_of_play": 0.536,
+     "waiting_share_of_play": 0.046
+    }
+   },
+   {
+    "batch": 15,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 885.7,
+    "update_seconds": 38.8,
+    "decisions": 11876,
+    "decisions_per_game_by_alliance": {
+     "axis": 301.4,
+     "allies": 109.2,
+     "comintern": 84.2
+    },
+    "mean_return": {
+     "axis": 34.53,
+     "allies": -50.36,
+     "comintern": -84.38
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00456,
+      0.00264
+     ],
+     "allies": [
+      0.00459,
+      0.00298
+     ],
+     "comintern": [
+      0.00416,
+      0.00206
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.346,
+      2.348
+     ],
+     "allies": [
+      2.13,
+      2.057
+     ],
+     "comintern": [
+      0.918,
+      0.81
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.6,
+     "movement_route": 80.6,
+     "naval_start_move": 69.1,
+     "economy_purchase": 22.1,
+     "end_phase": 61.0
+    },
+    "samples": 2963,
+    "draws_per_sample_once_full": 7.29,
+    "coordinator": {
+     "evaluations": 636439,
+     "network_passes": 63371,
+     "positions_per_pass": 10.04,
+     "answering_ms_per_pass": 7.68,
+     "answering_share_of_play": 0.549,
+     "waiting_share_of_play": 0.044
+    }
+   },
+   {
+    "batch": 16,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 882.6,
+    "update_seconds": 31.0,
+    "decisions": 11839,
+    "decisions_per_game_by_alliance": {
+     "axis": 303.1,
+     "allies": 116,
+     "comintern": 74.2
+    },
+    "mean_return": {
+     "axis": 32.59,
+     "allies": -48.06,
+     "comintern": -84.9
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00393,
+      0.00227
+     ],
+     "allies": [
+      0.00387,
+      0.00227
+     ],
+     "comintern": [
+      0.00335,
+      0.00189
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.332,
+      2.287
+     ],
+     "allies": [
+      2.05,
+      2.114
+     ],
+     "comintern": [
+      0.88,
+      0.825
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.7,
+     "movement_route": 77.8,
+     "naval_start_move": 66.8,
+     "economy_purchase": 22.2,
+     "end_phase": 61.0
+    },
+    "samples": 2930,
+    "draws_per_sample_once_full": 7.37,
+    "coordinator": {
+     "evaluations": 632740,
+     "network_passes": 62289,
+     "positions_per_pass": 10.16,
+     "answering_ms_per_pass": 7.62,
+     "answering_share_of_play": 0.538,
+     "waiting_share_of_play": 0.065
+    }
+   },
+   {
+    "batch": 17,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 909.0,
+    "update_seconds": 39.4,
+    "decisions": 11929,
+    "decisions_per_game_by_alliance": {
+     "axis": 308.2,
+     "allies": 115.7,
+     "comintern": 73.2
+    },
+    "mean_return": {
+     "axis": 32.95,
+     "allies": -46.43,
+     "comintern": -85.78
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00424,
+      0.00263
+     ],
+     "allies": [
+      0.00437,
+      0.00271
+     ],
+     "comintern": [
+      0.00389,
+      0.00222
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.414,
+      2.341
+     ],
+     "allies": [
+      1.894,
+      1.831
+     ],
+     "comintern": [
+      0.788,
+      0.76
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.3,
+     "movement_route": 77.5,
+     "naval_start_move": 67.8,
+     "economy_purchase": 21.8,
+     "end_phase": 61.0
+    },
+    "samples": 2920,
+    "draws_per_sample_once_full": 7.4,
+    "coordinator": {
+     "evaluations": 638660,
+     "network_passes": 68467,
+     "positions_per_pass": 9.33,
+     "answering_ms_per_pass": 7.22,
+     "answering_share_of_play": 0.544,
+     "waiting_share_of_play": 0.078
+    }
+   },
+   {
+    "batch": 18,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 933.5,
+    "update_seconds": 31.0,
+    "decisions": 12543,
+    "decisions_per_game_by_alliance": {
+     "axis": 331.4,
+     "allies": 119.4,
+     "comintern": 71.9
+    },
+    "mean_return": {
+     "axis": 34.02,
+     "allies": -45.46,
+     "comintern": -87.53
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00557,
+      0.00271
+     ],
+     "allies": [
+      0.0052,
+      0.00309
+     ],
+     "comintern": [
+      0.00414,
+      0.00207
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.263,
+      2.317
+     ],
+     "allies": [
+      2.144,
+      2.009
+     ],
+     "comintern": [
+      0.677,
+      0.769
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 24.5,
+     "movement_route": 78.2,
+     "naval_start_move": 76.6,
+     "economy_purchase": 22.5,
+     "end_phase": 61.0
+    },
+    "samples": 3136,
+    "draws_per_sample_once_full": 6.89,
+    "coordinator": {
+     "evaluations": 673671,
+     "network_passes": 68409,
+     "positions_per_pass": 9.85,
+     "answering_ms_per_pass": 7.54,
+     "answering_share_of_play": 0.552,
+     "waiting_share_of_play": 0.062
+    }
+   },
+   {
+    "batch": 19,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 889.8,
+    "update_seconds": 40.0,
+    "decisions": 12150,
+    "decisions_per_game_by_alliance": {
+     "axis": 318.7,
+     "allies": 110.2,
+     "comintern": 77.4
+    },
+    "mean_return": {
+     "axis": 35.5,
+     "allies": -50.28,
+     "comintern": -83.79
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00367,
+      0.00233
+     ],
+     "allies": [
+      0.00422,
+      0.00236
+     ],
+     "comintern": [
+      0.00464,
+      0.00193
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.312,
+      2.185
+     ],
+     "allies": [
+      1.996,
+      2.046
+     ],
+     "comintern": [
+      0.875,
+      0.771
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 25.0,
+     "movement_route": 71.8,
+     "naval_start_move": 75.3,
+     "economy_purchase": 20.9,
+     "end_phase": 61.0
+    },
+    "samples": 3002,
+    "draws_per_sample_once_full": 7.2,
+    "coordinator": {
+     "evaluations": 651120,
+     "network_passes": 64941,
+     "positions_per_pass": 10.03,
+     "answering_ms_per_pass": 7.43,
+     "answering_share_of_play": 0.542,
+     "waiting_share_of_play": 0.063
+    }
+   },
+   {
+    "batch": 20,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 841.0,
+    "update_seconds": 31.0,
+    "decisions": 12177,
+    "decisions_per_game_by_alliance": {
+     "axis": 335.2,
+     "allies": 102.1,
+     "comintern": 70.1
+    },
+    "mean_return": {
+     "axis": 35.94,
+     "allies": -50.88,
+     "comintern": -84.2
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00361,
+      0.00208
+     ],
+     "allies": [
+      0.00371,
+      0.00268
+     ],
+     "comintern": [
+      0.0032,
+      0.00152
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.27,
+      2.195
+     ],
+     "allies": [
+      1.958,
+      1.692
+     ],
+     "comintern": [
+      0.788,
+      0.716
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 24.6,
+     "movement_route": 68.0,
+     "naval_start_move": 79.1,
+     "economy_purchase": 19.0,
+     "end_phase": 61.0
+    },
+    "samples": 2977,
+    "draws_per_sample_once_full": 7.26,
+    "coordinator": {
+     "evaluations": 658014,
+     "network_passes": 57388,
+     "positions_per_pass": 11.47,
+     "answering_ms_per_pass": 7.88,
+     "answering_share_of_play": 0.538,
+     "waiting_share_of_play": 0.043
+    }
+   },
+   {
+    "batch": 21,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 941.7,
+    "update_seconds": 40.4,
+    "decisions": 12817,
+    "decisions_per_game_by_alliance": {
+     "axis": 348.6,
+     "allies": 109.8,
+     "comintern": 75.7
+    },
+    "mean_return": {
+     "axis": 32.21,
+     "allies": -48.77,
+     "comintern": -83.32
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00354,
+      0.00181
+     ],
+     "allies": [
+      0.00349,
+      0.00199
+     ],
+     "comintern": [
+      0.00343,
+      0.00168
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.267,
+      2.216
+     ],
+     "allies": [
+      1.791,
+      1.772
+     ],
+     "comintern": [
+      0.838,
+      0.977
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 25.3,
+     "movement_route": 74.6,
+     "naval_start_move": 84.5,
+     "economy_purchase": 20.0,
+     "end_phase": 61.0
+    },
+    "samples": 3180,
+    "draws_per_sample_once_full": 6.79,
+    "coordinator": {
+     "evaluations": 693981,
+     "network_passes": 68951,
+     "positions_per_pass": 10.06,
+     "answering_ms_per_pass": 7.55,
+     "answering_share_of_play": 0.553,
+     "waiting_share_of_play": 0.062
+    }
+   },
+   {
+    "batch": 22,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 865.4,
+    "update_seconds": 30.8,
+    "decisions": 11773,
+    "decisions_per_game_by_alliance": {
+     "axis": 311.4,
+     "allies": 113.0,
+     "comintern": 66.1
+    },
+    "mean_return": {
+     "axis": 35.17,
+     "allies": -47.71,
+     "comintern": -87.36
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00452,
+      0.00196
+     ],
+     "allies": [
+      0.00498,
+      0.00221
+     ],
+     "comintern": [
+      0.00455,
+      0.00191
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.245,
+      2.237
+     ],
+     "allies": [
+      1.83,
+      1.778
+     ],
+     "comintern": [
+      0.749,
+      0.888
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.3,
+     "movement_route": 72.3,
+     "naval_start_move": 71.9,
+     "economy_purchase": 20.2,
+     "end_phase": 61.0
+    },
+    "samples": 3042,
+    "draws_per_sample_once_full": 7.1,
+    "coordinator": {
+     "evaluations": 627693,
+     "network_passes": 61746,
+     "positions_per_pass": 10.17,
+     "answering_ms_per_pass": 7.58,
+     "answering_share_of_play": 0.541,
+     "waiting_share_of_play": 0.049
+    }
+   },
+   {
+    "batch": 23,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 883.1,
+    "update_seconds": 41.2,
+    "decisions": 11841,
+    "decisions_per_game_by_alliance": {
+     "axis": 327.8,
+     "allies": 96.4,
+     "comintern": 69.2
+    },
+    "mean_return": {
+     "axis": 35.3,
+     "allies": -48.83,
+     "comintern": -87.6
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00406,
+      0.0021
+     ],
+     "allies": [
+      0.00403,
+      0.00217
+     ],
+     "comintern": [
+      0.0042,
+      0.00182
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.257,
+      2.225
+     ],
+     "allies": [
+      1.907,
+      1.708
+     ],
+     "comintern": [
+      0.715,
+      0.845
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.2,
+     "movement_route": 66.8,
+     "naval_start_move": 75.8,
+     "economy_purchase": 20.0,
+     "end_phase": 61.0
+    },
+    "samples": 2951,
+    "draws_per_sample_once_full": 7.32,
+    "coordinator": {
+     "evaluations": 636854,
+     "network_passes": 60964,
+     "positions_per_pass": 10.45,
+     "answering_ms_per_pass": 7.72,
+     "answering_share_of_play": 0.533,
+     "waiting_share_of_play": 0.061
+    }
+   },
+   {
+    "batch": 24,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 895.1,
+    "update_seconds": 30.8,
+    "decisions": 12137,
+    "decisions_per_game_by_alliance": {
+     "axis": 330.9,
+     "allies": 105.2,
+     "comintern": 69.6
+    },
+    "mean_return": {
+     "axis": 35.95,
+     "allies": -50.03,
+     "comintern": -86.9
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00403,
+      0.00234
+     ],
+     "allies": [
+      0.00435,
+      0.00228
+     ],
+     "comintern": [
+      0.00342,
+      0.00172
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.299,
+      2.231
+     ],
+     "allies": [
+      1.974,
+      1.979
+     ],
+     "comintern": [
+      0.734,
+      0.658
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.5,
+     "movement_route": 72.5,
+     "naval_start_move": 80.5,
+     "economy_purchase": 20.1,
+     "end_phase": 61.0
+    },
+    "samples": 3076,
+    "draws_per_sample_once_full": 7.02,
+    "coordinator": {
+     "evaluations": 653902,
+     "network_passes": 63322,
+     "positions_per_pass": 10.33,
+     "answering_ms_per_pass": 7.8,
+     "answering_share_of_play": 0.552,
+     "waiting_share_of_play": 0.046
+    }
+   },
+   {
+    "batch": 25,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 822.9,
+    "update_seconds": 30.7,
+    "decisions": 11869,
+    "decisions_per_game_by_alliance": {
+     "axis": 325.5,
+     "allies": 100.2,
+     "comintern": 68.8
+    },
+    "mean_return": {
+     "axis": 34.15,
+     "allies": -50.37,
+     "comintern": -84.7
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00405,
+      0.00233
+     ],
+     "allies": [
+      0.00389,
+      0.00233
+     ],
+     "comintern": [
+      0.00365,
+      0.00203
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.244,
+      2.244
+     ],
+     "allies": [
+      1.978,
+      2.001
+     ],
+     "comintern": [
+      0.755,
+      0.796
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.7,
+     "movement_route": 64.8,
+     "naval_start_move": 78.2,
+     "economy_purchase": 21.4,
+     "end_phase": 61.0
+    },
+    "samples": 3002,
+    "draws_per_sample_once_full": 7.2,
+    "coordinator": {
+     "evaluations": 637733,
+     "network_passes": 54742,
+     "positions_per_pass": 11.65,
+     "answering_ms_per_pass": 8.15,
+     "answering_share_of_play": 0.542,
+     "waiting_share_of_play": 0.039
+    }
+   },
+   {
+    "batch": 26,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 937.1,
+    "update_seconds": 41.8,
+    "decisions": 12716,
+    "decisions_per_game_by_alliance": {
+     "axis": 355.8,
+     "allies": 108.8,
+     "comintern": 65.2
+    },
+    "mean_return": {
+     "axis": 36.46,
+     "allies": -51.0,
+     "comintern": -85.45
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00398,
+      0.00227
+     ],
+     "allies": [
+      0.00398,
+      0.00231
+     ],
+     "comintern": [
+      0.00376,
+      0.00179
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.264,
+      2.131
+     ],
+     "allies": [
+      2.088,
+      1.991
+     ],
+     "comintern": [
+      0.948,
+      0.822
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.9,
+     "movement_route": 70.5,
+     "naval_start_move": 86.7,
+     "economy_purchase": 21.7,
+     "end_phase": 61.0
+    },
+    "samples": 3120,
+    "draws_per_sample_once_full": 6.92,
+    "coordinator": {
+     "evaluations": 692431,
+     "network_passes": 64128,
+     "positions_per_pass": 10.8,
+     "answering_ms_per_pass": 7.75,
+     "answering_share_of_play": 0.53,
+     "waiting_share_of_play": 0.054
+    }
+   },
+   {
+    "batch": 27,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 893.5,
+    "update_seconds": 30.7,
+    "decisions": 11928,
+    "decisions_per_game_by_alliance": {
+     "axis": 337.2,
+     "allies": 94.9,
+     "comintern": 65.0
+    },
+    "mean_return": {
+     "axis": 35.69,
+     "allies": -52.87,
+     "comintern": -82.89
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00356,
+      0.00205
+     ],
+     "allies": [
+      0.00364,
+      0.00238
+     ],
+     "comintern": [
+      0.00312,
+      0.00167
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.274,
+      2.177
+     ],
+     "allies": [
+      2.042,
+      2.182
+     ],
+     "comintern": [
+      0.866,
+      0.928
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 20.8,
+     "movement_route": 66.8,
+     "naval_start_move": 82.4,
+     "economy_purchase": 21.2,
+     "end_phase": 61.0
+    },
+    "samples": 3013,
+    "draws_per_sample_once_full": 7.17,
+    "coordinator": {
+     "evaluations": 647406,
+     "network_passes": 65634,
+     "positions_per_pass": 9.86,
+     "answering_ms_per_pass": 7.5,
+     "answering_share_of_play": 0.551,
+     "waiting_share_of_play": 0.046
+    }
+   },
+   {
+    "batch": 28,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 911.0,
+    "update_seconds": 44.9,
+    "decisions": 12392,
+    "decisions_per_game_by_alliance": {
+     "axis": 334.8,
+     "allies": 114.0,
+     "comintern": 67.5
+    },
+    "mean_return": {
+     "axis": 32.08,
+     "allies": -46.37,
+     "comintern": -85.81
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00389,
+      0.00242
+     ],
+     "allies": [
+      0.00394,
+      0.00222
+     ],
+     "comintern": [
+      0.00368,
+      0.00237
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.308,
+      2.218
+     ],
+     "allies": [
+      2.106,
+      2.092
+     ],
+     "comintern": [
+      0.763,
+      0.761
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.6,
+     "movement_route": 78.4,
+     "naval_start_move": 79.4,
+     "economy_purchase": 20.8,
+     "end_phase": 61.0
+    },
+    "samples": 3002,
+    "draws_per_sample_once_full": 7.2,
+    "coordinator": {
+     "evaluations": 670429,
+     "network_passes": 63477,
+     "positions_per_pass": 10.56,
+     "answering_ms_per_pass": 7.82,
+     "answering_share_of_play": 0.545,
+     "waiting_share_of_play": 0.053
+    }
+   },
+   {
+    "batch": 29,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 930.4,
+    "update_seconds": 31.2,
+    "decisions": 12390,
+    "decisions_per_game_by_alliance": {
+     "axis": 336.6,
+     "allies": 112.9,
+     "comintern": 66.8
+    },
+    "mean_return": {
+     "axis": 33.78,
+     "allies": -47.59,
+     "comintern": -86.1
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00512,
+      0.00251
+     ],
+     "allies": [
+      0.00475,
+      0.00247
+     ],
+     "comintern": [
+      0.0048,
+      0.00201
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.286,
+      2.237
+     ],
+     "allies": [
+      2.034,
+      2.08
+     ],
+     "comintern": [
+      0.857,
+      0.66
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.2,
+     "movement_route": 77.6,
+     "naval_start_move": 79.8,
+     "economy_purchase": 20.8,
+     "end_phase": 61.0
+    },
+    "samples": 3096,
+    "draws_per_sample_once_full": 6.98,
+    "coordinator": {
+     "evaluations": 673345,
+     "network_passes": 63941,
+     "positions_per_pass": 10.53,
+     "answering_ms_per_pass": 7.82,
+     "answering_share_of_play": 0.538,
+     "waiting_share_of_play": 0.062
+    }
+   },
+   {
+    "batch": 30,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 859.0,
+    "update_seconds": 47.1,
+    "decisions": 11908,
+    "decisions_per_game_by_alliance": {
+     "axis": 323.2,
+     "allies": 101.0,
+     "comintern": 72
+    },
+    "mean_return": {
+     "axis": 35.07,
+     "allies": -52.35,
+     "comintern": -83.56
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00372,
+      0.00223
+     ],
+     "allies": [
+      0.00392,
+      0.00235
+     ],
+     "comintern": [
+      0.00358,
+      0.00199
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.329,
+      2.225
+     ],
+     "allies": [
+      1.965,
+      1.979
+     ],
+     "comintern": [
+      0.834,
+      0.801
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 22.2,
+     "movement_route": 74.8,
+     "naval_start_move": 75.5,
+     "economy_purchase": 19.3,
+     "end_phase": 61.0
+    },
+    "samples": 2933,
+    "draws_per_sample_once_full": 7.36,
+    "coordinator": {
+     "evaluations": 644136,
+     "network_passes": 58189,
+     "positions_per_pass": 11.07,
+     "answering_ms_per_pass": 8.02,
+     "answering_share_of_play": 0.543,
+     "waiting_share_of_play": 0.045
+    }
+   },
+   {
+    "batch": 31,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 920.4,
+    "update_seconds": 33.0,
+    "decisions": 12068,
+    "decisions_per_game_by_alliance": {
+     "axis": 335.3,
+     "allies": 100.1,
+     "comintern": 67.4
+    },
+    "mean_return": {
+     "axis": 37.51,
+     "allies": -52.45,
+     "comintern": -85.43
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.00498,
+      0.00256
+     ],
+     "allies": [
+      0.00533,
+      0.00256
+     ],
+     "comintern": [
+      0.00505,
+      0.00217
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.339,
+      2.274
+     ],
+     "allies": [
+      2.004,
+      1.913
+     ],
+     "comintern": [
+      0.748,
+      0.751
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 23.7,
+     "movement_route": 69.7,
+     "naval_start_move": 77.0,
+     "economy_purchase": 18.9,
+     "end_phase": 61.0
+    },
+    "samples": 3048,
+    "draws_per_sample_once_full": 7.09,
+    "coordinator": {
+     "evaluations": 648907,
+     "network_passes": 66800,
+     "positions_per_pass": 9.71,
+     "answering_ms_per_pass": 7.46,
+     "answering_share_of_play": 0.542,
+     "waiting_share_of_play": 0.044
+    }
+   },
+   {
+    "batch": 32,
+    "games": 24,
+    "terminal_games": 24,
+    "play_seconds": 952.7,
+    "update_seconds": 46.7,
+    "decisions": 12662,
+    "decisions_per_game_by_alliance": {
+     "axis": 344.5,
+     "allies": 105.3,
+     "comintern": 77.8
+    },
+    "mean_return": {
+     "axis": 34.47,
+     "allies": -51.08,
+     "comintern": -83.7
+    },
+    "value_loss_first_and_last_tenth": {
+     "axis": [
+      0.0049,
+      0.00295
+     ],
+     "allies": [
+      0.00443,
+      0.00287
+     ],
+     "comintern": [
+      0.00443,
+      0.00245
+     ]
+    },
+    "policy_loss_first_and_last_tenth": {
+     "axis": [
+      2.178,
+      2.234
+     ],
+     "allies": [
+      2.125,
+      2.08
+     ],
+     "comintern": [
+      0.83,
+      0.849
+     ]
+    },
+    "moves_per_game": {
+     "land_begin_battle": 24.5,
+     "movement_route": 78.3,
+     "naval_start_move": 82.1,
+     "economy_purchase": 21.2,
+     "end_phase": 61.0
+    },
+    "samples": 3172,
+    "draws_per_sample_once_full": 6.81,
+    "coordinator": {
+     "evaluations": 683188,
+     "network_passes": 59524,
+     "positions_per_pass": 11.48,
+     "answering_ms_per_pass": 8.47,
+     "answering_share_of_play": 0.529,
+     "waiting_share_of_play": 0.054
+    }
+   }
+  ]
+ },
+ "evaluation": {
+  "axis": {
+   "first": {
+    "policy": "e2b2662d887be1480bd30ce39158667c3afadb4bb685ba1696dcc39ecfdd6660",
+    "terminal_games": 24,
+    "mean_return": 41.2,
+    "return_standard_deviation": 9.59,
+    "returns_by_seed": {
+     "7100001": 44.4,
+     "7100002": 48.8,
+     "7100003": 39.1,
+     "7100004": 49.5,
+     "7100005": 49.5,
+     "7100006": 27.5,
+     "7100007": 49.4,
+     "7100008": 35.4,
+     "7100009": 35.5,
+     "7100010": 35.0,
+     "7100011": 47.9,
+     "7100012": 35.6,
+     "7100013": 33.8,
+     "7100014": 48.8,
+     "7100015": 42.8,
+     "7100016": 48.7,
+     "7100017": 39.6,
+     "7100018": 47.6,
+     "7100019": 49.2,
+     "7100020": 48.9,
+     "7100021": 45.3,
+     "7100022": 49.4,
+     "7100023": 15.1,
+     "7100024": 22.1
+    },
+    "target_decisions_per_game": 23.2,
+    "land_battles_per_game": 12.3,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 69.25,
+      "income_rate": 14.67,
+      "units": 324.42,
+      "infrastructure": 151.54,
+      "treasury": 59.83
+     },
+     "allies": {
+      "wealth": 24.07,
+      "income_rate": 11.92,
+      "units": 68.54,
+      "infrastructure": 40.88,
+      "treasury": 12.12
+     },
+     "comintern": {
+      "wealth": 3.97,
+      "income_rate": 1.54,
+      "units": 15.25,
+      "infrastructure": 5.67,
+      "treasury": 3.29
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.38,
+     "japan": 10.62,
+     "kmt": 10.67,
+     "mongolia": 3.92,
+     "warlord_kwangtung_hainan": 1.25,
+     "warlord_sikang": 0.54,
+     "warlord_tibet": 0.58,
+     "warlord_yunnan": 0.62,
+     "warlord_sinkiang": 0.5,
+     "warlord_suiyuan": 0.46,
+     "warlord_tsinghai": 0.42,
+     "dadao": 0.04
+    },
+    "first_search_value_prediction_mean": -35.05,
+    "mean_squared_value_error": 5902.5
+   },
+   "final": {
+    "policy": "6a1d9d1ceccfb6506fabe38000c5a775e521e42f0e4823ec244fc5df55638cc4",
+    "terminal_games": 24,
+    "mean_return": 28.25,
+    "return_standard_deviation": 8.16,
+    "returns_by_seed": {
+     "7100001": 13.2,
+     "7100002": 25.0,
+     "7100003": 37.5,
+     "7100004": 27.4,
+     "7100005": 21.8,
+     "7100006": 26.8,
+     "7100007": 24.3,
+     "7100008": 29.1,
+     "7100009": 16.9,
+     "7100010": 27.9,
+     "7100011": 29.2,
+     "7100012": 31.2,
+     "7100013": 27.7,
+     "7100014": 46.9,
+     "7100015": 32.6,
+     "7100016": 26.9,
+     "7100017": 27.6,
+     "7100018": 35.7,
+     "7100019": 28.3,
+     "7100020": 35.0,
+     "7100021": 17.4,
+     "7100022": 40.4,
+     "7100023": 13.5,
+     "7100024": 35.8
+    },
+    "target_decisions_per_game": 403.9,
+    "land_battles_per_game": 24.3,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 62.18,
+      "income_rate": 15.38,
+      "units": 284.04,
+      "infrastructure": 151.67,
+      "treasury": 17.5
+     },
+     "allies": {
+      "wealth": 29.62,
+      "income_rate": 14.33,
+      "units": 92.67,
+      "infrastructure": 45.88,
+      "treasury": 14.38
+     },
+     "comintern": {
+      "wealth": 4.3,
+      "income_rate": 1.71,
+      "units": 14.33,
+      "infrastructure": 7.83,
+      "treasury": 3.17
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.38,
+     "japan": 11.04,
+     "kmt": 15.12,
+     "mongolia": 3.46
+    },
+    "first_search_value_prediction_mean": 38.64,
+    "mean_squared_value_error": 175.9
+   },
+   "script": {
+    "policy": "campaign-active-baseline-v2:balanced",
+    "terminal_games": 24,
+    "mean_return": 30.66,
+    "return_standard_deviation": 8.86,
+    "returns_by_seed": {
+     "7100001": 48.9,
+     "7100002": 36.8,
+     "7100003": 25.5,
+     "7100004": 17.9,
+     "7100005": 25.8,
+     "7100006": 26.5,
+     "7100007": 35.9,
+     "7100008": 31.2,
+     "7100009": 41.2,
+     "7100010": 28.9,
+     "7100011": 41.7,
+     "7100012": 26.9,
+     "7100013": 27.1,
+     "7100014": 27.4,
+     "7100015": 9.3,
+     "7100016": 30.5,
+     "7100017": 39.9,
+     "7100018": 40.9,
+     "7100019": 30.7,
+     "7100020": 40.6,
+     "7100021": 24.4,
+     "7100022": 29.1,
+     "7100023": 20.1,
+     "7100024": 28.7
+    },
+    "target_decisions_per_game": 337.8,
+    "land_battles_per_game": 31.7,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 62.9,
+      "income_rate": 16.75,
+      "units": 286.67,
+      "infrastructure": 155.38,
+      "treasury": 19.25
+     },
+     "allies": {
+      "wealth": 28.35,
+      "income_rate": 14.21,
+      "units": 83.79,
+      "infrastructure": 43.38,
+      "treasury": 14.21
+     },
+     "comintern": {
+      "wealth": 3.89,
+      "income_rate": 1.79,
+      "units": 11.62,
+      "infrastructure": 5.25,
+      "treasury": 3.46
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.33,
+     "japan": 11.71,
+     "kmt": 15.79,
+     "mongolia": 2.17
+    },
+    "first_search_value_prediction_mean": null,
+    "mean_squared_value_error": null
+   },
+   "final_minus_first": {
+    "mean": -12.95,
+    "standard_error": 2.25,
+    "seeds_final_higher": 1,
+    "seeds_first_higher": 23
+   },
+   "final_minus_script": {
+    "mean": -2.41,
+    "standard_error": 2.64,
+    "seeds_final_higher": 9,
+    "seeds_script_higher": 15
+   },
+   "first_minus_script": {
+    "mean": 10.54,
+    "standard_error": 2.31,
+    "seeds_first_higher": 19,
+    "seeds_script_higher": 5
+   }
+  },
+  "allies": {
+   "first": {
+    "policy": "e2b2662d887be1480bd30ce39158667c3afadb4bb685ba1696dcc39ecfdd6660",
+    "terminal_games": 24,
+    "mean_return": -56.81,
+    "return_standard_deviation": 9.25,
+    "returns_by_seed": {
+     "7100001": -64.8,
+     "7100002": -59.9,
+     "7100003": -64.4,
+     "7100004": -43.4,
+     "7100005": -51.4,
+     "7100006": -47.6,
+     "7100007": -71.7,
+     "7100008": -44.4,
+     "7100009": -71.5,
+     "7100010": -48.8,
+     "7100011": -62.9,
+     "7100012": -52.2,
+     "7100013": -60.8,
+     "7100014": -60.1,
+     "7100015": -42.4,
+     "7100016": -61.5,
+     "7100017": -59.1,
+     "7100018": -75.4,
+     "7100019": -56.6,
+     "7100020": -58.4,
+     "7100021": -43.0,
+     "7100022": -51.6,
+     "7100023": -55.4,
+     "7100024": -56.2
+    },
+    "target_decisions_per_game": 28.6,
+    "land_battles_per_game": 23.8,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 68.45,
+      "income_rate": 20.5,
+      "units": 292.25,
+      "infrastructure": 166.38,
+      "treasury": 20.5
+     },
+     "allies": {
+      "wealth": 21.16,
+      "income_rate": 7.88,
+      "units": 77.67,
+      "infrastructure": 23.04,
+      "treasury": 31
+     },
+     "comintern": {
+      "wealth": 9.53,
+      "income_rate": 5.25,
+      "units": 16.83,
+      "infrastructure": 18.33,
+      "treasury": 6.71
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 3.83,
+     "japan": 13.71,
+     "kmt": 10.58,
+     "mongolia": 2.88
+    },
+    "first_search_value_prediction_mean": -6.33,
+    "mean_squared_value_error": 2628.8
+   },
+   "final": {
+    "policy": "6a1d9d1ceccfb6506fabe38000c5a775e521e42f0e4823ec244fc5df55638cc4",
+    "terminal_games": 24,
+    "mean_return": -51.45,
+    "return_standard_deviation": 13.22,
+    "returns_by_seed": {
+     "7100001": -59.2,
+     "7100002": -65.1,
+     "7100003": -65.7,
+     "7100004": -39.4,
+     "7100005": -44.7,
+     "7100006": -39.3,
+     "7100007": -65.3,
+     "7100008": -25.5,
+     "7100009": -72.7,
+     "7100010": -49.0,
+     "7100011": -58.6,
+     "7100012": -33.3,
+     "7100013": -45.7,
+     "7100014": -42.0,
+     "7100015": -31.5,
+     "7100016": -57.1,
+     "7100017": -66.3,
+     "7100018": -43.3,
+     "7100019": -66.0,
+     "7100020": -52.4,
+     "7100021": -53.6,
+     "7100022": -35.6,
+     "7100023": -59.7,
+     "7100024": -63.7
+    },
+    "target_decisions_per_game": 79.8,
+    "land_battles_per_game": 30.9,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 67.58,
+      "income_rate": 20.08,
+      "units": 290.58,
+      "infrastructure": 163.42,
+      "treasury": 20.79
+     },
+     "allies": {
+      "wealth": 23.12,
+      "income_rate": 9.96,
+      "units": 72.29,
+      "infrastructure": 34.38,
+      "treasury": 21.75
+     },
+     "comintern": {
+      "wealth": 6.99,
+      "income_rate": 3.54,
+      "units": 14.5,
+      "infrastructure": 13.58,
+      "treasury": 5.33
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 2.75,
+     "japan": 13.29,
+     "kmt": 12.42,
+     "mongolia": 2.54
+    },
+    "first_search_value_prediction_mean": -43.8,
+    "mean_squared_value_error": 227.1
+   },
+   "script": {
+    "policy": "campaign-active-baseline-v2:balanced",
+    "terminal_games": 24,
+    "mean_return": -38.44,
+    "return_standard_deviation": 12.76,
+    "returns_by_seed": {
+     "7100001": -52.5,
+     "7100002": -56.0,
+     "7100003": -40.5,
+     "7100004": -19.5,
+     "7100005": -27.0,
+     "7100006": -34.5,
+     "7100007": -43.7,
+     "7100008": -39.6,
+     "7100009": -44.6,
+     "7100010": -36.9,
+     "7100011": -53.1,
+     "7100012": -27.5,
+     "7100013": -27.9,
+     "7100014": -27.8,
+     "7100015": -9.9,
+     "7100016": -39.9,
+     "7100017": -57.7,
+     "7100018": -56.3,
+     "7100019": -44.1,
+     "7100020": -55.6,
+     "7100021": -35.6,
+     "7100022": -34.3,
+     "7100023": -23.3,
+     "7100024": -34.7
+    },
+    "target_decisions_per_game": 138.5,
+    "land_battles_per_game": 31.7,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 62.9,
+      "income_rate": 16.75,
+      "units": 286.67,
+      "infrastructure": 155.38,
+      "treasury": 19.25
+     },
+     "allies": {
+      "wealth": 28.35,
+      "income_rate": 14.21,
+      "units": 83.79,
+      "infrastructure": 43.38,
+      "treasury": 14.21
+     },
+     "comintern": {
+      "wealth": 3.89,
+      "income_rate": 1.79,
+      "units": 11.62,
+      "infrastructure": 5.25,
+      "treasury": 3.46
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.33,
+     "japan": 11.71,
+     "kmt": 15.79,
+     "mongolia": 2.17
+    },
+    "first_search_value_prediction_mean": null,
+    "mean_squared_value_error": null
+   },
+   "final_minus_first": {
+    "mean": 5.37,
+    "standard_error": 2.18,
+    "seeds_final_higher": 15,
+    "seeds_first_higher": 9
+   },
+   "final_minus_script": {
+    "mean": -13.01,
+    "standard_error": 2.56,
+    "seeds_final_higher": 3,
+    "seeds_script_higher": 21
+   },
+   "first_minus_script": {
+    "mean": -18.38,
+    "standard_error": 2.08,
+    "seeds_first_higher": 0,
+    "seeds_script_higher": 24
+   }
+  },
+  "comintern": {
+   "first": {
+    "policy": "e2b2662d887be1480bd30ce39158667c3afadb4bb685ba1696dcc39ecfdd6660",
+    "terminal_games": 24,
+    "mean_return": -86.34,
+    "return_standard_deviation": 5.34,
+    "returns_by_seed": {
+     "7100001": -84.5,
+     "7100002": -87.7,
+     "7100003": -73.3,
+     "7100004": -83.9,
+     "7100005": -88.0,
+     "7100006": -85.9,
+     "7100007": -85.2,
+     "7100008": -89.2,
+     "7100009": -86.9,
+     "7100010": -85.6,
+     "7100011": -89.5,
+     "7100012": -82.7,
+     "7100013": -95.5,
+     "7100014": -86.5,
+     "7100015": -86.1,
+     "7100016": -82.8,
+     "7100017": -73.2,
+     "7100018": -85.6,
+     "7100019": -88.5,
+     "7100020": -82.7,
+     "7100021": -90.6,
+     "7100022": -91.1,
+     "7100023": -95.0,
+     "7100024": -92.2
+    },
+    "target_decisions_per_game": 40,
+    "land_battles_per_game": 25.8,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 61.03,
+      "income_rate": 15.54,
+      "units": 289.25,
+      "infrastructure": 146.58,
+      "treasury": 18.83
+     },
+     "allies": {
+      "wealth": 30.29,
+      "income_rate": 15.12,
+      "units": 82.08,
+      "infrastructure": 54.42,
+      "treasury": 15.17
+     },
+     "comintern": {
+      "wealth": 4.98,
+      "income_rate": 2.21,
+      "units": 15.38,
+      "infrastructure": 3,
+      "treasury": 9.33
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.33,
+     "japan": 11.21,
+     "kmt": 16.21,
+     "mongolia": 2.25
+    },
+    "first_search_value_prediction_mean": 12.67,
+    "mean_squared_value_error": 9831.2
+   },
+   "final": {
+    "policy": "6a1d9d1ceccfb6506fabe38000c5a775e521e42f0e4823ec244fc5df55638cc4",
+    "terminal_games": 24,
+    "mean_return": -84.94,
+    "return_standard_deviation": 4.52,
+    "returns_by_seed": {
+     "7100001": -81.3,
+     "7100002": -75.1,
+     "7100003": -87.5,
+     "7100004": -91.3,
+     "7100005": -89.9,
+     "7100006": -85.5,
+     "7100007": -85.4,
+     "7100008": -93.7,
+     "7100009": -89.5,
+     "7100010": -79.8,
+     "7100011": -79.8,
+     "7100012": -86.1,
+     "7100013": -87.6,
+     "7100014": -82.8,
+     "7100015": -85.5,
+     "7100016": -86.0,
+     "7100017": -88.1,
+     "7100018": -79.2,
+     "7100019": -84.4,
+     "7100020": -88.9,
+     "7100021": -82.4,
+     "7100022": -77.4,
+     "7100023": -85.3,
+     "7100024": -86.1
+    },
+    "target_decisions_per_game": 90.5,
+    "land_battles_per_game": 28.2,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 62.39,
+      "income_rate": 16.42,
+      "units": 283.54,
+      "infrastructure": 155.67,
+      "treasury": 20.46
+     },
+     "allies": {
+      "wealth": 28.0,
+      "income_rate": 14,
+      "units": 81.5,
+      "infrastructure": 44.42,
+      "treasury": 14.04
+     },
+     "comintern": {
+      "wealth": 5.44,
+      "income_rate": 2.46,
+      "units": 21.08,
+      "infrastructure": 3.92,
+      "treasury": 4.83
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.58,
+     "japan": 11.67,
+     "kmt": 15.08,
+     "mongolia": 2.67
+    },
+    "first_search_value_prediction_mean": -86.53,
+    "mean_squared_value_error": 22.0
+   },
+   "script": {
+    "policy": "campaign-active-baseline-v2:balanced",
+    "terminal_games": 24,
+    "mean_return": -87.35,
+    "return_standard_deviation": 6.43,
+    "returns_by_seed": {
+     "7100001": -93.1,
+     "7100002": -77.2,
+     "7100003": -77.1,
+     "7100004": -93.7,
+     "7100005": -91.6,
+     "7100006": -85.1,
+     "7100007": -87.1,
+     "7100008": -86.8,
+     "7100009": -92.2,
+     "7100010": -88.7,
+     "7100011": -83.3,
+     "7100012": -96.5,
+     "7100013": -94.5,
+     "7100014": -94.6,
+     "7100015": -97.7,
+     "7100016": -86.3,
+     "7100017": -75.3,
+     "7100018": -80.9,
+     "7100019": -81.7,
+     "7100020": -81.8,
+     "7100021": -81.4,
+     "7100022": -89.9,
+     "7100023": -91.1,
+     "7100024": -88.9
+    },
+    "target_decisions_per_game": 80.8,
+    "land_battles_per_game": 31.7,
+    "wealth_at_end": {
+     "axis": {
+      "wealth": 62.9,
+      "income_rate": 16.75,
+      "units": 286.67,
+      "infrastructure": 155.38,
+      "treasury": 19.25
+     },
+     "allies": {
+      "wealth": 28.35,
+      "income_rate": 14.21,
+      "units": 83.79,
+      "infrastructure": 43.38,
+      "treasury": 14.21
+     },
+     "comintern": {
+      "wealth": 3.89,
+      "income_rate": 1.79,
+      "units": 11.62,
+      "infrastructure": 5.25,
+      "treasury": 3.46
+     }
+    },
+    "zones_held_per_game": {
+     "ccp": 1.33,
+     "japan": 11.71,
+     "kmt": 15.79,
+     "mongolia": 2.17
+    },
+    "first_search_value_prediction_mean": null,
+    "mean_squared_value_error": null
+   },
+   "final_minus_first": {
+    "mean": 1.4,
+    "standard_error": 1.56,
+    "seeds_final_higher": 14,
+    "seeds_first_higher": 10
+   },
+   "final_minus_script": {
+    "mean": 2.41,
+    "standard_error": 1.44,
+    "seeds_final_higher": 17,
+    "seeds_script_higher": 7
+   },
+   "first_minus_script": {
+    "mean": 1.01,
+    "standard_error": 1.32,
+    "seeds_first_higher": 12,
+    "seeds_script_higher": 12
+   }
+  }
+ }
+}
