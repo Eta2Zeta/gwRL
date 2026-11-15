@@ -130,6 +130,15 @@ self-play and the scripted opponents. For example, the trained Axis predicted
 
 ## What this does and does not show
 
+- **The settings could not test the main question.** An attack cannot pay off
+  for the Axis within three rounds. As the decision review measured, Japan's
+  first attack costs about 100 IPP of units and brings every warlord in on
+  China's side, so a passive Axis wins whatever the networks learn. A 64×2
+  network also relates each zone only to zones two borders away, about a third
+  of the map
+  ([how big](../../design/README.md#how-big-should-the-network-and-the-search-be)).
+  Whether the agents can learn a sequence of attacks needs eleven-round games
+  and a network that reaches the whole map, such as 256×8.
 - **Measured:** 33 updates and 216 held-out games, at the settings above, on one
   PC.
 - **The value heads learned the average final score of self-play.** The
@@ -145,8 +154,7 @@ self-play and the scripted opponents. For example, the trained Axis predicted
   design document's open questions on the objective and on flat search targets
   are candidates.
 - **Not shown:**
-  - whether more games, eleven-round games or another network size would do
-    better;
+  - whether more games would do better;
   - whether the final networks beat the first in self-play itself, against
     learning opponents.
 - **Inferred, about speed:** the coordinator waited for requests only 5.6% of the

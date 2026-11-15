@@ -1877,6 +1877,10 @@ measured and what would settle it.
     by a clear margin.
   - Training made the Axis more active, away from the passive play that scores
     best over three rounds.
+  - Its settings could not test the main question. Within three rounds a
+    passive Axis wins whatever is learned, and a 64×2 network relates each zone
+    to about a third of the map
+    ([how big](#how-big-should-the-network-and-the-search-be)).
 
   Two design questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
