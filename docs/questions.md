@@ -34,10 +34,14 @@ Other open things stay in the pages that own them, and
 | [Q-002](#q-002-chinese-land-that-japan-holds) | Is an attack on Chinese land that Japan now holds an attack on China? | A printed rule | No |
 | [Q-003](#q-003-one-list-of-marks-for-each-kind-of-thing) | Should the network's input ask about a mark only where the engine can put it, and learn the two marks it does not know? | The network's input | Yes, before the next long run |
 | [Q-004](#q-004-questions-whose-answer-never-changes) | Should the input stop asking questions whose answer never changes? | The network's input | Yes, in the same change as Q-003 |
+| [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 
-All four were raised on 14 November 2026, while the position questions about
-nations were being pruned (commit `bce7a4c`). Their numbers are in the
-[record of 15 November](archive/records/answer_census_2026_11_15.md).
+Q-001 to Q-004 were raised on 14 November 2026, while the position questions
+about nations were being pruned (commit `bce7a4c`). Their numbers are in the
+[record of the questions random games answer](archive/records/answer_census_2026_11_15.md).
+Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
+`e62e01b`). Its numbers are in the
+[record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 
 ## Q-001: Mongolia at war with the CCP
 
@@ -247,6 +251,55 @@ plain record of who is who costs almost nothing, so C is a fair choice too.
 
 **If answered.** The removed questions join the list in
 [the network's input, section 8](design/network_input.md#8-questions-removed-as-impossible).
+
+## Q-005: The supervisor's count of cores
+
+**The question.** Should the supervisor keep a training run within the owner's
+allowance of 9 cores by measuring the CPU its processes use, instead of
+counting one core for each game process?
+
+**What the supervisor does now.** Before it starts a run,
+`tools/supervise_campaign_training.py` checks that the run fits the allowance by
+counting: one core for each game process, one for the coordinator and one for
+itself (`validate_training_arguments`, and `busy_cores` in
+`studies/campaign/run.py`). While the run plays it measures only memory: every
+second it reads the process table and stops the run if the memory used comes
+within 1 GB of 30 GB. But a game process plays four games, one on each of its
+threads, and the engine releases Python's lock while it works, so the four
+threads compute at the same time. A process keeps 1.2 to 1.5 cores busy, not
+one ([running training on the Mac](design/README.md#92-running-training-on-the-mac)).
+
+**A real case** (15 November 2026, one training batch each, eleven-round games,
+64 simulations, the 64×2 network on the CPU). Seven game processes of four
+games count 7 + 1 + 1 = 9 cores, which the supervisor accepts. Measured every
+five seconds, they kept 9.9 cores busy in a typical half minute and up to 11.1,
+all ten of the Mac's performance cores. The Mac profile now runs six processes,
+which kept about 8.9 cores busy, because six were chosen by hand from these
+measurements. A command line that adds `--episode-workers 7` overrides the
+profile, and the supervisor would accept it.
+
+**Why it matters.** The allowance is there to keep one performance core free
+for everything else. The count does not show whether it is free: the profile
+keeps to it only because its layout was measured. A different network, device,
+number of games per process or search would change the load without the
+supervisor noticing. The count can also be too strict: with the network on the
+GPU, game threads wait more and use less than they count.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Measure the load | The supervisor adds the processes' CPU time to the process table it already reads every second, and records the load over the last minute in its status file. A run that stays over the allowance, for example for five minutes, is stopped safely, as a requested stop is. Short peaks, such as starting up, stop nothing. The count stays as the check before a run starts. |
+| B. Count better | Count a game process of four games as 1.5 cores instead of one. Checked before the run starts and simple, but the factor depends on the network, the device, the games per process and the Mac's other work, so it would need measuring again whenever those change. |
+| C. Leave it | The count stays a rough check before a run starts, and layouts are chosen by measuring them, as on 15 November. A layout chosen by hand can pass the allowance unnoticed. |
+
+**Recommendation: A.** It holds training to what the allowance means, whatever
+the layout, and the supervisor already samples every process once a second.
+Stopping only a run that stays over keeps a brief peak from costing a batch.
+
+**If answered.** What the supervisor measures and when it stops a run belong in
+the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
+and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
 
 ## Open elsewhere
 
