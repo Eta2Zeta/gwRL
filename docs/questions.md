@@ -72,28 +72,34 @@ attack at all?
 **A real case** (random game, seed 7155;
 [record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
 
-1. Round 1: the CCP attacks the Ma Clique in Tsinghai, so the Ma Clique joins
-   the KMT with its land at the end of that Combat Phase (rulebook 4.9,
-   page 30: a warlord attacked by the CCP aligns with the KMT). Later in the
-   round the KMT destroys the CCP's last units.
+1. Round 1: the CCP attacks the Ma Clique in Tsinghai and Mengjiang in
+   Suiyuan, so both join the KMT with their land at the end of that Combat
+   Phase (rulebook 4.9, page 30: a warlord attacked by the CCP aligns with the
+   KMT). Japan then attacks Nanking, and at the end of Japan's Combat Phase the
+   six other warlords join the KMT too (rulebook 4.9, page 30: an attack by a
+   foreign nation on Chinese land makes every warlord align with the CCP or
+   the KMT). Later in the round the KMT destroys the CCP's last units.
 2. Round 2: the KMT attacks Mongolia. The declaration-of-war table lets the
    KMT attack Chinese warlords or Mongolia, by a combat move, once the CCP has
    been eliminated (rulebook 5.1, page 35, the KMT's rows; the same rows are on
    the KMT's national reference sheet, page 2; [Q-006](#q-006-the-kmt-after-the-ccp-comes-back)
    is about their exact words). The KMT and Mongolia are now at war.
 3. Round 3: a Mongolian cavalry moves into Tsinghai, which the KMT holds, as an
-   attack. The engine records Mongolia as invading China, and from that move
-   on Mongolia and the CCP are at war.
+   attack. The engine records Mongolia as invading China. No warlord is left
+   to join a side, and Mongolia was already at war with the KMT, so the attack
+   changes one thing: from that move on Mongolia and the CCP are at war.
 
 **How often.** In 480 random games Mongolia was recorded as the invader in 70,
-from round 3 on, and in all 70 it came to be at war with the CCP. Three times
-Mongolia then attacked land the CCP held ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
+from round 3 on, and in all 70 it came to be at war with the CCP. In 69 of them
+no warlord was left to join a side; the new enemies were the CCP alone in 46
+games and the CCP and the KMT in 23. Three times Mongolia then attacked land
+the CCP held ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
 
 **The printed rules.**
 
 | Rule | What it says |
 | --- | --- |
-| 4.9, page 30 | A foreign nation that attacks land which was originally a warlord's, the CCP's or the KMT's has thereby declared war on the whole of China. |
+| 4.9, page 30 | A foreign nation that attacks land which was originally a warlord's, the CCP's or the KMT's has thereby declared war on the whole of China, and every warlord aligns with the CCP or the KMT (or the Dadao Government) at the end of the attacker's Combat Phase. |
 | 4.5, page 27 | Whoever controls a minor power may move its units in combat only against nations it is already at war with, and may not declare war for it or take any action that puts it at war with a power it is not already at war with. |
 | 4.3, page 26, and 4.7, page 29 | Mongolia is a minor power of the Comintern, controlled by the USSR. The CCP is in the Comintern too. |
 | 5.1, page 35 | Nobody may declare war inside their own alliance; the table answers "No" for the USSR and for the CCP against other Comintern nations. |
