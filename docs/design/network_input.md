@@ -118,8 +118,8 @@ The largest zone families:
 | `battle_data_unit`, `battle_data_zone` | 8,365 | what a battle's notes say about unit types and zones |
 | `unit_reference_here` | 4,501 | how many units, by alliance and type, point at this zone, and why: a blitz destination, an assault target, a route, ... |
 | `battle_data_word` | 3,706 | which words a battle's notes hold, such as its next step or its situation |
-| `unit_flag` | 2,000 | how many units carry each mark, such as "landed after combat" |
-| `facility_flag` | 1,792 | marks on a facility here |
+| `unit_flag` | 1,920 | how many units carry each mark, such as "landed after combat" |
+| `facility_flag` | 1,744 | marks on a facility here |
 | `unit_facility` | 1,601 | units inside a facility, by type and facility type |
 | `units` | 586 | how many units of each nation and type are here |
 | `carried` | 277 | carried units, by carrier type and cargo type |
@@ -626,7 +626,12 @@ The random games make uniformly random moves, but now and then end the phase
 instead, so some phases do little and others much.
 
 A name written another way, and met in no random game, can still slip into an
-"other" question, but it is counted and reported, never dropped.
+"other" question, but it is counted and reported, never dropped. Two such names
+are known: the marks `bombing_reduction` and `bombing_reduction_turn`, which the
+engine puts on a nation whose factory absorbs bombing damage under Improved
+Construction. The engine builds their names in a variable, so the source check
+does not see them, and no random game has reached them
+([Q-003](../questions.md#q-003-one-list-of-marks-for-each-kind-of-thing)).
 
 Some details are summarized on purpose rather than named:
 
@@ -725,10 +730,18 @@ for units and nations, and another for territories, facilities, projects,
 battles and the game as a whole. So `nation_flag` asks every nation about every
 unit mark, such as `nation_flag:japan:air_battle`, and `state_flag` asks the game
 about every territory mark. Giving each kind of thing its own list of marks
-would remove these questions in all three parts; it has not been done. Three
+would remove these questions in all three parts; it has not been done, and
+whether to do it is an open question
+([Q-003](../questions.md#q-003-one-list-of-marks-for-each-kind-of-thing)). Three
 families that name nations have not been judged nation by nation either,
 because many rules write their answers: `pending_nation`, `chance_nation` and
 `unsited_project`.
+
+**Still asked, though the answer never changes.** 37 position questions have
+only one possible answer, such as `power_status:japan:major`, and every
+`player` question repeats an `alliance` question. They are not impossible, so
+they stay until the owner decides
+([Q-004](../questions.md#q-004-questions-whose-answer-never-changes)).
 
 ## 9. Fixed facts and the layout version
 

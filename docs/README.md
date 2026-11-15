@@ -18,6 +18,7 @@ No run has yet shown robust playing strength.
 | How the agents learn: the search, the network's input, the networks and training | [How gwRL learns](design/README.md) |
 | How the rules engine works | [The rules engine](engine/README.md) |
 | What the campaign is, what the agents play for and what work is open | [Objective, decisions and open work](plans/japan_china_full_rules_plan.md) |
+| What is waiting for the owner's decision, and what was decided | [Questions waiting for a decision](questions.md) |
 | Which printed rules are implemented, how unclear ones were settled and where the scenario's numbers come from | [Rules and data](rules/README.md) |
 | How to train, resume a run and evaluate networks | [Campaign learning guide](../studies/campaign/README.md) |
 | How to watch a recorded game | [Campaign Observatory](../web/campaign_viewer/README.md) |
@@ -33,6 +34,11 @@ No run has yet shown robust playing strength.
   records of measurements and rule changes, and the delivery reports of the
   engine's build stages. A page here may cite a record as evidence for a number.
   No page here needs the archive to be understood.
+- **Questions have their own page.** Something only the project's owner can
+  decide is written out in full in [questions](questions.md), with the choices
+  and a recommendation, in the commit that found it. Once answered, the answer
+  is stated in the page of the thing it changes, and the question keeps one
+  line.
 - **A test keeps them navigable.** `tests/test_documentation.py` fails when a
   link leads nowhere, when the data or the code cites a missing document, or
   when a dated record sits outside the archive.

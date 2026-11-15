@@ -367,6 +367,8 @@ Use these layers of verification throughout:
   compute (section 2).
 - **Rules.** RCL-010 and RCL-015 await developer clarification; Tannu Tuva's
   identity is deferred to a future expanded map.
+- **Decisions.** What is waiting for the owner's decision is written out, with
+  the choices, in [questions](../questions.md).
 
 ## Sources
 

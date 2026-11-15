@@ -63,7 +63,8 @@
   starting point and says what to read for each purpose: `docs/design/` for how
   learning works, `docs/engine/` for how the rules engine works, by subject,
   `docs/rules/` for which rules are implemented and where the data comes from,
-  and the guides beside the code they describe.
+  `docs/questions.md` for what is waiting for the user's decision, and the
+  guides beside the code they describe.
 - When a change alters what a page describes, update that page in the same
   commit. Never describe a change in a new page instead. The reason for a
   choice that still holds belongs in the page that describes it; how the change
@@ -75,6 +76,16 @@
   numbers and what they do and do not show, beside its data file, plus a line in
   the archive's index. A current page cites a record as evidence for a number,
   never as the explanation of how something works.
+- A finding that needs the user's decision goes in `docs/questions.md`, in the
+  commit of the work that found it: a printed rule that can be read two ways, a
+  choice between two designs, a problem found and not fixed. Never leave it only
+  in a chat reply, a commit message or a file outside the repository. Write it
+  so that it can be decided from the page alone: what the program does now,
+  with a real case; why it matters; the choices and what each would change; and
+  a recommendation. Its numbers come from a dated record. When the user
+  answers, carry the answer out, state it in the page of the thing it changes,
+  and shrink the question to one line in the answered list of
+  `docs/questions.md`.
 - Test counts, random-game tallies and other check results go in the commit
   message, not in a document. A settled rules question goes in
   `game_content/rules/clarifications.md` and in the page of the rule it changes.

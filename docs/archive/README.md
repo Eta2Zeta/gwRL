@@ -38,6 +38,7 @@ the first learning stage.
 | 4 Nov | [Railroads named by their border, and repairs encoded](records/rail_repair_encoding_2026_11_04.md) | One railroad per border (RCL-019), so a railroad is named by its two zones. |
 | 4 Nov | [Every name the engine writes gets a question](records/zone_names_2026_11_04.md) | The names missing from the input's lists, found and fixed. |
 | 5 Nov | [The name check's early phase ends](records/zone_name_check_early_end_2026_11_05.md) | The check never ended a phase early; fixed, and the more varied games found upgrades aboard transports. |
+| 15 Nov | [Which questions random games answer](records/answer_census_2026_11_15.md) | 480 random games answered 5,811 of the input's 59,235 questions and 290 of its 8,902 questions about marks; Mongolia was recorded as the invader of China in 70 of them and each time came to be at war with the CCP. |
 
 ### Speed
 

@@ -63,7 +63,10 @@ land that was captured. A warlord joins a side in one of four ways.
 **A foreign power invades China.** The invasion is a land attack, by a nation
 that is not Chinese, on a zone that was originally the KMT's, the CCP's or a
 warlord's (`recordLandAttack`). In this campaign that is Japan or, more rarely,
-Mongolia, which starts no war itself. The attack
+Mongolia, which starts no war itself. Whether Mongolia's attacks should count,
+and whether they should put it at war with the CCP, are open questions
+([Q-001](../questions.md#q-001-mongolia-at-war-with-the-ccp),
+[Q-002](../questions.md#q-002-chinese-land-that-japan-holds)). The attack
 puts the invader at war with the KMT, the CCP and every unaligned warlord at
 once, and every such warlord picks a side at the end of that Combat Phase. All
 the warlords' neighbours are noted first, so that one warlord's result cannot

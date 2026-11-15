@@ -1,0 +1,7386 @@
+{
+ "date": "2026-11-15",
+ "commit": "bce7a4c",
+ "machine": "M4 Max, 8 worker processes",
+ "answer_census": {
+  "layout": "campaign-zone-v1-9e192fe5c085f13e",
+  "first_seeds": [
+   7000,
+   9000
+  ],
+  "games": 480,
+  "rounds": 11,
+  "finished": 480,
+  "decisions": 627342,
+  "dice_positions": 82912,
+  "answered_columns": [
+   "encoded positions",
+   "games",
+   "smallest answer",
+   "largest answer"
+  ],
+  "unknown": {},
+  "parts": {
+   "board": {
+    "questions": 42532,
+    "answered_questions": 3158,
+    "always_the_same": [
+     "capital_of:japan",
+     "facility:airbase:count",
+     "facility:major_factory:count",
+     "possessor:japan",
+     "possessor:kmt",
+     "rail_to:land_china_beiping",
+     "rail_to:land_china_hopeh",
+     "rail_to:land_china_hunan",
+     "rail_to:land_china_nanking",
+     "rail_to:land_china_shantung",
+     "rail_to:land_china_shensi",
+     "rail_to:land_china_suiyuan",
+     "rail_to:land_jap_honshu",
+     "rail_to:land_jap_kyushu",
+     "rail_to:land_jap_tokyo",
+     "rail_to:land_korea",
+     "rail_to:land_kwangtung",
+     "rail_to:land_manchuria_eastern",
+     "rail_to:land_manchuria_northern",
+     "rail_to:land_manchuria_rehe",
+     "rail_to:land_manchuria_western",
+     "turn_start_possessor:japan",
+     "turn_start_possessor:kmt"
+    ],
+    "families": {
+     "possessor": {
+      "questions": 14,
+      "answered": 13
+     },
+     "turn_start_possessor": {
+      "questions": 14,
+      "answered": 13
+     },
+     "changed_hands_this_turn": {
+      "questions": 1,
+      "answered": 1
+     },
+     "aligned_this_turn": {
+      "questions": 1,
+      "answered": 1
+     },
+     "territory_flag": {
+      "questions": 109,
+      "answered": 1
+     },
+     "capital_of": {
+      "questions": 13,
+      "answered": 3
+     },
+     "declined_rail_request": {
+      "questions": 1,
+      "answered": 0
+     },
+     "units": {
+      "questions": 586,
+      "answered": 105
+     },
+     "unit_stat": {
+      "questions": 13321,
+      "answered": 1293
+     },
+     "unit_flag": {
+      "questions": 1920,
+      "answered": 30
+     },
+     "unit_reference_here": {
+      "questions": 4501,
+      "answered": 279
+     },
+     "carried": {
+      "questions": 277,
+      "answered": 31
+     },
+     "unit_facility": {
+      "questions": 1601,
+      "answered": 51
+     },
+     "unit_facility_border": {
+      "questions": 601,
+      "answered": 68
+     },
+     "nation_flag_here": {
+      "questions": 1560,
+      "answered": 16
+     },
+     "facility": {
+      "questions": 48,
+      "answered": 30
+     },
+     "facility_flag": {
+      "questions": 1744,
+      "answered": 33
+     },
+     "facility_border": {
+      "questions": 592,
+      "answered": 87
+     },
+     "facility_original_owner": {
+      "questions": 208,
+      "answered": 29
+     },
+     "facility_original_type": {
+      "questions": 256,
+      "answered": 16
+     },
+     "project": {
+      "questions": 794,
+      "answered": 32
+     },
+     "project_stat": {
+      "questions": 306,
+      "answered": 63
+     },
+     "project_flag": {
+      "questions": 218,
+      "answered": 10
+     },
+     "project_row": {
+      "questions": 208,
+      "answered": 34
+     },
+     "project_border": {
+      "questions": 37,
+      "answered": 35
+     },
+     "repair": {
+      "questions": 312,
+      "answered": 17
+     },
+     "rail_to": {
+      "questions": 37,
+      "answered": 29
+     },
+     "rail_damage_toward": {
+      "questions": 37,
+      "answered": 13
+     },
+     "rail_repair_toward": {
+      "questions": 32,
+      "answered": 8
+     },
+     "battle": {
+      "questions": 1,
+      "answered": 1
+     },
+     "battle_stage": {
+      "questions": 54,
+      "answered": 38
+     },
+     "battle_round": {
+      "questions": 1,
+      "answered": 1
+     },
+     "battle_attacker": {
+      "questions": 13,
+      "answered": 5
+     },
+     "battle_defender": {
+      "questions": 14,
+      "answered": 11
+     },
+     "battle_flag": {
+      "questions": 109,
+      "answered": 16
+     },
+     "battle_data": {
+      "questions": 102,
+      "answered": 80
+     },
+     "battle_data_unit": {
+      "questions": 4591,
+      "answered": 314
+     },
+     "battle_data_unit_rank": {
+      "questions": 816,
+      "answered": 91
+     },
+     "battle_data_zone": {
+      "questions": 3774,
+      "answered": 152
+     },
+     "battle_data_word": {
+      "questions": 3706,
+      "answered": 107
+     },
+     "battle_pending_hits": {
+      "questions": 1,
+      "answered": 0
+     },
+     "battle_order": {
+      "questions": 1,
+      "answered": 1
+     }
+    }
+   },
+   "position": {
+    "questions": 4076,
+    "answered_questions": 843,
+    "always_the_same": [
+     "alliance:ccp:comintern",
+     "alliance:japan:axis",
+     "alliance:kmt:allies",
+     "alliance:mongolia:comintern",
+     "at_war:ccp:kmt",
+     "at_war:kmt:ccp",
+     "controller:ccp:ccp",
+     "controller:japan:japan",
+     "controller:kmt:kmt",
+     "controller:mongolia:~none",
+     "interrupt_order:allies:1",
+     "interrupt_order:axis:0",
+     "interrupt_order:comintern:2",
+     "nation_flag:ccp:economy_research_finished",
+     "nation_present:ccp",
+     "nation_present:japan",
+     "nation_present:kmt",
+     "nation_present:mongolia",
+     "nation_present:warlord_beiping_hopeh",
+     "nation_present:warlord_kwangtung_hainan",
+     "nation_present:warlord_sikang",
+     "nation_present:warlord_sinkiang",
+     "nation_present:warlord_suiyuan",
+     "nation_present:warlord_tibet",
+     "nation_present:warlord_tsinghai",
+     "nation_present:warlord_yunnan",
+     "player:ccp:comintern",
+     "player:japan:axis",
+     "player:kmt:allies",
+     "player:mongolia:comintern",
+     "power_status:japan:major",
+     "power_status:mongolia:minor",
+     "power_status:warlord_beiping_hopeh:warlord",
+     "power_status:warlord_kwangtung_hainan:warlord",
+     "power_status:warlord_sikang:warlord",
+     "power_status:warlord_sinkiang:warlord",
+     "power_status:warlord_suiyuan:warlord",
+     "power_status:warlord_tibet:warlord",
+     "power_status:warlord_tsinghai:warlord",
+     "power_status:warlord_yunnan:warlord",
+     "state_flag:__campaign_started"
+    ],
+    "families": {
+     "round": {
+      "questions": 1,
+      "answered": 1
+     },
+     "completed_rounds": {
+      "questions": 1,
+      "answered": 1
+     },
+     "rounds_left": {
+      "questions": 1,
+      "answered": 1
+     },
+     "phase": {
+      "questions": 5,
+      "answered": 5
+     },
+     "turn_nation": {
+      "questions": 5,
+      "answered": 4
+     },
+     "income_collected": {
+      "questions": 1,
+      "answered": 0
+     },
+     "terminal": {
+      "questions": 1,
+      "answered": 0
+     },
+     "nation_present": {
+      "questions": 13,
+      "answered": 13
+     },
+     "alliance": {
+      "questions": 38,
+      "answered": 29
+     },
+     "player": {
+      "questions": 38,
+      "answered": 29
+     },
+     "power_status": {
+      "questions": 16,
+      "answered": 15
+     },
+     "controller": {
+      "questions": 47,
+      "answered": 29
+     },
+     "treasury": {
+      "questions": 4,
+      "answered": 3
+     },
+     "income": {
+      "questions": 5,
+      "answered": 4
+     },
+     "technology_stage": {
+      "questions": 49,
+      "answered": 32
+     },
+     "at_war": {
+      "questions": 99,
+      "answered": 44
+     },
+     "allied": {
+      "questions": 3,
+      "answered": 0
+     },
+     "nation_flag": {
+      "questions": 1560,
+      "answered": 88
+     },
+     "researched_round": {
+      "questions": 49,
+      "answered": 32
+     },
+     "completed_turns": {
+      "questions": 5,
+      "answered": 4
+     },
+     "surrendered": {
+      "questions": 3,
+      "answered": 0
+     },
+     "evolution_awarded": {
+      "questions": 3,
+      "answered": 2
+     },
+     "chinese_truce": {
+      "questions": 1,
+      "answered": 0
+     },
+     "truce_permanently_ended": {
+      "questions": 1,
+      "answered": 0
+     },
+     "foreign_china_war_pending": {
+      "questions": 1,
+      "answered": 1
+     },
+     "truce_offer_pending": {
+      "questions": 1,
+      "answered": 0
+     },
+     "china_invader": {
+      "questions": 3,
+      "answered": 2
+     },
+     "attacked_warlord": {
+      "questions": 33,
+      "answered": 9
+     },
+     "alignment_queue": {
+      "questions": 9,
+      "answered": 8
+     },
+     "pending": {
+      "questions": 14,
+      "answered": 12
+     },
+     "pending_nation": {
+      "questions": 182,
+      "answered": 40
+     },
+     "pending_value": {
+      "questions": 14,
+      "answered": 4
+     },
+     "decision": {
+      "questions": 44,
+      "answered": 30
+     },
+     "decision_nation": {
+      "questions": 13,
+      "answered": 10
+     },
+     "decision_reaction": {
+      "questions": 1,
+      "answered": 1
+     },
+     "decision_depth": {
+      "questions": 1,
+      "answered": 1
+     },
+     "decision_below": {
+      "questions": 44,
+      "answered": 0
+     },
+     "scheduled_decision": {
+      "questions": 52,
+      "answered": 37
+     },
+     "deciding_player": {
+      "questions": 4,
+      "answered": 4
+     },
+     "interrupt_offered_to": {
+      "questions": 4,
+      "answered": 2
+     },
+     "interrupt_passed": {
+      "questions": 3,
+      "answered": 2
+     },
+     "interrupt_order": {
+      "questions": 9,
+      "answered": 3
+     },
+     "chance": {
+      "questions": 1,
+      "answered": 1
+     },
+     "chance_purpose": {
+      "questions": 20,
+      "answered": 12
+     },
+     "chance_technology": {
+      "questions": 17,
+      "answered": 16
+     },
+     "chance_nation": {
+      "questions": 13,
+      "answered": 5
+     },
+     "chance_stat": {
+      "questions": 4,
+      "answered": 2
+     },
+     "state_flag": {
+      "questions": 109,
+      "answered": 8
+     },
+     "state_flag_nation": {
+      "questions": 3,
+      "answered": 2
+     },
+     "visited_configurations": {
+      "questions": 1,
+      "answered": 1
+     },
+     "declined_rail_requests": {
+      "questions": 1,
+      "answered": 1
+     },
+     "unsited_project": {
+      "questions": 794,
+      "answered": 71
+     },
+     "unsited_project_stat": {
+      "questions": 306,
+      "answered": 118
+     },
+     "unsited_project_row": {
+      "questions": 208,
+      "answered": 78
+     },
+     "unsited_project_flag": {
+      "questions": 218,
+      "answered": 26
+     }
+    },
+    "answered": {
+     "round": [
+      710254,
+      480,
+      1,
+      11
+     ],
+     "completed_rounds": [
+      610092,
+      480,
+      1,
+      10
+     ],
+     "rounds_left": [
+      710254,
+      480,
+      1,
+      11
+     ],
+     "phase:combat": [
+      187630,
+      480,
+      1,
+      1
+     ],
+     "phase:combat_movement": [
+      205171,
+      480,
+      1,
+      1
+     ],
+     "phase:non_combat_movement": [
+      174986,
+      480,
+      1,
+      1
+     ],
+     "phase:place_units": [
+      59603,
+      480,
+      1,
+      1
+     ],
+     "phase:production": [
+      82864,
+      480,
+      1,
+      1
+     ],
+     "turn_nation:ccp": [
+      93141,
+      480,
+      1,
+      1
+     ],
+     "turn_nation:japan": [
+      389238,
+      480,
+      1,
+      1
+     ],
+     "turn_nation:kmt": [
+      187649,
+      480,
+      1,
+      1
+     ],
+     "turn_nation:mongolia": [
+      40226,
+      480,
+      1,
+      1
+     ],
+     "nation_present:ccp": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:dadao": [
+      3800,
+      3,
+      1,
+      1
+     ],
+     "nation_present:japan": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:kmt": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:mongolia": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_beiping_hopeh": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_kwangtung_hainan": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_sikang": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_sinkiang": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_suiyuan": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_tibet": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_tsinghai": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_present:warlord_yunnan": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "alliance:ccp:comintern": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "alliance:dadao:axis": [
+      3800,
+      3,
+      1,
+      1
+     ],
+     "alliance:japan:axis": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "alliance:kmt:allies": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "alliance:mongolia:comintern": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_beiping_hopeh:allies": [
+      495313,
+      356,
+      1,
+      1
+     ],
+     "alliance:warlord_beiping_hopeh:axis": [
+      2470,
+      2,
+      1,
+      1
+     ],
+     "alliance:warlord_beiping_hopeh:comintern": [
+      161541,
+      120,
+      1,
+      1
+     ],
+     "alliance:warlord_beiping_hopeh:~none": [
+      50930,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_kwangtung_hainan:allies": [
+      623850,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_kwangtung_hainan:~none": [
+      86404,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_sikang:allies": [
+      615897,
+      474,
+      1,
+      1
+     ],
+     "alliance:warlord_sikang:comintern": [
+      7846,
+      6,
+      1,
+      1
+     ],
+     "alliance:warlord_sikang:~none": [
+      86511,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_sinkiang:allies": [
+      618536,
+      476,
+      1,
+      1
+     ],
+     "alliance:warlord_sinkiang:comintern": [
+      4668,
+      3,
+      1,
+      1
+     ],
+     "alliance:warlord_sinkiang:~none": [
+      87050,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_suiyuan:allies": [
+      485180,
+      348,
+      1,
+      1
+     ],
+     "alliance:warlord_suiyuan:axis": [
+      1330,
+      1,
+      1,
+      1
+     ],
+     "alliance:warlord_suiyuan:comintern": [
+      179898,
+      131,
+      1,
+      1
+     ],
+     "alliance:warlord_suiyuan:~none": [
+      43846,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_tibet:allies": [
+      618265,
+      476,
+      1,
+      1
+     ],
+     "alliance:warlord_tibet:comintern": [
+      5454,
+      4,
+      1,
+      1
+     ],
+     "alliance:warlord_tibet:~none": [
+      86535,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_tsinghai:allies": [
+      504696,
+      365,
+      1,
+      1
+     ],
+     "alliance:warlord_tsinghai:comintern": [
+      157083,
+      115,
+      1,
+      1
+     ],
+     "alliance:warlord_tsinghai:~none": [
+      48475,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_yunnan:allies": [
+      623220,
+      480,
+      1,
+      1
+     ],
+     "alliance:warlord_yunnan:~none": [
+      87034,
+      480,
+      1,
+      1
+     ],
+     "player:ccp:comintern": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "player:dadao:axis": [
+      3800,
+      3,
+      1,
+      1
+     ],
+     "player:japan:axis": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "player:kmt:allies": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "player:mongolia:comintern": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_beiping_hopeh:allies": [
+      495313,
+      356,
+      1,
+      1
+     ],
+     "player:warlord_beiping_hopeh:axis": [
+      2470,
+      2,
+      1,
+      1
+     ],
+     "player:warlord_beiping_hopeh:comintern": [
+      161541,
+      120,
+      1,
+      1
+     ],
+     "player:warlord_beiping_hopeh:~none": [
+      50930,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_kwangtung_hainan:allies": [
+      623850,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_kwangtung_hainan:~none": [
+      86404,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_sikang:allies": [
+      615897,
+      474,
+      1,
+      1
+     ],
+     "player:warlord_sikang:comintern": [
+      7846,
+      6,
+      1,
+      1
+     ],
+     "player:warlord_sikang:~none": [
+      86511,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_sinkiang:allies": [
+      618536,
+      476,
+      1,
+      1
+     ],
+     "player:warlord_sinkiang:comintern": [
+      4668,
+      3,
+      1,
+      1
+     ],
+     "player:warlord_sinkiang:~none": [
+      87050,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_suiyuan:allies": [
+      485180,
+      348,
+      1,
+      1
+     ],
+     "player:warlord_suiyuan:axis": [
+      1330,
+      1,
+      1,
+      1
+     ],
+     "player:warlord_suiyuan:comintern": [
+      179898,
+      131,
+      1,
+      1
+     ],
+     "player:warlord_suiyuan:~none": [
+      43846,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_tibet:allies": [
+      618265,
+      476,
+      1,
+      1
+     ],
+     "player:warlord_tibet:comintern": [
+      5454,
+      4,
+      1,
+      1
+     ],
+     "player:warlord_tibet:~none": [
+      86535,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_tsinghai:allies": [
+      504696,
+      365,
+      1,
+      1
+     ],
+     "player:warlord_tsinghai:comintern": [
+      157083,
+      115,
+      1,
+      1
+     ],
+     "player:warlord_tsinghai:~none": [
+      48475,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_yunnan:allies": [
+      623220,
+      480,
+      1,
+      1
+     ],
+     "player:warlord_yunnan:~none": [
+      87034,
+      480,
+      1,
+      1
+     ],
+     "power_status:ccp:major": [
+      205,
+      1,
+      1,
+      1
+     ],
+     "power_status:ccp:minor": [
+      710049,
+      480,
+      1,
+      1
+     ],
+     "power_status:dadao:minor": [
+      3800,
+      3,
+      1,
+      1
+     ],
+     "power_status:japan:major": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:kmt:major": [
+      456412,
+      415,
+      1,
+      1
+     ],
+     "power_status:kmt:minor": [
+      253842,
+      480,
+      1,
+      1
+     ],
+     "power_status:mongolia:minor": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_beiping_hopeh:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_kwangtung_hainan:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_sikang:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_sinkiang:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_suiyuan:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_tibet:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_tsinghai:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "power_status:warlord_yunnan:warlord": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "controller:ccp:ccp": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "controller:dadao:japan": [
+      3800,
+      3,
+      1,
+      1
+     ],
+     "controller:japan:japan": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "controller:kmt:kmt": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "controller:mongolia:~none": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_beiping_hopeh:ccp": [
+      161541,
+      120,
+      1,
+      1
+     ],
+     "controller:warlord_beiping_hopeh:dadao": [
+      2470,
+      2,
+      1,
+      1
+     ],
+     "controller:warlord_beiping_hopeh:kmt": [
+      495313,
+      356,
+      1,
+      1
+     ],
+     "controller:warlord_beiping_hopeh:~none": [
+      50930,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_kwangtung_hainan:kmt": [
+      623850,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_kwangtung_hainan:~none": [
+      86404,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_sikang:ccp": [
+      7846,
+      6,
+      1,
+      1
+     ],
+     "controller:warlord_sikang:kmt": [
+      615897,
+      474,
+      1,
+      1
+     ],
+     "controller:warlord_sikang:~none": [
+      86511,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_sinkiang:ccp": [
+      4668,
+      3,
+      1,
+      1
+     ],
+     "controller:warlord_sinkiang:kmt": [
+      618536,
+      476,
+      1,
+      1
+     ],
+     "controller:warlord_sinkiang:~none": [
+      87050,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_suiyuan:ccp": [
+      179898,
+      131,
+      1,
+      1
+     ],
+     "controller:warlord_suiyuan:dadao": [
+      1330,
+      1,
+      1,
+      1
+     ],
+     "controller:warlord_suiyuan:kmt": [
+      485180,
+      348,
+      1,
+      1
+     ],
+     "controller:warlord_suiyuan:~none": [
+      43846,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_tibet:ccp": [
+      5454,
+      4,
+      1,
+      1
+     ],
+     "controller:warlord_tibet:kmt": [
+      618265,
+      476,
+      1,
+      1
+     ],
+     "controller:warlord_tibet:~none": [
+      86535,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_tsinghai:ccp": [
+      157083,
+      115,
+      1,
+      1
+     ],
+     "controller:warlord_tsinghai:kmt": [
+      504696,
+      365,
+      1,
+      1
+     ],
+     "controller:warlord_tsinghai:~none": [
+      48475,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_yunnan:kmt": [
+      623220,
+      480,
+      1,
+      1
+     ],
+     "controller:warlord_yunnan:~none": [
+      87034,
+      480,
+      1,
+      1
+     ],
+     "treasury:ccp": [
+      660081,
+      480,
+      1,
+      54
+     ],
+     "treasury:japan": [
+      501896,
+      480,
+      1,
+      101
+     ],
+     "treasury:kmt": [
+      598380,
+      480,
+      1,
+      90
+     ],
+     "income:ccp:territorial": [
+      625575,
+      480,
+      1,
+      15
+     ],
+     "income:japan:china_control_bonus": [
+      193985,
+      385,
+      1,
+      5
+     ],
+     "income:japan:territorial": [
+      710254,
+      480,
+      9,
+      25
+     ],
+     "income:kmt:territorial": [
+      710254,
+      480,
+      3,
+      24
+     ],
+     "technology_stage:japan:advanced_artillery": [
+      123195,
+      162,
+      1,
+      3
+     ],
+     "technology_stage:japan:advanced_mechanized_infantry": [
+      126726,
+      179,
+      1,
+      3
+     ],
+     "technology_stage:japan:advanced_submarines": [
+      127571,
+      187,
+      1,
+      3
+     ],
+     "technology_stage:japan:airborne_doctrine": [
+      127349,
+      175,
+      1,
+      3
+     ],
+     "technology_stage:japan:amphibious_doctrine": [
+      120173,
+      173,
+      1,
+      4
+     ],
+     "technology_stage:japan:anti_submarine_warfare": [
+      129578,
+      170,
+      1,
+      3
+     ],
+     "technology_stage:japan:heavy_armor": [
+      130801,
+      175,
+      1,
+      4
+     ],
+     "technology_stage:japan:heavy_strategic_bombers": [
+      154778,
+      212,
+      1,
+      3
+     ],
+     "technology_stage:japan:improved_construction": [
+      113611,
+      165,
+      1,
+      3
+     ],
+     "technology_stage:japan:improved_factories": [
+      138635,
+      177,
+      1,
+      3
+     ],
+     "technology_stage:japan:improved_logistics": [
+      124039,
+      172,
+      1,
+      3
+     ],
+     "technology_stage:japan:jet_fighters": [
+      139738,
+      181,
+      1,
+      4
+     ],
+     "technology_stage:japan:large_ship_construction": [
+      126703,
+      190,
+      1,
+      3
+     ],
+     "technology_stage:japan:long_range_aircraft": [
+      122123,
+      165,
+      1,
+      3
+     ],
+     "technology_stage:japan:radar": [
+      112361,
+      158,
+      1,
+      4
+     ],
+     "technology_stage:japan:strategic_rockets": [
+      168793,
+      216,
+      1,
+      3
+     ],
+     "technology_stage:kmt:advanced_artillery": [
+      6554,
+      14,
+      1,
+      2
+     ],
+     "technology_stage:kmt:advanced_mechanized_infantry": [
+      4000,
+      7,
+      1,
+      3
+     ],
+     "technology_stage:kmt:advanced_submarines": [
+      6873,
+      11,
+      1,
+      3
+     ],
+     "technology_stage:kmt:airborne_doctrine": [
+      12237,
+      20,
+      1,
+      1
+     ],
+     "technology_stage:kmt:amphibious_doctrine": [
+      8961,
+      14,
+      1,
+      2
+     ],
+     "technology_stage:kmt:anti_submarine_warfare": [
+      9411,
+      18,
+      1,
+      2
+     ],
+     "technology_stage:kmt:heavy_armor": [
+      4410,
+      8,
+      1,
+      2
+     ],
+     "technology_stage:kmt:heavy_strategic_bombers": [
+      11504,
+      15,
+      1,
+      3
+     ],
+     "technology_stage:kmt:improved_construction": [
+      5673,
+      9,
+      1,
+      2
+     ],
+     "technology_stage:kmt:improved_factories": [
+      10765,
+      14,
+      1,
+      2
+     ],
+     "technology_stage:kmt:improved_logistics": [
+      7414,
+      11,
+      1,
+      2
+     ],
+     "technology_stage:kmt:jet_fighters": [
+      7723,
+      13,
+      1,
+      2
+     ],
+     "technology_stage:kmt:large_ship_construction": [
+      8794,
+      14,
+      1,
+      2
+     ],
+     "technology_stage:kmt:long_range_aircraft": [
+      5241,
+      11,
+      1,
+      1
+     ],
+     "technology_stage:kmt:radar": [
+      7416,
+      13,
+      1,
+      2
+     ],
+     "technology_stage:kmt:strategic_rockets": [
+      4448,
+      7,
+      1,
+      2
+     ],
+     "at_war:ccp:dadao": [
+      1358,
+      2,
+      1,
+      1
+     ],
+     "at_war:ccp:japan": [
+      708389,
+      480,
+      1,
+      1
+     ],
+     "at_war:ccp:kmt": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "at_war:ccp:mongolia": [
+      39794,
+      70,
+      1,
+      1
+     ],
+     "at_war:ccp:warlord_beiping_hopeh": [
+      3689,
+      220,
+      1,
+      1
+     ],
+     "at_war:ccp:warlord_sinkiang": [
+      1285,
+      3,
+      1,
+      1
+     ],
+     "at_war:ccp:warlord_suiyuan": [
+      3656,
+      234,
+      1,
+      1
+     ],
+     "at_war:ccp:warlord_tibet": [
+      41,
+      2,
+      1,
+      1
+     ],
+     "at_war:ccp:warlord_tsinghai": [
+      3460,
+      216,
+      1,
+      1
+     ],
+     "at_war:dadao:ccp": [
+      1358,
+      2,
+      1,
+      1
+     ],
+     "at_war:dadao:kmt": [
+      2011,
+      3,
+      1,
+      1
+     ],
+     "at_war:japan:ccp": [
+      708389,
+      480,
+      1,
+      1
+     ],
+     "at_war:japan:kmt": [
+      708022,
+      480,
+      1,
+      1
+     ],
+     "at_war:japan:mongolia": [
+      464883,
+      417,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_beiping_hopeh": [
+      28872,
+      238,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_kwangtung_hainan": [
+      51723,
+      480,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_sikang": [
+      51830,
+      480,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_sinkiang": [
+      52678,
+      478,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_suiyuan": [
+      22870,
+      216,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_tibet": [
+      51898,
+      478,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_tsinghai": [
+      25712,
+      240,
+      1,
+      1
+     ],
+     "at_war:japan:warlord_yunnan": [
+      52353,
+      480,
+      1,
+      1
+     ],
+     "at_war:kmt:ccp": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "at_war:kmt:dadao": [
+      2011,
+      3,
+      1,
+      1
+     ],
+     "at_war:kmt:japan": [
+      708022,
+      480,
+      1,
+      1
+     ],
+     "at_war:kmt:mongolia": [
+      81308,
+      143,
+      1,
+      1
+     ],
+     "at_war:mongolia:ccp": [
+      39794,
+      70,
+      1,
+      1
+     ],
+     "at_war:mongolia:japan": [
+      464883,
+      417,
+      1,
+      1
+     ],
+     "at_war:mongolia:kmt": [
+      81308,
+      143,
+      1,
+      1
+     ],
+     "at_war:mongolia:warlord_beiping_hopeh": [
+      561,
+      1,
+      1,
+      1
+     ],
+     "at_war:warlord_beiping_hopeh:ccp": [
+      3689,
+      220,
+      1,
+      1
+     ],
+     "at_war:warlord_beiping_hopeh:japan": [
+      28872,
+      238,
+      1,
+      1
+     ],
+     "at_war:warlord_beiping_hopeh:mongolia": [
+      561,
+      1,
+      1,
+      1
+     ],
+     "at_war:warlord_kwangtung_hainan:japan": [
+      51723,
+      480,
+      1,
+      1
+     ],
+     "at_war:warlord_sikang:japan": [
+      51830,
+      480,
+      1,
+      1
+     ],
+     "at_war:warlord_sinkiang:ccp": [
+      1285,
+      3,
+      1,
+      1
+     ],
+     "at_war:warlord_sinkiang:japan": [
+      52678,
+      478,
+      1,
+      1
+     ],
+     "at_war:warlord_suiyuan:ccp": [
+      3656,
+      234,
+      1,
+      1
+     ],
+     "at_war:warlord_suiyuan:japan": [
+      22870,
+      216,
+      1,
+      1
+     ],
+     "at_war:warlord_tibet:ccp": [
+      41,
+      2,
+      1,
+      1
+     ],
+     "at_war:warlord_tibet:japan": [
+      51898,
+      478,
+      1,
+      1
+     ],
+     "at_war:warlord_tsinghai:ccp": [
+      3460,
+      216,
+      1,
+      1
+     ],
+     "at_war:warlord_tsinghai:japan": [
+      25712,
+      240,
+      1,
+      1
+     ],
+     "at_war:warlord_yunnan:japan": [
+      52353,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:ccp:civil_war_eliminated": [
+      81414,
+      154,
+      1,
+      1
+     ],
+     "nation_flag:ccp:economy_militia_placed": [
+      176200,
+      445,
+      1,
+      5
+     ],
+     "nation_flag:ccp:economy_militia_upgrades": [
+      157597,
+      456,
+      1,
+      2
+     ],
+     "nation_flag:ccp:economy_production_cap": [
+      37712,
+      90,
+      1,
+      2
+     ],
+     "nation_flag:ccp:economy_repair_cap": [
+      16327,
+      47,
+      1,
+      5
+     ],
+     "nation_flag:ccp:economy_repairs_finished": [
+      617113,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:ccp:economy_research_finished": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:ccp:economy_start_damage": [
+      1028,
+      5,
+      1,
+      4
+     ],
+     "nation_flag:ccp:economy_start_type": [
+      179697,
+      241,
+      1,
+      8
+     ],
+     "nation_flag:ccp:evolved_during_own_turn": [
+      205,
+      1,
+      31,
+      31
+     ],
+     "nation_flag:ccp:evolved_turn_serial": [
+      205,
+      1,
+      1,
+      8
+     ],
+     "nation_flag:ccp:influence_attempted": [
+      71321,
+      354,
+      1,
+      1
+     ],
+     "nation_flag:ccp:logistics_last_turn_start": [
+      710254,
+      480,
+      1,
+      3
+     ],
+     "nation_flag:ccp:objective_evolution": [
+      205,
+      1,
+      1,
+      1
+     ],
+     "nation_flag:ccp:politics_combat_finished": [
+      642912,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:ccp:possessed_land_ipp": [
+      625575,
+      480,
+      1,
+      15
+     ],
+     "nation_flag:ccp:purchased": [
+      448891,
+      480,
+      1,
+      13
+     ],
+     "nation_flag:ccp:rail_used": [
+      121449,
+      244,
+      1,
+      1
+     ],
+     "nation_flag:ccp:recruitment_attempted": [
+      345973,
+      471,
+      1,
+      1
+     ],
+     "nation_flag:dadao:incorporated": [
+      1354,
+      3,
+      1,
+      1
+     ],
+     "nation_flag:dadao:logistics_last_turn_start": [
+      3624,
+      3,
+      1,
+      25
+     ],
+     "nation_flag:dadao:possessed_land_ipp": [
+      2446,
+      3,
+      1,
+      3
+     ],
+     "nation_flag:dadao:recruitment_attempted": [
+      570,
+      3,
+      1,
+      1
+     ],
+     "nation_flag:japan:economy_militia_placed": [
+      9755,
+      135,
+      1,
+      2
+     ],
+     "nation_flag:japan:economy_militia_upgrades": [
+      7968,
+      124,
+      1,
+      2
+     ],
+     "nation_flag:japan:economy_production_cap": [
+      694282,
+      480,
+      28,
+      42
+     ],
+     "nation_flag:japan:economy_repair_cap": [
+      694282,
+      480,
+      20,
+      31
+     ],
+     "nation_flag:japan:economy_repairs_finished": [
+      305044,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:japan:economy_research_capacity": [
+      694282,
+      480,
+      1,
+      2
+     ],
+     "nation_flag:japan:economy_research_finished": [
+      678306,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:japan:economy_research_used": [
+      647901,
+      480,
+      1,
+      2
+     ],
+     "nation_flag:japan:economy_start_damage": [
+      892,
+      5,
+      1,
+      4
+     ],
+     "nation_flag:japan:economy_start_type": [
+      694282,
+      480,
+      14,
+      42
+     ],
+     "nation_flag:japan:economy_used": [
+      89616,
+      471,
+      1,
+      4
+     ],
+     "nation_flag:japan:influence_attempted": [
+      2868,
+      47,
+      1,
+      1
+     ],
+     "nation_flag:japan:lease_declared": [
+      5877,
+      22,
+      1,
+      1
+     ],
+     "nation_flag:japan:lease_delivered": [
+      363,
+      2,
+      1,
+      1
+     ],
+     "nation_flag:japan:logistics_last_turn_start": [
+      694282,
+      480,
+      1,
+      3
+     ],
+     "nation_flag:japan:politics_combat_finished": [
+      418980,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:japan:possessed_land_ipp": [
+      710254,
+      480,
+      9,
+      25
+     ],
+     "nation_flag:japan:purchased": [
+      631223,
+      480,
+      1,
+      17
+     ],
+     "nation_flag:japan:rail_build_permission": [
+      3142,
+      22,
+      3,
+      43
+     ],
+     "nation_flag:japan:rail_used": [
+      153361,
+      468,
+      1,
+      1
+     ],
+     "nation_flag:japan:strategic_naval_used": [
+      86118,
+      394,
+      1,
+      3
+     ],
+     "nation_flag:kmt:economy_militia_placed": [
+      63348,
+      269,
+      1,
+      8
+     ],
+     "nation_flag:kmt:economy_militia_upgrades": [
+      69744,
+      278,
+      1,
+      2
+     ],
+     "nation_flag:kmt:economy_production_cap": [
+      292130,
+      357,
+      1,
+      12
+     ],
+     "nation_flag:kmt:economy_repair_cap": [
+      570837,
+      480,
+      1,
+      10
+     ],
+     "nation_flag:kmt:economy_repairs_finished": [
+      440134,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:kmt:economy_research_capacity": [
+      44573,
+      54,
+      1,
+      1
+     ],
+     "nation_flag:kmt:economy_research_finished": [
+      626648,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:kmt:economy_research_used": [
+      41698,
+      53,
+      1,
+      1
+     ],
+     "nation_flag:kmt:economy_start_damage": [
+      8554,
+      25,
+      1,
+      5
+     ],
+     "nation_flag:kmt:economy_start_type": [
+      627783,
+      480,
+      1,
+      25
+     ],
+     "nation_flag:kmt:economy_used": [
+      27441,
+      223,
+      1,
+      2
+     ],
+     "nation_flag:kmt:evolved_during_own_turn": [
+      456412,
+      415,
+      3,
+      31
+     ],
+     "nation_flag:kmt:evolved_turn_serial": [
+      456412,
+      415,
+      1,
+      31
+     ],
+     "nation_flag:kmt:lease_declared": [
+      41742,
+      210,
+      1,
+      1
+     ],
+     "nation_flag:kmt:lease_delivered": [
+      2839,
+      29,
+      1,
+      1
+     ],
+     "nation_flag:kmt:logistics_last_turn_start": [
+      627783,
+      480,
+      1,
+      3
+     ],
+     "nation_flag:kmt:objective_evolution": [
+      456412,
+      415,
+      1,
+      1
+     ],
+     "nation_flag:kmt:politics_combat_finished": [
+      516392,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:kmt:possessed_land_ipp": [
+      710254,
+      480,
+      3,
+      24
+     ],
+     "nation_flag:kmt:purchased": [
+      521051,
+      480,
+      1,
+      22
+     ],
+     "nation_flag:kmt:rail_build_permission": [
+      9553,
+      73,
+      4,
+      72
+     ],
+     "nation_flag:kmt:rail_used": [
+      463550,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:mongolia:economy_militia_upgrades": [
+      571,
+      5,
+      1,
+      1
+     ],
+     "nation_flag:mongolia:economy_production_cap": [
+      3348,
+      12,
+      1,
+      2
+     ],
+     "nation_flag:mongolia:economy_repair_cap": [
+      63,
+      1,
+      1,
+      1
+     ],
+     "nation_flag:mongolia:economy_repairs_finished": [
+      657493,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:mongolia:economy_research_finished": [
+      697719,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:mongolia:economy_start_type": [
+      3728,
+      13,
+      1,
+      8
+     ],
+     "nation_flag:mongolia:logistics_last_turn_start": [
+      697719,
+      480,
+      1,
+      3
+     ],
+     "nation_flag:mongolia:politics_combat_finished": [
+      677492,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:mongolia:possessed_land_ipp": [
+      651644,
+      480,
+      1,
+      7
+     ],
+     "nation_flag:mongolia:recruitment_attempted": [
+      312250,
+      479,
+      1,
+      1
+     ],
+     "nation_flag:warlord_beiping_hopeh:incorporated": [
+      659324,
+      478,
+      1,
+      1
+     ],
+     "nation_flag:warlord_beiping_hopeh:possessed_land_ipp": [
+      48504,
+      480,
+      1,
+      3
+     ],
+     "nation_flag:warlord_kwangtung_hainan:incorporated": [
+      623850,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_kwangtung_hainan:possessed_land_ipp": [
+      86404,
+      480,
+      2,
+      3
+     ],
+     "nation_flag:warlord_sikang:incorporated": [
+      623743,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_sinkiang:incorporated": [
+      623204,
+      479,
+      1,
+      1
+     ],
+     "nation_flag:warlord_suiyuan:incorporated": [
+      666408,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_suiyuan:possessed_land_ipp": [
+      43846,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_tibet:incorporated": [
+      623719,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_tsinghai:incorporated": [
+      661779,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_yunnan:incorporated": [
+      623220,
+      480,
+      1,
+      1
+     ],
+     "nation_flag:warlord_yunnan:possessed_land_ipp": [
+      87034,
+      480,
+      1,
+      1
+     ],
+     "researched_round:japan:advanced_artillery": [
+      204342,
+      252,
+      1,
+      10
+     ],
+     "researched_round:japan:advanced_mechanized_infantry": [
+      187105,
+      253,
+      1,
+      10
+     ],
+     "researched_round:japan:advanced_submarines": [
+      186980,
+      247,
+      1,
+      10
+     ],
+     "researched_round:japan:airborne_doctrine": [
+      199770,
+      260,
+      1,
+      10
+     ],
+     "researched_round:japan:amphibious_doctrine": [
+      192176,
+      249,
+      1,
+      10
+     ],
+     "researched_round:japan:anti_submarine_warfare": [
+      195401,
+      242,
+      1,
+      10
+     ],
+     "researched_round:japan:heavy_armor": [
+      185941,
+      244,
+      1,
+      10
+     ],
+     "researched_round:japan:heavy_strategic_bombers": [
+      190144,
+      249,
+      1,
+      10
+     ],
+     "researched_round:japan:improved_construction": [
+      179569,
+      250,
+      1,
+      10
+     ],
+     "researched_round:japan:improved_factories": [
+      201806,
+      254,
+      1,
+      10
+     ],
+     "researched_round:japan:improved_logistics": [
+      194313,
+      251,
+      1,
+      10
+     ],
+     "researched_round:japan:jet_fighters": [
+      197495,
+      244,
+      1,
+      10
+     ],
+     "researched_round:japan:large_ship_construction": [
+      179066,
+      253,
+      1,
+      10
+     ],
+     "researched_round:japan:long_range_aircraft": [
+      179212,
+      232,
+      1,
+      10
+     ],
+     "researched_round:japan:radar": [
+      172690,
+      231,
+      1,
+      10
+     ],
+     "researched_round:japan:strategic_rockets": [
+      211305,
+      254,
+      1,
+      10
+     ],
+     "researched_round:kmt:advanced_artillery": [
+      11640,
+      19,
+      1,
+      10
+     ],
+     "researched_round:kmt:advanced_mechanized_infantry": [
+      7093,
+      13,
+      1,
+      10
+     ],
+     "researched_round:kmt:advanced_submarines": [
+      9127,
+      17,
+      1,
+      9
+     ],
+     "researched_round:kmt:airborne_doctrine": [
+      14414,
+      24,
+      1,
+      10
+     ],
+     "researched_round:kmt:amphibious_doctrine": [
+      15209,
+      22,
+      1,
+      9
+     ],
+     "researched_round:kmt:anti_submarine_warfare": [
+      12618,
+      24,
+      1,
+      10
+     ],
+     "researched_round:kmt:heavy_armor": [
+      5270,
+      11,
+      1,
+      9
+     ],
+     "researched_round:kmt:heavy_strategic_bombers": [
+      14491,
+      22,
+      1,
+      9
+     ],
+     "researched_round:kmt:improved_construction": [
+      10279,
+      16,
+      1,
+      9
+     ],
+     "researched_round:kmt:improved_factories": [
+      15799,
+      21,
+      1,
+      10
+     ],
+     "researched_round:kmt:improved_logistics": [
+      12721,
+      18,
+      1,
+      10
+     ],
+     "researched_round:kmt:jet_fighters": [
+      10876,
+      16,
+      1,
+      10
+     ],
+     "researched_round:kmt:large_ship_construction": [
+      15596,
+      22,
+      1,
+      10
+     ],
+     "researched_round:kmt:long_range_aircraft": [
+      8278,
+      14,
+      1,
+      8
+     ],
+     "researched_round:kmt:radar": [
+      9541,
+      18,
+      1,
+      10
+     ],
+     "researched_round:kmt:strategic_rockets": [
+      8029,
+      15,
+      1,
+      9
+     ],
+     "completed_turns:ccp": [
+      697719,
+      480,
+      1,
+      11
+     ],
+     "completed_turns:japan": [
+      627783,
+      480,
+      1,
+      11
+     ],
+     "completed_turns:kmt": [
+      610092,
+      480,
+      1,
+      10
+     ],
+     "completed_turns:mongolia": [
+      694282,
+      480,
+      1,
+      11
+     ],
+     "evolution_awarded:ccp": [
+      204,
+      1,
+      1,
+      1
+     ],
+     "evolution_awarded:kmt": [
+      455997,
+      415,
+      1,
+      1
+     ],
+     "foreign_china_war_pending": [
+      191313,
+      480,
+      1,
+      1
+     ],
+     "china_invader:japan": [
+      190441,
+      480,
+      1,
+      1
+     ],
+     "china_invader:mongolia": [
+      872,
+      70,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_beiping_hopeh:ccp": [
+      3689,
+      220,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_beiping_hopeh:japan": [
+      23742,
+      210,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_kwangtung_hainan:japan": [
+      28081,
+      239,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_sinkiang:ccp": [
+      65,
+      3,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_suiyuan:ccp": [
+      3656,
+      234,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_suiyuan:japan": [
+      15875,
+      141,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_tibet:ccp": [
+      41,
+      2,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_tsinghai:ccp": [
+      3460,
+      216,
+      1,
+      1
+     ],
+     "attacked_warlord:warlord_tsinghai:japan": [
+      197,
+      1,
+      1,
+      1
+     ],
+     "alignment_queue:warlord_beiping_hopeh": [
+      209,
+      209,
+      1,
+      1
+     ],
+     "alignment_queue:warlord_kwangtung_hainan": [
+      209,
+      209,
+      2,
+      2
+     ],
+     "alignment_queue:warlord_sikang": [
+      316,
+      275,
+      1,
+      3
+     ],
+     "alignment_queue:warlord_sinkiang": [
+      322,
+      272,
+      1,
+      4
+     ],
+     "alignment_queue:warlord_suiyuan": [
+      323,
+      216,
+      1,
+      5
+     ],
+     "alignment_queue:warlord_tibet": [
+      596,
+      389,
+      1,
+      6
+     ],
+     "alignment_queue:warlord_tsinghai": [
+      531,
+      240,
+      1,
+      7
+     ],
+     "alignment_queue:warlord_yunnan": [
+      839,
+      433,
+      2,
+      8
+     ],
+     "pending:economy_rail_permission": [
+      225,
+      172,
+      1,
+      1
+     ],
+     "pending:influence_roll": [
+      447,
+      359,
+      1,
+      1
+     ],
+     "pending:last_conqueror": [
+      584877,
+      479,
+      1,
+      6
+     ],
+     "pending:politics_chinese_liberation": [
+      136,
+      102,
+      1,
+      1
+     ],
+     "pending:politics_declaration_priority": [
+      650,
+      480,
+      1,
+      1
+     ],
+     "pending:politics_evolution": [
+      416,
+      415,
+      1,
+      1
+     ],
+     "pending:recruitment_choice": [
+      1419,
+      437,
+      1,
+      1
+     ],
+     "pending:recruitment_roll": [
+      5316,
+      480,
+      1,
+      1
+     ],
+     "pending:truce_foreign_declaration": [
+      564,
+      70,
+      1,
+      1
+     ],
+     "pending:warlord_alignment": [
+      839,
+      433,
+      2,
+      9
+     ],
+     "pending:warlord_combat_resolution": [
+      951,
+      452,
+      1,
+      1
+     ],
+     "pending:warlord_defense_player": [
+      49319,
+      471,
+      1,
+      3
+     ],
+     "pending_nation:economy_rail_permission:japan": [
+      48,
+      45,
+      1,
+      1
+     ],
+     "pending_nation:economy_rail_permission:kmt": [
+      177,
+      144,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:ccp": [
+      394,
+      354,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:japan": [
+      53,
+      47,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:warlord_beiping_hopeh": [
+      156,
+      129,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:warlord_sikang": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:warlord_sinkiang": [
+      2,
+      2,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:warlord_suiyuan": [
+      142,
+      122,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:warlord_tibet": [
+      2,
+      1,
+      1,
+      1
+     ],
+     "pending_nation:influence_roll:warlord_tsinghai": [
+      144,
+      136,
+      1,
+      1
+     ],
+     "pending_nation:last_conqueror:ccp": [
+      461116,
+      466,
+      1,
+      4
+     ],
+     "pending_nation:last_conqueror:dadao": [
+      2839,
+      3,
+      1,
+      1
+     ],
+     "pending_nation:last_conqueror:japan": [
+      509186,
+      469,
+      1,
+      6
+     ],
+     "pending_nation:last_conqueror:kmt": [
+      540612,
+      478,
+      1,
+      5
+     ],
+     "pending_nation:last_conqueror:mongolia": [
+      274136,
+      341,
+      1,
+      3
+     ],
+     "pending_nation:last_conqueror:warlord_beiping_hopeh": [
+      117860,
+      84,
+      1,
+      1
+     ],
+     "pending_nation:last_conqueror:warlord_kwangtung_hainan": [
+      100382,
+      78,
+      1,
+      1
+     ],
+     "pending_nation:last_conqueror:warlord_sinkiang": [
+      1238,
+      1,
+      1,
+      1
+     ],
+     "pending_nation:politics_declaration_priority:japan": [
+      650,
+      480,
+      1,
+      1
+     ],
+     "pending_nation:politics_declaration_priority:kmt": [
+      650,
+      480,
+      1,
+      1
+     ],
+     "pending_nation:recruitment_choice:ccp": [
+      606,
+      307,
+      1,
+      1
+     ],
+     "pending_nation:recruitment_choice:dadao": [
+      2,
+      2,
+      1,
+      1
+     ],
+     "pending_nation:recruitment_choice:mongolia": [
+      811,
+      395,
+      1,
+      1
+     ],
+     "pending_nation:recruitment_roll:ccp": [
+      2852,
+      471,
+      1,
+      1
+     ],
+     "pending_nation:recruitment_roll:dadao": [
+      8,
+      3,
+      1,
+      1
+     ],
+     "pending_nation:recruitment_roll:mongolia": [
+      2456,
+      479,
+      1,
+      1
+     ],
+     "pending_nation:warlord_alignment:warlord_beiping_hopeh": [
+      209,
+      209,
+      3,
+      3
+     ],
+     "pending_nation:warlord_alignment:warlord_kwangtung_hainan": [
+      209,
+      209,
+      2,
+      2
+     ],
+     "pending_nation:warlord_alignment:warlord_sikang": [
+      316,
+      275,
+      2,
+      3
+     ],
+     "pending_nation:warlord_alignment:warlord_sinkiang": [
+      322,
+      272,
+      2,
+      3
+     ],
+     "pending_nation:warlord_alignment:warlord_suiyuan": [
+      323,
+      216,
+      2,
+      3
+     ],
+     "pending_nation:warlord_alignment:warlord_tibet": [
+      596,
+      389,
+      2,
+      3
+     ],
+     "pending_nation:warlord_alignment:warlord_tsinghai": [
+      531,
+      240,
+      2,
+      3
+     ],
+     "pending_nation:warlord_alignment:warlord_yunnan": [
+      839,
+      433,
+      2,
+      2
+     ],
+     "pending_nation:warlord_defense_player:warlord_beiping_hopeh": [
+      27614,
+      430,
+      1,
+      1
+     ],
+     "pending_nation:warlord_defense_player:warlord_kwangtung_hainan": [
+      28181,
+      239,
+      1,
+      1
+     ],
+     "pending_nation:warlord_defense_player:warlord_sinkiang": [
+      65,
+      3,
+      1,
+      1
+     ],
+     "pending_nation:warlord_defense_player:warlord_suiyuan": [
+      19741,
+      375,
+      1,
+      1
+     ],
+     "pending_nation:warlord_defense_player:warlord_tibet": [
+      41,
+      2,
+      1,
+      1
+     ],
+     "pending_nation:warlord_defense_player:warlord_tsinghai": [
+      3659,
+      217,
+      1,
+      1
+     ],
+     "pending_value:influence_roll": [
+      447,
+      359,
+      1,
+      4
+     ],
+     "pending_value:recruitment_roll": [
+      5316,
+      480,
+      1,
+      11
+     ],
+     "pending_value:truce_foreign_declaration": [
+      564,
+      70,
+      1,
+      1
+     ],
+     "pending_value:warlord_alignment": [
+      785,
+      413,
+      1,
+      6
+     ],
+     "decision:air_casualty": [
+      11,
+      11,
+      1,
+      1
+     ],
+     "decision:air_ground_or_defend": [
+      885,
+      353,
+      1,
+      1
+     ],
+     "decision:air_interception": [
+      3,
+      3,
+      1,
+      1
+     ],
+     "decision:air_landing": [
+      3617,
+      473,
+      1,
+      1
+     ],
+     "decision:air_rail_border": [
+      60,
+      41,
+      1,
+      1
+     ],
+     "decision:air_scramble": [
+      154,
+      118,
+      1,
+      1
+     ],
+     "decision:economy_rail_permission": [
+      225,
+      172,
+      1,
+      1
+     ],
+     "decision:land_artillery_pairing": [
+      277,
+      56,
+      1,
+      1
+     ],
+     "decision:land_casualty": [
+      24086,
+      480,
+      1,
+      1
+     ],
+     "decision:land_casualty_consent": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "decision:land_retreat_destination": [
+      11540,
+      480,
+      1,
+      1
+     ],
+     "decision:land_retreat_or_continue": [
+      17194,
+      480,
+      1,
+      1
+     ],
+     "decision:naval_casualty": [
+      150,
+      83,
+      1,
+      1
+     ],
+     "decision:naval_engage_raider": [
+      3,
+      3,
+      1,
+      1
+     ],
+     "decision:naval_force_selection": [
+      91620,
+      480,
+      1,
+      1
+     ],
+     "decision:naval_movement_reaction": [
+      22,
+      13,
+      1,
+      1
+     ],
+     "decision:naval_patrol_participation": [
+      12,
+      10,
+      1,
+      1
+     ],
+     "decision:naval_port_evacuation": [
+      3,
+      2,
+      1,
+      1
+     ],
+     "decision:naval_retreat_destination": [
+      7,
+      3,
+      1,
+      1
+     ],
+     "decision:naval_retreat_or_continue": [
+      30,
+      16,
+      1,
+      1
+     ],
+     "decision:naval_scramble": [
+      83,
+      26,
+      1,
+      1
+     ],
+     "decision:naval_screening_force": [
+      148,
+      44,
+      1,
+      1
+     ],
+     "decision:naval_shore_casualty": [
+      238,
+      186,
+      1,
+      1
+     ],
+     "decision:naval_shore_selection": [
+      4052,
+      473,
+      1,
+      1
+     ],
+     "decision:naval_strategic_pickup": [
+      530,
+      244,
+      1,
+      1
+     ],
+     "decision:naval_submarine_participation": [
+      43,
+      21,
+      1,
+      1
+     ],
+     "decision:politics_chinese_liberation": [
+      136,
+      102,
+      1,
+      1
+     ],
+     "decision:politics_declaration_priority": [
+      650,
+      480,
+      1,
+      1
+     ],
+     "decision:politics_evolution": [
+      416,
+      415,
+      1,
+      1
+     ],
+     "decision:recruitment_choice": [
+      1419,
+      437,
+      1,
+      1
+     ],
+     "decision_nation:ccp": [
+      14653,
+      480,
+      1,
+      1
+     ],
+     "decision_nation:dadao": [
+      17,
+      3,
+      1,
+      1
+     ],
+     "decision_nation:japan": [
+      115254,
+      480,
+      1,
+      1
+     ],
+     "decision_nation:kmt": [
+      24724,
+      480,
+      1,
+      1
+     ],
+     "decision_nation:mongolia": [
+      2443,
+      476,
+      1,
+      1
+     ],
+     "decision_nation:warlord_beiping_hopeh": [
+      298,
+      202,
+      1,
+      1
+     ],
+     "decision_nation:warlord_kwangtung_hainan": [
+      75,
+      66,
+      1,
+      1
+     ],
+     "decision_nation:warlord_sinkiang": [
+      2,
+      1,
+      1,
+      1
+     ],
+     "decision_nation:warlord_suiyuan": [
+      100,
+      86,
+      1,
+      1
+     ],
+     "decision_nation:warlord_tsinghai": [
+      49,
+      44,
+      1,
+      1
+     ],
+     "decision_reaction": [
+      10507,
+      480,
+      1,
+      1
+     ],
+     "decision_depth": [
+      157615,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:air_casualty": [
+      11,
+      11,
+      1,
+      1
+     ],
+     "scheduled_decision:air_ground_or_defend": [
+      885,
+      353,
+      1,
+      1
+     ],
+     "scheduled_decision:air_interception": [
+      3,
+      3,
+      1,
+      1
+     ],
+     "scheduled_decision:air_landing": [
+      3617,
+      473,
+      1,
+      1
+     ],
+     "scheduled_decision:air_rail_border": [
+      60,
+      41,
+      1,
+      1
+     ],
+     "scheduled_decision:air_scramble": [
+      154,
+      118,
+      1,
+      1
+     ],
+     "scheduled_decision:chance": [
+      82912,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:combat": [
+      53678,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:combat_movement": [
+      135198,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:declaration_offer": [
+      1546,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:economy_rail_permission": [
+      225,
+      172,
+      1,
+      1
+     ],
+     "scheduled_decision:land_artillery_pairing": [
+      277,
+      56,
+      1,
+      1
+     ],
+     "scheduled_decision:land_casualty": [
+      24086,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:land_casualty_consent": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "scheduled_decision:land_retreat_destination": [
+      11540,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:land_retreat_or_continue": [
+      17194,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_casualty": [
+      150,
+      83,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_engage_raider": [
+      3,
+      3,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_force_selection": [
+      91620,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_movement_reaction": [
+      22,
+      13,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_patrol_participation": [
+      12,
+      10,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_port_evacuation": [
+      3,
+      2,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_retreat_destination": [
+      7,
+      3,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_retreat_or_continue": [
+      30,
+      16,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_scramble": [
+      83,
+      26,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_screening_force": [
+      148,
+      44,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_shore_casualty": [
+      238,
+      186,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_shore_selection": [
+      4052,
+      473,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_strategic_pickup": [
+      530,
+      244,
+      1,
+      1
+     ],
+     "scheduled_decision:naval_submarine_participation": [
+      43,
+      21,
+      1,
+      1
+     ],
+     "scheduled_decision:non_combat_movement": [
+      152153,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:place_units": [
+      51919,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:politics_chinese_liberation": [
+      136,
+      102,
+      1,
+      1
+     ],
+     "scheduled_decision:politics_declaration_priority": [
+      650,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:politics_evolution": [
+      416,
+      415,
+      1,
+      1
+     ],
+     "scheduled_decision:production": [
+      75233,
+      480,
+      1,
+      1
+     ],
+     "scheduled_decision:recruitment_choice": [
+      1419,
+      437,
+      1,
+      1
+     ],
+     "deciding_player:allies": [
+      163589,
+      480,
+      1,
+      1
+     ],
+     "deciding_player:axis": [
+      354264,
+      480,
+      1,
+      1
+     ],
+     "deciding_player:comintern": [
+      109489,
+      480,
+      1,
+      1
+     ],
+     "deciding_player:~none": [
+      82912,
+      480,
+      1,
+      1
+     ],
+     "interrupt_offered_to:allies": [
+      950,
+      480,
+      1,
+      1
+     ],
+     "interrupt_offered_to:comintern": [
+      596,
+      353,
+      1,
+      1
+     ],
+     "interrupt_passed:allies": [
+      620,
+      236,
+      1,
+      1
+     ],
+     "interrupt_passed:comintern": [
+      286,
+      167,
+      1,
+      1
+     ],
+     "interrupt_order:allies:1": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "interrupt_order:axis:0": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "interrupt_order:comintern:2": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "chance": [
+      82912,
+      480,
+      1,
+      1
+     ],
+     "chance_purpose:air_bomb_damage": [
+      141,
+      68,
+      1,
+      1
+     ],
+     "chance_purpose:air_facility_aa": [
+      24,
+      20,
+      1,
+      1
+     ],
+     "chance_purpose:air_interception_roll": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "chance_purpose:economy_research": [
+      5720,
+      480,
+      1,
+      1
+     ],
+     "chance_purpose:influence_roll": [
+      447,
+      359,
+      1,
+      1
+     ],
+     "chance_purpose:land_combat_roll": [
+      68642,
+      480,
+      1,
+      1
+     ],
+     "chance_purpose:naval_combat_roll": [
+      278,
+      85,
+      1,
+      1
+     ],
+     "chance_purpose:naval_port_aa": [
+      52,
+      43,
+      1,
+      1
+     ],
+     "chance_purpose:naval_port_capture": [
+      488,
+      207,
+      1,
+      1
+     ],
+     "chance_purpose:naval_shore_roll": [
+      1094,
+      421,
+      1,
+      1
+     ],
+     "chance_purpose:recruitment_roll": [
+      5316,
+      480,
+      1,
+      1
+     ],
+     "chance_purpose:warlord_alignment": [
+      709,
+      413,
+      1,
+      1
+     ],
+     "chance_technology:advanced_artillery": [
+      375,
+      262,
+      1,
+      1
+     ],
+     "chance_technology:advanced_mechanized_infantry": [
+      355,
+      259,
+      1,
+      1
+     ],
+     "chance_technology:advanced_submarines": [
+      368,
+      257,
+      1,
+      1
+     ],
+     "chance_technology:airborne_doctrine": [
+      382,
+      272,
+      1,
+      1
+     ],
+     "chance_technology:amphibious_doctrine": [
+      361,
+      262,
+      1,
+      1
+     ],
+     "chance_technology:anti_submarine_warfare": [
+      358,
+      256,
+      1,
+      1
+     ],
+     "chance_technology:heavy_armor": [
+      337,
+      249,
+      1,
+      1
+     ],
+     "chance_technology:heavy_strategic_bombers": [
+      359,
+      260,
+      1,
+      1
+     ],
+     "chance_technology:improved_construction": [
+      348,
+      259,
+      1,
+      1
+     ],
+     "chance_technology:improved_factories": [
+      379,
+      263,
+      1,
+      1
+     ],
+     "chance_technology:improved_logistics": [
+      350,
+      260,
+      1,
+      1
+     ],
+     "chance_technology:jet_fighters": [
+      363,
+      250,
+      1,
+      1
+     ],
+     "chance_technology:large_ship_construction": [
+      368,
+      261,
+      1,
+      1
+     ],
+     "chance_technology:long_range_aircraft": [
+      327,
+      240,
+      1,
+      1
+     ],
+     "chance_technology:radar": [
+      330,
+      243,
+      1,
+      1
+     ],
+     "chance_technology:strategic_rockets": [
+      360,
+      262,
+      1,
+      1
+     ],
+     "chance_nation:ccp": [
+      19915,
+      480,
+      1,
+      1
+     ],
+     "chance_nation:dadao": [
+      22,
+      3,
+      1,
+      1
+     ],
+     "chance_nation:japan": [
+      32956,
+      480,
+      1,
+      1
+     ],
+     "chance_nation:kmt": [
+      25836,
+      480,
+      1,
+      1
+     ],
+     "chance_nation:mongolia": [
+      4183,
+      479,
+      1,
+      1
+     ],
+     "chance_stat:dice": [
+      82912,
+      480,
+      1,
+      17
+     ],
+     "chance_stat:sides": [
+      82912,
+      480,
+      6,
+      12
+     ],
+     "state_flag:__campaign_started": [
+      710254,
+      480,
+      1,
+      1
+     ],
+     "state_flag:crossing_used": [
+      10303,
+      250,
+      1,
+      2
+     ],
+     "state_flag:immediate_naval_battles": [
+      727,
+      271,
+      1,
+      1
+     ],
+     "state_flag:logistics_damaged_turn": [
+      24764,
+      63,
+      1,
+      61
+     ],
+     "state_flag:logistics_rail_created_turn": [
+      393913,
+      434,
+      1,
+      240
+     ],
+     "state_flag:logistics_start_damaged": [
+      21638,
+      62,
+      1,
+      7
+     ],
+     "state_flag:naval_berthing": [
+      28595,
+      480,
+      1,
+      1
+     ],
+     "state_flag:naval_move_decisions": [
+      687284,
+      480,
+      1,
+      340
+     ],
+     "state_flag_nation:evolution_pending:ccp": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "state_flag_nation:evolution_pending:kmt": [
+      415,
+      415,
+      1,
+      1
+     ],
+     "visited_configurations": [
+      5098,
+      480,
+      2,
+      4
+     ],
+     "declined_rail_requests": [
+      122,
+      102,
+      1,
+      1
+     ],
+     "unsited_project:ccp:cavalry": [
+      39618,
+      413,
+      1,
+      5
+     ],
+     "unsited_project:ccp:infantry": [
+      70286,
+      474,
+      1,
+      6
+     ],
+     "unsited_project:ccp:militia": [
+      25989,
+      445,
+      1,
+      5
+     ],
+     "unsited_project:dadao:seaplane_base": [
+      89,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:dadao:submarine_base": [
+      96,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:japan:air_transport": [
+      4771,
+      65,
+      1,
+      2
+     ],
+     "unsited_project:japan:airborne_infantry": [
+      7428,
+      86,
+      1,
+      2
+     ],
+     "unsited_project:japan:anti_aircraft_artillery": [
+      5958,
+      68,
+      1,
+      1
+     ],
+     "unsited_project:japan:artillery": [
+      6112,
+      75,
+      1,
+      1
+     ],
+     "unsited_project:japan:battlecruiser": [
+      48878,
+      76,
+      1,
+      2
+     ],
+     "unsited_project:japan:battleship": [
+      50265,
+      70,
+      1,
+      2
+     ],
+     "unsited_project:japan:cavalry": [
+      3963,
+      53,
+      1,
+      1
+     ],
+     "unsited_project:japan:destroyer": [
+      4188,
+      66,
+      1,
+      2
+     ],
+     "unsited_project:japan:fighter": [
+      5520,
+      70,
+      1,
+      1
+     ],
+     "unsited_project:japan:fleet_carrier": [
+      707826,
+      480,
+      1,
+      3
+     ],
+     "unsited_project:japan:heavy_cruiser": [
+      677523,
+      480,
+      1,
+      4
+     ],
+     "unsited_project:japan:infantry": [
+      17820,
+      190,
+      1,
+      2
+     ],
+     "unsited_project:japan:light_armor": [
+      6693,
+      87,
+      1,
+      2
+     ],
+     "unsited_project:japan:light_carrier": [
+      56553,
+      77,
+      1,
+      2
+     ],
+     "unsited_project:japan:light_cruiser": [
+      3315,
+      50,
+      1,
+      1
+     ],
+     "unsited_project:japan:major_dockyard": [
+      177,
+      2,
+      1,
+      1
+     ],
+     "unsited_project:japan:major_factory": [
+      5625,
+      75,
+      1,
+      1
+     ],
+     "unsited_project:japan:major_port": [
+      6012,
+      85,
+      1,
+      2
+     ],
+     "unsited_project:japan:major_shipyard": [
+      99,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:japan:marine": [
+      7550,
+      92,
+      1,
+      2
+     ],
+     "unsited_project:japan:mechanized_infantry": [
+      1659,
+      23,
+      1,
+      1
+     ],
+     "unsited_project:japan:medium_armor": [
+      1438,
+      33,
+      1,
+      1
+     ],
+     "unsited_project:japan:medium_bomber": [
+      5374,
+      60,
+      1,
+      1
+     ],
+     "unsited_project:japan:medium_factory": [
+      1028,
+      21,
+      1,
+      1
+     ],
+     "unsited_project:japan:militia": [
+      11479,
+      136,
+      1,
+      2
+     ],
+     "unsited_project:japan:motorized_infantry": [
+      77603,
+      409,
+      1,
+      3
+     ],
+     "unsited_project:japan:mountain_infantry": [
+      7972,
+      84,
+      1,
+      1
+     ],
+     "unsited_project:japan:naval_transport": [
+      4313,
+      64,
+      1,
+      1
+     ],
+     "unsited_project:japan:seaplane": [
+      5808,
+      75,
+      1,
+      1
+     ],
+     "unsited_project:japan:seaplane_base": [
+      23,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:japan:self_propelled_artillery": [
+      5918,
+      72,
+      1,
+      1
+     ],
+     "unsited_project:japan:strategic_bomber": [
+      1120,
+      21,
+      1,
+      1
+     ],
+     "unsited_project:japan:submarine": [
+      5795,
+      89,
+      1,
+      1
+     ],
+     "unsited_project:japan:tactical_bomber": [
+      4125,
+      67,
+      1,
+      1
+     ],
+     "unsited_project:japan:tank_destroyer": [
+      2001,
+      34,
+      1,
+      1
+     ],
+     "unsited_project:kmt:air_transport": [
+      3089,
+      25,
+      1,
+      1
+     ],
+     "unsited_project:kmt:airborne_infantry": [
+      1720,
+      19,
+      1,
+      2
+     ],
+     "unsited_project:kmt:anti_aircraft_artillery": [
+      3122,
+      33,
+      1,
+      1
+     ],
+     "unsited_project:kmt:artillery": [
+      3729,
+      23,
+      1,
+      1
+     ],
+     "unsited_project:kmt:battlecruiser": [
+      372,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:kmt:battleship": [
+      317,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:kmt:cavalry": [
+      27534,
+      228,
+      1,
+      8
+     ],
+     "unsited_project:kmt:fighter": [
+      1521,
+      21,
+      1,
+      1
+     ],
+     "unsited_project:kmt:heavy_cruiser": [
+      10,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:kmt:infantry": [
+      67466,
+      340,
+      1,
+      8
+     ],
+     "unsited_project:kmt:light_armor": [
+      3449,
+      29,
+      1,
+      1
+     ],
+     "unsited_project:kmt:major_dockyard": [
+      1063,
+      33,
+      1,
+      1
+     ],
+     "unsited_project:kmt:major_factory": [
+      587,
+      19,
+      1,
+      1
+     ],
+     "unsited_project:kmt:major_port": [
+      1125,
+      30,
+      1,
+      1
+     ],
+     "unsited_project:kmt:marine": [
+      7679,
+      36,
+      1,
+      1
+     ],
+     "unsited_project:kmt:mechanized_infantry": [
+      1307,
+      19,
+      1,
+      1
+     ],
+     "unsited_project:kmt:medium_armor": [
+      465,
+      13,
+      1,
+      1
+     ],
+     "unsited_project:kmt:medium_bomber": [
+      2604,
+      25,
+      1,
+      1
+     ],
+     "unsited_project:kmt:medium_factory": [
+      657,
+      17,
+      1,
+      1
+     ],
+     "unsited_project:kmt:militia": [
+      34169,
+      280,
+      1,
+      8
+     ],
+     "unsited_project:kmt:motorized_infantry": [
+      24015,
+      301,
+      1,
+      3
+     ],
+     "unsited_project:kmt:mountain_infantry": [
+      2949,
+      33,
+      1,
+      2
+     ],
+     "unsited_project:kmt:naval_transport": [
+      22,
+      1,
+      1,
+      1
+     ],
+     "unsited_project:kmt:seaplane": [
+      1334,
+      17,
+      1,
+      1
+     ],
+     "unsited_project:kmt:self_propelled_artillery": [
+      2886,
+      35,
+      1,
+      1
+     ],
+     "unsited_project:kmt:strategic_bomber": [
+      257,
+      7,
+      1,
+      1
+     ],
+     "unsited_project:kmt:tactical_bomber": [
+      989,
+      16,
+      1,
+      1
+     ],
+     "unsited_project:kmt:tank_destroyer": [
+      396,
+      12,
+      1,
+      1
+     ],
+     "unsited_project:mongolia:infantry": [
+      292,
+      7,
+      1,
+      1
+     ],
+     "unsited_project:mongolia:seaplane_base": [
+      2865,
+      9,
+      1,
+      3
+     ],
+     "unsited_project:mongolia:submarine_base": [
+      1571,
+      11,
+      1,
+      2
+     ],
+     "unsited_project_stat:air_transport:count": [
+      7860,
+      87,
+      1,
+      2
+     ],
+     "unsited_project_stat:air_transport:paid_ipp": [
+      7860,
+      87,
+      8,
+      16
+     ],
+     "unsited_project_stat:air_transport:queue_position": [
+      7860,
+      87,
+      1,
+      2
+     ],
+     "unsited_project_stat:airborne_infantry:count": [
+      9148,
+      101,
+      1,
+      2
+     ],
+     "unsited_project_stat:airborne_infantry:paid_ipp": [
+      9148,
+      101,
+      3,
+      6
+     ],
+     "unsited_project_stat:airborne_infantry:queue_position": [
+      9148,
+      101,
+      1,
+      2
+     ],
+     "unsited_project_stat:anti_aircraft_artillery:count": [
+      9080,
+      97,
+      1,
+      1
+     ],
+     "unsited_project_stat:anti_aircraft_artillery:paid_ipp": [
+      9080,
+      97,
+      4,
+      4
+     ],
+     "unsited_project_stat:anti_aircraft_artillery:queue_position": [
+      9080,
+      97,
+      1,
+      1
+     ],
+     "unsited_project_stat:artillery:count": [
+      9841,
+      96,
+      1,
+      1
+     ],
+     "unsited_project_stat:artillery:paid_ipp": [
+      9841,
+      96,
+      4,
+      4
+     ],
+     "unsited_project_stat:artillery:queue_position": [
+      9841,
+      96,
+      1,
+      1
+     ],
+     "unsited_project_stat:battlecruiser:count": [
+      49250,
+      77,
+      1,
+      2
+     ],
+     "unsited_project_stat:battlecruiser:paid_ipp": [
+      49250,
+      77,
+      7,
+      14
+     ],
+     "unsited_project_stat:battlecruiser:payments_left": [
+      48911,
+      77,
+      1,
+      2
+     ],
+     "unsited_project_stat:battlecruiser:queue_position": [
+      49250,
+      77,
+      1,
+      4
+     ],
+     "unsited_project_stat:battlecruiser:remaining_payments": [
+      48911,
+      77,
+      7,
+      14
+     ],
+     "unsited_project_stat:battleship:count": [
+      50582,
+      71,
+      1,
+      2
+     ],
+     "unsited_project_stat:battleship:paid_ipp": [
+      50582,
+      71,
+      6,
+      18
+     ],
+     "unsited_project_stat:battleship:payments_left": [
+      50582,
+      71,
+      1,
+      4
+     ],
+     "unsited_project_stat:battleship:queue_position": [
+      50582,
+      71,
+      2,
+      6
+     ],
+     "unsited_project_stat:battleship:remaining_payments": [
+      50582,
+      71,
+      6,
+      24
+     ],
+     "unsited_project_stat:cavalry:count": [
+      70878,
+      437,
+      1,
+      8
+     ],
+     "unsited_project_stat:cavalry:paid_ipp": [
+      70878,
+      437,
+      3,
+      24
+     ],
+     "unsited_project_stat:cavalry:queue_position": [
+      70878,
+      437,
+      1,
+      8
+     ],
+     "unsited_project_stat:destroyer:count": [
+      4188,
+      66,
+      1,
+      2
+     ],
+     "unsited_project_stat:destroyer:paid_ipp": [
+      4188,
+      66,
+      7,
+      14
+     ],
+     "unsited_project_stat:destroyer:queue_position": [
+      4188,
+      66,
+      1,
+      2
+     ],
+     "unsited_project_stat:fighter:count": [
+      7013,
+      87,
+      1,
+      2
+     ],
+     "unsited_project_stat:fighter:paid_ipp": [
+      7013,
+      87,
+      10,
+      20
+     ],
+     "unsited_project_stat:fighter:queue_position": [
+      7013,
+      87,
+      1,
+      2
+     ],
+     "unsited_project_stat:fleet_carrier:count": [
+      707826,
+      480,
+      1,
+      3
+     ],
+     "unsited_project_stat:fleet_carrier:paid_ipp": [
+      707826,
+      480,
+      5,
+      25
+     ],
+     "unsited_project_stat:fleet_carrier:payments_left": [
+      707507,
+      480,
+      1,
+      6
+     ],
+     "unsited_project_stat:fleet_carrier:queue_position": [
+      707826,
+      480,
+      1,
+      9
+     ],
+     "unsited_project_stat:fleet_carrier:remaining_payments": [
+      707507,
+      480,
+      5,
+      30
+     ],
+     "unsited_project_stat:heavy_cruiser:count": [
+      677523,
+      480,
+      1,
+      4
+     ],
+     "unsited_project_stat:heavy_cruiser:paid_ipp": [
+      677523,
+      480,
+      5,
+      20
+     ],
+     "unsited_project_stat:heavy_cruiser:payments_left": [
+      673806,
+      480,
+      1,
+      4
+     ],
+     "unsited_project_stat:heavy_cruiser:queue_position": [
+      677523,
+      480,
+      1,
+      8
+     ],
+     "unsited_project_stat:heavy_cruiser:remaining_payments": [
+      673806,
+      480,
+      5,
+      20
+     ],
+     "unsited_project_stat:infantry:count": [
+      148401,
+      478,
+      1,
+      8
+     ],
+     "unsited_project_stat:infantry:paid_ipp": [
+      148401,
+      478,
+      2,
+      22
+     ],
+     "unsited_project_stat:infantry:queue_position": [
+      148401,
+      478,
+      1,
+      8
+     ],
+     "unsited_project_stat:light_armor:count": [
+      10142,
+      113,
+      1,
+      2
+     ],
+     "unsited_project_stat:light_armor:paid_ipp": [
+      10142,
+      113,
+      4,
+      8
+     ],
+     "unsited_project_stat:light_armor:queue_position": [
+      10142,
+      113,
+      1,
+      2
+     ],
+     "unsited_project_stat:light_carrier:count": [
+      56553,
+      77,
+      1,
+      2
+     ],
+     "unsited_project_stat:light_carrier:paid_ipp": [
+      56553,
+      77,
+      4,
+      12
+     ],
+     "unsited_project_stat:light_carrier:payments_left": [
+      56170,
+      77,
+      1,
+      2
+     ],
+     "unsited_project_stat:light_carrier:queue_position": [
+      56553,
+      77,
+      1,
+      4
+     ],
+     "unsited_project_stat:light_carrier:remaining_payments": [
+      56170,
+      77,
+      4,
+      8
+     ],
+     "unsited_project_stat:light_cruiser:count": [
+      3315,
+      50,
+      1,
+      1
+     ],
+     "unsited_project_stat:light_cruiser:paid_ipp": [
+      3315,
+      50,
+      9,
+      9
+     ],
+     "unsited_project_stat:light_cruiser:queue_position": [
+      3315,
+      50,
+      1,
+      1
+     ],
+     "unsited_project_stat:major_dockyard:count": [
+      1240,
+      35,
+      1,
+      1
+     ],
+     "unsited_project_stat:major_dockyard:paid_ipp": [
+      1240,
+      35,
+      5,
+      5
+     ],
+     "unsited_project_stat:major_dockyard:queue_position": [
+      1240,
+      35,
+      1,
+      1
+     ],
+     "unsited_project_stat:major_factory:count": [
+      6212,
+      90,
+      1,
+      1
+     ],
+     "unsited_project_stat:major_factory:paid_ipp": [
+      6212,
+      90,
+      6,
+      6
+     ],
+     "unsited_project_stat:major_factory:queue_position": [
+      6212,
+      90,
+      1,
+      1
+     ],
+     "unsited_project_stat:major_port:count": [
+      7137,
+      108,
+      1,
+      2
+     ],
+     "unsited_project_stat:major_port:paid_ipp": [
+      7137,
+      108,
+      4,
+      8
+     ],
+     "unsited_project_stat:major_port:queue_position": [
+      7137,
+      108,
+      1,
+      2
+     ],
+     "unsited_project_stat:major_shipyard:count": [
+      99,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_stat:major_shipyard:paid_ipp": [
+      99,
+      1,
+      5,
+      5
+     ],
+     "unsited_project_stat:major_shipyard:queue_position": [
+      99,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_stat:marine:count": [
+      15229,
+      123,
+      1,
+      2
+     ],
+     "unsited_project_stat:marine:paid_ipp": [
+      15229,
+      123,
+      4,
+      8
+     ],
+     "unsited_project_stat:marine:queue_position": [
+      15229,
+      123,
+      1,
+      2
+     ],
+     "unsited_project_stat:mechanized_infantry:count": [
+      2966,
+      39,
+      1,
+      1
+     ],
+     "unsited_project_stat:mechanized_infantry:paid_ipp": [
+      2966,
+      39,
+      4,
+      4
+     ],
+     "unsited_project_stat:mechanized_infantry:queue_position": [
+      2966,
+      39,
+      1,
+      1
+     ],
+     "unsited_project_stat:medium_armor:count": [
+      1903,
+      45,
+      1,
+      1
+     ],
+     "unsited_project_stat:medium_armor:paid_ipp": [
+      1903,
+      45,
+      6,
+      6
+     ],
+     "unsited_project_stat:medium_armor:queue_position": [
+      1903,
+      45,
+      1,
+      1
+     ],
+     "unsited_project_stat:medium_bomber:count": [
+      7938,
+      83,
+      1,
+      2
+     ],
+     "unsited_project_stat:medium_bomber:paid_ipp": [
+      7938,
+      83,
+      10,
+      20
+     ],
+     "unsited_project_stat:medium_bomber:queue_position": [
+      7938,
+      83,
+      1,
+      2
+     ],
+     "unsited_project_stat:medium_factory:count": [
+      1685,
+      35,
+      1,
+      1
+     ],
+     "unsited_project_stat:medium_factory:paid_ipp": [
+      1685,
+      35,
+      7,
+      7
+     ],
+     "unsited_project_stat:medium_factory:queue_position": [
+      1685,
+      35,
+      1,
+      1
+     ],
+     "unsited_project_stat:militia:count": [
+      71398,
+      464,
+      1,
+      8
+     ],
+     "unsited_project_stat:militia:paid_ipp": [
+      71398,
+      464,
+      2,
+      16
+     ],
+     "unsited_project_stat:militia:queue_position": [
+      71398,
+      464,
+      1,
+      8
+     ],
+     "unsited_project_stat:motorized_infantry:count": [
+      99799,
+      451,
+      1,
+      3
+     ],
+     "unsited_project_stat:motorized_infantry:paid_ipp": [
+      99799,
+      451,
+      1,
+      9
+     ],
+     "unsited_project_stat:motorized_infantry:queue_position": [
+      99799,
+      451,
+      1,
+      3
+     ],
+     "unsited_project_stat:mountain_infantry:count": [
+      10921,
+      114,
+      1,
+      2
+     ],
+     "unsited_project_stat:mountain_infantry:paid_ipp": [
+      10921,
+      114,
+      4,
+      8
+     ],
+     "unsited_project_stat:mountain_infantry:queue_position": [
+      10921,
+      114,
+      1,
+      2
+     ],
+     "unsited_project_stat:naval_transport:count": [
+      4335,
+      65,
+      1,
+      1
+     ],
+     "unsited_project_stat:naval_transport:paid_ipp": [
+      4335,
+      65,
+      7,
+      7
+     ],
+     "unsited_project_stat:naval_transport:queue_position": [
+      4335,
+      65,
+      1,
+      1
+     ],
+     "unsited_project_stat:seaplane:count": [
+      7142,
+      90,
+      1,
+      1
+     ],
+     "unsited_project_stat:seaplane:paid_ipp": [
+      7142,
+      90,
+      7,
+      7
+     ],
+     "unsited_project_stat:seaplane:queue_position": [
+      7142,
+      90,
+      1,
+      1
+     ],
+     "unsited_project_stat:seaplane_base:count": [
+      2977,
+      10,
+      1,
+      3
+     ],
+     "unsited_project_stat:seaplane_base:paid_ipp": [
+      2977,
+      10,
+      3,
+      9
+     ],
+     "unsited_project_stat:seaplane_base:queue_position": [
+      2977,
+      10,
+      1,
+      3
+     ],
+     "unsited_project_stat:self_propelled_artillery:count": [
+      8804,
+      103,
+      1,
+      1
+     ],
+     "unsited_project_stat:self_propelled_artillery:paid_ipp": [
+      8804,
+      103,
+      5,
+      5
+     ],
+     "unsited_project_stat:self_propelled_artillery:queue_position": [
+      8804,
+      103,
+      1,
+      1
+     ],
+     "unsited_project_stat:strategic_bomber:count": [
+      1377,
+      27,
+      1,
+      1
+     ],
+     "unsited_project_stat:strategic_bomber:paid_ipp": [
+      1377,
+      27,
+      10,
+      10
+     ],
+     "unsited_project_stat:strategic_bomber:queue_position": [
+      1377,
+      27,
+      1,
+      1
+     ],
+     "unsited_project_stat:submarine:count": [
+      5795,
+      89,
+      1,
+      1
+     ],
+     "unsited_project_stat:submarine:paid_ipp": [
+      5795,
+      89,
+      6,
+      6
+     ],
+     "unsited_project_stat:submarine:queue_position": [
+      5795,
+      89,
+      1,
+      1
+     ],
+     "unsited_project_stat:submarine_base:count": [
+      1667,
+      12,
+      1,
+      2
+     ],
+     "unsited_project_stat:submarine_base:paid_ipp": [
+      1667,
+      12,
+      3,
+      6
+     ],
+     "unsited_project_stat:submarine_base:queue_position": [
+      1667,
+      12,
+      1,
+      2
+     ],
+     "unsited_project_stat:tactical_bomber:count": [
+      5114,
+      82,
+      1,
+      1
+     ],
+     "unsited_project_stat:tactical_bomber:paid_ipp": [
+      5114,
+      82,
+      10,
+      10
+     ],
+     "unsited_project_stat:tactical_bomber:queue_position": [
+      5114,
+      82,
+      1,
+      1
+     ],
+     "unsited_project_stat:tank_destroyer:count": [
+      2397,
+      44,
+      1,
+      1
+     ],
+     "unsited_project_stat:tank_destroyer:paid_ipp": [
+      2397,
+      44,
+      4,
+      4
+     ],
+     "unsited_project_stat:tank_destroyer:queue_position": [
+      2397,
+      44,
+      1,
+      1
+     ],
+     "unsited_project_row:ccp_minor_cavalry": [
+      39618,
+      413,
+      1,
+      5
+     ],
+     "unsited_project_row:ccp_minor_infantry": [
+      44427,
+      400,
+      1,
+      4
+     ],
+     "unsited_project_row:ccp_minor_militia": [
+      25989,
+      445,
+      1,
+      5
+     ],
+     "unsited_project_row:ccp_minor_militia_to_infantry": [
+      32120,
+      456,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_air_transport": [
+      4771,
+      65,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_airborne_infantry": [
+      7428,
+      86,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_anti_aircraft_artillery": [
+      5958,
+      68,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_artillery": [
+      6112,
+      75,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_battlecruiser": [
+      48878,
+      76,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_battleship": [
+      50265,
+      70,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_cavalry": [
+      3963,
+      53,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_destroyer": [
+      4188,
+      66,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_fighter": [
+      5520,
+      70,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_fleet_carrier": [
+      54370,
+      76,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_heavy_cruiser": [
+      50160,
+      75,
+      1,
+      3
+     ],
+     "unsited_project_row:japan_major_infantry": [
+      6764,
+      89,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_infantry_to_motorized_infantry": [
+      72989,
+      392,
+      1,
+      3
+     ],
+     "unsited_project_row:japan_major_light_armor": [
+      6693,
+      87,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_light_carrier": [
+      56553,
+      77,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_light_cruiser": [
+      3315,
+      50,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_marine": [
+      7550,
+      92,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_mechanized_infantry": [
+      1659,
+      23,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_medium_armor": [
+      1438,
+      33,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_medium_bomber": [
+      5374,
+      60,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_medium_factory_to_major_factory": [
+      5625,
+      75,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_militia": [
+      11479,
+      136,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_militia_to_infantry": [
+      9601,
+      124,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_minor_dockyard_to_major_dockyard": [
+      177,
+      2,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_minor_factory_to_medium_factory": [
+      1028,
+      21,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_minor_port_to_major_port": [
+      6012,
+      85,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_minor_shipyard_to_major_shipyard": [
+      99,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_motorized_infantry": [
+      5661,
+      84,
+      1,
+      2
+     ],
+     "unsited_project_row:japan_major_mountain_infantry": [
+      7972,
+      84,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_naval_transport": [
+      4313,
+      64,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_seaplane": [
+      5808,
+      75,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_seaplane_base": [
+      112,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_self_propelled_artillery": [
+      5918,
+      72,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_strategic_bomber": [
+      1120,
+      21,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_submarine": [
+      5795,
+      89,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_submarine_base": [
+      96,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_tactical_bomber": [
+      4125,
+      67,
+      1,
+      1
+     ],
+     "unsited_project_row:japan_major_tank_destroyer": [
+      2001,
+      34,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_air_transport": [
+      3089,
+      25,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_airborne_infantry": [
+      1720,
+      19,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_anti_aircraft_artillery": [
+      3122,
+      33,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_artillery": [
+      3729,
+      23,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_battlecruiser": [
+      372,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_battleship": [
+      317,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_cavalry": [
+      5954,
+      22,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_fighter": [
+      1521,
+      21,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_heavy_cruiser": [
+      10,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_infantry": [
+      5071,
+      33,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_infantry_to_motorized_infantry": [
+      18846,
+      293,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_light_armor": [
+      3449,
+      29,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_marine": [
+      7679,
+      36,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_mechanized_infantry": [
+      1307,
+      19,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_medium_armor": [
+      465,
+      13,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_medium_bomber": [
+      2604,
+      25,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_medium_factory_to_major_factory": [
+      587,
+      19,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_militia": [
+      13715,
+      94,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_militia_to_infantry": [
+      3265,
+      84,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_minor_dockyard_to_major_dockyard": [
+      1063,
+      33,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_minor_factory_to_medium_factory": [
+      657,
+      17,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_minor_port_to_major_port": [
+      1125,
+      30,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_motorized_infantry": [
+      5584,
+      29,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_mountain_infantry": [
+      2949,
+      33,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_naval_transport": [
+      22,
+      1,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_seaplane": [
+      1334,
+      17,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_seaplane_base": [
+      2865,
+      9,
+      1,
+      3
+     ],
+     "unsited_project_row:kmt_major_self_propelled_artillery": [
+      2886,
+      35,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_strategic_bomber": [
+      257,
+      7,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_submarine_base": [
+      1571,
+      11,
+      1,
+      2
+     ],
+     "unsited_project_row:kmt_major_tactical_bomber": [
+      989,
+      16,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_major_tank_destroyer": [
+      396,
+      12,
+      1,
+      1
+     ],
+     "unsited_project_row:kmt_minor_cavalry": [
+      21580,
+      212,
+      1,
+      8
+     ],
+     "unsited_project_row:kmt_minor_infantry": [
+      19716,
+      210,
+      1,
+      6
+     ],
+     "unsited_project_row:kmt_minor_militia": [
+      20454,
+      217,
+      1,
+      8
+     ],
+     "unsited_project_row:kmt_minor_militia_to_infantry": [
+      22086,
+      217,
+      1,
+      2
+     ],
+     "unsited_project_flag:facility:completed": [
+      20239,
+      227,
+      1,
+      4
+     ],
+     "unsited_project_flag:facility:economy_last_paid_turn": [
+      20239,
+      227,
+      1,
+      63
+     ],
+     "unsited_project_flag:facility:economy_purchased": [
+      20239,
+      227,
+      1,
+      4
+     ],
+     "unsited_project_flag:facility:facility_upgrade": [
+      16247,
+      220,
+      1,
+      2
+     ],
+     "unsited_project_flag:facility:lease_available_after_turns": [
+      4099,
+      18,
+      3,
+      30
+     ],
+     "unsited_project_flag:facility:lease_received": [
+      4099,
+      18,
+      1,
+      3
+     ],
+     "unsited_project_flag:facility:lease_sender": [
+      4099,
+      18,
+      1,
+      3
+     ],
+     "unsited_project_flag:facility:lease_wait_controller": [
+      4099,
+      18,
+      1,
+      3
+     ],
+     "unsited_project_flag:facility:payment": [
+      20239,
+      227,
+      3,
+      16
+     ],
+     "unsited_project_flag:facility:price": [
+      20239,
+      227,
+      1,
+      4
+     ],
+     "unsited_project_flag:facility:stages_paid": [
+      20239,
+      227,
+      1,
+      4
+     ],
+     "unsited_project_flag:facility:stages_total": [
+      20239,
+      227,
+      1,
+      4
+     ],
+     "unsited_project_flag:unit:completed": [
+      368241,
+      480,
+      1,
+      23
+     ],
+     "unsited_project_flag:unit:economy_last_paid_turn": [
+      470153,
+      480,
+      1,
+      127
+     ],
+     "unsited_project_flag:unit:economy_purchased": [
+      453586,
+      480,
+      1,
+      24
+     ],
+     "unsited_project_flag:unit:lease_available_after_turns": [
+      292,
+      7,
+      3,
+      11
+     ],
+     "unsited_project_flag:unit:lease_militia_upgrade": [
+      30308,
+      55,
+      1,
+      2
+     ],
+     "unsited_project_flag:unit:lease_received": [
+      292,
+      7,
+      1,
+      1
+     ],
+     "unsited_project_flag:unit:lease_sender": [
+      292,
+      7,
+      1,
+      1
+     ],
+     "unsited_project_flag:unit:lease_wait_controller": [
+      292,
+      7,
+      1,
+      1
+     ],
+     "unsited_project_flag:unit:lend_to": [
+      78104,
+      149,
+      1,
+      4
+     ],
+     "unsited_project_flag:unit:payment": [
+      453586,
+      480,
+      1,
+      89
+     ],
+     "unsited_project_flag:unit:price": [
+      453586,
+      480,
+      1,
+      24
+     ],
+     "unsited_project_flag:unit:stages_paid": [
+      470153,
+      480,
+      1,
+      24
+     ],
+     "unsited_project_flag:unit:stages_total": [
+      453586,
+      480,
+      1,
+      25
+     ],
+     "unsited_project_flag:unit:unit_upgrade": [
+      152689,
+      480,
+      1,
+      4
+     ]
+    }
+   },
+   "moves": {
+    "questions": 12627,
+    "answered_questions": 1810,
+    "always_the_same": [],
+    "families": {
+     "schedule": {
+      "questions": 4,
+      "answered": 3
+     },
+     "player": {
+      "questions": 4,
+      "answered": 3
+     },
+     "kind": {
+      "questions": 143,
+      "answered": 99
+     },
+     "nation": {
+      "questions": 13,
+      "answered": 10
+     },
+     "answers_decision": {
+      "questions": 1,
+      "answered": 1
+     },
+     "parameter": {
+      "questions": 94,
+      "answered": 47
+     },
+     "unit": {
+      "questions": 2341,
+      "answered": 126
+     },
+     "unit_stat": {
+      "questions": 296,
+      "answered": 105
+     },
+     "unit_zone": {
+      "questions": 148,
+      "answered": 108
+     },
+     "unit_rank": {
+      "questions": 32,
+      "answered": 22
+     },
+     "unit_turn_origin": {
+      "questions": 148,
+      "answered": 111
+     },
+     "unit_reference_place": {
+      "questions": 3700,
+      "answered": 380
+     },
+     "unit_facility": {
+      "questions": 64,
+      "answered": 10
+     },
+     "unit_facility_border": {
+      "questions": 25,
+      "answered": 8
+     },
+     "unit_cargo": {
+      "questions": 97,
+      "answered": 18
+     },
+     "unit_cargo_turn_origin": {
+      "questions": 148,
+      "answered": 58
+     },
+     "unit_cargo_flag": {
+      "questions": 480,
+      "answered": 19
+     },
+     "unit_later_peers": {
+      "questions": 181,
+      "answered": 78
+     },
+     "project_stat": {
+      "questions": 20,
+      "answered": 10
+     },
+     "project_border": {
+      "questions": 148,
+      "answered": 40
+     },
+     "project_flag": {
+      "questions": 436,
+      "answered": 25
+     },
+     "facility_border": {
+      "questions": 148,
+      "answered": 12
+     },
+     "facility_flag": {
+      "questions": 436,
+      "answered": 16
+     },
+     "facility_damage": {
+      "questions": 4,
+      "answered": 2
+     },
+     "unit_carried_by": {
+      "questions": 41,
+      "answered": 8
+     },
+     "battle_attacker": {
+      "questions": 52,
+      "answered": 5
+     },
+     "battle_defender": {
+      "questions": 56,
+      "answered": 11
+     },
+     "battle_place": {
+      "questions": 148,
+      "answered": 36
+     },
+     "battle_units": {
+      "questions": 181,
+      "answered": 31
+     },
+     "zone": {
+      "questions": 148,
+      "answered": 74
+     },
+     "facility": {
+      "questions": 64,
+      "answered": 23
+     },
+     "battle_stage": {
+      "questions": 216,
+      "answered": 28
+     },
+     "project": {
+      "questions": 245,
+      "answered": 54
+     },
+     "project_owner": {
+      "questions": 52,
+      "answered": 7
+     },
+     "rail_endpoint": {
+      "questions": 125,
+      "answered": 13
+     },
+     "rail_damage": {
+      "questions": 125,
+      "answered": 13
+     },
+     "row": {
+      "questions": 208,
+      "answered": 136
+     },
+     "nation_named": {
+      "questions": 52,
+      "answered": 11
+     },
+     "technology": {
+      "questions": 17,
+      "answered": 16
+     },
+     "value": {
+      "questions": 1316,
+      "answered": 10
+     },
+     "number": {
+      "questions": 94,
+      "answered": 3
+     },
+     "true": {
+      "questions": 94,
+      "answered": 8
+     },
+     "false": {
+      "questions": 94,
+      "answered": 6
+     },
+     "null": {
+      "questions": 94,
+      "answered": 2
+     },
+     "list_length": {
+      "questions": 94,
+      "answered": 4
+     }
+    }
+   }
+  }
+ },
+ "mongolia_recorded_as_invader": {
+  "how": "The games of the answer census were played again, and after each move made on Mongolia's turn the state was read: an event is a move after which politics.china_invader is mongolia. The script that did this is not kept; each event can be checked by replaying its seed with the policy of tools/check_zone_names.py to its decision number.",
+  "games": 480,
+  "games_with_an_event": 70,
+  "events": 109,
+  "first_event_of_each_game": {
+   "zone_held_by": {
+    "kmt": 45,
+    "japan": 25
+   },
+   "newly_at_war_with": {
+    "ccp": 46,
+    "ccp, kmt": 23,
+    "ccp, warlord_beiping_hopeh": 1
+   },
+   "at_war_before_with": {
+    "japan, kmt": 32,
+    "japan": 23,
+    "kmt": 15
+   },
+   "warlords_not_yet_aligned": {
+    "0": 69,
+    "1": 1
+   },
+   "ccp_had_units": {
+    "false": 43,
+    "true": 27
+   },
+   "events": [
+    {
+     "seed": 7000,
+     "decision": 963,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7001,
+     "decision": 760,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 2,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7008,
+     "decision": 569,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7024,
+     "decision": 379,
+     "round": 3,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 2,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7026,
+     "decision": 1030,
+     "round": 9,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 8,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7043,
+     "decision": 751,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7044,
+     "decision": 771,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7046,
+     "decision": 567,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7062,
+     "decision": 1020,
+     "round": 9,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7065,
+     "decision": 997,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_manchuria_western",
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7069,
+     "decision": 933,
+     "round": 10,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 4,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7075,
+     "decision": 1098,
+     "round": 10,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 1,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7093,
+     "decision": 1004,
+     "round": 9,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 5,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7101,
+     "decision": 743,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 2,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7105,
+     "decision": 466,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7107,
+     "decision": 1057,
+     "round": 9,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7125,
+     "decision": 1189,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_manchuria_western",
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 9,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7128,
+     "decision": 437,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7131,
+     "decision": 694,
+     "round": 5,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7133,
+     "decision": 670,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 1,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7145,
+     "decision": 715,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 2,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7151,
+     "decision": 411,
+     "round": 5,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 7,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7155,
+     "decision": 342,
+     "round": 3,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7156,
+     "decision": 1146,
+     "round": 9,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 2,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7163,
+     "decision": 854,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7164,
+     "decision": 1115,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 3,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7167,
+     "decision": 500,
+     "round": 5,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 4,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7171,
+     "decision": 1202,
+     "round": 11,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7218,
+     "decision": 558,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7222,
+     "decision": 682,
+     "round": 5,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 3,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7228,
+     "decision": 819,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 8,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 7230,
+     "decision": 414,
+     "round": 3,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 4,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9002,
+     "decision": 692,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9009,
+     "decision": 698,
+     "round": 6,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 4,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9015,
+     "decision": 1068,
+     "round": 9,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9025,
+     "decision": 665,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9048,
+     "decision": 1008,
+     "round": 8,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 5,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9069,
+     "decision": 827,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9072,
+     "decision": 400,
+     "round": 3,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 1,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9077,
+     "decision": 931,
+     "round": 11,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 1,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9078,
+     "decision": 732,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9083,
+     "decision": 765,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 6,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9084,
+     "decision": 496,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 5,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9095,
+     "decision": 951,
+     "round": 10,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9103,
+     "decision": 248,
+     "round": 3,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9105,
+     "decision": 1056,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9111,
+     "decision": 559,
+     "round": 5,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_ulyassutai",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9113,
+     "decision": 624,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9116,
+     "decision": 656,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9123,
+     "decision": 1247,
+     "round": 11,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9129,
+     "decision": 1116,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_ulyassutai",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9131,
+     "decision": 935,
+     "round": 11,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 3,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9151,
+     "decision": 1005,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 8,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9172,
+     "decision": 674,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9183,
+     "decision": 857,
+     "round": 7,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9185,
+     "decision": 701,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9187,
+     "decision": 921,
+     "round": 10,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_ulyassutai",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9189,
+     "decision": 1186,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9190,
+     "decision": 1089,
+     "round": 9,
+     "unit": "cavalry",
+     "path": [
+      "land_manchuria_western",
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 6,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9196,
+     "decision": 470,
+     "round": 5,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kerulen",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9198,
+     "decision": 1022,
+     "round": 8,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9199,
+     "decision": 375,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9205,
+     "decision": 633,
+     "round": 6,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_central_mongolia",
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt",
+      "warlord_beiping_hopeh"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": [
+      "warlord_beiping_hopeh"
+     ]
+    },
+    {
+     "seed": 9221,
+     "decision": 824,
+     "round": 6,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_china_tsinghai"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_tsinghai",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9224,
+     "decision": 957,
+     "round": 10,
+     "unit": "cavalry",
+     "path": [
+      "land_manchuria_western",
+      "land_mongolia_kerulen",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9225,
+     "decision": 1198,
+     "round": 11,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9227,
+     "decision": 413,
+     "round": 4,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_mongolia_ulyassutai",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9229,
+     "decision": 1059,
+     "round": 10,
+     "unit": "infantry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9233,
+     "decision": 968,
+     "round": 11,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_ulyassutai",
+      "land_mongolia_central_mongolia",
+      "land_china_suiyuan"
+     ],
+     "zone_held_by": "japan",
+     "zone_originally": "warlord_suiyuan",
+     "at_war_before": [
+      "japan"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 9,
+     "warlords_not_yet_aligned": []
+    },
+    {
+     "seed": 9239,
+     "decision": 696,
+     "round": 7,
+     "unit": "cavalry",
+     "path": [
+      "land_mongolia_kobdo",
+      "land_china_sinkiang"
+     ],
+     "zone_held_by": "kmt",
+     "zone_originally": "warlord_sinkiang",
+     "at_war_before": [
+      "japan",
+      "kmt"
+     ],
+     "at_war_after": [
+      "ccp",
+      "japan",
+      "kmt"
+     ],
+     "ccp_units": 0,
+     "warlords_not_yet_aligned": []
+    }
+   ]
+  }
+ },
+ "two_marks_without_a_question": {
+  "how": "A serialized opening position (seed 7000) was given two turn marks on Japan, bombing_reduction:<facility> = 2 and bombing_reduction_turn:<facility> = the current turn, restored and encoded.",
+  "reported_by_zone_encoding_unknowns": {
+   "actor_flag:bombing_reduction": 1,
+   "actor_flag:bombing_reduction_turn": 1
+  },
+  "answer_in_the_input": {
+   "nation_flag:japan:other": 3
+  }
+ }
+}
