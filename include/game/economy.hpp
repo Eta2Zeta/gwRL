@@ -15,6 +15,11 @@ int effectiveTerritorialIpp(const State &, const Id &zone);
 // one, with cargo it may carry. An upgrade that would not waits on the build
 // queue (user ruling RCL-021; RB 12.3).
 bool upgradeKeepsCargo(const State &, const UnitState &unit, const Id &type);
+// Whether the rules can ever give this nation this part of an income: land
+// for the three nations that keep an account, and Japan's bonus for the
+// Chinese land it holds. evaluateIncome names no other part, and the network's
+// input asks about these pairs only (zone_encoding.cpp).
+bool incomePartPossible(const Id &nation, const Id &part);
 // The nation's income as the position stands: its parts, whether the nation
 // may collect it, and the total it would collect.
 IncomeBreakdown evaluateIncome(const State &, const Id &nation);

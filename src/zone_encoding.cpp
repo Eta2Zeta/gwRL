@@ -1,6 +1,7 @@
 #include "game/zone_encoding.hpp"
 
 #include "game/catalog.hpp"
+#include "game/economy.hpp"
 #include "game/politics.hpp"
 
 #include <algorithm>
@@ -383,7 +384,7 @@ struct Context {
         zBattleData, zBattleDataUnit, zBattleDataRank, zBattleDataZone, zBattleDataWord, zBattleHits, zBattleOrder;
     // Global families.
     int gRound, gCompletedRounds, gRoundsLeft, gPhase, gTurnNation, gIncomeCollected, gTerminal, gPresent, gAlliance,
-        gPlayer, gPower, gController, gTreasury, gHasTreasury, gIncome, gIncomeKnown, gTech, gWar, gAlly, gNationFlag,
+        gPlayer, gPower, gController, gTreasury, gHasTreasury, gIncome, gTech, gWar, gAlly, gNationFlag,
         gResearched, gCompletedTurns, gSurrendered, gEvolved, gTruce, gTruceEnded, gForeignWarPending,
         gTruceOfferPending, gInvader, gAttackedWarlord, gAlignmentQueue, gPending, gPendingNation, gPendingValue,
         gDecisionKind, gDecisionNation, gDecisionReaction, gDecisionDepth, gDecisionStack, gAdapterKind, gOwner,
@@ -729,8 +730,12 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gController = g.add("controller", {&c->nations, &c->nationOrNone});
     c->gTreasury = g.add("treasury", {&c->nations});
     c->gHasTreasury = g.add("has_treasury", {&c->nations});
-    c->gIncome = g.add("income", {&c->nations, &c->incomeComponents});
-    c->gIncomeKnown = g.add("income_known", {&c->nations});
+    // Only Japan, the KMT and the CCP keep an income account, and only Japan
+    // has the bonus for Chinese land (incomePartPossible in economy.cpp).
+    c->gIncome = g.add("income", {&c->nations, &c->incomeComponents}, [&](const Cell& x) {
+        return incomePartPossible(c->nations.names()[static_cast<std::size_t>(x[0])],
+                                  c->incomeComponents.names()[static_cast<std::size_t>(x[1])]);
+    });
     c->gTech = g.add("technology_stage", {&c->nations, &c->technologies});
     c->gWar = g.add("at_war", {&c->nations, &c->nations});
     c->gAlly = g.add("allied", {&c->nations, &c->nations});
@@ -1424,7 +1429,9 @@ void encodeNations(const Context& c, const State& s, Builder& b) {
         }
         for (const auto& [name, value] : n.incomeComponents)
             b.global(c.global.at(c.gIncome, {nation, c.incomeComponents(name)}), value);
-        b.global(c.global.at(c.gIncomeKnown, {nation}), n.incomeKnown);
+        // Every income is worked out in a started campaign. One that is not
+        // would read as no income, so it is reported.
+        if (!n.incomeKnown) noteUnknown("income_not_evaluated", id);
         for (const auto& [name, stage] : n.technologyStages) b.global(c.global.at(c.gTech, {nation, c.technologies(name)}), stage);
         for (const auto& other : n.atWarWith)
             if (const int m = c.nations.find(other); m >= 0) b.global(c.global.at(c.gWar, {nation, m}), 1);

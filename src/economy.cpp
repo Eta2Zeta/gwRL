@@ -419,6 +419,11 @@ int effectiveTerritorialIpp(const State &s, const Id &zone) {
     return std::max(0, node(s, zone).require("ipp_value").asInt() -
                            std::max(value(flags, "city_ipp_lost"), value(flags, "city_damage") / 20));
 }
+bool incomePartPossible(const Id &nation, const Id &part) {
+    if (part == "territorial")
+        return nation == "japan" || nation == "kmt" || nation == "ccp";
+    return part == "china_control_bonus" && nation == "japan";
+}
 IncomeBreakdown evaluateIncome(const State &s, const Id &nation) {
     IncomeBreakdown out;
     const auto &n = s.nations.at(nation);

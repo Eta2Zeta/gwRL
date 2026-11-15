@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <random>
+#include <set>
 #include <stdexcept>
 
 namespace {
@@ -89,6 +90,13 @@ std::map<std::string, int> zoneAnswers(const ZoneEncodingSpec& spec, const ZoneI
     std::map<std::string, int> out;
     for (std::size_t i = 0; i < z.zoneIndex.size(); ++i)
         if (z.zoneIndex[i] == index) out[spec.zoneColumnNames[static_cast<std::size_t>(z.zoneColumn[i])]] = z.zoneValue[i];
+    return out;
+}
+
+std::map<std::string, int> positionAnswers(const ZoneEncodingSpec& spec, const ZoneInput& z) {
+    std::map<std::string, int> out;
+    for (std::size_t i = 0; i < z.globalColumn.size(); ++i)
+        out[spec.globalColumnNames[static_cast<std::size_t>(z.globalColumn[i])]] = z.globalValue[i];
     return out;
 }
 
@@ -279,6 +287,38 @@ void unknownNamesAreCountedNotDropped() {
             "Unknown flags still count in an other column");
 }
 
+// Only Japan, the KMT and the CCP keep an income account, and only Japan has
+// the bonus for Chinese land, so only those four questions exist. Any other
+// nation and part share one column and are reported, and so is a nation whose
+// income was never worked out, which the position has no question for.
+void incomeQuestionsFollowTheRules() {
+    CampaignEnv env(scenario, 1, true);
+    auto s = env.engine().state().clone();
+    const auto spec = zoneEncodingSpec(s);
+    std::set<std::string> questions;
+    for (const auto& name : spec->globalColumnNames)
+        if (name.rfind("income", 0) == 0) questions.insert(name);
+    require(questions == std::set<std::string>{"income:ccp:territorial", "income:japan:china_control_bonus",
+                                               "income:japan:territorial", "income:kmt:territorial",
+                                               "income:~impossible", "income_collected"},
+            "Income questions exist only for the parts a nation can have");
+    zoneEncodingUnknowns(true);
+    auto answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
+    require(answers.at("income:japan:territorial") == 15 && answers.at("income:kmt:territorial") == 6 &&
+                answers.at("income:ccp:territorial") == 2 && !answers.contains("income:~impossible") &&
+                zoneEncodingUnknowns(true).empty(),
+            "The opening's incomes are read and nothing is reported");
+    s.nations.at("mongolia").incomeComponents["territorial"] = 2;
+    s.nations.at("kmt").incomeComponents["zone_test_income"] = 1;
+    s.nations.at("japan").incomeKnown = false;
+    answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
+    const auto unknown = zoneEncodingUnknowns(true);
+    require(answers.at("income:~impossible") == 3, "A ruled-out income still counts, in one shared column");
+    require(unknown.contains("impossible_income:mongolia:territorial") && unknown.contains("impossible_income:kmt:other") &&
+                unknown.contains("income_component:zone_test_income") && unknown.contains("income_not_evaluated:japan"),
+            "A ruled-out or unevaluated income is reported");
+}
+
 // A battle's notes keep their words: its steps, situation, result, the classes
 // a hit may take and the nations and players named. A unit lost earlier this
 // turn is skipped; a new word is counted in an "other" column and reported.
@@ -402,6 +442,7 @@ int main() {
                  {"identical units differ only by rank", identicalUnitsDifferOnlyByRank},
                  {"a railroad repair names its border", railroadRepairNamesItsBorder},
                  {"unknown names are counted, not dropped", unknownNamesAreCountedNotDropped},
+                 {"income questions follow the rules", incomeQuestionsFollowTheRules},
                  {"battle notes keep their words", battleNotesKeepTheirWords},
                  {"repairs and rare values have columns", repairsAndRareValuesHaveColumns},
                  {"scheduling state is part of the position", schedulingStateIsPartOfThePosition}}) {

@@ -47,14 +47,14 @@ The input for one decision is one bundle with three parts:
 
 1. **The board:** each of the 37 zones (31 land and 6 sea) answers the same list
    of 42,532 zone questions.
-2. **The position as a whole:** 6,524 questions about the round, the phase,
+2. **The position as a whole:** 6,477 questions about the round, the phase,
    whose turn it is, treasuries, wars and so on.
 3. **Each legal move:** every move on the menu answers the same list of 12,627
    move questions about itself.
 
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
 round 1, chosen by the Comintern player. It has 13 legal moves, and its input
-holds 326 board answers, 119 position answers and 244 answers across the 13
+holds 326 board answers, 107 position answers and 244 answers across the 13
 moves. Each earlier decision took the move that ends the phase, or else the first
 listed move.
 
@@ -79,8 +79,8 @@ listed move.
 Its name, such as `units:ccp:cavalry`, is a readable label for that meaning;
 the network only sees the number. A name is built as `family:part:part`. The
 family says what kind of question it is, and the parts say which nation, which
-unit type, which zone and so on. The board has 40 families, the position 57 and
-the moves 43.
+unit type, which zone and so on. The board has 42 families, the position 56 and
+the moves 45.
 
 **An answer** is a whole number: a count ("how many?"), 1 for "yes", or a value
 such as the round. Almost every answer is 0, so only the non-zero answers are
@@ -660,6 +660,15 @@ nation; a rare situation keeps its question.
 - **Names no code writes.** The lists hold only names the engine's code can
   write. Ten names left over from a removed benchmark, two kinds of move and
   eight marks, came off them on 14 November 2026, and 364 questions with them.
+- **Incomes no nation can have.** Only Japan, the KMT and the CCP keep an income
+  account, and only Japan has the bonus for the Chinese land it holds
+  (`incomePartPossible` in `src/economy.cpp`). Four income questions remain; the
+  35 for other nations and parts went on 14 November 2026.
+- **A question with one possible answer.** Thirteen questions said whether a
+  nation's income had been worked out. In a started game it always has been, so
+  each only repeated that its nation is in the game (`nation_present`), and
+  they went the same day. The encoder reports a position where an income has
+  not been worked out.
 - **Kept on purpose:** the coastal defense ship, reserved for nobody and
   capturable; and "warlords never own ships or planes", which lend-lease and
   recruitment might break, so it could not be proved.
@@ -679,10 +688,11 @@ Facts that never change come with the layout, not with each position:
 - the 160 directed borders, with 22 facts each, such as rivers, narrow crossings,
   railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-f59f909e705f9148`, is a hash of every
+The layout version, now `campaign-zone-v1-ed3184ce805f1af5`, is a hash of every
 question name and every fixed fact. A network refuses inputs of another layout,
 and a run cannot resume across a layout change. It last changed on 14 November
-2026, when ten names that no code writes were taken off the lists.
+2026, when the income questions that can never tell two positions apart were
+removed.
 
 ## 10. Why the encoder translates names
 

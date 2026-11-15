@@ -8,7 +8,7 @@
     "src/campaign_runtime.cpp": "80953646e1d4f4df7e31fee0306029df4bb4d79c52c77fee764cdc312a4a4de8",
     "src/campaign_setup.cpp": "a38e5de640b2c73c0e6a8d658709bebdea8286c882ddaffeb2e32cfdfb175579",
     "src/catalog.cpp": "46ce44b2a91f0207d780063a19dbba23fa1f5d5d42a779d801785592deaecc38",
-    "src/economy.cpp": "e7f0daa3100c70b7afa2d9c25b7c40fecb57bb124d2da8ea6995a3e0a5f530b3",
+    "src/economy.cpp": "c4030e7a000f87af4753ee5d35e853460c9e2a23e316fba72fbcb7576bca83bb",
     "src/economy_lendlease.cpp": "32a721a0f4b4f2458499e32cd34adc251c6ac5fad457cf941c374b63f5932ff8",
     "src/land_combat.cpp": "96202e3993a134fc5297e9c3160371a824b10988bc25b9a96b4e569d797e6e56",
     "src/movement.cpp": "00ff6a7e8d3708e21369ae3728a43742ca195a8bf811ec95ce6b26fd79f414e0",
@@ -2021,12 +2021,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "beginEconomyTurn",
-          "line": 481
+          "line": 486
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1044
+          "line": 1049
         }
       ],
       "fixtures": [
@@ -2080,12 +2080,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "beginEconomyTurn",
-          "line": 481
+          "line": 486
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1044
+          "line": 1049
         }
       ],
       "fixtures": [
@@ -2289,7 +2289,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 478
+          "line": 483
         },
         {
           "file": "src/catalog.cpp",
@@ -2349,7 +2349,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         },
         {
           "file": "src/air.cpp",
@@ -2833,12 +2833,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::actions",
-          "line": 1012
+          "line": 1017
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         }
       ],
       "fixtures": [
@@ -2905,7 +2905,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "damageConstruction",
-          "line": 510
+          "line": 515
         },
         {
           "file": "src/politics.cpp",
@@ -2938,12 +2938,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 952
+          "line": 957
         }
       ],
       "fixtures": [
@@ -2981,12 +2981,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 952
+          "line": 957
         }
       ],
       "fixtures": [
@@ -3035,12 +3035,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 952
+          "line": 957
         }
       ],
       "fixtures": [
@@ -5228,12 +5228,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 478
+          "line": 483
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         }
       ],
       "fixtures": [
@@ -5277,7 +5277,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         }
       ],
       "fixtures": [
@@ -5313,12 +5313,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 952
+          "line": 957
         }
       ],
       "fixtures": [
@@ -5533,12 +5533,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "evaluateIncome",
-          "line": 422
+          "line": 427
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::finishTurn",
-          "line": 1061
+          "line": 1066
         },
         {
           "file": "src/campaign_runtime.cpp",
@@ -5994,7 +5994,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 478
+          "line": 483
         },
         {
           "file": "src/movement.cpp",
@@ -6084,7 +6084,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 478
+          "line": 483
         }
       ],
       "fixtures": [
@@ -6213,7 +6213,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "facilityCapacity",
-          "line": 478
+          "line": 483
         },
         {
           "file": "src/movement.cpp",
@@ -6364,7 +6364,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         },
         {
           "file": "src/movement.cpp",
@@ -6874,7 +6874,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1038
+          "line": 1043
         }
       ],
       "fixtures": [
