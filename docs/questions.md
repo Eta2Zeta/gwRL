@@ -135,7 +135,9 @@ trained on such positions. Random play reaches this in one game in seven.
 | C. Do not allow the attack | Mongolia is offered no combat move into a zone that was originally a warlord's, the CCP's or the KMT's. It can still defend itself, retake its own land and attack zones that were never Chinese. A check in `landAccess` with a test; `china_invader:mongolia` and the `at_war` questions that only this attack can answer may then leave the network's input. |
 
 **Recommendation: C.** It is what rules 4.9, 4.5 and 5.1 give when read
-together. What C costs Mongolia: once the KMT has attacked it, Mongolia can
+together, and it treats Mongolia as the same rules treat the USSR, which they
+keep out of every zone that was originally a warlord's, the CCP's or the KMT's
+([Q-002](#q-002-chinese-land-that-japan-holds)). What C costs Mongolia: once the KMT has attacked it, Mongolia can
 fight on its own land but cannot strike back into China. If that seems wrong
 for the game, it is a question for the game's developers.
 
@@ -174,6 +176,17 @@ CCP. This campaign has no USSR and keeps Mongolia a nation of its own
 (`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`),
 so the case arises only here.
 
+Read literally, the same rules keep the USSR out of every zone that was
+originally a warlord's, the CCP's or the KMT's, including those Japan has
+taken: it may not enter one without a declaration of war (rulebook 14.3,
+page 101), an attack on one is a declaration of war on all of China (4.9,
+page 30), and it may not declare war on the CCP (5.1, page 35). It can still
+fight Japan in Manchukuo and Korea, which 4.9 does not name; holding all of
+Manchukuo is one of its strategic objectives (page 23). The rules look built
+for this: the USSR helps the CCP by rail (Comintern Brothers, 15.2, page 103)
+and by an air transport that must land back in Soviet land (International Red
+Aid, 15.3, page 105), and neither puts a Soviet unit in China.
+
 **How often.** In 25 of the 70 games of Q-001 the zone Mongolia first attacked
 was held by Japan; in the other 45 the KMT held it
 ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
@@ -210,10 +223,11 @@ this campaign: Mongolia then never attacks such a zone, and the only other
 nation that is not Chinese is Japan, which is the holder here. But C rests on
 rule 4.5, which binds Mongolia here only because this campaign keeps it a
 minor power after Japan's attack; in the full game the same attack is the
-USSR's, and 4.5 does not bind the USSR. So if the developers allow the USSR to
-attack Chinese land that Japan holds, the recommendation is to allow it to this
-campaign's Mongolia too, once Japan has attacked it, and to apply C only to
-land a Chinese nation holds.
+USSR's, and 4.5 does not bind the USSR. Read literally, rules 14.3, 4.9 and
+5.1 forbid the attack to the USSR all the same (above), so C agrees with the
+full game. Only if the developers allow the USSR to attack Chinese land that
+Japan holds is the recommendation to allow it to this campaign's Mongolia too,
+once Japan has attacked it, and to apply C only to land a Chinese nation holds.
 
 **If answered.** As for Q-001.
 
