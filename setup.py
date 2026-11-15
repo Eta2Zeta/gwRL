@@ -8,14 +8,17 @@ from setuptools import setup
 
 
 ROOT = Path(__file__).resolve().parent
+# Two separate lists: Pybind11Extension adds its own compile flags to the one
+# and link flags to the other in place, so one shared list would pass each set
+# to both the compiler and the linker.
 if sys.platform == "darwin":
-    COMPILE_ARGS = LINK_ARGS = ["-mmacosx-version-min=13.3"]
+    COMPILE_ARGS, LINK_ARGS = ["-mmacosx-version-min=13.3"], ["-mmacosx-version-min=13.3"]
 elif sys.platform == "win32":
     # MSVC otherwise reads the UTF-8 sources in the system code page, which
     # changes the bytes of non-ASCII names in string literals.
     COMPILE_ARGS, LINK_ARGS = ["/utf-8"], []
 else:
-    COMPILE_ARGS = LINK_ARGS = []
+    COMPILE_ARGS, LINK_ARGS = [], []
 
 
 ext_modules = [
