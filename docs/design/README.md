@@ -1693,24 +1693,32 @@ hour is unmeasured
 ([open question](#how-big-should-the-network-and-the-search-be)). To judge a
 change of the code at a size not yet trained, measure the rate it changes and
 work out the rest with the formula. A change to the engine or the search changes
-the cores' rate, which is the same for every network, so it raises decisions per
-hour at every size where the cores limit, on the Mac up to about 256×8. A change
-to the network's passes changes the network's rate and matters only where the
-network limits.
+the cores' rate, which is the same for every network. It raises decisions per hour
+wherever the cores limit, but only until the cores' line in the figure reaches the
+network's line above it. With the GPU in passes of 64, a cheaper engine can pay up
+to about 2.4 times at 64×2 but only about 1.1 times at 256×8, where the two rates
+are nearly equal; larger passes would raise that to at most about 1.6 times, with
+four times the games in flight. With the network on one core, as today, the
+coordinator is already busy about 85% of the time (section 9.2), so a cheaper
+engine alone would gain little even at 64×2. A change to the network's passes
+changes the network's rate and matters only where the network limits.
 
 Three things follow, inferred:
 
 - **The engine is the main cost of a simulation.** An evaluation takes about
-  2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8, so on
-  the Mac all ten cores for games just keep the GPU busy at 256×8, and for
+  2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8. Keeping
+  the Mac's GPU busy, in passes of 64, takes about 24 cores for games at 64×2,
+  11 at 256×8 and 4 at 512×16: the Mac's ten just keep it busy at 256×8, and for
   smaller networks they cannot.
 - **Memory grows with the search.** A tree holds about 0.24 MB per simulation, so
   at 800 simulations each game in flight holds about 190 MB, and memory, not the
   GPU, sets how many games can fill a pass.
-- **What each part of a computer buys.** More cores raise the cores' line in the
-  figure, and with it decisions per hour wherever the cores limit. A faster GPU
-  raises its line and moves the crossing to larger networks, but helps only with
-  enough cores to feed it, about one core for every 400 evaluations a second.
+- **What each part of a computer buys.** More cores, like a cheaper engine, raise
+  the cores' line in the figure, and with it decisions per hour wherever the cores
+  limit. A faster GPU raises its line and moves the crossing to larger networks,
+  but helps only with enough cores to feed it, about one core for every 400
+  evaluations a second at today's engine cost: a GPU ten times as fast as the
+  Mac's would need about ten times the cores, unless the engine gets cheaper.
   Memory must hold a tree for every game in flight.
 
 ### 9.4 How the Campaign Observatory shows a game
