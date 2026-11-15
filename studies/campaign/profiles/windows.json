@@ -15,6 +15,9 @@
     "cpu_budget": 7
   },
   "keep_awake": true,
+  "tests": {
+    "cpu_budget": 7
+  },
   "measured": [
     "3 November 2026, zone network, eleven-round games, 64 simulations, depth 16, fresh networks, one batch of 24 games per layout with learning at reuse 12: 22 to 31 games per hour, about a quarter of the Mac's 124 at the same settings.",
     "Network size cost nothing measurable up to 512 wide with two message layers, 48.5 million parameters per faction against 5.2 million at 64 wide: play searched 29,900 decisions per hour at 512 wide and 30,100 at 64 wide, with similar game lengths, and learning took 64 and 31 seconds per batch.",
@@ -28,6 +31,7 @@
     "Six game processes, the coordinator and the supervisor use the 8 cores.",
     "memory_bytes: 12 of the 16 GB, leaving the rest to Windows and the desktop.",
     "keep_awake: SetThreadExecutionState keeps Windows from idle sleep while the supervisor runs.",
+    "tests: a test's configuration uses at most 7 cores here (tests/machine.py).",
     "Start the supervisor from a console window: a safe stop is a Ctrl+Break to the trainer's process group."
   ]
 }

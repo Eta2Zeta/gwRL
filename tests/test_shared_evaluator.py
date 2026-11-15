@@ -20,6 +20,7 @@ from studies.campaign.shared_evaluator import (BUFFER_BYTES, EvaluatorClosed, Re
                                                evaluate_prepared, prepare_into, read_arrays)
 from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, UniformEvaluator, VectorMCTS
 from tools.benchmark_campaign_devices import Config, _shared_game_process
+from tests.machine import CPU_BUDGET
 
 SEED = 1951
 
@@ -265,7 +266,7 @@ class SharedEvaluatorTests(unittest.TestCase):
 class SharedGameSlotTests(unittest.TestCase):
     def test_an_unexpected_exception_fails_only_its_game(self):
         config = Config(mode="selfplay", search_evaluation="per_search", threads=1, devices=("mps",), processes=2,
-                        games_per_process=2, seeds=(1, 2, 3, 4))
+                        games_per_process=2, seeds=(1, 2, 3, 4), cpu_budget=CPU_BUDGET)
         memory = shared_memory.SharedMemory(create=True, size=1 << 20)
         parent, child = Pipe()
         tasks, results = queue.Queue(), queue.Queue()
@@ -296,7 +297,8 @@ class SharedGameSlotTests(unittest.TestCase):
 
 class SharedModeConfigTests(unittest.TestCase):
     def test_several_games_per_process_need_process_parallel_mps_self_play(self):
-        common = dict(mode="selfplay", search_evaluation="per_search", threads=1, seeds=(1, 2, 3, 4))
+        common = dict(mode="selfplay", search_evaluation="per_search", threads=1, seeds=(1, 2, 3, 4),
+                      cpu_budget=CPU_BUDGET)
         Config(**common, devices=("mps",), processes=2, games_per_process=2)
         for bad in (dict(devices=("mps",), processes=1), dict(devices=("cpu",), processes=2),
                     dict(devices=("cpu", "mps"), processes=2)):
@@ -307,13 +309,15 @@ class SharedModeConfigTests(unittest.TestCase):
 
     def test_shared_self_play_needs_a_game_for_every_slot(self):
         common = dict(mode="selfplay", search_evaluation="per_search", threads=1, devices=("mps",), processes=2,
-                      games_per_process=2)
+                      games_per_process=2, cpu_budget=CPU_BUDGET)
         Config(**common, seeds=(1, 2, 3, 4))
         with self.assertRaisesRegex(ValueError, "every game slot"):
             Config(**common, seeds=(1, 2, 3))
 
     def test_paired_runs_need_one_process_for_trace_comparison(self):
-        common = dict(mode="selfplay", search_evaluation="per_search", threads=1, seeds=(1, 2, 3, 4))
+        # Three games, so that one process searching each on its own core fits a 7-core budget.
+        common = dict(mode="selfplay", search_evaluation="per_search", threads=1, seeds=(1, 2, 3),
+                      cpu_budget=CPU_BUDGET)
         Config(**common, devices=("cpu", "mps"))
         for devices in (("cpu",), ("mps",)):
             Config(**common, devices=devices, processes=2)

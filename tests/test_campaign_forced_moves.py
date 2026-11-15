@@ -18,6 +18,7 @@ from studies.campaign.learning import LearningConfig, ReplayTraceWriter, play_ep
 from studies.campaign.replay import export_trace
 from studies.shared.multiplayer_mcts import Evaluation, MctsConfig
 from tools.benchmark_campaign_devices import Config, play_shared_game, selfplay, setup_models
+from tests.machine import CPU_BUDGET
 
 SEED = 1951
 
@@ -88,7 +89,8 @@ class ForcedMoveGameTests(unittest.TestCase):
         reports = {}
         for searched in (False, True):
             config = Config(mode="selfplay", devices=("cpu",), threads=1, search_evaluation="per_search", seeds=(SEED, 1952),
-                            calendar_rounds=1, simulations=2, max_depth=4, search_forced_roots=searched, seconds=240.)
+                            calendar_rounds=1, simulations=2, max_depth=4, search_forced_roots=searched, seconds=240.,
+                            cpu_budget=CPU_BUDGET)
             models, evaluator, forward_stats, _ = setup_models(config, "cpu")
             reports[searched] = selfplay(config, "cpu", models, evaluator, forward_stats, time.monotonic() + 240.,
                                          lambda result=None: None)

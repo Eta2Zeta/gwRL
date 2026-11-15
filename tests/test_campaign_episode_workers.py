@@ -17,6 +17,7 @@ from studies.campaign import run
 from studies.campaign.curriculum import make_env
 from studies.campaign.episode_workers import EpisodeWorkers, _play_game
 from studies.shared.multiplayer_mcts import NoLegalActionError
+from tests.machine import CPU_BUDGET
 
 TINY = {"calendar_rounds": 1, "simulations": 2, "max_depth": 4, "complete_episodes": True, "parallel_envs": 2}
 
@@ -109,8 +110,10 @@ class EpisodeWorkerTests(unittest.TestCase):
                        {"episode_workers": -1}):
             with self.subTest(values=values), self.assertRaises(ValueError):
                 run.RunConfig(**values)
-        config = run.RunConfig(episode_workers=8, complete_episodes=True, parallel_envs=8, threads=4, cpu_budget=9)
-        self.assertEqual(run.busy_cores(config), 9)
+        workers = CPU_BUDGET - 1  # One core per game process, plus the coordinator.
+        config = run.RunConfig(episode_workers=workers, complete_episodes=True, parallel_envs=workers, threads=4,
+                               cpu_budget=CPU_BUDGET)
+        self.assertEqual(run.busy_cores(config), CPU_BUDGET)
 
     def train(self, directory, *, resume=False, stop_after_waves=None):
         values = {field.name: None for field in fields(run.RunConfig)}

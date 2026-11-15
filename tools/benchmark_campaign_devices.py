@@ -43,7 +43,8 @@ class Config:
     warm_repeats: int = 3
     warmups: int = 1
     threads: int = 4
-    cpu_budget: int = 12
+    # The 12-core allowance, or every core of a smaller machine.
+    cpu_budget: int = min(12, os.cpu_count() or 1)
     memory_bytes: int = 24_000_000_000
     seconds: float = 120.0
     simulations: int = 16

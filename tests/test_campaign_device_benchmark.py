@@ -19,6 +19,7 @@ from unittest.mock import patch
 
 from studies.campaign.shared_evaluator import EvaluatorClosed, ServerStats, raise_descriptor_limit
 from studies.shared.multiplayer_mcts import NoLegalActionError
+from tests.machine import CPU_BUDGET
 from tools.benchmark_campaign_devices import (Config, TimedEvaluator, all_slots_busy, compare_selfplay, main,
     mps_allocator_limit, numerical_comparison, parallel_selfplay, play_shared_game, selfplay, setup_models,
     shared_summary, supervise_device)
@@ -58,30 +59,32 @@ class FakeEvaluator:
 
 class CampaignDeviceBenchmarkTests(unittest.TestCase):
     def test_configuration_validates_search_budget_horizon_and_resource_allowance(self):
-        selfplay_values = {"mode": "selfplay", "devices": ("cpu",), "threads": 1, "search_evaluation": "per_search"}
-        self.assertEqual((Config(simulations=64, max_depth=24, calendar_rounds=11).simulations), 64)
+        selfplay_values = {"mode": "selfplay", "devices": ("cpu",), "threads": 1, "search_evaluation": "per_search",
+                           "cpu_budget": CPU_BUDGET}
+        self.assertEqual((Config(simulations=64, max_depth=24, calendar_rounds=11, cpu_budget=CPU_BUDGET).simulations), 64)
+        most = CPU_BUDGET - 2  # One core per game process, plus the coordinator and its supervisor.
         for values in ({"devices": ("cpu", "auto")}, {"simulations": 0}, {"max_depth": 0}, {"calendar_rounds": 12},
                        {"threads": 10}, {"memory_bytes": 30_000_000_001}, {"batch_sizes": (1, 1)},
                        {"search_evaluation": "streamed"}, {**selfplay_values, "processes": 5},
                        {**selfplay_values, "processes": 2, "search_evaluation": "batched"},
                        {**selfplay_values, "processes": 2, "threads": 2},
-                       {**selfplay_values, "processes": 11, "seeds": tuple(range(11))}):
-            with self.subTest(values=values), self.assertRaises(ValueError): Config(**values)
-        self.assertEqual(Config(**selfplay_values, processes=10, seeds=tuple(range(10))).processes, 10)
-        self.assertEqual(len(Config(**selfplay_values, processes=10, seeds=tuple(range(30))).seeds), 30)
+                       {**selfplay_values, "processes": most + 1, "seeds": tuple(range(most + 1))}):
+            with self.subTest(values=values), self.assertRaises(ValueError): Config(**{"cpu_budget": CPU_BUDGET, **values})
+        self.assertEqual(Config(**selfplay_values, processes=most, seeds=tuple(range(most))).processes, most)
+        self.assertEqual(len(Config(**selfplay_values, processes=most, seeds=tuple(range(30))).seeds), 30)
 
     def test_searching_forced_roots_is_an_explicit_switch(self):
-        self.assertFalse(Config().search_forced_roots)
+        self.assertFalse(Config(cpu_budget=CPU_BUDGET).search_forced_roots)
         with self.assertRaisesRegex(ValueError, "search_forced_roots"):
-            Config(search_forced_roots=1)
+            Config(search_forced_roots=1, cpu_budget=CPU_BUDGET)
         seen = []
         def paired(config, output):
             seen.append(config.search_forced_roots)
             return {"status": "completed"}
         with patch("tools.benchmark_campaign_devices.paired", side_effect=paired), \
              contextlib.redirect_stdout(io.StringIO()):
-            main(["--output", "unused.json"])
-            main(["--output", "unused.json", "--search-forced-roots"])
+            main(["--output", "unused.json", "--cpu-budget", str(CPU_BUDGET)])
+            main(["--output", "unused.json", "--cpu-budget", str(CPU_BUDGET), "--search-forced-roots"])
         self.assertEqual(seen, [False, True])
 
     def test_parallel_selfplay_merges_games_in_seed_order_and_requires_identical_weights(self):
@@ -102,7 +105,7 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
                                "inference_calls": len(seeds), "inference_requests": len(seeds), "actual_inference_batch_sizes": {1: len(seeds)},
                                "games": [{"seed": seed, "terminal": True} for seed in seeds]}}
         config = Config(mode="selfplay", devices=("cpu",), threads=1, search_evaluation="per_search", processes=2,
-                        seeds=(5, 6, 7), seconds=60.)
+                        seeds=(5, 6, 7), seconds=60., cpu_budget=CPU_BUDGET)
         summary, forward, evaluated = parallel_selfplay(config, "w", float("inf"), run_group=run_group, executor=Immediate())
         self.assertEqual(calls, [(5,), (6,), (7,)])
         self.assertEqual([game["seed"] for game in summary["games"]], [5, 6, 7])
@@ -118,7 +121,7 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
 
     def test_real_game_processes_reproduce_single_process_games_exactly(self):
         config = Config(mode="selfplay", devices=("cpu",), threads=1, search_evaluation="per_search", processes=2,
-                        seeds=(1951, 1952), max_transitions=2, seconds=240.)
+                        seeds=(1951, 1952), max_transitions=2, seconds=240., cpu_budget=CPU_BUDGET)
         models, evaluator, forward_stats, metadata = setup_models(config, "cpu")
         summary, _, _ = parallel_selfplay(config, metadata["weights_sha256"], time.monotonic() + 240.)
         alone = selfplay(config, "cpu", models, evaluator, forward_stats, time.monotonic() + 240., lambda result=None: None)
@@ -231,7 +234,7 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
 
     def summarize_shared(self, games):
         config = Config(mode="selfplay", devices=("mps",), threads=1, search_evaluation="per_search", processes=2,
-                        games_per_process=2, seeds=(1, 2, 3, 4, 5))
+                        games_per_process=2, seeds=(1, 2, 3, 4, 5), cpu_budget=CPU_BUDGET)
         stats = ServerStats(requests=2000, rounds=500, requests_per_round={4: 500}, passes=800,
                             positions_per_pass={2: 400, 3: 400}, forward_seconds=30., reply_seconds=2.)
         samples = [(1000., 0), (1050., 500), (1150., 1500), (1250., 2000)]

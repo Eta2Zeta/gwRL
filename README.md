@@ -65,6 +65,10 @@ Python checks:
 ./.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
 ```
 
+A test's configuration uses at most the cores its machine's profile allows under
+`tests` ([tests/machine.py](tests/machine.py)): 9 on the Mac and 7 on the
+Windows PC. `GWRL_PROFILE` names another profile.
+
 After editing C++ headers, rebuild the Python bindings before training:
 
 ```sh

@@ -16,6 +16,9 @@
   },
   "unset_environment": ["MallocNanoZone"],
   "keep_awake": true,
+  "tests": {
+    "cpu_budget": 9
+  },
   "measured": [
     "2 November 2026, zone network, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, fresh networks: 124 games per hour with learning at these settings.",
     "The same layout evaluating on the GPU (neural_device mps) played 58.7 games per hour, and ten processes each evaluating their own games 84.",
@@ -26,6 +29,7 @@
     "python: PyTorch 2.14 from requirements-gpu-mps.txt, which the GPU needs for long runs; the numbers above were measured with it.",
     "unset_environment: agent shells set MallocNanoZone=0, which slows the allocator and costs 26 to 29% more CPU.",
     "keep_awake: caffeinate keeps the Mac awake while the supervisor runs.",
+    "tests: a test's configuration uses at most 9 cores here (tests/machine.py).",
     "The 12 cores and 30 GB are the owner's allowance; the supervisor's --all-cores uses all 14 cores when the owner allows it."
   ]
 }
