@@ -15,7 +15,12 @@ int effectiveTerritorialIpp(const State &, const Id &zone);
 // one, with cargo it may carry. An upgrade that would not waits on the build
 // queue (user ruling RCL-021; RB 12.3).
 bool upgradeKeepsCargo(const State &, const UnitState &unit, const Id &type);
+// The nation's income as the position stands: its parts, whether the nation
+// may collect it, and the total it would collect.
 IncomeBreakdown evaluateIncome(const State &, const Id &nation);
+// Stores the parts of every nation's income in the state. EconomyRules::settle
+// does this at the end of every transition, so a recorded position never
+// carries an income from before land changed hands.
 void refreshIncome(State &);
 void reconcileCapturedFacilities(State &, const Id &zone, const std::optional<Id> &oldOwner,
                                  const Id &newOwner);
@@ -44,6 +49,7 @@ class EconomyRules final : public Rules {
     void finishTurn(State &) const override;
     void beginTurn(State &) const override;
     void finishPhase(State &) const override;
+    void settle(State &) const override;
 
   private:
     std::shared_ptr<const Rules> gameplay_;

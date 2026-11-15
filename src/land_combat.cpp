@@ -1661,4 +1661,8 @@ void LandCombatRules::finishPhase(State &s) const {
         gameplay_->finishPhase(s);
     refreshImmediateBattles(s);
 }
+void LandCombatRules::settle(State &s) const {
+    if (gameplay_)
+        gameplay_->settle(s);
+}
 } // namespace game::campaign

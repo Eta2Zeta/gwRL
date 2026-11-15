@@ -199,6 +199,8 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
                 if(amount>highest)out.push_back("facility capacity exceeded: "+fid);
             }
         }
+    for(const auto&[id,nation]:s.nations)
+        if(nation.incomeKnown&&nation.incomeComponents!=evaluateIncome(s,id).components)out.push_back("stale income: "+id);
     if(s.terminal)for(const auto&[id,u]:s.units)
         if(value(u.turnFlags,"air_in_flight")&&!value(u.gameFlags,"on_map"))out.push_back("terminal aircraft still in flight: "+id);
     if(s.clock.phase==Phase::PlaceUnits&&s.battles.empty()&&s.decisions.empty()&&!s.chance)

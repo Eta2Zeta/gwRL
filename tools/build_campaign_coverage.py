@@ -58,7 +58,7 @@ put([26,42],R+"Engine::endPhase;"+P+"PoliticsRules::finishTurn",T("campaign_runt
 put([29,30,31],P+"recordLandAttack;"+W+"continueCombatPoliticalResolution;"+W+"applyWarlordChance",T("politics_warlords","wholeWarlordTable")+";"+T("politics_warlords","frozenNeighborsAndCheckpoint")+";"+T("politics_warlords","attacksAndDefeatedKmt")+";"+T("politics_warlords","invasionAlignsEveryWarlordBeforeTruce"))
 put([33,34],P+"mayDeclareWar;"+P+"declareWar",T("politics","declarationGatesAndUnknownAccounting")+";"+T("politics","outOfTurnPriorityCheckpointAndClone"))
 put([36],P+"surrenderNation;"+P+"refreshPoliticalState",T("politics","ccpNoUnitsIsNotSurrenderOrGameEnd")+";"+T("politics","directAxisDadaoSurvivesJapan")+";"+T("politics","japanSurrenderQueueBoundaryAndReplay"))
-put([37],P+"surrenderNation;"+P+"PoliticsRules::applyChanceImpl",T("politics","japanSurrenderQueueBoundaryAndReplay"))
+put([37],P+"surrenderNation;"+P+"PoliticsRules::applyChance",T("politics","japanSurrenderQueueBoundaryAndReplay"))
 put([40],W+"continueCombatPoliticalResolution;"+W+"applyWarlordAction",T("politics_warlords","truceConsentAndTiming")+";"+T("politics_warlords","invasionAlignsEveryWarlordBeforeTruce"))
 put([41],W+"terminateChineseTruce;"+L+"LandCombatRules::applyChance",T("land_truce","voluntarySharedRolesFollowTheActiveBreaker")+";"+T("land_truce","thirdPartyAutomaticSharedRolesFollowTheLandPossessor")+";"+T("land_truce","automaticTruceLowMoraleEliminatesWithoutAnEscape")+";"+T("land_truce","japaneseCaptureGiftCanEndAnExistingTruce"))
 put([43],R+"Engine::step;"+R+"Engine::replay",T("campaign_runtime","replayAndRestoreAreExact"))

@@ -1510,4 +1510,8 @@ void MovementRules::finishPhase(State &s) const {
   if (gameplay_)
     gameplay_->finishPhase(s);
 }
+void MovementRules::settle(State &s) const {
+  if (gameplay_)
+    gameplay_->settle(s);
+}
 } // namespace game::campaign

@@ -30,6 +30,16 @@ of damage. Repairing the city does not bring the value back.
 The other sources of income in the full game, such as trade and the Burma
 Road, need nations or routes this campaign leaves out.
 
+**The stored income.** The state also stores each nation's income as the
+position stands, part by part (`income_components`), because the network reads
+it as [part of the position](../design/network_input.md#5-the-position-part).
+Land changes hands in battles, political events and surrenders, which are not
+economy moves. So the module brings the stored income up to date when any move
+or dice roll ends, not only one of its own (`EconomyRules::settle`). The parts
+are stored even for a major power that has lost its capital and so collects
+nothing. Collection and the score do not read the stored income; they work it
+out again.
+
 ## 2. The Production Phase
 
 Production has two steps.

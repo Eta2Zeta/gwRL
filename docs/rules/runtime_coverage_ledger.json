@@ -3,19 +3,19 @@
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
   "ledger_sha256": "f0f404611cdc70c7cbfefcf75195b4edfb333dac0ecfc7870ff757f5a953a389",
   "evidence_file_sha256": {
-    "src/air.cpp": "722ee67c23382796f6954e830f1a08078bd91d28fdc00065b5874d29b365f25a",
+    "src/air.cpp": "eea42f56183450e05abe346c8632edf88e75efc298f60f2ec77061ac374a2a4b",
     "src/campaign_objective.cpp": "909e7983532e484ac89fa17ec060cd033c47587c852b926a62653d33bea43640",
-    "src/campaign_runtime.cpp": "ce0ece719b3373f65a6f86533c386b93eb605fc6b47426b89d22d635a78bf164",
+    "src/campaign_runtime.cpp": "80953646e1d4f4df7e31fee0306029df4bb4d79c52c77fee764cdc312a4a4de8",
     "src/campaign_setup.cpp": "a38e5de640b2c73c0e6a8d658709bebdea8286c882ddaffeb2e32cfdfb175579",
     "src/catalog.cpp": "46ce44b2a91f0207d780063a19dbba23fa1f5d5d42a779d801785592deaecc38",
-    "src/economy.cpp": "2e8599687bdc8c47949ff07d1dd616d10a0abe4ecf231d44e8c731744d6136be",
+    "src/economy.cpp": "e7f0daa3100c70b7afa2d9c25b7c40fecb57bb124d2da8ea6995a3e0a5f530b3",
     "src/economy_lendlease.cpp": "32a721a0f4b4f2458499e32cd34adc251c6ac5fad457cf941c374b63f5932ff8",
-    "src/land_combat.cpp": "a6be30607ce8040c508720764c02cb321eacf56724511ca35874bceec22cea96",
-    "src/movement.cpp": "4e92b1e8df1f07ceb4692290a40f73c33c2406219186b3c946ac43600018717c",
+    "src/land_combat.cpp": "96202e3993a134fc5297e9c3160371a824b10988bc25b9a96b4e569d797e6e56",
+    "src/movement.cpp": "00ff6a7e8d3708e21369ae3728a43742ca195a8bf811ec95ce6b26fd79f414e0",
     "src/naval_combat.cpp": "89628d29300555c8924eb73409fce6aeb8268e04f68d7deed4f303ba123b9e15",
     "src/naval_movement.cpp": "e482f983d07f42123b94d10afc3203edccbc1a6b1c34850ba9d7548fe748c531",
     "src/naval_operations.cpp": "29b9de6c565f0c1f565d5bfeb661d3377d09d304f1938c67cdad11a47211415b",
-    "src/politics.cpp": "f7de86964343014b53b28d55916b07aee67f4522b2f1fa424dd9ab18e3bfddd6",
+    "src/politics.cpp": "75b49c65a46cb71738404e66d8fb8eb669463b316f1944574d5c912e3e8adf58",
     "src/politics_influence.cpp": "0f5c8c2b659a7ee4016ee97b27a9908a83f132aa82d95d6917756c0eab9c52a1",
     "src/politics_warlords.cpp": "b174f2d281be9a78f7b90782804db25f9421a4bcea6dc04a34d9144d2af6a91a",
     "tests/air_integration_tests.cpp": "ab2ea27c3665f5b81b30995d2e14882cf4d0370cfdf95ce995ffd73d935f0a59",
@@ -23,7 +23,7 @@
     "tests/air_mission_tests.cpp": "d13a5437a4e49d497ae2099f69738c61bc0e6d8b1604bb955b1c971b2e39cb5c",
     "tests/air_tests.cpp": "f339fa3c671fe3940b1002fce78d0810bc1447c09db295e90af0edbaba64fd5b",
     "tests/campaign_env_tests.cpp": "218ee2348e24b47384c3a2893ff5f5a5c2d501b85ae3e997c3844a8e160da4ce",
-    "tests/campaign_integration_tests.cpp": "db272d8017f37e54fc1fb7675ebffd984a2579a8e002df98bc63b70f6dd27f72",
+    "tests/campaign_integration_tests.cpp": "36878d1e05382b9d30640d3895c9d50a6cc378439ba4653889d0f3638673b5fd",
     "tests/campaign_runtime_tests.cpp": "64e744440dd1e9b2e6ad889dedec37c724443bf5ba9db681e5a1b6ae7ecc5dd9",
     "tests/campaign_setup_tests.cpp": "85b8850f5363c4454de6de319d7a8f0ed72b33e70cd678c8f27249d0134b1977",
     "tests/campaign_state_tests.cpp": "75c11a63037d60a391d5eb84e199eded1ec2b586cd8e0709866a66b2154d0ad6",
@@ -923,7 +923,7 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 560
+          "line": 561
         },
         {
           "file": "src/campaign_objective.cpp",
@@ -1158,12 +1158,12 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 560
+          "line": 561
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 645
+          "line": 639
         }
       ],
       "fixtures": [
@@ -1733,8 +1733,8 @@
         },
         {
           "file": "src/politics.cpp",
-          "symbol": "PoliticsRules::applyChanceImpl",
-          "line": 618
+          "symbol": "PoliticsRules::applyChance",
+          "line": 612
         }
       ],
       "fixtures": [
@@ -1924,12 +1924,12 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 560
+          "line": 561
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 645
+          "line": 639
         }
       ],
       "fixtures": [
@@ -1988,12 +1988,12 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::step",
-          "line": 431
+          "line": 432
         },
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::replay",
-          "line": 655
+          "line": 656
         }
       ],
       "fixtures": [
@@ -2026,7 +2026,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1047
+          "line": 1044
         }
       ],
       "fixtures": [
@@ -2085,7 +2085,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::applyChance",
-          "line": 1047
+          "line": 1044
         }
       ],
       "fixtures": [
@@ -2205,7 +2205,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2067
+          "line": 2066
         },
         {
           "file": "src/naval_combat.cpp",
@@ -2349,7 +2349,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         },
         {
           "file": "src/air.cpp",
@@ -2392,7 +2392,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/land_combat.cpp",
@@ -2762,12 +2762,12 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2067
+          "line": 2066
         },
         {
           "file": "src/land_combat.cpp",
@@ -2833,12 +2833,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::actions",
-          "line": 1014
+          "line": 1012
         },
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         }
       ],
       "fixtures": [
@@ -2905,7 +2905,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "damageConstruction",
-          "line": 511
+          "line": 510
         },
         {
           "file": "src/politics.cpp",
@@ -2938,12 +2938,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 953
+          "line": 952
         }
       ],
       "fixtures": [
@@ -2981,12 +2981,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 953
+          "line": 952
         }
       ],
       "fixtures": [
@@ -3035,12 +3035,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 953
+          "line": 952
         }
       ],
       "fixtures": [
@@ -3321,7 +3321,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::actions",
-          "line": 1417
+          "line": 1416
         },
         {
           "file": "src/naval_movement.cpp",
@@ -3374,7 +3374,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/land_combat.cpp",
@@ -4172,7 +4172,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         }
       ],
       "fixtures": [
@@ -4246,7 +4246,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/land_combat.cpp",
@@ -4336,7 +4336,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2067
+          "line": 2066
         }
       ],
       "fixtures": [
@@ -4385,7 +4385,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2067
+          "line": 2066
         }
       ],
       "fixtures": [
@@ -4422,7 +4422,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2067
+          "line": 2066
         }
       ],
       "fixtures": [
@@ -4453,7 +4453,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2067
+          "line": 2066
         }
       ],
       "fixtures": [
@@ -4545,7 +4545,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/air.cpp",
@@ -4562,7 +4562,7 @@
         {
           "file": "tests/campaign_integration_tests.cpp",
           "symbol": "carpetBombingParticipatesOnceAndCannotBeHitByInfantry",
-          "line": 55,
+          "line": 62,
           "behavior_assertions": [
             "Carpet bombing became available without Heavy Strategic Bombers technology",
             "Conditional carpet fixture lacks legal action ",
@@ -5003,7 +5003,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/air.cpp",
@@ -5233,7 +5233,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         }
       ],
       "fixtures": [
@@ -5277,7 +5277,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         }
       ],
       "fixtures": [
@@ -5313,12 +5313,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         },
         {
           "file": "src/economy.cpp",
           "symbol": "finishEconomyPlacement",
-          "line": 953
+          "line": 952
         }
       ],
       "fixtures": [
@@ -5538,12 +5538,12 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::finishTurn",
-          "line": 1065
+          "line": 1061
         },
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 560
+          "line": 561
         }
       ],
       "fixtures": [
@@ -5812,7 +5812,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::actions",
-          "line": 1417
+          "line": 1416
         },
         {
           "file": "src/naval_combat.cpp",
@@ -5935,7 +5935,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1700
+          "line": 1699
         },
         {
           "file": "src/land_combat.cpp",
@@ -6364,7 +6364,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         },
         {
           "file": "src/movement.cpp",
@@ -6874,7 +6874,7 @@
         {
           "file": "src/economy.cpp",
           "symbol": "EconomyRules::apply",
-          "line": 1040
+          "line": 1038
         }
       ],
       "fixtures": [

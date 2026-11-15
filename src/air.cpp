@@ -1342,7 +1342,6 @@ void applyCityBombDamage(State &s, const Id &zone, int damage) {
     t.flags["city_ipp_lost"] = std::max(flag(t.flags, "city_ipp_lost"), t.flags["city_damage"] / 20);
     if (t.flags["city_damage"] == max)
         t.flags["city_destroyed"] = 1;
-    refreshIncome(s);
     refreshPoliticalState(s);
 }
 void applyRailBombDamage(State &s, const Id &zone, const Id &other, int damage) {
@@ -2211,5 +2210,9 @@ void AirRules::finishPhase(State &s) const {
 void AirRules::finishTurn(State &s) const {
     require(bool(gameplay_), "Air module requires income accounting");
     gameplay_->finishTurn(s);
+}
+void AirRules::settle(State &s) const {
+    if (gameplay_)
+        gameplay_->settle(s);
 }
 } // namespace game::campaign

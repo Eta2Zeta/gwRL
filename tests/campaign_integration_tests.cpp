@@ -1,4 +1,5 @@
 #include "game/campaign_audit.hpp"
+#include "game/campaign_env.hpp"
 #include "game/catalog.hpp"
 #include "game/air.hpp"
 #include "game/politics.hpp"
@@ -37,6 +38,12 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     broken.nations.at("japan").turnFlags["economy_used:"+factory]=6;
     const auto capacityFailures=campaignInvariantFailures(broken);
     check(std::find(capacityFailures.begin(),capacityFailures.end(),"facility capacity exceeded: "+factory)!=capacityFailures.end(),"Excess facility use escaped audit");
+    const auto started=Engine::start(initial(),campaignRules(),1936).state().clone();
+    check(started.nations.at("japan").incomeKnown&&campaignInvariantFailures(started).empty(),"A new campaign's first position has no evaluated income");
+    broken=started.clone();broken.territories.at("land_china_nanking").possessor="japan";
+    const auto incomeFailures=campaignInvariantFailures(broken);
+    check(std::find(incomeFailures.begin(),incomeFailures.end(),"stale income: japan")!=incomeFailures.end()&&
+          std::find(incomeFailures.begin(),incomeFailures.end(),"stale income: kmt")!=incomeFailures.end(),"A stored income that no longer matches the land held escaped audit");
 }
 void transitionAuditAndExactReplay() {
     auto s=initial();auto rules=campaignRules();auto e=Engine::start(s,rules,1936);CampaignAuditLog log(e);
@@ -149,5 +156,31 @@ void randomLegalChoicesPreserveDomainAndReplay() {
         check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Random legal action/chance/interrupt trace replay diverged");
     }
 }
+std::map<Id,std::map<Id,int>> storedIncomes(const State&s){std::map<Id,std::map<Id,int>> out;for(const auto&[id,n]:s.nations)out[id]=n.incomeComponents;return out;}
+void storedIncomeFollowsLandThatChangesHands() {
+    // Land changes hands in battles, political events and surrenders, which the
+    // economy module never handles. After any move, in either interface, each
+    // nation's stored income must be what it would collect as the position stands.
+    const auto scenario=std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936";
+    for(const bool training:{false,true}) {
+        auto env=CampaignEnv::curriculum(scenario,4,9003,training);
+        requireCampaignInvariants(env.engine().state());
+        std::uint64_t policy=9003;int changed=0,transitions=0;
+        while(!env.isTerminal()) {
+            const auto before=storedIncomes(env.engine().state());Id kind="chance";
+            if(env.engine().state().chance)env.resolveChance();
+            else {
+                policy=policy*UINT64_C(6364136223846793005)+UINT64_C(1442695040888963407);
+                const auto actions=env.legalActions();check(!actions.empty(),"Random play reached a campaign dead end");
+                const auto action=actions[(policy>>33)%actions.size()];kind=action.kind;env.applyAction(action);
+            }
+            requireCampaignInvariants(env.engine().state());++transitions;
+            if(kind.rfind("economy_",0)!=0&&kind!="end_phase"&&storedIncomes(env.engine().state())!=before)++changed;
+        }
+        check(changed>0,"The random campaign never changed an income outside the economy's own moves");
+        std::cout<<"Stored income checked after "<<transitions<<" transitions of a four-round campaign in the "<<(training?"training":"ordinary")
+                 <<" interface; "<<changed<<" of them changed an income outside the economy's own moves\n";
+    }
 }
-int main(){try{authoritativeInitialStateAndDomainDiagnostics();transitionAuditAndExactReplay();carpetBombingParticipatesOnceAndCannotBeHitByInfantry();creationRequiresAnExplicitRuleSource();randomLegalChoicesPreserveDomainAndReplay();std::cout<<"Campaign integration: 5 fixture groups passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+}
+int main(){try{authoritativeInitialStateAndDomainDiagnostics();transitionAuditAndExactReplay();carpetBombingParticipatesOnceAndCannotBeHitByInfantry();creationRequiresAnExplicitRuleSource();randomLegalChoicesPreserveDomainAndReplay();storedIncomeFollowsLandThatChangesHands();std::cout<<"Campaign integration: 6 fixture groups passed\n";return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

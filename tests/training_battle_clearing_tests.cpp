@@ -1,4 +1,5 @@
 #include "game/campaign_actions.hpp"
+#include "game/campaign_audit.hpp"
 #include "game/campaign_env.hpp"
 #include "game/catalog.hpp"
 #include "game/naval.hpp"
@@ -19,11 +20,12 @@ void check(bool condition, const std::string &message) {
     throw std::runtime_error(message);
 }
 
-// The training profile without its settle step, which is how it worked before
-// finished battles were cleared automatically.
-class WithoutSettle final : public Rules {
+// The training profile without the steps it takes itself when a transition
+// ends, which is how it worked before finished battles were cleared
+// automatically. The rules modules beneath it still settle, as under any profile.
+class WithoutAutomaticSteps final : public Rules {
 public:
-  explicit WithoutSettle(std::shared_ptr<const Rules> rules) : rules_(std::move(rules)) {}
+  explicit WithoutAutomaticSteps(std::shared_ptr<const Rules> rules) : rules_(std::move(rules)) {}
   Id id() const override { return rules_->id(); }
   std::vector<Action> actions(const State &s) const override { return rules_->actions(s); }
   std::vector<Action> interrupts(const State &s) const override { return rules_->interrupts(s); }
@@ -35,9 +37,11 @@ public:
   void finishTurn(State &s) const override { rules_->finishTurn(s); }
   void beginTurn(State &s) const override { rules_->beginTurn(s); }
   void finishPhase(State &s) const override { rules_->finishPhase(s); }
+  void settle(State &s) const override { modules_->settle(s); }
 
 private:
   std::shared_ptr<const Rules> rules_;
+  std::shared_ptr<const Rules> modules_ = campaignRules();
 };
 
 bool marked(const std::map<Id, int> &flags, const Id &key) {
@@ -108,7 +112,7 @@ Lockstep playLockstep(std::uint64_t seed, int rounds) {
       std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/scenarios/japan_china_1936";
   const auto start = CampaignEnv::curriculum(scenario, rounds, seed, true).engine().state();
   Engine training(start, trainingCampaignRules(), seed);
-  Engine reference(start, std::make_shared<WithoutSettle>(trainingCampaignRules()), seed);
+  Engine reference(start, std::make_shared<WithoutAutomaticSteps>(trainingCampaignRules()), seed);
   std::mt19937_64 choices(seed * 7919 + 17);
   Lockstep result;
   for (int step = 0; step < 20000 && !training.state().terminal; ++step) {
@@ -178,7 +182,7 @@ Delayed playDelayed(std::uint64_t seed, int rounds) {
       std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/scenarios/japan_china_1936";
   const auto start = CampaignEnv::curriculum(scenario, rounds, seed, true).engine().state();
   Engine training(start, trainingCampaignRules(), seed);
-  Engine reference(start, std::make_shared<WithoutSettle>(trainingCampaignRules()), seed);
+  Engine reference(start, std::make_shared<WithoutAutomaticSteps>(trainingCampaignRules()), seed);
   std::mt19937_64 choices(seed * 104729 + 3);
   const auto chance = [&](double probability) {
     return std::uniform_real_distribution<double>(0, 1)(choices) < probability;
@@ -332,7 +336,7 @@ void choose(Engine &engine, const Id &kind, const Id &unit = "") {
 void finishedNavalBattlesClearThemselves() {
   const auto state = navalFixture();
   Engine training(state, trainingCampaignRules(), 5);
-  Engine reference(state, std::make_shared<WithoutSettle>(trainingCampaignRules()), 5);
+  Engine reference(state, std::make_shared<WithoutAutomaticSteps>(trainingCampaignRules()), 5);
   for (auto *engine : {&training, &reference}) {
     engine->setDiceTapeForTesting({1, 1});
     choose(*engine, "naval_begin_battle");

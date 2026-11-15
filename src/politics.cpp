@@ -553,9 +553,6 @@ bool PoliticsRules::phaseComplete(const State& s) const {
     return !gameplay_||gameplay_->phaseComplete(s);
 }
 void PoliticsRules::apply(State& s,const Action& a) const {
-    applyImpl(s,a);if(gameplay_&&gameplay_->id().find("m6_economy")!=std::string::npos)refreshIncome(s);
-}
-void PoliticsRules::applyImpl(State& s,const Action& a) const {
     if(a.kind=="politics_declare_war") {
         const auto target=a.parameters.require("target").asString();
         if(a.nation!=s.currentNation()&&s.nations.at(a.nation).alliance!=s.nations.at(s.currentNation()).alliance) {
@@ -613,9 +610,6 @@ void PoliticsRules::applyImpl(State& s,const Action& a) const {
     throw std::runtime_error("Unknown political action: "+a.kind);
 }
 void PoliticsRules::applyChance(State& s,const ChanceRequest& request,const ChanceOutcome& outcome) const {
-    applyChanceImpl(s,request,outcome);if(gameplay_&&gameplay_->id().find("m6_economy")!=std::string::npos)refreshIncome(s);
-}
-void PoliticsRules::applyChanceImpl(State& s,const ChanceRequest& request,const ChanceOutcome& outcome) const {
     if(request.purpose=="politics_surrender_queues") {
         const auto context=pendingPolitical(s,request.continuation);erasePoliticalContinuation(s,request.continuation);
         const auto faces=effectiveResults(request,outcome);const auto& ships=context.require("ships").asArray();
@@ -659,5 +653,8 @@ void PoliticsRules::finishTurn(State& s) const {
         const auto it=s.politics.capitals.find("japan");
         if(it!=s.politics.capitals.end()) {const auto owner=s.territories.at(it->second).possessor;if(owner&&s.nations.at("japan").atWarWith.contains(*owner))surrenderNation(s,"japan",*owner);}
     }
+}
+void PoliticsRules::settle(State& s) const {
+    if(gameplay_)gameplay_->settle(s);
 }
 } // namespace game::campaign

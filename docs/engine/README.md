@@ -123,10 +123,13 @@ is all or nothing:
 | `interrupt(move)` | Between moves | Applies a move made out of turn ([section 6](#6-moves-made-out-of-turn)) |
 | `resolveChance()` | At a chance event | Rolls the waiting dice and lets the rules apply the result |
 
-After the rules have applied a move or a roll, the engine lets them take any
-steps that offer no choice (`settle`), checks the new state for consistency,
-and adds the move to the history. If anything fails on the way, the game is
-left exactly as it was.
+After the rules have applied a move or a roll, the engine lets them settle the
+position (`settle`). Each module brings the values it keeps about the position
+up to date, such as [every nation's income](economy.md#1-money), and the
+training interface takes any steps that offer no choice. The engine then checks
+the new state for consistency and adds the move to the history. If anything
+fails on the way, the game is left exactly as it was. A new game's first
+position is settled in the same way.
 
 ## 5. Dice
 
@@ -209,8 +212,9 @@ engine builds the list once and shares it between copies.
   (`State::validate`).
 - **Rule checks across modules** (`campaignInvariantFailures` in
   `src/campaign_audit.cpp`) look for states no legal play can reach, such as a
-  war only one side is in. The integration tests run them after every step of
-  whole games.
+  war only one side is in, or a stored income that no longer matches the
+  position. The integration tests run them after every step of random
+  campaigns four rounds long, in both move interfaces.
 - **Each module has its own test suite** in `tests/`, with small set-up
   positions for each rule: 26 C++ suites in all.
 - **Random play** finds what set-up positions miss.

@@ -103,7 +103,7 @@ struct NationState {
     std::optional<Id> alliance;
     std::string powerStatus {"minor"};
     std::optional<int> treasury;  // No account is different from an account with zero cash.
-    std::map<Id, int> incomeComponents;
+    std::map<Id, int> incomeComponents;  // The parts of its income as the position stands.
     bool incomeKnown {false};  // An unevaluated rate is not a zero-income ruling.
     std::map<Id, int> technologyStages;
     std::set<Id> atWarWith;
@@ -402,9 +402,11 @@ class Rules {
     virtual void finishTurn(State&) const = 0;
     virtual void beginTurn(State&) const {}
     virtual void finishPhase(State&) const {}
-    // Runs at the end of every action, interrupt and chance transition, before the
-    // new position is recorded. A rules profile may take steps here that offer no
-    // choice; they become part of the transition that made them possible.
+    // Runs when a campaign starts and at the end of every action, interrupt and
+    // chance transition, before the position is recorded. A module brings the
+    // values it keeps about the position up to date here, and passes the call
+    // on to the module it wraps. A rules profile may also take steps that offer
+    // no choice; they become part of the transition that made them possible.
     virtual void settle(State&) const {}
 };
 

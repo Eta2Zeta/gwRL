@@ -151,10 +151,10 @@ is turned into "turns since", so equal situations in different turns look alike.
 ## 5. The position part
 
 The position answers questions such as `round`, `rounds_left`, `phase:<phase>`,
-`turn_nation:<nation>`, `treasury:<nation>`, `at_war:<nation>:<nation>`,
-`technology_stage:<nation>:<technology>`, the kind of decision being taken
-(`decision:<kind>`) and the purpose of a pending dice roll. In the seed-5 decision
-these include:
+`turn_nation:<nation>`, `treasury:<nation>`, `income:<nation>:<part>`,
+`at_war:<nation>:<nation>`, `technology_stage:<nation>:<technology>`, the kind of
+decision being taken (`decision:<kind>`) and the purpose of a pending dice roll.
+In the seed-5 decision these include:
 
 | Question | Answer | Meaning |
 | --- | ---: | --- |
@@ -162,7 +162,14 @@ these include:
 | `rounds_left` | 11 | rounds still to play |
 | `phase:combat_movement` | 1 | the Combat Movement phase |
 | `turn_nation:ccp` | 1 | the CCP's turn |
+| `treasury:japan` | 15 | Japan's money: 15 IPP, the game's unit of money |
+| `income:japan:territorial` | 15 | the income Japan's land gives it each turn |
 | `nation_present:<nation>` | 1 | one answer for each nation in the game |
+
+An income answer is the nation's income as the position stands, not what it
+last collected. The engine brings it up to date at the end of every move, so
+land taken in a battle counts at the next decision
+([economy](../engine/economy.md#1-money)).
 
 ## 6. The move part
 

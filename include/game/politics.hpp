@@ -87,10 +87,9 @@ class PoliticsRules final : public Rules {
     void finishTurn(State&) const override;
     void beginTurn(State&) const override;
     void finishPhase(State&) const override;
+    void settle(State&) const override;
 
   private:
-    void applyImpl(State&, const Action&) const;
-    void applyChanceImpl(State&, const ChanceRequest&, const ChanceOutcome&) const;
     std::shared_ptr<const Rules> gameplay_;
 };
 

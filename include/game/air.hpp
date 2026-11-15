@@ -77,6 +77,7 @@ class AirRules final : public Rules {
     void finishTurn(State &) const override;
     void beginTurn(State &) const override;
     void finishPhase(State &) const override;
+    void settle(State &) const override;
 
   private:
     std::shared_ptr<const Rules> gameplay_;

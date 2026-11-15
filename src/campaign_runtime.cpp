@@ -321,6 +321,7 @@ Engine Engine::start(State initial, std::shared_ptr<const Rules> rules, std::uin
     const auto before = result.state_.clock;
     result.rules_->beginTurn(result.state_);
     checkHookClock(result.state_, before, false);
+    result.settle();
     result.state_.validate();
     return result;
 }

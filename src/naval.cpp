@@ -160,4 +160,8 @@ void NavalRules::finishTurn(State &s) const {
     }
   }
 }
+void NavalRules::settle(State &s) const {
+  if (gameplay_)
+    gameplay_->settle(s);
+}
 } // namespace game::campaign

@@ -506,7 +506,6 @@ void beginEconomyTurn(State &s) {
             ++research;
     n.turnFlags["economy_research_capacity"] = n.powerStatus == "major" ? research : 0;
     n.turnFlags["economy_research_finished"] = research == 0 || n.powerStatus != "major";
-    refreshIncome(s);
 }
 void damageConstruction(State &s, const Id &id, int damage) {
     require(damage >= 0, "Negative construction damage");
@@ -1004,7 +1003,6 @@ void finishEconomyPlacement(State &s) {
         it = s.repairs.erase(it);
     }
     s.nations.at(s.currentNation()).turnFlags["economy_repairs_finished"] = 1;
-    refreshIncome(s);
 }
 
 EconomyRules::EconomyRules(std::shared_ptr<const Rules> gameplay) : gameplay_(std::move(gameplay)) {}
@@ -1042,14 +1040,12 @@ void EconomyRules::apply(State &s, const Action &a) const {
         require(bool(gameplay_), "Unhandled gameplay action");
         gameplay_->apply(s, a);
     }
-    refreshIncome(s);
 }
 void EconomyRules::applyChance(State &s, const ChanceRequest &r, const ChanceOutcome &o) const {
     if (!applyEconomyChance(s, r, o)) {
         require(bool(gameplay_), "Unhandled gameplay chance");
         gameplay_->applyChance(s, r, o);
     }
-    refreshIncome(s);
 }
 void EconomyRules::beginTurn(State &s) const {
     if (gameplay_)
@@ -1064,7 +1060,6 @@ void EconomyRules::finishPhase(State &s) const {
 }
 void EconomyRules::finishTurn(State &s) const {
     finishEconomyPlacement(s);
-    refreshIncome(s);
     auto &n = s.nations.at(s.currentNation());
     const auto rate = evaluateIncome(s, s.currentNation());
     if (!s.clock.incomeCollected && rate.collectable && n.treasury) {
@@ -1074,5 +1069,12 @@ void EconomyRules::finishTurn(State &s) const {
     s.clock.incomeCollected = true;
     if (gameplay_)
         gameplay_->finishTurn(s);
+}
+void EconomyRules::settle(State &s) const {
+    if (gameplay_)
+        gameplay_->settle(s);
+    // Land changes hands in moves no economy step sees, so the stored rates are
+    // brought up to date here, where every transition ends.
+    refreshIncome(s);
 }
 } // namespace game::campaign

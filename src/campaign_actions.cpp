@@ -238,8 +238,12 @@ class TrainingRules final : public Rules {
         core_->settle(state);
         // A finished battle stays listed only until its follow-ups are done. Its
         // click then only deletes the record, in any order, so the profile takes
-        // each one itself as soon as it is offered, exactly as if chosen.
-        while (const auto clearing = battleClearing(state)) apply(state, *clearing);
+        // each one itself as soon as it is offered, exactly as if chosen: the
+        // modules settle after it, as they do after a chosen move.
+        while (const auto clearing = battleClearing(state)) {
+            apply(state, *clearing);
+            core_->settle(state);
+        }
     }
   private:
     std::shared_ptr<const Rules> core_;
