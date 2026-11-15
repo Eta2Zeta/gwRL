@@ -38,6 +38,15 @@ follows rulebook 15.4 (page 105). Mongolia starts no war because the power
 that controls a minor power may not declare war for it (rulebook 4.5,
 page 27).
 
+Mongolia stays a nation of its own when it is attacked. In the full game it
+would stay one only when the KMT attacks it: an attack by anyone else makes it
+align with the USSR at the end of the attacker's Combat Phase (rulebook 4.7,
+page 29), and a minor power that aligns is incorporated into the major power
+(rulebook 4.6, page 28). This campaign has no USSR and turns that alignment off
+(`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`),
+so here Mongolia can be at war with Japan, where in the full game it would by
+then be Soviet ([Q-002](../questions.md#q-002-chinese-land-that-japan-holds)).
+
 The KMT's row is the engine's reading of the printed condition that the CCP
 has been eliminated before: it allows the attack only while the CCP has no
 units. Whether the permission should last once the CCP has been eliminated is

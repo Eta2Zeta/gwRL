@@ -102,13 +102,19 @@ the CCP held ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-t
 | 4.9, page 30 | A foreign nation that attacks land which was originally a warlord's, the CCP's or the KMT's has thereby declared war on the whole of China, and every warlord aligns with the CCP or the KMT (or the Dadao Government) at the end of the attacker's Combat Phase. |
 | 4.5, page 27 | Whoever controls a minor power may move its units in combat only against nations it is already at war with, and may not declare war for it or take any action that puts it at war with a power it is not already at war with. |
 | 4.3, page 26, and 4.7, page 29 | Mongolia is a minor power of the Comintern, controlled by the USSR. The CCP is in the Comintern too. |
+| 4.7, page 29, and 4.6, page 28 | Attacked by the KMT, Mongolia stays a nation of its own. Attacked by anyone else, it aligns with the USSR at the end of the attacker's Combat Phase, and at once if the USSR is at war with a major power. A minor power that aligns is incorporated into the major power and ceases to exist; its land and units become the major power's. |
 | 5.1, page 35 | Nobody may declare war inside their own alliance; the table answers "No" for the USSR and for the CCP against other Comintern nations. |
 | 14.3, page 101 | Without a declaration of war no other nation may enter land that was originally the KMT's, the CCP's or a warlord's; that the land is friendly makes no difference. |
 
 This campaign leaves the USSR out and lets the Comintern player move Mongolia
 with the rights of a controlled minor power
 ([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions);
-`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`).
+`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`,
+which also turns off Mongolia's alignment with the USSR). In the full game,
+then, the only nation a Mongolia of its own can be at war with is the KMT, and
+the only Chinese land it can attack is land the KMT holds, as in the case
+above. Here it can also be at war with Japan; that case is
+[Q-002](#q-002-chinese-land-that-japan-holds).
 
 Read together, the rules do not allow this attack: by 4.9 it would be a
 declaration of war on all of China, which 4.5 forbids for a controlled minor
@@ -159,6 +165,15 @@ zone that Dadao holds: an attack there is an attack on Dadao only.
    The engine treats that as Mongolia invading China: Mongolia is now also at
    war with the KMT and the CCP, neither of which had any part in the fight.
 
+In the full game Mongolia would no longer exist at step 3. Japan's attack in
+step 2 makes it align with the USSR at the end of Japan's Combat Phase, and it
+is incorporated into the USSR (rulebook 4.7, page 29; 4.6, page 28). The attack
+in step 3 would be the USSR's. Rule 4.5, which binds a controlled minor power,
+would not apply to it; rule 5.1 forbids the USSR, too, to declare war on the
+CCP. This campaign has no USSR and keeps Mongolia a nation of its own
+(`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`),
+so the case arises only here.
+
 **How often.** In 25 of the 70 games of Q-001 the zone Mongolia first attacked
 was held by Japan; in the other 45 the KMT held it
 ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
@@ -192,7 +207,13 @@ up at war with China as well.
 
 **This depends on Q-001.** If Q-001 is answered C, the case cannot arise in
 this campaign: Mongolia then never attacks such a zone, and the only other
-nation that is not Chinese is Japan, which is the holder here.
+nation that is not Chinese is Japan, which is the holder here. But C rests on
+rule 4.5, which binds Mongolia here only because this campaign keeps it a
+minor power after Japan's attack; in the full game the same attack is the
+USSR's, and 4.5 does not bind the USSR. So if the developers allow the USSR to
+attack Chinese land that Japan holds, the recommendation is to allow it to this
+campaign's Mongolia too, once Japan has attacked it, and to apply C only to
+land a Chinese nation holds.
 
 **If answered.** As for Q-001.
 
