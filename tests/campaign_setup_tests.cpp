@@ -29,8 +29,13 @@ struct TemporaryScenario {
         fs::copy(source, scenario, fs::copy_options::recursive);
         fs::create_directories(root / "game_content/maps");
         fs::copy_file(source / "../../maps/gw36_nation_home_country.json", root / "game_content/maps/gw36_nation_home_country.json");
-        fs::create_directory_symlink(fs::path(GWRL_SOURCE_DIR) / "game_content/catalog", root / "game_content/catalog");
-        fs::create_directory_symlink(fs::path(GWRL_SOURCE_DIR) / "game_content/rules", root / "game_content/rules");
+        for (const char* shared : {"game_content/catalog", "game_content/rules"}) {
+            // Windows refuses symbolic links without Developer Mode or administrator
+            // rights; a copy reads the same.
+            std::error_code linkError;
+            fs::create_directory_symlink(fs::path(GWRL_SOURCE_DIR) / shared, root / shared, linkError);
+            if (linkError) fs::copy(fs::path(GWRL_SOURCE_DIR) / shared, root / shared, fs::copy_options::recursive);
+        }
     }
     ~TemporaryScenario() { std::error_code ignored; fs::remove_all(root, ignored); }
 };

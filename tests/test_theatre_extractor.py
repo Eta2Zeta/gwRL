@@ -270,7 +270,10 @@ class TheatreExtractorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source_path, manifest_path = self.write_inputs(directory)
             link_path = Path(directory) / "alias.json"
-            link_path.symlink_to(source_path)
+            try:
+                link_path.symlink_to(source_path)
+            except OSError:
+                self.skipTest("This system refuses symbolic links (Windows without Developer Mode)")
             for output in (source_path, manifest_path, link_path):
                 with self.subTest(output=output):
                     with self.assertRaisesRegex(ValueError, "must not overwrite"):

@@ -95,7 +95,8 @@ software versions are part of exact continuation compatibility.
 its own interpreter lock; the main process keeps learning updates, model exports
 and checkpoints. `--games-per-process N` with `--episode-workers P` plays N games
 in each of P processes for one batch and evaluates all their positions together
-in the main process on `--neural-device` (`mps` for the Apple GPU). A position's
+in the main process on `--neural-device` (`mps` for the Apple GPU, `cuda` for an
+NVIDIA GPU). A position's
 batch changes its outputs in the last digits, so unlike one-position evaluation
 a game need not repeat exactly from its seed. In either mode a game that fails
 costs only that game, recorded with its seed in `failed_games`.
@@ -151,6 +152,30 @@ and nothing else of that run, even if the sources have changed since, so a run
 stopped by a bug continues from its latest networks after the fix.
 `tools/record_campaign_games.py` plays recorded games from a model export, each in
 its own process, for the Campaign Observatory.
+
+### Training on Windows
+
+`--profile windows` gives the supervisor the setup in
+[profiles/windows.json](profiles/windows.json): an 8-core PC with an NVIDIA GPU,
+six game processes of four games each, whose positions the coordinating process
+evaluates with CUDA, 7 cores for training and one for the supervisor, a 12 GB
+memory limit and keeping the PC awake. Its software: Visual Studio 2022 Build
+Tools with the C++ workload, and a Python 3.13 environment at `~/.venvs/gwrl`
+built from `requirements-gpu-cuda.txt`, PyTorch 2.14 for CUDA 12.6. Build the extension with
+`python setup.py build_ext --inplace`; MSVC reads the sources as UTF-8, and
+`.gitattributes` keeps every text file's line endings LF, which the engine's
+data fingerprints need. That checkout syncs through OneDrive, so the environment
+and the run directories live outside it. Use the Mac's command with
+`--profile windows` and `--epochs 525`, which reads each kept sample as often
+with 24 games per batch as 700 epochs do with 32.
+
+The supervisor holds the trainer and every process it starts in a Windows job
+object. A safe stop is a Ctrl+Break to the trainer's console process group,
+which Python receives as `SIGBREAK`, so start the supervisor from a console
+window; Ctrl+Break or Ctrl+C there stops the supervisor and saves the run. On
+3 November 2026 this PC played 22 to 31 eleven-round games per hour with
+learning at those settings, about a quarter of the Mac's rate then: the game
+processes on its CPU limited it, not the network on its GPU.
 
 ## The network's input and the order interface
 

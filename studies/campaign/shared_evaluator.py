@@ -24,7 +24,10 @@ import multiprocessing
 from multiprocessing import shared_memory
 from multiprocessing.connection import Connection, wait
 import queue
-import resource
+try:
+    import resource
+except ImportError:  # Windows has no open-file limit for these pipes and buffers.
+    resource = None
 import signal
 import threading
 import time
@@ -272,6 +275,8 @@ class SharedEvaluatorServer:
 
 def raise_descriptor_limit(wanted: int) -> None:
     """Raise the soft open-file limit towards `wanted`, never lowering it."""
+    if resource is None:
+        return
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     wanted = wanted if hard == resource.RLIM_INFINITY else min(wanted, hard)
     if soft != resource.RLIM_INFINITY and soft < wanted:
@@ -319,8 +324,8 @@ def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], version
 
 def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
     # The coordinator stops games by closing their pipes. A signal to the process
-    # group must reach it, not end games under it.
-    for number in (signal.SIGINT, signal.SIGTERM):
+    # group (Ctrl+Break on Windows) must reach it, not end games under it.
+    for number in (signal.SIGINT, signal.SIGTERM, *([signal.SIGBREAK] if hasattr(signal, "SIGBREAK") else [])):
         signal.signal(number, signal.SIG_IGN)
     target(*arguments)
 

@@ -42,7 +42,8 @@ class ReplayTraceWriter:
 
     def __init__(self, path: str | Path, metadata: Mapping[str, Any]):
         self.path = Path(path)
-        self._handle = self.path.open("x")
+        # The same bytes on every platform: UTF-8 with bare newlines.
+        self._handle = self.path.open("x", encoding="utf-8", newline="\n")
         self({"type": "run_start", **dict(metadata),
               "verification": "initial_serialized_sha256_then_planning_keys_and_seed",
               "resume_supported": False})

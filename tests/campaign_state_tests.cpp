@@ -253,9 +253,12 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
     unit.zone=unit.turnOrigin="sea_p15";unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags["raider"]=0;
     state.units.emplace(unit.id,unit);
     auto configuration=[&](double number) {
-        return V(O{{"schema",V(trainingActionSchema)},{"visited_configurations",V(V::Array{V(O{
-            {"raiders",V(O{{unit.id,V(O{{"raider",V(number)}})}})},
-            {"aircraft",V(O{})},{"carriers",V(O{})}})})},{"declined_rail_requests",V(V::Array{})}});
+        // Built in steps: MSVC runs out of memory resolving it as one nested initializer.
+        O raiders{{unit.id,V(O{{"raider",V(number)}})}};
+        O visited{{"raiders",V(std::move(raiders))},{"aircraft",V(O{})},{"carriers",V(O{})}};
+        V::Array configurations{V(std::move(visited))};
+        return V(O{{"schema",V(trainingActionSchema)},{"visited_configurations",V(std::move(configurations))},
+                   {"declined_rail_requests",V(V::Array{})}});
     };
     state.actionInterface=configuration(-0.0);state.validate();
     check(std::signbit(state.actionInterface.require("visited_configurations").asArray().front()

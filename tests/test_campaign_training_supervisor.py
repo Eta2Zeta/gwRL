@@ -16,13 +16,18 @@ import unittest
 from unittest.mock import Mock, patch
 
 from tools.supervise_campaign_training import (
-    PROFILE_SCHEMA, SupervisorConfig, aggregate_rss, exclusive_lock, keep_awake, load_profile, main,
+    KILL, PROFILE_SCHEMA, SupervisorConfig, aggregate_rss, exclusive_lock, keep_awake, load_profile, main,
     profile_arguments, supervise, training_command, validate_training_arguments, process_group_alive,
     process_memory_charge, _darwin_physical_footprint, monitor_error_details,
 )
 
 
 ARGUMENTS = ["--threads", "1", "--parallel-envs", "1", "--cpu-budget", "3"]
+WINDOWS = sys.platform == "win32"
+# A forced stop's exit code: SIGKILL, or the code a Windows job is terminated with.
+KILLED = 1 if WINDOWS else -KILL
+# Windows supervisors ask a child to stop with Ctrl+Break, which arrives as SIGBREAK.
+STOP_SIGNALS = "(signal.SIGTERM, *([signal.SIGBREAK] if hasattr(signal, 'SIGBREAK') else []))"
 
 
 class CampaignTrainingSupervisorTests(unittest.TestCase):
@@ -63,7 +68,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                 "    (run / 'checkpoint.pt').write_text('unfinished games and optimizer')\n"
                 "    (run / 'manifest.json').write_text(json.dumps({'status':'interrupted'}))\n"
                 "    sys.exit(130)\n"
-                "signal.signal(signal.SIGTERM, stop)\n"
+                f"for number in {STOP_SIGNALS}: signal.signal(number, stop)\n"
                 "while True: time.sleep(0.01)\n")
         state = self.run_supervisor(body)
         self.assertEqual(state["status"], "time_budget_exhausted")
@@ -121,7 +126,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                                "    (run / 'checkpoint.pt').write_text('safe')\n"
                                "    (run / 'manifest.json').write_text(json.dumps({'status':'interrupted'}))\n"
                                "    sys.exit(130)\n"
-                               "signal.signal(signal.SIGTERM, stop)\n"
+                               f"for number in {STOP_SIGNALS}: signal.signal(number, stop)\n"
                                "(run / 'ready').write_text('ready')\n"
                                "while True: time.sleep(0.01)\n")
         def resident(_pid):
@@ -165,7 +170,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                 self.assertEqual(state["status"], "memory_monitor_failure")
                 self.assertEqual(state["error_restarts"], 0)
                 self.assertEqual(signals, [signal.SIGTERM] if phase == "worker"
-                                 else [signal.SIGTERM, signal.SIGKILL])
+                                 else [signal.SIGTERM, KILL])
 
     def test_monitor_diagnostics_are_bounded_and_retain_exception_context(self):
         try:
@@ -188,7 +193,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         self.assertEqual(saved["exception_context"][0]["sampled_pid"], 987651)
 
     def test_memory_is_sampled_during_grace_and_absolute_limit_kills_immediately(self):
-        factory = self.factory("signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
+        factory = self.factory(f"for number in {STOP_SIGNALS}: signal.signal(number, signal.SIG_IGN)\n"
                                "(run / 'ready').write_text('ready')\n"
                                "while True: time.sleep(0.01)\n")
         samples = []
@@ -202,7 +207,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         self.assertGreaterEqual(len(samples), 2)
         self.assertEqual(state["status"], "memory_limit")
         self.assertTrue(state["attempts"][0]["forced_kill"])
-        self.assertEqual(state["attempts"][0]["returncode"], -signal.SIGKILL)
+        self.assertEqual(state["attempts"][0]["returncode"], KILLED)
 
     def test_checkpoint_adoption_is_explicit_and_still_resumes_that_checkpoint(self):
         self.run.mkdir()
@@ -222,6 +227,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "already owns"):
                 self.run_supervisor("raise RuntimeError('must not launch')\n")
 
+    @unittest.skipIf(WINDOWS, "POSIX process groups; see the Windows job test")
     def test_orphan_group_is_stopped_before_retry(self):
         body = ("marker = run / 'checkpoint.pt'\n"
                 "if not marker.exists():\n"
@@ -237,6 +243,24 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         group = int((self.run / "orphan_group").read_text())
         self.assertFalse(process_group_alive(group))
         self.assertTrue(any(event["kind"] == "orphan_group_stop" for event in state["events"]))
+
+    @unittest.skipUnless(WINDOWS, "Windows job objects")
+    def test_windows_job_stops_orphans_before_retry_and_charges_the_whole_tree(self):
+        from tools.windows_process_tree import process_alive
+        body = ("marker = run / 'checkpoint.pt'\n"
+                "if not marker.exists():\n"
+                "    import subprocess\n"
+                "    child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(20)'])\n"
+                "    (run / 'orphan').write_text(str(child.pid))\n"
+                "    marker.write_text('saved unfinished game')\n"
+                "    sys.exit(75)\n"
+                "assert sys.argv[2] == str(marker)\n"
+                "(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n")
+        state = supervise(self.control, self.run, self.config, ARGUMENTS, command_factory=self.factory(body))
+        self.assertEqual(state["status"], "completed")
+        self.assertFalse(process_alive(int((self.run / "orphan").read_text())))
+        self.assertTrue(any(event["kind"] == "orphan_group_stop" for event in state["events"]))
+        self.assertGreater(state["aggregate_sampled_peak_rss_bytes"], 0)
 
     def test_existing_outputs_and_changed_identity_are_preserved(self):
         self.run.mkdir()
@@ -260,6 +284,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         self.assertEqual(state["status"], "supervisor_error")
         self.assertEqual(state["events"][-1]["error_type"], "FileNotFoundError")
 
+    @unittest.skipIf(WINDOWS, "Windows children cannot inherit the lock")
     def test_duplicate_lock_is_rejected_and_inherited_by_running_child(self):
         lock = self.directory / "run.lock"
         with exclusive_lock(lock) as handle:
@@ -274,6 +299,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                 process.terminate()
                 process.wait(timeout=5)
 
+    @unittest.skipIf(WINDOWS, "Windows children cannot inherit the lock")
     def test_crashed_supervisor_cannot_release_a_live_childs_lock(self):
         lock, marker = self.directory / "crash.lock", self.directory / "child.pid"
         body = ("import os, pathlib, subprocess, sys\n"
@@ -292,6 +318,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         finally:
             os.kill(child_pid, signal.SIGTERM)
 
+    @unittest.skipIf(WINDOWS, "Windows children cannot inherit the lock")
     def test_parent_context_exit_preserves_inherited_live_child_lock(self):
         lock = self.directory / "inherited-exit.lock"
         with exclusive_lock(lock) as handle:
@@ -309,11 +336,11 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
 
     def test_unresponsive_worker_is_killed_after_save_grace_within_budget(self):
         self.config = replace(self.config, seconds=0.5, shutdown_seconds=0.1)
-        state = self.run_supervisor("signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
+        state = self.run_supervisor(f"for number in {STOP_SIGNALS}: signal.signal(number, signal.SIG_IGN)\n"
                                     "while True: time.sleep(0.01)\n")
         self.assertEqual(state["status"], "time_budget_exhausted")
         self.assertTrue(state["attempts"][0]["forced_kill"])
-        self.assertEqual(state["attempts"][0]["returncode"], -signal.SIGKILL)
+        self.assertEqual(state["attempts"][0]["returncode"], KILLED)
         self.assertLessEqual(state["charged_seconds"], self.config.seconds)
 
     def test_cpu_envelope_and_manual_checkpoint_recovery_are_explicit(self):
@@ -428,7 +455,8 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         parent = os.getpid()
         rows = [(parent, 1, parent, 10), (123, parent, 123, 20), (124, 123, 123, 30),
                 (125, 124, 125, 40), (126, 1, 126, 1000)]
-        with patch("tools.supervise_campaign_training._process_table", return_value=rows), \
+        with patch("tools.supervise_campaign_training.sys.platform", "linux"), \
+             patch("tools.supervise_campaign_training._process_table", return_value=rows), \
              patch("tools.supervise_campaign_training.process_memory_charge", side_effect=lambda _pid, rss: rss + 1) as charge:
             self.assertEqual(aggregate_rss(123), 100 * 1024 + 4)
             self.assertEqual(charge.call_count, 4)
@@ -457,6 +485,13 @@ class MachineProfileTests(unittest.TestCase):
         self.assertEqual((self.flag(arguments, "--neural-device"), self.flag(arguments, "--games-per-process")), ("cpu", "4"))
         self.assertEqual(self.flag(arguments, "--simulations"), "64")
         self.assertEqual(profile["unset_environment"], ["MallocNanoZone"])
+
+    def test_the_windows_profile_is_a_valid_execution_layout(self):
+        profile = load_profile("windows")
+        arguments = profile_arguments(profile, ["--full-campaign", "--simulations", "64"])
+        validate_training_arguments(arguments, SupervisorConfig(seconds=2, **profile["supervisor"]))
+        self.assertEqual(self.flag(arguments, "--games-per-process"), "4")
+        self.assertTrue(profile["python"].startswith("~/"))  # Outside the OneDrive-synced checkout.
 
     def test_command_line_flags_win_over_the_profile(self):
         arguments = profile_arguments(self.PROFILE, ["--threads", "2", "--parallel-envs=8"])

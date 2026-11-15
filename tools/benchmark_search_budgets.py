@@ -53,6 +53,9 @@ class EncodingEvaluator:
 
 
 def rss():
+    if sys.platform == "win32":  # No ps there; the working set is Windows' resident size.
+        from tools.windows_process_tree import working_set
+        return working_set(os.getpid())
     return int(subprocess.run(["ps", "-o", "rss=", "-p", str(os.getpid())], capture_output=True,
                               text=True).stdout) * 1024
 

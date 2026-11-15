@@ -67,7 +67,7 @@ class CampaignReplayTests(unittest.TestCase):
         value["verification_trace"] = {"event_count": len(self.events if events is None else events),
                                         "events_sha256": hashlib.sha256(trace.encode()).hexdigest()}
         path.write_text(json.dumps(value))
-        path.with_suffix(".trace.jsonl").write_text(trace)
+        path.with_suffix(".trace.jsonl").write_text(trace, newline="\n")
         return path
 
     def test_roundtrip_preserves_all_decisions_chance_and_final_frame(self):

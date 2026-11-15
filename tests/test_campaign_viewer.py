@@ -4,6 +4,7 @@ from http.client import HTTPConnection
 import json
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -109,7 +110,9 @@ class CampaignViewerTests(unittest.TestCase):
         scripts = re.findall(r'<script type="module">([\s\S]*?)</script>', page)
         self.assertEqual(len(scripts), 1)
         script = Path(self.scratch.name) / "viewer.mjs"
-        script.write_text(scripts[0])
+        script.write_text(scripts[0], encoding="utf-8")
+        if shutil.which("node") is None:
+            self.skipTest("Node.js is not installed to check the packaged script's syntax")
         checked = subprocess.run(["node", "--check", str(script)], capture_output=True, text=True)
         self.assertEqual(checked.returncode, 0, checked.stderr)
 

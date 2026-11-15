@@ -45,7 +45,10 @@ import argparse
 import json
 import os
 import re
-import resource
+try:
+    import resource
+except ImportError:  # Windows has no getrusage; see _usage.
+    resource = None
 import subprocess
 import sys
 import threading
@@ -53,6 +56,7 @@ import time
 from collections import Counter
 from functools import partial
 from pathlib import Path
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -224,6 +228,15 @@ def _profiled_play(play, directory: Path):
     return wrapper
 
 
+def _usage():
+    """This process's CPU seconds and peak resident bytes, as getrusage reports them."""
+    if resource is not None:
+        return resource.getrusage(resource.RUSAGE_SELF)
+    from tools.windows_process_tree import peak_working_set
+    times = os.times()  # Windows reads the same process CPU times here.
+    return SimpleNamespace(ru_utime=times.user, ru_stime=times.system, ru_maxrss=peak_working_set(os.getpid()))
+
+
 def _profiled_shared_process(settings, batch_version, *arguments) -> None:
     """A training game process (episode_workers._shared_process) that keeps accounts."""
     global _overhead_ns
@@ -236,7 +249,7 @@ def _profiled_shared_process(settings, batch_version, *arguments) -> None:
         game_process(partial(_profiled_play(episode_workers._play_shared, directory), settings),
                      batch_version, *arguments)
     finally:
-        usage = resource.getrusage(resource.RUSAGE_SELF)
+        usage = _usage()
         (directory / f"{os.getpid()}.process.json").write_text(json.dumps({
             "pid": os.getpid(), "user_seconds": usage.ru_utime, "system_seconds": usage.ru_stime,
             "max_rss_bytes": usage.ru_maxrss, "wall_seconds": time.time() - started,
@@ -402,7 +415,7 @@ def main(argv=None) -> int:
     arguments = args.training_arguments[1:] if args.training_arguments[:1] == ["--"] else args.training_arguments
     profile = supervisor.load_profile(args.profile) if args.profile else {}
     limits = profile.get("supervisor", {})
-    python = str(ROOT / profile["python"]) if "python" in profile else sys.executable
+    python = str(ROOT / Path(profile["python"]).expanduser()) if "python" in profile else sys.executable
     config = supervisor.SupervisorConfig(seconds=args.seconds, cpu_budget=limits.get("cpu_budget", 12),
                                          memory_bytes=limits.get("memory_bytes", 30_000_000_000),
                                          max_restarts=0)

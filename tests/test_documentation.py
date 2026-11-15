@@ -53,7 +53,7 @@ def prose(text: str) -> str:
 @lru_cache(maxsize=None)
 def anchors(path: Path) -> frozenset[str]:
     """The anchors GitHub gives a Markdown file's headings, plus explicit HTML anchors."""
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     found: set[str] = set(HTML_ANCHOR.findall(text))
     seen: dict[str, int] = {}
     for title in HEADING.findall(FENCED.sub("", text)):
@@ -70,7 +70,7 @@ class DocumentationTests(unittest.TestCase):
         broken = []
         for name in tracked("*.md"):
             source = ROOT / name
-            for target in LINK.findall(prose(source.read_text())):
+            for target in LINK.findall(prose(source.read_text(encoding="utf-8"))):
                 if re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", target) or target.startswith("//"):
                     continue
                 if target.startswith("/"):
@@ -95,7 +95,7 @@ class DocumentationTests(unittest.TestCase):
                 continue
             if name == "tests/test_documentation.py":
                 continue
-            for cited in set(CITED_DOCUMENT.findall((ROOT / name).read_text(errors="replace"))):
+            for cited in set(CITED_DOCUMENT.findall((ROOT / name).read_text(encoding="utf-8", errors="replace"))):
                 path = ROOT / cited
                 if not path.exists() and path.suffix.lower() not in LOCAL_ONLY_SUFFIXES:
                     missing.append(f"{name} cites {cited}")
@@ -119,7 +119,7 @@ class DocumentationTests(unittest.TestCase):
         for name in current:
             if not name.endswith(".md") or name.startswith(BOARD_PAGES) or name == STATES_THE_RULE:
                 continue
-            for label in sorted(set(STAGE_LABEL.findall(prose((ROOT / name).read_text())))):
+            for label in sorted(set(STAGE_LABEL.findall(prose((ROOT / name).read_text(encoding="utf-8"))))):
                 labelled.append(f"{name}: {label}")
         self.assertEqual(labelled, [], "Say what the thing is, not the stage that built it:\n" + "\n".join(labelled))
 

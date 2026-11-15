@@ -11,6 +11,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
@@ -225,11 +226,50 @@ class CampaignRunTests(unittest.TestCase):
         self.assertEqual(resumed.returncode, 0, resumed.stderr[-3000:])
         self.assert_completed_matches_reference(directory)
 
+    @unittest.skipIf(sys.platform == "win32", "POSIX signals and pipe selection; see the Ctrl+Break test")
     def test_sigint_after_first_flushed_rollout_saves_then_resumes_exactly(self):
         self.assert_signal_resume(signal.SIGINT)
 
+    @unittest.skipIf(sys.platform == "win32", "POSIX signals and pipe selection; see the Ctrl+Break test")
     def test_sigterm_after_first_flushed_rollout_saves_then_resumes_exactly(self):
         self.assert_signal_resume(signal.SIGTERM)
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows console stop requests")
+    def test_ctrl_break_after_first_flushed_rollout_saves_then_resumes_exactly(self):
+        # A Windows supervisor's safe stop: Ctrl+Break to the runner's own process group.
+        directory = self.directory / "signal-resume-SIGBREAK"
+        command = [sys.executable, "-m", "studies.campaign.run", "train", "--run-dir", str(directory), *self.flags]
+        process = subprocess.Popen(command, cwd=ROOT, env=self.environment(), stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, text=True, bufsize=1,
+                                   creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+        output, sent = [], False
+        watchdog = threading.Timer(60, process.kill)  # Windows pipes cannot be selected with a timeout.
+        watchdog.start()
+        try:
+            for line in process.stdout:
+                output.append(line)
+                if not sent and line.startswith("{") and json.loads(line).get("event") == "rollout":
+                    process.send_signal(signal.CTRL_BREAK_EVENT)
+                    sent = True
+            process.wait(timeout=60)
+            self.assertTrue(sent, "No flushed rollout was observed before the bounded signal deadline")
+            self.assertEqual(process.returncode, 130, "".join(output)[-3000:])
+        finally:
+            watchdog.cancel()
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=5)
+            process.stdout.close()
+        manifest = json.loads((directory / "manifest.json").read_text())
+        self.assertEqual(manifest["status"], "interrupted")
+        checkpoint = self.read(directory / "checkpoint.pt")
+        self.assertIsNotNone(checkpoint["learner"]["frozen_models"])
+        self.assertGreater(checkpoint["learner"]["counters"]["transitions"], 0)
+        self.assertTrue(any(json.loads(line).get("stop_reason") == "SIGBREAK"
+                            for line in "".join(output).splitlines() if line.startswith("{")))
+        resumed = self.command(["--resume", str(directory / "checkpoint.pt")])
+        self.assertEqual(resumed.returncode, 0, resumed.stderr[-3000:])
+        self.assert_completed_matches_reference(directory)
 
     def test_sigkill_resumes_last_complete_checkpoint_without_partial_update(self):
         directory = self.directory / "killed-resume"
@@ -247,7 +287,8 @@ class CampaignRunTests(unittest.TestCase):
                         break
                 time.sleep(0.01)
             _, error = process.communicate(timeout=max(0.1, deadline - time.monotonic()))
-            self.assertEqual(process.returncode, -signal.SIGKILL, error[-3000:])
+            # Windows reports the exit code Popen.kill terminates with, not a signal.
+            self.assertEqual(process.returncode, 1 if sys.platform == "win32" else -signal.SIGKILL, error[-3000:])
         finally:
             if process.poll() is None:
                 process.kill()

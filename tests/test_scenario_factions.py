@@ -132,7 +132,10 @@ class ScenarioFactionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             paths = self.write_inputs(directory)
             alias = Path(directory) / "alias.json"
-            alias.symlink_to(paths["map"])
+            try:
+                alias.symlink_to(paths["map"])
+            except OSError:
+                self.skipTest("This system refuses symbolic links (Windows without Developer Mode)")
             for output in [*paths.values(), alias]:
                 with self.subTest(output=output), self.assertRaisesRegex(ValueError, "must not overwrite"):
                     factions.build(paths["map"], paths["japan"], paths["china"], output)

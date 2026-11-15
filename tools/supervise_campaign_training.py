@@ -37,7 +37,6 @@ import ctypes
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 import errno
-import fcntl
 from functools import lru_cache
 import json
 import math
@@ -50,18 +49,41 @@ import sys
 import tempfile
 import time
 
+try:
+    import fcntl
+except ImportError:  # Windows locks a byte with msvcrt instead.
+    fcntl = None
+    import msvcrt
+
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "campaign-training-supervisor-v1"
 PROFILES = ROOT / "studies/campaign/profiles"
 PROFILE_SCHEMA = "campaign-machine-profile-v1"
 MEMORY_MARGIN_BYTES = 1_000_000_000
 # Source/configuration errors normally exit 1 and must stop for inspection.
-RETRYABLE_RETURNCODES = {-signal.SIGKILL, -signal.SIGSEGV, -signal.SIGBUS, 75}
+if sys.platform == "win32":
+    # Access violation, stack overflow, heap corruption and fail-fast exits.
+    RETRYABLE_RETURNCODES = {0xC0000005, 0xC00000FD, 0xC0000374, 0xC0000409, 75}
+else:
+    RETRYABLE_RETURNCODES = {-signal.SIGKILL, -signal.SIGSEGV, -signal.SIGBUS, 75}
+# A forced stop. Windows has no SIGKILL; _send ends the child's whole job there.
+KILL = getattr(signal, "SIGKILL", 9)
+# Windows children's process trees, by child PID; see tools/windows_process_tree.py.
+_TREES: dict = {}
+
+
+def _windows():
+    """Windows process control, imported only where it runs."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from tools import windows_process_tree
+    return windows_process_tree
 
 
 def memory_metric() -> str:
-    return ("sum of per-process max(RSS, macOS physical footprint including compressed pages)"
-            if sys.platform == "darwin" else "sum of per-process RSS")
+    if sys.platform == "darwin":
+        return "sum of per-process max(RSS, macOS physical footprint including compressed pages)"
+    return "sum of per-process working sets" if sys.platform == "win32" else "sum of per-process RSS"
 
 
 def monitor_error_details(error: BaseException, operation: str, *, root_pid: int | None = None) -> dict:
@@ -197,11 +219,12 @@ def atomic_json(path: Path, value):
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary, path)
-        directory = os.open(path.parent, os.O_RDONLY)
-        try:
-            os.fsync(directory)
-        finally:
-            os.close(directory)
+        if os.name != "nt":  # Windows cannot open a directory to flush it.
+            directory = os.open(path.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
@@ -211,10 +234,19 @@ def atomic_json(path: Path, value):
 def exclusive_lock(path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a+") as handle:
-        try:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as error:
-            raise RuntimeError("Another supervisor already owns this run") from error
+        if fcntl is not None:
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise RuntimeError("Another supervisor already owns this run") from error
+        else:
+            # Windows ends this lock with the supervisor, since the child cannot
+            # inherit it; a resumed supervisor's check of its child covers that.
+            handle.seek(0)
+            try:
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            except OSError as error:
+                raise RuntimeError("Another supervisor already owns this run") from error
         handle.seek(0)
         handle.truncate()
         handle.write(str(os.getpid()) + "\n")
@@ -236,6 +268,10 @@ def _process_table():
 
 def aggregate_rss(child_pid: int) -> int:
     """Legacy API name: sample the charged memory of this full process tree."""
+    if sys.platform == "win32":
+        tree, windows = _TREES.get(child_pid), _windows()
+        child = tree.working_set() if tree is not None else windows.working_set(child_pid)
+        return windows.working_set(os.getpid()) + child
     rows = _process_table()
     included = {os.getpid(), child_pid}
     while True:
@@ -249,14 +285,33 @@ def aggregate_rss(child_pid: int) -> int:
 
 
 def process_group_alive(group: int | None) -> bool:
+    if group is not None and sys.platform == "win32":
+        tree = _TREES.get(group)
+        return tree.alive() if tree is not None else _windows().process_alive(group)
     return group is not None and any(pgid == group for _, _, pgid, _ in _process_table())
 
 
 def _send(process, number):
+    if sys.platform == "win32":
+        tree = _TREES.get(process.pid)
+        if tree is not None and number == signal.SIGTERM:
+            tree.stop()
+        elif tree is not None:
+            tree.kill()
+        elif process.poll() is None:
+            process.kill()
+        return
     try:
         os.killpg(process.pid, number)
     except ProcessLookupError:
         pass
+
+
+def _close_tree(pid: int):
+    """Release a Windows child's job handle; its processes are not stopped by this."""
+    tree = _TREES.pop(pid, None)
+    if tree is not None:
+        tree.close()
 
 
 def _event(state: dict, kind: str, **details):
@@ -280,7 +335,7 @@ def load_profile(name: str) -> dict:
     if not path.is_file():
         known = ", ".join(sorted(item.stem for item in PROFILES.glob("*.json")))
         raise ValueError(f"Unknown machine profile {name!r}; known profiles: {known}")
-    profile = json.loads(path.read_text())
+    profile = json.loads(path.read_text(encoding="utf-8"))
     if profile.get("schema") != PROFILE_SCHEMA:
         raise ValueError(f"Machine profile {name!r} is not a {PROFILE_SCHEMA} file")
     return profile
@@ -300,7 +355,9 @@ def profile_arguments(profile: dict, arguments: list[str]) -> list[str]:
 
 
 def keep_awake():
-    """Hold off idle and system sleep on a Mac until this process exits."""
+    """Hold off idle and system sleep until this process exits (macOS) or releases it (Windows)."""
+    if sys.platform == "win32":
+        return _windows().KeepAwake()
     if sys.platform != "darwin":
         return None
     return subprocess.Popen(["caffeinate", "-i", "-s", "-w", str(os.getpid())], stdin=subprocess.DEVNULL,
@@ -410,8 +467,9 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
             nonlocal requested_stop
             requested_stop = signal.Signals(number).name
 
+        # Windows has no SIGHUP; Ctrl+Break arrives as SIGBREAK there.
         handlers = {number: signal.signal(number, request_stop)
-                    for number in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP)}
+                    for number in (signal.SIGTERM, signal.SIGINT, getattr(signal, "SIGHUP", None) or signal.SIGBREAK)}
 
         def persist():
             elapsed = max(0.0, time.monotonic() - started)
@@ -447,9 +505,15 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                 state["status"] = "starting"
                 persist()  # Charge a lease before launching any child compute.
                 with stdout_path.open("a") as stdout, stderr_path.open("a") as stderr:
-                    process = subprocess.Popen(command, cwd=working_directory, env=environment, stdout=stdout,
-                                               stderr=stderr, start_new_session=True,
-                                               pass_fds=(lock_handle.fileno(), run_lock.fileno()))
+                    if sys.platform == "win32":
+                        # Its own console process group receives Ctrl+Break; a job holds its tree.
+                        process = subprocess.Popen(command, cwd=working_directory, env=environment, stdout=stdout,
+                                                   stderr=stderr, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+                        _TREES[process.pid] = _windows().ProcessTree(process.pid)
+                    else:
+                        process = subprocess.Popen(command, cwd=working_directory, env=environment, stdout=stdout,
+                                                   stderr=stderr, start_new_session=True,
+                                                   pass_fds=(lock_handle.fileno(), run_lock.fileno()))
                     state["child_process_group"] = process.pid
                     state["status"] = "running"
                     _event(state, "child_started", attempt=attempt, pid=process.pid, resume=bool(resume))
@@ -475,7 +539,7 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                             stop_reason = "memory_limit"
                             _event(state, "forced_stop", reason=stop_reason, resident_bytes=resident)
                             record["forced_kill"] = True
-                            _send(process, signal.SIGKILL)
+                            _send(process, KILL)
                             stopping_at = now
                         if stop_reason is None:
                             if requested_stop:
@@ -492,7 +556,7 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                         elif now >= min(deadline, stopping_at + config.shutdown_seconds):
                             _event(state, "forced_stop", reason=stop_reason)
                             record["forced_kill"] = True
-                            _send(process, signal.SIGKILL)
+                            _send(process, KILL)
                         persist()
                         time.sleep(min(config.poll_seconds, max(0.01, deadline - time.monotonic())))
                     process.wait()
@@ -508,24 +572,25 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                             state["aggregate_sampled_peak_rss_bytes"] = max(state["aggregate_sampled_peak_rss_bytes"], resident)
                             if resident >= config.memory_bytes - MEMORY_MARGIN_BYTES:
                                 stop_reason = "memory_limit"
-                                _send(process, signal.SIGKILL)
+                                _send(process, KILL)
                                 break
                         except (OSError, ValueError, subprocess.SubprocessError) as error:
                             _event(state, "memory_monitor_error", phase="orphan_cleanup",
                                    **monitor_error_details(error, "aggregate_memory_sample", root_pid=process.pid))
                             stop_reason = "memory_monitor_failure"
-                            _send(process, signal.SIGKILL)
+                            _send(process, KILL)
                             break
                         persist()
                         time.sleep(config.poll_seconds)
                     if process_group_alive(process.pid):
-                        _send(process, signal.SIGKILL)
+                        _send(process, KILL)
                         for _ in range(20):
                             if not process_group_alive(process.pid):
                                 break
                             time.sleep(0.05)
                     if process_group_alive(process.pid):
                         raise RuntimeError("Previous worker process group did not stop; refusing to retry")
+                _close_tree(process.pid)
                 state["child_process_group"] = None
                 record["returncode"] = process.returncode
                 record["runner_status"] = _runner_status(run_dir)
@@ -567,11 +632,13 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                 try:
                     process.wait(timeout=min(config.shutdown_seconds, max(0.01, deadline - time.monotonic())))
                 except subprocess.TimeoutExpired:
-                    _send(process, signal.SIGKILL)
+                    _send(process, KILL)
                     process.wait(timeout=5)
                 state["child_process_group"] = None
                 state["status"] = "supervisor_error"
                 persist()
+            if "process" in locals():
+                _close_tree(process.pid)
             for number, handler in handlers.items():
                 signal.signal(number, handler)
 
@@ -602,7 +669,8 @@ def main(argv=None) -> int:
     limits = profile.get("supervisor", {})
     python = sys.executable
     if "python" in profile:
-        python = str(ROOT / profile["python"])
+        # Relative to the repository, or under the home directory with "~".
+        python = str(ROOT / Path(profile["python"]).expanduser())
         if not Path(python).is_file():
             raise SystemExit(f"Profile {args.profile!r} needs its Python at {python}")
     config = SupervisorConfig(seconds=args.seconds,

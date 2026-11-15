@@ -11,6 +11,7 @@ import queue
 import signal
 import struct
 import subprocess
+import sys
 import tempfile
 import time
 import unittest
@@ -146,8 +147,9 @@ class SharedEpisodeWorkerTests(unittest.TestCase):
         self.assertEqual({len(result["records"]) > 0 for result in collection["results"]}, {True})
         report = workers.report()
         self.assertEqual(report["evaluations"], workers.serving.requests)
-        started = subprocess.run(["pgrep", "-P", "1", "torch_shm"], capture_output=True, text=True).stdout
-        self.assertEqual(started, "")  # A manager would inherit the game pipes.
+        if sys.platform != "win32":  # Windows has no shared-memory manager process.
+            started = subprocess.run(["pgrep", "-P", "1", "torch_shm"], capture_output=True, text=True).stdout
+            self.assertEqual(started, "")  # A manager would inherit the game pipes.
         self.assertGreater(max(workers.serving.requests_per_round), 1)
         self.assertEqual(multiprocessing.active_children(), [])
 

@@ -1,0 +1,33 @@
+{
+  "schema": "campaign-machine-profile-v1",
+  "machine": "Intel Core i7-9700K: 8 CPU cores, 16 GB memory; NVIDIA GeForce RTX 3060 Ti, 8 GB; Windows 10",
+  "python": "~/.venvs/gwrl/Scripts/python.exe",
+  "supervisor": {
+    "cpu_budget": 8,
+    "memory_bytes": 12000000000
+  },
+  "training": {
+    "episode_workers": 6,
+    "games_per_process": 4,
+    "parallel_envs": 24,
+    "neural_device": "cuda",
+    "threads": 1,
+    "cpu_budget": 7
+  },
+  "keep_awake": true,
+  "measured": [
+    "3 November 2026, zone network, eleven-round games, 64 simulations, depth 16, fresh networks, one batch of 24 games per layout with learning at reuse 12: 22 to 31 games per hour, about a quarter of the Mac's 124 at the same settings.",
+    "Network size cost nothing measurable up to 512 wide with two message layers, 48.5 million parameters per faction against 5.2 million at 64 wide: play searched 29,900 decisions per hour at 512 wide and 30,100 at 64 wide, with similar game lengths, and learning took 64 and 31 seconds per batch.",
+    "Batches with longer games searched fewer decisions per hour whatever the network size, 27,600 at 1,223 decisions per game against 30,100 at 998, so single batches differ by about 10% for that reason alone.",
+    "The shared evaluator was busy 51 to 60% of the time at every size, so the game engine on the CPU limits this machine.",
+    "At 64 wide, evaluating on the CPU searched 32,600 decisions per hour against CUDA's 30,100 with the same game lengths, but learning took 118 seconds per batch against 31. The CPU was not measured at larger sizes.",
+    "Peak memory was 5.8 to 6.4 GB."
+  ],
+  "notes": [
+    "python: Python 3.13 with requirements-gpu-cuda.txt (PyTorch 2.14 for CUDA 12.6), in a virtual environment outside the OneDrive-synced checkout.",
+    "Six game processes, the coordinator and the supervisor use the 8 cores.",
+    "memory_bytes: 12 of the 16 GB, leaving the rest to Windows and the desktop.",
+    "keep_awake: SetThreadExecutionState keeps Windows from idle sleep while the supervisor runs.",
+    "Start the supervisor from a console window: a safe stop is a Ctrl+Break to the trainer's process group."
+  ]
+}

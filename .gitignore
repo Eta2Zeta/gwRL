@@ -28,6 +28,7 @@ __pycache__/
 build/
 *.o
 *.so
+*.pyd
 *.dylib
 *.egg-info/
 

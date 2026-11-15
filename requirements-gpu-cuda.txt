@@ -1,0 +1,8 @@
+# Optional NVIDIA GPU environment, as profiles/windows.json uses it. PyTorch's
+# CUDA 12.6 build comes from PyTorch's own package index; pybind11 and setuptools
+# build the engine extension. 2.14.0 is the release tested for this backend.
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch==2.14.0+cu126
+numpy==2.4.3
+pybind11==3.1.0
+setuptools==84.2.1

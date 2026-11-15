@@ -30,7 +30,7 @@ EDGE_DEFAULTS = {
 
 
 def load(name):
-    return json.loads((AUTHORING / f"{name}.json").read_text())
+    return json.loads((AUTHORING / f"{name}.json").read_text(encoding="utf-8"))
 
 
 def edge(nodes, a, b):
@@ -53,9 +53,10 @@ def apply_authoring(document):
                 continue
             raise FileNotFoundError(path)
         data = load(name)
-        sources[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
+        source = path.relative_to(ROOT).as_posix()  # The same name on every platform.
+        sources[source] = hashlib.sha256(path.read_bytes()).hexdigest()
         findings.update(data.get("findings", {}))
-        operations.extend(dict(o, authoring_source=str(path.relative_to(ROOT))) for o in data["operations"])
+        operations.extend(dict(o, authoring_source=source) for o in data["operations"])
 
     # A visually verified facility access independently establishes that coast.
     # This uses the re-audited symbol/access record, never a legacy port default.

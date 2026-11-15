@@ -120,7 +120,8 @@ def source_hashes() -> dict[str, str]:
              ROOT / "studies/shared/immutable_json.py",
              *sorted((ROOT / "include").rglob("*.hpp")), *sorted((ROOT / "src").rglob("*.cpp")),
              *sorted((ROOT / "src").rglob("*.inc"))]
-    return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    # Forward slashes, so Windows and macOS name the same sources the same way.
+    return {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
 
 def _json(path: Path, value):
@@ -144,8 +145,9 @@ def _record_failed_games(output: Path, runner: dict, failed: list[dict]) -> None
         if state is not None:
             position = Path("failed-positions") / f"batch-{runner['batch_index']}-seed-{failure['seed']}.json"
             (output / position).parent.mkdir(exist_ok=True)
-            (output / position).write_text(state)
-            failure["position"] = str(position)
+            # UTF-8 with bare newlines: Windows would otherwise write its code page.
+            (output / position).write_text(state, encoding="utf-8", newline="\n")
+            failure["position"] = position.as_posix()
         runner.setdefault("failed_games", []).append({"batch": runner["batch_index"], **failure})
 
 
@@ -277,7 +279,9 @@ def train(args) -> int:
         nonlocal stopped, signal_name
         stopped, signal_name = True, signal.Signals(number).name
 
-    old_handlers = {number: signal.signal(number, request_stop) for number in (signal.SIGINT, signal.SIGTERM)}
+    # A Windows supervisor asks for a stop with Ctrl+Break, which arrives as SIGBREAK.
+    stop_signals = (signal.SIGINT, signal.SIGTERM, *([signal.SIGBREAK] if hasattr(signal, "SIGBREAK") else []))
+    old_handlers = {number: signal.signal(number, request_stop) for number in stop_signals}
     manifest_path, checkpoint_path = output / "manifest.json", output / "checkpoint.pt"
     recovering_previous = resuming and args.resume.resolve() == checkpoint_path.with_name(
         checkpoint_path.name + ".previous").resolve()
@@ -321,7 +325,7 @@ def train(args) -> int:
             else:
                 metadata = save_model_export(output / relative, learner, runner)
                 model_exports += 1
-        latest_model_export = {**metadata, "path": str(relative)}
+        latest_model_export = {**metadata, "path": relative.as_posix()}
 
     def factory(seed):
         runner["training_environment_seeds"].append(seed)

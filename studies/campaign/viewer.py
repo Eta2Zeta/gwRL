@@ -181,15 +181,15 @@ def standalone_html(replay: dict) -> str:
     if replay.get("schema") != SCHEMA:
         raise ValueError("Expected campaign-replay-v1 data")
     page = viewer_page(embed_map=True)
-    css = (ASSETS / "style.css").read_text()
-    app = (ASSETS / "app.js").read_text()
+    css = (ASSETS / "style.css").read_text(encoding="utf-8")
+    app = (ASSETS / "app.js").read_text(encoding="utf-8")
     dependencies = []
     for filename in ("model.js", "map-layout.js"):
         pattern = rf"^import\s+\{{[^}}]*\}}\s+from\s+['\"]\./{re.escape(filename)}['\"];\s*"
         app, count = re.subn(pattern, "", app, count=1, flags=re.MULTILINE)
         if count != 1:
             raise ValueError(f"Viewer import for {filename} no longer matches the standalone packager")
-        dependencies.append((ASSETS / filename).read_text())
+        dependencies.append((ASSETS / filename).read_text(encoding="utf-8"))
     data = json.dumps(replay, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
     data = data.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     data = data.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")

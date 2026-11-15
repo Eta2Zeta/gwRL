@@ -5,6 +5,10 @@ project(gw_simplified_china LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+if(MSVC)
+    # Read the UTF-8 sources as UTF-8, not the system code page.
+    add_compile_options(/utf-8)
+endif()
 
 add_library(gw_engine STATIC
     src/campaign_runtime.cpp

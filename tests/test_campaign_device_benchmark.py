@@ -7,7 +7,10 @@ from concurrent.futures import Future
 import io
 import json
 from pathlib import Path
-import resource
+try:
+    import resource
+except ImportError:  # Windows has no open-file limit to test.
+    resource = None
 import time
 from types import SimpleNamespace
 import tempfile
@@ -235,6 +238,7 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
         return shared_summary(config, games, stats, samples, task={"calendar_rounds": 3},
                               game_process_cpu_seconds=100., coordinator_cpu_seconds=50.)
 
+    @unittest.skipIf(resource is None, "Windows has no open-file limit")
     def test_descriptor_limit_rises_within_the_hard_limit_and_never_falls(self):
         infinite = resource.RLIM_INFINITY
         for limits, wanted, expected in (((256, infinite), 1000, (1000, infinite)), ((256, 512), 1000, (512, 512)),

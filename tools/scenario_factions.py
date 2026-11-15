@@ -187,7 +187,7 @@ def build(map_path=DEFAULT_MAP, japan_setup_path=DEFAULT_JAPAN_SETUP,
     temporary_path = None
     try:
         with tempfile.NamedTemporaryFile(
-            mode="w", encoding="utf-8", dir=output_path.parent,
+            mode="w", encoding="utf-8", newline="\n", dir=output_path.parent,
             prefix=f".{output_path.name}.", suffix=".tmp", delete=False,
         ) as temporary:
             temporary_path = Path(temporary.name)

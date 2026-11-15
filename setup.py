@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup
 
 
 ROOT = Path(__file__).resolve().parent
+if sys.platform == "darwin":
+    COMPILE_ARGS = LINK_ARGS = ["-mmacosx-version-min=13.3"]
+elif sys.platform == "win32":
+    # MSVC otherwise reads the UTF-8 sources in the system code page, which
+    # changes the bytes of non-ASCII names in string literals.
+    COMPILE_ARGS, LINK_ARGS = ["/utf-8"], []
+else:
+    COMPILE_ARGS = LINK_ARGS = []
 
 
 ext_modules = [
@@ -37,11 +46,12 @@ ext_modules = [
             "src/simple_json.cpp",
             "src/zone_encoding.cpp",
         ],
-        define_macros=[("GWRL_SOURCE_DIR", chr(34) + str(ROOT) + chr(34))],
+        # Forward slashes: a Windows path's backslashes would be escapes in a C string.
+        define_macros=[("GWRL_SOURCE_DIR", chr(34) + ROOT.as_posix() + chr(34))],
         include_dirs=[str(ROOT / "include")],
         cxx_std=20,
-        extra_compile_args=["-mmacosx-version-min=13.3"],
-        extra_link_args=["-mmacosx-version-min=13.3"],
+        extra_compile_args=COMPILE_ARGS,
+        extra_link_args=LINK_ARGS,
     )
 ]
 

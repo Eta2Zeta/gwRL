@@ -38,12 +38,16 @@ import argparse
 import json
 import os
 import pickle
-import resource
+try:
+    import resource
+except ImportError:  # Windows has no getrusage; see _usage.
+    resource = None
 import sys
 import threading
 import time
 from collections import Counter, defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -66,6 +70,14 @@ class _Accounts:
 
 
 _accounts = _Accounts()
+
+
+def _usage():
+    """This process's user and system CPU seconds, as getrusage reports them."""
+    if resource is not None:
+        return resource.getrusage(resource.RUSAGE_SELF)
+    times = os.times()  # Windows reads the same process CPU times here.
+    return SimpleNamespace(ru_utime=times.user, ru_stime=times.system)
 
 
 def _timed(function, step):
@@ -120,14 +132,14 @@ def _install(save_every: int) -> None:
         return answer(self, requests)
 
     def profiled_serve(self, keep_running):
-        usage, started = resource.getrusage(resource.RUSAGE_SELF), time.perf_counter()
+        usage, started = _usage(), time.perf_counter()
         thread_started = time.thread_time()
         _accounts.serving = True
         try:
             return serve(self, keep_running)
         finally:
             _accounts.serving = False
-            after = resource.getrusage(resource.RUSAGE_SELF)
+            after = _usage()
             _write(self.stats, time.perf_counter() - started, time.thread_time() - thread_started,
                    (after.ru_utime - usage.ru_utime) + (after.ru_stime - usage.ru_stime))
 
@@ -225,7 +237,7 @@ def main(argv=None) -> int:
     arguments = args.training_arguments[1:] if args.training_arguments[:1] == ["--"] else args.training_arguments
     profile = supervisor.load_profile(args.profile) if args.profile else {}
     limits = profile.get("supervisor", {})
-    python = str(ROOT / profile["python"]) if "python" in profile else sys.executable
+    python = str(ROOT / Path(profile["python"]).expanduser()) if "python" in profile else sys.executable
     config = supervisor.SupervisorConfig(seconds=args.seconds, cpu_budget=limits.get("cpu_budget", 12),
                                          memory_bytes=limits.get("memory_bytes", 30_000_000_000),
                                          max_restarts=0)

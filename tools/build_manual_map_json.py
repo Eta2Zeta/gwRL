@@ -2056,11 +2056,11 @@ def build():
     # Deterministic node ordering
     doc["nodes"] = {k: doc["nodes"][k] for k in sorted(doc["nodes"])}
 
-    with open(OUTPUT, "w", encoding="utf-8") as f:
+    with open(OUTPUT, "w", encoding="utf-8", newline="\n") as f:
         json.dump(doc, f, ensure_ascii=True, indent=2)
 
     review_output = OUTPUT.with_name(OUTPUT.stem + "_review.json")
-    review_output.write_text(json.dumps(review, ensure_ascii=False, indent=2) + "\n")
+    review_output.write_text(json.dumps(review, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     print(f"Wrote {OUTPUT} with {len(doc['nodes'])} nodes")
 
