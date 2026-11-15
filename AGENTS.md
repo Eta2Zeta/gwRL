@@ -116,6 +116,12 @@
   layered and readable, instead of appending another layer of explanation.
 - Verify statements against the code and say what is measured, what is inferred
   and what is open.
+- Name the source of every statement, where it is made: a printed rule by its
+  section and page of the rulebook or of a national reference sheet, read from
+  the page itself and not from memory or from another page of the project; the
+  program by its function and file; a scenario choice by the page or data file
+  that records it; a number by the record that measured it. Look the source up
+  before writing the statement: it often says more than was remembered.
 - Never draw a diagram, table or formula in plain text, in any document. Draw
   diagrams as SVG figures in the `figures/` folder beside the page
   (`docs/design/figures/`, `docs/engine/figures/`; tracked despite the image

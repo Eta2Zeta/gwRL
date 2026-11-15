@@ -7373,14 +7373,274 @@
    ]
   }
  },
- "two_marks_without_a_question": {
-  "how": "A serialized opening position (seed 7000) was given two turn marks on Japan, bombing_reduction:<facility> = 2 and bombing_reduction_turn:<facility> = the current turn, restored and encoded.",
-  "reported_by_zone_encoding_unknowns": {
-   "actor_flag:bombing_reduction": 1,
-   "actor_flag:bombing_reduction_turn": 1
+ "marks_the_engine_puts_on_a_nation": {
+  "how": "Read from the source: every write to a nation's turnFlags or gameFlags in src/, including writes through an alias and names built in a variable. economy_researched_round is left out because the input files it under researched_round.",
+  "on_the_input_list": {
+   "count": 43,
+   "of": 119,
+   "by_source_file": {
+    "src/politics.cpp": [
+     "civil_war_eliminated",
+     "controller_unresolved",
+     "direct_axis_control_after_japan_surrender",
+     "evolved_during_own_turn",
+     "evolved_turn_serial",
+     "first_allies_major_war_declared",
+     "incorporated",
+     "objective_evolution",
+     "objective_one_china",
+     "one_china_bonus_awarded",
+     "one_china_bonus_eligible_at_surrender",
+     "politics_combat_finished",
+     "possessed_land_ipp",
+     "surprise_attack_available",
+     "surprise_attack_target",
+     "surrendered"
+    ],
+    "src/politics_influence.cpp": [
+     "influence_attempted",
+     "recruitment_attempted",
+     "surrendered"
+    ],
+    "src/economy.cpp": [
+     "economy_militia_placed",
+     "economy_militia_upgrades",
+     "economy_production_cap",
+     "economy_repair_cap",
+     "economy_repairs_finished",
+     "economy_research_capacity",
+     "economy_research_finished",
+     "economy_research_used",
+     "economy_start_damage",
+     "economy_start_type",
+     "economy_used",
+     "purchased",
+     "rail_build_permission",
+     "rail_declined"
+    ],
+    "src/economy_lendlease.cpp": [
+     "economy_militia_upgrades",
+     "economy_used",
+     "lease_declared",
+     "lease_delivered",
+     "lease_repair_wait"
+    ],
+    "src/movement.cpp": [
+     "logistics_last_turn_start",
+     "rail_permission",
+     "rail_used"
+    ],
+    "src/land_combat.cpp": [
+     "surprise_attack_used",
+     "surprise_attack_zone"
+    ],
+    "src/naval_combat.cpp": [
+     "surprise_attack_naval_sea",
+     "surprise_attack_used"
+    ],
+    "src/naval_movement.cpp": [
+     "strategic_naval_used"
+    ],
+    "src/naval_operations.cpp": [
+     "surprise_attack_linked_land",
+     "surprise_attack_used",
+     "surprise_attack_zone"
+    ],
+    "src/air.cpp": [
+     "surprise_attack_used"
+    ]
+   }
   },
-  "answer_in_the_input": {
-   "nation_flag:japan:other": 3
+  "on_no_list": {
+   "count": 4,
+   "by_function": {
+    "applyFacilityBombDamage in src/air.cpp": [
+     "bombing_reduction",
+     "bombing_reduction_turn"
+    ],
+    "applyCityBombDamage in src/air.cpp": [
+     "city_bombing_reduction",
+     "city_bombing_reduction_turn"
+    ]
+   }
+  }
+ },
+ "marks_the_engine_puts_on_the_game_as_a_whole": {
+  "how": "Read from the source: every write to State::flags in src/. Counters whose names end in _sequence are left out because the input skips them.",
+  "count": 11,
+  "of": 108,
+  "by_source_file": {
+   "src/campaign_runtime.cpp": [
+    "__campaign_started"
+   ],
+   "src/air.cpp": [
+    "logistics_damaged_turn",
+    "stranded_aircraft_lost"
+   ],
+   "src/economy.cpp": [
+    "logistics_damaged_turn",
+    "logistics_rail_created_turn"
+   ],
+   "src/movement.cpp": [
+    "crossing_used",
+    "logistics_start_damaged"
+   ],
+   "src/land_combat.cpp": [
+    "immediate_land_battles"
+   ],
+   "src/politics_warlords.cpp": [
+    "immediate_land_battles"
+   ],
+   "src/naval_combat.cpp": [
+    "immediate_naval_battles"
+   ],
+   "src/naval_movement.cpp": [
+    "immediate_naval_battles",
+    "naval_move_decisions"
+   ],
+   "src/naval_operations.cpp": [
+    "immediate_naval_battles",
+    "naval_berthing"
+   ],
+   "src/politics.cpp": [
+    "evolution_pending"
+   ]
+  }
+ },
+ "four_marks_without_a_question": {
+  "how": "A serialized opening position (seed 7000) was given two turn marks on Japan, restored and encoded: first bombing_reduction:<facility> = 2 and bombing_reduction_turn:<facility> = the current turn, then city_bombing_reduction:land_jap_tokyo = 4 and city_bombing_reduction_turn:land_jap_tokyo = the current turn.",
+  "factory_marks": {
+   "reported_by_zone_encoding_unknowns": {
+    "actor_flag:bombing_reduction": 1,
+    "actor_flag:bombing_reduction_turn": 1
+   },
+   "answers": {
+    "nation_flag:japan:other": 3
+   }
+  },
+  "city_marks": {
+   "reported_by_zone_encoding_unknowns": {
+    "actor_flag:city_bombing_reduction": 1,
+    "actor_flag:city_bombing_reduction_turn": 1
+   },
+   "answers": {
+    "nation_flag:japan:other": 5,
+    "nation_flag_here:japan:other at land_jap_tokyo": 5
+   }
+  }
+ },
+ "kmt_and_mongolia_after_the_ccp_comes_back": {
+  "how": "The games of the answer census were played again. At every Combat Movement decision of the KMT at which the KMT was not at war with Mongolia and the CCP had been without units at some earlier decision, the state was read: does a KMT land unit with movement left stand in a zone with a passable border to land Mongolia holds, and does the list of legal moves hold a combat move into land Mongolia holds? The script is not kept; each example can be checked by replaying its seed with the policy of tools/check_zone_names.py to its decision number.",
+  "games": 480,
+  "games_where_the_ccp_had_no_units_at_some_decision": 154,
+  "games_where_it_had_units_again_later": 57,
+  "kmt_decisions_next_to_mongolia": {
+   "ccp_has_no_units_and_the_attack_is_offered": {
+    "decisions": 244,
+    "games": 124
+   },
+   "ccp_has_units_again_and_no_attack_is_offered": {
+    "decisions": 600,
+    "games": 43
+   },
+   "ccp_has_no_units_and_no_attack_is_offered": {
+    "decisions": 48,
+    "games": 8,
+    "note": "not looked into; in the one example read, the KMT units next to Mongolia were militia"
+   },
+   "ccp_has_units_again_and_the_attack_is_offered": {
+    "decisions": 0,
+    "games": 0
+   }
+  },
+  "examples": {
+   "ccp_has_no_units_attack_offered": {
+    "seed": 7008,
+    "decision": 374,
+    "round": 2,
+    "ccp_units": 0,
+    "kmt_units_next_to_mongolia": [
+     [
+      "setup_warlord_sinkiang_land_china_sinkiang_infantry_1",
+      "infantry",
+      "land_china_tsinghai",
+      "land_mongolia_central_mongolia"
+     ],
+     [
+      "setup_warlord_sinkiang_land_china_sinkiang_infantry_1",
+      "infantry",
+      "land_china_tsinghai",
+      "land_mongolia_ulyassutai"
+     ],
+     [
+      "setup_warlord_sinkiang_land_china_sinkiang_infantry_2",
+      "infantry",
+      "land_china_tsinghai",
+      "land_mongolia_central_mongolia"
+     ]
+    ],
+    "attacks_offered": 15,
+    "first_without_units_at_decision": 346,
+    "first_with_units_again_at_decision": null
+   },
+   "ccp_has_units_again_no_attack_offered": {
+    "seed": 9105,
+    "decision": 355,
+    "round": 2,
+    "ccp_units": 1,
+    "kmt_units_next_to_mongolia": [
+     [
+      "setup_warlord_sikang_land_china_sikang_militia_1",
+      "militia",
+      "land_china_tsinghai",
+      "land_mongolia_central_mongolia"
+     ],
+     [
+      "setup_warlord_sikang_land_china_sikang_militia_1",
+      "militia",
+      "land_china_tsinghai",
+      "land_mongolia_ulyassutai"
+     ],
+     [
+      "setup_warlord_sinkiang_land_china_sinkiang_infantry_1",
+      "infantry",
+      "land_china_tsinghai",
+      "land_mongolia_central_mongolia"
+     ]
+    ],
+    "attacks_offered": 0,
+    "first_without_units_at_decision": 220,
+    "first_with_units_again_at_decision": 223
+   },
+   "ccp_has_no_units_no_attack_offered": {
+    "seed": 9117,
+    "decision": 478,
+    "round": 4,
+    "ccp_units": 0,
+    "kmt_units_next_to_mongolia": [
+     [
+      "setup_warlord_kwangtung_hainan_land_kwangtung_militia_2",
+      "militia",
+      "land_china_tsinghai",
+      "land_mongolia_central_mongolia"
+     ],
+     [
+      "setup_warlord_kwangtung_hainan_land_kwangtung_militia_2",
+      "militia",
+      "land_china_tsinghai",
+      "land_mongolia_ulyassutai"
+     ],
+     [
+      "setup_warlord_yunnan_land_china_yunnan_militia_4",
+      "militia",
+      "land_china_tsinghai",
+      "land_mongolia_central_mongolia"
+     ]
+    ],
+    "attacks_offered": 0,
+    "first_without_units_at_decision": 344,
+    "first_with_units_again_at_decision": null
+   }
   }
  }
 }

@@ -20,8 +20,10 @@ code.
   here then shrinks to one line under [Answered](#answered).
 - **A number is never used twice,** so that a reply, a commit or a comment in
   the code can name a question.
-- **Numbers cited here come from a dated record** in the
-  [archive](archive/README.md), which says how they were measured.
+- **Every statement names its source:** a printed rule by its section and
+  page, the engine by its function and file, a scenario choice by the page that
+  records it, and a number by the dated record in the
+  [archive](archive/README.md) that says how it was measured.
 
 Other open things stay in the pages that own them, and
 [Open elsewhere](#open-elsewhere) lists them.
@@ -30,11 +32,12 @@ Other open things stay in the pages that own them, and
 
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
-| [Q-001](#q-001-mongolia-at-war-with-the-ccp) | When Mongolia attacks land that was Chinese at the start, is it then at war with the CCP? | A printed rule | No |
-| [Q-002](#q-002-chinese-land-that-japan-holds) | Is an attack on Chinese land that Japan now holds an attack on China? | A printed rule | No |
-| [Q-003](#q-003-one-list-of-marks-for-each-kind-of-thing) | Should the network's input ask about a mark only where the engine can put it, and learn the two marks it does not know? | The network's input | Yes, before the next long run |
+| [Q-001](#q-001-mongolia-at-war-with-the-ccp) | May Mongolia attack land that was Chinese at the start, which now puts it at war with the CCP? | A printed rule | No: rule 4.5 does not allow the attack |
+| [Q-002](#q-002-chinese-land-that-japan-holds) | Is an attack on Chinese land that Japan now holds an attack on China? | A printed rule | Yes, as now; it cannot arise if Q-001 is answered as recommended |
+| [Q-003](#q-003-one-list-of-marks-for-each-kind-of-thing) | Should the network's input ask about a mark only where the engine can put it, and learn the four marks it does not know? | The network's input | Yes, before the next long run |
 | [Q-004](#q-004-questions-whose-answer-never-changes) | Should the input stop asking questions whose answer never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
+| [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
 
 Q-001 to Q-004 were raised on 14 November 2026, while the position questions
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
@@ -42,62 +45,87 @@ about nations were being pruned (commit `bce7a4c`). Their numbers are in the
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
+Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
+being looked up; its numbers are in the first record.
 
 ## Q-001: Mongolia at war with the CCP
 
 **The question.** When Mongolia attacks land that was Chinese at the start of
-the game, should it come to be at war with the CCP, which belongs to its own
-alliance and is played by the same player?
+the game, the engine puts it at war with the CCP, which belongs to its own
+alliance and is played by the same player. Should Mongolia be able to make that
+attack at all?
 
-**What the engine does now.** Rulebook 4.9 (page 30) says that an attack by a
-foreign nation on a land zone that was originally a warlord's, the CCP's or
-the KMT's counts as a declaration of war on all of China. The engine applies
-this to every attacker that is not Chinese, so to Japan and to Mongolia. It
-puts the attacker at war with the KMT, the CCP and every warlord that has not
-yet joined a side, and those warlords then pick a side at the end of that
-Combat Phase (`recordLandAttack` in `src/politics.cpp`;
-[politics](engine/politics.md#2-the-warlords)). Mongolia cannot declare war
-itself, so it attacks such a zone only when the nation holding it is already at
-war with Mongolia, or when nobody holds it.
+**What the engine does now.**
 
-**A real case** (random game, seed 7155). In round 1 the CCP attacks the Ma
-Clique in Tsinghai, which therefore joins the KMT with its land. Later in the
-round the KMT destroys the CCP's last units. In round 2 the KMT attacks
-Mongolia, which the rules allow once the CCP has been eliminated, so the KMT
-and Mongolia are at war. In round 3 a Mongolian cavalry moves into Tsinghai,
-which the KMT holds, as an attack. The engine records Mongolia as invading
-China, and from that move on Mongolia and the CCP are at war. Both are Comintern nations, and
-the Comintern player decides for both.
+- An attack by a nation that is not Chinese on a land zone that was originally
+  a warlord's, the CCP's or the KMT's is recorded as an invasion of China. The
+  attacker is put at war with the KMT, the CCP and every warlord that has not
+  yet joined a side, and those warlords pick a side at the end of that Combat
+  Phase (`recordLandAttack` in `src/politics.cpp`, following rulebook 4.9,
+  page 30; [politics](engine/politics.md#2-the-warlords)).
+- Mongolia may never declare war (`mayDeclareWar` in `src/politics.cpp`). It
+  may make a combat move only into a zone whose holder is already at war with
+  it, or that nobody holds (`landAccess` in `src/movement.cpp`).
+- The second check looks only at the holder of the zone. It does not look at
+  the wars the first rule then adds.
+
+**A real case** (random game, seed 7155;
+[record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
+
+1. Round 1: the CCP attacks the Ma Clique in Tsinghai, so the Ma Clique joins
+   the KMT with its land at the end of that Combat Phase (rulebook 4.9,
+   page 30: a warlord attacked by the CCP aligns with the KMT). Later in the
+   round the KMT destroys the CCP's last units.
+2. Round 2: the KMT attacks Mongolia. The declaration-of-war table lets the
+   KMT attack Chinese warlords or Mongolia, by a combat move, once the CCP has
+   been eliminated (rulebook 5.1, page 35, the KMT's rows; the same rows are on
+   the KMT's national reference sheet, page 2; [Q-006](#q-006-the-kmt-after-the-ccp-comes-back)
+   is about their exact words). The KMT and Mongolia are now at war.
+3. Round 3: a Mongolian cavalry moves into Tsinghai, which the KMT holds, as an
+   attack. The engine records Mongolia as invading China, and from that move
+   on Mongolia and the CCP are at war.
 
 **How often.** In 480 random games Mongolia was recorded as the invader in 70,
 from round 3 on, and in all 70 it came to be at war with the CCP. Three times
-Mongolia then attacked land the CCP held.
+Mongolia then attacked land the CCP held ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
+
+**The printed rules.**
+
+| Rule | What it says |
+| --- | --- |
+| 4.9, page 30 | A foreign nation that attacks land which was originally a warlord's, the CCP's or the KMT's has thereby declared war on the whole of China. |
+| 4.5, page 27 | Whoever controls a minor power may move its units in combat only against nations it is already at war with, and may not declare war for it or take any action that puts it at war with a power it is not already at war with. |
+| 4.3, page 26, and 4.7, page 29 | Mongolia is a minor power of the Comintern, controlled by the USSR. The CCP is in the Comintern too. |
+| 5.1, page 35 | Nobody may declare war inside their own alliance; the table answers "No" for the USSR and for the CCP against other Comintern nations. |
+| 14.3, page 101 | Without a declaration of war no other nation may enter land that was originally the KMT's, the CCP's or a warlord's; that the land is friendly makes no difference. |
+
+This campaign leaves the USSR out and lets the Comintern player move Mongolia
+with the rights of a controlled minor power
+([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions);
+`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`).
+
+Read together, the rules do not allow this attack: by 4.9 it would be a
+declaration of war on all of China, which 4.5 forbids for a controlled minor
+power and 5.1 forbids against the CCP. The engine applies 4.5 to the holder of
+the zone only.
 
 **Why it matters.** Two nations of one alliance, moved by one player, become
-enemies: their units may attack each other and neither may enter the other's
-land in peace. No player of the board game would expect that, and the
-Comintern's network is trained on such positions. It is also against another
-printed rule: rulebook 5.1 (page 35) says a nation may not declare war on a
-member of its own alliance, and its table answers "No" for the USSR and for
-the CCP against other Comintern nations. Rule 4.7 (page 29) makes Mongolia a
-Comintern minor power controlled by the USSR; this campaign leaves the USSR
-out and lets the Comintern player move Mongolia
-([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions)).
-So 4.9 and 5.1 give different answers. The full game would have the same
-conflict if the USSR attacked such a zone.
+enemies (rulebook glossary, page 6: nations at war with each other are
+enemies), so their units may attack each other, and the Comintern's network is
+trained on such positions. Random play reaches this in one game in seven.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Keep it: rule 4.9 is followed to the letter | Nothing. |
-| B. Rule 5.1 wins: an attack never puts a nation at war with its own alliance | Mongolia's attack still counts as an invasion and puts it at war with the KMT and with warlords that have not joined a side, but not with the CCP. A small change in `recordLandAttack` with a test; the two `at_war` questions between Mongolia and the CCP can then leave the network's input. |
-| C. Such an attack is not allowed | Mongolia may not attack land that was originally Chinese at all, because that would declare war on its own alliance. Stricter than B, and it needs a check where moves are listed. |
+| A. Keep it | Nothing. The engine stays against rules 4.5 and 5.1. |
+| B. Allow the attack, but never put a nation at war with its own alliance | Mongolia's attack still counts as an invasion and puts it at war with the KMT and with warlords that have not joined a side, but not with the CCP. No printed rule says this; it follows 5.1 and sets 4.5 aside. A small change in `recordLandAttack` with a test. |
+| C. Do not allow the attack | Mongolia is offered no combat move into a zone that was originally a warlord's, the CCP's or the KMT's. It can still defend itself, retake its own land and attack zones that were never Chinese. A check in `landAccess` with a test; `china_invader:mongolia` and the `at_war` questions that only this attack can answer may then leave the network's input. |
 
-**Recommendation: B.** Rule 5.1 is the rule about who may be at war with whom,
-and nothing in the rules suggests that the Comintern's nations should fight
-each other. This is a reading, not something the rulebook says outright; it is
-the kind of question that has been put to the game's developers before.
+**Recommendation: C.** It is what rules 4.9, 4.5 and 5.1 give when read
+together. What C costs Mongolia: once the KMT has attacked it, Mongolia can
+fight on its own land but cannot strike back into China. If that seems wrong
+for the game, it is a question for the game's developers.
 
 **If answered.** The ruling becomes the next rule clarification, with the
 engine, its test and the politics page changed in the same commit.
@@ -107,48 +135,65 @@ engine, its test and the politics page changed in the same commit.
 **The question.** Is an attack on a zone that was Chinese at the start, but
 that a nation outside China now holds, an attack on China?
 
-**What the engine does now.** The same rule, 4.9, names the zones by who
-*originally* possessed them, and the rulebook's glossary (page 7) defines
-"originally" as the nation whose roundel is printed in the zone. The engine
-follows that: what counts is whose zone it was at the start, not who holds it
-now. Only zones held by Dadao are left out, as the rule says.
+**What the engine does now.** It goes by who possessed the zone at the start,
+not by who holds it now (`recordLandAttack` in `src/politics.cpp` asks
+`originalNation` for the zone's first owner). It makes one exception, for a
+zone that Dadao holds: an attack there is an attack on Dadao only.
 
-**A real case** (random game, seed 7024). In round 1 the CCP attacks Mengjiang
-in Suiyuan, which therefore joins the KMT. In round 2 Japan takes Suiyuan from
-the KMT and also attacks Mongolia, so Japan and Mongolia are at war. In round 3
-a Mongolian cavalry moves into Suiyuan, now Japan's, as an attack. The engine
-treats that as Mongolia invading China: Mongolia is now also at war with the
-KMT and the CCP, neither of which had any part in the fight.
+**A real case** (random game, seed 7024;
+[record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
+
+1. Round 1: the CCP attacks Mengjiang in Suiyuan, so Mengjiang joins the KMT
+   with its land (rulebook 4.9, page 30).
+2. Round 2: Japan takes Suiyuan from the KMT. A Japanese infantry also attacks
+   Kerulen, which puts Japan and Mongolia at war: an Axis major power may
+   declare war on any nation outside the Axis, and on a minor power it does so
+   by a land unit's combat move against it (rulebook 5.1, page 35).
+3. Round 3: a Mongolian cavalry moves into Suiyuan, now Japan's, as an attack.
+   The engine treats that as Mongolia invading China: Mongolia is now also at
+   war with the KMT and the CCP, neither of which had any part in the fight.
 
 **How often.** In 25 of the 70 games of Q-001 the zone Mongolia first attacked
-was held by Japan; in the other 45 the KMT held it.
+was held by Japan; in the other 45 the KMT held it
+([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
+
+**The printed rules.**
+
+| Rule | What it says |
+| --- | --- |
+| 4.9, page 30 | It names the zones as those originally possessed by a warlord, the CCP or the KMT, and leaves out the Dadao Government, pointing to 15.4. |
+| Glossary, page 7 | It defines "originally" by the roundel printed in the land zone on the map. |
+| 14.3, page 101 | Without a declaration of war no other nation may enter land that was originally the KMT's, the CCP's or a warlord's; that the land is friendly makes no difference. |
+| 15.4, page 105, and 4.7, page 29 | Dadao may attack Chinese land without the rest of China picking sides; if a nation that is not Chinese attacks Dadao, Dadao aligns with Japan. |
+| 10.10.1, page 73 | A major power that conquers a zone of the Chinese Home Country it did not originally own keeps it or gives it to a Chinese faction. |
+
+Rules 4.9 and 14.3 both name the zones by their printed owner, and 14.3 adds
+that even a friendly zone counts. So the printed words agree with the engine.
+Rule 10.10.1 shows that taking Chinese land can end with China getting it
+back, but it does not say that attacking it is no attack on China.
 
 **Why it matters.** A nation that fights Japan on land Japan has conquered ends
-up at war with China as well. The rule would work the
-same way against Japan: attacking a Chinese zone that Mongolia had taken would
-count as a new attack on China.
+up at war with China as well.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Keep it: the printed roundel decides, whoever holds the zone | Nothing. |
-| B. Only a zone that the KMT, the CCP or a warlord holds counts | An attack on land held by a nation that is not Chinese is an attack on that nation only. A small change in `recordLandAttack` with a test. |
+| A. Keep it: the printed owner decides, whoever holds the zone | Nothing. |
+| B. Only a zone that the KMT, the CCP or a warlord holds counts | An attack on land held by a nation that is not Chinese is an attack on that nation only. No printed rule says this. A small change in `recordLandAttack` with a test. |
 
-**Recommendation: B**, but with less confidence than for Q-001. The purpose of
-the rule is that invading any part of China brings war with all of China, and
-attacking Japan's troops is not invading China. Rulebook 10.10.1 (page 73) even
-lets a major power that conquers Chinese land give it to the KMT or the CCP.
-But the printed words support A, so this too is one to ask the developers.
+**Recommendation: A.** Two printed rules say it.
 
-**If answered.** As for Q-001. The two can be answered separately: with B
-here and A for Q-001, Mongolia would still come to be at war with the CCP by
-attacking a zone the KMT holds.
+**This depends on Q-001.** If Q-001 is answered C, the case cannot arise in
+this campaign: Mongolia then never attacks such a zone, and the only other
+nation that is not Chinese is Japan, which is the holder here.
+
+**If answered.** As for Q-001.
 
 ## Q-003: One list of marks for each kind of thing
 
 **The question.** Should the network's input ask about a mark only where the
-engine can put that mark, and should it learn the two marks it does not know?
+engine can put that mark, and should it learn the four marks it does not know?
 
 **What happens now.** The engine puts *marks* on things to remember what has
 happened to them: on a unit that has moved, on a nation that has finished its
@@ -156,46 +201,54 @@ research this turn, on a city that is damaged, on a facility built this turn.
 The code calls a mark a flag. The network's input asks one question for each
 pairing of a thing and a mark
 ([the network's input](design/network_input.md#3-questions-and-answers)). But
-it keeps only two lists of marks: one of 119 for units and nations together,
-and one of 108 for territories, facilities, construction projects, battles and
-the game as a whole. So it asks about every pairing, including those that
-cannot happen. `nation_flag:japan:air_battle` asks whether Japan, the nation,
-carries the mark of a unit that is in an air battle. Only a unit ever gets
-that mark.
+it keeps only two lists of marks, `kActorFlags` and `kRecordFlags` in
+`src/zone_encoding.cpp`: one of 119 for units and nations together, and one of
+108 for territories, facilities, construction projects, battles and the game
+as a whole. So it asks about every pairing, including those that cannot
+happen. `nation_flag:japan:air_battle` asks whether Japan, the nation, carries
+the mark of a unit that is in an air battle. Only a unit ever gets that mark.
 
 Of the layout's 59,235 questions, 8,902 are about marks: 5,660 of the 42,532 a
 zone answers, 1,890 of the position's 4,076 and 1,352 of a move's 12,627. In
-480 random games, 290 of them were ever answered. Of the 1,560 that ask a
-nation about a mark, 88 were. By a reading of the code, 43 of the 119 marks
-are ever put on a nation and 11 of the 108 on the game as a whole; a change
-would have to confirm such a count for every list.
+480 random games, 290 of them were ever answered; of the 1,560 that ask a
+nation about a mark, 88 were
+([record](archive/records/answer_census_2026_11_15.md#which-questions-were-answered)). The engine's code puts 43
+of the 119 marks on a nation and 11 of the 108 on the game as a whole; the
+record [lists them](archive/records/answer_census_2026_11_15.md#the-marks-the-engine-puts-on-a-nation) with the
+source files that write each. A change would have to make such a list for
+every kind of thing.
 
-**Two marks are on no list.** With Improved Construction a factory absorbs the
-first points of bombing damage in a turn: 1 for a minor factory, 3 for a medium
-one, 5 for a major one. The engine notes on the factory's nation how much the
-factory has absorbed this turn, in two marks, `bombing_reduction` and
-`bombing_reduction_turn` (`applyFacilityBombDamage` in `src/air.cpp`). The
-input has no question for either. Put on Japan by hand, they arrive as
-`nation_flag:japan:other = 3`, which says only that Japan carries some unlisted
-mark, and the name check reports them. No random game has reached this: it
-needs a nation that has completed Improved Construction to have a factory
-bombed. The test that reads the engine's source for marks missed them because
+**Four marks are on no list.** With Improved Construction, a factory or a city
+takes less damage from strategic bombing in each player turn: a minor factory
+1 less, a medium factory 3, a major factory 5, a city 5 (rulebook 8.2.1,
+page 46). The engine notes on the nation that holds the factory or the city
+how much has been taken off this turn, in four marks: `bombing_reduction` and
+`bombing_reduction_turn` (`applyFacilityBombDamage` in `src/air.cpp`), and
+`city_bombing_reduction` and `city_bombing_reduction_turn`
+(`applyCityBombDamage`, the same file). The input has no question for any of
+them. Put on Japan by hand, the first pair arrives as
+`nation_flag:japan:other = 3` and the second as `nation_flag:japan:other = 5`,
+which says only that Japan carries some unlisted mark, and the name check
+reports them ([record](archive/records/answer_census_2026_11_15.md#four-marks-without-a-question)). No random
+game has reached this: it needs a nation that has completed Improved
+Construction to be bombed. The test that reads the engine's source for marks
+(`test_marks` in `tests/test_campaign_zone_encoding.py`) misses them because
 the engine builds their names in a variable.
 
-**Why it matters.** Play is not affected: the rules are right. For learning,
+**Why it matters.** Play is not affected: the rules are applied. For learning,
 the questions that can never be answered cost no time, because an unanswered
 question is never read, but their rows never train and they make the layout
-harder to read. The two missing marks mean the network cannot see how much of a
-factory's protection is already used up, which matters to a player choosing
-what to bomb next. That is rare.
+harder to read. The four missing marks mean the network cannot see how much of
+a factory's or a city's protection is already used up, which matters to a
+player choosing what to bomb next. That is rare.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Give each kind of thing its own list, and add the two marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November: every place where the engine writes a mark is listed, and a test keeps the lists in step with the source. Most of the 8,902 questions go. |
-| B. Only add the two marks | A small layout change. The questions that cannot be answered stay. |
-| C. Leave it | Nothing changes. The name check reports the two marks if a game ever reaches them. |
+| A. Give each kind of thing its own list, and add the four marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November (commit `bce7a4c`): every place where the engine writes a mark is listed, and a test keeps the lists in step with the source. Most of the 8,902 questions go. |
+| B. Only add the four marks | A small layout change. The questions that cannot be answered stay. |
+| C. Leave it | Nothing changes. The name check reports the four marks if a game ever reaches them. |
 
 **Recommendation: A, before the next long training run.** After a long run a
 layout change costs the networks it trained.
@@ -209,33 +262,41 @@ which now describes the gap.
 **The question.** Should the input stop asking questions that every position
 answers alike, and questions that always repeat another question?
 
-**What happens now.** The rules leave 37 position questions only one answer:
+**What happens now.** The engine leaves 37 position questions only one answer:
 
-| Questions | How many | Always |
-| --- | ---: | --- |
-| `nation_present` for every nation but Dadao | 12 | 1: they are in the game from the start and never leave it |
-| `alliance` and `player` of Japan, the KMT, the CCP and Mongolia | 8 | 1: each keeps its alliance and its player for good |
-| `power_status` of Japan, Mongolia and the eight warlords | 10 | 1: Japan is always a major power, Mongolia a minor one, a warlord a warlord |
-| `controller` of Japan, the KMT, the CCP and Mongolia | 4 | 1: the first three under themselves, Mongolia under nobody |
-| `at_war` between the KMT and the CCP, both ways | 2 | 1: they start at war and the engine never ends that war, even under the Truce |
-| `state_flag:__campaign_started` | 1 | 1 |
+| Questions | How many | Always | Where that is settled |
+| --- | ---: | --- | --- |
+| `nation_present` for every nation but Dadao | 12 | 1 | `loadScenario` in `src/campaign_setup.cpp` creates these twelve nations, and no code removes a nation |
+| `alliance` and `player` of Japan, the KMT, the CCP and Mongolia | 8 | 1 | `alliancePossible` in `src/politics.cpp`: each keeps its alliance and its player for good |
+| `power_status` of Japan, Mongolia and the eight warlords | 10 | 1 | `powerStatusPossible`, the same file: Japan is always a major power, Mongolia a minor one, a warlord a warlord |
+| `controller` of Japan, the KMT, the CCP and Mongolia | 4 | 1 | `controllerPossible`, the same file: the first three under themselves, Mongolia under nobody |
+| `at_war` between the KMT and the CCP, both ways | 2 | 1 | They start at war (`china_minor_setup.json` of the scenario), and the engine ends a war only for a nation that is incorporated (`incorporateNation`), which these two never are. Under the Truce it treats them as friends while the war stays recorded (`politicallyFriendly`) |
+| `state_flag:__campaign_started` | 1 | 1 | `Engine::start` in `src/campaign_runtime.cpp` sets it once |
+
+The reasons for the middle three rows are in
+[what the position asks about a nation](design/network_input.md#what-the-position-asks-about-a-nation).
 
 And every `player` question always has the answer of the `alliance` question
 for the same nation: a nation's player is the agent that decides for it, and in
-this campaign each alliance is one agent. In 710,254 encoded positions none of
-these ever differed. At decision 612, the example of the
+this campaign each alliance is one agent
+([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions);
+the rule `alliancePossible` covers both). In 710,254 encoded positions none of
+these ever differed ([record](archive/records/answer_census_2026_11_15.md#which-questions-were-answered)). At
+decision 612, the example of the
 [design document](design/README.md#52-three-parts-the-board-the-position-and-the-moves),
-45 of the position's 176 answers are of these kinds.
+45 of the position's 176 answers are of these kinds; its answers are listed in
+the [record of that sample](archive/records/training_sample_2026_11_05.md).
 
 Sixteen questions of this kind were removed on 14 November 2026: thirteen that
-said a nation's income had been worked out, and three that said Japan, the KMT
-and the CCP keep a treasury.
+said a nation's income had been worked out (commit `c998709`), and three that
+said Japan, the KMT and the CCP keep a treasury (commit `bce7a4c`).
 
 **Why it matters.** Little. A question answered alike everywhere cannot tell
 two positions apart, so the network learns nothing from it: its row is a
 constant added to every position. Unlike a question that is never answered, it
-is read at every evaluation: 45 of the 1,096 rows that decision 612 looks up.
-Whether that shows in speed has not been measured.
+is read at every evaluation: 45 of the 1,096 rows that decision 612 looks up
+([its size](design/README.md#69-the-whole-network)). Whether that shows in
+speed has not been measured.
 
 **The choices.**
 
@@ -300,6 +361,75 @@ Stopping only a run that stays over keeps a brief peak from costing a batch.
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
+
+## Q-006: The KMT after the CCP comes back
+
+**The question.** Once the CCP has been eliminated, may the KMT attack Chinese
+warlords and Mongolia for the rest of the game, or only while the CCP has no
+units?
+
+**What the engine does now.** It lets the KMT start a war with a warlord or
+with Mongolia, by a land attack, only while the CCP has no units at that
+moment (`mayDeclareWar` in `src/politics.cpp`;
+[politics](engine/politics.md#1-war)). When the CCP has a unit again, the
+permission is gone. A CCP without units still holds its land and its treasury,
+so it can buy a unit in its next Production Phase.
+
+**The printed rules.**
+
+| Rule | What it says |
+| --- | --- |
+| 5.1, page 35, and the KMT's national reference sheet, page 2 | Can the KMT declare war on Chinese warlords or Mongolia? "Yes, if CCP previously has been eliminated. Via combat movement." |
+| 4.9, page 30 | Before the CCP is eliminated the KMT may not attack a Chinese warlord. One it attacks afterwards aligns with the CCP, which brings the CCP back. |
+| 14.3, page 101 | The Chinese Civil War ends when one faction no longer has any surviving units. |
+
+The word is "previously", and 4.9 says "until": both speak of something that
+has happened, not of how things stand now. No rule says that the permission
+ends when the CCP has units again. The earlier check of this subject settled
+only that an eliminated CCP has not surrendered and can come back
+(`game_content/rules/source_answered_questions.md`, the row on CCP
+elimination).
+
+**A real case** (random game, seed 9105;
+[record](archive/records/answer_census_2026_11_15.md#the-kmt-and-mongolia-after-the-ccp-comes-back)).
+
+1. Round 2, the CCP's Combat Phase: the CCP loses its last two units in
+   battles on its own turn. It has no units.
+2. Three decisions later, in its Place Units Phase, the CCP places an infantry
+   it had bought. It has one unit again.
+3. Later in round 2, the KMT's Combat Movement: KMT units in Tsinghai stand
+   next to Mongolian land. The engine offers the KMT seven combat moves, none
+   into Mongolia, because the CCP has a unit.
+
+Under the printed words the attack would be allowed: the CCP had been
+eliminated before.
+
+**How often.** In 480 random games the CCP was without units at some decision
+in 154, and had units again later in 57. In 43 games the KMT then stood next
+to Mongolia in its Combat Movement, not yet at war with it, and was not
+offered the attack, at 600 decisions in all. While the CCP had no units, the
+attack was offered in 124 games
+([record](archive/records/answer_census_2026_11_15.md#the-kmt-and-mongolia-after-the-ccp-comes-back)).
+
+**Why it matters.** It decides how free the KMT is once the CCP has been
+without units for the first time: for good, or only in the short windows when
+the CCP has nothing on the map. It also decides what the CCP's player has to prevent: ever
+dropping to no units, or only being without units on the KMT's turn.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Keep it: only while the CCP has no units | Nothing. |
+| B. For good, once the CCP has been without units | The engine remembers that the CCP has been eliminated, in a mark on the CCP, and `mayDeclareWar` asks that mark. The mark needs a question in the network's input, so it is a layout change. |
+
+**Recommendation: B, with moderate confidence.** It is what the words say.
+The engine's reading is not unreasonable, since 4.9 speaks of the CCP coming
+back, but no rule states that the ban returns. This is a good one to put to
+the game's developers.
+
+**If answered.** A ruling becomes the next rule clarification, with
+`mayDeclareWar`, its test and the politics page changed in the same commit.
 
 ## Open elsewhere
 

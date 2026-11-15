@@ -1857,9 +1857,9 @@ measured and what would settle it.
   engine's source writes, and in 480 random games no name falls into an "other"
   question. But a mark's argument other than a place or a nation, such as which
   railroad was damaged this turn, is counted for the whole position, and a
-  battle note's numbers are added into one answer. Two marks a nation can
-  carry are known to be on no list, because the engine builds their names in a
-  variable. See
+  battle note's numbers are added into one answer. Four marks a nation can
+  carry are known to be on no list, because the engine puts their names
+  together in a variable. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
   early in batch 3: the engine freed memory and kept using it. About 4.5 hours of

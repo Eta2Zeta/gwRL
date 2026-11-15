@@ -31,9 +31,24 @@ at war. A war begins in one of two ways (`mayDeclareWar`):
 | Dadao | A Chinese nation or a warlord, by attacking it |
 | Mongolia | Nobody |
 
-Two nations of one alliance never go to war, and while the Chinese Truce holds
-the KMT and the CCP cannot declare war on each other; they break the Truce
-instead ([section 3](#3-the-chinese-truce)).
+The rows for Japan, the KMT and the CCP follow the declaration-of-war table of
+rulebook 5.1 (pages 35 and 36), which is repeated on the national reference
+sheets of Japan (page 3), the CCP (page 2) and the KMT (page 2). Dadao's row
+follows rulebook 15.4 (page 105). Mongolia starts no war because the power
+that controls a minor power may not declare war for it (rulebook 4.5,
+page 27).
+
+The KMT's row is the engine's reading of the printed condition that the CCP
+has been eliminated before: it allows the attack only while the CCP has no
+units. Whether the permission should last once the CCP has been eliminated is
+an open question
+([Q-006](../questions.md#q-006-the-kmt-after-the-ccp-comes-back)).
+
+No nation may declare war inside its own alliance (rulebook 5.1, page 35), and
+while the Chinese Truce holds the KMT and the CCP cannot declare war on each
+other; they break the Truce instead ([section 3](#3-the-chinese-truce)). One
+war inside an alliance can still arise: an invasion of China by Mongolia puts
+it at war with the CCP ([section 2](#2-the-warlords)).
 
 **The nation whose turn it is declares first.** When another alliance declares
 a war out of turn, the alliance whose turn it is first gets a decision

@@ -626,12 +626,17 @@ The random games make uniformly random moves, but now and then end the phase
 instead, so some phases do little and others much.
 
 A name written another way, and met in no random game, can still slip into an
-"other" question, but it is counted and reported, never dropped. Two such names
-are known: the marks `bombing_reduction` and `bombing_reduction_turn`, which the
-engine puts on a nation whose factory absorbs bombing damage under Improved
-Construction. The engine builds their names in a variable, so the source check
-does not see them, and no random game has reached them
-([Q-003](../questions.md#q-003-one-list-of-marks-for-each-kind-of-thing)).
+"other" question, but it is counted and reported, never dropped. Four such
+names are known. Under Improved Construction a factory or a city takes less
+bombing damage in each player turn (rulebook 8.2.1, page 46), and the engine
+notes on the nation that holds it how much has been taken off:
+`bombing_reduction` and `bombing_reduction_turn` for a factory
+(`applyFacilityBombDamage` in `src/air.cpp`), `city_bombing_reduction` and
+`city_bombing_reduction_turn` for a city (`applyCityBombDamage`). The engine
+puts these names together in a variable, so the source check does not see
+them, and no random game has reached them
+([Q-003](../questions.md#q-003-one-list-of-marks-for-each-kind-of-thing);
+[record](../archive/records/answer_census_2026_11_15.md#four-marks-without-a-question)).
 
 Some details are summarized on purpose rather than named:
 
