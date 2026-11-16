@@ -3,6 +3,7 @@
 #include "game/marks.hpp"
 #include "game/names.hpp"
 #include "game/simple_json.hpp"
+#include "game/slot_map.hpp"
 
 #include <compare>
 #include <cstddef>
@@ -217,6 +218,13 @@ struct TerritoryState {
     Marks flags;
 };
 
+// Units and facilities enter and leave a game, so the position keeps them in
+// SlotMaps (slot_map.hpp): each has a slot there, fixed while it exists.
+struct UnitKind {};
+struct FacilityKind {};
+using UnitSlot = Slot<UnitKind>;
+using FacilitySlot = Slot<FacilityKind>;
+
 struct UnitState {
     Id id;
     UnitTypeId type;  // A number in the catalog's unit type table (unitTypeName names it).
@@ -234,6 +242,7 @@ struct UnitState {
     MarkSet commitments;  // What the unit is committed to this turn, as marks without values.
     Marks turnFlags;  // Marks cleared when its owner's turn begins.
     Marks gameFlags;  // Marks kept from turn to turn.
+    UnitSlot slot;  // Its slot in the position's units, which the SlotMap writes; never set it.
 };
 
 struct FacilityState {
@@ -242,6 +251,7 @@ struct FacilityState {
     ZoneId zone;
     int damage {0};
     Marks flags;
+    FacilitySlot slot;  // Its slot in the position's facilities, which the SlotMap writes; never set it.
 };
 
 struct RailState {
@@ -424,8 +434,8 @@ struct State {
     std::shared_ptr<const Definition> definition;
     NumberMap<NationId, NationState> nations;
     NumberMap<ZoneId, TerritoryState> territories;
-    std::map<Id, UnitState> units;
-    std::map<Id, FacilityState> facilities;
+    SlotMap<UnitKind, UnitState> units;  // By name, in name order; each unit also has a slot.
+    SlotMap<FacilityKind, FacilityState> facilities;
     std::map<Id, RailState> rails;
     std::map<Id, BuildProject> construction;
     std::map<Id, RepairJob> repairs;

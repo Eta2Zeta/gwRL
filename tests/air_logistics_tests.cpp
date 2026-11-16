@@ -45,7 +45,7 @@ void add(State &s, const Id &id, const Id &type, const Id &zone, const Id &owner
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
         s.definition->catalog->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
-    s.units[id] = std::move(u);
+    s.units.insert_or_assign(id, std::move(u));
 }
 bool offered(const State &s, const Id &kind) {
     const auto actions = AirRules{}.actions(s);
@@ -92,7 +92,7 @@ void controlPermitsOverflightOnly() {
 void baseMovementNeedsSupplyAndAge() {
     auto isolated = fixture();
     add(isolated, "aircraft", "fighter", beiping);
-    isolated.facilities["base"] = {"base", facilityTypeNumber(isolated, "airbase"), zoneNumber(isolated, beiping), 0, {}};
+    isolated.facilities.insert_or_assign("base", {"base", facilityTypeNumber(isolated, "airbase"), zoneNumber(isolated, beiping), 0, {}});
     const int ordinary = *isolated.units.at("aircraft").movementRemaining;
     check(!inSupply(isolated, nationNumber(isolated, "japan"), zoneNumber(isolated, beiping)), "Isolated-base fixture accidentally has supply");
     AirRules{}.beginTurn(isolated);
@@ -100,19 +100,19 @@ void baseMovementNeedsSupplyAndAge() {
           "Unsupplied airbase granted movement bonus");
     auto supplied = fixture();
     add(supplied, "aircraft", "fighter", honshu);
-    supplied.facilities["base"] = {"base", facilityTypeNumber(supplied, "airbase"), zoneNumber(supplied, honshu), 0, {}};
+    supplied.facilities.insert_or_assign("base", {"base", facilityTypeNumber(supplied, "airbase"), zoneNumber(supplied, honshu), 0, {}});
     AirRules{}.beginTurn(supplied);
     check(supplied.units.at("aircraft").movementRemaining == ordinary + 1,
           "Held supplied airbase failed movement bonus");
     auto newBase = fixture();
     add(newBase, "aircraft", "fighter", honshu);
-    newBase.facilities["base"] = {"base", facilityTypeNumber(newBase, "airbase"), zoneNumber(newBase, honshu), 0, {{mark::placed_this_turn, 1}}};
+    newBase.facilities.insert_or_assign("base", {"base", facilityTypeNumber(newBase, "airbase"), zoneNumber(newBase, honshu), 0, {{mark::placed_this_turn, 1}}});
     AirRules{}.beginTurn(newBase);
     check(newBase.units.at("aircraft").movementRemaining == ordinary,
           "Newly placed airbase granted immediate movement bonus");
     auto damaged = fixture();
     add(damaged, "aircraft", "fighter", honshu);
-    damaged.facilities["base"] = {"base", facilityTypeNumber(damaged, "airbase"), zoneNumber(damaged, honshu), 1, {}};
+    damaged.facilities.insert_or_assign("base", {"base", facilityTypeNumber(damaged, "airbase"), zoneNumber(damaged, honshu), 1, {}});
     AirRules{}.beginTurn(damaged);
     check(damaged.units.at("aircraft").movementRemaining == ordinary,
           "Damaged airbase granted movement bonus");
@@ -263,7 +263,7 @@ void attacksMayPrecedeTheCarrierTheyReturnTo() {
     auto s=fixture();for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
     s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     add(s,"cv","fleet_carrier","sea_p15");add(s,"f","fighter","land_jap_tokyo");
-    s.facilities["base"]={"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, "land_jap_tokyo"),0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
+    s.facilities.insert_or_assign("base", {"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, "land_jap_tokyo"),0,{}});s.captureTurnStart();AirRules{}.beginTurn(s);
     auto actions=AirRules{}.actions(s);
     auto attack=std::find_if(actions.begin(),actions.end(),[](const auto& a){return a.kind=="air_ground_attack"&&
         a.parameters.require("unit").asString()=="f"&&a.parameters.require("path").asArray().back().asString()=="land_china_hopeh";});
@@ -431,7 +431,7 @@ void attackDeclarationsRequireACombinedReturnPlan() {
     s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     add(s,"carrier","fleet_carrier","sea_p14");
     for(const auto& id:{Id("a"),Id("b"),Id("c")})add(s,id,"fighter","land_jap_tokyo");
-    s.facilities["base"]={"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, "land_jap_tokyo"),0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
+    s.facilities.insert_or_assign("base", {"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, "land_jap_tokyo"),0,{}});s.captureTurnStart();AirRules{}.beginTurn(s);
     auto attack=[&](const Id& unit,const Id& kind){auto actions=AirRules{}.actions(s);
         auto a=std::find_if(actions.begin(),actions.end(),[&](const auto& x){return x.kind==kind&&
             x.parameters.require("unit").asString()==unit&&x.parameters.require("path").asArray().back().asString()=="land_china_hopeh";});

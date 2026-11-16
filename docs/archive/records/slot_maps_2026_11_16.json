@@ -1,0 +1,121 @@
+{
+ "date": "2026-11-16",
+ "question": "Does keeping the position's units and facilities in slot maps instead of std::maps keyed by name leave play unchanged, and what does it save?",
+ "code": {
+  "before_any": "9519ea7",
+  "facility_types": "1b620d3",
+  "slot_maps": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py",
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical": 300,
+  "steps": 443974,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 10.03,
+     "facility_types": 6.08,
+     "slot_maps": 5.74,
+     "change_percent_from_facility_types": -5.6,
+     "change_percent_from_before_any": -42.8
+    },
+    "microseconds_per_call": {
+     "before_any": 640,
+     "facility_types": 350,
+     "slot_maps": 339
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 4.31,
+     "facility_types": 3.18,
+     "slot_maps": 3.02,
+     "change_percent_from_facility_types": -5.0,
+     "change_percent_from_before_any": -29.9
+    },
+    "microseconds_per_call": {
+     "before_any": 311,
+     "facility_types": 206,
+     "slot_maps": 225
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "before_any": 3.2,
+     "facility_types": 2.54,
+     "slot_maps": 2.41,
+     "change_percent_from_facility_types": -5.1,
+     "change_percent_from_before_any": -24.7
+    },
+    "microseconds_per_call": {
+     "before_any": 225,
+     "facility_types": 166,
+     "slot_maps": 184
+    }
+   }
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "calendar_rounds": 11,
+  "simulations": 64,
+  "max_depth": 16,
+  "network": "64x2 networks with random-filled first-layer tables (tools/replay_coordinator_rounds.py --make-weights), evaluated one position at a time",
+  "games_compared": 4,
+  "identical": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before_any": 6782,
+   "facility_types": 5334,
+   "slot_maps": 5164,
+   "change_percent_from_facility_types": -3.2,
+   "change_percent_from_before_any": -23.9,
+   "facility_types_bracketed_run": 5321,
+   "slot_maps_runs": [
+    5169,
+    5166
+   ]
+  },
+  "cpu_seconds_bracketed": {
+   "slot_maps_before": 424.1,
+   "facility_types": 428.6,
+   "slot_maps_after": 416.1,
+   "change_percent": -2.0
+  }
+ },
+ "notes": [
+  "The bracketed searched games ran in the order: this change, the facility types build, this change, back to back on the same Mac, with nothing else of this study running.",
+  "Instruction counts of repeated searched-game runs of one build differ by about 1%; CPU seconds depend more on the Mac's other work.",
+  "A build with GWRL_CHECK_SLOT_MAPS (an iterator used after its map changed throws) played the same 300 random games identically, without one."
+ ],
+ "first_version": {
+  "what": "The first SlotMap found a thing by name with a binary search over its slots sorted by name, instead of the hash table of slots; same random games, compared with the facility types build",
+  "random_games_identical": 300,
+  "million_instructions_per_call": {
+   "legal_actions": {
+    "facility_types": 6.08,
+    "first_version": 6.49,
+    "change_percent": 6.7
+   },
+   "apply_action": {
+    "facility_types": 3.18,
+    "first_version": 3.14,
+    "change_percent": -1.3
+   },
+   "resolve_chance": {
+    "facility_types": 2.54,
+    "first_version": 2.46,
+    "change_percent": -3.1
+   }
+  },
+  "profile": "/usr/bin/sample, 60 s of one searched game (seed 41) from 25 s after it started: the name search (SlotMap::position) took 9.38% of the engine's 21,641 samples for units and 2.07% for facilities"
+ }
+}

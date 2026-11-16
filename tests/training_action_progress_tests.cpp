@@ -157,7 +157,7 @@ void zeroMovementCarrierAssignmentsRemainReachable() {
 
 void inPortDeckLandAssignmentsCannotCycle() {
     auto source = fixture(Phase::NonCombatMovement);
-    source.facilities["test_port"] = {"test_port", facilityTypeNumber(source, "major_port"), zoneNumber(source, honshu), 0, {{MarkKey(mark::border, sea), 1}}};
+    source.facilities.insert_or_assign("test_port", {"test_port", facilityTypeNumber(source, "major_port"), zoneNumber(source, honshu), 0, {{MarkKey(mark::border, sea), 1}}});
     add(source, "carrier", "fleet_carrier", honshu);
     source.units.at("carrier").gameFlags[MarkKey(mark::in_port, "test_port")] = 1;
     add(source, "plane", "fighter", honshu);

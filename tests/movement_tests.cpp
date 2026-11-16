@@ -138,7 +138,7 @@ void unit(State &s, const Id &id, const Id &zone, const Id &type = "infantry",
                     : s.definition->catalog
                           ->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone)))
                           .movement;
-  s.units[id] = std::move(u);
+  s.units.insert_or_assign(id, std::move(u));
 }
 void port(State &s, const Id &id, const Id &zone, const std::vector<Id> &seas,
           const Id &type = "minor_port") {
@@ -148,7 +148,7 @@ void port(State &s, const Id &id, const Id &zone, const std::vector<Id> &seas,
   f.zone = zoneNumber(s, zone);
   for (const auto &sea : seas)
     f.flags[MarkKey(mark::border, sea)] = 1;
-  s.facilities[id] = std::move(f);
+  s.facilities.insert_or_assign(id, std::move(f));
 }
 Action offered(const MovementRules &rules, const State &s, const Id &id,
                const std::vector<Id> &path, MovementMode mode) {
@@ -670,7 +670,7 @@ void factoryRelocation() {
   f.type = facilityTypeNumber(s, "major_factory");
   f.zone = zoneNumber(s, "a");
   f.damage = 2;
-  s.facilities[f.id] = f;
+  s.facilities.insert_or_assign(f.id, f);
   check(!validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Factory moved without Improved Logistics");
   s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "improved_logistics")] = 4;

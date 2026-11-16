@@ -43,9 +43,11 @@ types, facility types and technologies, and the engine's mark table for marks
 (zone 0 is `land_china_beiping`, nation 0 is `ccp`, unit type 0 is
 `advanced_artillery`, facility type 0 is `airbase`, mark 0 is
 `__campaign_started`). A construction project's type is a unit type or a
-facility type number. Everything else, and everything the engine reads or
-writes, uses names; [names held as numbers](names.md) explains the numbering
-and lists the campaign's tables.
+facility type number. Units and facilities, which enter and leave a game, are
+kept in slot maps that give each a slot of its own and list them in name order.
+Everything else, and everything the engine reads or writes, uses names; [names
+held as numbers](names.md) explains the numbering and lists the campaign's
+tables.
 
 Two things are kept beside the state:
 

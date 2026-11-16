@@ -1558,15 +1558,16 @@ looking up maps and copying memory, and 41% to the rules' own logic, while the
 position kept its zones, units, facilities and nations in maps keyed by name
 ([record](../archive/records/self_play_limits_2026_11_16.md#inside-the-engine)).
 The engine now holds zones, nations, unit types, facility types, technologies
-and the bases of marks as numbers, which together took 21.4% of the
-instructions out of a searched game with play unchanged
+and the bases of marks as numbers, and keeps units and facilities in slot maps
+found through a hash table, which together took 23.9% of the instructions out
+of a searched game with play unchanged
 ([zones](../archive/records/zone_numbers_2026_11_16.md),
 [nations](../archive/records/nation_numbers_2026_11_16.md),
 [unit types](../archive/records/unit_type_numbers_2026_11_16.md),
 [marks](../archive/records/mark_numbers_2026_11_16.md),
-[facility types](../archive/records/facility_type_numbers_2026_11_16.md)); units
-and facilities themselves are still keyed by name ([names held as
-numbers](../engine/names.md)).
+[facility types](../archive/records/facility_type_numbers_2026_11_16.md),
+[slot maps](../archive/records/slot_maps_2026_11_16.md)); the rules still refer
+to units and facilities by name ([names held as numbers](../engine/names.md)).
 While the engine lists a position's legal moves, it keeps a cache of facts about
 that position, such as whether a zone is in supply for a nation, so that each is
 worked out once (`PositionScope` in `include/game/position_facts.hpp`). Playing a

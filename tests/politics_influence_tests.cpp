@@ -35,7 +35,7 @@ void unit(State& state, const Id& id, const Id& owner, const Id& zone,
     value.owner = nationNumber(state, owner);
     value.zone = value.turnOrigin = zoneNumber(state, zone);
     value.movementAllowance = value.movementRemaining = 1;
-    state.units[id] = value;
+    state.units.insert_or_assign(id, value);
 }
 
 // The source values/identities/catalog are real. Deliberately small synthetic
@@ -428,7 +428,7 @@ void freeShipAdvanceAndFacilityRepair() {
           "Controlled-minor queue work changed a national treasury");
 
     auto repair = fixture("mongolia");
-    repair.facilities["minor_repair"] = FacilityState{"minor_repair", facilityTypeNumber(repair, "major_factory"), zoneNumber(repair, central), 9, {}};
+    repair.facilities.insert_or_assign("minor_repair", FacilityState{"minor_repair", facilityTypeNumber(repair, "major_factory"), zoneNumber(repair, central), 9, {}});
     repair.repairs["pending_job"] = RepairJob{"pending_job", nationNumber(repair, "mongolia"), "minor_repair", 9, 9, true};
     applyInfluenceAction(repair, recruitment(repair, "mongolia"));
     resolve(repair, 1);

@@ -414,7 +414,7 @@ void freshCampaignStartAndRestoreBoundary() {
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_b"); unit.route = zoneNumbers(state, {"land_b", "land_a"});
     unit.movementAllowance = 3; unit.movementRemaining = 0;  // Not infantry's: the new turn restores the catalog's 1.
     unit.turnFlags[MarkKey(mark::fixture, "used")] = 1; unit.commitments.insert(MarkKey(mark::fixture, "spent"));
-    state.units[unit.id] = unit;
+    state.units.insert_or_assign(unit.id, unit);
     state.nations.at(nationNumber(state, "ccp")).turnFlags[MarkKey(mark::fixture, "used")] = 1;
     state.territories.at(zoneNumber(state, "land_b")).flags[mark::aligned_turn] = 0;
     state.territories.at(zoneNumber(state, "land_b")).flags[MarkKey(mark::fixture, "kept")] = 1;
@@ -469,7 +469,7 @@ void accountingFailureAndTurnStartSnapshot() {
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_a"); unit.route = zoneNumbers(state, {"land_a"});
     unit.movementAllowance = 2; unit.movementRemaining = 0;  // Not infantry's: the new turn restores the catalog's 1.
     unit.turnFlags[MarkKey(mark::fixture, "used")] = 1; unit.gameFlags[MarkKey(mark::fixture, "keep")] = 1; unit.commitments.insert(MarkKey(mark::fixture, "spent"));
-    state.units[unit.id] = unit;
+    state.units.insert_or_assign(unit.id, unit);
     state.nations.at(nationNumber(state, "mongolia")).turnFlags[MarkKey(mark::fixture, "used")] = 1;
     Engine engine(state, rules);
     rules->missingIncome = true;

@@ -47,7 +47,7 @@ void add(State &s, const Id &id, const Id &type, const Id &owner, const Id &zone
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
         s.definition->catalog->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
-    s.units[id] = u;
+    s.units.insert_or_assign(id, u);
 }
 std::shared_ptr<const Rules> rules() {
     return std::make_shared<PoliticsRules>(std::make_shared<MovementRules>(
@@ -238,7 +238,7 @@ void flightMayPrecedeItsLandingCarrier() {
 void bombingDamageThenAAAndReplay() {
     auto s = fixture();
     add(s, "b", "medium_bomber", "japan", beiping);
-    s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
+    s.facilities.insert_or_assign("factory", {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}});
     Engine e(s, rules(), 4);
     e.setDiceTapeForTesting({6, 1});
     auto checkpoint = e.serialize();
@@ -261,7 +261,7 @@ void interceptorAndEscortSimultaneous() {
     add(s, "b", "medium_bomber", "japan", beiping);
     add(s, "escort", "fighter", "japan", beiping);
     add(s, "i", "fighter", "kmt", hopeh);
-    s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
+    s.facilities.insert_or_assign("factory", {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}});
     Engine e(s, rules());
     choose(e, "air_bomb",
            [](const auto &a) { return a.parameters.require("target").asString() == "factory"; });
@@ -302,7 +302,7 @@ void cityPermanentIPPAndDestruction() {
 void improvedConstructionPerPlayerTurn() {
     auto s = fixture();
     s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "improved_construction")] = 4;
-    s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
+    s.facilities.insert_or_assign("factory", {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}});
     applyFacilityBombDamage(s, "factory", 4);
     applyFacilityBombDamage(s, "factory", 4);
     check(s.facilities.at("factory").damage == 3, "Factory mitigation stacked across missions");

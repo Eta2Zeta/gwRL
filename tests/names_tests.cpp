@@ -6,6 +6,7 @@
 #include "game/catalog.hpp"
 #include "game/marks.hpp"
 #include "game/names.hpp"
+#include "game/slot_map.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -78,6 +79,10 @@ static_assert(!std::is_constructible_v<UnitTypeId, NationId> && !std::is_constru
 static_assert(!std::is_constructible_v<UnitClassId, UnitTypeId> && !std::is_constructible_v<UnitClassId, const char*>);
 static_assert(!std::is_constructible_v<FacilityTypeId, UnitTypeId> && !std::is_constructible_v<FacilityTypeId, std::string>);
 static_assert(!std::is_constructible_v<TechnologyId, FacilityTypeId> && !std::is_constructible_v<TechnologyId, const char*>);
+// A slot is made only by its SlotMap, and has no order, so nothing can be keyed by slots.
+template <class T>
+concept Ordered = requires(T a, T b) { a < b; };
+static_assert(!Ordered<UnitSlot> && !std::is_constructible_v<UnitSlot, int> && !std::is_constructible_v<UnitSlot, FacilitySlot>);
 // A build type is made from a unit type or a facility type number, never from a name.
 static_assert(std::is_convertible_v<UnitTypeId, BuildType> && std::is_convertible_v<FacilityTypeId, BuildType>);
 static_assert(!std::is_constructible_v<BuildType, const char*> && !std::is_constructible_v<BuildType, std::string>);
@@ -155,6 +160,42 @@ void numberSetsHoldBitsInNameOrder() {
     check(!set.contains(ZoneId {}), "A set contains a number with no name");
     set.clear();
     check(set.empty() && set.begin() == set.end(), "Clearing left members");
+}
+
+void slotMapsKeepNameOrderAndSlots() {
+    struct TestKind {};
+    struct Thing {
+        int value {0};
+        Slot<TestKind> slot;
+    };
+    SlotMap<TestKind, Thing> things;
+    things.emplace("b", Thing {2, {}});
+    things.emplace("a", Thing {1, {}});
+    auto& b = things.at("b");
+    things.emplace("c", Thing {3, {}});
+    check(&b == &things.at("b"), "A thing moved when another entered");
+    std::string order;
+    for (const auto& [name, thing] : things) order += name;
+    check(order == "abc", "A slot map does not list its things in name order");
+    const auto slotB = *things.slotOf("b");
+    check(things.at("b").slot == slotB && things.at(slotB).value == 2 && things.name(slotB) == "b" &&
+              things.at("a").slot != slotB,
+          "A thing's slot does not reach it");
+    things.insert_or_assign("b", Thing {20, {}});
+    check(things.at("b").value == 20 && things.at("b").slot == slotB, "Replacing a thing changed its slot");
+    check(things.erase("b") == 1 && !things.contains(slotB) && !things.contains("b") && things.size() == 2,
+          "Erasing left the thing reachable");
+    things.emplace("bb", Thing {4, {}});
+    check(things.at("bb").slot != slotB && !things.contains(slotB), "A new thing took an erased thing's slot");
+    for (auto it = things.begin(); it != things.end();) it = it->first == "a" ? things.erase(it) : std::next(it);
+    order.clear();
+    for (const auto& [name, thing] : things) order += name + ",";
+    check(order == "bb,c," && things.upper_bound("bb")->first == "c", "Erasing while iterating lost the order");
+    auto copy = things;
+    copy.at("c").value = 30;
+    check(things.at("c").value == 3 && copy.at(*copy.slotOf("c")).value == 30, "A copy shares its things");
+    rejects([&] { (void)things.at("missing"); }, "A missing name was found");
+    rejects([&] { (void)things.at(slotB); }, "An erased slot was found");
 }
 
 void theScenarioNumbersItsMapZones() {
@@ -420,6 +461,7 @@ int main() {
         {"numbers have no name until a table gives them", numbersHaveNoNameUntilATableGivesThem},
         {"number maps keep name order without nodes", numberMapsKeepNameOrderWithoutNodes},
         {"number sets hold bits in name order", numberSetsHoldBitsInNameOrder},
+        {"slot maps keep name order and slots", slotMapsKeepNameOrderAndSlots},
         {"the scenario numbers its map zones", theScenarioNumbersItsMapZones},
         {"the scenario numbers its nations", theScenarioNumbersItsNations},
         {"the catalog numbers its unit types and classes", theCatalogNumbersItsUnitTypesAndClasses},

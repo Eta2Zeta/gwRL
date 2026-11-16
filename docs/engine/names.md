@@ -31,9 +31,10 @@ random games and 4 searched games each time
 | Unit types and classes as well | 7.77 million | 5,845 billion | [unit types](../archive/records/unit_type_numbers_2026_11_16.md) |
 | The bases of marks as well | 7.07 million | 5,557 billion | [marks](../archive/records/mark_numbers_2026_11_16.md) |
 | Facility types and technologies as well | 6.08 million | 5,334 billion | [facility types](../archive/records/facility_type_numbers_2026_11_16.md) |
+| Units and facilities kept in slot maps | 5.74 million | 5,164 billion | [slot maps](../archive/records/slot_maps_2026_11_16.md) |
 
-So listing a position's moves runs 39.4% fewer instructions than before any of
-these changes, and a searched game 21.4% fewer. Part of the last step is a
+So listing a position's moves runs 42.8% fewer instructions than before any of
+these changes, and a searched game 23.9% fewer. Part of the last step is a
 check that numbers made cheap: a factory's production capacity, which the build
 menu asks for each row of the build chart, reads the nation's completed
 technologies as a set of bits (`completedTechnologies`) instead of a catalog
@@ -157,6 +158,30 @@ say which. The catalog gives no unit type and facility type the same name, so a
 name says which of the two it is: `buildTypeNumber(state, name)` reads it and
 `buildTypeName(state, type)` names it. The target of an upgrade, the type a row
 upgrades from and the types a technology unlocks are build types too.
+
+### Units and facilities: slots
+
+Units and facilities enter and leave a game: a purchase places a unit, a
+battle destroys one, a factory is built. A new unit's name, such as
+`economy_unit_12`, may sort anywhere among the others, so these names cannot be
+numbered once for the whole game, as zones are. The position keeps them in
+`SlotMap`s instead (`include/game/slot_map.hpp`). Each unit and facility gets a
+*slot* when it enters the position: a number of its own type (`UnitSlot`,
+`FacilitySlot`), fixed while the thing exists and never given to another, which
+`units.at(slot)` follows without comparing names. The map writes it into the
+thing as well (`u.slot`).
+
+A slot is not a place in name order. Slots follow the order things entered the
+position, so two copies of a game that reached the same position by different
+moves may give its units different slots, and a position read back from its
+saved form gives them slots in name order. A slot therefore has no order: no
+set or map can be keyed by slots, and anything listed in order is listed in
+name order, as a `SlotMap` lists its things. Saved positions, planning keys and
+moves name units and facilities as before.
+
+A `SlotMap` is also searched by name, through a hash table of its slots, so a
+lookup compares one name or two where a search in name order compared seven or
+eight. Everything that refers to a unit or facility still names it.
 
 ### What a mark is
 
@@ -673,6 +698,15 @@ The marks' own, declared in `include/game/marks.hpp`:
   entry showing as `{first: key, second: value}`, and `argumentAfter(base,
   prefix)` for the argument of the first mark of a base. **`MarkSet`** is the
   same without values, for a unit's commitments.
+- **`SlotMap<Kind, Value>`** keeps the position's units and facilities
+  ([slots](#units-and-facilities-slots)). It has the parts of `std::map`'s
+  interface the engine uses, by name. It lists its entries in name order
+  through a vector of slots sorted by name, and finds a name through a hash
+  table of slots, rebuilt when a thing enters or leaves. The things themselves
+  live in a `std::deque` that only grows, so a reference to a thing stays valid
+  while others enter and leave, and copying the map allocates a few blocks
+  instead of a node per thing. It has no `operator[]`: `insert_or_assign`
+  replaces a thing and keeps its slot.
 
 ## 6. Rules for code
 
@@ -707,6 +741,13 @@ The marks' own, declared in `include/game/marks.hpp`:
 - **Ask about a possessor with `isNation`.** A possessor may be empty, and so
   may a known nation the scenario lacks; comparing the two would match
   ([the nations the rules name](#the-nations-the-rules-name)).
+- **Never let units or facilities enter or leave while iterating over them.**
+  A `SlotMap`'s iterators are places in name order, so an entering or leaving
+  thing moves the places after it, where a `std::map`'s iterators kept their
+  element. Collect the names first, or erase through the iterator `erase`
+  returns. A build with `GWRL_CHECK_SLOT_MAPS` defined throws when an iterator
+  is used after its map changed; the C++ suites and 300 random games ran
+  without one when units and facilities moved to `SlotMap`s.
 
 ## What is still a name
 

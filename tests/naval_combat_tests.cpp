@@ -25,7 +25,7 @@ State fixture(){
 void add(State& s,const Id& id,const Id& type,const Id& owner,const Id& zone=sea){
     UnitState u;u.id=id;u.type=unitTypeNumber(s, type);u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(unitTypeNumber(s, type),0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;
-    s.units[id]=u;
+    s.units.insert_or_assign(id, u);
 }
 std::shared_ptr<const Rules> rules(){return std::make_shared<NavalRules>(std::make_shared<AirRules>(std::make_shared<EconomyRules>()));}
 Action pick(Engine& e,const Id& kind,const std::function<bool(const Action&)>& match=[](const Action&){return true;}){
@@ -127,7 +127,7 @@ void declaredAircraftMergeAndAttackOriginsStayNaval(){
 }
 void portAttackStillGetsFacilityAaAfterShipLoss(){
     auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor=nationNumber(s, "kmt");s.captureTurnStart();
-    FacilityState f;f.id="port";f.type=facilityTypeNumber(s, "major_port");f.zone = zoneNumber(s, tokyo);s.facilities[f.id]=f;
+    FacilityState f;f.id="port";f.type=facilityTypeNumber(s, "major_port");f.zone = zoneNumber(s, tokyo);s.facilities.insert_or_assign(f.id, f);
     add(s,"a","fighter","japan");add(s,"d","destroyer","kmt",tokyo);s.units.at("d").gameFlags[MarkKey(mark::in_port, "port")]=1;
     auto id=registerNavalBattle(s,zoneNumber(s, sea),nationNumber(s, "japan"),{"a"},{{"a",zoneNumber(s, from)}},V(O{{"context",V(std::string("port_attack"))},{"facility",V(std::string("port"))},{"defenders",V(A{V(std::string("d"))})},{"no_scramble",V(true)}}));
     Engine e(s,rules());e.setDiceTapeForTesting({1,1});choose(e,"naval_begin_battle");e.resolveChance();choose(e,"naval_take_casualty","d");
@@ -158,7 +158,7 @@ void jointDefenseDisputeUsesEntitledPlayers(){
     check(e.state().chance&&e.state().chance->dice.size()==2,"Disputed ordinary casualty lost its normal return fire");
 }
 void shipScrambleAndSkeletonCrewExclusion(){
-    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor=nationNumber(s, "kmt");FacilityState port;port.id="scramble_port";port.type=facilityTypeNumber(s, "major_port");port.zone = zoneNumber(s, tokyo);port.flags[MarkKey(mark::border, sea)]=1;s.facilities[port.id]=port;
+    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor=nationNumber(s, "kmt");FacilityState port;port.id="scramble_port";port.type=facilityTypeNumber(s, "major_port");port.zone = zoneNumber(s, tokyo);port.flags[MarkKey(mark::border, sea)]=1;s.facilities.insert_or_assign(port.id, port);
     add(s,"a","destroyer","japan");add(s,"d","destroyer","kmt");add(s,"scramble","destroyer","kmt",tokyo);add(s,"locked","heavy_cruiser","kmt",tokyo);
     s.units.at("scramble").gameFlags[MarkKey(mark::in_port, "scramble_port")]=1;s.units.at("locked").gameFlags[MarkKey(mark::in_port, "scramble_port")]=1;s.units.at("locked").gameFlags[mark::skeleton_crew_until_own_turn]=1;s.captureTurnStart();
     registerNavalBattle(s,zoneNumber(s, sea),nationNumber(s, "japan"),{"a"},{{"a",zoneNumber(s, from)}});Engine e(s,rules());choose(e,"naval_begin_battle");
@@ -166,7 +166,7 @@ void shipScrambleAndSkeletonCrewExclusion(){
     check(e.state().units.at("scramble").zone == zoneNumber(e.state(), sea)&&e.state().units.at("scramble").commitments.contains(MarkKey(mark::naval_scramble_origin, "scramble_port")),"Ship scramble lost physical source");
 }
 void scrambledCarrierTakesItsAircraft(){
-    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor=nationNumber(s, "kmt");FacilityState port;port.id="scramble_port";port.type=facilityTypeNumber(s, "major_port");port.zone = zoneNumber(s, tokyo);port.flags[MarkKey(mark::border, sea)]=1;s.facilities[port.id]=port;
+    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor=nationNumber(s, "kmt");FacilityState port;port.id="scramble_port";port.type=facilityTypeNumber(s, "major_port");port.zone = zoneNumber(s, tokyo);port.flags[MarkKey(mark::border, sea)]=1;s.facilities.insert_or_assign(port.id, port);
     add(s,"a","destroyer","japan");add(s,"d","destroyer","kmt");add(s,"carrier","fleet_carrier","kmt",tokyo);add(s,"plane","fighter","kmt",tokyo);
     s.units.at("carrier").gameFlags[MarkKey(mark::in_port, "scramble_port")]=1;attachCargo(s,"carrier","plane");s.captureTurnStart();
     registerNavalBattle(s,zoneNumber(s, sea),nationNumber(s, "japan"),{"a"},{{"a",zoneNumber(s, from)}});Engine e(s,rules());choose(e,"naval_begin_battle");choose(e,"naval_scramble","carrier");
@@ -179,7 +179,7 @@ void scrambledCarrierTakesItsAircraft(){
 void patrolPlaneChoosesBeforeScrambles(){
     const auto setup=[](bool armed,bool escort){
         auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor=nationNumber(s, "kmt");
-        FacilityState port;port.id="scramble_port";port.type=facilityTypeNumber(s, "major_port");port.zone = zoneNumber(s, tokyo);port.flags[MarkKey(mark::border, sea)]=1;s.facilities[port.id]=port;
+        FacilityState port;port.id="scramble_port";port.type=facilityTypeNumber(s, "major_port");port.zone = zoneNumber(s, tokyo);port.flags[MarkKey(mark::border, sea)]=1;s.facilities.insert_or_assign(port.id, port);
         add(s,"a","destroyer","japan");add(s,"patrol","fighter","kmt");add(s,"scramble","destroyer","kmt",tokyo);
         auto& p=s.units.at("patrol");p.gameFlags[mark::on_map]=1;p.gameFlags[mark::map_range]=1;p.commitments.insert(mark::maritime_air_patrol);
         s.units.at("scramble").gameFlags[MarkKey(mark::in_port, "scramble_port")]=1;

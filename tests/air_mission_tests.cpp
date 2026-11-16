@@ -55,7 +55,7 @@ void add(State &s, const Id &id, const Id &type, const Id &owner,
   u.movementAllowance = u.movementRemaining =
       s.definition->catalog->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone)))
           .movement;
-  s.units[id] = std::move(u);
+  s.units.insert_or_assign(id, std::move(u));
 }
 std::shared_ptr<const Rules> rules() {
   return std::make_shared<PoliticsRules>(
@@ -91,7 +91,7 @@ void declareRocket(Engine &e) {
 void rocketRadarBeforeDamage() {
   auto s = fixture();
   add(s, "rocket", "strategic_rocket", "japan", beiping);
-  s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
+  s.facilities.insert_or_assign("factory", {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}});
   s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "radar")] = 4;
   Engine hit(s, rules());
   hit.setDiceTapeForTesting({1});
@@ -124,7 +124,7 @@ void rocketRadarBeforeDamage() {
 void rocketWithoutRadar() {
   auto s = fixture();
   add(s, "rocket", "strategic_rocket", "japan", beiping);
-  s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
+  s.facilities.insert_or_assign("factory", {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}});
   Engine e(s, rules());
   e.setDiceTapeForTesting({4});
   declareRocket(e);
@@ -141,8 +141,8 @@ void selectedSurpriseBombingUsesFirstStrikeWithoutRemovingFacilityAA() {
   s.nations.at(nationNumber(s, "japan")).turnFlags[MarkKey(mark::surprise_attack_target, "kmt")]=1;
   add(s,"bomber","medium_bomber","japan",beiping);add(s,"escort","fighter","japan",beiping);
   add(s,"local","fighter","kmt",hopeh);add(s,"adjacent","fighter","kmt",shensi);
-  s.territories.at(zoneNumber(s, shensi)).possessor=nationNumber(s, "kmt");s.facilities["base"]={"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, shensi),0,{}};
-  s.facilities["factory"]={"factory",facilityTypeNumber(s, "major_factory"),zoneNumber(s, hopeh),0,{}};s.captureTurnStart();
+  s.territories.at(zoneNumber(s, shensi)).possessor=nationNumber(s, "kmt");s.facilities.insert_or_assign("base", {"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, shensi),0,{}});
+  s.facilities.insert_or_assign("factory", {"factory",facilityTypeNumber(s, "major_factory"),zoneNumber(s, hopeh),0,{}});s.captureTurnStart();
   Engine e(s,rules(),32);e.setDiceTapeForTesting({1,12,4,12,12});const auto checkpoint=e.serialize();
   choose(e,"land_select_surprise_zone",[](const auto& a){return a.parameters.require("zone").asString()==hopeh;});
   choose(e,"air_bomb",[](const auto& a){return a.parameters.require("target").asString()=="factory";});
@@ -165,7 +165,7 @@ void selectedSurpriseBombingUsesFirstStrikeWithoutRemovingFacilityAA() {
 }
 void rocketRangeIgnoresAircraftInterceptionAndRequiresNoTransport() {
   auto s=fixture();add(s,"rocket","strategic_rocket","japan",beiping);
-  add(s,"blocker","fighter","kmt",hopeh);s.facilities["factory"]={"factory",facilityTypeNumber(s, "major_factory"),zoneNumber(s, shensi),0,{}};
+  add(s,"blocker","fighter","kmt",hopeh);s.facilities.insert_or_assign("factory", {"factory",facilityTypeNumber(s, "major_factory"),zoneNumber(s, shensi),0,{}});
   s.territories.at(zoneNumber(s, shensi)).possessor=nationNumber(s, "kmt");
   const auto actions=AirRules{}.actions(s);
   check(std::any_of(actions.begin(),actions.end(),[](const auto& a){return a.kind=="air_rocket_attack"&&
@@ -184,7 +184,7 @@ void artilleryCityBombingStaysAdjacentAndBypassesAirDefence() {
     auto s=fixture();add(s,"gun",type,"japan",shantung);add(s,"lift","heavy_air_transport","japan",shantung);
     add(s,"interceptor","fighter","kmt",nanking);
     add(s,"aaa","anti_aircraft_artillery","kmt",nanking);
-    s.facilities["fort"]={"fort",facilityTypeNumber(s, "fortification"),zoneNumber(s, nanking),0,{}};
+    s.facilities.insert_or_assign("fort", {"fort",facilityTypeNumber(s, "fortification"),zoneNumber(s, nanking),0,{}});
     s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "radar")]=4;s.captureTurnStart();
     Engine e(s,rules(),77);e.setDiceTapeForTesting({6});const auto checkpoint=e.serialize();
     choose(e,"air_artillery_city_bomb");
@@ -277,7 +277,7 @@ State scrambledFixture() {
   add(s, "attacker", "infantry", "japan", hopeh);
   add(s, "defender", "infantry", "kmt", hopeh);
   add(s, "scrambler", "fighter", "kmt", shensi);
-  s.facilities["base"] = {"base", facilityTypeNumber(s, "airbase"), zoneNumber(s, shensi), 0, {}};
+  s.facilities.insert_or_assign("base", {"base", facilityTypeNumber(s, "airbase"), zoneNumber(s, shensi), 0, {}});
   const auto id = registerLandBattle(s, zoneNumber(s, hopeh), nationNumber(s, "japan"), {"attacker"},
                                      {{"attacker", zoneNumber(s, beiping)}});
   beginAirDefence(s, id);

@@ -26,7 +26,7 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     check(std::find(cargoFailures.begin(),cargoFailures.end(),"untransported land unit at sea: "+i->first)!=cargoFailures.end(),"Untransported land unit at sea escaped audit");
     broken=s.clone();auto&carrier=broken.units.at("japan_light_carrier_p15_setup_1");
     auto extra=broken.units.at(carrier.cargo.front());extra.id="extra_carrier_fighter";extra.carriedBy=carrier.id;
-    broken.units[extra.id]=extra;carrier.cargo.push_back(extra.id);
+    broken.units.insert_or_assign(extra.id, extra);carrier.cargo.push_back(extra.id);
     const auto carrierFailures=campaignInvariantFailures(broken);
     check(std::find(carrierFailures.begin(),carrierFailures.end(),"carrier over capacity: "+carrier.id)!=carrierFailures.end(),"Carrier overbooking escaped audit");
     broken=s.clone();auto&fighter=broken.units.at("setup_japan_land_jap_tokyo_fighter_1");
@@ -70,7 +70,7 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     s.territories.at(zoneNumber(s, origin)).possessor=nationNumber(s, "japan");s.territories.at(zoneNumber(s, target)).possessor=nationNumber(s, "kmt");
     auto add=[&](const Id&id,const Id&type,const Id&owner,const Id&zone){
         UnitState u;u.id=id;u.type=unitTypeNumber(s, type);u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
-        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(unitTypeNumber(s, type),0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;s.units[id]=u;
+        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(unitTypeNumber(s, type),0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;s.units.insert_or_assign(id, u);
     };
     add("carpet_bomber","heavy_strategic_bomber","japan",origin);
     add("ordinary_aircraft","tactical_bomber","japan",origin);
@@ -126,7 +126,7 @@ void creationRequiresAnExplicitRuleSource() {
     auto s=initial();auto rules=campaignRules();auto e=Engine::start(s,rules,1);CampaignAuditLog audit(e);
     const auto before=e.state().clone();auto changed=before.clone();
     auto invented=changed.units.begin()->second;invented.id="unfunded_duplicate";invented.cargo.clear();invented.carriedBy.reset();
-    changed.units[invented.id]=invented;Engine illegal(changed,rules,1);
+    changed.units.insert_or_assign(invented.id, invented);Engine illegal(changed,rules,1);
     bool rejected=false;
     try{audit.record(before,illegal,"action",game::json::Value(game::json::Value::Object{{"kind",game::json::Value(std::string("end_phase"))}}));}
     catch(const std::exception&error){rejected=std::string(error.what()).find("Unit creation lacks")!=std::string::npos;}

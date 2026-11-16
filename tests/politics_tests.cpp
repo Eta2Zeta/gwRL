@@ -253,9 +253,9 @@ void captureCapitalAndFacilities() {
     state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
     state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
     const auto conquerorCash = state.nations.at(nationNumber(state, "kmt")).treasury;
-    state.facilities["test_fort"] = FacilityState{"test_fort", facilityTypeNumber(state, "fortification"), zoneNumber(state, tokyo)};
-    state.facilities["test_coast"] = FacilityState{"test_coast", facilityTypeNumber(state, "coastal_artillery"), zoneNumber(state, tokyo)};
-    state.facilities["test_factory"] = FacilityState{"test_factory", facilityTypeNumber(state, "medium_factory"), zoneNumber(state, tokyo)};
+    state.facilities.insert_or_assign("test_fort", FacilityState{"test_fort", facilityTypeNumber(state, "fortification"), zoneNumber(state, tokyo)});
+    state.facilities.insert_or_assign("test_coast", FacilityState{"test_coast", facilityTypeNumber(state, "coastal_artillery"), zoneNumber(state, tokyo)});
+    state.facilities.insert_or_assign("test_factory", FacilityState{"test_factory", facilityTypeNumber(state, "medium_factory"), zoneNumber(state, tokyo)});
     state.construction["test_factory_queue"] = BuildProject{"test_factory_queue", nationNumber(state, "japan"), buildTypeNumber(state, "minor_factory"), tokyo, 2, 4, {4}};
     rejects([&] { captureLand(state, nationNumber(state, "kmt"), zoneNumber(state, tokyo)); }, "Air/naval presence alone established land possession");
     addUnit(state, "surviving_conqueror", "kmt", tokyo);
