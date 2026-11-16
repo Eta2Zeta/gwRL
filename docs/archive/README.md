@@ -55,6 +55,7 @@ the first learning stage.
 | 14 Nov | [What a larger network and a longer search cost](records/network_and_search_cost_2026_11_14.md) | Networks from 64×2 to 512×16 on one core, four threads and the GPU, and searches of 64 to 1,024 simulations: the GPU pays only with many positions per pass, a simulation costs about the same CPU at any budget, and a tree holds about 0.17 to 0.25 MB per simulation. |
 | 15 Nov | [Training within nine cores](records/nine_core_layouts_2026_11_15.md) | Seven game processes fit the supervisor's count of 9 cores but kept about 10 busy; six kept about 9 and played about 192,000 decisions an hour, a quarter fewer than eight under the 12-core allowance. |
 | 16 Nov | [What limits self-play within nine cores](records/self_play_limits_2026_11_16.md) | The 9 cores are full and the game processes do 90% of the work, 80% of it in the engine, where comparing names, allocating and copying take 59%; the coordinator, busy 90%, caps what a faster engine alone can add at 12% to 40%; the Mac's other work pushed 27% to 29% of the game processes' time onto efficiency cores. |
+| 16 Nov | [Playing a move without checking it twice](records/move_checks_2026_11_16.md) | Identical play in 300 random games; playing a move takes 29% fewer instructions, and game processes 10.6% fewer per decision in training batches, but with a quiet Mac the coordinator set the pace and decisions per hour did not rise. |
 
 ### The engine
 

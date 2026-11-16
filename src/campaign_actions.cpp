@@ -250,14 +250,14 @@ class TrainingRules final : public Rules {
 };
 
 void exactKeys(const V& value, const std::set<Id>& expected, const Id& label) {
-    require(value.isObject(), "Action-interface " + label + " must be an object");
+    if (!value.isObject()) throw std::runtime_error("Action-interface " + label + " must be an object");
     std::set<Id> keys;
     for (const auto& [key, entry] : value.asObject()) keys.insert(key);
-    require(keys == expected, "Action-interface " + label + " has unknown or missing fields");
+    if (keys != expected) throw std::runtime_error("Action-interface " + label + " has unknown or missing fields");
 }
 
 void integerRecord(const V& value, const Id& label) {
-    require(value.isObject(), "Action-interface " + label + " must be an object");
+    if (!value.isObject()) throw std::runtime_error("Action-interface " + label + " must be an object");
     for (const auto& [key, number] : value.asObject()) {
         require(!key.empty() && number.isNumber(), "Invalid action-interface integer record");
         (void)number.asInt();
@@ -265,9 +265,10 @@ void integerRecord(const V& value, const Id& label) {
 }
 
 void stringArray(const V& value, const Id& label, const std::function<bool(const Id&)>& allowed) {
-    require(value.isArray(), "Action-interface " + label + " must be an array");
+    if (!value.isArray()) throw std::runtime_error("Action-interface " + label + " must be an array");
     for (const auto& entry : value.asArray())
-        require(entry.isString() && allowed(entry.asString()), "Invalid action-interface " + label + " identity");
+        if (!entry.isString() || !allowed(entry.asString()))
+            throw std::runtime_error("Invalid action-interface " + label + " identity");
 }
 
 std::set<Id> keys(const V& object) {

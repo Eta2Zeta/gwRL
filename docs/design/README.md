@@ -1563,21 +1563,34 @@ unchanged, such as whether a fleet's chosen route is legal, and closes it before
 the move changes anything. The supply search also works out only once per search
 which naval facilities it may use. Since these two changes, playing a move takes
 about 0.6 ms in random play instead of 1.1 ms
-([record](../archive/records/supply_cache_2026_11_14.md)).
+([record](../archive/records/supply_cache_2026_11_14.md)). A move is also checked
+only once. The engine looks the chosen move up in the position's menu, and the
+economy, which used to list all its options again to check an economy move, skips
+that check for a move the engine has found (`MenuCheckedAction` in
+`include/game/campaign.hpp`). The check of the whole position after every step
+reads the map's index and builds an error message only when it fails. In random
+play these make playing a move take 29% fewer instructions, and in training
+batches the game processes ran 10.6% fewer instructions per decision
+([record](../archive/records/move_checks_2026_11_16.md)).
 
-**What limits self-play.** Inferred from the 16 November batches, the first limit
-is the 9 cores. The training kept them busy and spent about 148 ms of CPU per
-decision. At that load that makes about 222,500 decisions an hour, close to the
-213,600 the batch played. More decisions an hour within the allowance therefore
-need less CPU per decision, and 90% of that CPU is the game processes'. The
-coordinator is the next limit. Busy all the time, at 0.26 ms a round plus 0.23 ms
-a position, it would answer about 240,000 decisions an hour with rounds of 4.4
-positions, and about 301,000 with rounds of any size. A cheaper engine leaves
-more positions waiting for each round, so rounds grow. A faster engine alone can
-therefore add at most about 12% to 40%, and about a quarter with rounds of 8 to
-12 positions. Beyond that, the coordinator's cost per position, mostly the
-network's arithmetic, has to fall too
+**What limits self-play** depends on the Mac's other work. Inferred from batches
+on 16 November: when other work took about 4 cores, the training kept the 9 left
+to it busy and spent about 148 ms of CPU per decision. At that load that makes
+about 222,500 decisions an hour, close to the 213,600 the batch played. Less CPU
+per decision then buys more decisions an hour, and 90% of that CPU is the game
+processes'
 ([record](../archive/records/self_play_limits_2026_11_16.md#what-limits-self-play)).
+When other work took about 2 cores, the training got about 10, and the
+coordinator, busy about 90% of the time, set the pace. The game processes then
+used 6% less CPU per decision without playing more decisions an hour
+([record](../archive/records/move_checks_2026_11_16.md#training-batches)). Busy
+all the time, at 0.26 ms a round plus 0.23 ms a position, the coordinator would
+answer about 240,000 decisions an hour with rounds of 4.4 positions, and about
+301,000 with rounds of any size. A cheaper engine leaves more positions waiting
+for each round, so rounds grow, but a faster engine alone can add at most about
+12% to 40%. Beyond that, the coordinator's cost per position, mostly the
+network's arithmetic, has to fall too
+([record](../archive/records/self_play_limits_2026_11_16.md#the-coordinator)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1924,18 +1937,20 @@ measured and what would settle it.
   pair a nation, or the game as a whole, with a mark that only units or
   territories carry
   ([what is still asked](network_input.md#what-the-position-asks-about-a-nation)).
-- **Self-play on the Mac is close to two limits.** The training keeps its 9
-  cores busy, and the coordinator is busy about 90% of the time. The game
-  processes do 90% of the CPU work, so less engine work per move frees the most.
-  But a faster engine alone can add at most about 12% to 40% before the
-  coordinator is busy all the time. Within the engine, listing a position's legal
-  moves costs the most, about 1.0 ms a call, and 59% of the engine's time goes to
-  comparing names, allocating memory, looking up maps and copying memory. Some
-  work is repeated: playing an economy move lists the economy's menu again, and
-  checking a naval route copies the whole position. Every move and every dice
-  roll also writes out the whole position, for its planning key, and checks all
-  of it. When the Mac's other work needs
-  more than one core, part of the training runs on the efficiency cores
+- **Self-play on the Mac is close to two limits.** The coordinator is busy about
+  90% of the time, and the training's cores are busy too. Which one sets the pace
+  depends on the Mac's other work: with about 4 cores of it the cores did, with
+  about 2 the coordinator did
+  ([record](../archive/records/move_checks_2026_11_16.md#training-batches)). The
+  game processes do 90% of the CPU work, so less engine work per move frees the
+  most, but a faster engine alone can add at most about 12% to 40% before the
+  coordinator is busy all the time. Within the engine, listing a position's
+  legal moves costs the most, about 1.0 ms a call, and 59% of the engine's time
+  goes to comparing names, allocating memory, looking up maps and copying memory.
+  Checking a naval route copies the whole position, and every move and every
+  dice roll writes out the whole position for its planning key. When the Mac's
+  other work needs more than one core, part of the training runs on the
+  efficiency cores
   ([record](../archive/records/self_play_limits_2026_11_16.md)).
 
 ### Open design questions

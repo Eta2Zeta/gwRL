@@ -706,16 +706,20 @@ bool applyEconomyAction(State &s, const Action &a) {
         return false;
     if (applyLendLeaseAction(s, a))
         return true;
-    const auto options = [&] {
-        // The check only reads the position: each facility's supply is traced once.
-        const PositionScope scope(s);
-        return economyActions(s);
-    }();
-    require(std::any_of(options.begin(), options.end(),
-                        [&](const auto &option) {
-                            return canonicalJson(actionJson(option)) == canonicalJson(actionJson(a));
-                        }),
-            "Illegal economy action");
+    // Engine::step has already found a move it plays in the position's whole
+    // menu, of which the economy's options are a part. Any other action, such
+    // as the purchase a railroad consent completes, is checked against them.
+    if (!MenuCheckedAction::marks(a)) {
+        const auto options = [&] {
+            // The check only reads the position: each facility's supply is traced once.
+            const PositionScope scope(s);
+            return economyActions(s);
+        }();
+        const auto proposed = canonicalJson(actionJson(a));
+        require(std::any_of(options.begin(), options.end(),
+                            [&](const auto &option) { return canonicalJson(actionJson(option)) == proposed; }),
+                "Illegal economy action");
+    }
     if (a.kind == "economy_approve_rail" || a.kind == "economy_decline_rail") {
         require(!s.decisions.empty() && a.decision && s.decisions.back().id == *a.decision,
                 "Missing railroad consent");

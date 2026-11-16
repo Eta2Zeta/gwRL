@@ -160,7 +160,16 @@ void prepareTurnStart(State& state) {
     state.captureTurnStart();
 }
 
+// Each game thread applies its own engine's moves, so the mark is per thread.
+thread_local const Action* menuCheckedAction = nullptr;
+
 }  // namespace
+
+MenuCheckedAction::MenuCheckedAction(const Action& action) : outer_(menuCheckedAction) {
+    menuCheckedAction = &action;
+}
+MenuCheckedAction::~MenuCheckedAction() { menuCheckedAction = outer_; }
+bool MenuCheckedAction::marks(const Action& action) { return menuCheckedAction == &action; }
 
 struct Engine::ActionMenu {
     std::vector<Action> actions;
@@ -441,7 +450,12 @@ void Engine::step(const Action& action) {
         else {
             const auto before = next.state_.clock;
             const bool terminal = next.state_.terminal;
-            next.rules_->apply(next.state_, chosen);
+            {
+                // The menu check above found this very action in the menu of
+                // the position it is applied to.
+                const MenuCheckedAction checked(chosen);
+                next.rules_->apply(next.state_, chosen);
+            }
             checkHookClock(next.state_, before, terminal);
         }
         next.settle();

@@ -91,6 +91,10 @@ std::shared_ptr<const IndexedGeography> indexGeography(const V::Object& nodes) {
     for(const auto& [id,node]:nodes) {
         index->nodeIndices.emplace(id,index->nodeIds.size());
         index->nodeIds.push_back(id);
+        const auto* type=node.find("type");
+        const bool land=type && type->isString() && type->asString()=="land";
+        index->land.push_back(land);
+        if(land)index->landIds.push_back(id);
     }
     index->adjacency.resize(nodes.size());
     index->nodes.reserve(nodes.size());
@@ -422,13 +426,26 @@ void State::validate(std::size_t historyFrom) const {
     require(actionInterface.isObject(),"Action-interface state must be an object");
     validateTrainingActionState(*this);
     const auto& nodes=definition->geography.require("nodes").asObject();
-    const auto zone=[&](const Id& id){require(nodes.contains(id),"Unknown zone: "+id);};
-    const auto land=[&](const Id& id){zone(id);require(nodes.at(id).require("type").asString()=="land","Expected land zone: "+id);};
-    const auto nation=[&](const Id& id){require(nations.contains(id),"Unknown nation: "+id);};
-    const auto unique=[](const std::vector<Id>& ids,const std::string& message){require(std::set<Id>(ids.begin(),ids.end()).size()==ids.size(),message);};
+    // This runs after every move, so it reads zones from the frozen map index
+    // when there is one, which gives the same answers as the map's JSON, and
+    // builds an error message only for a check that fails.
+    const auto* mapIndex=definition->indexedGeography.get();
+    const auto zone=[&](const Id& id){if(!(mapIndex?mapIndex->nodeIndices.contains(id):nodes.contains(id)))throw std::runtime_error("Unknown zone: "+id);};
+    const auto land=[&](const Id& id) {
+        if(mapIndex) {
+            const auto found=mapIndex->nodeIndices.find(id);
+            if(found==mapIndex->nodeIndices.end())throw std::runtime_error("Unknown zone: "+id);
+            if(!mapIndex->land[found->second])throw std::runtime_error("Expected land zone: "+id);
+            return;
+        }
+        zone(id);if(nodes.at(id).require("type").asString()!="land")throw std::runtime_error("Expected land zone: "+id);
+    };
+    const auto nation=[&](const Id& id){if(!nations.contains(id))throw std::runtime_error("Unknown nation: "+id);};
+    const auto unique=[](const std::vector<Id>& ids,const std::string& message){require(ids.size()<2||std::set<Id>(ids.begin(),ids.end()).size()==ids.size(),message);};
     for(const auto& [id,f]:definition->factions)require(f.dormant||nations.contains(id),"State faction inventory differs from definition");
-    for(const auto& [id,n]:nations) { require(definition->factions.contains(id),"Undefined national identity: "+id);if(n.controllerNation)nation(*n.controllerNation);if(n.player)require(definition->players.contains(*n.player),"Unknown controlling player");if(n.alliance)require(!n.alliance->empty(),"Empty alliance identity");require(!n.powerStatus.empty(),"Missing power status");if(n.treasury)require(*n.treasury>=0,"Negative treasury");for(const auto& [tech,stage]:n.technologyStages){require(!tech.empty()&&stage>=0,"Invalid technology stage");if(definition->catalog)require(stage<=4&&definition->catalog->technologies().contains(tech),"Unknown catalog technology/stage");}for(const auto& other:n.atWarWith){nation(other);require(other!=id,"Nation cannot be at war with itself");}for(const auto& other:n.allies){nation(other);require(other!=id,"Nation cannot ally with itself");} }
-    for(const auto& [id,node]:nodes)if(node.require("type").asString()=="land")require(territories.contains(id),"Missing retained territory: "+id);
+    for(const auto& [id,n]:nations) { if(!definition->factions.contains(id))throw std::runtime_error("Undefined national identity: "+id);if(n.controllerNation)nation(*n.controllerNation);if(n.player)require(definition->players.contains(*n.player),"Unknown controlling player");if(n.alliance)require(!n.alliance->empty(),"Empty alliance identity");require(!n.powerStatus.empty(),"Missing power status");if(n.treasury)require(*n.treasury>=0,"Negative treasury");for(const auto& [tech,stage]:n.technologyStages){require(!tech.empty()&&stage>=0,"Invalid technology stage");if(definition->catalog)require(stage<=4&&definition->catalog->technologies().contains(tech),"Unknown catalog technology/stage");}for(const auto& other:n.atWarWith){nation(other);require(other!=id,"Nation cannot be at war with itself");}for(const auto& other:n.allies){nation(other);require(other!=id,"Nation cannot ally with itself");} }
+    if(mapIndex) { for(const auto& id:mapIndex->landIds)if(!territories.contains(id))throw std::runtime_error("Missing retained territory: "+id); }
+    else for(const auto& [id,node]:nodes)if(node.require("type").asString()=="land"&&!territories.contains(id))throw std::runtime_error("Missing retained territory: "+id);
     for(const auto& [id,t]:territories){land(id);if(t.possessor)nation(*t.possessor);}
     for(const auto& [id,u]:units) {
         require(!id.empty()&&id==u.id&&!u.type.empty(),"Invalid unit identity/type");nation(u.owner);zone(u.zone);zone(u.turnOrigin);for(const auto& routeZone:u.route)zone(routeZone);require(u.damage>=0,"Negative unit damage");
@@ -440,7 +457,7 @@ void State::validate(std::size_t historyFrom) const {
         if(u.movementRemaining)require(*u.movementRemaining>=0,"Negative remaining movement");if(u.movementAllowance)require(*u.movementAllowance>=0,"Negative movement allowance");if(u.movementRemaining&&u.movementAllowance)require(*u.movementRemaining<=*u.movementAllowance,"Remaining movement exceeds allowance");
         unique(u.cargo,"Duplicate cargo reference");for(const auto& child:u.cargo){require(child!=id&&units.contains(child),"Unknown/self cargo reference");const auto& item=units.at(child);require(item.carriedBy&&*item.carriedBy==id,"Cargo links are not reciprocal");require(item.zone==u.zone,"Cargo and carrier locations differ");}
         if(u.carriedBy){require(units.contains(*u.carriedBy),"Unknown carrier");const auto& carrier=units.at(*u.carriedBy);require(std::count(carrier.cargo.begin(),carrier.cargo.end(),id)==1,"Carrier omits cargo");require(carrier.zone==u.zone,"Cargo and carrier locations differ");}
-        std::set<Id> chain{id};auto parent=u.carriedBy;while(parent){require(chain.insert(*parent).second,"Cargo cycle");require(units.contains(*parent),"Unknown carrier");parent=units.at(*parent).carriedBy;}
+        if(u.carriedBy){std::set<Id> chain{id};auto parent=u.carriedBy;while(parent){require(chain.insert(*parent).second,"Cargo cycle");require(units.contains(*parent),"Unknown carrier");parent=units.at(*parent).carriedBy;}}
     }
     for(const auto& [id,f]:facilities){require(!id.empty()&&id==f.id&&!f.type.empty(),"Invalid facility identity/type");land(f.zone);require(f.damage>=0,"Negative facility damage");require(!units.contains(id),"Unit/facility identity collision");if(definition->catalog){const auto& type=definition->catalog->facility(f.type);const auto captured=f.flags.find("captured_max_damage");const int maximum=captured==f.flags.end()?type.maxDamage.value_or(f.damage):captured->second;require(maximum>=0&&f.damage<=maximum,"Facility damage exceeds maximum");}}
     for(const auto& [id,r]:rails){require(!id.empty()&&id==r.id&&r.endpointA<r.endpointB,"Invalid railway identity/endpoints");require(id==railroadId(r.endpointA,r.endpointB),"A railroad is named by its border (one railroad per border)");land(r.endpointA);land(r.endpointB);require(!units.contains(id)&&!facilities.contains(id),"Ambiguous repair target identity");for(const auto& [endpoint,damage]:r.damageByEndpoint)require((endpoint==r.endpointA||endpoint==r.endpointB)&&damage>=0,"Invalid railway damage endpoint");}
@@ -457,8 +474,9 @@ void State::validate(std::size_t historyFrom) const {
         const auto& id = definition->turnOrder[index];
         const int expected = terminal ? definition->calendarRounds
             : clock.roundIndex + (index < static_cast<std::size_t>(clock.nationIndex) ? 1 : 0);
-        require(completedTurns.contains(id) && completedTurns.at(id) == expected,
-                "Completed national turns disagree with calendar cursor: " + id);
+        const auto completed = completedTurns.find(id);
+        if (completed == completedTurns.end() || completed->second != expected)
+            throw std::runtime_error("Completed national turns disagree with calendar cursor: " + id);
     }
     for(const auto& [id,owner]:turnStart.possessions){land(id);if(owner)nation(*owner);}for(const auto& [id,pair]:turnStart.units){require(!id.empty(),"Empty snapshot unit identity");nation(pair.first);zone(pair.second);}
     require(!(politics.chineseTruce&&politics.trucePermanentlyEnded),"Terminated Chinese Truce is active");

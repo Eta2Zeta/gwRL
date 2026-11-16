@@ -1,0 +1,550 @@
+{
+ "date": "2026-11-16",
+ "question": "Does playing a move without listing the economy's options again, and a cheaper check of the whole position after each step, keep play the same, and what does it save?",
+ "code": {
+  "before": "557b03e",
+  "after": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "same_play": {
+  "setup": "300 seeded random eleven-round games, seeds 7000-7299, through make_env as search uses it; each move drawn with random.Random('trace:<seed>'), ending the phase with probability 2%, 5% or 10% by seed; at every step a digest of the legal moves' ids, the chosen move and the planning key reached, and the final planning key",
+  "games_identical": 300,
+  "games": 300,
+  "steps": 443974
+ },
+ "random_play": {
+  "setup": "the same 300 games, both versions at the same time, 4 processes each; thread CPU time and the process's instruction count (proc_pid_rusage) around each engine call",
+  "before": {
+   "games": 300,
+   "steps": 443974,
+   "terminal": 300,
+   "errors": 0,
+   "calls": {
+    "legal_actions": {
+     "calls": 391840,
+     "cpu_seconds": 281.6,
+     "microseconds_per_call": 719,
+     "million_instructions_per_call": 10.29
+    },
+    "apply_action": {
+     "calls": 391840,
+     "cpu_seconds": 180.7,
+     "microseconds_per_call": 461,
+     "million_instructions_per_call": 6.18
+    },
+    "resolve_chance": {
+     "calls": 52134,
+     "cpu_seconds": 14.4,
+     "microseconds_per_call": 277,
+     "million_instructions_per_call": 3.61
+    }
+   },
+   "engine_cpu_seconds": 476.7
+  },
+  "after": {
+   "games": 300,
+   "steps": 443974,
+   "terminal": 300,
+   "errors": 0,
+   "calls": {
+    "legal_actions": {
+     "calls": 391840,
+     "cpu_seconds": 284.6,
+     "microseconds_per_call": 726,
+     "million_instructions_per_call": 10.29
+    },
+    "apply_action": {
+     "calls": 391840,
+     "cpu_seconds": 138.3,
+     "microseconds_per_call": 353,
+     "million_instructions_per_call": 4.4
+    },
+    "resolve_chance": {
+     "calls": 52134,
+     "cpu_seconds": 13.0,
+     "microseconds_per_call": 250,
+     "million_instructions_per_call": 3.19
+    }
+   },
+   "engine_cpu_seconds": 435.9
+  }
+ },
+ "training_batches": {
+  "setup": "the matched-batch command with the Mac profile (6 game processes of 4 games, coordinator on the CPU), 24 eleven-round games, 64 simulations, depth 16, 64x2 network, seed 20261104; run in the order before1, after1, before2, after2; tools/log_process_load.py beside each",
+  "batches": {
+   "before1": {
+    "games": 24,
+    "decisions": 25741,
+    "playing_s": 349.2,
+    "decisions_per_hour": 265368,
+    "games_per_hour": 247.4,
+    "positions_per_round": 5.22,
+    "coordinator_busy": 0.932,
+    "batch_cores": 10.36,
+    "other_cores_median": 1.64,
+    "game_cpu_ms_per_decision": 121.8,
+    "game_pcore_ms_per_decision": 107.1,
+    "coordinator_cpu_ms_per_decision": 12.5,
+    "game_minstr_per_decision": 1226,
+    "coordinator_minstr_per_decision": 177,
+    "game_pcore_share": 0.802,
+    "peak_memory_gb": 4.61,
+    "failed_games": 0,
+    "coordinator_busy_microseconds_per_evaluation": 231,
+    "coordinator_instructions_per_cycle_performance": 3.93,
+    "game_instructions_per_cycle_performance": 3.02,
+    "coordinator_wait_for_a_core_per_cpu_second": 0.035,
+    "game_wait_for_a_core_per_cpu_second": 0.215,
+    "load_windows": [
+     {
+      "batch_cores": 10.89,
+      "other_cores": 1.86
+     },
+     {
+      "batch_cores": 11.14,
+      "other_cores": 1.39
+     },
+     {
+      "batch_cores": 10.16,
+      "other_cores": 2.06
+     },
+     {
+      "batch_cores": 10.36,
+      "other_cores": 1.69
+     },
+     {
+      "batch_cores": 11.02,
+      "other_cores": 1.07
+     },
+     {
+      "batch_cores": 11.01,
+      "other_cores": 1.05
+     },
+     {
+      "batch_cores": 11.05,
+      "other_cores": 1.05
+     },
+     {
+      "batch_cores": 11.14,
+      "other_cores": 1.04
+     },
+     {
+      "batch_cores": 10.48,
+      "other_cores": 1.64
+     },
+     {
+      "batch_cores": 9.54,
+      "other_cores": 2.12
+     },
+     {
+      "batch_cores": 7.16,
+      "other_cores": 2.85
+     }
+    ]
+   },
+   "after1": {
+    "games": 24,
+    "decisions": 25417,
+    "playing_s": 386.4,
+    "decisions_per_hour": 236816,
+    "games_per_hour": 223.6,
+    "positions_per_round": 5.33,
+    "coordinator_busy": 0.872,
+    "batch_cores": 9.14,
+    "other_cores_median": 2.17,
+    "game_cpu_ms_per_decision": 117.3,
+    "game_pcore_ms_per_decision": 103.2,
+    "coordinator_cpu_ms_per_decision": 13.1,
+    "game_minstr_per_decision": 1124,
+    "coordinator_minstr_per_decision": 179,
+    "game_pcore_share": 0.803,
+    "peak_memory_gb": 4.58,
+    "failed_games": 0,
+    "coordinator_busy_microseconds_per_evaluation": 242,
+    "coordinator_instructions_per_cycle_performance": 3.79,
+    "game_instructions_per_cycle_performance": 2.88,
+    "coordinator_wait_for_a_core_per_cpu_second": 0.045,
+    "game_wait_for_a_core_per_cpu_second": 0.242,
+    "load_windows": [
+     {
+      "batch_cores": 11.26,
+      "other_cores": 1.52
+     },
+     {
+      "batch_cores": 10.47,
+      "other_cores": 1.61
+     },
+     {
+      "batch_cores": 9.57,
+      "other_cores": 2.77
+     },
+     {
+      "batch_cores": 9.34,
+      "other_cores": 2.18
+     },
+     {
+      "batch_cores": 9.71,
+      "other_cores": 2.15
+     },
+     {
+      "batch_cores": 10.09,
+      "other_cores": 1.93
+     },
+     {
+      "batch_cores": 9.41,
+      "other_cores": 2.29
+     },
+     {
+      "batch_cores": 9.63,
+      "other_cores": 2.51
+     },
+     {
+      "batch_cores": 10.35,
+      "other_cores": 2.1
+     },
+     {
+      "batch_cores": 9.85,
+      "other_cores": 1.98
+     },
+     {
+      "batch_cores": 7.81,
+      "other_cores": 2.35
+     },
+     {
+      "batch_cores": 2.25,
+      "other_cores": 2.85
+     }
+    ]
+   },
+   "before2": {
+    "games": 24,
+    "decisions": 26538,
+    "playing_s": 377.8,
+    "decisions_per_hour": 252887,
+    "games_per_hour": 228.7,
+    "positions_per_round": 4.79,
+    "coordinator_busy": 0.898,
+    "batch_cores": 10.09,
+    "other_cores_median": 1.72,
+    "game_cpu_ms_per_decision": 124.7,
+    "game_pcore_ms_per_decision": 108.7,
+    "coordinator_cpu_ms_per_decision": 12.8,
+    "game_minstr_per_decision": 1265,
+    "coordinator_minstr_per_decision": 183,
+    "game_pcore_share": 0.789,
+    "peak_memory_gb": 4.28,
+    "failed_games": 0,
+    "coordinator_busy_microseconds_per_evaluation": 234,
+    "coordinator_instructions_per_cycle_performance": 3.96,
+    "game_instructions_per_cycle_performance": 3.07,
+    "coordinator_wait_for_a_core_per_cpu_second": 0.034,
+    "game_wait_for_a_core_per_cpu_second": 0.256,
+    "load_windows": [
+     {
+      "batch_cores": 10.22,
+      "other_cores": 2.68
+     },
+     {
+      "batch_cores": 11.02,
+      "other_cores": 2.0
+     },
+     {
+      "batch_cores": 10.87,
+      "other_cores": 2.02
+     },
+     {
+      "batch_cores": 10.66,
+      "other_cores": 2.26
+     },
+     {
+      "batch_cores": 10.32,
+      "other_cores": 2.36
+     },
+     {
+      "batch_cores": 10.44,
+      "other_cores": 1.89
+     },
+     {
+      "batch_cores": 10.87,
+      "other_cores": 1.21
+     },
+     {
+      "batch_cores": 11.01,
+      "other_cores": 1.23
+     },
+     {
+      "batch_cores": 11.33,
+      "other_cores": 1.24
+     },
+     {
+      "batch_cores": 10.76,
+      "other_cores": 1.55
+     },
+     {
+      "batch_cores": 8.73,
+      "other_cores": 1.13
+     },
+     {
+      "batch_cores": 4.9,
+      "other_cores": 1.21
+     }
+    ]
+   },
+   "after2": {
+    "games": 24,
+    "decisions": 26067,
+    "playing_s": 383.0,
+    "decisions_per_hour": 244993,
+    "games_per_hour": 225.6,
+    "positions_per_round": 5.25,
+    "coordinator_busy": 0.896,
+    "batch_cores": 9.78,
+    "other_cores_median": 2.01,
+    "game_cpu_ms_per_decision": 115.2,
+    "game_pcore_ms_per_decision": 101.6,
+    "coordinator_cpu_ms_per_decision": 12.8,
+    "game_minstr_per_decision": 1102,
+    "coordinator_minstr_per_decision": 175,
+    "game_pcore_share": 0.807,
+    "peak_memory_gb": 4.46,
+    "failed_games": 0,
+    "coordinator_busy_microseconds_per_evaluation": 241,
+    "coordinator_instructions_per_cycle_performance": 3.8,
+    "game_instructions_per_cycle_performance": 2.86,
+    "coordinator_wait_for_a_core_per_cpu_second": 0.042,
+    "game_wait_for_a_core_per_cpu_second": 0.228,
+    "load_windows": [
+     {
+      "batch_cores": 11.49,
+      "other_cores": 1.16
+     },
+     {
+      "batch_cores": 10.17,
+      "other_cores": 1.81
+     },
+     {
+      "batch_cores": 9.14,
+      "other_cores": 3.07
+     },
+     {
+      "batch_cores": 9.4,
+      "other_cores": 2.56
+     },
+     {
+      "batch_cores": 9.57,
+      "other_cores": 2.32
+     },
+     {
+      "batch_cores": 9.83,
+      "other_cores": 2.05
+     },
+     {
+      "batch_cores": 10.22,
+      "other_cores": 1.89
+     },
+     {
+      "batch_cores": 10.19,
+      "other_cores": 1.74
+     },
+     {
+      "batch_cores": 9.89,
+      "other_cores": 1.73
+     },
+     {
+      "batch_cores": 9.18,
+      "other_cores": 2.04
+     },
+     {
+      "batch_cores": 8.5,
+      "other_cores": 2.01
+     }
+    ]
+   }
+  }
+ },
+ "coordinator_replay": {
+  "setup": "tools/replay_coordinator_rounds.py, the 1,536 rounds saved by the 16 November coordinator profile, random-filled 64x2 weights, one tensor thread, 15 timed passes after a warm-up; beside nothing, or beside 8 processes playing random games of the code before or after this change, in the order listed",
+  "runs": [
+   {
+    "order": 1,
+    "beside": "nothing",
+    "median_microseconds_per_round": 968,
+    "pass_seconds": [
+     1.5889,
+     1.5402,
+     1.4914,
+     1.4975,
+     1.5363,
+     1.5034,
+     1.4758,
+     1.4244,
+     1.423,
+     1.4708,
+     1.4859,
+     1.4873,
+     1.4989,
+     1.4171,
+     1.4201
+    ]
+   },
+   {
+    "order": 2,
+    "beside": "random games of the code before",
+    "median_microseconds_per_round": 1044,
+    "pass_seconds": [
+     1.7466,
+     1.7224,
+     1.7188,
+     1.7155,
+     1.668,
+     1.6608,
+     1.604,
+     1.555,
+     1.5625,
+     1.6072,
+     1.5683,
+     1.5539,
+     1.5212,
+     1.5087,
+     1.4954
+    ]
+   },
+   {
+    "order": 3,
+    "beside": "random games of this change",
+    "median_microseconds_per_round": 973,
+    "pass_seconds": [
+     1.5996,
+     1.5674,
+     1.6164,
+     1.6233,
+     1.6043,
+     1.5091,
+     1.4931,
+     1.4485,
+     1.425,
+     1.5173,
+     1.4399,
+     1.4691,
+     1.4456,
+     1.494,
+     1.432
+    ]
+   },
+   {
+    "order": 4,
+    "beside": "random games of the code before",
+    "median_microseconds_per_round": 967,
+    "pass_seconds": [
+     1.6149,
+     1.5811,
+     1.5792,
+     1.5771,
+     1.5564,
+     1.5358,
+     1.5039,
+     1.466,
+     1.4854,
+     1.4616,
+     1.4004,
+     1.4046,
+     1.4303,
+     1.4669,
+     1.4607
+    ]
+   },
+   {
+    "order": 5,
+    "beside": "random games of this change",
+    "median_microseconds_per_round": 1013,
+    "pass_seconds": [
+     1.6647,
+     1.6341,
+     1.6652,
+     1.5972,
+     1.6289,
+     1.5638,
+     1.6406,
+     1.4594,
+     1.473,
+     1.5567,
+     1.4892,
+     1.5018,
+     1.4495,
+     1.4246,
+     1.4261
+    ]
+   },
+   {
+    "order": 6,
+    "beside": "nothing",
+    "median_microseconds_per_round": 972,
+    "pass_seconds": [
+     1.467,
+     1.4928,
+     1.469,
+     1.5581,
+     1.4387,
+     1.523,
+     1.6473,
+     1.6039,
+     1.5968,
+     1.6798,
+     1.6201,
+     1.4616,
+     1.4597,
+     1.4588,
+     1.4492
+    ]
+   },
+   {
+    "order": 7,
+    "beside": "random games of the code before",
+    "median_microseconds_per_round": 968,
+    "pass_seconds": [
+     1.5932,
+     1.5818,
+     1.6008,
+     1.6524,
+     1.5989,
+     1.6171,
+     1.4873,
+     1.4522,
+     1.4684,
+     1.5194,
+     1.4488,
+     1.4625,
+     1.4343,
+     1.4713,
+     1.4571
+    ]
+   },
+   {
+    "order": 8,
+    "beside": "random games of this change",
+    "median_microseconds_per_round": 965,
+    "pass_seconds": [
+     1.5837,
+     1.5872,
+     1.5666,
+     1.6773,
+     1.5935,
+     1.5183,
+     1.4829,
+     1.458,
+     1.4248,
+     1.4785,
+     1.4201,
+     1.445,
+     1.4537,
+     1.491,
+     1.4522
+    ]
+   }
+  ]
+ },
+ "checks": {
+  "ctest": "26 of 26 passed (build/release)",
+  "python": "467 tests OK, 6 skipped"
+ }
+}

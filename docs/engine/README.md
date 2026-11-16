@@ -208,6 +208,13 @@ engine builds the list once and shares it between copies.
 
 ## 9. How the engine is checked
 
+- **Before every step** the engine looks the chosen move up in the position's
+  list of moves, by its exact text, and refuses a move that is not there
+  (`Engine::step`). A rule module that would check a move against its own
+  options again skips that check for the move the engine has just found
+  (`MenuCheckedAction` in `include/game/campaign.hpp`). A move a module builds
+  for itself, such as the purchase a railroad consent completes, it still
+  checks.
 - **After every step** the engine validates the new state's structure
   (`State::validate`).
 - **Rule checks across modules** (`campaignInvariantFailures` in

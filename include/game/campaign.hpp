@@ -40,6 +40,8 @@ struct FactionDefinition {
 struct IndexedGeography {
     std::vector<Id> nodeIds;
     std::unordered_map<Id, std::size_t> nodeIndices;
+    std::vector<char> land;  // Per node, in nodeIds order: whether its type is land.
+    std::vector<Id> landIds;  // The land nodes, in nodeIds order.
     std::vector<std::vector<std::size_t>> adjacency;
     std::vector<std::vector<int>> hopDistances;  // -1 means unreachable.
     // Per node, in nodeIds order, for rules that read the map inside move
@@ -408,6 +410,22 @@ class Rules {
     // on to the module it wraps. A rules profile may also take steps that offer
     // no choice; they become part of the transition that made them possible.
     virtual void settle(State&) const {}
+};
+
+// While open, marks the action Engine::step is applying as one it found in the
+// complete menu of the position it applies it to. A rule that checks an action
+// by listing its own menu again may skip that check for the marked Action
+// object; an action a rule builds for itself is not marked and is checked.
+class MenuCheckedAction {
+  public:
+    explicit MenuCheckedAction(const Action&);
+    ~MenuCheckedAction();
+    MenuCheckedAction(const MenuCheckedAction&) = delete;
+    MenuCheckedAction& operator=(const MenuCheckedAction&) = delete;
+    static bool marks(const Action&);
+
+  private:
+    const Action* outer_;
 };
 
 class Engine {

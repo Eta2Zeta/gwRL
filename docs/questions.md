@@ -376,13 +376,17 @@ one ([running training on the Mac](design/README.md#92-running-training-on-the-m
 games count 7 + 1 + 1 = 9 cores, which the supervisor accepts. Measured every
 five seconds, they kept 9.9 cores busy in a typical half minute and up to 11.1,
 all ten of the Mac's performance cores. The Mac profile now runs six processes,
-which kept about 8.9 cores busy, because six were chosen by hand from these
-measurements. A command line that adds `--episode-workers 7` overrides the
-profile, and the supervisor would accept it.
+chosen by hand from these measurements, which kept about 8.9 cores busy that
+day ([record](archive/records/nine_core_layouts_2026_11_15.md)). On 16 November,
+with less other work on the Mac, about 2 cores instead of 3, the same six
+processes kept 9.1 to 10.4 cores busy on average in four batches
+([record](archive/records/move_checks_2026_11_16.md#training-batches)). The
+layout's load grows into whatever cores are free. A command line that adds
+`--episode-workers 7` overrides the profile, and the supervisor would accept it.
 
 **Why it matters.** The allowance is there to keep one performance core free
-for everything else. The count does not show whether it is free: the profile
-keeps to it only because its layout was measured. A different network, device,
+for everything else. The count does not show whether it is free, and even a
+layout chosen by measuring it goes over when the Mac is quiet. A different network, device,
 number of games per process or search would change the load without the
 supervisor noticing. The count can also be too strict: with the network on the
 GPU, game threads wait more and use less than they count.
